@@ -120,6 +120,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerLook;
@@ -170,7 +171,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInFinishUsingItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInLeaveBed;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOpenInventory;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
@@ -364,7 +365,8 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInPlayerDigging());
         inbound.bind(MessagePlayInDropHeldItem.class)
                 .bindHandler(new HandlerPlayInDropHeldItem());
-        inbound.bind(MessagePlayInFinishUsingItem.class); // TODO: Handler
+        inbound.bind(MessagePlayInOutFinishUsingItem.class)
+                .bindHandler(new HandlerPlayInFinishUsingItem());
         inbound.bind(MessagePlayInSwapHandItems.class)
                 .bindHandler(new HandlerPlayInSwapHandItems());
         // Provided by CodecPlayInClientStatus
@@ -428,6 +430,7 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutEntityStatus.bind(MessagePlayOutEntityStatus.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutSetOpLevel.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutSetReducedDebug.class);
+        codecPlayOutEntityStatus.bind(MessagePlayInOutFinishUsingItem.class);
         // 0x1c
         outbound.bind(0x1d, CodecPlayOutUnloadChunk.class, MessagePlayOutUnloadChunk.class);
         outbound.bind(0x1e, CodecPlayOutChangeGameState.class, MessagePlayOutChangeGameState.class);

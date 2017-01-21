@@ -182,14 +182,18 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
     }
 
     private void writeEntry(String key, Object object) throws IOException {
-        byte type = this.typeFor(object);
+        final byte type = typeFor(object);
         this.dos.writeByte(type);
         if (object instanceof Boolean || (object instanceof List && !((List<?>) object).isEmpty()
                 && ((List<?>) object).get(0) instanceof Boolean)) {
             key += BOOLEAN_IDENTIFER;
         }
         this.dos.writeUTF(key);
-        this.writePayload(type, object);
+        try {
+            writePayload(type, object);
+        } catch (Exception e) {
+            throw new IOException("Exception while serializing key: " + key, e);
+        }
     }
 
     private byte typeFor(Object object) {

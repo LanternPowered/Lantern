@@ -23,16 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.item.behavior.vanilla;
 
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.behavior.Behavior;
+import org.lanternpowered.server.behavior.BehaviorContext;
+import org.lanternpowered.server.behavior.BehaviorResult;
+import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.ItemStack;
 
-/**
- * When a {@link Player} stops using a {@link ItemStack}, this will only be send
- * for items that have a action that takes some time, like drawing a bow, eating food.
- */
-public final class MessagePlayInFinishUsingItem implements Message {
+import java.util.Optional;
 
+public class ShieldInteractionBehavior implements InteractWithItemBehavior {
+
+    @Override
+    public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
+        final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
+        if (optPlayer.isPresent()) {
+            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.tryGet(Parameters.INTERACTION_HAND)));
+            return BehaviorResult.SUCCESS;
+        }
+        return BehaviorResult.PASS;
+    }
 }

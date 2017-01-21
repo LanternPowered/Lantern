@@ -30,7 +30,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.item.PropertyProviders.armorType;
 import static org.lanternpowered.server.item.PropertyProviders.dualWield;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
+import static org.lanternpowered.server.item.PropertyProviders.maximumUseDuration;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
+import static org.lanternpowered.server.item.PropertyProviders.useDuration;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -47,6 +49,7 @@ import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.ItemTypeBuilder;
@@ -54,7 +57,10 @@ import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.TranslationProvider;
 import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.EatingInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.food.GoldenAppleConsumer;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.ArmorType;
@@ -68,6 +74,8 @@ import org.spongepowered.api.data.type.GoldenApples;
 import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.ToolTypes;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -86,7 +94,8 @@ import java.util.function.Function;
         EquipmentTypeRegistryModule.class,
         ToolTypeRegistryModule.class,
         FishRegistryModule.class,
-        CookedFishRegistryModule.class
+        CookedFishRegistryModule.class,
+        PotionEffectTypeRegistryModule.class,
 })
 public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
 
@@ -175,12 +184,16 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////
         register(260, builder()
                 .translation("item.apple.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
                 .build("minecraft", "apple"));
         ///////////////////
         ///     Bow     ///
         ///////////////////
         register(261, durableBuilder()
                 .translation("item.bow.name")
+                .properties(builder -> builder.add(maximumUseDuration(72000)))
                 .build("minecraft", "bow"));
         ///////////////////
         ///    Arrow    ///
@@ -323,6 +336,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////
         register(282, builder()
                 .translation("item.mushroomStew.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(6).saturation(0.6)
+                                .restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
                 .build("minecraft", "mushroom_stew"));
         /////////////////////
         ///  Golden Sword ///
@@ -417,6 +434,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(297, builder()
                 .translation("item.bread.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(5).saturation(0.6)))
                 .build("minecraft", "bread"));
         //////////////////////////
         ///   Leather Helmet   ///
@@ -549,12 +569,18 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(319, builder()
                 .translation("item.porkchopRaw.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
                 .build("minecraft", "porkchop"));
         /////////////////////////
         ///  Cooked Porkchop  ///
         /////////////////////////
         register(320, builder()
                 .translation("item.porkchopCooked.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(8).saturation(0.8)))
                 .build("minecraft", "cooked_porkchop"));
         /////////////////////////
         ///      Painting     ///
@@ -570,6 +596,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.GOLDEN_APPLE_TYPE, GoldenApples.GOLDEN_APPLE)
                 )
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(4).saturation(1.2)
+                                .consumer(new GoldenAppleConsumer()).alwaysConsumable(true)))
                 .build("minecraft", "golden_apple"));
         /////////////////////
         ///      Sign     ///
@@ -717,18 +747,21 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////
         register(345, builder()
                 .translation("item.compass.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "compass"));
         ///////////////////////
         ///   Fishing Rod   ///
         ///////////////////////
         register(346, builder()
                 .translation("item.fishingRod.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "fishing_rod"));
         /////////////////
         ///   Clock   ///
         /////////////////
         register(347, builder()
                 .translation("item.clock.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "clock"));
         //////////////////////////
         ///   Glowstone Dust   ///
@@ -743,6 +776,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.FISH_TYPE, Fishes.COD).notRemovable())
                 .translation(TranslationProvider.of(Fishes.COD, Keys.FISH_TYPE))
+                .properties(builder -> builder.add(useDuration(32)))
+                // TODO: Make edible
                 .build("minecraft", "fish"));
         ///////////////////////
         ///   Cooked Fish   ///
@@ -751,6 +786,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.COOKED_FISH, CookedFishes.COD).notRemovable())
                 .translation(TranslationProvider.of(CookedFishes.COD, Keys.COOKED_FISH))
+                .properties(builder -> builder.add(useDuration(32)))
+                // TODO: Make edible
                 .build("minecraft", "cooked_fish"));
         ///////////////
         ///   Dye   ///
@@ -777,12 +814,14 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////
         register(354, builder()
                 .translation("item.cake.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "cake"));
         ///////////////
         ///   Bed   ///
         ///////////////
         register(355, builder()
                 .translation("item.bed.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "bed"));
         ////////////////////
         ///   Repeater   ///
@@ -795,24 +834,32 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(357, builder()
                 .translation("item.cookie.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(2).saturation(0.1)))
                 .build("minecraft", "cookie"));
         //////////////////////
         ///   Filled Map   ///
         //////////////////////
         register(358, builder()
                 .translation("item.map.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "filled_map"));
         //////////////////
         ///   Shears   ///
         //////////////////
         register(359, builder()
                 .translation("item.shears.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "shears"));
         /////////////////
         ///   Melon   ///
         /////////////////
         register(360, builder()
                 .translation("item.melon.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)))
                 .build("minecraft", "melon"));
         /////////////////////////
         ///   Pumpkin Seeds   ///
@@ -831,36 +878,54 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////
         register(363, builder()
                 .translation("item.beefRaw.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
                 .build("minecraft", "beef"));
         ///////////////////////
         ///   Cooked Beef   ///
         ///////////////////////
         register(364, builder()
                 .translation("item.beefCooked.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(8).saturation(0.8)))
                 .build("minecraft", "cooked_beef"));
         ///////////////////
         ///   Chicken   ///
         ///////////////////
         register(365, builder()
                 .translation("item.chickenRaw.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)
+                                .potionEffect(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .build("minecraft", "chicken"));
         //////////////////////////
         ///   Cooked Chicken   ///
         //////////////////////////
         register(366, builder()
                 .translation("item.chickenCooked.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(6).saturation(0.6)))
                 .build("minecraft", "cooked_chicken"));
         ////////////////////////
         ///   Rotten Flesh   ///
         ////////////////////////
         register(367, builder()
                 .translation("item.rottenFlesh.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(4).saturation(0.1)
+                                .potionEffect(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .build("minecraft", "rotten_flesh"));
         ///////////////////////
         ///   Ender Pearl   ///
         ///////////////////////
         register(368, builder()
                 .translation("item.enderPearl.name")
+                .maxStackQuantity(16)
                 .build("minecraft", "ender_pearl"));
         /////////////////////
         ///   Blaze Rod   ///
@@ -903,6 +968,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////
         register(375, builder()
                 .translation("item.spiderEye.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(2).saturation(0.8)
+                                .potionEffect(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
                 .build("minecraft", "spider_eye"));
         ////////////////////////////////
         ///   Fermented Spider Eye   ///
@@ -969,6 +1038,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         register(386, builder()
                 .translation("item.writingBook.name")
+                .maxStackQuantity(1)
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.BOOK_PAGES, null))
                 .build("minecraft", "writable_book"));
@@ -977,6 +1047,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////
         register(387, builder()
                 .translation("item.writtenBook.name")
+                .maxStackQuantity(1)
                 .keysProvider(valueContainer -> {
                     valueContainer.registerKey(Keys.BOOK_PAGES, null);
                     valueContainer.registerKey(Keys.BOOK_AUTHOR, null);
@@ -1008,24 +1079,37 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(391, builder()
                 .translation("item.carrots.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(3).saturation(0.6)))
                 .build("minecraft", "carrot"));
         //////////////////
         ///   Potato   ///
         //////////////////
         register(392, builder()
                 .translation("item.potato.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(1).saturation(0.3)))
                 .build("minecraft", "potato"));
         ////////////////////////
         ///   Baked Potato   ///
         ////////////////////////
         register(393, builder()
                 .translation("item.potatoBaked.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(5).saturation(0.6)))
                 .build("minecraft", "baked_potato"));
         ////////////////////////////
         ///   Poisonous Potato   ///
         ////////////////////////////
         register(394, builder()
                 .translation("item.potatoPoisonous.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)
+                                .potionEffect(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
                 .build("minecraft", "poisonous_potato"));
         ///////////////
         ///   Map   ///
@@ -1038,6 +1122,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         register(396, builder()
                 .translation("item.carrotGolden.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(6).saturation(1.2)))
                 .build("minecraft", "golden_carrot"));
         /////////////////
         ///   Skull   ///
@@ -1054,6 +1141,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////////
         register(398, builder()
                 .translation("item.carrotOnAStick.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "carrot_on_a_stick"));
         ///////////////////////
         ///   Nether Star   ///
@@ -1066,6 +1154,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(400, builder()
                 .translation("item.pumpkinPie.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(8).saturation(0.3)))
                 .build("minecraft", "pumpkin_pie"));
         ////////////////////
         ///  Fireworks   ///
@@ -1145,18 +1236,29 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(411, builder()
                 .translation("item.rabbitRaw.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
                 .build("minecraft", "rabbit"));
         /////////////////////////
         ///   Cooked Rabbit   ///
         /////////////////////////
         register(412, builder()
                 .translation("item.rabbitCooked.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(5).saturation(0.6)))
                 .build("minecraft", "cooked_rabbit"));
         ///////////////////////
         ///   Rabbit Stew   ///
         ///////////////////////
         register(413, builder()
                 .translation("item.rabbitStew.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(10).saturation(0.6)
+                                .restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
+                .maxStackQuantity(1)
                 .build("minecraft", "rabbit_stew"));
         ///////////////////////
         ///   Rabbit Foot   ///
@@ -1181,18 +1283,21 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////////
         register(417, builder()
                 .translation("item.horsearmormetal.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "iron_horse_armor"));
         //////////////////////////////
         ///   Golden Horse Armor   ///
         //////////////////////////////
         register(418, builder()
                 .translation("item.horsearmorgold.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "golden_horse_armor"));
         ///////////////////////////////
         ///   Diamond Horse Armor   ///
         ///////////////////////////////
         register(419, builder()
                 .translation("item.horsearmordiamond.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "diamond_horse_armor"));
         ////////////////
         ///   Lead   ///
@@ -1218,12 +1323,20 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(423, builder()
                 .translation("item.muttonRaw.name")
+                .properties(builder ->
+                        builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)))
                 .build("minecraft", "mutton"));
         /////////////////////////
         ///   Cooked Mutton   ///
         /////////////////////////
         register(424, builder()
                 .translation("item.muttonCooked.name")
+                .properties(builder ->
+                        builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(6).saturation(0.8)))
                 .build("minecraft", "cooked_mutton"));
         //////////////////
         ///   Banner   ///
@@ -1273,6 +1386,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////
         register(432, builder()
                 .translation("item.chorusFruit.name")
+                .properties(builder ->
+                        builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(4).saturation(0.3).alwaysConsumable(true)))
+                // TODO: Add random teleport consumer behavior
                 .build("minecraft", "chorus_fruit"));
         ///////////////////////////////
         ///   Chorus Fruit Popped   ///
@@ -1285,6 +1403,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////
         register(434, builder()
                 .translation("item.beetroot.name")
+                .properties(builder ->
+                        builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(1).saturation(0.6)))
                 .build("minecraft", "beetroot"));
         //////////////////////////
         ///   Beetroot Seeds   ///
@@ -1297,6 +1419,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         register(436, builder()
                 .translation("item.beetroot_soup.name")
+                .properties(builder -> builder.add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new EatingInteractionBehavior().food(6).saturation(0.6)
+                                .restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
+                .maxStackQuantity(1)
                 .build("minecraft", "beetroot_soup"));
         /////////////////////////
         ///   Dragon Breath   ///
@@ -1335,6 +1462,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(442, durableBuilder()
                 .translation("item.shield.name")
+                .behaviors(pipeline -> pipeline
+                        .add(new ShieldInteractionBehavior()))
                 .build("minecraft", "shield"));
         //////////////////
         ///   Elytra   ///

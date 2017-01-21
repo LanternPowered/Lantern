@@ -36,7 +36,7 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInFinishUsingItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
 
@@ -57,7 +57,7 @@ public final class CodecPlayInPlayerDigging implements Codec<Message> {
             case 4:
                 return new MessagePlayInDropHeldItem(action == 3);
             case 5:
-                return new MessagePlayInFinishUsingItem();
+                return new MessagePlayInOutFinishUsingItem();
             case 6:
                 return new MessagePlayInSwapHandItems();
             default:

@@ -25,6 +25,10 @@
  */
 package org.lanternpowered.server.item;
 
+import org.lanternpowered.server.item.property.CooldownProperty;
+import org.lanternpowered.server.item.property.DualWieldProperty;
+import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
+import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
 import org.spongepowered.api.data.property.item.ToolTypeProperty;
@@ -36,6 +40,33 @@ public final class PropertyProviders {
 
     private static final DualWieldProperty DUAL_WIELD_PROPERTY_TRUE = new DualWieldProperty(true);
     private static final DualWieldProperty DUAL_WIELD_PROPERTY_FALSE = new DualWieldProperty(false);
+
+    public static PropertyProviderCollection useDuration(int duration) {
+        return useDuration(duration, duration);
+    }
+
+    public static PropertyProviderCollection useDuration(int minimum, int maximum) {
+        final MaximumUseDurationProperty maxProperty = new MaximumUseDurationProperty(maximum);
+        final MinimumUseDurationProperty minProperty = new MinimumUseDurationProperty(minimum);
+        return PropertyProviderCollection.builder()
+                .add(MaximumUseDurationProperty.class, (itemType, itemStack) -> maxProperty)
+                .add(MinimumUseDurationProperty.class, (itemType, itemStack) -> minProperty)
+                .build();
+    }
+
+    public static PropertyProviderCollection minimumUseDuration(int minimum) {
+        final MinimumUseDurationProperty minProperty = new MinimumUseDurationProperty(minimum);
+        return PropertyProviderCollection.builder()
+                .add(MinimumUseDurationProperty.class, (itemType, itemStack) -> minProperty)
+                .build();
+    }
+
+    public static PropertyProviderCollection maximumUseDuration(int maximum) {
+        final MaximumUseDurationProperty maxProperty = new MaximumUseDurationProperty(maximum);
+        return PropertyProviderCollection.builder()
+                .add(MaximumUseDurationProperty.class, (itemType, itemStack) -> maxProperty)
+                .build();
+    }
 
     public static PropertyProviderCollection cooldown(int cooldown) {
         final CooldownProperty property = new CooldownProperty(cooldown);

@@ -26,6 +26,7 @@
 package org.lanternpowered.server.data.key;
 
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBoundedValueKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
@@ -36,8 +37,10 @@ import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
+import org.spongepowered.api.data.value.mutable.OptionalValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -105,6 +108,12 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("CanWallJump"), "lantern:can_wall_jump");
     public static final Key<Value<Boolean>> CAN_DUAL_WIELD =
             makeValueKey(Boolean.class, DataQuery.of("CanDualWield"), "lantern:can_dual_wield");
+    public static final Key<OptionalValue<HandType>> ACTIVE_HAND =
+            makeOptionalKey(HandType.class, DataQuery.of("ActiveHand"), "lantern:active_hand");
+    public static final Key<MutableBoundedValue<Integer>> MAX_FOOD_LEVEL =
+            makeMutableBoundedValueKey(Integer.class, DataQuery.of("MaxFoodLevel"), "lantern:max_food_level");
+    public static final Key<MutableBoundedValue<Double>> MAX_SATURATION =
+            makeMutableBoundedValueKey(Double.class, DataQuery.of("MaxSaturation"), "lantern:max_saturation");
 
     private LanternKeys() {
     }

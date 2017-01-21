@@ -39,11 +39,15 @@ import java.util.List;
 
 public class LanternFireworkEffectBuilder implements FireworkEffect.Builder {
 
-    private boolean trail = false;
-    private boolean flicker = false;
-    private List<Color> colors = new ArrayList<>();
-    private List<Color> fades = new ArrayList<>();
-    private FireworkShape shape = FireworkShapes.BALL;
+    private boolean trail;
+    private boolean flicker;
+    private List<Color> colors;
+    private List<Color> fades;
+    private FireworkShape shape;
+
+    public LanternFireworkEffectBuilder() {
+        reset();
+    }
 
     @Override
     public LanternFireworkEffectBuilder trail(boolean trail) {
@@ -116,7 +120,7 @@ public class LanternFireworkEffectBuilder implements FireworkEffect.Builder {
 
     @Override
     public FireworkEffect.Builder from(FireworkEffect value) {
-        return this.trail(value.hasTrail())
+        return trail(value.hasTrail())
                 .colors(value.getColors())
                 .fades(value.getFadeColors())
                 .shape(value.getShape())
@@ -127,8 +131,8 @@ public class LanternFireworkEffectBuilder implements FireworkEffect.Builder {
     public LanternFireworkEffectBuilder reset() {
         this.trail = false;
         this.flicker = false;
-        this.colors = Lists.newArrayList();
-        this.fades = Lists.newArrayList();
+        this.colors = new ArrayList<>();
+        this.fades = new ArrayList<>();
         this.shape = FireworkShapes.BALL;
         return this;
     }

@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item;
+package org.lanternpowered.server.item.property;
 
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.spongepowered.api.data.property.BooleanProperty;

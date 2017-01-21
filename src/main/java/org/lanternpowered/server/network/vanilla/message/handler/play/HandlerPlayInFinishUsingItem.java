@@ -23,50 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.asset;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.api.asset.Asset;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 
-import java.net.URL;
-import java.nio.file.Path;
-
-final class LanternAsset implements Asset {
-
-    private final PluginContainer plugin;
-    private final String id;
-    final Path path;
-    private final URL url;
-
-    LanternAsset(PluginContainer plugin, String id, Path path, URL url) {
-        this.plugin = plugin;
-        this.path = path;
-        this.url = url;
-        this.id = id;
-    }
+public class HandlerPlayInFinishUsingItem implements Handler<MessagePlayInOutFinishUsingItem> {
 
     @Override
-    public PluginContainer getOwner() {
-        return this.plugin;
-    }
-
-    @Override
-    public URL getUrl() {
-        return this.url;
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("plugin", this.plugin.getId())
-                .add("id", this.id)
-                .add("url", this.url.toString())
-                .toString();
+    public void handle(NetworkContext context, MessagePlayInOutFinishUsingItem message) {
+        context.getSession().getPlayer().getInteractionHandler().handleFinishItemInteraction(message);
     }
 }

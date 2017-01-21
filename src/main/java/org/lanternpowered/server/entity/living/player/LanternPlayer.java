@@ -93,6 +93,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
+import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -280,6 +281,10 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public void registerKeys() {
         super.registerKeys();
+        registerKey(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
+        registerKey(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
+        registerKey(LanternKeys.MAX_SATURATION, 40.0, 0.0, Double.MAX_VALUE);
+        registerKey(Keys.SATURATION, 40.0, 0.0, LanternKeys.MAX_SATURATION);
         registerKey(Keys.LAST_DATE_PLAYED, null);
         registerKey(Keys.FIRST_DATE_PLAYED, null);
         registerKey(Keys.IS_FLYING, false).notRemovable();
@@ -298,6 +303,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(LanternKeys.CAN_WALL_JUMP, false).notRemovable();
         registerKey(LanternKeys.CAN_DUAL_WIELD, false).notRemovable();
         registerKey(LanternKeys.SCORE, 0).notRemovable();
+        registerKey(LanternKeys.ACTIVE_HAND, Optional.empty()).notRemovable();
         registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
                     this.statisticMap.setStatisticValues(map);
@@ -715,7 +721,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public void sendMessage(Text message) {
-        this.sendMessage(ChatTypes.CHAT, message);
+        sendMessage(ChatTypes.CHAT, message);
     }
 
     @Override

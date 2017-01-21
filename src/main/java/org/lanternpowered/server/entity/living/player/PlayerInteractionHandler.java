@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
+
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
@@ -35,11 +37,16 @@ import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.item.DualWieldProperty;
+import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.LanternItemType;
+import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
+import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
@@ -62,6 +69,7 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -92,6 +100,11 @@ public final class PlayerInteractionHandler {
 
     private long lastInteractionTime = -1;
 
+    @Nullable private HandType lastActiveHand;
+    @Nullable private ItemStack lastActiveItemStack;
+
+    private long activeHandStartTime = -1L;
+
     public PlayerInteractionHandler(LanternPlayer player) {
         this.player = player;
     }
@@ -114,6 +127,34 @@ public final class PlayerInteractionHandler {
             if (this.lastBreakState != breakState) {
                 sendBreakUpdate(breakState);
                 this.lastBreakState = breakState;
+            }
+        }
+        final HandType activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty()).orElse(null);
+        final LanternSlot slot = activeHand == null ? null : activeHand == HandTypes.MAIN_HAND ?
+                this.player.getInventory().getHotbar().getSelectedSlot() : this.player.getInventory().getOffhand();
+        // The interaction just started
+        if (!Objects.equals(activeHand, this.lastActiveHand)) {
+            this.lastActiveHand = activeHand;
+            this.lastActiveItemStack = slot == null ? null : slot.getRawItemStack();
+        } else if (activeHand != null) {
+            if (this.activeHandStartTime == -1L) {
+                this.activeHandStartTime = LanternGame.currentTimeTicks();
+            }
+            //noinspection ConstantConditions
+            final ItemStack itemStack = slot.getRawItemStack();
+            if (itemStack == null || this.lastActiveItemStack != itemStack) {
+                // Stop the interaction
+                resetItemUseTime();
+            } else {
+                final MaximumUseDurationProperty property = itemStack.getProperty(MaximumUseDurationProperty.class).orElse(null);
+                if (property != null) {
+                    // Check if the interaction reached it's max time
+                    final long time = LanternGame.currentTimeTicks();
+                    //noinspection ConstantConditions
+                    if (time - this.activeHandStartTime > property.getValue()) {
+                        handleFinishItemInteraction0(slot, activeHand);
+                    }
+                }
             }
         }
     }
@@ -330,9 +371,68 @@ public final class PlayerInteractionHandler {
         this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.MAIN_HAND));
     }
 
+    public void handleFinishItemInteraction(MessagePlayInOutFinishUsingItem message) {
+        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+        // The player is already interacting
+        if (!activeHand.isPresent() || this.activeHandStartTime == -1L) {
+            return;
+        }
+
+        // Try the action of the hotbar item first
+        final LanternSlot slot = activeHand.get() == HandTypes.MAIN_HAND ?
+                this.player.getInventory().getHotbar().getSelectedSlot() : this.player.getInventory().getOffhand();
+
+        final ItemStack rawItemStack = slot.getRawItemStack();
+        if (rawItemStack == null) {
+            return;
+        }
+
+        // Require a minimum amount of ticks for the interaction to succeed
+        final MinimumUseDurationProperty property = rawItemStack.getProperty(MinimumUseDurationProperty.class).orElse(null);
+        if (property != null) {
+            final long time = LanternGame.currentTimeTicks();
+            //noinspection ConstantConditions
+            if (time - this.activeHandStartTime < property.getValue()) {
+                resetItemUseTime();
+                return;
+            }
+        }
+
+        handleFinishItemInteraction0(slot, activeHand.get());
+    }
+
+    private void handleFinishItemInteraction0(LanternSlot slot, HandType handType) {
+        final BehaviorContextImpl context = new BehaviorContextImpl(Cause.source(this.player).build());
+        context.set(Parameters.PLAYER, this.player);
+
+        final Optional<ItemStack> handItem = slot.peek();
+        if (handItem.isPresent()) {
+            final LanternItemType itemType = (LanternItemType) handItem.get().getItem();
+            context.set(Parameters.USED_ITEM_STACK, handItem.get());
+            context.set(Parameters.USED_SLOT, slot);
+            context.set(Parameters.INTERACTION_HAND, handType);
+            context.set(Parameters.ITEM_TYPE, itemType);
+
+            if (context.process(itemType.getPipeline().pipeline(FinishUsingItemBehavior.class),
+                    (ctx, behavior) -> behavior.tryUse(itemType.getPipeline(), ctx))) {
+                context.accept();
+            }
+        }
+
+        resetItemUseTime();
+    }
+
+    private void resetItemUseTime() {
+        this.lastActiveItemStack = null;
+        this.lastActiveHand = null;
+        this.activeHandStartTime = -1L;
+        this.player.offer(LanternKeys.ACTIVE_HAND, Optional.empty());
+    }
+
     public void handleItemInteraction(MessagePlayInPlayerUseItem message) {
+        // Prevent duplicate messages
         final long time = System.currentTimeMillis();
-        if (this.lastInteractionTime != -1 && (time - this.lastInteractionTime) < 40) {
+        if (this.lastInteractionTime != -1L && time - this.lastInteractionTime < 40) {
             return;
         }
         this.lastInteractionTime = time;
@@ -377,6 +477,12 @@ public final class PlayerInteractionHandler {
     }
 
     private boolean handleItemInteraction(BehaviorContextImpl context, BehaviorContextImpl.Snapshot snapshot) {
+        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+        // The player is already interacting
+        if (activeHand.isPresent()) {
+            return true;
+        }
+
         // Try the action of the hotbar item first
         final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
         final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();

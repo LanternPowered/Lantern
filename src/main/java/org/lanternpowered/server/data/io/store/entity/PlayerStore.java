@@ -127,6 +127,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     public void serializeValues(LanternPlayer player, SimpleValueContainer valueContainer, DataView dataView) {
         valueContainer.remove(Keys.IS_SPRINTING);
         valueContainer.remove(Keys.IS_SNEAKING);
+        valueContainer.remove(LanternKeys.ACTIVE_HAND);
         final DataView abilities = dataView.createView(ABILITIES);
         abilities.set(FLYING, (byte) (valueContainer.remove(Keys.IS_FLYING).orElse(false) ? 1 : 0));
         abilities.set(FLYING_SPEED, valueContainer.remove(Keys.FLYING_SPEED).orElse(0.1).floatValue());

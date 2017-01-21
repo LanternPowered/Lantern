@@ -30,6 +30,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetOpLevel;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
@@ -51,6 +52,9 @@ public final class CodecPlayOutEntityStatus implements Codec<Message> {
         } else if (message instanceof MessagePlayOutEntityStatus) {
             entityId = ((MessagePlayOutEntityStatus) message).getEntityId();
             action = ((MessagePlayOutEntityStatus) message).getStatus();
+        } else if (message instanceof MessagePlayInOutFinishUsingItem) {
+            entityId = context.getChannel().attr(CodecPlayOutPlayerJoinGame.PLAYER_ENTITY_ID).get();
+            action = 9;
         } else {
             throw new CodecException("Unsupported message type: " + message.getClass().getName());
         }

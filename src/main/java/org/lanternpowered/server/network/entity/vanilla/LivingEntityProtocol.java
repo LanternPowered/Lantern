@@ -37,19 +37,36 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 
+import java.util.Optional;
+
 public abstract class LivingEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
 
     private float lastHealth;
     private int lastArrowsInEntity;
+    private byte lastHandData;
 
     protected LivingEntityProtocol(E entity) {
         super(entity);
     }
 
+    private byte getHandData() {
+        final Optional<HandType> activeHand = this.entity.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+        byte value;
+        if (activeHand.isPresent()) {
+            value = 0x1;
+            if (activeHand.get() == HandTypes.OFF_HAND) {
+                value |= 0x2;
+            }
+        } else {
+            value = 0;
+        }
+        return value;
+    }
+
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
-        parameterList.add(EntityParameters.Living.HAND_DATA, (byte) 0);
+        parameterList.add(EntityParameters.Living.HAND_DATA, getHandData());
         parameterList.add(EntityParameters.Living.HEALTH, this.entity.get(Keys.HEALTH).map(Double::floatValue).orElse(1f));
         parameterList.add(EntityParameters.Living.ARROWS_IN_ENTITY, this.entity.get(LanternKeys.ARROWS_IN_ENTITY).orElse(0));
         parameterList.add(EntityParameters.Living.POTION_EFFECT_COLOR, 0);
@@ -68,6 +85,11 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
         if (arrowsInEntity != this.lastArrowsInEntity) {
             parameterList.add(EntityParameters.Living.ARROWS_IN_ENTITY, arrowsInEntity);
             this.lastArrowsInEntity = arrowsInEntity;
+        }
+        final byte handData = getHandData();
+        if (handData != this.lastHandData) {
+            parameterList.add(EntityParameters.Living.HAND_DATA, handData);
+            this.lastHandData = handData;
         }
     }
 

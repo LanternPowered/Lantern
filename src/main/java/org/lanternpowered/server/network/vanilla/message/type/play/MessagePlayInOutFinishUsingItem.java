@@ -23,50 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.asset;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.api.asset.Asset;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.net.URL;
-import java.nio.file.Path;
+/**
+ * When a {@link Player} stops using a {@link ItemStack}, this will only be send
+ * for items that have a action that takes some time, like drawing a bow, eating food.
+ */
+public final class MessagePlayInOutFinishUsingItem implements Message {
 
-final class LanternAsset implements Asset {
-
-    private final PluginContainer plugin;
-    private final String id;
-    final Path path;
-    private final URL url;
-
-    LanternAsset(PluginContainer plugin, String id, Path path, URL url) {
-        this.plugin = plugin;
-        this.path = path;
-        this.url = url;
-        this.id = id;
-    }
-
-    @Override
-    public PluginContainer getOwner() {
-        return this.plugin;
-    }
-
-    @Override
-    public URL getUrl() {
-        return this.url;
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("plugin", this.plugin.getId())
-                .add("id", this.id)
-                .add("url", this.url.toString())
-                .toString();
-    }
 }

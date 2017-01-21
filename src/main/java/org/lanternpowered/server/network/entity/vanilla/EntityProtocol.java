@@ -85,9 +85,9 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                 };
     }
 
-    private double lastX;
-    private double lastY;
-    private double lastZ;
+    private long lastX;
+    private long lastY;
+    private long lastZ;
 
     private byte lastYaw;
     private byte lastPitch;
@@ -137,6 +137,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final double y = pos.getY();
         final double z = pos.getZ();
 
+        final long xu = (long) (x * 4096);
+        final long yu = (long) (y * 4096);
+        final long zu = (long) (z * 4096);
+
         final byte yaw = wrapAngle(rot.getY());
         // All living entities have a head rotation and changing the pitch
         // would only affect the head pitch.
@@ -154,30 +158,26 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             this.lastPitch = pitch;
         }
         if (dirtyPos) {
-            double dx = x - this.lastX;
-            double dy = y - this.lastY;
-            double dz = z - this.lastZ;
-            this.lastX = x;
-            this.lastY = y;
-            this.lastZ = z;
+            final long dxu = xu - this.lastX;
+            final long dyu = yu - this.lastY;
+            final long dzu = zu - this.lastZ;
+            this.lastX = xu;
+            this.lastY = yu;
+            this.lastZ = zu;
 
             // Don't send movement messages if the entity
             // is a passengers, otherwise glitches will
             // rule the world.
             if (!this.entity.getVehicle().isPresent()) {
-                if (Math.abs(dx) < 8 && Math.abs(dy) < 8 && Math.abs(dz) < 8) {
-                    int dxu = (int) (dx * 4096);
-                    int dyu = (int) (dy * 4096);
-                    int dzu = (int) (dz * 4096);
-
+                if (Math.abs(dxu) <= Short.MAX_VALUE && Math.abs(dyu) <= Short.MAX_VALUE && Math.abs(dzu) <= Short.MAX_VALUE) {
                     if (dirtyRot) {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
-                                dxu, dyu, dzu, yaw, pitch, false));
+                                (int) dxu, (int) dyu, (int) dzu, yaw, pitch, false));
                         // The rotation is already send
                         dirtyRot = false;
                     } else {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityRelativeMove(entityId,
-                                dxu, dyu, dzu, false));
+                                (int) dxu, (int) dyu, (int) dzu, false));
                     }
                 } else {
                     context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
@@ -194,8 +194,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             final byte headYaw = wrapAngle(headRot.getY());
             if (headYaw != this.lastHeadYaw) {
                 context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, headYaw));
+                this.lastHeadYaw = headYaw;
             }
-            this.lastHeadYaw = headYaw;
         }
         final Vector3d velocity = this.entity.getVelocity();
         final double vx = velocity.getX();

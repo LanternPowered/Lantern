@@ -23,13 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item;
+package org.lanternpowered.server.item.behavior.types;
 
-import org.spongepowered.api.data.property.IntProperty;
+import org.lanternpowered.server.behavior.Behavior;
+import org.lanternpowered.server.behavior.BehaviorContext;
+import org.lanternpowered.server.behavior.BehaviorResult;
+import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 
-public final class CooldownProperty extends IntProperty {
+public interface FinishUsingItemBehavior extends Behavior {
 
-    public CooldownProperty(int value) {
-        super(value);
-    }
+    BehaviorResult tryUse(BehaviorPipeline<Behavior> pipeline, BehaviorContext context);
 }

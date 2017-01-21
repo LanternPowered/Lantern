@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> implements IdentifiableObjectStore<T> {
 
@@ -195,12 +196,14 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
             }
             // TODO: Allow out impl to use integers as amplifier and use a string as effect id,
             // without breaking the official format
-            dataView.set(POTION_EFFECTS, v.stream().map(effect -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
-                    .set(POTION_EFFECT_ID, (byte) ((LanternPotionEffectType) effect.getType()).getInternalId())
-                    .set(POTION_EFFECT_AMPLIFIER, (byte) effect.getAmplifier())
-                    .set(POTION_EFFECT_DURATION, effect.getDuration())
-                    .set(POTION_EFFECT_AMBIENT, (byte) (effect.isAmbient() ? 1 : 0))
-                    .set(POTION_EFFECT_SHOW_PARTICLES, (byte) (effect.getShowParticles() ? 1 : 0))));
+            dataView.set(POTION_EFFECTS, v.stream()
+                    .map(effect -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
+                            .set(POTION_EFFECT_ID, (byte) ((LanternPotionEffectType) effect.getType()).getInternalId())
+                            .set(POTION_EFFECT_AMPLIFIER, (byte) effect.getAmplifier())
+                            .set(POTION_EFFECT_DURATION, effect.getDuration())
+                            .set(POTION_EFFECT_AMBIENT, (byte) (effect.isAmbient() ? 1 : 0))
+                            .set(POTION_EFFECT_SHOW_PARTICLES, (byte) (effect.getShowParticles() ? 1 : 0)))
+                    .collect(Collectors.toList()));
         });
         valueContainer.remove(Keys.FOOD_LEVEL).ifPresent(v -> dataView.set(FOOD_LEVEL, v));
         valueContainer.remove(Keys.EXHAUSTION).ifPresent(v -> dataView.set(EXHAUSTION, v.floatValue()));

@@ -165,7 +165,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public void registerKeys() {
-        //noinspection ConstantConditions
         registerKey(Keys.DISPLAY_NAME, Text.EMPTY);
         registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
         registerKey(Keys.VELOCITY, Vector3d.ZERO).notRemovable();

@@ -33,6 +33,9 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.data.io.store.ObjectStore;
+import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
+import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.effect.particle.LanternParticleEffect;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
@@ -50,12 +53,16 @@ import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -65,6 +72,7 @@ import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
@@ -118,8 +126,16 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 final ItemStackSnapshot snapshot = optSnapshot.get();
                 final Optional<BlockType> blockType = snapshot.getType().getBlock();
                 if (blockType.isPresent()) {
-                    // TODO: Item stack data value
-                    return BlockRegistryModule.get().getStateInternalIdAndData(blockType.get().getDefaultState());
+                    final BlockState state;
+                    if (blockType.get().getDefaultState().getTraits().isEmpty()) {
+                        state = blockType.get().getDefaultState();
+                    } else {
+                        final BlockState.Builder builder = BlockState.builder().blockType(blockType.get());
+                        //noinspection unchecked
+                        snapshot.getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
+                        state = builder.build();
+                    }
+                    return BlockRegistryModule.get().getStateInternalIdAndData(state);
                 } else {
                     return 0;
                 }
@@ -161,6 +177,15 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                     .entityMetadataMessage.getParameterList();
             parameterList.getByteBuffer().ifPresent(ByteBuffer::release);
         }
+    }
+
+    private static int[] toExtraItemData(ItemStack itemStack) {
+        final ObjectStore<LanternItemStack> store = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
+        final DataContainer view = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        store.serialize((LanternItemStack) itemStack, view);
+        final int data = view.getInt(ItemStackStore.DATA).get();
+        final int internalId = ItemRegistryModule.get().getInternalId(itemStack.getItem());
+        return new int[] { internalId, data };
     }
 
     private ICachedMessage preProcess(ParticleEffect effect0) {
@@ -234,9 +259,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         if (extra == null && (defaultItemStackSnapshot = type.getDefaultOption(ParticleOptions.ITEM_STACK_SNAPSHOT)).isPresent()) {
             final Optional<ItemStackSnapshot> optItemStackSnapshot = effect.getOption(ParticleOptions.ITEM_STACK_SNAPSHOT);
             if (optItemStackSnapshot.isPresent()) {
-                final ItemStackSnapshot snapshot = optItemStackSnapshot.get();
-                // TODO: Item damage value
-                extra = new int[]{ItemRegistryModule.get().getInternalId(snapshot.getType()), 0};
+                extra = toExtraItemData(optItemStackSnapshot.get().createStack());
             } else {
                 final Optional<BlockState> optBlockState = effect.getOption(ParticleOptions.BLOCK_STATE);
                 if (optBlockState.isPresent()) {
@@ -244,13 +267,12 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                     final Optional<ItemType> optItemType = blockState.getType().getItem();
                     if (optItemType.isPresent()) {
                         // TODO: Item damage value
-                        extra = new int[]{ItemRegistryModule.get().getInternalId(optItemType.get()), 0};
+                        extra = new int[] { ItemRegistryModule.get().getInternalId(optItemType.get()), 0};
                     } else {
                         return EmptyCachedMessage.INSTANCE;
                     }
                 } else {
-                    final ItemStackSnapshot snapshot = defaultItemStackSnapshot.get();
-                    extra = new int[]{ItemRegistryModule.get().getInternalId(snapshot.getType()), 0};
+                    extra = toExtraItemData(defaultItemStackSnapshot.get().createStack());
                 }
             }
         }

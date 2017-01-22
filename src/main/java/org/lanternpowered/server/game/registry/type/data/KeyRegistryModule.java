@@ -283,7 +283,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("Open"), "sponge:open"));
         register(makeMutableBoundedValueKey(Integer.class, of("PassedBurnTime"), "sponge:passed_burn_time"));
         register(makeMutableBoundedValueKey(Integer.class, of("PassedCookTime"), "sponge:passed_cook_time"));
-        register(makeListKey(EntitySnapshot.class, of("Passengers"), "sponge:passengers"));
+        register(makeListKey(UUID.class, of("Passengers"), "sponge:passengers"));
         register(makeValueKey(Boolean.class, of("Persists"), "sponge:persists"));
         register(makeMutableBoundedValueKey(Integer.class, of("PickupDelay"), "sponge:pickup_delay"));
         register(makeValueKey(PickupRule.class, of("PickupRule"), "sponge:pickup_rule"));

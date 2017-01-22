@@ -477,33 +477,38 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public DataTransactionResult addPassenger(Entity entity) {
+    public boolean hasPassenger(Entity entity) {
         checkNotNull(entity, "entity");
-        final LanternEntity entity1 = (LanternEntity) entity;
-        if (entity1.getVehicle0() != null) {
-            return DataTransactionResult.failNoData();
+        synchronized (this.passengers) {
+            //noinspection SuspiciousMethodCalls
+            return this.passengers.contains(entity);
         }
-        return entity1.setVehicle(this);
     }
 
     @Override
-    public DataTransactionResult removePassenger(Entity entity) {
+    public boolean addPassenger(Entity entity) {
+        checkNotNull(entity, "entity");
+        final LanternEntity entity1 = (LanternEntity) entity;
+        return entity1.getVehicle0() == null && entity1.setVehicle(this);
+    }
+
+    @Override
+    public void removePassenger(Entity entity) {
         checkNotNull(entity, "entity");
         final LanternEntity entity1 = (LanternEntity) entity;
         if (entity1.getVehicle0() != this) {
-            return DataTransactionResult.failNoData();
+            return;
         }
-        return entity1.setVehicle(null);
+        entity1.setVehicle(null);
     }
 
     @Override
-    public DataTransactionResult clearPassengers() {
+    public void clearPassengers() {
         synchronized (this.passengers) {
             for (LanternEntity passenger : this.passengers) {
                 passenger.setVehicle(null);
             }
         }
-        return DataTransactionResult.failNoData();
     }
 
     @Override
@@ -514,10 +519,10 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public DataTransactionResult setVehicle(@Nullable Entity entity) {
+    public boolean setVehicle(@Nullable Entity entity) {
         synchronized (this.passengers) {
             if (this.vehicle == entity) {
-                return DataTransactionResult.failNoData();
+                return false;
             }
             if (this.vehicle != null) {
                 this.vehicle.removePassenger0(this);
@@ -526,7 +531,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
             if (this.vehicle != null) {
                 this.vehicle.addPassenger0(this);
             }
-            return DataTransactionResult.successNoData();
+            return true;
         }
     }
 

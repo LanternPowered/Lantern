@@ -817,7 +817,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                         .add(SaturationProperty.class, new FishForwardingPropertyProvider<>(SaturationProperty.class))
                         .add(ApplicableEffectProperty.class, new FishForwardingPropertyProvider<>(ApplicableEffectProperty.class)))
                 .behaviors(pipeline -> pipeline
-                        .add(new ConsumableInteractionBehavior().ignoreFoodLevel(true)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "fish"));
         ///////////////////////
         ///   Cooked Fish   ///

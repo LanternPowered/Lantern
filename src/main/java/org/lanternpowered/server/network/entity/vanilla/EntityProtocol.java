@@ -410,12 +410,12 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     /**
      * Gets the air level of the entity.
      *
-     * The air is by default 100 because the entities don't even use the air level,
+     * The air is by default 300 because the entities don't even use the air level,
      * except for the players. This method can be overridden if needed.
      *
      * @return The air level
      */
     protected short getAirLevel() {
-        return 100;
+        return 300;
     }
 }

@@ -34,24 +34,19 @@ import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.io.store.IdentifiableObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
+import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.util.DataQueries;
-import org.lanternpowered.server.effect.potion.LanternPotionEffect;
-import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.effect.potion.PotionEffect;
-import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.util.GuavaCollectors;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -197,12 +192,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
             // TODO: Allow out impl to use integers as amplifier and use a string as effect id,
             // without breaking the official format
             dataView.set(POTION_EFFECTS, v.stream()
-                    .map(effect -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
-                            .set(POTION_EFFECT_ID, (byte) ((LanternPotionEffectType) effect.getType()).getInternalId())
-                            .set(POTION_EFFECT_AMPLIFIER, (byte) effect.getAmplifier())
-                            .set(POTION_EFFECT_DURATION, effect.getDuration())
-                            .set(POTION_EFFECT_AMBIENT, (byte) (effect.isAmbient() ? 1 : 0))
-                            .set(POTION_EFFECT_SHOW_PARTICLES, (byte) (effect.getShowParticles() ? 1 : 0)))
+                    .map(PotionEffectSerializer::serialize)
                     .collect(Collectors.toList()));
         });
         valueContainer.remove(Keys.FOOD_LEVEL).ifPresent(v -> dataView.set(FOOD_LEVEL, v));
@@ -242,24 +232,10 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
             if (v.isEmpty()) {
                 return;
             }
-            final PotionEffectTypeRegistryModule module = Lantern.getRegistry().getRegistryModule(PotionEffectTypeRegistryModule.class).get();
-            final List<PotionEffect> potionEffects = new ArrayList<>();
-            for (DataView view : v) {
-                final int internalId = view.getInt(POTION_EFFECT_ID).get() & 0xff;
-                final PotionEffectType type = module.getByInternalId(internalId).orElse(null);
-                if (type == null) {
-                    Lantern.getLogger().warn("Deserialized a potion effect type with unknown id: " + internalId);
-                    continue;
-                }
-                final int amplifier = view.getInt(POTION_EFFECT_AMPLIFIER).get() & 0xff;
-                final int duration = view.getInt(POTION_EFFECT_DURATION).get();
-                final boolean ambient = view.getInt(POTION_EFFECT_AMBIENT).orElse(0) > 0;
-                final boolean showParticles = view.getInt(POTION_EFFECT_SHOW_PARTICLES).orElse(0) > 0;
-                potionEffects.add(new LanternPotionEffect(type, duration, amplifier, ambient, showParticles));
-            }
-            if (!potionEffects.isEmpty()) {
-                valueContainer.set(Keys.POTION_EFFECTS, potionEffects);
-            }
+            valueContainer.set(Keys.POTION_EFFECTS, v.stream()
+                    .map(PotionEffectSerializer::deserialize)
+                    .filter(effect -> effect != null)
+                    .collect(GuavaCollectors.toImmutableList()));
         });
         dataView.getInt(FOOD_LEVEL).ifPresent(v -> valueContainer.set(Keys.FOOD_LEVEL, v));
         dataView.getDouble(EXHAUSTION).ifPresent(v -> valueContainer.set(Keys.EXHAUSTION, v));

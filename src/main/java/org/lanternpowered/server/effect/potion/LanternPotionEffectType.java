@@ -29,12 +29,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.text.translation.Translation;
+
+import java.util.function.BiConsumer;
 
 public class LanternPotionEffectType extends PluginCatalogType.Base.Translatable.Internal implements PotionEffectType {
 
     private final Translation potionTranslation;
+    private final BiConsumer<Entity, PotionEffect> effectConsumer;
+    private boolean instant;
 
     public LanternPotionEffectType(String pluginId, String id, int internalId, String translationKey) {
         this(pluginId, id, id, internalId, translationKey);
@@ -55,15 +61,48 @@ public class LanternPotionEffectType extends PluginCatalogType.Base.Translatable
             Translation translation, Translation potionTranslation) {
         super(pluginId, id, name, translation, internalId);
         this.potionTranslation = checkNotNull(potionTranslation, "potionTranslation");
+        this.effectConsumer = (entity, potionEffect) -> {};
+    }
+
+    public LanternPotionEffectType(String pluginId, String id, int internalId, String translationKey, BiConsumer<Entity, PotionEffect> effectConsumer) {
+        this(pluginId, id, id, internalId, translationKey, effectConsumer);
+    }
+
+    public LanternPotionEffectType(String pluginId, String id, int internalId,
+            Translation translation, Translation potionTranslation, BiConsumer<Entity, PotionEffect> effectConsumer) {
+        this(pluginId, id, id, internalId, translation, potionTranslation, effectConsumer);
+    }
+
+    public LanternPotionEffectType(String pluginId, String id, String name, int internalId, String translationKey,
+            BiConsumer<Entity, PotionEffect> effectConsumer) {
+        this(pluginId, id, name, internalId,
+                tr("effect.%s", translationKey),
+                tr("potion.effect.%s", name), effectConsumer);
+    }
+
+    public LanternPotionEffectType(String pluginId, String id, String name, int internalId,
+            Translation translation, Translation potionTranslation, BiConsumer<Entity, PotionEffect> effectConsumer) {
+        super(pluginId, id, name, translation, internalId);
+        this.potionTranslation = checkNotNull(potionTranslation, "potionTranslation");
+        this.effectConsumer = effectConsumer;
+    }
+
+    public LanternPotionEffectType instant() {
+        this.instant = true;
+        return this;
     }
 
     @Override
     public boolean isInstant() {
-        return false; // TODO
+        return this.instant;
     }
 
     @Override
     public Translation getPotionTranslation() {
         return this.potionTranslation;
+    }
+
+    public BiConsumer<Entity, PotionEffect> getEffectConsumer() {
+        return this.effectConsumer;
     }
 }

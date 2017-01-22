@@ -47,8 +47,8 @@ public final class PotionEffectTypeRegistryModule extends AdditionalInternalPlug
         register(new LanternPotionEffectType("minecraft", "haste", 3, "digSpeed"));
         register(new LanternPotionEffectType("minecraft", "mining_fatigue", 4, "digSlowDown"));
         register(new LanternPotionEffectType("minecraft", "strength", 5, "damageBoost"));
-        register(new LanternPotionEffectType("minecraft", "instant_health", 6, "heal"));
-        register(new LanternPotionEffectType("minecraft", "instant_damage", 7, "harm"));
+        register(new LanternPotionEffectType("minecraft", "instant_health", 6, "heal").instant());
+        register(new LanternPotionEffectType("minecraft", "instant_damage", 7, "harm").instant());
         register(new LanternPotionEffectType("minecraft", "jump_boost", 8, "jump"));
         register(new LanternPotionEffectType("minecraft", "nausea", 9, "confusion"));
         register(new LanternPotionEffectType("minecraft", "regeneration", 10, "regeneration"));

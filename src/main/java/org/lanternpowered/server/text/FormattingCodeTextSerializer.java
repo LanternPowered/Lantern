@@ -56,6 +56,9 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+/**
+ * TODO: Separate the usage of {@link TextColors#RESET} and {@link TextStyles#RESET}.
+ */
 public class FormattingCodeTextSerializer implements org.spongepowered.api.text.serializer.FormattingCodeTextSerializer, LanternTextSerializer {
 
     public static final Object2CharMap<Object> FORMATS_TO_CODE = new Object2CharOpenHashMap<>();

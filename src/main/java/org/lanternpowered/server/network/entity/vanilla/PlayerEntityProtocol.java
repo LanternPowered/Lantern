@@ -185,8 +185,8 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     @Override
     protected short getAirLevel() {
-        final double max = this.entity.get(Keys.MAX_AIR).orElse(100);
-        final double air = this.entity.get(Keys.REMAINING_AIR).orElse(100);
-        return (short) (Math.min(1.0, air / max) * 100);
+        final double max = this.entity.get(Keys.MAX_AIR).orElse(300);
+        final double air = this.entity.get(Keys.REMAINING_AIR).orElse(300);
+        return (short) (Math.min(1.0, air / max) * 300.0);
     }
 }

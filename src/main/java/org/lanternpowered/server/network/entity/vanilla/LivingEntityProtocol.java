@@ -132,10 +132,8 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
                     context.sendToAll(() -> createAddMessage(potionEffect));
                 }
             }
-            this.lastPotionEffects.values().stream()
-                    .filter(potionEffect -> potionEffect.getDuration() - delay > 0)
-                    .forEach(potionEffect -> context.sendToAll(
-                            () -> new MessagePlayOutRemovePotionEffect(getRootEntityId(), potionEffect.getType())));
+            this.lastPotionEffects.values().forEach(potionEffect -> context.sendToAll(
+                    () -> new MessagePlayOutRemovePotionEffect(getRootEntityId(), potionEffect.getType())));
         }
         this.lastPotionSendTime = time;
         this.lastPotionEffects = potionEffectMap;

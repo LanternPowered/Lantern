@@ -34,6 +34,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.stream.Collectors;
 
@@ -67,7 +68,7 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
             valueContainer.set(Keys.POTION_EFFECTS, effects.stream()
                     .map(PotionEffectSerializer::deserialize)
                     .filter(effect -> effect != null)
-                    .collect(Collectors.toList()));
+                    .collect(GuavaCollectors.toImmutableList()));
         });
         dataView.getString(POTION).ifPresent(id -> PotionTypeRegistryModule.get().getById(id).ifPresent(
                 potionType -> valueContainer.set(LanternKeys.POTION_TYPE, potionType)));

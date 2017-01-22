@@ -28,11 +28,16 @@ package org.lanternpowered.server.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class LanternLiving extends LanternEntity implements Living {
@@ -70,5 +75,34 @@ public class LanternLiving extends LanternEntity implements Living {
     @Override
     public Text getTeamRepresentation() {
         return Text.of(getUniqueId().toString());
+    }
+
+    @Override
+    public void pulse() {
+        super.pulse();
+
+        boolean glowing = false;
+        // TODO: Move potion effects to a component? + The key registration
+        final List<PotionEffect> potionEffects = get(Keys.POTION_EFFECTS).get();
+        if (!potionEffects.isEmpty()) {
+            final PotionEffect.Builder builder = PotionEffect.builder();
+            final ImmutableList.Builder<PotionEffect> newPotionEffects = ImmutableList.builder();
+            for (PotionEffect potionEffect : potionEffects) {
+                final boolean instant = potionEffect.getType().isInstant();
+                final int duration = instant ? 1 : potionEffect.getDuration() - 1;
+                if (duration > 0) {
+                    final PotionEffect newPotionEffect = builder.from(potionEffect).duration(duration).build();
+                    ((LanternPotionEffectType) newPotionEffect.getType()).getEffectConsumer().accept(this, newPotionEffect);
+                    if (!instant) {
+                        newPotionEffects.add(newPotionEffect);
+                    }
+                    if (potionEffect.getType() == PotionEffectTypes.GLOWING) {
+                        glowing = true;
+                    }
+                }
+            }
+            offer(Keys.POTION_EFFECTS, newPotionEffects.build());
+        }
+        offer(Keys.GLOWING, glowing);
     }
 }

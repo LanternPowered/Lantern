@@ -27,32 +27,31 @@ package org.lanternpowered.server.data.type;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.item.PropertyProviderCollection;
 import org.spongepowered.api.data.type.CookedFish;
 import org.spongepowered.api.data.type.Fish;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 public class LanternFish extends PluginCatalogType.Base.Translatable.Internal implements Fish {
 
     @Nullable private CookedFish cookedFish;
+    private final PropertyProviderCollection propertyProviderCollection;
 
     public LanternFish(String pluginId, String name, String translation, int internalId) {
+        this(pluginId, name, translation, internalId, builder -> {});
+    }
+
+    public LanternFish(String pluginId, String name, String translation, int internalId,
+            Consumer<PropertyProviderCollection.Builder> propertiesConsumer) {
         super(pluginId, name, translation, internalId);
-    }
-
-    public LanternFish(String pluginId, String name, Translation translation, int internalId) {
-        super(pluginId, name, translation, internalId);
-    }
-
-    public LanternFish(String pluginId, String id, String name, String translation, int internalId) {
-        super(pluginId, id, name, translation, internalId);
-    }
-
-    public LanternFish(String pluginId, String id, String name, Translation translation, int internalId) {
-        super(pluginId, id, name, translation, internalId);
+        final PropertyProviderCollection.Builder builder = PropertyProviderCollection.builder();
+        propertiesConsumer.accept(builder);
+        this.propertyProviderCollection = builder.build();
     }
 
     @Override
@@ -67,5 +66,9 @@ public class LanternFish extends PluginCatalogType.Base.Translatable.Internal im
 
     public void setCookedFish(@Nullable CookedFish cookedFish) {
         this.cookedFish = cookedFish;
+    }
+
+    public PropertyProviderCollection getProperties() {
+        return this.propertyProviderCollection;
     }
 }

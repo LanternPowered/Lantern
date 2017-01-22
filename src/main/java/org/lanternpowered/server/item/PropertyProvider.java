@@ -26,8 +26,16 @@
 package org.lanternpowered.server.item;
 
 import org.spongepowered.api.data.Property;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 @FunctionalInterface
 public interface PropertyProvider<T extends Property> extends ObjectProvider<T> {
 
+    @SuppressWarnings("NullableProblems")
+    @Nullable
+    @Override
+    T get(ItemType itemType, @Nullable ItemStack itemStack);
 }

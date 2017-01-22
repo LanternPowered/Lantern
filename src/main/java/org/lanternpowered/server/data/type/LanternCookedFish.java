@@ -29,32 +29,29 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.item.PropertyProviderCollection;
 import org.spongepowered.api.data.type.CookedFish;
 import org.spongepowered.api.data.type.Fish;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.function.Consumer;
+
 public class LanternCookedFish extends PluginCatalogType.Base.Translatable.Internal implements CookedFish {
 
     private final Fish rawFish;
+    private final PropertyProviderCollection propertyProviderCollection;
 
     public LanternCookedFish(String pluginId, String name, String translation, int internalId, Fish rawFish) {
+        this(pluginId, name, translation, internalId, rawFish, builder -> {});
+    }
+
+    public LanternCookedFish(String pluginId, String name, String translation, int internalId, Fish rawFish,
+            Consumer<PropertyProviderCollection.Builder> propertiesConsumer) {
         super(pluginId, name, translation, internalId);
         this.rawFish = applyRawFish(rawFish);
-    }
-
-    public LanternCookedFish(String pluginId, String name, Translation translation, int internalId, Fish rawFish) {
-        super(pluginId, name, translation, internalId);
-        this.rawFish = applyRawFish(rawFish);
-    }
-
-    public LanternCookedFish(String pluginId, String id, String name, String translation, int internalId, Fish rawFish) {
-        super(pluginId, id, name, translation, internalId);
-        this.rawFish = applyRawFish(rawFish);
-    }
-
-    public LanternCookedFish(String pluginId, String id, String name, Translation translation, int internalId, Fish rawFish) {
-        super(pluginId, id, name, translation, internalId);
-        this.rawFish = applyRawFish(rawFish);
+        final PropertyProviderCollection.Builder builder = PropertyProviderCollection.builder();
+        propertiesConsumer.accept(builder);
+        this.propertyProviderCollection = builder.build();
     }
 
     private Fish applyRawFish(Fish rawFish) {
@@ -71,5 +68,9 @@ public class LanternCookedFish extends PluginCatalogType.Base.Translatable.Inter
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
         return super.toStringHelper().add("rawFish", this.rawFish);
+    }
+
+    public PropertyProviderCollection getProperties() {
+        return this.propertyProviderCollection;
     }
 }

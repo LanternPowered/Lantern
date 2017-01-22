@@ -25,6 +25,10 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
+import static org.lanternpowered.server.item.PropertyProviders.foodRestoration;
+import static org.lanternpowered.server.item.PropertyProviders.saturation;
+import static org.lanternpowered.server.item.PropertyProviders.useDuration;
+
 import org.lanternpowered.server.data.type.LanternCookedFish;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
 import org.spongepowered.api.data.type.CookedFish;
@@ -47,7 +51,13 @@ public class CookedFishRegistryModule extends InternalPluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
-        register(new LanternCookedFish("minecraft", "cod", "item.fish.cod.cooked.name", 0, Fishes.COD));
-        register(new LanternCookedFish("minecraft", "salmon", "item.fish.salmon.cooked.name", 1, Fishes.SALMON));
+        register(new LanternCookedFish("minecraft", "cod", "item.fish.cod.cooked.name", 0, Fishes.COD,
+                builder -> builder
+                        .add(foodRestoration(5))
+                        .add(saturation(0.6))));
+        register(new LanternCookedFish("minecraft", "salmon", "item.fish.salmon.cooked.name", 1, Fishes.SALMON,
+                builder -> builder
+                        .add(foodRestoration(6))
+                        .add(saturation(0.8))));
     }
 }

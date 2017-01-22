@@ -64,11 +64,17 @@ import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractio
 import org.lanternpowered.server.item.behavior.vanilla.ConsumableInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.consumable.CookedFishForwardingPropertyProvider;
+import org.lanternpowered.server.item.behavior.vanilla.consumable.FishForwardingPropertyProvider;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.GoldenAppleEffectsProvider;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider;
+import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
+import org.spongepowered.api.data.property.item.FoodRestorationProperty;
+import org.spongepowered.api.data.property.item.SaturationProperty;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ArmorTypes;
 import org.spongepowered.api.data.type.CoalTypes;
@@ -804,8 +810,14 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.FISH_TYPE, Fishes.COD).notRemovable())
                 .translation(TranslationProvider.of(Fishes.COD, Keys.FISH_TYPE))
-                .properties(builder -> builder.add(useDuration(32)))
-                // TODO: Make edible
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(FoodRestorationProperty.class, new FishForwardingPropertyProvider<>(FoodRestorationProperty.class))
+                        .add(HealthRestorationProperty.class, new FishForwardingPropertyProvider<>(HealthRestorationProperty.class))
+                        .add(SaturationProperty.class, new FishForwardingPropertyProvider<>(SaturationProperty.class))
+                        .add(ApplicableEffectProperty.class, new FishForwardingPropertyProvider<>(ApplicableEffectProperty.class)))
+                .behaviors(pipeline -> pipeline
+                        .add(new ConsumableInteractionBehavior().ignoreFoodLevel(true)))
                 .build("minecraft", "fish"));
         ///////////////////////
         ///   Cooked Fish   ///
@@ -814,8 +826,14 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.COOKED_FISH, CookedFishes.COD).notRemovable())
                 .translation(TranslationProvider.of(CookedFishes.COD, Keys.COOKED_FISH))
-                .properties(builder -> builder.add(useDuration(32)))
-                // TODO: Make edible
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(FoodRestorationProperty.class, new CookedFishForwardingPropertyProvider<>(FoodRestorationProperty.class))
+                        .add(HealthRestorationProperty.class, new CookedFishForwardingPropertyProvider<>(HealthRestorationProperty.class))
+                        .add(SaturationProperty.class, new CookedFishForwardingPropertyProvider<>(SaturationProperty.class))
+                        .add(ApplicableEffectProperty.class, new CookedFishForwardingPropertyProvider<>(ApplicableEffectProperty.class)))
+                .behaviors(pipeline -> pipeline
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "cooked_fish"));
         ///////////////
         ///   Dye   ///

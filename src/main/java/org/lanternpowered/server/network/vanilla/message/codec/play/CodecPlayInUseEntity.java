@@ -54,7 +54,7 @@ public final class CodecPlayInUseEntity implements Codec<MessagePlayInUseEntity>
             final HandType hand = buf.readVarInt() == 0 ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
             return new MessagePlayInUseEntity.Interact(entityId, hand, position);
         } else {
-            throw new DecoderException("Recieved a UseEntity message with a unknown action: " + action);
+            throw new DecoderException("Received a UseEntity message with a unknown action: " + action);
         }
     }
 }

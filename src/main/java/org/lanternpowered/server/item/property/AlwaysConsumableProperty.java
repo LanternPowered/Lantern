@@ -23,39 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.text.format;
+package org.lanternpowered.server.item.property;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.spongepowered.api.data.property.BooleanProperty;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.util.Color;
+public final class AlwaysConsumableProperty extends BooleanProperty {
 
-public final class LanternTextColor extends SimpleCatalogType.Base implements TextColor, FormattingCodeHolder {
-
-    private final Color color;
-    private final char code;
-
-    public LanternTextColor(String name, Color color, char code) {
-        super(name);
-        this.color = checkNotNull(color, "color");
-        this.code = code;
-    }
-
-    @Override
-    public Color getColor() {
-        return this.color;
-    }
-
-    @Override
-    public char getCode() {
-        return this.code;
-    }
-
-    @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper()
-                .add("code", this.code);
+    public AlwaysConsumableProperty(boolean value) {
+        super(value);
     }
 }

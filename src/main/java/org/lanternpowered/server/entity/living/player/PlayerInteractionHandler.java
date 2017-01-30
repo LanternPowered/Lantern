@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
-
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
@@ -40,10 +38,10 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;

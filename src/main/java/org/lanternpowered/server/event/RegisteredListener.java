@@ -27,6 +27,7 @@ package org.lanternpowered.server.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
@@ -64,7 +65,6 @@ final class RegisteredListener<T extends Event> implements LanternEventListener<
         if (this.handler instanceof LanternEventListener) {
             return ((LanternEventListener<?>) this.handler).getHandle();
         }
-
         return this.handler;
     }
 
@@ -78,4 +78,12 @@ final class RegisteredListener<T extends Event> implements LanternEventListener<
         return this.order.compareTo(handler.order);
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("plugin", this.plugin.getId())
+                .add("eventType", this.eventClass.getName())
+                .add("order", this.order.toString())
+                .toString();
+    }
 }

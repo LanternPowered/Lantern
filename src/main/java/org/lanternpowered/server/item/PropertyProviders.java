@@ -28,6 +28,7 @@ package org.lanternpowered.server.item;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
 import org.lanternpowered.server.item.property.CooldownProperty;
 import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
@@ -51,6 +52,9 @@ public final class PropertyProviders {
 
     private static final DualWieldProperty DUAL_WIELD_PROPERTY_TRUE = new DualWieldProperty(true);
     private static final DualWieldProperty DUAL_WIELD_PROPERTY_FALSE = new DualWieldProperty(false);
+
+    private static final AlwaysConsumableProperty ALWAYS_CONSUMABLE_PROPERTY_TRUE = new AlwaysConsumableProperty(true);
+    private static final AlwaysConsumableProperty ALWAYS_CONSUMABLE_PROPERTY_FALSE = new AlwaysConsumableProperty(false);
 
     public static PropertyProviderCollection applicableEffects(PotionEffect... potionEffects) {
         checkNotNull(potionEffects, "potionEffects");
@@ -169,6 +173,20 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(CooldownProperty.class, (itemType, itemStack) ->
                         new CooldownProperty(cooldown.get(itemType, itemStack)))
+                .build();
+    }
+
+    public static PropertyProviderCollection alwaysConsumable(boolean alwaysConsumable) {
+        final AlwaysConsumableProperty property = alwaysConsumable ? ALWAYS_CONSUMABLE_PROPERTY_TRUE : ALWAYS_CONSUMABLE_PROPERTY_FALSE;
+        return PropertyProviderCollection.builder()
+                .add(AlwaysConsumableProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection alwaysConsumable(ObjectProvider<Boolean> alwaysConsumable) {
+        return PropertyProviderCollection.builder()
+                .add(AlwaysConsumableProperty.class, (itemType, itemStack) ->
+                        alwaysConsumable.get(itemType, itemStack) ? ALWAYS_CONSUMABLE_PROPERTY_TRUE : ALWAYS_CONSUMABLE_PROPERTY_FALSE)
                 .build();
     }
 

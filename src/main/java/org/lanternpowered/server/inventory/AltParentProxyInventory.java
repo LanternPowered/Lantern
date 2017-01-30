@@ -319,7 +319,7 @@ public class AltParentProxyInventory extends AbstractInventory {
     }
 
     @Override
-    protected PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack) {
+    public PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack) {
         return this.delegate.peekOfferFastTransactions(stack);
     }
 

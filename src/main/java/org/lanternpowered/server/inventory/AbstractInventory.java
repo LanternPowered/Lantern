@@ -85,7 +85,7 @@ public abstract class AbstractInventory implements IInventory {
      */
     protected abstract FastOfferResult offerFast(ItemStack stack);
 
-    protected abstract PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack);
+    public abstract PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack);
 
     @SuppressWarnings("unchecked")
     @Override

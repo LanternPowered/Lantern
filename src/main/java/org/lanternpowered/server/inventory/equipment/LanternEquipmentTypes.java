@@ -25,6 +25,10 @@
  */
 package org.lanternpowered.server.inventory.equipment;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
@@ -33,6 +37,11 @@ public final class LanternEquipmentTypes {
     public static final EquipmentType MAIN_HAND = DummyObjectProvider.createFor(EquipmentType.class, "MAIN_HAND");
 
     public static final EquipmentType OFF_HAND = DummyObjectProvider.createFor(EquipmentType.class, "OFF_HAND");
+
+    public static EquipmentType forHand(HandType handType) {
+        checkNotNull(handType, "handType");
+        return handType == HandTypes.MAIN_HAND ? MAIN_HAND : OFF_HAND;
+    }
 
     private LanternEquipmentTypes() {
     }

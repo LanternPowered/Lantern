@@ -291,7 +291,7 @@ public final class PluginCandidate {
                             if (majorInstalled != null && (!majorExpected.equals(majorInstalled) ||
                                     installedVersion.compareTo(range.getRecommendedVersion()) < 0)) {
                                 Lantern.getLogger().warn("Plugin {} from {} was designed for {} {}. It may not work properly.",
-                                        this.id, this.source, id, range.getRecommendedVersion());
+                                        this.id, this.source.map(Path::toString).orElse("unknown"), id, range.getRecommendedVersion());
                             }
                         }
 
@@ -306,7 +306,7 @@ public final class PluginCandidate {
         } else {
             if (this.dependenciesWithUnknownVersion.add(id)) {
                 Lantern.getLogger().warn("Cannot check version of dependency {} for plugin {} from {}: Version of dependency unknown",
-                        id, this.id, this.source);
+                        id, this.id, this.source.map(Path::toString).orElse("unknown"));
             }
             return true;
         }

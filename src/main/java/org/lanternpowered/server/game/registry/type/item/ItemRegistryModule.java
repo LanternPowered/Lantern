@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.item;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.item.PropertyProviders.alwaysConsumable;
 import static org.lanternpowered.server.item.PropertyProviders.applicableEffects;
 import static org.lanternpowered.server.item.PropertyProviders.armorType;
 import static org.lanternpowered.server.item.PropertyProviders.dualWield;
@@ -626,9 +627,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                         .add(useDuration(32))
                         .add(foodRestoration(4))
                         .add(saturation(1.2))
-                        .add(applicableEffects(new GoldenAppleEffectsProvider())))
+                        .add(applicableEffects(new GoldenAppleEffectsProvider()))
+                        .add(alwaysConsumable(true)))
                 .behaviors(pipeline -> pipeline
-                        .add(new ConsumableInteractionBehavior().ignoreFoodLevel(true)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "golden_apple"));
         /////////////////////
         ///      Sign     ///
@@ -713,7 +715,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(335, builder()
                 .translation("item.milk.name")
                 .properties(builder -> builder
-                        .add(useDuration(32)))
+                        .add(useDuration(32))
+                        .add(alwaysConsumable(true)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior().consumer(new MilkConsumer())
                                 .restItem(() -> new LanternItemStack(ItemTypes.BUCKET))))
@@ -1024,7 +1027,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(373, potionEffectsBuilder(PotionType::getTranslation)
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(applicableEffects(new PotionEffectsProvider())))
+                        .add(applicableEffects(new PotionEffectsProvider()))
+                        .add(alwaysConsumable(true)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()
                                 .restItem(() -> new LanternItemStack(ItemTypes.GLASS_BOTTLE))))
@@ -1496,9 +1500,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .properties(builder -> builder
                         .add(useDuration(32))
                         .add(foodRestoration(4))
-                        .add(saturation(0.3)))
+                        .add(saturation(0.3))
+                        .add(alwaysConsumable(true)))
                 .behaviors(pipeline -> pipeline
-                        .add(new ConsumableInteractionBehavior().ignoreFoodLevel(true)))
+                        .add(new ConsumableInteractionBehavior()))
                 // TODO: Add random teleport consumer behavior
                 .build("minecraft", "chorus_fruit"));
         ///////////////////////////////

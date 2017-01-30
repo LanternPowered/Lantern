@@ -31,9 +31,13 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
+import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
@@ -41,6 +45,9 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -48,12 +55,10 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.statistic.achievement.Achievements;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -172,13 +177,27 @@ public class LanternItem extends LanternEntity implements Item {
             if (inventory instanceof PlayerInventory) {
                 inventory = ((PlayerInventory) inventory).getMain();
             }
-            final InventoryTransactionResult result = inventory.offer(itemStack);
-            final Collection<ItemStackSnapshot> rejected = result.getRejectedItems();
+            final PeekOfferTransactionsResult result = ((AbstractInventory) inventory).peekOfferFastTransactions(itemStack);
+            final ItemStack rest = result.getOfferResult().getRest();
+            final Cause.Builder cause = Cause.source(entity);
+            cause.named("OriginalItemStack", itemStack);
+            if (rest != null) {
+                cause.named("RestItemStack", rest);
+            }
+            final ChangeInventoryEvent.Pickup event = SpongeEventFactory.createChangeInventoryEventPickup(
+                    cause.build(), this, inventory, result.getTransactions());
+            event.setCancelled(result.getOfferResult().isSuccess());
+            Sponge.getEventManager().post(event);
+            if (event.isCancelled() && !isRemoved()) { // Don't continue if the entity was removed during the event
+                continue;
+            }
+            event.getTransactions().stream()
+                    .filter(Transaction::isValid)
+                    .forEach(transaction -> transaction.getSlot().set(transaction.getFinal().createStack()));
             final int added;
-            if (!rejected.isEmpty()) {
-                final ItemStack itemStack1 = rejected.iterator().next().createStack();
-                added = itemStack.getQuantity() - itemStack1.getQuantity();
-                itemStack = itemStack1;
+            if (rest != null) {
+                added = itemStack.getQuantity() - rest.getQuantity();
+                itemStack = rest;
             } else {
                 added = itemStack.getQuantity();
             }
@@ -198,10 +217,9 @@ public class LanternItem extends LanternEntity implements Item {
                         player.triggerAchievement(Achievements.BLAZE_ROD);
                     }
                 }
-
                 triggerEvent(new CollectEntityEvent((Living) entity, added));
             }
-            if (rejected.isEmpty()) {
+            if (rest == null || isRemoved()) {
                 itemStack = null;
             }
             if (itemStack == null) {

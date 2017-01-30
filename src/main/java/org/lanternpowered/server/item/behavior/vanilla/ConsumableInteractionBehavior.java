@@ -35,6 +35,7 @@ import org.lanternpowered.server.effect.potion.PotionEffectHelper;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
@@ -60,8 +61,6 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
         void apply(Player player, BehaviorPipeline<Behavior> pipeline, BehaviorContext context);
     }
 
-    private boolean ignoreFoodLevel;
-
     @Nullable private Consumer consumer;
     @Nullable private Supplier<ItemStack> restItemSupplier;
 
@@ -70,16 +69,30 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
         final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
         if (optPlayer.isPresent()) {
             final Player player = optPlayer.get();
-            if (!this.ignoreFoodLevel) {
-                final FoodRestorationProperty foodRestorationProperty = context
-                        .tryGet(Parameters.USED_ITEM_STACK).getProperty(FoodRestorationProperty.class).orElse(null);
+            final ItemStack itemStack = context.tryGet(Parameters.USED_ITEM_STACK);
+            final AlwaysConsumableProperty property = itemStack.getProperty(AlwaysConsumableProperty.class).orElse(null);
+            //noinspection ConstantConditions
+            if (property == null || !property.getValue()) {
+                int status = 0;
+                final FoodRestorationProperty foodRestorationProperty = itemStack.getProperty(FoodRestorationProperty.class).orElse(null);
                 //noinspection ConstantConditions
                 if (foodRestorationProperty != null && foodRestorationProperty.getValue() != 0.0) {
                     final int maxFood = player.get(LanternKeys.MAX_FOOD_LEVEL).orElse(1);
                     final int food = player.get(Keys.FOOD_LEVEL).orElse(maxFood);
-                    if (food >= maxFood) {
-                        return BehaviorResult.PASS;
+                    status = food < maxFood ? 2 : 1;
+                }
+                if (status != 2) {
+                    final HealthRestorationProperty healthRestorationProperty = itemStack
+                            .getProperty(HealthRestorationProperty.class).orElse(null);
+                    //noinspection ConstantConditions
+                    if (healthRestorationProperty != null && healthRestorationProperty.getValue() != 0.0) {
+                        final double maxHealth = player.get(Keys.MAX_HEALTH).orElse(1.0);
+                        final double health = player.get(Keys.HEALTH).orElse(maxHealth);
+                        status = health < maxHealth ? 2 : 1;
                     }
+                }
+                if (status == 1) {
+                    return BehaviorResult.PASS;
                 }
             }
             optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.tryGet(Parameters.INTERACTION_HAND)));
@@ -153,11 +166,6 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
 
     public ConsumableInteractionBehavior restItem(Supplier<ItemStack> restItemSupplier) {
         this.restItemSupplier = restItemSupplier;
-        return this;
-    }
-
-    public ConsumableInteractionBehavior ignoreFoodLevel(boolean ignoreFoodLevel) {
-        this.ignoreFoodLevel = ignoreFoodLevel;
         return this;
     }
 

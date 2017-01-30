@@ -44,7 +44,7 @@ public interface AbstractEquipable extends Equipable {
 
     @Override
     default boolean canEquip(EquipmentType type) {
-        return this.canEquip(type, null);
+        return canEquip(type, null);
     }
 
     @Override

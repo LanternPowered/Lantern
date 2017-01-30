@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.entity;
 
+import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -38,54 +39,52 @@ public interface AbstractArmorEquipable extends AbstractEquipable, ArmorEquipabl
 
     @Override
     default Optional<ItemStack> getHelmet() {
-        return this.getEquipped(EquipmentTypes.HEADWEAR);
+        return getEquipped(EquipmentTypes.HEADWEAR);
     }
 
     @Override
     default void setHelmet(@Nullable ItemStack helmet) {
-        this.equip(EquipmentTypes.HEADWEAR, helmet);
+        equip(EquipmentTypes.HEADWEAR, helmet);
     }
 
     @Override
     default Optional<ItemStack> getChestplate() {
-        return this.getEquipped(EquipmentTypes.CHESTPLATE);
+        return getEquipped(EquipmentTypes.CHESTPLATE);
     }
 
     @Override
     default void setChestplate(@Nullable ItemStack chestplate) {
-        this.equip(EquipmentTypes.CHESTPLATE, chestplate);
+        equip(EquipmentTypes.CHESTPLATE, chestplate);
     }
 
     @Override
     default Optional<ItemStack> getLeggings() {
-        return this.getEquipped(EquipmentTypes.LEGGINGS);
+        return getEquipped(EquipmentTypes.LEGGINGS);
     }
 
     @Override
     default void setLeggings(@Nullable ItemStack leggings) {
-        this.equip(EquipmentTypes.LEGGINGS, leggings);
+        equip(EquipmentTypes.LEGGINGS, leggings);
     }
 
     @Override
     default Optional<ItemStack> getBoots() {
-        return this.getEquipped(EquipmentTypes.BOOTS);
+        return getEquipped(EquipmentTypes.BOOTS);
     }
 
     @Override
     default void setBoots(@Nullable ItemStack boots) {
-        this.equip(EquipmentTypes.BOOTS, boots);
+        equip(EquipmentTypes.BOOTS, boots);
     }
 
     @Override
     default Optional<ItemStack> getItemInHand(HandType handType) {
-        // TODO: Hand type
-        return this.getEquipped(EquipmentTypes.EQUIPPED);
+        return getEquipped(LanternEquipmentTypes.forHand(handType));
     }
 
     @Override
-    default void setItemInHand(HandType hand, @Nullable ItemStack itemInHand) {
-        // TODO: Hand type
-        this.equip(EquipmentTypes.EQUIPPED, itemInHand);
+    default void setItemInHand(HandType handType, @Nullable ItemStack itemInHand) {
+        equip(LanternEquipmentTypes.forHand(handType), itemInHand);
     }
 
 }

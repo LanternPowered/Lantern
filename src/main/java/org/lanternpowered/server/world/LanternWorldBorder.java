@@ -31,6 +31,8 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.component.Component;
 import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.inject.Inject;
+import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
+import org.spongepowered.api.world.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
@@ -125,8 +127,8 @@ public final class LanternWorldBorder implements WorldBorder, Component {
     }
 
     @Override
-    public ChunkPreGenerate newChunkPreGenerate(World world) {
-        return new LanternChunkPreGenerate(checkNotNull(world, "world"), this.getCenter(), this.getDiameter());
+    public ChunkPreGenerate.Builder newChunkPreGenerate(World world) {
+        checkNotNull(world, "world");
+        return new LanternChunkPreGenerateTask.Builder(world, getCenter(), getDiameter());
     }
-
 }

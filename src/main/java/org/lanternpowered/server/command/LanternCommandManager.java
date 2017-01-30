@@ -63,7 +63,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -338,7 +337,9 @@ public class LanternCommandManager implements CommandManager {
             }
         } catch (CommandException e) {
             source.sendMessage(error(t("Error getting suggestions: %s", e.getText())));
-            return Collections.emptyList();
+            return ImmutableList.of();
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Error occurred while tab completing '%s'", arguments), e);
         }
     }
 

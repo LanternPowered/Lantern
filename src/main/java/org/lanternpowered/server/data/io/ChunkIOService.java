@@ -47,37 +47,41 @@
  */
 package org.lanternpowered.server.data.io;
 
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.chunk.LanternChunk;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.WorldStorage;
 
 import java.io.IOException;
 
-@NonnullByDefault
 public interface ChunkIOService extends WorldStorage {
 
     /**
      * Reads a single chunk. The provided chunk must
      * not yet be initialized.
      * 
-     * @param chunk the chunk to read into
-     * @throws IOException if an i/o error occurs
+     * @param chunk The chunk to read into
+     * @throws IOException If an i/o error occurs
      */
     boolean read(LanternChunk chunk) throws IOException;
 
     /**
      * Writes a single chunk.
      * 
-     * @param chunk the chunk to write from
-     * @throws IOException if an i/o error occurs
+     * @param chunk The chunk to write from
+     * @throws IOException If an i/o error occurs
      */
     void write(LanternChunk chunk) throws IOException;
 
     /**
      * Unload the service, performing any cleanup necessary.
      * 
-     * @throws IOException if an i/o error occurs
+     * @throws IOException If an i/o error occurs
      */
     void unload() throws IOException;
 
+    boolean exists(int x, int z) throws IOException;
+
+    default boolean exists(Vector3i chunkCoords) throws IOException {
+        return exists(chunkCoords.getX(), chunkCoords.getZ());
+    }
 }

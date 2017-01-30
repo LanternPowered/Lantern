@@ -134,6 +134,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         this.world = world;
     }
 
+    @Override
     public boolean exists(int x, int z) throws IOException {
         final RegionFile region = this.cache.getRegionFileByChunk(x, z);
 

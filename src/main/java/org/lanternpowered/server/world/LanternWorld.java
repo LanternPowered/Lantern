@@ -52,7 +52,6 @@ import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
-import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -64,10 +63,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.RawItemStack;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
@@ -80,6 +76,7 @@ import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
+import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
 import org.lanternpowered.server.world.rules.RuleType;
@@ -93,13 +90,11 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -124,11 +119,11 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.ChunkPreGenerate;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.PortalAgent;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -625,6 +620,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(UUID.randomUUID());
         entity.setPositionAndWorld(this, position);
         return entity;
+    }
+
+    @Override
+    public Entity createEntityNaturally(EntityType type, Vector3d position) throws IllegalArgumentException, IllegalStateException {
+        return createEntity(type, position); // TODO: Naturally
     }
 
     @Override
@@ -1208,6 +1208,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public ChunkPreGenerate.Builder newChunkPreGenerate(Vector3d center, double diameter) {
+        checkNotNull(center, "center");
+        return new LanternChunkPreGenerateTask.Builder(this, center, diameter);
+    }
+
+    @Override
     public Optional<String> getGameRule(String gameRule) {
         return this.properties.getGameRule(gameRule);
     }
@@ -1282,11 +1288,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public PortalAgent getPortalAgent() {
         return this.portalAgent;
-    }
-
-    @Override
-    public ChunkPreGenerate newChunkPreGenerate(Vector3d center, double diameter) {
-        return new LanternChunkPreGenerate(this, checkNotNull(center, "center"), diameter);
     }
 
     public void pulse() {

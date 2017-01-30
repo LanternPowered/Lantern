@@ -517,6 +517,12 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
+    public Entity createEntityNaturally(EntityType type, Vector3d position) {
+        checkRange(position);
+        return this.extent.createEntityNaturally(type, position);
+    }
+
+    @Override
     public Optional<Entity> createEntity(DataContainer entityContainer) {
         // TODO once entity containers are implemented
         //checkRange(position.getX(), position.getY(), position.getZ());

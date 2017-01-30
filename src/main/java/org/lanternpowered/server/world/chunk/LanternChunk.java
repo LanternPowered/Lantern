@@ -1405,6 +1405,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
+    public Entity createEntityNaturally(EntityType type, Vector3d position) throws IllegalArgumentException, IllegalStateException {
+        return createEntity(type, position); // TODO: Naturally
+    }
+
+    @Override
     public Optional<Entity> createEntity(DataContainer entityContainer) {
         // TODO Auto-generated method stub
         return Optional.empty();

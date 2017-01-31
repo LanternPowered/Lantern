@@ -294,7 +294,19 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.CAN_FLY, false).notRemovable();
         registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).notRemovable();
         registerKey(Keys.GAME_MODE, GameModes.NOT_SET).notRemovable().addListener(
-                (oldElement, newElement) -> ((LanternGameMode) newElement).getAbilityApplier().accept(this));
+                (oldElement, newElement) -> {
+                    ((LanternGameMode) newElement).getAbilityApplier().accept(this);
+                    // This MUST be updated, unless you want strange behavior on the client,
+                    // the client has 3 different concepts of 'isCreative', and each combination
+                    // gives a different outcome...
+                    // For example:
+                    // - Disable noClip and glow in spectator, but you can place blocks
+                    // - NoClip in creative, but you cannot change your hotbar, or drop items
+                    // Not really worth the trouble right now
+                    // TODO: Differentiate the 'global tab list entry' and the entry to update
+                    // TODO: these kind of settings to avoid possible 'strange' behavior.
+                    GlobalTabList.getInstance().get(this.gameProfile).ifPresent(e -> e.setGameMode(newElement));
+                });
         registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).notRemovable();
         registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
         registerKey(LanternKeys.ELYTRA_GLIDE_SPEED, 0.1).notRemovable();

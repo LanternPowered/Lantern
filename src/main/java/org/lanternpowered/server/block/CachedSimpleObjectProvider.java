@@ -43,7 +43,7 @@ public class CachedSimpleObjectProvider<T> implements ObjectProvider<T> {
     private final Object[] values;
 
     CachedSimpleObjectProvider(LanternBlockType blockType, Function<BlockState, T> simpleObjectProvider) {
-        final Collection<BlockState> blockStates = blockType.getAllStates();
+        final Collection<BlockState> blockStates = blockType.getAllBlockStates();
         final Object[] values = new Object[blockStates.size()];
         for (BlockState blockState : blockStates) {
             values[((LanternBlockState) blockState).getInternalId()] = simpleObjectProvider.apply(blockState);

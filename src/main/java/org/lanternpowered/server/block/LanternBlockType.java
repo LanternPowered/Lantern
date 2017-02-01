@@ -188,6 +188,11 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
     }
 
     @Override
+    public Collection<BlockState> getAllBlockStates() {
+        return this.blockStateBase.getBlockStates();
+    }
+
+    @Override
     public boolean getTickRandomly() {
         return this.tickRandomly;
     }
@@ -210,16 +215,6 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
     @Override
     public BlockSoundGroup getSoundGroup() {
         return null; // TODO
-    }
-
-    /**
-     * Gets a collection with all the {@link BlockState}s of
-     * this block type.
-     * 
-     * @return The block states
-     */
-    public Collection<BlockState> getAllStates() {
-        return this.blockStateBase.getBlockStates();
     }
 
     public ExtendedBlockStateProvider getExtendedBlockStateProvider() {

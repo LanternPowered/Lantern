@@ -25,18 +25,18 @@
  */
 package org.lanternpowered.server.network.rcon;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.net.InetSocketAddress;
 
-@NonnullByDefault
-public class RconConnection implements RemoteConnection {
+final class RconConnection implements RemoteConnection {
 
     private final InetSocketAddress address;
     private final InetSocketAddress virtualHost;
 
-    public RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
+    RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
         this.virtualHost = virtualHost;
         this.address = address;
     }
@@ -49,5 +49,13 @@ public class RconConnection implements RemoteConnection {
     @Override
     public InetSocketAddress getVirtualHost() {
         return this.virtualHost;
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("address", this.address)
+                .add("virtualHost", this.virtualHost)
+                .toString();
     }
 }

@@ -179,7 +179,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         }
         final BlockStateRegistryModule blockStateRegistryModule = Lantern.getRegistry()
                 .getRegistryModule(BlockStateRegistryModule.class).get();
-        blockType.getAllStates().forEach(blockStateRegistryModule::registerState);
+        blockType.getAllBlockStates().forEach(blockStateRegistryModule::registerState);
         blockType.getItem().ifPresent(itemType -> ItemRegistryModule.get().register(internalId, itemType));
         LanternPropertyRegistry.getInstance().registerBlockPropertyStores(blockType.getPropertyProviderCollection());
     }

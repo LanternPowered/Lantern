@@ -64,17 +64,18 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
 
     public DebugGenerationPopulator(GameRegistry registry) {
         checkNotNull(registry, "registry");
-        Set<BlockState> blockStates = Sets.newLinkedHashSet();
+        final Set<BlockState> blockStates = Sets.newLinkedHashSet();
         for (BlockType blockType : registry.getAllOf(BlockType.class)) {
-            blockStates.addAll(((LanternBlockType) blockType).getAllStates().stream().filter(state ->
-                    !((LanternBlockState) state).isExtended()).collect(Collectors.toList()));
+            blockStates.addAll(blockType.getAllBlockStates().stream()
+                    .filter(state -> !((LanternBlockState) state).isExtended())
+                    .collect(Collectors.toList()));
         }
         this.blockStateCache = blockStates.toArray(new BlockState[blockStates.size()]);
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));
     }
 
     public DebugGenerationPopulator(Iterable<BlockState> blockStates) {
-        LinkedHashSet<BlockState> states = Sets.newLinkedHashSet(checkNotNull(blockStates, "blockStates"));
+        final LinkedHashSet<BlockState> states = Sets.newLinkedHashSet(checkNotNull(blockStates, "blockStates"));
         this.blockStateCache = states.toArray(new BlockState[states.size()]);
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));
     }

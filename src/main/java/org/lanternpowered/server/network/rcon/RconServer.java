@@ -62,16 +62,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 public class RconServer extends ServerBase implements RconService {
 
     private final Map<String, RconSource> sourcesByHostname = new ConcurrentHashMap<>();
     private final String password;
 
-    private ServerBootstrap bootstrap;
-    private EventLoopGroup bossGroup;
-    private EventLoopGroup workerGroup;
+    @Nullable private ServerBootstrap bootstrap;
+    @Nullable private EventLoopGroup bossGroup;
+    @Nullable private EventLoopGroup workerGroup;
 
-    private InetSocketAddress address;
+    @Nullable private InetSocketAddress address;
 
     public RconServer(String password) {
         this.password = password;
@@ -97,6 +99,7 @@ public class RconServer extends ServerBase implements RconService {
                 .bind(address);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void shutdown0() {
         this.workerGroup.shutdownGracefully();
@@ -113,6 +116,7 @@ public class RconServer extends ServerBase implements RconService {
      * @return source The rcon source
      */
     RconSource newSource(Channel channel) {
+        //noinspection ConstantConditions
         return new RconSource(new RconConnection((InetSocketAddress) channel.remoteAddress(), this.address));
     }
 
@@ -121,7 +125,7 @@ public class RconServer extends ServerBase implements RconService {
      *
      * @param source The rcon source
      */
-    public void onChannelActive(RconSource source) {
+    void onChannelActive(RconSource source) {
         this.sourcesByHostname.put(source.getConnection().getAddress().getHostName(), source);
     }
 
@@ -130,7 +134,7 @@ public class RconServer extends ServerBase implements RconService {
      *
      * @param source The rcon source
      */
-    public void onChannelInactive(RconSource source) {
+    void onChannelInactive(RconSource source) {
         this.sourcesByHostname.remove(source.getConnection().getAddress().getHostName());
     }
 

@@ -32,11 +32,9 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 
-@NonnullByDefault
 public final class RconSource extends AbstractSubjectBase implements org.spongepowered.api.command.source.RconSource {
 
     public static final String NAME_PREFIX = "Rcon";
@@ -49,9 +47,9 @@ public final class RconSource extends AbstractSubjectBase implements org.spongep
     // Whether the rcon source is logged in
     private volatile boolean loggedIn;
 
-    public RconSource(RconConnection connection) {
+    RconSource(RconConnection connection) {
         this.connection = connection;
-        this.initSubject();
+        initSubject();
     }
 
     @Override
@@ -109,9 +107,8 @@ public final class RconSource extends AbstractSubjectBase implements org.spongep
     }
 
     public String flush() {
-        String result = this.buffer.toString();
+        final String result = this.buffer.toString();
         this.buffer.setLength(0);
         return result;
     }
-
 }

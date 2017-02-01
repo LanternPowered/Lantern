@@ -83,12 +83,12 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
             return;
         }
 
-        int requestId = buf.readIntLE();
-        int type = buf.readIntLE();
+        final int requestId = buf.readIntLE();
+        final int type = buf.readIntLE();
 
-        byte[] payloadData = new byte[buf.readableBytes() - 2];
+        final byte[] payloadData = new byte[buf.readableBytes() - 2];
         buf.readBytes(payloadData);
-        String payload = new String(payloadData, StandardCharsets.UTF_8);
+        final String payload = new String(payloadData, StandardCharsets.UTF_8);
 
         // Two byte padding
         buf.readBytes(2);
@@ -104,34 +104,41 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        Channel channel = ctx.channel();
-        RconSource source = this.server.newSource(channel);
+        final Channel channel = ctx.channel();
+        final RconSource source = this.server.newSource(channel);
+
+        final RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(Cause.source(source).build(), source);
+        Sponge.getEventManager().post(event);
+        if (event.isCancelled()) {
+            ctx.channel().close();
+            return;
+        }
 
         if (!channel.attr(SOURCE).compareAndSet(null, source)) {
             throw new IllegalStateException("Rcon source may not be set more than once!");
         }
 
         this.server.onChannelActive(source);
-
-        RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(Cause.source(source).build(), source);
-        Sponge.getEventManager().post(event);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        Channel channel = ctx.channel();
-        RconSource source = channel.attr(SOURCE).getAndRemove();
+        final Channel channel = ctx.channel();
+        final RconSource source = channel.attr(SOURCE).getAndRemove();
 
-        RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(Cause.source(source).build(), source);
+        if (source == null) {
+            return;
+        }
+        final RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(Cause.source(source).build(), source);
         Sponge.getEventManager().post(event);
 
         this.server.onChannelInactive(source);
     }
 
     private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {
-        RconSource source = ctx.channel().attr(SOURCE).get();
+        final RconSource source = ctx.channel().attr(SOURCE).get();
         if (password.equals(payload)) {
-            RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(Cause.source(source).build(), source);
+            final RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(Cause.source(source).build(), source);
 
             if (!Sponge.getEventManager().post(event)) {
                 source.setLoggedIn(true);
@@ -146,7 +153,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     private static void handleCommand(ChannelHandlerContext ctx, String payload, int requestId) {
-        RconSource source = ctx.channel().attr(SOURCE).get();
+        final RconSource source = ctx.channel().attr(SOURCE).get();
         if (!source.getLoggedIn()) {
             sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
             return;
@@ -156,7 +163,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     private static void sendResponse(ChannelHandlerContext ctx, int requestId, int type, String payload) {
-        ByteBuf buf = ctx.alloc().buffer();
+        final ByteBuf buf = ctx.alloc().buffer();
         buf.writeIntLE(requestId);
         buf.writeIntLE(type);
         buf.writeBytes(payload.getBytes(StandardCharsets.UTF_8));
@@ -172,12 +179,11 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
         int start = 0;
         while (start < payload.length()) {
-            int length = payload.length() - start;
-            int truncated = length > 2048 ? 2048 : length;
+            final int length = payload.length() - start;
+            final int truncated = length > 2048 ? 2048 : length;
 
             sendResponse(ctx, requestId, TYPE_RESPONSE, payload.substring(start, truncated));
             start += truncated;
         }
     }
-
 }

@@ -79,7 +79,7 @@ public final class RconFramingHandler extends ByteToMessageCodec<ByteBuf> {
             return;
         }
 
-        ByteBuf buf = ctx.alloc().buffer(length);
+        final ByteBuf buf = ctx.alloc().buffer(length);
         in.readBytes(buf, length);
         out.add(buf);
     }

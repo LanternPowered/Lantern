@@ -47,7 +47,6 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.ScoreboardIO;
@@ -158,7 +157,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class LanternWorld extends BaseComponentHolder implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer, RuleHolder {
+public class LanternWorld implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer, RuleHolder {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -256,13 +255,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         final LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
         // Create the weather universe if needed
         if (dimensionType.hasSky()) {
-            this.weatherUniverse = this.addComponent(LanternWeatherUniverse.class);
+            this.weatherUniverse = new LanternWeatherUniverse(this);
         } else {
             this.weatherUniverse = null;
         }
-        this.timeUniverse = addComponent(TimeUniverse.class);
+        this.timeUniverse = new TimeUniverse(this);
         // Create the world border
-        this.worldBorder = addComponent(LanternWorldBorder.class);
+        this.worldBorder = new LanternWorldBorder(this);
         // Create the dimension
         this.dimension = dimensionType.newDimension(this);
         // Create the portal agent
@@ -1383,6 +1382,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    public TimeUniverse getTimeUniverse() {
+        return this.timeUniverse;
     }
 
     public EntityProtocolManager getEntityProtocolManager() {

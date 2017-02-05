@@ -31,11 +31,6 @@ import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Component;
-import org.lanternpowered.server.component.Locked;
-import org.lanternpowered.server.component.OnAttach;
-import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.script.context.ContextImpl;
 import org.lanternpowered.server.world.rules.RuleTypes;
@@ -52,17 +47,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@Locked
-@AttachableTo(LanternWorld.class)
-public final class LanternWeatherUniverse implements Component, WeatherUniverse {
+public final class LanternWeatherUniverse implements WeatherUniverse {
 
     private static final float FADE_SPEED = 0.01f;
 
     // The random used for the random weather times
     private final Random random = new Random();
-
     // The world this weather universe is attached to
-    @Inject private LanternWorld world;
+    private final LanternWorld world;
+
     private WeatherData weatherData;
 
     private float rainStrengthTarget;
@@ -73,8 +66,8 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
 
     private ScriptContext context;
 
-    @OnAttach
-    private void onAttach() {
+    public LanternWeatherUniverse(LanternWorld world) {
+        this.world = world;
         this.weatherData = this.world.getProperties().getWeatherData();
         this.rainStrengthTarget = this.weatherData.getWeather().getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get().floatValue();
         this.rainStrength = this.rainStrengthTarget;
@@ -87,8 +80,8 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
      * Pulses the weather.
      */
     void pulse() {
-        this.pulseWeather();
-        this.pulseSky();
+        pulseWeather();
+        pulseSky();
     }
 
     private void pulseWeather() {

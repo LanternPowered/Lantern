@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.block.tile;
 
-import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
@@ -45,7 +44,7 @@ import org.spongepowered.api.world.World;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class LanternTileEntity extends BaseComponentHolder implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
+public abstract class LanternTileEntity implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
 
     private static boolean bypassEntityTypeLookup;
 

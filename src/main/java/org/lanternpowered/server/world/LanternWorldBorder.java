@@ -28,22 +28,18 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.component.Component;
-import org.lanternpowered.server.component.OnAttach;
-import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
 import org.spongepowered.api.world.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
-public final class LanternWorldBorder implements WorldBorder, Component {
+final class LanternWorldBorder implements WorldBorder {
 
-    @Inject
-    private LanternWorld world;
+    private final LanternWorld world;
 
-    @OnAttach
-    private void onAttach() {
-        this.world.getProperties().updateCurrentBorderTime();
+    LanternWorldBorder(LanternWorld world) {
+        world.getProperties().updateCurrentBorderTime();
+        this.world = world;
     }
 
     @Override

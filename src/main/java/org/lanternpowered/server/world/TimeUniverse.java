@@ -25,31 +25,24 @@
  */
 package org.lanternpowered.server.world;
 
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Component;
-import org.lanternpowered.server.component.Locked;
-import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.data.world.MoonPhase;
-import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.world.rules.RuleTypes;
 
-@Locked
-@AttachableTo(LanternWorld.class)
-public class TimeUniverse implements Component {
+public class TimeUniverse {
 
     public static final int TICKS_IN_A_DAY = 24000;
     private static final int SYNC_DELAY = 6;
 
-    // The world this weather universe is attached to
-    @Inject private LanternWorld world;
+    private final LanternWorld world;
+
     private TimeData timeData;
     private int syncCounter = 0;
     private MoonPhase lastMoonPhase;
     private boolean lastDoDaylightCycle;
 
-    @OnAttach
-    private void onAttach() {
+    public TimeUniverse(LanternWorld world) {
+        this.world = world;
         this.timeData = this.world.getProperties().getTimeData();
         this.lastDoDaylightCycle = this.world.getOrCreateRule(RuleTypes.DO_DAYLIGHT_CYCLE).getValue();
         this.lastMoonPhase = this.timeData.getMoonPhase();

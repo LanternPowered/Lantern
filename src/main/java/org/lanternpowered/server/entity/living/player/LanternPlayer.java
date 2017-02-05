@@ -80,7 +80,6 @@ import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
-import org.lanternpowered.server.world.TimeUniverse;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -423,7 +422,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             pulseChunkChanges();
             this.session.send(world.getProperties().createWorldBorderMessage());
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
-            this.session.send(world.getComponent(TimeUniverse.class).get().createUpdateTimeMessage());
+            this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
             setScoreboard(world.getScoreboard());
             this.inventoryContainer.openInventoryForAndInitialize(this);

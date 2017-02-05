@@ -32,12 +32,11 @@ import static com.google.common.base.Preconditions.checkState;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.component.BaseComponentHolder;
-import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.entity.event.DamageEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
@@ -47,7 +46,6 @@ import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -59,6 +57,7 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.text.Text;
@@ -82,7 +81,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
-public class LanternEntity extends BaseComponentHolder implements Entity, AbstractDataHolder, AbstractPropertyHolder {
+public class LanternEntity implements Entity, AbstractDataHolder, AbstractPropertyHolder {
 
     @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;
@@ -607,9 +606,24 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public boolean damage(double damage, DamageSource damageSource, Cause cause) {
-        Optional<Health> health = this.getComponent(Health.class);
-        if (health.isPresent()) {
-            return health.get().damage(damage, damageSource, cause);
+        final Optional<Double> optHealth = get(Keys.HEALTH);
+        if (!optHealth.isPresent()) {
+            return false;
+        }
+        // TODO: Damage modifiers, etc.
+        final org.spongepowered.api.event.entity.DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
+                cause, new ArrayList<>(), this, damage);
+        if (event.isCancelled()) {
+            return false;
+        }
+        damage = event.getFinalDamage();
+        if (damage > 0) {
+            final double health = optHealth.get() - damage;
+            offer(Keys.HEALTH, health);
+            if (health <= 0.0) {
+                // TODO: Notify stuff and kill the entity
+            }
+            return true;
         }
         return false;
     }

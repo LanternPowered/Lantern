@@ -32,7 +32,7 @@ public class ExtendedOtherComponent extends OtherComponent {
     @OnAttach
     @Override
     public void onAttach() {
-        System.out.println("ExtendedOtherComponent: onAttach");
+        //System.out.println("ExtendedOtherComponent: onAttach");
         super.onAttach();
     }
 }

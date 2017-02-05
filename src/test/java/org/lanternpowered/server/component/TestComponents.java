@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.component;
 
-import static org.junit.Assert.assertNotNull;
-
 import org.junit.Test;
 import org.lanternpowered.server.component.test.TestComponent;
 
@@ -34,8 +32,22 @@ public class TestComponents {
 
     @Test
     public void test() {
-        long time = System.currentTimeMillis();
+        //long time = System.currentTimeMillis();
+
+        ComponentHolder[] holders = new BaseComponentHolder[10000];
+        for (int i = 0; i < holders.length; i++) {
+            holders[i] = new BaseComponentHolder();
+        }
+
+        final long start = System.nanoTime();
+        for (int i = 0; i < holders.length; i++) {
+            holders[i].addComponent(TestComponent.class);
+        }
+        System.out.println("Took " + (System.nanoTime() - start) / (1000 * holders.length) + "ms");
+        /*
         BaseComponentHolder holder = new BaseComponentHolder();
+
+
         System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
         time = System.currentTimeMillis();
         TestComponent test = holder.addComponent(TestComponent.class);
@@ -51,6 +63,6 @@ public class TestComponents {
         System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
         time = System.currentTimeMillis();
         holder.addComponent(TestComponent.class);
-        System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
+        System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");*/
     }
 }

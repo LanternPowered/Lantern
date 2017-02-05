@@ -32,6 +32,6 @@ public class OtherComponent implements Component {
 
     @OnAttach
     public void onAttach() {
-        System.out.println("OtherComponent: onAttach");
+        //System.out.println("OtherComponent: onAttach");
     }
 }

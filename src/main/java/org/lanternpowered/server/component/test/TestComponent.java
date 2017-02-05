@@ -42,7 +42,7 @@ public class TestComponent implements Component {
 
     @OnAttach
     public void onAttach() {
-        System.out.println("onAttach");
+        //System.out.println("onAttach");
     }
 
     @OnDetach
@@ -51,7 +51,7 @@ public class TestComponent implements Component {
 
     @Inject
     private void setOtherComponent(@Require AnotherTestComponent another) {
-        System.out.println("Set other test component: " + another);
+        //System.out.println("Set other test component: " + another);
         this.another = another;
     }
 }

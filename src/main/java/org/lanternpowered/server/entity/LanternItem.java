@@ -171,7 +171,11 @@ public class LanternItem extends LanternEntity implements Item {
         if (entities.isEmpty()) {
             return;
         }
-        ItemStack itemStack = get(Keys.REPRESENTED_ITEM).get().createStack();
+        ItemStack itemStack = get(Keys.REPRESENTED_ITEM).map(ItemStackSnapshot::createStack).orElse(null);
+        if (itemStack == null) {
+            remove();
+            return;
+        }
         for (Entity entity : entities) {
             Inventory inventory = ((Carrier) entity).getInventory();
             if (inventory instanceof PlayerInventory) {
@@ -186,7 +190,7 @@ public class LanternItem extends LanternEntity implements Item {
             }
             final ChangeInventoryEvent.Pickup event = SpongeEventFactory.createChangeInventoryEventPickup(
                     cause.build(), this, inventory, result.getTransactions());
-            event.setCancelled(result.getOfferResult().isSuccess());
+            event.setCancelled(!result.getOfferResult().isSuccess());
             Sponge.getEventManager().post(event);
             if (event.isCancelled() && !isRemoved()) { // Don't continue if the entity was removed during the event
                 continue;
@@ -246,7 +250,11 @@ public class LanternItem extends LanternEntity implements Item {
 
     @Nullable
     private CombineData combineItemStacks(int pickupDelay, int despawnDelay) {
-        ItemStackSnapshot itemStackSnapshot1 = get(Keys.REPRESENTED_ITEM).get();
+        ItemStackSnapshot itemStackSnapshot1 = get(Keys.REPRESENTED_ITEM).orElse(null);
+        if (itemStackSnapshot1 == null) {
+            remove();
+            return null;
+        }
         if (itemStackSnapshot1.getCount() >= itemStackSnapshot1.getType().getMaxStackQuantity()) {
             return null;
         }

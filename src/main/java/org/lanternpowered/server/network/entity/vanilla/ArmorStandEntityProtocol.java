@@ -23,21 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.entity.vanilla;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
 
-public final class CodecPlayOutEntityHeadLook implements Codec<MessagePlayOutEntityHeadLook> {
+public class ArmorStandEntityProtocol<E extends LanternEntity> extends CreatureEntityProtocol<E> {
+
+    public ArmorStandEntityProtocol(E entity) {
+        super(entity);
+    }
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutEntityHeadLook message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVarInt(message.getEntityId());
-        buf.writeByte(message.getYaw());
-        return buf;
+    protected int getMobType() {
+        return 30;
+    }
+
+    @Override
+    protected void spawn(ParameterList parameterList) {
+        super.spawn(parameterList);
+    }
+
+    @Override
+    protected void update(ParameterList parameterList) {
+        super.update(parameterList);
     }
 }

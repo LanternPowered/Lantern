@@ -51,6 +51,8 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 
 import java.util.List;
 import java.util.Set;
@@ -77,6 +79,13 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         if (codecRegistration == null) {
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered to allow encoding!");
         }
+        /*
+        if (message instanceof MessagePlayOutWorldTime ||
+                message instanceof MessageInOutKeepAlive) {
+        } else {
+            System.out.println(message.getClass().getName());
+        }
+        */
 
         final ByteBuf opcode = ctx.alloc().buffer();
 

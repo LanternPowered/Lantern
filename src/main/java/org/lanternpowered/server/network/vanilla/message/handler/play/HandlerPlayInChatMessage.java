@@ -129,6 +129,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             if (chatData.lastChatTime != -1L) {
                 chatData.chatThrottle = (int) Math.max(0, chatData.chatThrottle - (currentTime - chatData.lastChatTime));
             }
+            chatData.lastChatTime = currentTime;
             chatData.chatThrottle += 20;
             if (chatData.chatThrottle > Lantern.getGame().getGlobalConfig().getChatSpamThreshold()) {
                 session.disconnect(t("disconnect.spam"));

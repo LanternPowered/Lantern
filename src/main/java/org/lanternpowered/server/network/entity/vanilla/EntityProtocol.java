@@ -153,8 +153,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         // would only affect the head pitch.
         final byte pitch = wrapAngle((headRot != null ? headRot : rot).getX());
 
-        boolean dirtyPos = x != this.lastX || y != this.lastY || z != this.lastZ;
-        boolean dirtyRot = yaw != this.lastYaw || z != this.lastPitch;
+        boolean dirtyPos = xu != this.lastX || yu != this.lastY || zu != this.lastZ;
+        boolean dirtyRot = yaw != this.lastYaw || pitch != this.lastPitch;
 
         // TODO: On ground state
 

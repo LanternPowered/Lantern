@@ -42,6 +42,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +110,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
     @Override
     protected void update(EntityProtocolUpdateContext context) {
         super.update(context);
-        final List<PotionEffect> potionEffects = this.entity.get(Keys.POTION_EFFECTS).orElse(null);
+        final List<PotionEffect> potionEffects = this.entity.get(Keys.POTION_EFFECTS).orElse(Collections.emptyList());
         final Map<PotionEffectType, PotionEffect> potionEffectMap = new HashMap<>();
         for (PotionEffect potionEffect : potionEffects) {
             if (potionEffect.getDuration() > 0) {

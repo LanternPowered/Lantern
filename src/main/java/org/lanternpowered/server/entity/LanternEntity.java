@@ -505,7 +505,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public void clearPassengers() {
         synchronized (this.passengers) {
-            for (LanternEntity passenger : this.passengers) {
+            for (LanternEntity passenger : new ArrayList<>(this.passengers)) {
                 passenger.setVehicle(null);
             }
         }

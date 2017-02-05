@@ -31,6 +31,8 @@ import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 public final class EntityProtocolTypes {
 
+    public static final EntityProtocolType<LanternEntity> ARMOR_STAND = dummy("ARMOR_STAND");
+
     public static final EntityProtocolType<LanternEntity> BAT = dummy("BAT");
 
     public static final EntityProtocolType<LanternEntity> CHICKEN = dummy("CHICKEN");

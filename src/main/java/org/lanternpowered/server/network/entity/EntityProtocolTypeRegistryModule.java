@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.entity;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.network.entity.vanilla.ArmorStandEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.BatEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ChickenEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.EnderDragonEntityProtocol;
@@ -64,6 +65,8 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
         // well it's not working, at least not outside the development environment, java is throwing
         // "no such constructor" exceptions...
         // Tested with: oracle jre1.8.0_101
+        register(LanternEntityProtocolType.of("minecraft", "armor_stand",
+                entity -> new ArmorStandEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "bat",
                 entity -> new BatEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "chicken",

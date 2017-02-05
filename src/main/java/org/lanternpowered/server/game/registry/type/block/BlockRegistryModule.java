@@ -945,7 +945,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         // TODO: 76 Redstone Torch (on)
         // TODO: 77 Stone Button
         // TODO: 78 Snow(layer)
+<<<<<<< HEAD
         ///////////////
+=======
+        ////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         ///   Ice   ///
         ///////////////
         register(79, simpleBuilder()
@@ -955,7 +959,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(2.5)))
                         .translation("tile.ice.name")
                         .build("minecraft", "ice"));
+<<<<<<< HEAD
         ////////////////
+=======
+        /////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         ///   Snow   ///
         ////////////////
         register(80, simpleBuilder()
@@ -966,7 +974,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.snow.name")
                         .build("minecraft", "snow"));
         // TODO: 81 Cactus
+<<<<<<< HEAD
         ////////////////
+=======
+        /////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         ///   Clay   ///
         ////////////////
         register(82, simpleBuilder()
@@ -977,9 +989,15 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.clay.name")
                         .build("minecraft", "clay"));
         // TODO: 83 Sugar Canes
+<<<<<<< HEAD
         //////////////////
         ///   Jukebox  ///
         //////////////////
+=======
+        ////////////////////
+        ///   Jukebox  ///
+        ////////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         register(84, simpleBuilder()
                         .itemType()
                         .properties(builder -> builder
@@ -1094,9 +1112,15 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         // TODO: 106 Vines
         // TODO: 107 Oak Fence Gate
         // TODO: 108 Brick Stairs
+<<<<<<< HEAD
         ////////////////////
         ///   Mycelium   ///
         ////////////////////
+=======
+        /////////////////////
+        ///   Mycelium   ///
+        /////////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         register(110, simpleBuilder()
                         .itemType()
                         .properties(builder -> builder
@@ -1190,9 +1214,15 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 });
         // TODO: 127 Cocoa
         // TODO: 128 Sandstone Stairs
+<<<<<<< HEAD
         ///////////////////////
         ///   Emerald Ore   ///
         ///////////////////////
+=======
+        //////////////////////
+        ///   Emerald Ore   ///
+        //////////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         register(129, simpleBuilder()
                         .itemType()
                         .properties(builder -> builder
@@ -1386,6 +1416,17 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .build("minecraft", "slime"));
         // TODO: Slime block functionality
         ////////////////////
+        ///   Slime Block    ///
+        ////////////////////
+        register(166, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.0))
+                                .add(blastResistance(0.0)))
+                        .translation("tile.slime.name")
+                        .build("minecraft", "slime"));
+        // TODO: Slime block functionality
+        ////////////////////
         ///   Barrier    ///
         ////////////////////
         register(166, simpleBuilder()
@@ -1454,9 +1495,15 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(30.0)))
                         .translation("tile.blockCoal.name")
                         .build("minecraft", "coal_block"));
+<<<<<<< HEAD
         /////////////////////
         ///   Packed Ice  ///
         /////////////////////
+=======
+        //////////////////////
+        ///   Packed Ice  ///
+        ///////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         register(174, simpleBuilder()
                         .itemType()
                         .properties(builder -> builder
@@ -1555,7 +1602,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.endBricks.name")
                         .build("minecraft", "end_bricks"));
         // TODO: 207 Beetroot Block
+<<<<<<< HEAD
         /////////////////////
+=======
+        //////////////////////
+>>>>>>> 8270f9959094927a30ecf8e993eb0839a8321405
         ///   Grass Path  ///
         /////////////////////
         register(208, simpleBuilder()

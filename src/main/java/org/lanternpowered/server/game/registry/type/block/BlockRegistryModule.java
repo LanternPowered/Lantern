@@ -74,10 +74,14 @@ import org.lanternpowered.server.block.translation.SpongeTranslationProvider;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternBedPart;
+import org.lanternpowered.server.data.type.LanternBigMushroomType;
+import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternDirtType;
+import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPortionType;
+import org.lanternpowered.server.data.type.LanternPrismarineType;
 import org.lanternpowered.server.data.type.LanternQuartzType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.LanternSandType;
@@ -855,6 +859,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                             throw new IllegalArgumentException();
                     }
                 });
+        // TODO: 52 Monster Spawner
+        // TODO: 53 Oak Wood Stairs
         ////////////////////
         ///     Chest    ///
         ////////////////////
@@ -862,6 +868,125 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.chest.name")
                         .build("minecraft", "chest"),
                 this::chestData);
+        // TODO: 55 Redstone Wire
+        ///////////////////////
+        ///   Diamond Ore   ///
+        ///////////////////////
+        register(56, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(3.0))
+                                .add(blastResistance(15.0)))
+                        .translation("tile.oreDiamond.name")
+                        .build("minecraft", "diamond_ore"));
+        /////////////////////////
+        ///   Diamond Block   ///
+        /////////////////////////
+        register(57, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.blockDiamond.name")
+                        .build("minecraft", "diamond_block"));
+        //////////////////////////
+        ///   Crafting Table   ///
+        //////////////////////////
+        register(58, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.5))
+                                .add(blastResistance(12.5)))
+                        .translation("tile.workbench.name")
+                        .build("minecraft", "crafting_table"));
+        // TODO: Crafting functionality
+        // TODO: 59 Wheat Crops
+        ////////////////////
+        ///   Farmland   ///
+        ////////////////////
+        register(60, simpleBuilder()
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(0.6))
+                        .add(blastResistance(3.0)))
+                .translation("tile.farmland.name")
+                .build("minecraft", "farmland"));
+        // TODO: Trampling of farmland
+        // TODO: 61 Furnace
+        // TODO: 62 Burning Furnace
+        // TODO: 63 Standing Sign Block
+        // TODO: 64 Oak Door Block
+        // TODO: 65 Ladder
+        ///////////////
+        ///   Rail  ///
+        ///////////////
+        register(66, simpleBuilder()
+                        .trait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get())
+                        .itemType()
+                        .boundingBox(BoundingBoxes::rail)
+                        .properties(builder -> builder
+                                .add(PASSABLE)
+                                .add(hardness(0.7))
+                                .add(blastResistance(3.5)))
+                        .translation("tile.rail.name")
+                        .build("minecraft", "rail"),
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION).get().getInternalId());
+        // TODO: 67 Cobblestone Stairs
+        // TODO: 68 Wall-mounted Sign Block
+        // TODO: 69 Lever
+        // TODO: 70 Stone Pressure Plate
+        // TODO: 71 Iron Door Block
+        // TODO: 72 Wooden Pressure Plate
+        // TODO: 73 Redstone Ore
+        // TODO: 74 Glowing Redstone Ore
+        // TODO: 75 Redstone Torch (off)
+        // TODO: 76 Redstone Torch (on)
+        // TODO: 77 Stone Button
+        // TODO: 78 Snow(layer)
+        ///////////////
+        ///   Ice   ///
+        ///////////////
+        register(79, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.5))
+                                .add(blastResistance(2.5)))
+                        .translation("tile.ice.name")
+                        .build("minecraft", "ice"));
+        ////////////////
+        ///   Snow   ///
+        ////////////////
+        register(80, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.2))
+                                .add(blastResistance(1.0)))
+                        .translation("tile.snow.name")
+                        .build("minecraft", "snow"));
+        // TODO: 81 Cactus
+        ////////////////
+        ///   Clay   ///
+        ////////////////
+        register(82, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.6))
+                                .add(blastResistance(3.0)))
+                        .translation("tile.clay.name")
+                        .build("minecraft", "clay"));
+        // TODO: 83 Sugar Canes
+        //////////////////
+        ///   Jukebox  ///
+        //////////////////
+        register(84, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.jukebox.name")
+                        .build("minecraft", "jukebox"));
         ////////////////////
         ///    Pumpkin   ///
         ////////////////////
@@ -872,6 +997,30 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.pumpkin.name")
                         .build("minecraft", "pumpkin"),
                 this::pumpkinData);
+        /////////////////////
+        ///   Netherrack  ///
+        /////////////////////
+        register(87, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.4))
+                                .add(blastResistance(2.0)))
+                        .translation("tile.hellrock.name")
+                        .build("minecraft", "netherrack"));
+
+        // TODO: 88 Soul Sand
+        /////////////////////
+        ///   Glowstone   ///
+        /////////////////////
+        register(89, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.3))
+                                .add(blastResistance(1.5))
+                                .add(lightEmission(15)))
+                        .translation("tile.lightgem.name")
+                        .build("minecraft", "glowstone"));
+        // TODO: 90 Nether Portal
         ////////////////////
         ///  Lit Pumpkin ///
         ////////////////////
@@ -881,6 +1030,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.litpumpkin.name")
                         .build("minecraft", "lit_pumpkin"),
                 this::pumpkinData);
+        // TODO: 92 Cake Block
+        // TODO: 93 Redstone Repeater Block (off)
+        // TODO: 94 Redstone Repeater Block (on)
         /////////////////////
         /// Stained Glass ///
         /////////////////////
@@ -890,6 +1042,104 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(1.5)))
                         .build("minecraft", "stained_glass"),
                 this::dyedData);
+        // TODO: 96 Wooden Trapdoor
+        ///////////////////////
+        ///   Monster Egg   ///
+        ///////////////////////
+        register(97, simpleBuilder()
+                        .trait(LanternEnumTraits.DISGUISED_BLOCK_TYPE)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.DISGUISED_BLOCK_TYPE, LanternDisguisedBlockType.STONE).get())
+                        .itemType(builder -> builder
+                                .keysProvider(valueContainer -> valueContainer
+                                    .registerKey(Keys.DISGUISED_BLOCK_TYPE, LanternDisguisedBlockType.STONE)
+                                )
+                        )
+                        .properties(builder -> builder
+                                .add(hardness(0.75))
+                                .add(blastResistance(3.75)))
+                        .build("minecraft", "monster_egg"),
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.DISGUISED_BLOCK_TYPE).get().getInternalId());
+        ////////////////////////
+        ///   Stone Bricks   ///
+        ////////////////////////
+        register(98, simpleBuilder()
+                        .trait(LanternEnumTraits.BRICK_TYPE)
+                        .defaultState(state -> state.withTrait(LanternEnumTraits.BRICK_TYPE, LanternBrickType.DEFAULT).get())
+                        .itemType(builder -> builder
+                                .keysProvider(valueContainer -> valueContainer.registerKey(Keys.BRICK_TYPE, LanternBrickType.DEFAULT)))
+                        .properties(builder -> builder
+                                .add(hardness(1.5))
+                                .add(blastResistance(30)))
+                        .translation(TranslationProvider.of(LanternEnumTraits.BRICK_TYPE))
+                        .build("minecraft", "stonebrick"),
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.BRICK_TYPE).get().getInternalId());
+        ////////////////////////////////
+        ///   Brown Mushroom Block   ///
+        ////////////////////////////////
+        register(99, mushroomBlockBuilder()
+                        .build("minecraft", "brown_mushroom_block"),
+            this::mushroomData);
+        //////////////////////////////
+        ///   Red Mushroom Block   ///
+        //////////////////////////////
+        register(100, mushroomBlockBuilder()
+                        .build("minecraft", "red_mushroom_block"),
+            this::mushroomData);
+        // TODO: 101 Iron Bars
+        // TODO: 102 Glass Pane
+        // TODO: 103 Melon Block
+        // TODO: 104 Pumpkin Stem
+        // TODO: 105 Melon Stem
+        // TODO: 106 Vines
+        // TODO: 107 Oak Fence Gate
+        // TODO: 108 Brick Stairs
+        ////////////////////
+        ///   Mycelium   ///
+        ////////////////////
+        register(110, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.6))
+                                .add(blastResistance(2.5)))
+                        .translation("tile.mycel.name")
+                        .build("minecraft", "mycelium"));
+        // TODO: 111 Lily Pad
+        register(112, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.netherBrick.name")
+                        .build("minecraft", "nether_brick"));
+        // TODO: 113 Nether Brick Fence
+        // TODO: 114 Nether Brick Stairs
+        // TODO: 115 Nether Wart
+        register(116, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(6000.0)))
+                        .translation("tile.enchantmentTable.name")
+                        .build("minecraft", "enchanting_table"));
+        // TODO: 116 Enchantment Table Functionality/Behavior
+        // TODO: 117 Brewing Stand
+        // TODO: 118 Cauldron
+        // TODO: 119 End Portal
+        // TODO: 120 End Portal Frame
+        ////////////////////
+        ///   End Stone  ///
+        ////////////////////
+        register(121, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(3.0))
+                                .add(blastResistance(45.0)))
+                        .translation("tile.whiteStone.name")
+                        .build("minecraft", "end_stone"));
+        // TODO: 122 Dragon Egg
+        // TODO: 123 Redstone Lamp (inactive)
+        // TODO: 124 Redstone Lamp (active)
         //////////////////////////
         /// Double Wooden Slab ///
         //////////////////////////
@@ -938,6 +1188,18 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                     final int portion = (byte) blockState.getTraitValue(LanternEnumTraits.PORTION_TYPE).get().getInternalId();
                     return (byte) (portion << 3 | type);
                 });
+        // TODO: 127 Cocoa
+        // TODO: 128 Sandstone Stairs
+        ///////////////////////
+        ///   Emerald Ore   ///
+        ///////////////////////
+        register(129, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(3.0))
+                                .add(blastResistance(15.0)))
+                        .translation("tile.oreEmerald.name")
+                        .build("minecraft", "emerald_ore"));
         /////////////////////
         ///  Ender Chest  ///
         /////////////////////
@@ -957,6 +1219,30 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(new EnderChestInteractionBehavior()))
                         .build("minecraft", "ender_chest"),
                 this::chestData);
+        // TODO: 131 Tripwire Hook
+        // TODO: 131 Tripwire
+        /////////////////////////
+        ///   Emerald Block   ///
+        /////////////////////////
+        register(133, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.blockEmerald.name")
+                        .build("minecraft", "emerald_block"));
+        // TODO: 134 Spruce Wood Stairs
+        // TODO: 135 Birch Wood Stairs
+        // TODO: 136 Jungle Wood Stairs
+        // TODO: 137 Command Block
+        // TODO: 138 Beacon
+        // TODO: 139 Cobblestone Wall
+        // TODO: 140 Flower Pot
+        // TODO: 141 Carrots
+        // TODO: 142 Potatoes
+        // TODO: 143 Wooden Button
+        // TODO: 144 Mob Head
+        // TODO: 145 Anvil
         /////////////////////
         /// Trapped Chest ///
         /////////////////////
@@ -964,6 +1250,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.chestTrap.name")
                         .build("minecraft", "trapped_chest"),
                 this::chestData);
+        // TODO: 147 Weighted Pressure Plate (light)
+        // TODO: 148 Weighted Pressure Plate (heavy)
+        // TODO: 149 Redstone Comparator (inactive)
+        // TODO: 150 Redstone Comparator (active)
+        // TODO: 151 Daylight Sensor
         ///////////////////////
         /// Redstone Block  ///
         ///////////////////////
@@ -1027,6 +1318,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(new QuartzLinesRotationPlacementBehavior()))
                         .build("minecraft", "quartz_block"),
                 blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.QUARTZ_TYPE).get().getInternalId());
+        // TODO: 156 Quartz Stairs
+        // TODO: 157 Activator Rail
         ////////////////////
         ///    Dropper   ///
         ////////////////////
@@ -1081,6 +1374,17 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(162, logBuilder(LanternEnumTraits.LOG2_TYPE, LanternTreeType.ACACIA)
                         .build("minecraft", "log2"),
                 blockState -> logData(blockState, blockState.getTraitValue(LanternEnumTraits.LOG2_TYPE).get().getInternalId() - 4));
+        ////////////////////////
+        ///   Slime Block    ///
+        ////////////////////////
+        register(166, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.0))
+                                .add(blastResistance(0.0)))
+                        .translation("tile.slime.name")
+                        .build("minecraft", "slime"));
+        // TODO: Slime block functionality
         ////////////////////
         ///   Barrier    ///
         ////////////////////
@@ -1090,6 +1394,80 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(PropertyProviderCollections.UNBREAKABLE))
                         .translation("tile.barrier.name")
                         .build("minecraft", "barrier"));
+        // TODO: 167 Iron Trapdoor
+        //////////////////////
+        ///   Prismarine   ///
+        //////////////////////
+        register(168, simpleBuilder()
+                        .trait(LanternEnumTraits.PRISMARINE_TYPE)
+                        .defaultState(state -> state.withTrait(LanternEnumTraits.PRISMARINE_TYPE, LanternPrismarineType.ROUGH).get())
+                        .itemType(builder -> builder
+                            .keysProvider(valueContainer -> valueContainer
+                                .registerKey(Keys.PRISMARINE_TYPE, LanternPrismarineType.ROUGH)
+                            )
+                        )
+                        .properties(builder -> builder
+                                .add(hardness(1.5))
+                                .add(blastResistance(30.0)))
+                        .translation(TranslationProvider.of(LanternEnumTraits.PRISMARINE_TYPE))
+                        .build("minecraft", "prismarine"),
+                    blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.PRISMARINE_TYPE).get().getInternalId());
+        ///////////////////////
+        ///   Sea Lantern   ///
+        ///////////////////////
+        register(169, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.3))
+                                .add(blastResistance(1.5))
+                                .add(lightEmission(15)))
+                        .translation("tile.seaLantern.name")
+                        .build("minecraft", "sea_lantern"));
+        ////////////////////
+        ///   Hay Bale   ///
+        ////////////////////
+        register(170, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.5))
+                                .add(blastResistance(2.5)))
+                        .translation("tile.hayBlock.name")
+                        .build("minecraft", "hay_block"));
+        // TODO: 171 Carpet
+        /////////////////////////
+        ///   Hardened Clay   ///
+        /////////////////////////
+        register(172, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(1.25))
+                                .add(blastResistance(30)))
+                        .translation("tile.clayHardened.name")
+                        .build("minecraft", "hardened_clay"));
+        /////////////////////////
+        ///   Block of Coal   ///
+        /////////////////////////
+        register(173, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.blockCoal.name")
+                        .build("minecraft", "coal_block"));
+        /////////////////////
+        ///   Packed Ice  ///
+        /////////////////////
+        register(174, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.5))
+                                .add(blastResistance(2.5)))
+                        .translation("tile.icePacked.name")
+                        .build("minecraft", "packed_ice"));
+        // TODO: 175 Lilac + other flowers
+        // TODO: 175 Free-standing Banner
+        // TODO: 177 Wall-mounted Banner
+        // TODO: 178 Inverted Daylight Sensor
         /////////////////////
         /// Red Sandstone ///
         /////////////////////
@@ -1125,6 +1503,124 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .boundingBox(BoundingBoxes::slab)
                         .build("minecraft", "stone_slab2"),
                 blockState -> stoneSlabData(blockState, blockState.getTraitValue(LanternEnumTraits.STONE_SLAB2_TYPE).get().getInternalId() - 8));
+        // TODO: 183 Spruce Fence Gate
+        // TODO: 184 Birch Fence Gate
+        // TODO: 185 Jungle Fence Gate
+        // TODO: 186 Dark Oak Fence Gate
+        // TODO: 187 Acacia Fence Gate
+        // TODO: 188 Spruce Fence
+        // TODO: 189 Birch Fence
+        // TODO: 190 Jungle Fence
+        // TODO: 191 Dark Oak Fence
+        // TODO: 192 Acacia Fence
+        // TODO: 193 Spruce Door Block
+        // TODO: 194 Birch Door Block
+        // TODO: 195 Jungle Door Block
+        // TODO: 196 Acacia Door Block
+        // TODO: 197 Dark Oak Block
+        // TODO: 198 End Rod
+        // TODO: 199 Chorus Plant
+        // TODO: 200 Chorus Flower
+        ///////////////////////
+        ///   Purpur Block  ///
+        ///////////////////////
+        register(201, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(1.5))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.purpurBlock.name")
+                        .build("minecraft", "purpur_block"));
+        ////////////////////////
+        ///   Purpur Pillar  ///
+        ////////////////////////
+        register(202, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(1.5))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.purpurPillar.name")
+                        .build("minecraft", "purpur_pillar"));
+        // TODO: 203 Purpur Stairs
+        // TODO: 204 Purpur Double Slab
+        // TODO: 205 Purpur Slab
+        ///////////////////////////
+        ///   End Stone Bricks  ///
+        ///////////////////////////
+        register(202, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.8))
+                                .add(blastResistance(4.0)))
+                        .translation("tile.endBricks.name")
+                        .build("minecraft", "end_bricks"));
+        // TODO: 207 Beetroot Block
+        /////////////////////
+        ///   Grass Path  ///
+        /////////////////////
+        register(208, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.6))
+                                .add(blastResistance(3.25)))
+                        .translation("tile.grassPath.name")
+                        .build("minecraft", "grass_path"));
+        // TODO: 209 End Gateway
+        // TODO: 210 Repeating Command Block
+        // TODO: 211 Chain Command Block
+        //////////////////////
+        ///   Frosted Ice  ///
+        //////////////////////
+        register(212, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.5))
+                                .add(blastResistance(2.5)))
+                        .translation("tile.frostedIce.name")
+                        .build("minecraft", "frosted_ice"));
+        //////////////////////
+        ///   Magma Block  ///
+        //////////////////////
+        register(213, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.5))
+                                .add(blastResistance(2.5)))
+                        .translation("tile.magma.name")
+                        .build("minecraft", "magma"));
+        // TODO: Magma Block Damage Functionality
+        ////////////////////////////
+        ///   Nether Wart Block  ///
+        ////////////////////////////
+        register(214, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(1.0))
+                                .add(blastResistance(5.0)))
+                        .translation("tile.netherWartBlock.name")
+                        .build("minecraft", "nether_wart_block"));
+        ///////////////////////////
+        ///   Red Nether Brick  ///
+        ///////////////////////////
+        register(215, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.redNetherBrick.name")
+                    .build("minecraft", "red_nether_brick"));
+        /////////////////////
+        ///   Bone Block  ///
+        /////////////////////
+        register(216, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(30.0)))
+                        .translation("tile.boneBlock.name")
+                        .build("minecraft", "bone_block"));
+        // TODO: 217 Structure Void
+        // TODO: 218 Observer
         ///////////////////////////
         ///  White Shulker Box  ///
         ///////////////////////////
@@ -1237,6 +1733,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.shulkerBoxBlack.name")
                         .build("minecraft", "black_shulker_box"),
                 this::shulkerBoxData);
+        // TODO: 255 Structure Block
 
         // @formatter:on
     }
@@ -1303,6 +1800,22 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private byte pumpkinData(BlockState blockState) {
         return (byte) horizontalDirectionData(blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get());
+    }
+
+    private BlockTypeBuilder mushroomBlockBuilder() {
+        return simpleBuilder()
+                .itemType()
+                .trait(LanternEnumTraits.BIG_MUSHROOM_TYPE)
+                .defaultState(state -> state
+                        .withTrait(LanternEnumTraits.BIG_MUSHROOM_TYPE, LanternBigMushroomType.ALL_OUTSIDE).get())
+                .properties(builder -> builder
+                        .add(hardness(0.2))
+                        .add(blastResistance(1.0)))
+                .translation("tile.mushroom.name");
+    }
+
+    private byte mushroomData(BlockState blockState) {
+        return (byte) blockState.getTraitValue(LanternEnumTraits.BIG_MUSHROOM_TYPE).get().getInternalId();
     }
 
     private BlockTypeBuilder dyedBuilder(String translationKey) {

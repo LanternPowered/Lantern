@@ -26,11 +26,15 @@
 package org.lanternpowered.server.block.trait;
 
 import org.lanternpowered.server.data.type.LanternBedPart;
+import org.lanternpowered.server.data.type.LanternBigMushroomType;
+import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternDirtType;
+import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.data.type.LanternLogAxis;
 import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPortionType;
+import org.lanternpowered.server.data.type.LanternPrismarineType;
 import org.lanternpowered.server.data.type.LanternQuartzType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.LanternSandType;
@@ -68,6 +72,18 @@ public final class LanternEnumTraits {
 
     public static final EnumTrait<LanternStoneType> STONE_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.STONE_TYPE, LanternStoneType.class);
+
+    public static final EnumTrait<LanternBrickType> BRICK_TYPE =
+            LanternEnumTrait.of("variant", (Key) Keys.BRICK_TYPE, LanternBrickType.class);
+
+    public static final EnumTrait<LanternDisguisedBlockType> DISGUISED_BLOCK_TYPE =
+            LanternEnumTrait.of("variant", (Key) Keys.DISGUISED_BLOCK_TYPE, LanternDisguisedBlockType.class);
+
+    public static final EnumTrait<LanternBigMushroomType> BIG_MUSHROOM_TYPE =
+            LanternEnumTrait.of("variant", (Key) Keys.BIG_MUSHROOM_TYPE, LanternBigMushroomType.class);
+
+    public static final EnumTrait<LanternPrismarineType> PRISMARINE_TYPE =
+            LanternEnumTrait.of("variant", (Key) Keys.PRISMARINE_TYPE, LanternPrismarineType.class);
 
     public static final EnumTrait<LanternDirtType> DIRT_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.DIRT_TYPE, LanternDirtType.class);

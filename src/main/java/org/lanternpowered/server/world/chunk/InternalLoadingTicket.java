@@ -29,6 +29,8 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.MemoryDataContainer;
 
 final class InternalLoadingTicket implements ChunkLoadingTicket {
 
@@ -47,6 +49,15 @@ final class InternalLoadingTicket implements ChunkLoadingTicket {
     @Override
     public int getMaxNumChunks() {
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public DataContainer getCompanionData() {
+        return new MemoryDataContainer();
+    }
+
+    @Override
+    public void setCompanionData(DataContainer container) {
     }
 
     @Override

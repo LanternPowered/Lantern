@@ -71,6 +71,7 @@ public class CareerRegistryModule extends PluginCatalogRegistryModule<Career> {
         register(new LanternCareer("minecraft", "shepherd", Professions.FARMER));
         register(new LanternCareer("minecraft", "fletcher", Professions.FARMER));
         register(new LanternCareer("minecraft", "librarian", Professions.LIBRARIAN));
+        register(new LanternCareer("minecraft", "cartographer", Professions.LIBRARIAN));
         register(new LanternCareer("minecraft", "cleric", Professions.PRIEST));
         register(new LanternCareer("minecraft", "armor", Professions.BLACKSMITH));
         register(new LanternCareer("minecraft", "weapon", Professions.BLACKSMITH));

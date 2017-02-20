@@ -80,7 +80,7 @@ import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.util.generator.event.factory.ClassGenerator;
+import org.spongepowered.api.util.generator.GeneratorUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -219,7 +219,7 @@ public class FilterGenerator {
                 mv.visitIntInsn(BIPUSH, i);
                 Type paramType = Type.getType(params[i].getType());
                 mv.visitVarInsn(paramType.getOpcode(ILOAD), plocals[i - 1]);
-                ClassGenerator.visitBoxingMethod(mv, paramType);
+                GeneratorUtils.visitBoxingMethod(mv, paramType);
                 mv.visitInsn(AASTORE);
             }
             mv.visitInsn(ARETURN);

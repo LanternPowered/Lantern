@@ -61,7 +61,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.util.generator.event.factory.ClassGenerator;
+import org.spongepowered.api.util.generator.GeneratorUtils;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -172,7 +172,7 @@ final class ClassEventListenerFactory implements AnnotatedEventListener.Factory 
                 mv.visitIntInsn(BIPUSH, i);
                 mv.visitInsn(AALOAD);
                 Type paramType = Type.getType(method.getParameterTypes()[i]);
-                ClassGenerator.visitUnboxingMethod(mv, paramType);
+                GeneratorUtils.visitUnboxingMethod(mv, paramType);
             }
             mv.visitMethodInsn(INVOKEVIRTUAL, handleName, method.getName(), eventDescriptor, false);
             mv.visitLabel(l2);

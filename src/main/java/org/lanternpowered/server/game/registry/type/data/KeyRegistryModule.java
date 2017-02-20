@@ -29,7 +29,6 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeImmutable
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMapKeyWithKeyAndValue;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBoundedValueKey;
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeNextEntityToSpawnKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makePatternListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
@@ -38,6 +37,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeWeightedC
 import static org.spongepowered.api.data.DataQuery.of;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.block.BlockState;
@@ -91,6 +91,7 @@ import org.spongepowered.api.data.type.WireAttachmentType;
 import org.spongepowered.api.data.type.ZombieType;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
@@ -108,6 +109,7 @@ import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RespawnLocation;
 import org.spongepowered.api.util.rotation.Rotation;
+import org.spongepowered.api.util.weighted.WeightedSerializableObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -324,11 +326,11 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("SlimeSize"), "sponge:slime_size"));
         register(makeValueKey(Boolean.class, of("Snowed"), "sponge:snowed"));
         register(makeValueKey(EntityType.class, of("SpawnableEntityType"), "sponge:spawnable_entity_type"));
-        register(makeWeightedCollectionKey(EntitySnapshot.class, of("SpawnerEntities"), "sponge:spawner_entities"));
+        register(makeWeightedCollectionKey(EntityArchetype.class, of("SpawnerEntities"), "sponge:spawner_entities"));
         register(makeMutableBoundedValueKey(Short.class, of("SpawnerMaximumDelay"), "sponge:spawner_maximum_delay"));
         register(makeMutableBoundedValueKey(Short.class, of("SpawnerMaximumNearbyEntities"), "sponge:spawner_maximum_nearby_entities"));
         register(makeMutableBoundedValueKey(Short.class, of("SpawnerMinimumDelay"), "sponge:spawner_minimum_delay"));
-        register(makeNextEntityToSpawnKey(of("SpawnerNextEntityToSpawn"), "sponge:spawner_next_entity_to_spawn"));
+        register(makeValueKey(new TypeToken<WeightedSerializableObject<EntityArchetype>>() {}, of("SpawnerNextEntityToSpawn"), "sponge:spawner_next_entity_to_spawn"));
         register(makeMutableBoundedValueKey(Short.class, of("SpawnerRemainingDelay"), "sponge:spawner_remaining_delay"));
         register(makeMutableBoundedValueKey(Short.class, of("SpawnerRequiredPlayerRange"), "sponge:spawner_required_player_range"));
         register(makeMutableBoundedValueKey(Short.class, of("SpawnerSpawnCount"), "sponge:spawner_spawn_count"));

@@ -30,7 +30,6 @@ import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.KeyFactory;
-import org.spongepowered.api.data.manipulator.mutable.MobSpawnerData;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
@@ -42,8 +41,6 @@ import org.spongepowered.api.data.value.mutable.PatternListValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
-import org.spongepowered.api.entity.EntitySnapshot;
-import org.spongepowered.api.util.weighted.WeightedSerializableObject;
 import org.spongepowered.api.util.weighted.WeightedTable;
 
 import java.util.List;
@@ -299,18 +296,6 @@ public final class LanternKeyFactory {
     public static <E> Key<WeightedCollectionValue<E>> makeWeightedCollectionKey(Class<E> elementType,
             DataQuery query, String id, String name) {
         return makeWeightedCollectionKey(TypeToken.of(elementType), query, id, name);
-    }
-
-    public static Key<MobSpawnerData.NextEntityToSpawnValue> makeNextEntityToSpawnKey(
-            DataQuery query, String id, String name) {
-        final TypeToken<WeightedSerializableObject<EntitySnapshot>> elementToken = new TypeToken<WeightedSerializableObject<EntitySnapshot>>() {};
-        final TypeToken<MobSpawnerData.NextEntityToSpawnValue> valueToken = new TypeToken<MobSpawnerData.NextEntityToSpawnValue>() {};
-        return makeSingleKey(elementToken, valueToken, query, id, name);
-    }
-
-    public static Key<MobSpawnerData.NextEntityToSpawnValue> makeNextEntityToSpawnKey(
-            DataQuery query, String id) {
-        return makeNextEntityToSpawnKey(query, id, query.last().toString());
     }
 
     private LanternKeyFactory() {

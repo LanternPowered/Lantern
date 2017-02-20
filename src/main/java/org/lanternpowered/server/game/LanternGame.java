@@ -116,12 +116,8 @@ import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.EventManager;
-import org.spongepowered.api.event.SpongeEventFactoryUtils;
-import org.spongepowered.api.event.game.state.GameConstructionEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
@@ -505,8 +501,10 @@ public class LanternGame implements Game {
         // Create the teleport helper
         this.teleportHelper = new LanternTeleportHelper();
 
+        final Cause gameCause = Cause.source(this).build();
+
         // Call the construction events
-        postGameStateChange(GameState.CONSTRUCTION, GameConstructionEvent.class);
+        postGameStateChange(SpongeEventFactory.createGameConstructionEvent(gameCause));
 
         // Load libraries
         final Path librariesFolder = Paths.get(LIBRARIES_FOLDER);
@@ -542,7 +540,7 @@ public class LanternGame implements Game {
                 });
 
         // Pre-init phase
-        postGameStateChange(GameState.PRE_INITIALIZATION, GamePreInitializationEvent.class);
+        postGameStateChange(SpongeEventFactory.createGamePreInitializationEvent(gameCause));
 
         // Create the default sql service
         registerService(SqlService.class, new LanternSqlService());
@@ -582,21 +580,21 @@ public class LanternGame implements Game {
         }
 
         // Init phase
-        postGameStateChange(GameState.INITIALIZATION, GameInitializationEvent.class);
+        postGameStateChange(SpongeEventFactory.createGameInitializationEvent(gameCause));
 
         // Call post init phase for registry
         this.gameRegistry.postInit();
 
         // Post-init phase
-        postGameStateChange(GameState.POST_INITIALIZATION, GamePostInitializationEvent.class);
+        postGameStateChange(SpongeEventFactory.createGamePostInitializationEvent(gameCause));
 
         // Load-complete phase
-        postGameStateChange(GameState.LOAD_COMPLETE, GameLoadCompleteEvent.class);
+        postGameStateChange(SpongeEventFactory.createGameLoadCompleteEvent(gameCause));
     }
 
-    public <T extends GameStateEvent> void postGameStateChange(GameState gameState, Class<T> eventClass) {
-        this.gameState = checkNotNull(gameState, "gameState");
-        this.eventManager.post(SpongeEventFactoryUtils.createState(eventClass, this));
+    public <T extends GameStateEvent> void postGameStateChange(T event) {
+        this.gameState = checkNotNull(event.getState(), "gameState");
+        this.eventManager.post(event);
     }
 
     private <T> void registerService(Class<T> serviceClass, T serviceImpl) {

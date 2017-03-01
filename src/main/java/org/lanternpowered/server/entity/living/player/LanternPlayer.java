@@ -39,6 +39,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternHumanoid;
+import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
@@ -97,10 +98,14 @@ import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -232,6 +237,11 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
      * {@link PlayerStore}.
      */
     @Nullable private LanternWorldProperties tempWorld;
+
+    /**
+     * The entity that is being spectated by this player.
+     */
+    @Nullable private Entity spectatorEntity;
 
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
@@ -882,6 +892,22 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         return this.chatColorsEnabled;
     }
 
+    @Override
+    public MessageChannelEvent.Chat simulateChat(Text message, Cause cause) {
+        checkNotNull(message, "message");
+        checkNotNull(cause, "cause");
+
+        final Text nameText = get(Keys.DISPLAY_NAME).get();
+        final MessageChannel channel = getMessageChannel();
+        final MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(cause,
+                channel, Optional.of(channel), new MessageEvent.MessageFormatter(nameText, message), message, false);
+        if (!Sponge.getEventManager().post(event) && !event.isMessageCancelled()) {
+            event.getChannel().ifPresent(c -> c.send(this, event.getMessage(), ChatTypes.CHAT));
+        }
+
+        return event;
+    }
+
     public void setChatColorsEnabled(boolean enabled) {
         this.chatColorsEnabled = enabled;
     }
@@ -938,7 +964,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public Text getTeamRepresentation() {
-        return Text.of(this.getName());
+        return Text.of(getName());
     }
 
     @Override
@@ -959,6 +985,17 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public boolean respawnPlayer() {
         return false;
+    }
+
+    @Override
+    public Optional<Entity> getSpectatorTarget() {
+        return Optional.ofNullable(this.spectatorEntity);
+    }
+
+    @Override
+    public void setSpectatorTarget(@Nullable Entity entity) {
+        this.spectatorEntity = entity;
+        triggerEvent(new SpectateEntityEvent(entity));
     }
 
     public PlayerInteractionHandler getInteractionHandler() {

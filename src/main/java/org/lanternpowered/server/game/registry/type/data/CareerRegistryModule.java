@@ -27,9 +27,11 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternCareer;
 import org.lanternpowered.server.data.type.LanternProfession;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.Careers;
+import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.Professions;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
@@ -77,5 +79,8 @@ public class CareerRegistryModule extends PluginCatalogRegistryModule<Career> {
         register(new LanternCareer("minecraft", "weapon", Professions.BLACKSMITH));
         register(new LanternCareer("minecraft", "butcher", Professions.BUTCHER));
         register(new LanternCareer("minecraft", "leather", Professions.BUTCHER));
+        // TODO: Use field when available
+        register(new LanternCareer("minecraft", "nitwit",
+                Lantern.getRegistry().getType(Profession.class, "minecraft:nitwit").get()));
     }
 }

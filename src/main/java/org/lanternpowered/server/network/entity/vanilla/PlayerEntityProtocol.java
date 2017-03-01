@@ -31,6 +31,7 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
+import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -43,9 +44,11 @@ import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCamera;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemTypes;
@@ -139,7 +142,14 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
-        if (event instanceof RefreshAbilitiesPlayerEvent) {
+        if (event instanceof SpectateEntityEvent) {
+            final Entity entity = ((SpectateEntityEvent) event).getSpectatedEntity().orElse(null);
+            if (entity == null) {
+                context.sendToSelf(() -> new MessagePlayOutSetCamera(getRootEntityId()));
+            } else {
+                context.getId(entity).ifPresent(id -> context.sendToSelf(() -> new MessagePlayOutSetCamera(id)));
+            }
+        } else if (event instanceof RefreshAbilitiesPlayerEvent) {
             final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
             final float flySpeed = getFlySpeed();
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(

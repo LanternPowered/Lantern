@@ -252,6 +252,8 @@ shadowJar {
     exclude 'Version.java.template'
     exclude 'log4j2_indev.xml'
 
+    from zipTree(api.tasks.genEventImpl.outputs.files.first())
+
     // Make sure that the jar is generated
     afterEvaluate {
         // Include the fastutil classes

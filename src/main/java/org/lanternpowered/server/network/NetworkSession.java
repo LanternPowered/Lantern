@@ -44,6 +44,7 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.timeout.TimeoutException;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.concurrent.ScheduledFuture;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.PlayerIO;
@@ -215,6 +216,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     private long keepAliveTime;
 
     /**
+     * The keep alive task.
+     */
+    private ScheduledFuture<?> keepAliveTask;
+
+    /**
      * The protocol version.
      */
     private int protocolVersion = -1;
@@ -223,21 +229,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.networkManager = networkManager;
         this.channel = channel;
         this.server = server;
-    }
-
-    @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        // Send a keep alive message to the client every 40 ticks (2 seconds),
-        // doing this also in the event loop to keep it separate from the main
-        // thread.
-        this.channel.eventLoop().scheduleAtFixedRate(() -> {
-            final ProtocolState protocolState = this.protocolState;
-            if (protocolState == ProtocolState.PLAY || protocolState == ProtocolState.FORGE_HANDSHAKE) {
-                this.keepAliveId = this.random.nextInt();
-                this.keepAliveTime = System.currentTimeMillis();
-                send(new MessageInOutKeepAlive(this.keepAliveId));
-            }
-        }, 0, 2, TimeUnit.SECONDS);
     }
 
     private void handleKeepAlive(MessageInOutKeepAlive message) {
@@ -315,6 +306,17 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         this.networkManager.onActive(this);
+        // Send a keep alive message to the client every 40 ticks (2 seconds),
+        // doing this also in the event loop to keep it separate from the main
+        // thread.
+        this.keepAliveTask = this.channel.eventLoop().scheduleAtFixedRate(() -> {
+            final ProtocolState protocolState = this.protocolState;
+            if (protocolState == ProtocolState.PLAY || protocolState == ProtocolState.FORGE_HANDSHAKE) {
+                this.keepAliveId = this.random.nextInt();
+                this.keepAliveTime = System.currentTimeMillis();
+                send(new MessageInOutKeepAlive(this.keepAliveId));
+            }
+        }, 0, 2, TimeUnit.SECONDS);
     }
 
     @Override
@@ -341,6 +343,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                             " (" + this.gameProfile.getName().orElse("Unknown") + ')',
                     this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
         }
+        this.keepAliveTask.cancel(true);
+        this.keepAliveTask = null;
     }
 
     @Override

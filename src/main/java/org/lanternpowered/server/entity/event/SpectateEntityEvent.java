@@ -23,26 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.entity.event;
 
-import org.lanternpowered.server.data.type.LanternProfession;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.data.type.Profession;
-import org.spongepowered.api.data.type.Professions;
+import org.spongepowered.api.entity.Entity;
 
-public class ProfessionRegistryModule extends PluginCatalogRegistryModule<Profession> {
+import java.util.Optional;
 
-    public ProfessionRegistryModule() {
-        super(Professions.class);
+import javax.annotation.Nullable;
+
+public final class SpectateEntityEvent implements EntityEvent {
+
+    @Nullable private final Entity spectatedEntity;
+
+    public SpectateEntityEvent(@Nullable Entity spectatedEntity) {
+        this.spectatedEntity = spectatedEntity;
+    }
+
+    public Optional<Entity> getSpectatedEntity() {
+        return Optional.ofNullable(this.spectatedEntity);
     }
 
     @Override
-    public void registerDefaults() {
-        register(new LanternProfession("minecraft", "farmer", 0));
-        register(new LanternProfession("minecraft", "librarian", 1));
-        register(new LanternProfession("minecraft", "priest", 2));
-        register(new LanternProfession("minecraft", "blacksmith", 3));
-        register(new LanternProfession("minecraft", "butcher", 4));
-        register(new LanternProfession("minecraft", "nitwit", 5));
+    public EntityEventType type() {
+        return EntityEventType.ALIVE;
     }
 }

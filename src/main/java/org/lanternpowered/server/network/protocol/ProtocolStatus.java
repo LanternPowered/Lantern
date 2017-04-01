@@ -38,13 +38,15 @@ import org.lanternpowered.server.network.vanilla.message.type.status.MessageStat
 final class ProtocolStatus extends ProtocolBase {
 
     ProtocolStatus() {
-        MessageRegistry inbound = this.inbound();
-        MessageRegistry outbound = this.outbound();
+        final MessageRegistry inbound = inbound();
+        final MessageRegistry outbound = outbound();
 
-        inbound.bind(0x00, CodecStatusInRequest.class, MessageStatusInRequest.class).bindHandler(new HandlerStatusRequest());
-        inbound.bind(0x01, CodecStatusInOutPing.class, MessageStatusInOutPing.class).bindHandler(new HandlerStatusPing());
+        inbound.bind(CodecStatusInRequest.class, MessageStatusInRequest.class)
+                .bindHandler(new HandlerStatusRequest());
+        inbound.bind(CodecStatusInOutPing.class, MessageStatusInOutPing.class)
+                .bindHandler(new HandlerStatusPing());
 
-        outbound.bind(0x00, CodecStatusOutResponse.class, MessageStatusOutResponse.class);
-        outbound.bind(0x01, CodecStatusInOutPing.class, MessageStatusInOutPing.class);
+        outbound.bind(CodecStatusOutResponse.class, MessageStatusOutResponse.class);
+        outbound.bind(CodecStatusInOutPing.class, MessageStatusInOutPing.class);
     }
 }

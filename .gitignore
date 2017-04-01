@@ -76,3 +76,4 @@ nb-configuration.xml
 ###############
 /openCmd.bat
 /run
+*.launch

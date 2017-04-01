@@ -49,14 +49,14 @@ final class ProtocolLogin extends ProtocolBase {
         final MessageRegistry inbound = this.inbound();
         final MessageRegistry outbound = this.outbound();
 
-        inbound.bind(0x00, CodecLoginInStart.class, MessageLoginInStart.class).bindHandler(new HandlerLoginStart());
-        inbound.bind(0x01, CodecLoginInEncryptionResponse.class, MessageLoginInEncryptionResponse.class)
+        inbound.bind(CodecLoginInStart.class, MessageLoginInStart.class).bindHandler(new HandlerLoginStart());
+        inbound.bind(CodecLoginInEncryptionResponse.class, MessageLoginInEncryptionResponse.class)
                 .bindHandler(new HandlerEncryptionResponse());
         inbound.bindHandler(MessageLoginInFinish.class, new HandlerLoginFinish());
 
-        outbound.bind(0x00, CodecOutDisconnect.class, MessageOutDisconnect.class);
-        outbound.bind(0x01, CodecLoginOutEncryptionRequest.class, MessageLoginOutEncryptionRequest.class);
-        outbound.bind(0x02, CodecLoginOutSuccess.class, MessageLoginOutSuccess.class);
-        outbound.bind(0x03, CodecLoginOutSetCompression.class, MessageLoginOutSetCompression.class);
+        outbound.bind(CodecOutDisconnect.class, MessageOutDisconnect.class);
+        outbound.bind(CodecLoginOutEncryptionRequest.class, MessageLoginOutEncryptionRequest.class);
+        outbound.bind(CodecLoginOutSuccess.class, MessageLoginOutSuccess.class);
+        outbound.bind(CodecLoginOutSetCompression.class, MessageLoginOutSetCompression.class);
     }
 }

@@ -31,16 +31,18 @@ import static org.lanternpowered.server.text.LanternTexts.fixJson;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextParseException;
 import org.spongepowered.api.text.serializer.TextSerializer;
 
-public final class LanternJsonTextSerializer implements TextSerializer {
+public final class LanternJsonTextSerializer extends PluginCatalogType.Base implements TextSerializer {
 
     private final Gson gson;
 
-    public LanternJsonTextSerializer(TranslationManager translationManager) {
+    public LanternJsonTextSerializer(String pluginId, String name, TranslationManager translationManager) {
+        super(pluginId, name);
         this.gson = JsonTextSerializer.applyTo(new GsonBuilder(), translationManager, false).create();
     }
 

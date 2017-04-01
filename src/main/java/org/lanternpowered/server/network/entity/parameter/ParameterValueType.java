@@ -27,15 +27,18 @@ package org.lanternpowered.server.network.entity.parameter;
 
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 public final class ParameterValueType<T> {
 
+    private final static AtomicInteger COUNTER = new AtomicInteger();
+
     private final byte internalId;
     private final BiConsumer<ByteBuffer, T> serializer;
 
-    ParameterValueType(int internalId, BiConsumer<ByteBuffer, T> serializer) {
-        this.internalId = (byte) internalId;
+    ParameterValueType(BiConsumer<ByteBuffer, T> serializer) {
+        this.internalId = (byte) COUNTER.getAndIncrement();
         this.serializer = serializer;
     }
 

@@ -25,50 +25,77 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.CatalogMappingData;
-import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
-import org.lanternpowered.server.text.LanternTextSerializerFactory;
 import org.lanternpowered.server.text.PlainTextSerializer;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.lanternpowered.server.text.xml.XmlTextSerializer;
-import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.text.serializer.TextSerializer;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.util.Collections;
-import java.util.List;
-
 @RegistrationDependency({ TranslationManagerRegistryModule.class, TextColorRegistryModule.class, TextStyleRegistryModule.class })
-public final class TextSerializersRegistryModule implements RegistryModule, CatalogMappingDataHolder {
+public final class TextSerializersRegistryModule extends AdditionalPluginCatalogRegistryModule<TextSerializer> {
 
-    private TextSerializerFactory textSerializerFactory;
+    private final Char2ObjectMap<org.spongepowered.api.text.serializer.FormattingCodeTextSerializer> formattingCodeSerializers =
+            new Char2ObjectOpenHashMap<>();
+
+    private final TextSerializerFactory textSerializerFactory = legacyChar -> {
+        if (legacyChar == TextSerializers.LEGACY_FORMATTING_CODE.getCharacter()) {
+            return TextSerializers.LEGACY_FORMATTING_CODE;
+        } else if (legacyChar == TextSerializers.FORMATTING_CODE.getCharacter()) {
+            return TextSerializers.FORMATTING_CODE;
+        } else {
+            synchronized (this.formattingCodeSerializers) {
+                org.spongepowered.api.text.serializer.FormattingCodeTextSerializer serializer = this.formattingCodeSerializers.get(legacyChar);
+                if (serializer == null) {
+                    this.formattingCodeSerializers.put(legacyChar, serializer = new FormattingCodeTextSerializer(
+                            "minecraft", "formatting_code_" + legacyChar, legacyChar));
+                }
+                return serializer;
+            }
+        }
+    };
+
+    public TextSerializersRegistryModule() {
+        super(TextSerializers.class);
+    }
 
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        this.textSerializerFactory = new LanternTextSerializerFactory();
+        register(new PlainTextSerializer("minecraft", "plain"));
+        register(new FormattingCodeTextSerializer("minecraft", "legacy_formatting_code", TextConstants.LEGACY_CHAR));
+        register(new FormattingCodeTextSerializer("minecraft", "formatting_code", '&'));
+        register(new LanternJsonTextSerializer("minecraft", "json", Lantern.getGame().getRegistry().getRegistryModule(
+                TranslationManagerRegistryModule.class).get().getTranslationManager()));
+        register(new XmlTextSerializer("minecraft", "text_xml"));
     }
 
     @Override
-    public List<CatalogMappingData> getCatalogMappings() {
-        return Collections.singletonList(new CatalogMappingData(TextSerializers.class, ImmutableMap.<String, Object>builder()
-                .put("plain", new PlainTextSerializer())
-                .put("legacy_formatting_code", new FormattingCodeTextSerializer(TextConstants.LEGACY_CHAR))
-                .put("formatting_code", new FormattingCodeTextSerializer('&'))
-                .put("json", new LanternJsonTextSerializer(Lantern.getGame().getRegistry().getRegistryModule(
-                        TranslationManagerRegistryModule.class).get().getTranslationManager()))
-                .put("text_xml", new XmlTextSerializer())
-                .build()));
+    protected void register(TextSerializer catalogType, boolean disallowInbuiltPluginIds) {
+        super.register(catalogType, disallowInbuiltPluginIds);
+        if (catalogType instanceof org.spongepowered.api.text.serializer.FormattingCodeTextSerializer) {
+            final org.spongepowered.api.text.serializer.FormattingCodeTextSerializer serializer =
+                    (org.spongepowered.api.text.serializer.FormattingCodeTextSerializer) catalogType;
+            synchronized (this.formattingCodeSerializers) {
+                if (this.formattingCodeSerializers.containsKey(serializer.getCharacter())) {
+                    Lantern.getLogger().warn("There is already a FormattingCodeTextSerializer registered for the character: {}."
+                                    + "The original {} will be overridden by {}",
+                            serializer.getCharacter(), this.formattingCodeSerializers.get(serializer.getCharacter()).getId(), serializer.getId());
+                }
+                this.formattingCodeSerializers.put(serializer.getCharacter(), serializer);
+            }
+        }
     }
 
     public TextSerializerFactory getTextSerializerFactory() {
         return this.textSerializerFactory;
     }
-
 }

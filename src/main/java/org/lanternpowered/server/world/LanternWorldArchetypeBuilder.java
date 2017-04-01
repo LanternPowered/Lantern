@@ -83,8 +83,9 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     private boolean commandsAllowed; // No builder method available
     private boolean pvpEnabled;
     private boolean generateSpawnOnLoad;
+    private boolean isSeedRandomized;
 
-    private long seed;
+    @Nullable private Long seed;
 
     public LanternWorldArchetypeBuilder() {
         this.reset();
@@ -100,7 +101,6 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.gameMode = archetype0.getGameMode();
         this.keepsSpawnLoaded = archetype0.doesKeepSpawnLoaded();
         this.usesMapFeatures = archetype0.usesMapFeatures();
-        this.seed = archetype0.getSeed();
         this.generatorModifiers = archetype0.getGeneratorModifiers();
         this.dimensionType = archetype0.getDimensionType();
         this.generatorType = archetype0.getGeneratorType();
@@ -113,6 +113,12 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.pvpEnabled = archetype0.isPVPEnabled();
         this.generateSpawnOnLoad = archetype0.doesGenerateSpawnOnLoad();
         this.portalAgentType = archetype0.getPortalAgentType();
+        this.isSeedRandomized = archetype0.isSeedRandomized();
+        if (!this.isSeedRandomized) {
+            this.seed = archetype0.getSeed();
+        } else {
+            this.seed = null;
+        }
         return this;
     }
 
@@ -171,6 +177,12 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     }
 
     @Override
+    public WorldArchetype.Builder randomSeed() {
+        this.isSeedRandomized = true;
+        return this;
+    }
+
+    @Override
     public LanternWorldArchetypeBuilder gameMode(GameMode gameMode) {
         this.gameMode = checkNotNull(gameMode, "gameMode");
         return this;
@@ -185,8 +197,8 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     @Override
     public LanternWorldArchetypeBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
-        Set<WorldGeneratorModifier> entries = Sets.newHashSet();
-        GeneratorModifierRegistryModule registry = Lantern.getGame().getRegistry().getWorldGeneratorModifierRegistry();
+        final Set<WorldGeneratorModifier> entries = Sets.newHashSet();
+        final GeneratorModifierRegistryModule registry = Lantern.getGame().getRegistry().getWorldGeneratorModifierRegistry();
         for (WorldGeneratorModifier modifier : modifiers) {
             checkNotNull(modifier, "modifier");
             checkState(registry.getById(modifier.getId()).isPresent(), "Modifier not registered: " + modifier.getId()
@@ -287,11 +299,17 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
                 this.dimensionType.doesWaterEvaporate() : this.waterEvaporates;
         final boolean allowPlayerRespawns = this.allowPlayerRespawns == null ?
                 this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
+        long seed;
+        if (this.seed == null || this.isSeedRandomized) {
+            seed = new Random().nextLong();
+        } else {
+            seed = this.seed;
+        }
         return new LanternWorldArchetype(id, name, this.gameMode, this.dimensionType, generatorType,
                 this.generatorModifiers, generatorSettings, this.difficulty, this.serializationBehavior, this.portalAgentType,
                 this.hardcore, this.enabled, this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
                 this.generateBonusChest, this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.generateSpawnOnLoad,
-                this.seed, this.buildHeight);
+                this.isSeedRandomized, seed, this.buildHeight);
     }
 
     @Override
@@ -309,12 +327,13 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.commandsAllowed = true;
         this.dimensionType = null;
         this.generatorModifiers = Collections.emptySet();
-        this.seed = new Random().nextLong();
+        this.seed = null;
         this.generatorType = null;
         this.generatorSettings = null;
         this.waterEvaporates = null;
         this.buildHeight = 256;
         this.serializationBehavior = SerializationBehaviors.AUTOMATIC;
+        this.isSeedRandomized = false;
         return this;
     }
 }

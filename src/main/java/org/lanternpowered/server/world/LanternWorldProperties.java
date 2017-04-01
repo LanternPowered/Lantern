@@ -172,20 +172,20 @@ public final class LanternWorldProperties implements WorldProperties {
         this.commandsAllowed = worldArchetype.areCommandsAllowed();
         this.dimensionType = worldArchetype.getDimensionType();
         this.portalAgentType = worldArchetype.getPortalAgentType();
-        this.setGeneratorType(worldArchetype.getGeneratorType());
+        setGeneratorType(worldArchetype.getGeneratorType());
         this.worldConfig.getGeneration().setGeneratorSettings(worldArchetype.getGeneratorSettings());
         this.generateBonusChest = worldArchetype.doesGenerateBonusChest();
         this.mapFeatures = worldArchetype.usesMapFeatures();
-        this.worldConfig.getGeneration().setSeed(worldArchetype.getSeed());
+        setSeed(worldArchetype.getSeed());
         this.worldConfig.setGameMode(worldArchetype.getGameMode());
         this.worldConfig.setAllowPlayerRespawns(worldArchetype.allowPlayerRespawns());
         this.worldConfig.setDifficulty(worldArchetype.getDifficulty());
         this.worldConfig.setKeepSpawnLoaded(worldArchetype.doesKeepSpawnLoaded());
         this.worldConfig.setDoesWaterEvaporate(worldArchetype.waterEvaporates());
-        this.setGeneratorModifiers(worldArchetype.getGeneratorModifiers());
-        this.setEnabled(worldArchetype.isEnabled());
+        setGeneratorModifiers(worldArchetype.getGeneratorModifiers());
+        setEnabled(worldArchetype.isEnabled());
         this.worldConfig.setPVPEnabled(worldArchetype.isPVPEnabled());
-        this.setBuildHeight(worldArchetype.getBuildHeight());
+        setBuildHeight(worldArchetype.getBuildHeight());
         this.worldConfig.setHardcore(worldArchetype.isHardcore());
         this.worldConfig.setLowHorizon(worldArchetype.getGeneratorType() == GeneratorTypes.FLAT);
         this.worldConfig.save();
@@ -373,6 +373,11 @@ public final class LanternWorldProperties implements WorldProperties {
     @Override
     public long getSeed() {
         return this.worldConfig.getGeneration().getSeed();
+    }
+
+    @Override
+    public void setSeed(long seed) {
+        this.worldConfig.getGeneration().setSeed(seed);
     }
 
     @Override

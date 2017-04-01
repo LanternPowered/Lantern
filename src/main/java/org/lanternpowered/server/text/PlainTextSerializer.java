@@ -27,6 +27,7 @@ package org.lanternpowered.server.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.SafeTextSerializer;
 import org.spongepowered.api.text.serializer.TextParseException;
@@ -34,7 +35,11 @@ import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.Locale;
 
-public final class PlainTextSerializer implements SafeTextSerializer, LanternTextSerializer {
+public final class PlainTextSerializer extends PluginCatalogType.Base implements SafeTextSerializer, LanternTextSerializer {
+
+    public PlainTextSerializer(String pluginId, String name) {
+        super(pluginId, name);
+    }
 
     @Override
     public String serialize(Text text) {

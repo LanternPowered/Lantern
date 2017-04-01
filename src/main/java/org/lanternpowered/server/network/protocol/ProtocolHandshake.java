@@ -32,6 +32,7 @@ import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageH
 final class ProtocolHandshake extends ProtocolBase {
 
     ProtocolHandshake() {
-        inbound().bind(0x00, CodecHandshakeIn.class, MessageHandshakeIn.class).bindHandler(new HandlerHandshakeIn());
+        inbound().bind(CodecHandshakeIn.class, MessageHandshakeIn.class)
+                .bindHandler(new HandlerHandshakeIn());
     }
 }

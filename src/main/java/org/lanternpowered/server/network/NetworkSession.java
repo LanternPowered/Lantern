@@ -218,7 +218,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     /**
      * The keep alive task.
      */
-    private ScheduledFuture<?> keepAliveTask;
+    @Nullable private ScheduledFuture<?> keepAliveTask;
 
     /**
      * The protocol version.
@@ -353,6 +353,13 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (cause instanceof CodecException) {
             Lantern.getLogger().error("A netty pipeline error occurred", cause);
         } else {
+            if (cause instanceof IOException) {
+                final StackTraceElement[] stack = cause.getStackTrace();
+                if (stack.length != 0 && stack[0].toString().startsWith("sun.nio.ch.SocketDispatcher.read0")) {
+                    return;
+                }
+            }
+
             // Use the debug level, don't spam the server with errors
             // caused by client disconnection, ...
             Lantern.getLogger().debug("A netty connection error occurred", cause);

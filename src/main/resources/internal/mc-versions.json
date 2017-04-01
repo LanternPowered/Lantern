@@ -522,5 +522,17 @@
     {
         "version": 316,
         "name": "1.11.2"
+    },
+    {
+        "version": 317,
+        "name": "17w06a"
+    },
+    {
+        "version": 318,
+        "name": "17w13a"
+    },
+    {
+        "version": 319,
+        "name": "17w13b"
     }
 ]

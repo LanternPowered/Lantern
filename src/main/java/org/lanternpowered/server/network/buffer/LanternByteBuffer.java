@@ -40,6 +40,7 @@ import org.lanternpowered.server.util.LimitInputStream;
 import org.spongepowered.api.data.DataView;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -77,6 +78,11 @@ public class LanternByteBuffer implements ByteBuffer {
     @Override
     public int refCnt() {
         return this.buf.refCnt();
+    }
+
+    @Override
+    public OutputStream asOutputStream() {
+        return new ByteBufOutputStream(this.buf);
     }
 
     @Override

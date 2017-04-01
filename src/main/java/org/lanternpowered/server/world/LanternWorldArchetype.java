@@ -61,6 +61,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
     private final boolean allowPlayerRespawns;
     private final boolean pvpEnabled;
     private final boolean generateSpawnOnLoad;
+    private final boolean isSeedRandomized;
 
     private final int buildHeight;
     private final long seed;
@@ -69,7 +70,8 @@ public final class LanternWorldArchetype implements WorldArchetype {
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, Difficulty difficulty,
             SerializationBehavior serializationBehavior, LanternPortalAgentType portalAgentType, boolean hardcore, boolean enabled,
             boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures, boolean pvpEnabled, boolean generateBonusChest,
-            boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns, boolean generateSpawnOnLoad, long seed, int buildHeight) {
+            boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns, boolean generateSpawnOnLoad, boolean isSeedRandomized,
+            long seed, int buildHeight) {
         this.serializationBehavior = serializationBehavior;
         this.generateSpawnOnLoad = generateSpawnOnLoad;
         this.allowPlayerRespawns = allowPlayerRespawns;
@@ -84,6 +86,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
         this.loadsOnStartup = loadsOnStartup;
         this.dimensionType = dimensionType;
         this.generatorType = generatorType;
+        this.isSeedRandomized = isSeedRandomized;
         this.buildHeight = buildHeight;
         this.pvpEnabled = pvpEnabled;
         this.difficulty = difficulty;
@@ -132,6 +135,11 @@ public final class LanternWorldArchetype implements WorldArchetype {
     @Override
     public long getSeed() {
         return this.seed;
+    }
+
+    @Override
+    public boolean isSeedRandomized() {
+        return this.isSeedRandomized;
     }
 
     @Override

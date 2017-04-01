@@ -30,7 +30,6 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOpenInventory;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPerformRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 
@@ -42,7 +41,6 @@ public final class CodecPlayInClientStatus implements Codec<Message> {
         switch (action) {
             case 0: return new MessagePlayInPerformRespawn();
             case 1: return new MessagePlayInRequestStatistics();
-            case 2: return new MessagePlayInOpenInventory();
             default:
                 throw new CodecException("Received client status message with unknown action: " + action);
         }

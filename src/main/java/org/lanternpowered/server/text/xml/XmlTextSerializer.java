@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.text.xml;
 
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextParseException;
@@ -46,7 +47,7 @@ import javax.xml.bind.UnmarshallerHandler;
 /**
  * Xml format serializer for Text instances.
  */
-public class XmlTextSerializer implements TextSerializer, LanternTextSerializer {
+public class XmlTextSerializer extends PluginCatalogType.Base implements TextSerializer, LanternTextSerializer {
 
     private static final JAXBContext CONTEXT;
 
@@ -60,7 +61,9 @@ public class XmlTextSerializer implements TextSerializer, LanternTextSerializer 
         }
     }
 
-    public XmlTextSerializer() {}
+    public XmlTextSerializer(String pluginId, String name) {
+        super(pluginId, name);
+    }
 
     @Override
     public String serialize(Text text) {

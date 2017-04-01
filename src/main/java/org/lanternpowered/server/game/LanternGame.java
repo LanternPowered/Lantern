@@ -164,7 +164,7 @@ public class LanternGame implements Game {
 
     public static final String MINECRAFT_ID = "minecraft";
     public static final String MINECRAFT_NAME = "Minecraft";
-    public static final String MINECRAFT_VERSION = "1.11.2";
+    public static final String MINECRAFT_VERSION = "17w13b";
 
     // The name of the config folder
     public static final String CONFIG_FOLDER = "config";

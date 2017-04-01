@@ -51,7 +51,6 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
@@ -65,7 +64,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -126,11 +124,11 @@ public class PlayerContainerSession {
      * @param container The container
      */
     public boolean setOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause) {
-        return this.setRawOpenContainer(container, cause, true);
+        return setRawOpenContainer(container, cause, true);
     }
 
     public boolean setRawOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause) {
-        return this.setRawOpenContainer(container, cause, false);
+        return setRawOpenContainer(container, cause, false);
     }
 
     /**
@@ -161,7 +159,7 @@ public class PlayerContainerSession {
                     final List<Entity> entities = new ArrayList<>();
                     entities.add(this.createDroppedItem(oldCursorItemSnapshot));
 
-                    final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities, this.player.getWorld());
+                    final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities);
                     Sponge.getEventManager().post(event1);
                     if (!event1.isCancelled()) {
                         this.finishSpawnEntityEvent(event1);
@@ -236,7 +234,7 @@ public class PlayerContainerSession {
 
     public void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
         if (this.openContainer == null) {
-            return;
+            setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
         }
         ItemStack itemStack = LanternItemStack.toNullable(message.getItemStack());
         int slotIndex = message.getSlot();
@@ -246,10 +244,9 @@ public class PlayerContainerSession {
                         .type(SpawnTypes.DROPPED_ITEM).build()).named(NamedCause.SOURCE, this.player).build();
 
                 final List<Entity> entities = new ArrayList<>();
-                entities.add(this.createDroppedItem(itemStack.createSnapshot()));
-                final World world = this.player.getWorld();
+                entities.add(createDroppedItem(itemStack.createSnapshot()));
 
-                final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities, world);
+                final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
                 Sponge.getEventManager().post(event);
 
                 if (!event.isCancelled()) {
@@ -292,7 +289,7 @@ public class PlayerContainerSession {
             final List<Entity> entities = new ArrayList<>();
             entities.add(this.createDroppedItem(itemStack.get().createSnapshot()));
 
-            final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities, this.player.getWorld());
+            final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
             Sponge.getEventManager().post(event);
 
             if (!event.isCancelled()) {
@@ -312,11 +309,14 @@ public class PlayerContainerSession {
     }
 
     public void handleWindowClick(MessagePlayInClickWindow message) {
-        if (this.openContainer == null) {
-            return;
-        }
         final int windowId = message.getWindowId();
-        if (windowId != this.openContainer.windowId) {
+        if (this.openContainer == null) {
+            if (message.getWindowId() == 0) {
+                setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
+            } else {
+                return;
+            }
+        } else if (windowId != this.openContainer.windowId) {
             return;
         }
         final int button = message.getButton();
@@ -712,10 +712,10 @@ public class PlayerContainerSession {
                 cursorTransaction = new Transaction<>(oldItem, newItem);
                 if (button == 0) {
                     event = SpongeEventFactory.createClickInventoryEventDropOutsidePrimary(cause, cursorTransaction, entities,
-                            this.openContainer, world, slotTransactions);
+                            this.openContainer, slotTransactions);
                 } else {
                     event = SpongeEventFactory.createClickInventoryEventDropOutsideSecondary(cause, cursorTransaction, entities,
-                            this.openContainer, world, slotTransactions);
+                            this.openContainer, slotTransactions);
                 }
             } else {
                 final ItemStackSnapshot item = LanternItemStack.toSnapshot(this.cursorItem);
@@ -734,10 +734,10 @@ public class PlayerContainerSession {
                     }
                     if (button == 0) {
                         event = SpongeEventFactory.createClickInventoryEventDropSingle(cause, cursorTransaction, entities,
-                                this.openContainer, world, slotTransactions);
+                                this.openContainer, slotTransactions);
                     } else {
                         event = SpongeEventFactory.createClickInventoryEventDropFull(cause, cursorTransaction, entities,
-                                this.openContainer, world, slotTransactions);
+                                this.openContainer, slotTransactions);
                     }
                 } else {
                     Lantern.getLogger().warn("Unknown slot index {} in container {}", slotIndex, this.openContainer);

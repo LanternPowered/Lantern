@@ -32,12 +32,15 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
+
+    OutputStream asOutputStream();
 
     @Override
     ByteBuffer retain();

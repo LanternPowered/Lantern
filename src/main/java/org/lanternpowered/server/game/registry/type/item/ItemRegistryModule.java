@@ -1648,6 +1648,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(452, builder()
                 .translation("item.ironNugget.name")
                 .build("minecraft", "iron_nugget"));
+        //////////////////////////
+        ///   Knowledge Book   ///
+        //////////////////////////
+        register(453, builder()
+                .translation("item.knowledgeBook.name")
+                .build("minecraft", "knowledge_book"));
         /////////////////////
         ///   Record 13   ///
         /////////////////////

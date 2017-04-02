@@ -27,6 +27,11 @@ package org.lanternpowered.server.statistic.achievement;
 
 import org.spongepowered.api.statistic.achievement.Achievement;
 
+/**
+ * {@link Achievement}s are being replaced by advancements in 1.12,
+ * just leaving this until sponge decides to remove the api.
+ */
+@Deprecated
 public interface IAchievement extends Achievement {
 
     static AchievementBuilder builder() {

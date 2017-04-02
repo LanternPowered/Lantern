@@ -41,6 +41,11 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+/**
+ * {@link Achievement}s are being replaced by advancements in 1.12,
+ * just leaving this until sponge decides to remove the api.
+ */
+@Deprecated
 public final class LanternAchievement extends LanternStatistic implements IAchievement {
 
     private final Set<Achievement> children = new HashSet<>();

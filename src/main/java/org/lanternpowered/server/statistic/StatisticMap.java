@@ -30,9 +30,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics;
-import org.lanternpowered.server.statistic.achievement.IAchievement;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.achievement.Achievement;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -45,8 +43,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 public final class StatisticMap {
 
@@ -87,29 +83,9 @@ public final class StatisticMap {
                 id -> new StatisticEntry((LanternStatistic) StatisticRegistryModule.get().getByInternalId(statistic).orElse(null)));
     }
 
-    @Nullable
-    public MessagePlayOutStatistics createAchievementsMessage(boolean initial) {
-        Set<MessagePlayOutStatistics.Entry> entries = initial ? new HashSet<>() : null;
-        for (Map.Entry<String, StatisticEntry> entry : this.statisticEntries.entrySet()) {
-            final LanternStatistic statistic = entry.getValue().getStatistic();
-            if (!(statistic instanceof Achievement) || !entry.getValue().isDirty(true)) {
-                continue;
-            }
-            final IAchievement achievement = (IAchievement) statistic;
-            final long value = entry.getValue().get();
-            if (value >= achievement.getStatisticTargetValue()) {
-                if (entries == null) {
-                    entries = new HashSet<>();
-                }
-                entries.add(new MessagePlayOutStatistics.Entry(((LanternStatistic) achievement).getInternalId(), (int) value));
-            }
-        }
-        return entries == null ? null : new MessagePlayOutStatistics(entries);
-    }
-
     public MessagePlayOutStatistics createStatisticsMessage() {
         return new MessagePlayOutStatistics(this.statisticEntries.entrySet().stream()
-                .filter(entry -> entry.getValue().getStatistic() instanceof Achievement && entry.getValue().isDirty(true))
+                .filter(entry -> entry.getValue().isDirty(true))
                 .map(entry -> new MessagePlayOutStatistics.Entry(entry.getKey(), (int) entry.getValue().get()))
                 .collect(Collectors.toSet()));
     }

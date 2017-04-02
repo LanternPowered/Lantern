@@ -39,6 +39,11 @@ import org.spongepowered.api.statistic.achievement.Achievements;
 
 import java.lang.reflect.Method;
 
+/**
+ * {@link Achievement}s are being replaced by advancements in 1.12,
+ * just leaving this until sponge decides to remove the api.
+ */
+@Deprecated
 @RegistrationDependency(StatisticRegistryModule.class)
 public final class AchievementRegistryModule extends AdditionalPluginCatalogRegistryModule<Achievement> {
 

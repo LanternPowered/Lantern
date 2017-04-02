@@ -39,6 +39,8 @@ public final class RuleTypes {
             RuleType.create(DefaultGameRules.DO_ENTITY_DROPS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_FIRE_TICK =
             RuleType.create(DefaultGameRules.DO_FIRE_TICK, RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<Boolean> DO_LIMITED_CRAFTING =
+            RuleType.create("doLimitedCrafting", RuleDataTypes.BOOLEAN, false);
     public static final RuleType<Boolean> DO_MOB_LOOT =
             RuleType.create(DefaultGameRules.DO_MOB_LOOT, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_MOB_SPAWNING =

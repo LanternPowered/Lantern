@@ -31,6 +31,11 @@ import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
+/**
+ * {@link Achievement}s are being replaced by advancements in 1.12,
+ * just leaving this until sponge decides to remove the api.
+ */
+@Deprecated
 public interface AchievementBuilder extends StatisticBuilderBase<IAchievement, AchievementBuilder> {
 
     /**

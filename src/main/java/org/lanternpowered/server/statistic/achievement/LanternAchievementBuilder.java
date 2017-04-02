@@ -37,6 +37,11 @@ import java.text.NumberFormat;
 
 import javax.annotation.Nullable;
 
+/**
+ * {@link Achievement}s are being replaced by advancements in 1.12,
+ * just leaving this until sponge decides to remove the api.
+ */
+@Deprecated
 public final class LanternAchievementBuilder extends AbstractStatisticBuilder<IAchievement, AchievementBuilder> implements AchievementBuilder {
 
     private Translation description;

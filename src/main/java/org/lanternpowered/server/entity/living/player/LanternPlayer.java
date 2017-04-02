@@ -70,7 +70,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
@@ -409,7 +408,6 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     }
                 }
                 this.tabList.init(tabListEntries);
-                this.session.send(this.statisticMap.createAchievementsMessage(true));
             } else {
                 //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {
@@ -571,12 +569,6 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         // Stream the inventory updates
         final LanternContainer container = this.containerSession.getOpenContainer();
         (container == null ? this.inventoryContainer : container).streamSlotChanges();
-
-        // Update achievements
-        final MessagePlayOutStatistics achievementsMessage = this.statisticMap.createAchievementsMessage(false);
-        if (achievementsMessage != null) {
-            this.session.send(achievementsMessage);
-        }
 
         this.resourcePackSendQueue.pulse();
 

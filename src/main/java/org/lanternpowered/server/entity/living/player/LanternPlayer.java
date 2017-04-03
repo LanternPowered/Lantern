@@ -32,6 +32,8 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.advancement.AdvancementTrees;
+import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
@@ -242,6 +244,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
      */
     @Nullable private Entity spectatorEntity;
 
+    private final AdvancementsProgress advancementsProgress = new AdvancementsProgress();
+
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
@@ -408,6 +412,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     }
                 }
                 this.tabList.init(tabListEntries);
+                // TODO: AdvancementTrees.TEST_TREE.addTracker(this);
             } else {
                 //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {
@@ -1042,5 +1047,9 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     public CooldownTracker getCooldownTracker() {
         return this.cooldownTracker;
+    }
+
+    public AdvancementsProgress getAdvancementsProgress() {
+        return this.advancementsProgress;
     }
 }

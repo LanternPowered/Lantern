@@ -58,6 +58,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInT
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInUseEntity;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutAddPotionEffect;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutAdvancements;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockChange;
@@ -203,6 +204,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAddPotionEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
@@ -394,7 +396,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutSpawnPlayer.class, MessagePlayOutSpawnPlayer.class);
         outbound.bind(CodecPlayOutEntityAnimation.class, MessagePlayOutEntityAnimation.class);
         outbound.bind(CodecPlayOutStatistics.class, MessagePlayOutStatistics.class);
-        outbound.bind(); // TODO: Advancements
+        outbound.bind(CodecPlayOutAdvancements.class, MessagePlayOutAdvancements.class);
         outbound.bind(CodecPlayOutBlockBreakAnimation.class, MessagePlayOutBlockBreakAnimation.class);
         outbound.bind(CodecPlayOutUpdateTileEntity.class, MessagePlayOutUpdateTileEntity.class);
         outbound.bind(CodecPlayOutBlockAction.class, MessagePlayOutBlockAction.class);

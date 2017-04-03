@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
@@ -360,6 +361,7 @@ public class LanternServer implements Server {
         this.game.getScheduler().pulseSyncScheduler();
         // Pulse the world threads
         this.worldManager.pulse();
+        AdvancementTrees.INSTANCE.pulse();
     }
 
     /**

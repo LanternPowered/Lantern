@@ -23,25 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRecipeDisplayed;
 
-public interface Protocol {
+public class HandlerPlayInRecipeDisplayed implements Handler<MessagePlayInRecipeDisplayed> {
 
-    int CURRENT_VERSION = 320;
-
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    @Override
+    public void handle(NetworkContext context, MessagePlayInRecipeDisplayed message) {
+        System.out.println(message.getId());
+    }
 }

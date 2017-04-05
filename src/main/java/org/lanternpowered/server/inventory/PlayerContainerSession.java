@@ -219,7 +219,7 @@ public class PlayerContainerSession {
      */
     public void setCursorItem(@Nullable ItemStack cursorItem) {
         this.cursorItem = LanternItemStack.toNullable(cursorItem);
-        this.updateCursorItem();
+        updateCursorItem();
     }
 
     private void updateCursorItem() {

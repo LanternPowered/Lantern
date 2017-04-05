@@ -52,6 +52,8 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInP
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerVehicleControls;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPrepareCraftingGrid;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInRecipeDisplayed;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInSpectate;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
@@ -114,6 +116,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTeams;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUnloadChunk;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUnlockRecipes;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUpdateTileEntity;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWindowItems;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWindowProperty;
@@ -142,6 +145,8 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSprint;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPrepareCraftingGrid;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRecipeDisplayed;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
@@ -194,6 +199,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPrepareCraftingGrid;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRecipeDisplayed;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
@@ -267,6 +274,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTheEnd;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateTileEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
@@ -290,7 +298,8 @@ final class ProtocolPlay extends ProtocolBase {
 
         // Register the codecs and handlers of the default messages
         inbound.bind(CodecPlayInTeleportConfirm.class, MessagePlayInTeleportConfirm.class); // TODO: Handler
-        inbound.bind(); // TODO: Unknown
+        inbound.bind(CodecPlayInPrepareCraftingGrid.class, MessagePlayInPrepareCraftingGrid.class)
+                .bindHandler(new HandlerPlayInPrepareCraftingGrid());
         inbound.bind(CodecPlayInTabComplete.class, MessagePlayInTabComplete.class)
                 .bindHandler(new HandlerPlayInTabComplete());
         inbound.bind(CodecPlayInChatMessage.class, MessagePlayInChatMessage.class)
@@ -322,7 +331,8 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInPlayerDigging.class);
         inbound.bind(CodecPlayInPlayerAction.class);
         inbound.bind(CodecPlayInPlayerVehicleControls.class);
-        inbound.bind(); // TODO: Recipe Displayed
+        inbound.bind(CodecPlayInRecipeDisplayed.class, MessagePlayInRecipeDisplayed.class)
+                .bindHandler(new HandlerPlayInRecipeDisplayed());
         inbound.bind(CodecPlayInResourcePackStatus.class, MessagePlayInResourcePackStatus.class)
                 .bindHandler(new HandlerPlayInResourcePackStatus());
         inbound.bind(CodecPlayInOutHeldItemChange.class, MessagePlayInOutHeldItemChange.class)
@@ -452,7 +462,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutTabListEntries.class, MessagePlayOutTabListEntries.class);
         outbound.bind(CodecPlayOutPlayerPositionAndLook.class, MessagePlayOutPlayerPositionAndLook.class);
         outbound.bind(); // TODO: Use Bed
-        outbound.bind(); // TODO: Unlock Recipes
+        outbound.bind(CodecPlayOutUnlockRecipes.class, MessagePlayOutUnlockRecipes.class);
         outbound.bind(CodecPlayOutDestroyEntities.class, MessagePlayOutDestroyEntities.class);
         outbound.bind(CodecPlayOutRemovePotionEffect.class, MessagePlayOutRemovePotionEffect.class);
         outbound.bind(CodecPlayOutSendResourcePack.class, MessagePlayOutSendResourcePack.class);

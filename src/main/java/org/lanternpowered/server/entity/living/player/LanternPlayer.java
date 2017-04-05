@@ -31,6 +31,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
@@ -72,6 +73,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
@@ -412,7 +414,13 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     }
                 }
                 this.tabList.init(tabListEntries);
-                // TODO: AdvancementTrees.TEST_TREE.addTracker(this);
+                this.session.send(new MessagePlayOutUnlockRecipes(ImmutableList.of(
+                        new MessagePlayOutUnlockRecipes.Entry("minecraft:crafting_table", true, false),
+                        new MessagePlayOutUnlockRecipes.Entry("minecraft:acacia_boat", true, false),
+                        new MessagePlayOutUnlockRecipes.Entry("minecraft:bread", true, false),
+                        new MessagePlayOutUnlockRecipes.Entry("minecraft:torch", true, false)
+                ), false, false, false));
+                // AdvancementTrees.TEST_TREE.addTracker(this);
             } else {
                 //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {

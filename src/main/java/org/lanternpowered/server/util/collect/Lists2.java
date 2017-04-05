@@ -34,6 +34,7 @@ import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -373,6 +374,10 @@ public final class Lists2 {
         public List<T> subList(int fromIndex, int toIndex) {
             return new CheckedList<>(this.backing.subList(fromIndex, toIndex), this.checker);
         }
+    }
+
+    public static String toString(List<?> list) {
+        return Arrays.toString(list.toArray(new Object[list.size()]));
     }
 
     private Lists2() {

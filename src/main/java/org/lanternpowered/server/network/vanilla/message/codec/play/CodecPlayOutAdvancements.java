@@ -48,7 +48,12 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
         buf.writeVarInt(addedAdvStructs.size());
         for (MessagePlayOutAdvancements.AdvStruct struct : addedAdvStructs) {
             buf.writeString(struct.getId());
-            buf.writeString(struct.getParentId().orElse(""));
+            final Optional<String> optParent = struct.getParentId();
+            /*buf.writeBoolean(optParent.isPresent());
+            if (optParent.isPresent()) {
+                buf.writeString(optParent.get());
+            }*/
+            buf.writeBoolean(false);
             final Optional<MessagePlayOutAdvancements.AdvStruct.Display> optDisplay = struct.getDisplay();
             buf.writeBoolean(optDisplay.isPresent());
             if (optDisplay.isPresent()) {
@@ -62,7 +67,7 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
                     buf.writeString(optBackground.get());
                 }
                 buf.writeVarInt(display.getX());
-                buf.writeInteger(display.getY());
+                buf.writeVarInt(display.getY());
             }
             final List<String> criteria = struct.getCriteria();
             buf.writeVarInt(criteria.size());
@@ -78,10 +83,11 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
         buf.writeVarInt(removed.size());
         removed.forEach(buf::writeString);
         final Map<String, Object2LongMap<String>> progress = message.getProgress();
+        buf.writeVarInt(0);
+        /*
         buf.writeVarInt(progress.size());
         for (Map.Entry<String, Object2LongMap<String>> entry : progress.entrySet()) {
             buf.writeString(entry.getKey());
-            // buf.writeVarInt(0);
             buf.writeVarInt(entry.getValue().size());
             for (Object2LongMap.Entry<String> entry1 : entry.getValue().object2LongEntrySet()) {
                 buf.writeString(entry1.getKey());
@@ -91,7 +97,7 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
                     buf.writeLong(time);
                 }
             }
-        }
+        }*/
         return buf;
     }
 }

@@ -23,25 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.message.Message;
 
-public interface Protocol {
+// This is the most useless message ever, it just spams for 20 times
+// and stops. It is only send when the recipe book is opened.
+public final class MessagePlayInRecipeDisplayed implements Message {
 
-    int CURRENT_VERSION = 320;
+    private final String id;
 
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
+    public MessagePlayInRecipeDisplayed(String id) {
+        this.id = id;
+    }
 
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    public String getId() {
+        return this.id;
+    }
 }

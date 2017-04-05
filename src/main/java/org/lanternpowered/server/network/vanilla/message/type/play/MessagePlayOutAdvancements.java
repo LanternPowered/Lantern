@@ -33,7 +33,6 @@ import org.lanternpowered.server.network.objects.LocalizedText;
 import org.spongepowered.api.item.ItemType;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

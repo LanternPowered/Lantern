@@ -23,25 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 
-public interface Protocol {
+import java.util.List;
 
-    int CURRENT_VERSION = 320;
+public final class CodecPlayOutUnlockRecipes implements Codec<MessagePlayOutUnlockRecipes> {
 
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    @Override
+    public ByteBuffer encode(CodecContext context, MessagePlayOutUnlockRecipes message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeBoolean(message.hasFlag1());
+        buf.writeBoolean(message.hasFlag2());
+        buf.writeBoolean(message.hasFlag3());
+        final List<MessagePlayOutUnlockRecipes.Entry> entries = message.getEntries();
+        buf.writeVarInt(entries.size());
+        for (MessagePlayOutUnlockRecipes.Entry entry : entries) {
+            buf.writeString(entry.getId());
+            buf.writeBoolean(entry.isUnlocked());
+            buf.writeBoolean(entry.isDisplayed());
+        }
+        return buf;
+    }
 }

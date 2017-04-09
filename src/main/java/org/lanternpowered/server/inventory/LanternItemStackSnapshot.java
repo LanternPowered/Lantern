@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.AbstractImmutableDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
@@ -44,7 +45,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -155,6 +155,15 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
     @Override
     public ItemStackSnapshot merge(ItemStackSnapshot that, MergeFunction function) {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("type", this.itemType.getId())
+                .add("quantity", this.quantity)
+                .add("data", LanternItemStack.valuesToString(getValues()))
+                .toString();
     }
 
     public boolean isSimilar(ItemStackSnapshot that) {

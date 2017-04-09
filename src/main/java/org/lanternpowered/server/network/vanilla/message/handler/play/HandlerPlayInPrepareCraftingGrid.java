@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPrepareCraftingGrid;
@@ -34,6 +33,6 @@ public final class HandlerPlayInPrepareCraftingGrid implements Handler<MessagePl
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPrepareCraftingGrid message) {
-        Lantern.getLogger().info("prepareCraftingGrid: " + message);
+        context.getSession().getPlayer().getContainerSession().handlePrepareCraftingGrid(message);
     }
 }

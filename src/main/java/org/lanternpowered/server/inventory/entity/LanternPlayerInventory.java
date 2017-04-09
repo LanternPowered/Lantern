@@ -68,7 +68,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
         super(parent, name);
         this.player = player == null ? null : new WeakReference<>(player);
 
-        this.registerChild(new LanternCraftingInventory(this) {
+        registerChild(new LanternCraftingInventory(this) {
             {
                 registerSlot(new LanternCraftingOutput(this));
                 registerChild(new LanternGridInventory(this) {
@@ -130,6 +130,10 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
         // This is the default views/inventories
         this.inventoryViews.put(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR, this.mainInventory);
         this.inventoryViews.put(HumanInventoryView.HOTBAR, this.hotbar);
+    }
+
+    public LanternOrderedInventory getRawInventoryView() {
+        return (LanternOrderedInventory) this.inventoryViews.get(HumanInventoryView.RAW_INVENTORY);
     }
 
     private AbstractMutableInventory generateRawInventoryView(HumanMainInventory mainInventory,

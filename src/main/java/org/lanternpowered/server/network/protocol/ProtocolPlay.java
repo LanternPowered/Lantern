@@ -53,7 +53,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInP
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerVehicleControls;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPrepareCraftingGrid;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInRecipeDisplayed;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInCraftingBookData;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInSpectate;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
@@ -128,6 +128,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCloseWindow;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
@@ -170,6 +171,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
@@ -200,7 +202,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPrepareCraftingGrid;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRecipeDisplayed;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
@@ -331,8 +333,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInPlayerDigging.class);
         inbound.bind(CodecPlayInPlayerAction.class);
         inbound.bind(CodecPlayInPlayerVehicleControls.class);
-        inbound.bind(CodecPlayInRecipeDisplayed.class, MessagePlayInRecipeDisplayed.class)
-                .bindHandler(new HandlerPlayInRecipeDisplayed());
+        inbound.bind(CodecPlayInCraftingBookData.class);
         inbound.bind(CodecPlayInResourcePackStatus.class, MessagePlayInResourcePackStatus.class)
                 .bindHandler(new HandlerPlayInResourcePackStatus());
         inbound.bind(CodecPlayInOutHeldItemChange.class, MessagePlayInOutHeldItemChange.class)
@@ -397,6 +398,11 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bindMessage(MessagePlayInPlayerVehicleJump.class); // TODO: Handler
         // Provided by CodecPlayInPlayerVehicleControls
         inbound.bindMessage(MessagePlayInPlayerVehicleMovement.class); // TODO: Handler
+        // Provided by CodecPlayInCraftingBookData
+        inbound.bindMessage(MessagePlayInDisplayedRecipe.class)
+                .bindHandler(new HandlerPlayInRecipeDisplayed());
+        inbound.bindMessage(MessagePlayInCraftingBookState.class)
+                .bindHandler(new HandlerPlayInCraftingBookState());
 
         outbound.bind(CodecPlayOutSpawnObject.class, MessagePlayOutSpawnObject.class);
         outbound.bind(CodecPlayOutSpawnExperienceOrb.class, MessagePlayOutSpawnExperienceOrb.class);

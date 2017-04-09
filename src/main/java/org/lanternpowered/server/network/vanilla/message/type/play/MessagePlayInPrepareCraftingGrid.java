@@ -71,7 +71,7 @@ public final class MessagePlayInPrepareCraftingGrid implements Message {
                 .add("windowId", this.windowId)
                 .add("transactionId", this.transactionId)
                 .add("preparedItems", Lists2.toString(this.preparedItems))
-                .add("preparedItems", Lists2.toString(this.returnedItems))
+                .add("returnedItems", Lists2.toString(this.returnedItems))
                 .toString();
     }
 

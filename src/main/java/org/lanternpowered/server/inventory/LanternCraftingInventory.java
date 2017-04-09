@@ -54,12 +54,12 @@ public class LanternCraftingInventory extends LanternGridInventory implements Cr
         super.finalizeContent();
 
         try {
-            this.gridInventory = this.query(GridInventory.class).first();
+            this.gridInventory = query(GridInventory.class).first();
         } catch (ClassCastException e) {
             throw new IllegalStateException("Unable to find the GridInventory");
         }
         try {
-            this.craftingOutput = this.query(CraftingOutput.class).first();
+            this.craftingOutput = query(CraftingOutput.class).first();
         } catch (ClassCastException e) {
             throw new IllegalStateException("Unable to find the CraftingOutput");
         }

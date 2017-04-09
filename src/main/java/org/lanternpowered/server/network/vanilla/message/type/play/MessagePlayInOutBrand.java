@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayInOutBrand implements Message {
@@ -51,4 +52,10 @@ public final class MessagePlayInOutBrand implements Message {
         return this.brand;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("brand", this.brand)
+                .toString();
+    }
 }

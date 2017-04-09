@@ -42,8 +42,8 @@ public final class CodecPlayInPrepareCraftingGrid implements Codec<MessagePlayIn
     public MessagePlayInPrepareCraftingGrid decode(CodecContext context, ByteBuffer buf) throws CodecException {
         final int windowId = buf.readByte();
         final int transactionId = buf.readShort();
-        final List<MessagePlayInPrepareCraftingGrid.SlotUpdate> preparedItems = readUpdates(buf);
         final List<MessagePlayInPrepareCraftingGrid.SlotUpdate> returnedItems = readUpdates(buf);
+        final List<MessagePlayInPrepareCraftingGrid.SlotUpdate> preparedItems = readUpdates(buf);
         return new MessagePlayInPrepareCraftingGrid(windowId, transactionId, preparedItems, returnedItems);
     }
 

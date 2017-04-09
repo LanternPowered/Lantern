@@ -33,7 +33,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
@@ -329,6 +328,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(LanternKeys.CAN_DUAL_WIELD, false).notRemovable();
         registerKey(LanternKeys.SCORE, 0).notRemovable();
         registerKey(LanternKeys.ACTIVE_HAND, Optional.empty()).notRemovable();
+        registerKey(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, false).notRemovable();
+        registerKey(LanternKeys.RECIPE_BOOK_GUI_OPEN, false).notRemovable();
         registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
                     this.statisticMap.setStatisticValues(map);
@@ -419,7 +420,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                         new MessagePlayOutUnlockRecipes.Entry("minecraft:acacia_boat", true, false),
                         new MessagePlayOutUnlockRecipes.Entry("minecraft:bread", true, false),
                         new MessagePlayOutUnlockRecipes.Entry("minecraft:torch", true, false)
-                ), false, false, false));
+                ), true, get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(), get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get()));
                 // AdvancementTrees.TEST_TREE.addTracker(this);
             } else {
                 //noinspection ConstantConditions

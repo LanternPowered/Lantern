@@ -23,31 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
+import org.lanternpowered.server.network.message.Message;
 
-import java.util.List;
+// This is the most useless message ever, it just spams for 20 times
+// and stops. It is only send when the recipe book is opened.
+public final class MessagePlayInDisplayedRecipe implements Message {
 
-public final class CodecPlayOutUnlockRecipes implements Codec<MessagePlayOutUnlockRecipes> {
+    private final String id;
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutUnlockRecipes message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeBoolean(message.isNotification());
-        buf.writeBoolean(message.hasOpenCraftingBook());
-        buf.writeBoolean(message.hasCraftingFilter());
-        final List<MessagePlayOutUnlockRecipes.Entry> entries = message.getEntries();
-        buf.writeVarInt(entries.size());
-        for (MessagePlayOutUnlockRecipes.Entry entry : entries) {
-            buf.writeString(entry.getId());
-            buf.writeBoolean(entry.isUnlocked());
-            buf.writeBoolean(entry.isDisplayed());
-        }
-        return buf;
+    public MessagePlayInDisplayedRecipe(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return this.id;
     }
 }

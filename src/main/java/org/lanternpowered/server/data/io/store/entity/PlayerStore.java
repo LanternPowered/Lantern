@@ -101,6 +101,10 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static final DataQuery INVENTORY = DataQuery.of("Inventory");
     private static final DataQuery ENDER_CHEST_INVENTORY = DataQuery.of("EnderItems");
 
+    private static final DataQuery RECIPE_BOOK = DataQuery.of("recipeBook");
+    private static final DataQuery RECIPE_BOOK_GUI_OPEN = DataQuery.of("isGuiOpen");
+    private static final DataQuery RECIPE_BOOK_FILTER_ACTIVE = DataQuery.of("isFilteringCraftable");
+
     @Override
     public void deserialize(LanternPlayer player, DataView dataView) {
         super.deserialize(player, dataView);
@@ -160,6 +164,10 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         // Serialize the ender chest inventory
         dataView.set(ENDER_CHEST_INVENTORY, serializeEnderChest(player.getEnderChestInventory()));
 
+        final DataView recipeBook = dataView.createView(RECIPE_BOOK);
+        recipeBook.set(RECIPE_BOOK_FILTER_ACTIVE, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).orElse(false) ? 1 : 0));
+        recipeBook.set(RECIPE_BOOK_GUI_OPEN, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_GUI_OPEN).orElse(false) ? 1 : 0));
+
         super.serializeValues(player, valueContainer, dataView);
     }
 
@@ -218,6 +226,11 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         dataView.getViewList(INVENTORY).ifPresent(views -> deserializePlayerInventory(player.getInventory(), views));
         // Deserialize the ender chest inventory
         dataView.getViewList(ENDER_CHEST_INVENTORY).ifPresent(views -> deserializeEnderChest(player.getEnderChestInventory(), views));
+
+        dataView.getView(RECIPE_BOOK).ifPresent(view -> {
+            view.getInt(RECIPE_BOOK_FILTER_ACTIVE).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, v > 0));
+            view.getInt(RECIPE_BOOK_GUI_OPEN).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_GUI_OPEN, v > 0));
+        });
 
         super.deserializeValues(player, valueContainer, dataView);
     }

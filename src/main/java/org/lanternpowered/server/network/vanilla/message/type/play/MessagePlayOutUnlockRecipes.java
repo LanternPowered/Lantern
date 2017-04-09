@@ -25,39 +25,51 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.util.collect.Lists2;
 
 import java.util.List;
 
 public final class MessagePlayOutUnlockRecipes implements Message {
 
-    private final boolean flag1;
-    private final boolean flag2;
-    private final boolean flag3;
+    private final boolean notification;
+    private final boolean openRecipeBook;
+    private final boolean craftingFilter;
     private final List<Entry> entries;
 
-    public MessagePlayOutUnlockRecipes(List<Entry> entries, boolean flag1, boolean flag2, boolean flag3) {
+    public MessagePlayOutUnlockRecipes(List<Entry> entries, boolean notification, boolean openRecipeBook, boolean craftingFilter) {
         this.entries = ImmutableList.copyOf(entries);
-        this.flag1 = flag1;
-        this.flag2 = flag2;
-        this.flag3 = flag3;
+        this.notification = notification;
+        this.openRecipeBook = openRecipeBook;
+        this.craftingFilter = craftingFilter;
     }
 
     public List<Entry> getEntries() {
         return this.entries;
     }
 
-    public boolean hasFlag1() {
-        return this.flag1;
+    public boolean isNotification() {
+        return this.notification;
     }
 
-    public boolean hasFlag2() {
-        return this.flag2;
+    public boolean hasOpenCraftingBook() {
+        return this.openRecipeBook;
     }
 
-    public boolean hasFlag3() {
-        return this.flag3;
+    public boolean hasCraftingFilter() {
+        return this.craftingFilter;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("notification", this.notification)
+                .add("openRecipeBook", this.openRecipeBook)
+                .add("craftingFilter", this.craftingFilter)
+                .add("entries", Lists2.toString(this.entries))
+                .toString();
     }
 
     public static final class Entry {
@@ -82,6 +94,15 @@ public final class MessagePlayOutUnlockRecipes implements Message {
 
         public boolean isDisplayed() {
             return this.displayed;
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("id", this.id)
+                    .add("unlocked", this.unlocked)
+                    .add("displayed", this.displayed)
+                    .toString();
         }
     }
 }

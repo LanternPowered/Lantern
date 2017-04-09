@@ -51,6 +51,8 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
 
 import java.util.List;
 import java.util.Set;
@@ -119,7 +121,8 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         if (registration == null) {
             if (warnedMissingOpcodes.add(opcode)) {
-                Lantern.getLogger().warn("Failed to find a message registration with opcode 0x{} in state {}!", Integer.toHexString(opcode), state);
+                Lantern.getLogger().warn("Failed to find a message registration with opcode 0x{} in state {}!",
+                        Integer.toHexString(opcode), state);
             }
             return;
         }
@@ -133,10 +136,21 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         final Message message;
         try {
             message = registration.getCodec().decode(this.codecContext, content);
+            if (content.available() > 0) {
+                Lantern.getLogger().warn("Trailing bytes {}b after decoding with message codec {} with opcode 0x{} in state {}!\n{}",
+                        content.available(), registration.getCodec().getClass().getName(), Integer.toHexString(opcode), state, message);
+            }
         } finally {
             content.release();
         }
-        this.processMessage(message, output, protocol, state, this.codecContext);
+
+        if (message instanceof MessageInOutKeepAlive ||
+                message instanceof MessagePlayInPlayerMovement) {
+        } else {
+            // System.out.println(message.getClass().getName());
+        }
+
+        processMessage(message, output, protocol, state, this.codecContext);
     }
 
     private void processMessage(Message message, List<Object> output, Protocol protocol, ProtocolState state, CodecContext context) {

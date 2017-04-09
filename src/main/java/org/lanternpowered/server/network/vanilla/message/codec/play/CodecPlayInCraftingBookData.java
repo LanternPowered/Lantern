@@ -23,21 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.NullMessage;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 
-// This is the most useless message ever, it just spams for 20 times
-// and stops. It is only send when the recipe book is opened.
-public final class MessagePlayInRecipeDisplayed implements Message {
+public final class CodecPlayInCraftingBookData implements Codec<Message> {
 
-    private final String id;
-
-    public MessagePlayInRecipeDisplayed(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return this.id;
+    @Override
+    public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        final int type = buf.readInteger();
+        if (type == 1) {
+            final String id = buf.readString();
+            return new MessagePlayInDisplayedRecipe(id);
+        } else if (type == 2) {
+            final boolean open = buf.readBoolean();
+            final boolean filter = buf.readBoolean();
+            return new MessagePlayInCraftingBookState(open, filter);
+        }
+        return NullMessage.INSTANCE;
     }
 }

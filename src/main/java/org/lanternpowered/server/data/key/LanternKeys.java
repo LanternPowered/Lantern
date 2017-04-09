@@ -114,6 +114,10 @@ public final class LanternKeys {
             makeMutableBoundedValueKey(Integer.class, DataQuery.of("MaxFoodLevel"), "lantern:max_food_level");
     public static final Key<MutableBoundedValue<Double>> MAX_SATURATION =
             makeMutableBoundedValueKey(Double.class, DataQuery.of("MaxSaturation"), "lantern:max_saturation");
+    public static final Key<Value<Boolean>> RECIPE_BOOK_GUI_OPEN =
+            makeValueKey(Boolean.class, DataQuery.of("RecipeBookGUIOpen"), "lantern:recipe_book_gui_open");
+    public static final Key<Value<Boolean>> RECIPE_BOOK_FILTER_ACTIVE =
+            makeValueKey(Boolean.class, DataQuery.of("RecipeBookFilterActive"), "lantern:recipe_book_filter_active");
 
     private LanternKeys() {
     }

@@ -32,6 +32,7 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
@@ -77,12 +78,23 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
 
     @Override
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        String channel = buf.readString();
-        int length = buf.available();
+        final String channel = buf.readString();
+        final int length = buf.available();
         if (length > Short.MAX_VALUE) {
             throw new DecoderException("CustomPayload messages may not be longer then " + Short.MAX_VALUE + " bytes");
         }
-        ByteBuffer content = buf.slice();
+        final ByteBuffer content = buf.slice();
+        final Message message = decode0(context, content, channel);
+        if (content.available() > 0) {
+            Lantern.getLogger().warn("Trailing bytes {}b after decoding with custom payload message codec {} with channel {}!\n{}",
+                    content.available(), getClass().getName(), channel, message);
+        }
+        // Skip all the bytes, we already processed them
+        buf.setReadIndex(buf.readerIndex() + buf.available());
+        return message;
+    }
+
+    private Message decode0(CodecContext context, ByteBuffer content, String channel) {
         if ("REGISTER".equals(channel)) {
             Set<String> channels = decodeChannels(content);
             Iterator<String> it = channels.iterator();
@@ -111,15 +123,15 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
             MultiPartMessage message0 = attribute.get();
             if (message0 == null) {
-                String channel0 = buf.readString();
-                int parts = buf.readByte() & 0xff;
+                String channel0 = content.readString();
+                int parts = content.readByte() & 0xff;
                 int size = content.readInteger();
                 if (size <= 0 || size >= -16797616) {
                     throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Max: -16797616, Received: " + size);
                 }
                 attribute.set(new MultiPartMessage(channel0, context.byteBufAlloc().buffer(size), parts));
             } else {
-                int part = buf.readByte() & 0xff;
+                int part = content.readByte() & 0xff;
                 if (part != message0.index) {
                     throw new CodecException("Received FML MultiPart packet out of order, Expected: " + message0.index + ", Got: " + part);
                 }

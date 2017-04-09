@@ -27,12 +27,12 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRecipeDisplayed;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 
-public class HandlerPlayInRecipeDisplayed implements Handler<MessagePlayInRecipeDisplayed> {
+public class HandlerPlayInRecipeDisplayed implements Handler<MessagePlayInDisplayedRecipe> {
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInRecipeDisplayed message) {
-        System.out.println(message.getId());
+    public void handle(NetworkContext context, MessagePlayInDisplayedRecipe message) {
+        // System.out.println(message.getId());
     }
 }

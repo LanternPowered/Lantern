@@ -23,25 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.NullMessage;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRecipeDisplayed;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
 
-public final class CodecPlayInRecipeDisplayed implements Codec<Message> {
+public final class HandlerPlayInCraftingBookState implements Handler<MessagePlayInCraftingBookState> {
 
     @Override
-    public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final String id = buf.readString();
-        final int type = buf.readInteger();
-        if (type == -1) {
-            return new MessagePlayInRecipeDisplayed(id);
-        }
-        return NullMessage.INSTANCE;
+    public void handle(NetworkContext context, MessagePlayInCraftingBookState message) {
+        final LanternPlayer player = context.getSession().getPlayer();
+        player.offer(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, message.hasFilter());
+        player.offer(LanternKeys.RECIPE_BOOK_GUI_OPEN, message.isCurrentlyOpen());
     }
 }

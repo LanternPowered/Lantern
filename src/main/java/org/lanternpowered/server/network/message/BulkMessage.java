@@ -25,7 +25,9 @@
  */
 package org.lanternpowered.server.network.message;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.util.collect.Lists2;
 
 import java.util.List;
 
@@ -40,7 +42,7 @@ public final class BulkMessage implements Message {
     private final List<Message> messages;
 
     public BulkMessage(List<Message> messages) {
-        this.messages = messages instanceof ImmutableList ? messages : ImmutableList.copyOf(messages);
+        this.messages = ImmutableList.copyOf(messages);
     }
 
     /**
@@ -52,4 +54,10 @@ public final class BulkMessage implements Message {
         return this.messages;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("messages", Lists2.toString(this.messages))
+                .toString();
+    }
 }

@@ -23,31 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.network.message.Message;
 
-import java.util.List;
+public final class MessagePlayInCraftingBookState implements Message {
 
-public final class CodecPlayOutUnlockRecipes implements Codec<MessagePlayOutUnlockRecipes> {
+    private final boolean open;
+    private final boolean filter;
+
+    public MessagePlayInCraftingBookState(boolean open, boolean filter) {
+        this.filter = filter;
+        this.open = open;
+    }
+
+    public boolean isCurrentlyOpen() {
+        return this.open;
+    }
+
+    public boolean hasFilter() {
+        return this.filter;
+    }
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutUnlockRecipes message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeBoolean(message.isNotification());
-        buf.writeBoolean(message.hasOpenCraftingBook());
-        buf.writeBoolean(message.hasCraftingFilter());
-        final List<MessagePlayOutUnlockRecipes.Entry> entries = message.getEntries();
-        buf.writeVarInt(entries.size());
-        for (MessagePlayOutUnlockRecipes.Entry entry : entries) {
-            buf.writeString(entry.getId());
-            buf.writeBoolean(entry.isUnlocked());
-            buf.writeBoolean(entry.isDisplayed());
-        }
-        return buf;
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("open", this.open)
+                .add("filter", this.filter)
+                .toString();
     }
 }

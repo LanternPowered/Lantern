@@ -42,16 +42,19 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
@@ -199,11 +202,21 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
                 ((LanternItemStack) itemStackA).isSimilar(itemStackB);
     }
 
+    static String valuesToString(Set<ImmutableValue<?>> values) {
+        return Arrays.toString(values.stream()
+                .map(e -> MoreObjects.toStringHelper("")
+                        .add("key", e.getKey().getId())
+                        .add("value", e.get())
+                        .toString())
+                .toArray());
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("type", this.itemType.getId())
                 .add("quantity", this.quantity)
+                .add("data", valuesToString(getValues()))
                 .toString();
     }
 

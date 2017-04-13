@@ -34,6 +34,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
+import org.lanternpowered.server.advancement.TestAdvancementTree;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
@@ -421,7 +422,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                         new MessagePlayOutUnlockRecipes.Entry("minecraft:bread", true, false),
                         new MessagePlayOutUnlockRecipes.Entry("minecraft:torch", true, false)
                 ), true, get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(), get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get()));
-                // AdvancementTrees.TEST_TREE.addTracker(this);
+                TestAdvancementTree.INSTANCE.addTracker(this);
             } else {
                 //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {

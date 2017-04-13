@@ -23,40 +23,67 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound;
+package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
-import org.spongepowered.api.effect.sound.SoundCategory;
-import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.text.Text;
 
-public final class LanternSoundType extends PluginCatalogType.Base implements SoundType {
+public abstract class Styleable extends PluginCatalogType.Base {
 
-    private final int eventId;
+    private final Text title;
+    private final Text description;
+    private final ItemType icon;
+    private final FrameType frameType;
 
-    public LanternSoundType(String pluginId, String id, String name, int eventId) {
+    Styleable(String pluginId, String id, String name, Text title, Text description, ItemType icon, FrameType frameType) {
         super(pluginId, id, name);
-        this.eventId = eventId;
+        checkNotNull(title, "title");
+        checkNotNull(description, "description");
+        checkNotNull(icon, "icon");
+        checkNotNull(frameType, "frameType");
+        this.description = description;
+        this.frameType = frameType;
+        this.title = title;
+        this.icon = icon;
     }
 
-    public LanternSoundType(String pluginId, String id, String name) {
-        super(pluginId, id, name);
-        this.eventId = -1;
+    /**
+     * Gets the description.
+     *
+     * @return The description
+     */
+    public Text getDescription() {
+        return this.description;
     }
 
-    public MessagePlayOutSoundEffectBase createMessage(Vector3d position, SoundCategory soundCategory,
-            float volume, float pitch) {
-        checkNotNull(soundCategory, "soundCategory");
-        checkNotNull(position, "position");
-        if (this.eventId != -1) {
-            return new MessagePlayOutSoundEffect(this.eventId, position, soundCategory, volume, pitch, "");
-        } else {
-            return new MessagePlayOutNamedSoundEffect(this.getName(), position, soundCategory, volume, pitch);
-        }
+    /**
+     * Gets the icon.
+     *
+     * @return The icon
+     */
+    public ItemType getIcon() {
+        return this.icon;
     }
+
+    /**
+     * Gets the {@link FrameType}.
+     *
+     * @return The frame type
+     */
+    public FrameType getFrameType() {
+        return this.frameType;
+    }
+
+    /**
+     * Gets the title.
+     *
+     * @return The title
+     */
+    public Text getTitle() {
+        return this.title;
+    }
+
 }

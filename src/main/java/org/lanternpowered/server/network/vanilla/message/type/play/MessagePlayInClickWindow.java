@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -72,5 +73,17 @@ public final class MessagePlayInClickWindow implements Message {
     @Nullable
     public ItemStack getClickedItem() {
         return this.itemStack;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("windowId", this.windowId)
+                .add("slot", this.slot)
+                .add("mode", this.mode)
+                .add("button", this.button)
+                .add("transaction", this.transaction)
+                .add("itemStack", this.itemStack)
+                .toString();
     }
 }

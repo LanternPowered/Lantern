@@ -26,14 +26,14 @@
 package org.lanternpowered.server.advancement;
 
 /**
- * An enumeration of all the available {@link AdvancementFrameType}s in minecraft.
+ * An enumeration of all the available {@link FrameType}s in minecraft.
  */
-public final class AdvancementFrameTypes {
+public final class FrameTypes {
 
-    public static final AdvancementFrameType CHALLENGE = new AdvancementFrameType("minecraft", "challenge", 1);
+    public static final FrameType CHALLENGE = new FrameType("minecraft", "challenge", 1);
 
-    public static final AdvancementFrameType TASK = new AdvancementFrameType("minecraft", "task", 0);
+    public static final FrameType TASK = new FrameType("minecraft", "task", 0);
 
-    private AdvancementFrameTypes() {
+    private FrameTypes() {
     }
 }

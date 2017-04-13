@@ -40,7 +40,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class Advancement extends PluginCatalogType.Base {
+public final class Advancement extends Styleable {
 
     public static AdvancementBuilder builder() {
         return new AdvancementBuilder();
@@ -50,23 +50,15 @@ public final class Advancement extends PluginCatalogType.Base {
     private final List<Advancement> children = new ArrayList<>();
     private final List<List<AdvancementCriterion>> advancementCriteria;
     private final List<AdvancementCriterion> advancementCriteria0;
-    private final Text title;
-    private final ItemType icon;
-    private final AdvancementFrameType frameType;
 
-    AdvancementTree advancementTree;
-
-    public Advancement(String pluginId, String id, String name, @Nullable Advancement parent,
-            List<List<AdvancementCriterion>> advancementCriteria, Text title, ItemType icon, AdvancementFrameType frameType) {
-        super(pluginId, id, name);
+    Advancement(String pluginId, String id, String name, @Nullable Advancement parent,
+            List<List<AdvancementCriterion>> advancementCriteria, Text title, Text description, ItemType icon, FrameType frameType) {
+        super(pluginId, id, name, title, description, icon, frameType);
         this.advancementCriteria = advancementCriteria.stream().map(ImmutableList::copyOf).collect(GuavaCollectors.toImmutableList());
         final ImmutableList.Builder<AdvancementCriterion> criteria = ImmutableList.builder();
         advancementCriteria.forEach(criteria::addAll);
         this.advancementCriteria0 = criteria.build();
         this.parent = parent;
-        this.title = title;
-        this.icon = icon;
-        this.frameType = frameType;
     }
 
     /**
@@ -97,33 +89,6 @@ public final class Advancement extends PluginCatalogType.Base {
      */
     public List<List<AdvancementCriterion>> getCriteria() {
         return this.advancementCriteria;
-    }
-
-    /**
-     * Gets the icon of this advancement.
-     *
-     * @return The icon
-     */
-    public ItemType getIcon() {
-        return this.icon;
-    }
-
-    /**
-     * Gets the {@link AdvancementFrameType}.
-     *
-     * @return The frame type
-     */
-    public AdvancementFrameType getFrameType() {
-        return this.frameType;
-    }
-
-    /**
-     * Gets the title.
-     *
-     * @return The title
-     */
-    public Text getTitle() {
-        return this.title;
     }
 
     /**

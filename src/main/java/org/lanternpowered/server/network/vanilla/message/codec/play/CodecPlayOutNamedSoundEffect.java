@@ -23,36 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.flowpowered.math.vector.Vector3d;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.effect.sound.LanternSoundCategory;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.network.message.handler.Handler;
-
-public final class HandlerMessage<M extends Message> implements Message {
-
-    private final M message;
-    private final Handler<? super M> handler;
-
-    public HandlerMessage(M message, Handler<? super M> handler) {
-        this.message = checkNotNull(message, "message");
-        this.handler = checkNotNull(handler, "handler");
-    }
-
-    public M getMessage() {
-        return this.message;
-    }
-
-    public Handler<? super M> getHandler() {
-        return this.handler;
-    }
+public final class CodecPlayOutNamedSoundEffect implements Codec<MessagePlayOutNamedSoundEffect> {
 
     @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("message", this.message)
-                .add("handler", this.handler)
-                .toString();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutNamedSoundEffect message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeString(message.getType());
+        buf.writeVarInt(((LanternSoundCategory) message.getCategory()).getInternalId());
+        Vector3d pos = message.getPosition();
+        buf.writeInteger((int) (pos.getX() * 8.0));
+        buf.writeInteger((int) (pos.getY() * 8.0));
+        buf.writeInteger((int) (pos.getZ() * 8.0));
+        buf.writeFloat(message.getVolume());
+        buf.writeFloat(message.getPitch());
+        return buf;
     }
 }

@@ -82,6 +82,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityTeleport;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutMultiBlockChange;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutOpenWindow;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerAbilities;
@@ -441,7 +442,7 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayInOutCustomPayload.bind(MessagePlayOutOpenBook.class);
         codecPlayInOutCustomPayload.bind(MessagePlayInOutBrand.class);
         codecPlayInOutCustomPayload.bind(MessagePlayOutStopSound.class);
-        outbound.bind(CodecPlayOutSoundEffect.class, MessagePlayOutNamedSoundEffect.class);
+        outbound.bind(CodecPlayOutNamedSoundEffect.class, MessagePlayOutNamedSoundEffect.class);
         outbound.bind(CodecOutDisconnect.class, MessageOutDisconnect.class);
         final CodecRegistration<Message, CodecPlayOutEntityStatus> codecPlayOutEntityStatus = outbound.bind(CodecPlayOutEntityStatus.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutEntityStatus.class);

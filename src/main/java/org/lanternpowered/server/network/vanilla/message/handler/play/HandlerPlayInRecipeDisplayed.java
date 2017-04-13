@@ -33,6 +33,6 @@ public class HandlerPlayInRecipeDisplayed implements Handler<MessagePlayInDispla
 
     @Override
     public void handle(NetworkContext context, MessagePlayInDisplayedRecipe message) {
-        // System.out.println(message.getId());
+        context.getSession().getPlayer().getContainerSession().handleDisplayedRecipe(message);
     }
 }

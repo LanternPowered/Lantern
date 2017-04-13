@@ -27,9 +27,10 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.base.MoreObjects;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import org.lanternpowered.server.advancement.AdvancementFrameType;
+import org.lanternpowered.server.advancement.FrameType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
+import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.item.ItemType;
 
 import java.util.Arrays;
@@ -72,11 +73,18 @@ public final class MessagePlayOutAdvancements implements Message {
 
     @Override
     public String toString() {
+        final MoreObjects.ToStringHelper progress = MoreObjects.toStringHelper("");
+        this.progress.entrySet().forEach(e -> {
+            final MoreObjects.ToStringHelper progressEntry = MoreObjects.toStringHelper("");
+            e.getValue().object2LongEntrySet().forEach(e2 -> progressEntry.add(e2.getKey(), e2.getLongValue()));
+            progress.add(e.getKey(), progressEntry.toString());
+        });
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
                 .add("clear", this.clear)
-                .add("addedAdvStructs", Arrays.toString(this.addedAdvStructs.toArray(new AdvStruct[0])))
-                .add("removedAdvs", Arrays.toString(this.removedAdvs.toArray(new String[0])))
+                .add("addedAdvStructs", Lists2.toString(this.addedAdvStructs))
+                .add("removedAdvs", Lists2.toString(this.removedAdvs))
+                .add("progress", progress.toString())
                 .toString();
     }
 
@@ -131,20 +139,26 @@ public final class MessagePlayOutAdvancements implements Message {
         public static final class Display {
 
             private final LocalizedText title;
+            private final LocalizedText description;
             private final ItemType icon;
-            private final AdvancementFrameType frameType;
+            private final FrameType frameType;
             @Nullable private final String background;
             private final int x;
             private final int y;
 
-            public Display(LocalizedText title, ItemType icon, AdvancementFrameType frameType,
+            public Display(LocalizedText title, LocalizedText description, ItemType icon, FrameType frameType,
                     @Nullable String background, int x, int y) {
-                this.icon = icon;
-                this.title = title;
-                this.frameType = frameType;
+                this.description = description;
                 this.background = background;
+                this.frameType = frameType;
+                this.title = title;
+                this.icon = icon;
                 this.x = x;
                 this.y = y;
+            }
+
+            public LocalizedText getDescription() {
+                return this.description;
             }
 
             public LocalizedText getTitle() {
@@ -155,7 +169,7 @@ public final class MessagePlayOutAdvancements implements Message {
                 return this.icon;
             }
 
-            public AdvancementFrameType getFrameType() {
+            public FrameType getFrameType() {
                 return this.frameType;
             }
 
@@ -177,6 +191,7 @@ public final class MessagePlayOutAdvancements implements Message {
                         .omitNullValues()
                         .add("icon", this.icon.getId())
                         .add("title", this.title.getText())
+                        .add("description", this.description.getText())
                         .add("frameType", this.frameType.getId())
                         .add("background", this.background)
                         .add("x", this.x)

@@ -26,6 +26,7 @@
 package org.lanternpowered.server.inventory;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Iterables;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
@@ -34,8 +35,10 @@ import org.lanternpowered.server.inventory.entity.LanternHotbar;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutConfirmWindowTransaction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPrepareCraftingGrid;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.spongepowered.api.Sponge;
@@ -64,7 +67,6 @@ import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.slot.OutputSlot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
-import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -172,7 +174,7 @@ public class PlayerContainerSession {
                     final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities);
                     Sponge.getEventManager().post(event1);
                     if (!event1.isCancelled()) {
-                        this.finishSpawnEntityEvent(event1);
+                        finishSpawnEntityEvent(event1);
                     }
                 }
             } else {
@@ -311,15 +313,16 @@ public class PlayerContainerSession {
         final int a = prepare ? 1 : 0;
         final int b = prepare ? 0 : 1;
         for (MessagePlayInPrepareCraftingGrid.SlotUpdate update : updates) {
-            final StrictSlot[] slots = getSlots(strictSlotMap, update);
+            final LanternSlot[] slots = getSlots(update);
             if (slots == null) {
                 return false;
             }
-            final LanternItemStack itemStack = slots[a].poll(update.getItemStack(), update.getItemStack().getQuantity());
+            final LanternItemStack itemStack = strictSlotMap.computeIfAbsent(slots[a], StrictSlot::new)
+                    .poll(update.getItemStack(), update.getItemStack().getQuantity());
             if (itemStack == null) {
                 return false;
             }
-            if (!slots[b].offer(itemStack)) {
+            if (!strictSlotMap.computeIfAbsent(slots[b], StrictSlot::new).offer(itemStack)) {
                 return false;
             }
         }
@@ -327,6 +330,27 @@ public class PlayerContainerSession {
     }
 
     public void handlePrepareCraftingGrid(MessagePlayInPrepareCraftingGrid message) {
+        final boolean success;
+        // Check if anything went wrong, and resend updates if needed
+        if (!handlePrepareCraftingGrid0(message)) {
+            for (MessagePlayInPrepareCraftingGrid.SlotUpdate update :
+                    Iterables.concat(message.getReturnedItems(), message.getPreparedItems())) {
+                final LanternSlot[] slots = getSlots(update);
+                if (slots != null) {
+                    //noinspection ConstantConditions
+                    this.openContainer.queueSlotChange(slots[0]);
+                    this.openContainer.queueSlotChange(slots[1]);
+                }
+            }
+            success = false;
+        } else {
+            success = true;
+        }
+        this.player.getConnection().send(new MessagePlayInOutConfirmWindowTransaction(
+                message.getWindowId(), message.getTransactionId(), success));
+    }
+
+    private boolean handlePrepareCraftingGrid0(MessagePlayInPrepareCraftingGrid message) {
         final int windowId = message.getWindowId();
         if (windowId == 0) {
             if (this.openContainer == null) {
@@ -334,29 +358,28 @@ public class PlayerContainerSession {
             }
         // Check for the open window
         } else if (this.openContainer == null || this.openContainer.windowId != windowId) {
-            return;
+            return true;
         }
         // Check for a crafting grid
         final Inventory craftingQuery = this.openContainer.query(CraftingInventory.class);
         if (craftingQuery instanceof EmptyInventory) {
-            return;
+            return false;
         }
-        Lantern.getLogger().info(message.toString());
         final Map<LanternSlot, StrictSlot> strictSlotMap = new HashMap<>();
         if (!process(strictSlotMap, message.getReturnedItems(), false)) {
-            return;
+            return false;
         }
-        Lantern.getLogger().info(Arrays.toString(strictSlotMap.values().stream().map(Object::toString).toArray()));
         if (!process(strictSlotMap, message.getPreparedItems(), true)) {
-            return;
+            return false;
         }
         final List<SlotTransaction> transactions = strictSlotMap.values().stream()
                 .map(StrictSlot::toTransaction).collect(Collectors.toList());
         finishInventoryEvent(SpongeEventFactory.createChangeInventoryEventTransfer(
                 Cause.source(this.player).build(), this.openContainer, transactions));
+        return true;
     }
 
-    private StrictSlot[] getSlots(Map<LanternSlot, StrictSlot> slots, MessagePlayInPrepareCraftingGrid.SlotUpdate update) {
+    private LanternSlot[] getSlots(MessagePlayInPrepareCraftingGrid.SlotUpdate update) {
         //noinspection ConstantConditions
         Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(update.getCraftingSlot());
         if (!optSlot.isPresent()) {
@@ -374,9 +397,7 @@ public class PlayerContainerSession {
         }
         final LanternSlot playerSlot = optSlot.get();
 
-        return new StrictSlot[] {
-                slots.computeIfAbsent(craftingSlot, StrictSlot::new),
-                slots.computeIfAbsent(playerSlot, StrictSlot::new) };
+        return new LanternSlot[] { craftingSlot, playerSlot };
     }
 
     public void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
@@ -445,7 +466,7 @@ public class PlayerContainerSession {
                 } else {
                     slot.poll(1);
                 }
-                this.finishSpawnEntityEvent(event);
+                finishSpawnEntityEvent(event);
             }
         }
     }
@@ -453,6 +474,13 @@ public class PlayerContainerSession {
     private void resetDrag() {
         this.dragState = -1;
         this.dragSlots.clear();
+    }
+
+    public void handleDisplayedRecipe(MessagePlayInDisplayedRecipe message) {
+        // A quite useless packet, maybe only useful to track the inventory state
+        if (this.openContainer == null) {
+            setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
+        }
     }
 
     public void handleWindowClick(MessagePlayInClickWindow message) {
@@ -528,8 +556,8 @@ public class PlayerContainerSession {
 
                             final ClickInventoryEvent.Drag.Secondary event = SpongeEventFactory.createClickInventoryEventDragSecondary(
                                     cause, cursorTransaction, this.openContainer, transactions);
-                            this.finishInventoryEvent(event);
-                            this.resetDrag();
+                            finishInventoryEvent(event);
+                            resetDrag();
                         }
                     } else {
                         // Add slot
@@ -836,7 +864,6 @@ public class PlayerContainerSession {
             final Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
                     .type(SpawnTypes.DROPPED_ITEM).build()).named(NamedCause.SOURCE, this.player).build();
             final List<Entity> entities = new ArrayList<>();
-            final World world = this.player.getWorld();
 
             final Transaction<ItemStackSnapshot> cursorTransaction;
             final List<SlotTransaction> slotTransactions = new ArrayList<>();
@@ -937,17 +964,6 @@ public class PlayerContainerSession {
         final Cause cause = Cause.source(event).build();
         for (Entity entity : event.getEntities()) {
             entity.getWorld().spawnEntity(entity, cause);
-        }
-    }
-
-    private void processSlotTransactions(List<SlotTransaction> slotTransactions) {
-        for (SlotTransaction slotTransaction : slotTransactions) {
-            if (slotTransaction.isValid()) {
-                slotTransaction.getSlot().set(slotTransaction.getFinal().createStack());
-            } else {
-                // Force the slot to update
-                this.openContainer.queueSlotChange(slotTransaction.getSlot());
-            }
         }
     }
 

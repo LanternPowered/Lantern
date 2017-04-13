@@ -70,15 +70,4 @@ public final class AdvancementTrees {
         }
         trackers.forEach(player -> player.getAdvancementsProgress().clearDirty());
     }
-
-    public static final AdvancementTree TEST_TREE;
-
-    static {
-        TEST_TREE = new AdvancementTree();
-        final Advancement advancement = Advancement.builder()
-                .icon(ItemTypes.DIAMOND)
-                .title(Text.of("Become King"))
-                .build("test", "become_king");
-        TEST_TREE.addAdvancement(3, 3, advancement);
-    }
 }

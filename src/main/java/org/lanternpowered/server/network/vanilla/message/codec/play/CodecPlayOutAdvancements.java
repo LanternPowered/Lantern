@@ -42,6 +42,7 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutAdvancements message) throws CodecException {
+        System.out.println(message.toString());
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeBoolean(message.getClear());
         final List<MessagePlayOutAdvancements.AdvStruct> addedAdvStructs = message.getAddedAdvStructs();
@@ -49,16 +50,16 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
         for (MessagePlayOutAdvancements.AdvStruct struct : addedAdvStructs) {
             buf.writeString(struct.getId());
             final Optional<String> optParent = struct.getParentId();
-            /*buf.writeBoolean(optParent.isPresent());
+            buf.writeBoolean(optParent.isPresent());
             if (optParent.isPresent()) {
                 buf.writeString(optParent.get());
-            }*/
-            buf.writeBoolean(false);
+            }
             final Optional<MessagePlayOutAdvancements.AdvStruct.Display> optDisplay = struct.getDisplay();
             buf.writeBoolean(optDisplay.isPresent());
             if (optDisplay.isPresent()) {
                 final MessagePlayOutAdvancements.AdvStruct.Display display = optDisplay.get();
                 buf.write(Types.LOCALIZED_TEXT, display.getTitle());
+                buf.write(Types.LOCALIZED_TEXT, display.getDescription());
                 buf.writeVarInt(ItemRegistryModule.get().getInternalId(display.getIcon()));
                 buf.writeVarInt(display.getFrameType().getInternalId());
                 final Optional<String> optBackground = display.getBackground();
@@ -83,8 +84,6 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
         buf.writeVarInt(removed.size());
         removed.forEach(buf::writeString);
         final Map<String, Object2LongMap<String>> progress = message.getProgress();
-        buf.writeVarInt(0);
-        /*
         buf.writeVarInt(progress.size());
         for (Map.Entry<String, Object2LongMap<String>> entry : progress.entrySet()) {
             buf.writeString(entry.getKey());
@@ -97,7 +96,7 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
                     buf.writeLong(time);
                 }
             }
-        }*/
+        }
         return buf;
     }
 }

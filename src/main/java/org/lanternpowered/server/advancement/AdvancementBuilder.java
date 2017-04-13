@@ -28,24 +28,15 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.ResettableBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-public final class AdvancementBuilder implements ResettableBuilder<Advancement, AdvancementBuilder> {
+public final class AdvancementBuilder extends StyleableBuilder<Advancement, AdvancementBuilder> {
 
     private final List<List<AdvancementCriterion>> criteria = new ArrayList<>();
 
-    private Text title;
-    private ItemType icon;
-    private AdvancementFrameType frameType;
     @Nullable private Advancement parent;
 
     AdvancementBuilder() {
@@ -64,53 +55,6 @@ public final class AdvancementBuilder implements ResettableBuilder<Advancement, 
     }
 
     /**
-     * Sets the title of the advancement.
-     *
-     * @param title The title
-     * @return This builder, for chaining
-     */
-    public AdvancementBuilder title(Text title) {
-        this.title = checkNotNull(title, "title");
-        return this;
-    }
-
-    /**
-     * Sets the {@link AdvancementFrameType} of the advancement.
-     *
-     * @param frameType The frame type
-     * @return This builder, for chaining
-     */
-    public AdvancementBuilder frameType(AdvancementFrameType frameType) {
-        this.frameType = checkNotNull(frameType, "frameType");
-        return this;
-    }
-
-    /**
-     * Sets the icon of the advancement with the
-     * specified {@link ItemType}.
-     *
-     * @param itemType The item type
-     * @return This builder, for chaining
-     */
-    public AdvancementBuilder icon(ItemType itemType) {
-        this.icon = checkNotNull(itemType, "itemType");
-        return this;
-    }
-
-    /**
-     * Sets the icon of the advancement with the
-     * specified {@link ItemType}.
-     *
-     * @param blockType The block type
-     * @return This builder, for chaining
-     */
-    public AdvancementBuilder icon(BlockType blockType) {
-        this.icon = checkNotNull(blockType, "blockType").getItem().orElseThrow(
-                () -> new IllegalArgumentException("The block type: " + blockType.getId() + " doesn't have a item type."));
-        return this;
-    }
-
-    /**
      * Builds a new {@link Advancement}.
      *
      * @param pluginId The plugin id
@@ -122,27 +66,26 @@ public final class AdvancementBuilder implements ResettableBuilder<Advancement, 
         checkNotNull(id, "id");
         //noinspection ConstantConditions
         checkArgument(this.title != null, "The title must be set");
-        return new Advancement(pluginId, id, id, this.parent, this.criteria, this.title, this.icon, this.frameType);
+        //noinspection ConstantConditions
+        checkArgument(this.description != null, "The description must be set");
+        return new Advancement(pluginId, id, this.title.toPlain(), this.parent, this.criteria,
+                this.title, this.description, this.icon, this.frameType);
     }
 
     @Override
     public AdvancementBuilder from(Advancement value) {
+        super.reset();
         this.parent = value.getParent().orElse(null);
         this.criteria.clear();
         this.criteria.addAll(value.getCriteria());
-        this.icon = value.getIcon();
-        this.frameType = value.getFrameType();
-        this.title = value.getTitle();
         return this;
     }
 
     @Override
     public AdvancementBuilder reset() {
+        super.reset();
         this.parent = null;
         this.criteria.clear();
-        this.icon = ItemTypes.APPLE;
-        this.frameType = AdvancementFrameTypes.TASK;
-        this.title = null;
         return this;
     }
 }

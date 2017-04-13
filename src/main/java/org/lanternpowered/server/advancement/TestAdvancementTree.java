@@ -25,11 +25,31 @@
  */
 package org.lanternpowered.server.advancement;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.text.Text;
 
-public final class AdvancementFrameType extends PluginCatalogType.Base.Internal {
+public final class TestAdvancementTree {
 
-    public AdvancementFrameType(String pluginId, String name, int internalId) {
-        super(pluginId, name, internalId);
+    public static final AdvancementTree INSTANCE;
+
+    static {
+        INSTANCE = AdvancementTree.builder()
+                .title(Text.of("Rule!"))
+                .description(Text.of("Build a kingdom."))
+                .icon(ItemTypes.GOLDEN_APPLE)
+                .build("test", "king_of_the_hill");
+        final Advancement becomeKing = Advancement.builder()
+                .icon(ItemTypes.DIAMOND)
+                .title(Text.of("Become King"))
+                .description(Text.of("Claim a piece of land."))
+                .build("test", "become_king");
+        final Advancement prepareCake = Advancement.builder()
+                .parent(becomeKing)
+                .icon(ItemTypes.CAKE)
+                .title(Text.of("Cake"))
+                .description(Text.of("Prepare cake for your people."))
+                .build("test", "cake");
+        INSTANCE.addAdvancement(2, -1, prepareCake);
+        INSTANCE.addAdvancement(2, 1, becomeKing);
     }
 }

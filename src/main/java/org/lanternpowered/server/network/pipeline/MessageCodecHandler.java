@@ -53,6 +53,7 @@ import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 
 import java.util.List;
 import java.util.Set;
@@ -144,11 +145,13 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
             content.release();
         }
 
+        /*
         if (message instanceof MessageInOutKeepAlive ||
                 message instanceof MessagePlayInPlayerMovement) {
         } else {
-            // System.out.println(message.getClass().getName());
+            System.out.println(message.getClass().getName());
         }
+        */
 
         processMessage(message, output, protocol, state, this.codecContext);
     }

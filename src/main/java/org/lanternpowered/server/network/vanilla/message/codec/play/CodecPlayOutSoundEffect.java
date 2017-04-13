@@ -31,21 +31,17 @@ import org.lanternpowered.server.effect.sound.LanternSoundCategory;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 
-public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundEffectBase> {
+public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundEffect> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutSoundEffectBase message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
-        final Object type = message.getType();
-        if (type instanceof Integer) {
-            buf.writeVarInt((Integer) type);
-        } else {
-            buf.writeString((String) type);
-        }
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSoundEffect message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(((LanternSoundCategory) message.getCategory()).getInternalId());
-        Vector3d pos = message.getPosition();
+        buf.writeVarInt(message.getType());
+        buf.writeString(message.getParrotedEntityType().orElse(""));
+        final Vector3d pos = message.getPosition();
         buf.writeInteger((int) (pos.getX() * 8.0));
         buf.writeInteger((int) (pos.getY() * 8.0));
         buf.writeInteger((int) (pos.getZ() * 8.0));

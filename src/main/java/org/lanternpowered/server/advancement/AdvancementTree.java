@@ -36,6 +36,7 @@ import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,12 +51,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public final class AdvancementTree {
+public final class AdvancementTree extends Styleable {
 
-    /**
-     * The default background of the {@link AdvancementTree}.
-     */
-    public static final String DEFAULT_BACKGROUND = "minecraft:textures/gui/advancements/backgrounds/stone.png";
+    public static AdvancementTreeBuilder builder() {
+        return new AdvancementTreeBuilder();
+    }
 
     private static final String ROOT_ADVANCEMENT = "root:root";
     private static final AtomicInteger TREE_COUNTER = new AtomicInteger();
@@ -63,7 +63,7 @@ public final class AdvancementTree {
     private final Map<Advancement, Vector2i> advancements = new HashMap<>();
     private final int internalId;
 
-    private String backgroundTexture = DEFAULT_BACKGROUND;
+    private final String background;
 
     // Changes since the last tick
     private final List<Advancement> addedAdvancements = new ArrayList<>();
@@ -72,7 +72,18 @@ public final class AdvancementTree {
     // All the players tracking this tree
     private final List<LanternPlayer> trackers = new ArrayList<>();
 
-    public AdvancementTree() {
+    @Nullable private final Advancement rootAdvancement;
+    private final Vector2i rootPosition;
+
+    private int xOffset;
+    private int yOffset;
+
+    AdvancementTree(String pluginId, String id, String name, Text title, Text description, ItemType icon, FrameType frameType,
+            String background, @Nullable Advancement rootAdvancement, Vector2i rootPosition) {
+        super(pluginId, id, name, title, description, icon, frameType);
+        this.background = background;
+        this.rootAdvancement = rootAdvancement;
+        this.rootPosition = rootPosition;
         this.internalId = TREE_COUNTER.getAndIncrement();
         AdvancementTrees.INSTANCE.add(this);
     }
@@ -97,12 +108,21 @@ public final class AdvancementTree {
     }
 
     /**
+     * Gets the root {@link Advancement} if present.
+     *
+     * @return The root advancement
+     */
+    public Optional<Advancement> getRootAdvancement() {
+        return Optional.ofNullable(this.rootAdvancement);
+    }
+
+    /**
      * Gets the background texture of this tree.
      *
      * @return The background texture
      */
-    public String getBackgroundTexture() {
-        return this.backgroundTexture;
+    public String getBackground() {
+        return this.background;
     }
 
     /**
@@ -115,6 +135,12 @@ public final class AdvancementTree {
     public void addAdvancement(int x, int y, Advancement advancement) {
         checkNotNull(advancement, "advancement");
         checkArgument(!this.advancements.containsKey(advancement), "The advancement %s is already present in this tree", advancement.getId());
+        if (x < 0) {
+            this.xOffset = Math.max(Math.abs(x), this.xOffset);
+        }
+        if (y < 0) {
+            this.yOffset = Math.max(Math.abs(y), this.yOffset);
+        }
         this.advancements.put(advancement, new Vector2i(x, y));
         this.addedAdvancements.add(advancement);
     }
@@ -126,8 +152,23 @@ public final class AdvancementTree {
      */
     public void removeAdvancement(Advancement advancement) {
         checkNotNull(advancement, "advancement");
-        if (this.advancements.remove(advancement) != null) {
+        final Vector2i position = this.advancements.remove(advancement);
+        if (position != null) {
             this.removedAdvancements.add(advancement);
+            if (position.getX() < 0 || position.getY() < 0) {
+                this.xOffset = 0;
+                this.yOffset = 0;
+                for (Vector2i pos : this.advancements.values()) {
+                    final int x = pos.getX();
+                    final int y = pos.getY();
+                    if (x < 0) {
+                        this.xOffset = Math.max(Math.abs(x), this.xOffset);
+                    }
+                    if (y < 0) {
+                        this.yOffset = Math.max(Math.abs(y), this.yOffset);
+                    }
+                }
+            }
         }
     }
 
@@ -165,7 +206,12 @@ public final class AdvancementTree {
 
     @Nullable
     GlobalAdvancementsData createGlobalData(Locale locale, boolean initial) {
-        final String rootId = formatId0(ROOT_ADVANCEMENT);
+        final String rootId;
+        if (this.rootAdvancement != null) {
+            rootId = formatId0(this.rootAdvancement.getId());
+        } else {
+            rootId = formatId0(ROOT_ADVANCEMENT);
+        }
 
         final List<String> removed = initial || this.removedAdvancements.isEmpty() ? null :
                 this.removedAdvancements.stream().map(Advancement::getId).collect(Collectors.toList());
@@ -175,14 +221,13 @@ public final class AdvancementTree {
         if (initial || !advancements.isEmpty()) {
             addedStructs = new ArrayList<>();
             if (initial) {
-
-                /*
-                addedStructs.add(createStruct(rootId, null, createDisplay(new LocalizedText(Text.of("hoja"), Locale.ENGLISH),
-                        ItemTypes.NONE, AdvancementFrameTypes.TASK, this.backgroundTexture, 0, 0)));*/
-
-                addedStructs.add(createStruct(rootId, ":", null));
+                addedStructs.add(createStruct(rootId, null, createDisplay(
+                        new LocalizedText(getTitle(), Locale.ENGLISH),
+                        new LocalizedText(getDescription(), Locale.ENGLISH),
+                        getIcon(), getFrameType(), this.background,
+                        this.rootPosition.getX() + this.xOffset,
+                        this.rootPosition.getY() + this.yOffset)));
             }
-            boolean first = true;
             for (Advancement advancement : advancements) {
                 final String id = formatId0(advancement.getId());
 
@@ -201,9 +246,11 @@ public final class AdvancementTree {
                 }
 
                 final Vector2i pos = this.advancements.get(advancement);
-                addedStructs.add(createStruct(id, parentId, createDisplay(new LocalizedText(advancement.getTitle(), locale),
-                        advancement.getIcon(), advancement.getFrameType(), /*first ? this.backgroundTexture : */null, pos.getX(), pos.getY())));
-                first = false;
+                addedStructs.add(createStruct(id, parentId, createDisplay(
+                        new LocalizedText(advancement.getTitle(), locale),
+                        new LocalizedText(advancement.getDescription(), locale),
+                        advancement.getIcon(), advancement.getFrameType(), null,
+                        pos.getX() + this.xOffset, pos.getY() + this.yOffset)));
             }
         }
 
@@ -247,9 +294,9 @@ public final class AdvancementTree {
         return Object2LongMaps.singleton(formatCriterion0(id), time);
     }
 
-    private MessagePlayOutAdvancements.AdvStruct.Display createDisplay(LocalizedText title, ItemType icon,
-            AdvancementFrameType frameType, @Nullable String background, int x, int y) {
-        return new MessagePlayOutAdvancements.AdvStruct.Display(title, icon, frameType, background, x, y);
+    private MessagePlayOutAdvancements.AdvStruct.Display createDisplay(LocalizedText title, LocalizedText description, ItemType icon,
+            FrameType frameType, @Nullable String background, int x, int y) {
+        return new MessagePlayOutAdvancements.AdvStruct.Display(title, description, icon, frameType, background, x, y);
     }
 
     private MessagePlayOutAdvancements.AdvStruct createStruct(String id, @Nullable String parentId,

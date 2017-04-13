@@ -42,7 +42,6 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutAdvancements message) throws CodecException {
-        System.out.println(message.toString());
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeBoolean(message.getClear());
         final List<MessagePlayOutAdvancements.AdvStruct> addedAdvStructs = message.getAddedAdvStructs();

@@ -30,10 +30,11 @@ import org.spongepowered.api.text.Text;
 
 public final class TestAdvancementTree {
 
-    public static final AdvancementTree INSTANCE;
+    public static final AdvancementTree A;
+    public static final AdvancementTree B;
 
     static {
-        INSTANCE = AdvancementTree.builder()
+        A = AdvancementTree.builder()
                 .title(Text.of("Rule!"))
                 .description(Text.of("Build a kingdom."))
                 .icon(ItemTypes.GOLDEN_APPLE)
@@ -49,7 +50,35 @@ public final class TestAdvancementTree {
                 .title(Text.of("Cake"))
                 .description(Text.of("Prepare cake for your people."))
                 .build("test", "cake");
-        INSTANCE.addAdvancement(2, -1, prepareCake);
-        INSTANCE.addAdvancement(2, 1, becomeKing);
+        A.addAdvancement(2, -1, prepareCake);
+        A.addAdvancement(2, 1, becomeKing);
+        B = AdvancementTree.builder()
+                .title(Text.of("Digger"))
+                .description(Text.of("Mine, dig, destroy... everything!"))
+                .icon(ItemTypes.IRON_PICKAXE)
+                .build("test", "digger");
+        final Advancement digDirt = Advancement.builder()
+                .parent(becomeKing)
+                .icon(ItemTypes.DIRT)
+                .title(Text.of("Dig Dirt"))
+                .description(Text.of("Dig a more then 100 dirt blocks."))
+                .build("test", "dig_dirt");
+        final Advancement dirtLover = Advancement.builder()
+                .parent(digDirt)
+                .icon(ItemTypes.DIRT)
+                .frameType(FrameTypes.CHALLENGE)
+                .title(Text.of("Dirt Lover"))
+                .description(Text.of("Dig a more then 1000 dirt blocks."))
+                .build("test", "dirt_lover");
+        final Advancement wanderingChallenge = Advancement.builder()
+                .parent(becomeKing)
+                .icon(ItemTypes.BREAD)
+                .frameType(FrameTypes.CHALLENGE)
+                .title(Text.of("Is it edible?"))
+                .description(Text.of("Attempt to cook dirt."))
+                .build("test", "cooking_dirt");
+        B.addAdvancement(1, 1, digDirt);
+        B.addAdvancement(2, 1, dirtLover);
+        B.addAdvancement(2, 2, wanderingChallenge);
     }
 }

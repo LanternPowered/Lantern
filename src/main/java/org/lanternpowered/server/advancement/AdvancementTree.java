@@ -238,8 +238,7 @@ public final class AdvancementTree extends Styleable {
                     if (this.advancements.containsKey(parent)) {
                         parentId = formatId0(parent.getId());
                     } else {
-                        parentId = formatId0(advancement.getId(), "dummy");
-                        addedStructs.add(createStruct(parentId, rootId, null));
+                        parentId = rootId;
                     }
                 } else {
                     parentId = rootId;

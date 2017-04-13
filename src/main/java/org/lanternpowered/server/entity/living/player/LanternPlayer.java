@@ -422,7 +422,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                         new MessagePlayOutUnlockRecipes.Entry("minecraft:bread", true, false),
                         new MessagePlayOutUnlockRecipes.Entry("minecraft:torch", true, false)
                 ), true, get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(), get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get()));
-                TestAdvancementTree.INSTANCE.addTracker(this);
+                TestAdvancementTree.A.addTracker(this);
+                TestAdvancementTree.B.addTracker(this);
             } else {
                 //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {

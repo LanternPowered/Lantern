@@ -29,8 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +49,12 @@ public final class AdvancementTrees {
 
     private int counter = UPDATE_DELAY;
 
+    public void removeTracker(Player player) {
+        for (AdvancementTree advancementTree : this.advancementTrees) {
+            advancementTree.removeRawTracker(player);
+        }
+    }
+
     public void pulse() {
         if (this.counter-- > 0) {
             return;
@@ -57,11 +62,13 @@ public final class AdvancementTrees {
         this.counter = UPDATE_DELAY;
         final List<LanternPlayer> trackers = new ArrayList<>();
         for (AdvancementTree advancementTree : this.advancementTrees) {
-            trackers.addAll(advancementTree.getTrackers());
-            final AdvancementTree.GlobalAdvancementsData globalAdvancementsData = advancementTree.createGlobalData(Locale.ENGLISH, false);
-            for (LanternPlayer tracker : advancementTree.getTrackers()) {
+            final List<LanternPlayer> trackers1 = advancementTree.getUpdateTrackers();
+            trackers.addAll(trackers1);
+            final int state = advancementTree.isRefreshRequired() ? AdvancementTree.REFRESH : AdvancementTree.UPDATE;
+            final AdvancementTree.GlobalAdvancementsData globalAdvancementsData = advancementTree.createGlobalData(Locale.ENGLISH, state);
+            for (LanternPlayer tracker : trackers1) {
                 final MessagePlayOutAdvancements message = advancementTree.createAdvancementsMessage(
-                        globalAdvancementsData, tracker.getAdvancementsProgress(), false);
+                        globalAdvancementsData, tracker.getAdvancementsProgress(), state);
                 if (message != null) {
                     tracker.getConnection().send(message);
                 }

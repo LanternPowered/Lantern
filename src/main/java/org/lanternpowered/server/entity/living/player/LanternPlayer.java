@@ -33,6 +33,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.advancement.TestAdvancementTree;
 import org.lanternpowered.server.boss.LanternBossBar;
@@ -454,6 +455,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             // Add the player to the world
             world.addPlayer(this);
         } else {
+            AdvancementTrees.INSTANCE.removeTracker(this);
             this.session.getServer().removePlayer(this);
             this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));
             this.tabList.clear();

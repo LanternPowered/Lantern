@@ -71,12 +71,15 @@ public final class AdvancementTree extends Styleable {
 
     // All the players tracking this tree
     private final List<LanternPlayer> trackers = new ArrayList<>();
+    private final List<LanternPlayer> addedTrackers = new ArrayList<>();
 
     @Nullable private final Advancement rootAdvancement;
     private final Vector2i rootPosition;
 
     private int xOffset;
     private int yOffset;
+
+    private boolean refresh;
 
     AdvancementTree(String pluginId, String id, String name, Text title, Text description, ItemType icon, FrameType frameType,
             String background, @Nullable Advancement rootAdvancement, Vector2i rootPosition) {
@@ -85,11 +88,14 @@ public final class AdvancementTree extends Styleable {
         this.rootAdvancement = rootAdvancement;
         this.rootPosition = rootPosition;
         this.internalId = TREE_COUNTER.getAndIncrement();
+        if (rootAdvancement != null) {
+            this.advancements.put(rootAdvancement, rootPosition);
+        }
         AdvancementTrees.INSTANCE.add(this);
     }
 
-    List<LanternPlayer> getTrackers() {
-        return this.trackers;
+    List<LanternPlayer> getUpdateTrackers() {
+        return this.trackers.stream().filter(p -> !this.addedTrackers.contains(p)).collect(Collectors.toList());
     }
 
     /**
@@ -100,11 +106,35 @@ public final class AdvancementTree extends Styleable {
     public void addTracker(Player tracker) {
         checkNotNull(tracker, "tracker");
         final LanternPlayer player = (LanternPlayer) tracker;
-        final MessagePlayOutAdvancements message = createAdvancementsMessage(Locale.ENGLISH, player.getAdvancementsProgress(), true);
-        if (message != null) {
-            player.getConnection().send(message);
+        if (this.trackers.add(player)) {
+            this.addedTrackers.add(player);
+            final MessagePlayOutAdvancements message = createAdvancementsMessage(Locale.ENGLISH, player.getAdvancementsProgress(), INITIALIZE);
+            if (message != null) {
+                player.getConnection().send(message);
+            }
         }
-        this.trackers.add(player);
+    }
+
+    /**
+     * Removes the tracker ({@link Player}).
+     *
+     * @param tracker The tracker
+     */
+    public void removeTracker(Player tracker) {
+        checkNotNull(tracker, "tracker");
+        final LanternPlayer player = (LanternPlayer) tracker;
+        if (this.trackers.remove(player)) {
+            this.addedTrackers.remove(player);
+            final MessagePlayOutAdvancements message = createAdvancementsMessage(Locale.ENGLISH, player.getAdvancementsProgress(), REMOVE);
+            if (message != null) {
+                player.getConnection().send(message);
+            }
+        }
+    }
+
+    void removeRawTracker(Player tracker) {
+        final LanternPlayer player = (LanternPlayer) tracker;
+        this.trackers.remove(player);
     }
 
     /**
@@ -136,10 +166,18 @@ public final class AdvancementTree extends Styleable {
         checkNotNull(advancement, "advancement");
         checkArgument(!this.advancements.containsKey(advancement), "The advancement %s is already present in this tree", advancement.getId());
         if (x < 0) {
-            this.xOffset = Math.max(Math.abs(x), this.xOffset);
+            final int x1 = Math.abs(x);
+            if (x1 > this.xOffset) {
+                this.refresh = true;
+                this.xOffset = x1;
+            }
         }
         if (y < 0) {
-            this.yOffset = Math.max(Math.abs(y), this.yOffset);
+            final int y1 = Math.abs(y);
+            if (y1 > this.yOffset) {
+                this.refresh = true;
+                this.yOffset = y1;
+            }
         }
         this.advancements.put(advancement, new Vector2i(x, y));
         this.addedAdvancements.add(advancement);
@@ -156,17 +194,22 @@ public final class AdvancementTree extends Styleable {
         if (position != null) {
             this.removedAdvancements.add(advancement);
             if (position.getX() < 0 || position.getY() < 0) {
-                this.xOffset = 0;
-                this.yOffset = 0;
+                int xOffset = 0;
+                int yOffset = 0;
                 for (Vector2i pos : this.advancements.values()) {
                     final int x = pos.getX();
                     final int y = pos.getY();
                     if (x < 0) {
-                        this.xOffset = Math.max(Math.abs(x), this.xOffset);
+                        xOffset = Math.max(Math.abs(x), this.xOffset);
                     }
                     if (y < 0) {
-                        this.yOffset = Math.max(Math.abs(y), this.yOffset);
+                        yOffset = Math.max(Math.abs(y), this.yOffset);
                     }
+                }
+                if (xOffset != this.xOffset || yOffset != this.yOffset) {
+                    this.refresh = true;
+                    this.xOffset = xOffset;
+                    this.yOffset = yOffset;
                 }
             }
         }
@@ -191,6 +234,12 @@ public final class AdvancementTree extends Styleable {
     void clearDirty() {
         this.addedAdvancements.clear();
         this.removedAdvancements.clear();
+        this.addedTrackers.clear();
+        this.refresh = false;
+    }
+
+    boolean isRefreshRequired() {
+        return this.refresh;
     }
 
     final static class GlobalAdvancementsData {
@@ -204,8 +253,13 @@ public final class AdvancementTree extends Styleable {
         }
     }
 
+    static final int UPDATE = 0;
+    static final int INITIALIZE = 1;
+    static final int REFRESH = 2;
+    static final int REMOVE = 3;
+
     @Nullable
-    GlobalAdvancementsData createGlobalData(Locale locale, boolean initial) {
+    GlobalAdvancementsData createGlobalData(Locale locale, int state) {
         final String rootId;
         if (this.rootAdvancement != null) {
             rootId = formatId0(this.rootAdvancement.getId());
@@ -213,22 +267,48 @@ public final class AdvancementTree extends Styleable {
             rootId = formatId0(ROOT_ADVANCEMENT);
         }
 
-        final List<String> removed = initial || this.removedAdvancements.isEmpty() ? null :
-                this.removedAdvancements.stream().map(Advancement::getId).collect(Collectors.toList());
+        List<String> removed = null;
+        if (state != INITIALIZE && !this.removedAdvancements.isEmpty()) {
+            removed = this.removedAdvancements.stream().map(a -> formatId0(a.getId())).collect(Collectors.toList());
+        }
+        if (state == REFRESH || state == REMOVE) {
+            final List<String> removed1 = this.advancements.keySet().stream().map(a -> formatId0(a.getId())).collect(Collectors.toList());
+            if (removed == null) {
+                removed = removed1;
+            } else {
+                removed.addAll(removed1);
+            }
+            if (state == REMOVE) {
+                return removed.isEmpty() ? null : new GlobalAdvancementsData(removed, null);
+            }
+        }
         List<MessagePlayOutAdvancements.AdvStruct> addedStructs = null;
 
-        final Collection<Advancement> advancements = initial ? this.advancements.keySet() : this.addedAdvancements;
-        if (initial || !advancements.isEmpty()) {
+        final Collection<Advancement> advancements;
+        if (state == UPDATE) {
+            advancements = this.addedAdvancements;
+        } else {
+            advancements = this.advancements.keySet();
+        }
+
+        if (state != UPDATE || (this.rootAdvancement != null && advancements.contains(this.rootAdvancement))) {
             addedStructs = new ArrayList<>();
-            if (initial) {
-                addedStructs.add(createStruct(rootId, null, createDisplay(
-                        new LocalizedText(getTitle(), Locale.ENGLISH),
-                        new LocalizedText(getDescription(), Locale.ENGLISH),
-                        getIcon(), getFrameType(), this.background,
-                        this.rootPosition.getX() + this.xOffset,
-                        this.rootPosition.getY() + this.yOffset)));
+            addedStructs.add(createStruct(rootId, null, createDisplay(
+                    new LocalizedText(getTitle(), Locale.ENGLISH),
+                    new LocalizedText(getDescription(), Locale.ENGLISH),
+                    getIcon(), getFrameType(), this.background,
+                    this.rootPosition.getX() + this.xOffset,
+                    this.rootPosition.getY() + this.yOffset)));
+        }
+
+        if (!advancements.isEmpty()) {
+            if (addedStructs == null) {
+                addedStructs = new ArrayList<>();
             }
             for (Advancement advancement : advancements) {
+                if (advancement == this.rootAdvancement) {
+                    continue;
+                }
                 final String id = formatId0(advancement.getId());
 
                 final String parentId;
@@ -257,15 +337,20 @@ public final class AdvancementTree extends Styleable {
     }
 
     @Nullable
-    private MessagePlayOutAdvancements createAdvancementsMessage(Locale locale, AdvancementsProgress progress, boolean initial) {
-        return createAdvancementsMessage(createGlobalData(locale, initial), progress, initial);
+    private MessagePlayOutAdvancements createAdvancementsMessage(Locale locale, AdvancementsProgress progress, int state) {
+        return createAdvancementsMessage(createGlobalData(locale, state), progress, state);
     }
 
     @Nullable
     MessagePlayOutAdvancements createAdvancementsMessage(@Nullable GlobalAdvancementsData advancementsData,
-            AdvancementsProgress progress, boolean initial) {
+            AdvancementsProgress progress, int state) {
+        if (state == REMOVE) {
+            return advancementsData == null || advancementsData.removed.isEmpty() ? null : new MessagePlayOutAdvancements(
+                    false, Collections.emptyList(), advancementsData.removed, Collections.emptyMap());
+        }
+
         Map<String, Object2LongMap<String>> progressMap = null;
-        if (initial) {
+        if (this.rootAdvancement == null && (state == INITIALIZE || state == REFRESH)) {
             progressMap = new HashMap<>();
             final String rootId = formatId0(ROOT_ADVANCEMENT);
             progressMap.put(rootId, createProgress(rootId, System.currentTimeMillis()));
@@ -273,7 +358,7 @@ public final class AdvancementTree extends Styleable {
 
         for (Advancement advancement : this.advancements.keySet()) {
             final AdvancementProgress progress1 = progress.getOrNull(advancement);
-            if (progress1 != null && (initial || progress1.isDirty())) {
+            if (progress1 != null && (state == INITIALIZE || state == REFRESH || progress1.isDirty())) {
                 final long achieveTime = progress1.getAchieveTime();
                 if (progressMap == null) {
                     progressMap = new HashMap<>();
@@ -282,7 +367,6 @@ public final class AdvancementTree extends Styleable {
                 progressMap.put(id, createProgress(id, achieveTime));
             }
         }
-
         return advancementsData == null && progressMap == null ? null : new MessagePlayOutAdvancements(false,
                 advancementsData == null ? Collections.emptyList() : advancementsData.addedStructs,
                 advancementsData == null ? Collections.emptyList() : advancementsData.removed,

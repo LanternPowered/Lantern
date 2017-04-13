@@ -56,6 +56,7 @@ public final class TestAdvancementTree {
                 .title(Text.of("Digger"))
                 .description(Text.of("Mine, dig, destroy... everything!"))
                 .icon(ItemTypes.IRON_PICKAXE)
+                .background("minecraft:textures/blocks/dirt.png")
                 .build("test", "digger");
         final Advancement digDirt = Advancement.builder()
                 .parent(becomeKing)

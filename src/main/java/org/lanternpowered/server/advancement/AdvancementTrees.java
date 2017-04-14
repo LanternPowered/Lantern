@@ -27,13 +27,19 @@ package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public final class AdvancementTrees {
 
@@ -52,6 +58,50 @@ public final class AdvancementTrees {
     public void removeTracker(Player player) {
         for (AdvancementTree advancementTree : this.advancementTrees) {
             advancementTree.removeRawTracker(player);
+        }
+    }
+
+    private static <T> List<T> modifiable(List<T> list) {
+        return list == Collections.emptyList() ? new ArrayList<>() :
+                list instanceof ImmutableList ? new ArrayList<>(list) : list;
+    }
+
+    private static <K, V> Map<K, V> modifiable(Map<K, V> map) {
+        return map == Collections.emptyMap() ? new HashMap<>() :
+                map instanceof ImmutableMap ? new HashMap<>(map) : map;
+    }
+
+    public void initialize(Player player) {
+        final LanternPlayer player1 = (LanternPlayer) player;
+
+        List<MessagePlayOutAdvancements.AdvStruct> addedAdvStructs = null;
+        Map<String, Object2LongMap<String>> progress = null;
+
+        for (AdvancementTree advancementTree : this.advancementTrees) {
+            final List<LanternPlayer> trackers1 = advancementTree.getTrackers();
+            if (!trackers1.contains(player1)) {
+                continue;
+            }
+            final AdvancementTree.GlobalAdvancementsData globalAdvancementsData = advancementTree.createGlobalData(
+                    Locale.ENGLISH, AdvancementTree.INITIALIZE);
+            final MessagePlayOutAdvancements message = advancementTree.createAdvancementsMessage(
+                    globalAdvancementsData, player1.getAdvancementsProgress(), AdvancementTree.INITIALIZE);
+            if (message != null) {
+                if (addedAdvStructs == null) {
+                    addedAdvStructs = modifiable(message.getAddedAdvStructs());
+                } else {
+                    addedAdvStructs.addAll(message.getAddedAdvStructs());
+                }
+                if (progress == null) {
+                    progress = modifiable(message.getProgress());
+                } else {
+                    progress.putAll(message.getProgress());
+                }
+            }
+        }
+
+        if (addedAdvStructs != null) {
+            player1.getConnection().send(new MessagePlayOutAdvancements(true, addedAdvStructs, Collections.emptyList(), progress));
         }
     }
 

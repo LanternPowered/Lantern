@@ -25,14 +25,26 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class HandlerPlayInCreativeWindowAction implements Handler<MessagePlayInCreativeWindowAction> {
+import org.lanternpowered.server.inventory.PlayerContainerSession;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.handler.Handler;
+
+import java.util.function.BiConsumer;
+
+public class HandlerPlayInContainerSessionForwarding<M extends Message> implements Handler<M> {
+
+    private final BiConsumer<PlayerContainerSession, M> function;
+
+    public HandlerPlayInContainerSessionForwarding(BiConsumer<PlayerContainerSession, M> function) {
+        checkNotNull(function, "function");
+        this.function = function;
+    }
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInCreativeWindowAction message) {
-        context.getSession().getPlayer().getContainerSession().handleWindowCreativeClick(message);
+    public void handle(NetworkContext context, M message) {
+        this.function.accept(context.getSession().getPlayer().getContainerSession(), message);
     }
 }

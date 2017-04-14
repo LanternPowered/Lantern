@@ -94,6 +94,10 @@ public final class AdvancementTree extends Styleable {
         AdvancementTrees.INSTANCE.add(this);
     }
 
+    List<LanternPlayer> getTrackers() {
+        return this.trackers;
+    }
+
     List<LanternPlayer> getUpdateTrackers() {
         return this.trackers.stream().filter(p -> !this.addedTrackers.contains(p)).collect(Collectors.toList());
     }
@@ -112,6 +116,19 @@ public final class AdvancementTree extends Styleable {
             if (message != null) {
                 player.getConnection().send(message);
             }
+        }
+    }
+
+    /**
+     * Adds a new tracker ({@link Player}).
+     *
+     * @param tracker The tracker
+     */
+    public void addRawTracker(Player tracker) {
+        checkNotNull(tracker, "tracker");
+        final LanternPlayer player = (LanternPlayer) tracker;
+        if (this.trackers.add(player)) {
+            this.addedTrackers.add(player);
         }
     }
 

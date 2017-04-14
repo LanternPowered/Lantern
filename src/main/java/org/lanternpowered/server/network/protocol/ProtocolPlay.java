@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.protocol;
 
+import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.network.message.CodecRegistration;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistry;
@@ -35,6 +36,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInC
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInClientStatus;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInCraftingBookData;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInEnchantItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCloseWindow;
@@ -53,7 +55,6 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInP
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerVehicleControls;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPrepareCraftingGrid;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInCraftingBookData;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInSpectate;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
@@ -126,12 +127,10 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCloseWindow;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInContainerSessionForwarding;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCraftingBookState;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCreativeWindowAction;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInHeldItemChange;
@@ -147,8 +146,6 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSprint;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPrepareCraftingGrid;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRecipeDisplayed;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
@@ -174,6 +171,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditCommandBlock;
@@ -203,7 +201,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPrepareCraftingGrid;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
@@ -302,7 +299,7 @@ final class ProtocolPlay extends ProtocolBase {
         // Register the codecs and handlers of the default messages
         inbound.bind(CodecPlayInTeleportConfirm.class, MessagePlayInTeleportConfirm.class); // TODO: Handler
         inbound.bind(CodecPlayInPrepareCraftingGrid.class, MessagePlayInPrepareCraftingGrid.class)
-                .bindHandler(new HandlerPlayInPrepareCraftingGrid());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handlePrepareCraftingGrid));
         inbound.bind(CodecPlayInTabComplete.class, MessagePlayInTabComplete.class)
                 .bindHandler(new HandlerPlayInTabComplete());
         inbound.bind(CodecPlayInChatMessage.class, MessagePlayInChatMessage.class)
@@ -313,7 +310,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class); // TODO: Handler
         inbound.bind(CodecPlayInEnchantItem.class, MessagePlayInEnchantItem.class); // TODO: Handler
         inbound.bind(CodecPlayInClickWindow.class, MessagePlayInClickWindow.class)
-                .bindHandler(new HandlerPlayInClickWindow());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowClick));
         inbound.bind(CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class)
                 .bindHandler(new HandlerPlayInCloseWindow());
         inbound.bind(CodecPlayInOutCustomPayload.class);
@@ -340,7 +337,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInOutHeldItemChange.class, MessagePlayInOutHeldItemChange.class)
                 .bindHandler(new HandlerPlayInHeldItemChange());
         inbound.bind(CodecPlayInCreativeWindowAction.class, MessagePlayInCreativeWindowAction.class)
-                .bindHandler(new HandlerPlayInCreativeWindowAction());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowCreativeClick));
         inbound.bind(CodecPlayInChangeSign.class, MessagePlayInChangeSign.class)
                 .bindHandler(new HandlerPlayInChangeSign());
         inbound.bind(CodecPlayInPlayerSwingArm.class, MessagePlayInPlayerSwingArm.class)
@@ -379,7 +376,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bindMessage(MessagePlayInPlayerDigging.class)
                 .bindHandler(new HandlerPlayInPlayerDigging());
         inbound.bindMessage(MessagePlayInDropHeldItem.class)
-                .bindHandler(new HandlerPlayInDropHeldItem());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleItemDrop));
         inbound.bindMessage(MessagePlayInOutFinishUsingItem.class)
                 .bindHandler(new HandlerPlayInFinishUsingItem());
         inbound.bindMessage(MessagePlayInSwapHandItems.class)
@@ -401,7 +398,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bindMessage(MessagePlayInPlayerVehicleMovement.class); // TODO: Handler
         // Provided by CodecPlayInCraftingBookData
         inbound.bindMessage(MessagePlayInDisplayedRecipe.class)
-                .bindHandler(new HandlerPlayInRecipeDisplayed());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleDisplayedRecipe));
         inbound.bindMessage(MessagePlayInCraftingBookState.class)
                 .bindHandler(new HandlerPlayInCraftingBookState());
 

@@ -25,22 +25,51 @@
  */
 package org.lanternpowered.server.console;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import jline.console.ConsoleReader;
+import jline.console.history.FileHistory;
+import jline.console.history.History;
 import org.lanternpowered.server.console.launch.ConsoleLaunch;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.Sponge;
+import org.lanternpowered.server.game.DirectoryKeys;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
+import org.lanternpowered.server.scheduler.LanternScheduler;
+import org.slf4j.Logger;
+import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
+@Singleton
 public final class ConsoleManager {
 
-    // Whether the command threads are running
+    private static final String HISTORY_FILE_NAME = "console_history.txt";
+
+    private final Path consoleHistoryFile;
+    private final Logger logger;
+    private final Scheduler scheduler;
+    private final CommandManager commandManager;
+    private final PluginContainer pluginContainer;
+
     private volatile boolean active;
 
-    public void start() {
-        this.active = true;
+    @Inject
+    public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager,
+            @Named(DirectoryKeys.CONFIG) Path configFolder,
+            @Named(InternalPluginsInfo.Implementation.IDENTIFIER) PluginContainer pluginContainer) {
+        this.consoleHistoryFile = configFolder.resolve(HISTORY_FILE_NAME);
+        this.pluginContainer = pluginContainer;
+        this.commandManager = commandManager;
+        this.scheduler = scheduler;
+        this.logger = logger;
+    }
 
+    public void start() {
         // Set the colored console formatter
         ConsoleLaunch.setFormatter(new ColoredConsoleFormatter());
 
@@ -55,22 +84,45 @@ public final class ConsoleManager {
             return;
         }
         reader.addCompleter(new ConsoleCommandCompleter());
+        try {
+            reader.setHistory(new FileHistory(this.consoleHistoryFile.toFile()));
+        } catch (IOException e) {
+            this.logger.error("Error while loading the console history!", e);
+        }
 
-        // Start the command reader thread
-        final Thread thread = new Thread(this::commandReaderTask);
-        thread.setName("console");
+        this.active = true;
+
+        final Thread thread = new Thread(this::readCommandTask, "console");
         thread.setDaemon(true);
         thread.start();
+
+        this.scheduler.createAsyncExecutor(this.pluginContainer).scheduleAtFixedRate(
+                this::saveHistory, 120, 120, TimeUnit.SECONDS);
     }
 
     public void shutdown() {
         this.active = false;
+        saveHistory();
+    }
+
+    private void saveHistory() {
+        final ConsoleReader reader = ConsoleLaunch.getReader();
+        if (reader != null) {
+            final History history = reader.getHistory();
+            if (history instanceof FileHistory) {
+                try {
+                    ((FileHistory) history).flush();
+                } catch (IOException e) {
+                    this.logger.error("Error while saving the console history!", e);
+                }
+            }
+        }
     }
 
     /**
      * This task handles the commands that are executed through the console.
      */
-    private void commandReaderTask() {
+    private void readCommandTask() {
         final ConsoleReader reader = ConsoleLaunch.getReader();
         while (this.active) {
             try {
@@ -80,15 +132,14 @@ public final class ConsoleManager {
                     command = command.trim();
                     if (!command.isEmpty()) {
                         final String runCommand = command.startsWith("/") ? command.substring(1) : command;
-                        Sponge.getScheduler().createTaskBuilder()
-                                .execute(() -> Sponge.getCommandManager().process(LanternConsoleSource.INSTANCE, runCommand))
-                                .submit(Lantern.getMinecraftPlugin());
+                        this.scheduler.createTaskBuilder()
+                                .execute(() -> this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand))
+                                .submit(this.pluginContainer);
                     }
                 }
             } catch (IOException e) {
-                Lantern.getLogger().error("Error while reading commands!", e);
+                this.logger.error("Error while reading commands!", e);
             }
         }
     }
-
 }

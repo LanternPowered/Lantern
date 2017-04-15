@@ -147,7 +147,7 @@ public class FormattingCodeTextSerializer extends PluginCatalogType.Base
 
     @Override
     public Text deserialize(String input) throws TextParseException {
-        return this.deserializeUnchecked(input);
+        return deserializeUnchecked(input);
     }
 
     @Override

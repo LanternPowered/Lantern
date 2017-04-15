@@ -54,7 +54,7 @@ public class LanternTaskBuilder implements Task.Builder {
 
     public LanternTaskBuilder(LanternScheduler scheduler) {
         this.scheduler = scheduler;
-        this.reset();
+        reset();
     }
 
     @Override
@@ -119,9 +119,9 @@ public class LanternTaskBuilder implements Task.Builder {
 
     @Override
     public Task submit(Object plugin) {
-        PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
         checkState(this.consumer != null, "consumer not set");
-        String name;
+        final String name;
         if (this.name == null) {
             name = this.scheduler.getNameFor(pluginContainer, this.syncType);
         } else {

@@ -28,6 +28,8 @@ package org.lanternpowered.server.game.version;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -36,10 +38,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Optional;
 
-public class MinecraftVersionCache {
+@Singleton
+public final class MinecraftVersionCache {
 
     private final Int2ObjectMap<LanternMinecraftVersion> versionsByProtocol = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<LanternMinecraftVersion> legacyVersionsByProtocol = new Int2ObjectOpenHashMap<>();
+
+    @Inject
+    private MinecraftVersionCache() {
+        load();
+    }
 
     public void load() {
         load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-versions.json"), false);

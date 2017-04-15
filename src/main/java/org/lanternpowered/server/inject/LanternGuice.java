@@ -23,25 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.inject;
 
-import java.util.Optional;
-import java.util.function.Supplier;
+import com.google.inject.Stage;
 
-import javax.annotation.Nullable;
+public final class LanternGuice {
 
-public class SimplePluginContainer extends AbstractPluginContainer {
-
-    private final Supplier<Object> instanceSupplier;
-
-    public SimplePluginContainer(String id, @Nullable String name, @Nullable String version,
-            Supplier<Object> instanceSupplier) {
-        super(id, name, version);
-        this.instanceSupplier = instanceSupplier;
+    public static Stage getInjectorStage(Stage defaultStage) {
+        return Stage.valueOf(System.getProperty("guice.stage", defaultStage.name()).toUpperCase());
     }
 
-    @Override
-    public Optional<?> getInstance() {
-        return Optional.ofNullable(this.instanceSupplier.get());
+    private LanternGuice() {
     }
 }

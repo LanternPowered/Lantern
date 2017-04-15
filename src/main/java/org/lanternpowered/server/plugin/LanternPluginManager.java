@@ -29,9 +29,15 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.ClassLoaderUtil;
+import org.slf4j.Logger;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.plugin.meta.PluginMetadata;
@@ -52,20 +58,27 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+@Singleton
 public final class LanternPluginManager implements PluginManager {
 
     private final Map<String, PluginContainer> plugins = new HashMap<>();
     private final Map<Object, PluginContainer> pluginInstances = new IdentityHashMap<>();
 
-    private final LanternGame game;
+    private final Logger logger;
+    private final EventManager eventManager;
     private final Path pluginsFolder;
+    private final Injector injector;
 
-    public LanternPluginManager(LanternGame game, Path pluginsFolder) {
-        this.pluginsFolder = checkNotNull(pluginsFolder, "pluginsFolder");
-        this.game = checkNotNull(game, "game");
+    @Inject
+    private LanternPluginManager(EventManager eventManager, Logger logger, Injector injector,
+            @Named(DirectoryKeys.PLUGINS) Path pluginsFolder) {
+        this.injector = injector.getParent();
+        this.pluginsFolder = pluginsFolder;
+        this.eventManager = eventManager;
+        this.logger = logger;
     }
 
-    public void registerPlugin(PluginContainer plugin) {
+    void registerPlugin(PluginContainer plugin) {
         checkNotNull(plugin, "plugin");
         this.plugins.put(plugin.getId(), plugin);
     }
@@ -74,7 +87,6 @@ public final class LanternPluginManager implements PluginManager {
         checkNotNull(plugin, "plugin");
         this.pluginInstances.put(plugin.getInstance().orElseThrow(
                 () -> new IllegalStateException("Plugin instance missing.")), plugin);
-
     }
 
     public void registerPluginInstances() {
@@ -84,9 +96,9 @@ public final class LanternPluginManager implements PluginManager {
     }
 
     public void loadPlugins(boolean scanClasspath) throws IOException {
-        this.game.getLogger().info("Searching for plugins...");
+        this.logger.info("Searching for plugins...");
 
-        PluginScanner pluginScanner = new PluginScanner();
+        final PluginScanner pluginScanner = new PluginScanner();
         if (scanClasspath) {
             Lantern.getLogger().info("Scanning classpath for plugins...");
 
@@ -94,7 +106,7 @@ public final class LanternPluginManager implements PluginManager {
             if (loader instanceof URLClassLoader) {
                 pluginScanner.scanClassPath((URLClassLoader) loader);
             } else {
-                this.game.getLogger().error("Cannot search for plugins on classpath: Unsupported class loader: {}",
+                this.logger.error("Cannot search for plugins on classpath: Unsupported class loader: {}",
                         loader.getClass().getName());
             }
         }
@@ -107,7 +119,7 @@ public final class LanternPluginManager implements PluginManager {
         }
 
         final Map<String, PluginCandidate> plugins = pluginScanner.getPlugins();
-        this.game.getLogger().info("{} plugin(s) found", plugins.size());
+        this.logger.info("{} plugin(s) found", plugins.size());
 
         try {
             PluginHelper.sort(checkRequirements(plugins)).forEach(this::loadPlugin);
@@ -117,8 +129,8 @@ public final class LanternPluginManager implements PluginManager {
     }
 
     private Set<PluginCandidate> checkRequirements(Map<String, PluginCandidate> candidates) {
-        Set<PluginCandidate> successfulCandidates = new HashSet<>(candidates.size());
-        List<PluginCandidate> failedCandidates = new ArrayList<>();
+        final Set<PluginCandidate> successfulCandidates = new HashSet<>(candidates.size());
+        final List<PluginCandidate> failedCandidates = new ArrayList<>();
 
         for (PluginCandidate candidate : candidates.values()) {
             if (candidate.collectDependencies(this.plugins, candidates)) {
@@ -156,10 +168,10 @@ public final class LanternPluginManager implements PluginManager {
 
         for (PluginCandidate failed : failedCandidates) {
             if (failed.isInvalid()) {
-                this.game.getLogger().error("Plugin '{}' from {} cannot be loaded because it is invalid",
+                this.logger.error("Plugin '{}' from {} cannot be loaded because it is invalid",
                         failed.getId(), failed.getDisplaySource());
             } else {
-                this.game.getLogger().error("Cannot load plugin '{}' from {} because it is missing the required dependencies {}",
+                this.logger.error("Cannot load plugin '{}' from {} because it is missing the required dependencies {}",
                         failed.getId(), failed.getDisplaySource(), PluginHelper.formatRequirements(failed.getMissingRequirements()));
             }
         }
@@ -180,20 +192,21 @@ public final class LanternPluginManager implements PluginManager {
         }
 
         final PluginMetadata metadata = candidate.getMetadata();
+        checkNotNull(metadata, "metadata");
         final String name = firstNonNull(metadata.getName(), id);
         final String version = firstNonNull(metadata.getVersion(), "unknown");
 
         try {
             final Class<?> pluginClass = Class.forName(candidate.getPluginClass());
-            final PluginContainer container = new LanternPluginContainer(id, pluginClass, metadata.getName(), metadata.getVersion(),
-                    metadata.getDescription(), metadata.getUrl(), metadata.getAuthors(), candidate.getSource());
+            final PluginContainer container = new LanternPluginContainer(this.injector, id, pluginClass, metadata.getName(), metadata.getVersion(),
+                    metadata.getDescription(), metadata.getUrl(), metadata.getAuthors(), candidate.getSource().orElse(null));
             registerPlugin(container);
             registerPluginInstance(container);
-            this.game.getEventManager().registerListeners(container, container.getInstance().get());
+            this.eventManager.registerListeners(container, container.getInstance().get());
 
-            this.game.getLogger().info("Loaded plugin: {} {} (from {})", name, version, candidate.getDisplaySource());
+            this.logger.info("Loaded plugin: {} {} (from {})", name, version, candidate.getDisplaySource());
         } catch (Throwable e) {
-            this.game.getLogger().error("Failed to load plugin: {} {} (from {})", name, version, candidate.getDisplaySource(), e);
+            this.logger.error("Failed to load plugin: {} {} (from {})", name, version, candidate.getDisplaySource(), e);
         }
     }
 

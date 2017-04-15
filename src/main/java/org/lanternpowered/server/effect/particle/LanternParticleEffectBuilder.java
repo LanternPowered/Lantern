@@ -51,7 +51,7 @@ public class LanternParticleEffectBuilder extends AbstractDataBuilder<ParticleEf
 
     public LanternParticleEffectBuilder() {
         super(ParticleEffect.class, 1);
-        this.reset();
+        reset();
     }
 
     @Override

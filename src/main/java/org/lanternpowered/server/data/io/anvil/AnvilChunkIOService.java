@@ -52,6 +52,9 @@ import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_MAS
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_SIZE;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
@@ -62,12 +65,13 @@ import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStrea
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.DirectoryKeys;
+import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.NibbleArray;
-import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSectionSnapshot;
+import org.slf4j.Logger;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -75,6 +79,7 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -91,6 +96,7 @@ import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
+@Singleton
 public class AnvilChunkIOService implements ChunkIOService {
 
     private static final DataQuery VERSION = DataQuery.of("V"); // byte
@@ -122,15 +128,20 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final DataQuery INHABITED_TIME = DataQuery.of("InhabitedTime");
     private static final DataQuery ENTITIES = DataQuery.of("Entities");
 
-    private final LanternWorld world;
+    private final World world;
+    private final Logger logger;
+    private final LanternScheduler scheduler;
     private final RegionFileCache cache;
     private final Path baseDir;
 
     // TODO: Consider the session.lock file
 
-    public AnvilChunkIOService(Path baseDir, LanternWorld world) {
+    @Inject
+    public AnvilChunkIOService(@Named(DirectoryKeys.WORLD) Path baseDir, World world, Logger logger, LanternScheduler scheduler) {
         this.cache = new RegionFileCache(baseDir);
+        this.scheduler = scheduler;
         this.baseDir = baseDir;
+        this.logger = logger;
         this.world = world;
     }
 
@@ -207,8 +218,8 @@ public class AnvilChunkIOService implements ChunkIOService {
                     tileEntity.setValid(true);
                     tileEntitySections[section].put((short) ChunkSection.index(tileX & 0xf, tileY & 0xf, tileZ & 0xf), tileEntity);
                 } catch (InvalidDataException e) {
-                    Lantern.getLogger().warn("Error loading tile entity at ({};{};{}) in the chunk ({},{}) in the world {}",
-                            tileX & 0xf, tileY & 0xf, tileZ & 0xf, x, z, this.getWorldProperties().getWorldName(), e);
+                    this.logger.warn("Error loading tile entity at ({};{};{}) in the chunk ({},{}) in the world {}",
+                            tileX & 0xf, tileY & 0xf, tileZ & 0xf, x, z, getWorldProperties().getWorldName(), e);
                 }
             }
         });
@@ -269,8 +280,8 @@ public class AnvilChunkIOService implements ChunkIOService {
                     final LanternEntity entity = entitySerializer.deserialize(entityView);
                     chunk.addEntity(entity, entity.getPosition().getFloorY() >> 4);
                 } catch (InvalidDataException e) {
-                    Lantern.getLogger().warn("Error loading entity in the chunk ({},{}) in the world {}",
-                            x, z, this.getWorldProperties().getWorldName(), e);
+                    this.logger.warn("Error loading entity in the chunk ({},{}) in the world {}",
+                            x, z, getWorldProperties().getWorldName(), e);
                 }
             }
         });
@@ -527,7 +538,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                         try {
                             this.region = cache.getRegionFile(regionX, regionZ);
                         } catch (IOException e) {
-                            Lantern.getLogger().error("Failed to read the region file ({};{}) in the world folder {}",
+                            logger.error("Failed to read the region file ({};{}) in the world folder {}",
                                     regionX, regionZ, baseDir.getFileName().toString(), e);
                             this.region = null;
                         }
@@ -557,26 +568,26 @@ public class AnvilChunkIOService implements ChunkIOService {
     }
 
     @Override
-    public CompletableFuture<Boolean> doesChunkExist(final Vector3i chunkCoords) {
-        return Lantern.getScheduler().submitAsyncTask(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
+    public CompletableFuture<Boolean> doesChunkExist(Vector3i chunkCoords) {
+        return this.scheduler.submitAsyncTask(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
     }
 
     @Override
-    public CompletableFuture<Optional<DataContainer>> getChunkData(final Vector3i chunkCoords) {
-        return Lantern.getScheduler().submitAsyncTask(() -> {
-            int x = chunkCoords.getX();
-            int z = chunkCoords.getZ();
+    public CompletableFuture<Optional<DataContainer>> getChunkData(Vector3i chunkCoords) {
+        return this.scheduler.submitAsyncTask(() -> {
+            final int x = chunkCoords.getX();
+            final int z = chunkCoords.getZ();
 
-            RegionFile region = cache.getRegionFileByChunk(x, z);
-            int regionX = x & REGION_MASK;
-            int regionZ = z & REGION_MASK;
+            final RegionFile region = cache.getRegionFileByChunk(x, z);
+            final int regionX = x & REGION_MASK;
+            final int regionZ = z & REGION_MASK;
 
-            DataInputStream is = region.getChunkDataInputStream(regionX, regionZ);
+            final DataInputStream is = region.getChunkDataInputStream(regionX, regionZ);
             if (is == null) {
                 return Optional.empty();
             }
 
-            DataContainer data;
+            final DataContainer data;
             try (NbtDataContainerInputStream nbt = new NbtDataContainerInputStream(is)) {
                 data = nbt.read();
             }

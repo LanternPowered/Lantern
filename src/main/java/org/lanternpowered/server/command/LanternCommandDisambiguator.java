@@ -28,6 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.base.Predicates;
+import com.google.inject.Inject;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandSource;
@@ -52,6 +53,7 @@ public final class LanternCommandDisambiguator implements Disambiguator {
      *
      * @param game The game instance to be used
      */
+    @Inject
     public LanternCommandDisambiguator(LanternGame game) {
         this.game = game;
     }

@@ -48,6 +48,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.effect.potion.PotionType;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
@@ -140,7 +141,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         super.register(itemType);
         this.internalIdByItemType.put(itemType, internalId);
         this.itemTypeByInternalId.put(internalId, itemType);
-        LanternPropertyRegistry.getInstance().registerItemPropertyStores(((LanternItemType) itemType).getPropertyProviderCollection());
+        Lantern.getGame().getPropertyRegistry().registerItemPropertyStores(((LanternItemType) itemType).getPropertyProviderCollection());
     }
 
     @Override

@@ -27,6 +27,7 @@ package org.lanternpowered.server.asset;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.plugin.PluginManager;
 
 import java.io.File;
 import java.net.URL;
@@ -37,6 +38,10 @@ import javax.annotation.Nullable;
 public class ClassLoaderAssetRepository extends AbstractAssetRepository {
 
     private static final ClassLoader CLASS_LOADER = Sponge.class.getClassLoader();
+
+    public ClassLoaderAssetRepository(PluginManager pluginManager) {
+        super(pluginManager);
+    }
 
     @Nullable
     @Override

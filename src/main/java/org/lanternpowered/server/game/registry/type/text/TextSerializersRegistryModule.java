@@ -40,7 +40,7 @@ import org.spongepowered.api.text.serializer.TextSerializer;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-@RegistrationDependency({ TranslationManagerRegistryModule.class, TextColorRegistryModule.class, TextStyleRegistryModule.class })
+@RegistrationDependency({ TranslationManagerRegistryModule.class, TextFormatRegistryModule.class })
 public final class TextSerializersRegistryModule extends AdditionalPluginCatalogRegistryModule<TextSerializer> {
 
     private final Char2ObjectMap<org.spongepowered.api.text.serializer.FormattingCodeTextSerializer> formattingCodeSerializers =

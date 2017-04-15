@@ -28,12 +28,11 @@ package org.lanternpowered.server.data;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
-import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.item.enchantment.ItemEnchantmentDataBuilder;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
@@ -47,12 +46,12 @@ import org.spongepowered.api.util.RespawnLocation;
 
 public class DataRegistrar {
 
-    public static void setupRegistrations(Game game) {
-        final PropertyRegistry propertyRegistry = LanternPropertyRegistry.getInstance();
+    public static void setupRegistrations(LanternGame game) {
+        final PropertyRegistry propertyRegistry = game.getPropertyRegistry();
         propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
         propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
 
-        final LanternDataManager dataManager = LanternDataManager.get();
+        final LanternDataManager dataManager = game.getDataManager();
         // Register the data type serializers
         DataTypeSerializers.registerSerializers(dataManager);
         // Register the data serializers
@@ -68,7 +67,7 @@ public class DataRegistrar {
         DataManipulatorRegistry.get();
     }
 
-    public static void finalizeRegistrations(Game game) {
-        LanternPropertyRegistry.getInstance().completeRegistration();
+    public static void finalizeRegistrations(LanternGame game) {
+        game.getPropertyRegistry().completeRegistration();
     }
 }

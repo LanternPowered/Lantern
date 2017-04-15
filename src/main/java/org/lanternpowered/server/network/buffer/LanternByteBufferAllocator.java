@@ -26,9 +26,12 @@
 package org.lanternpowered.server.network.buffer;
 
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 
 public class LanternByteBufferAllocator implements ByteBufferAllocator {
+
+    static final LanternByteBufferAllocator DEFAULT_POOLED = new LanternByteBufferAllocator(PooledByteBufAllocator.DEFAULT);
 
     private final ByteBufAllocator byteBufAllocator;
 

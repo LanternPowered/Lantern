@@ -43,7 +43,7 @@ public final class PlainTextSerializer extends PluginCatalogType.Base implements
 
     @Override
     public String serialize(Text text) {
-        return this.serialize(text, Locales.DEFAULT);
+        return serialize(text, Locales.DEFAULT);
     }
 
     @Override

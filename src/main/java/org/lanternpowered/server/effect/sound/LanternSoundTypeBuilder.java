@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.effect.sound;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.effect.sound.SoundType;
 
 public final class LanternSoundTypeBuilder implements SoundType.Builder {
@@ -42,6 +42,6 @@ public final class LanternSoundTypeBuilder implements SoundType.Builder {
 
     @Override
     public SoundType build(String id) {
-        return new LanternSoundType(LanternGame.SPONGE_PLATFORM_ID, id, id);
+        return new LanternSoundType(InternalPluginsInfo.SpongePlatform.IDENTIFIER, id, id);
     }
 }

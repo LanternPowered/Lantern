@@ -33,6 +33,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.text.LanternTexts;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -77,9 +79,10 @@ import javax.annotation.Nullable;
  * A simple implementation of {@link CommandManager}.
  * This service calls the appropriate events for a command.
  */
+@Singleton
 public class LanternCommandManager implements CommandManager {
 
-    private final Logger log;
+    private final Logger logger;
     private final SimpleDispatcher dispatcher;
     private final Multimap<PluginContainer, CommandMapping> owners = HashMultimap.create();
     private final Map<CommandMapping, PluginContainer> reverseOwners = new ConcurrentHashMap<>();
@@ -91,9 +94,10 @@ public class LanternCommandManager implements CommandManager {
      * @param logger The logger to log error messages to
      * @param disambiguator The function to resolve a single command when multiple options are available
      */
+    @Inject
     public LanternCommandManager(Logger logger, Disambiguator disambiguator) {
-        this.log = logger;
         this.dispatcher = new SimpleDispatcher(disambiguator);
+        this.logger = logger;
     }
 
     @Override
@@ -148,12 +152,8 @@ public class LanternCommandManager implements CommandManager {
     @Override
     public Optional<CommandMapping> removeMapping(CommandMapping mapping) {
         synchronized (this.lock) {
-            Optional<CommandMapping> removed = this.dispatcher.removeMapping(mapping);
-
-            if (removed.isPresent()) {
-                forgetMapping(removed.get());
-            }
-
+            final Optional<CommandMapping> removed = this.dispatcher.removeMapping(mapping);
+            removed.ifPresent(this::forgetMapping);
             return removed;
         }
     }
@@ -275,10 +275,8 @@ public class LanternCommandManager implements CommandManager {
 
                 if (ex.shouldIncludeUsage()) {
                     final Optional<CommandMapping> mapping = this.dispatcher.get(argSplit[0], source);
-                    if (mapping.isPresent()) {
-                        source.sendMessage(error(t("commands.generic.usage",
-                                t("/%s %s", argSplit[0], mapping.get().getCallable().getUsage(source)))));
-                    }
+                    mapping.ifPresent(commandMapping -> source.sendMessage(error(t("commands.generic.usage",
+                            t("/%s %s", argSplit[0], commandMapping.getCallable().getUsage(source))))));
                 }
             }
         } catch (Throwable thr) {
@@ -298,7 +296,7 @@ public class LanternCommandManager implements CommandManager {
                         .replace("\r", "\n")))); // I mean I guess somebody could be running this on like OS 9?
             }
             source.sendMessage(error(t("Error occurred while executing command: %s", excBuilder.build())));
-            this.log.error(LanternTexts.toLegacy(t("Error occurred while executing command '%s' for source %s: %s",
+            this.logger.error(LanternTexts.toLegacy(t("Error occurred while executing command '%s' for source %s: %s",
                     commandLine, source.toString(), String.valueOf(thr.getMessage()))), thr);
         }
         return CommandResult.empty();

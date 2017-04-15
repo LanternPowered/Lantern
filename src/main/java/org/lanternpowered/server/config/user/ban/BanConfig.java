@@ -30,12 +30,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.user.UserStorage;
+import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.util.collect.Lists2;
@@ -61,9 +65,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+@Singleton
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService, CloseableService {
 
+    private static final String FILE_NAME = "bans.json";
     private static final ConfigurationOptions OPTIONS;
 
     static {
@@ -86,8 +92,11 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     // A version of the entries list that allows concurrent operations
     private final List<BanEntry> entries0 = Collections.synchronizedList(Lists2.createExpirableValueListWithPredicate(BanEntry::isExpired));
 
-    public BanConfig(Path path) throws IOException {
-        super(path, OPTIONS, false);
+    @Inject
+    public BanConfig(@Named(DirectoryKeys.CONFIG) Path configFolder) throws IOException {
+        super(configFolder.resolve(FILE_NAME), OPTIONS, false);
+        // Load the config
+        load();
     }
 
     @Override
@@ -127,7 +136,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public Optional<BanEntry> getEntryByProfile(GameProfile gameProfile) {
-        return this.getEntryByUUID(gameProfile.getUniqueId());
+        return getEntryByUUID(gameProfile.getUniqueId());
     }
 
     /**
@@ -139,7 +148,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
      */
     public Optional<BanEntry> getEntryByIp(InetAddress address) {
         final String address0 = checkNotNull(address, "address").getHostAddress();
-        return (Optional) this.entries0.stream().filter(e -> e instanceof BanEntry.Ip &&
+        return this.entries0.stream().filter(e -> e instanceof BanEntry.Ip &&
                 ((BanEntry.Ip) e).getAddress().getHostAddress().equalsIgnoreCase(address0)).findFirst();
     }
 

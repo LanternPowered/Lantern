@@ -33,6 +33,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
@@ -42,19 +44,21 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.UUID;
 
+@Singleton
 public class LanternChunkTicketManager implements ChunkTicketManager {
 
     private final Multimap<String, Callback> callbacks = HashMultimap.create();
     private final GlobalConfig globalConfig;
 
-    public LanternChunkTicketManager(GlobalConfig globalConfig) {
+    @Inject
+    private LanternChunkTicketManager(GlobalConfig globalConfig) {
         this.globalConfig = globalConfig;
     }
 
     /**
      * Gets all the registered callbacks.
      * 
-     * @return the callbacks
+     * @return The callbacks
      */
     public Multimap<String, Callback> getCallbacks() {
         return ImmutableMultimap.copyOf(this.callbacks);
@@ -63,8 +67,8 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
     /**
      * Gets the maximum amount of tickets the player can have.
      * 
-     * @param playerUUID the player unique id
-     * @return the maximum amount of tickets
+     * @param playerUUID The player unique id
+     * @return The maximum amount of tickets
      */
     public int getMaxTicketsForPlayer(UUID playerUUID) {
         return this.globalConfig.getPlayerTicketCount();

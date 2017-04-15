@@ -25,18 +25,26 @@
  */
 package org.lanternpowered.server.asset;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetManager;
 
 import java.util.Optional;
 
+@Singleton
 public class LanternAssetManager implements AssetManager {
 
     private final AssetRepository assetRepository;
 
+    @Inject
     public LanternAssetManager(AssetRepository assetRepository) {
         this.assetRepository = assetRepository;
+    }
+
+    public AssetRepository getRepository() {
+        return this.assetRepository;
     }
 
     @SuppressWarnings("unchecked")

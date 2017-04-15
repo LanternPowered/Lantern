@@ -28,14 +28,13 @@ package org.lanternpowered.server.data.util;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.data.LanternDataManager;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,12 +73,10 @@ public final class DataUtil {
             final DataView manipulatorView = view.getView(DataQueries.INTERNAL_DATA).get();
             try {
                 final Class<?> clazz = Class.forName(clazzName);
-                final Optional<DataManipulatorBuilder<?, ?>> optional = LanternDataManager.get().getBuilder((Class) clazz);
+                final Optional<DataManipulatorBuilder<?, ?>> optional = Lantern.getGame().getDataManager().getBuilder((Class) clazz);
                 if (optional.isPresent()) {
                     final Optional<? extends DataManipulator<?, ?>> manipulatorOptional = optional.get().build(manipulatorView);
-                    if (manipulatorOptional.isPresent()) {
-                        builder.add(manipulatorOptional.get());
-                    }
+                    manipulatorOptional.ifPresent(builder::add);
                 }
             } catch (Exception e) {
                 new InvalidDataException("Could not deserialize " + clazzName

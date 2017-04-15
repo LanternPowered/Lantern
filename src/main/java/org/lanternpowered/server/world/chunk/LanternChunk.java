@@ -59,6 +59,7 @@ import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.NibbleArray;
@@ -1576,7 +1577,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
         final Location<World> location = new Location<>(this.world, x, y, z);
         final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
-        builder.addAll(LanternPropertyRegistry.getInstance().getPropertiesFor(location));
+        builder.addAll(Lantern.getGame().getPropertyRegistry().getPropertiesFor(location));
         getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
         return builder.build();
     }
@@ -1590,7 +1591,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
         final Location<World> location = new Location<>(this.world, x, y, z);
         //noinspection unchecked
-        final Optional<PropertyStore<?>> store = (Optional) LanternPropertyRegistry.getInstance().getStore(propertyClass);
+        final Optional<PropertyStore<?>> store = (Optional) Lantern.getGame().getPropertyRegistry().getStore(propertyClass);
+        //noinspection OptionalIsPresent
         if (!store.isPresent()) {
             return Collections.emptyList();
         }

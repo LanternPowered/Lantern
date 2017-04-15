@@ -32,8 +32,11 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.data.persistence.SimpleDataTypeSerializerCollection;
 import org.lanternpowered.server.game.Lantern;
+import org.slf4j.Logger;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
@@ -56,18 +59,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Singleton
 public final class LanternDataManager extends SimpleDataTypeSerializerCollection implements DataManager {
 
     private static final Comparator<DataContentUpdater> dataContentUpdaterComparator = (o1, o2) -> ComparisonChain.start()
                     .compare(o2.getInputVersion(), o1.getInputVersion())
                     .compare(o2.getOutputVersion(), o1.getOutputVersion())
                     .result();
-
-    private static final LanternDataManager instance = new LanternDataManager();
-
-    public static LanternDataManager get() {
-        return instance;
-    }
 
     private final Map<Class<?>, DataBuilder<?>> builders = new HashMap<>();
     private final Map<Class<? extends DataManipulator<?, ?>>, DataManipulatorBuilder<?, ?>> builderMap =
@@ -78,9 +76,13 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
             new MapMaker().concurrencyLevel(4).makeMap();
     private final Map<Class<? extends DataSerializable>, List<DataContentUpdater>> updatersMap = new IdentityHashMap<>();
 
+    private final Logger logger;
+
     private boolean allowRegistrations = true;
 
-    private LanternDataManager() {
+    @Inject
+    private LanternDataManager(Logger logger) {
+        this.logger = logger;
     }
 
     @Override
@@ -99,23 +101,23 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         checkState(this.allowRegistrations);
         if (!this.builders.containsKey(clazz)) {
             if (!(builder instanceof AbstractDataBuilder)) {
-                Lantern.getLogger().warn("A custom DataBuilder is not extending AbstractDataBuilder! It is recommended that "
+                this.logger.warn("A custom DataBuilder is not extending AbstractDataBuilder! It is recommended that "
                         + "the custom data builder does extend it to gain automated content versioning updates and maintain "
                         + "simplicity. The offending builder's class is: {}", builder.getClass());
             }
             this.builders.put(clazz, builder);
         } else {
-            Lantern.getLogger().warn("A DataBuilder has already been registered for {}. Attempted to register {} instead.", clazz,
+            this.logger.warn("A DataBuilder has already been registered for {}. Attempted to register {} instead.", clazz,
                     builder.getClass());
         }
     }
 
     @Override
-    public <T extends DataSerializable> void registerContentUpdater(Class<T> clazz, DataContentUpdater updater) {
-        checkNotNull(updater, "DataContentUpdater was null!");
-        final List<DataContentUpdater> updaters = this.updatersMap.computeIfAbsent(checkNotNull(clazz, "DataSerializable class was null!"),
-                key -> new ArrayList<>());
-        updaters.add(updater);
+    public <T extends DataSerializable> void registerContentUpdater(Class<T> clazz, DataContentUpdater dataContentUpdater) {
+        checkNotNull(dataContentUpdater, "dataContentUpdater");
+        checkNotNull(clazz, "clazz");
+        final List<DataContentUpdater> updaters = this.updatersMap.computeIfAbsent(clazz, key -> new ArrayList<>());
+        updaters.add(dataContentUpdater);
         Collections.sort(updaters, dataContentUpdaterComparator);
     }
 
@@ -127,7 +129,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         if (updaters == null) {
             return Optional.empty();
         }
-        ImmutableList.Builder<DataContentUpdater> builder = ImmutableList.builder();
+        final ImmutableList.Builder<DataContentUpdater> builder = ImmutableList.builder();
         int version = fromVersion;
         for (DataContentUpdater updater : updaters) {
             if (updater.getInputVersion() == version) {
@@ -139,7 +141,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
             }
         }
         if (version < toVersion || version > toVersion) { // There wasn't a registered updater for the version being requested
-            Exception e = new IllegalStateException("The requested content version for: " + clazz.getSimpleName() + " was requested, "
+            final Exception e = new IllegalStateException("The requested content version for: " + clazz.getSimpleName() + " was requested, "
                     + "\nhowever, the versions supplied: from " + fromVersion + " to " + toVersion + " is impossible"
                     + "\nas the latest version registered is: " + version + ". Please notify the developer of"
                     + "\nthe requested consumed DataSerializable of this error.");
@@ -149,7 +151,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         return Optional.of(new DataUpdaterDelegate(builder.build(), fromVersion, toVersion));
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
     @Override
     public <T extends DataSerializable> Optional<DataBuilder<T>> getBuilder(Class<T> objectClass) {
         checkNotNull(objectClass, "objectClass");
@@ -166,7 +168,8 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
 
     @Override
     public <T extends DataSerializable> Optional<T> deserialize(Class<T> clazz, DataView dataView) {
-        final Optional<DataBuilder<T>> optional = this.getBuilder(clazz);
+        checkNotNull(dataView, "dataView");
+        final Optional<DataBuilder<T>> optional = getBuilder(clazz);
         if (optional.isPresent()) {
             return optional.get().build(dataView);
         } else {
@@ -188,7 +191,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         if (!this.builderMap.containsKey(checkNotNull(manipulatorClass))) {
             this.builderMap.put(manipulatorClass, checkNotNull(builder));
             this.immutableBuilderMap.put(checkNotNull(immutableManipulatorClass), builder);
-            this.registerBuilder((Class<T>) manipulatorClass, builder);
+            registerBuilder((Class<T>) manipulatorClass, builder);
         } else {
             throw new IllegalStateException("Already registered the DataUtil for " + manipulatorClass.getCanonicalName());
         }
@@ -215,7 +218,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         checkNotNull(serializer, "serializer");
         checkArgument(serializer.getToken().isAssignableFrom(objectClass),
                 "DataTranslator is not compatible with the target object class: " +objectClass);
-        this.registerTranslator(serializer);
+        registerTranslator(serializer);
     }
 
     @Override

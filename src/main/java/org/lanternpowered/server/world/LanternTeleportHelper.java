@@ -25,12 +25,14 @@
  */
 package org.lanternpowered.server.world;
 
+import com.google.inject.Singleton;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.TeleportHelper;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
+@Singleton
 public class LanternTeleportHelper implements TeleportHelper {
 
     @Override
@@ -44,5 +46,4 @@ public class LanternTeleportHelper implements TeleportHelper {
         // TODO Auto-generated method stub
         return Optional.empty();
     }
-
 }

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.asset.json;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -35,6 +37,7 @@ import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.asset.ClassLoaderAssetRepository;
 import org.lanternpowered.server.asset.DirectoryAssetRepository;
 import org.lanternpowered.server.asset.MultiAssetRepository;
+import org.spongepowered.api.plugin.PluginManager;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -45,13 +48,20 @@ import java.util.Locale;
 
 public class AssetRepositoryJsonDeserializer implements JsonDeserializer<AssetRepository> {
 
+    private final PluginManager pluginManager;
+
+    public AssetRepositoryJsonDeserializer(PluginManager pluginManager) {
+        checkNotNull(pluginManager, "pluginManager");
+        this.pluginManager = pluginManager;
+    }
+
     @Override
     public AssetRepository deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final MultiAssetRepository repository = new MultiAssetRepository();
         // The class loader asset repository will always be present,
         // this cannot be overridden, but the assets themselves can
         // be overridden like the minecraft resource pack system
-        repository.add(new ClassLoaderAssetRepository());
+        repository.add(new ClassLoaderAssetRepository(this.pluginManager));
         final JsonArray array = json.getAsJsonArray();
         for (int i = 0; i < array.size(); i++) {
             final JsonObject obj = array.get(i).getAsJsonObject();
@@ -60,7 +70,7 @@ public class AssetRepositoryJsonDeserializer implements JsonDeserializer<AssetRe
                 // Currently only directory asset repositories
                 case "directory":
                     final Path path = Paths.get(obj.get("path").getAsString());
-                    final DirectoryAssetRepository repo = new DirectoryAssetRepository(path);
+                    final DirectoryAssetRepository repo = new DirectoryAssetRepository(this.pluginManager, path);
                     if (!Files.exists(path)) {
                         try {
                             Files.createDirectories(path);

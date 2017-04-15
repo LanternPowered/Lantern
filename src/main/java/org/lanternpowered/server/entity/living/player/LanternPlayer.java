@@ -76,6 +76,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 import org.lanternpowered.server.permission.AbstractSubject;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.statistic.StatisticMap;
@@ -405,7 +406,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.networkEntityId,
                         this.session.getServer().getMaxPlayers(), reducedDebug, false, lowHorizon));
                 // Send the server brand
-                this.session.send(new MessagePlayInOutBrand(LanternGame.IMPL_NAME));
+                this.session.send(new MessagePlayInOutBrand(InternalPluginsInfo.Implementation.NAME));
                 // Send the player list
                 final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
                 final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);

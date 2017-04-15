@@ -40,7 +40,7 @@ final class ConsoleCommandCompleter implements Completer {
 
     @Override
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {
-        int len = buffer.length();
+        final int len = buffer.length();
 
         // The content with normalized spaces, the spaces are trimmed
         // from the ends and there are never two spaces directly after eachother
@@ -58,12 +58,12 @@ final class ConsoleCommandCompleter implements Completer {
         }
 
         final String command0 = command;
-        Future<List<String>> tabComplete = ((LanternScheduler) Sponge.getScheduler()).callSync(() ->
+        final Future<List<String>> tabComplete = ((LanternScheduler) Sponge.getScheduler()).callSync(() ->
                 Sponge.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, command0, null));
 
         try {
             // Get the suggestions
-            List<String> suggestions = tabComplete.get();
+            final List<String> suggestions = tabComplete.get();
             // If the suggestions are for the command and there was a prefix, then append the prefix
             if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
                 candidates.addAll(suggestions.stream()
@@ -73,7 +73,7 @@ final class ConsoleCommandCompleter implements Completer {
                 candidates.addAll(suggestions);
             }
 
-            int pos = buffer.lastIndexOf(' ');
+            final int pos = buffer.lastIndexOf(' ');
             if (pos == -1) {
                 return cursor - len;
             } else {

@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.plugin.PluginManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,7 +48,8 @@ public class DirectoryAssetRepository extends AbstractAssetRepository {
     private final List<ReloadListener> reloadListeners = new ArrayList<>();
     private final Path directory;
 
-    public DirectoryAssetRepository(Path directory) {
+    public DirectoryAssetRepository(PluginManager pluginManager, Path directory) {
+        super(pluginManager);
         this.directory = checkNotNull(directory, "directory");
     }
 

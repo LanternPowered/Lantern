@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.launch;
 
-import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.LanternLaunch;
 
 import java.awt.GraphicsEnvironment;
 
@@ -48,7 +48,7 @@ public class VersionCheckingMain {
             }
             throw new RuntimeException(error);
         }
-        LanternServer.main(args);
+        LanternLaunch.main(args);
     }
 
     /**

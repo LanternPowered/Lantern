@@ -52,7 +52,7 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements C
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     private LanternConsoleSource() {
-        this.initSubject();
+        initSubject();
     }
 
     @Override
@@ -87,7 +87,7 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements C
 
     @Override
     public String getIdentifier() {
-        return this.getName();
+        return getName();
     }
 
     @Override

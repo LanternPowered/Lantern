@@ -91,13 +91,13 @@ public final class LanternPatternLayer implements PatternLayer {
 
         @Override
         public Optional<PatternLayer> build(DataView container) throws InvalidDataException {
-            String bannerShape = container.getString(BANNER_SHAPE).orElse(null);
-            String dyeColor = container.getString(DYE_COLOR).orElse(null);
+            final String bannerShape = container.getString(BANNER_SHAPE).orElse(null);
+            final String dyeColor = container.getString(DYE_COLOR).orElse(null);
             if (bannerShape == null || dyeColor == null) {
                 return Optional.empty();
             }
-            BannerPatternShape shape = this.game.getRegistry().getType(BannerPatternShape.class, bannerShape).orElse(null);
-            DyeColor color = this.game.getRegistry().getType(DyeColor.class, dyeColor).orElse(null);
+            final BannerPatternShape shape = this.game.getRegistry().getType(BannerPatternShape.class, bannerShape).orElse(null);
+            final DyeColor color = this.game.getRegistry().getType(DyeColor.class, dyeColor).orElse(null);
             if (shape == null || color == null) {
                 return Optional.empty();
             }

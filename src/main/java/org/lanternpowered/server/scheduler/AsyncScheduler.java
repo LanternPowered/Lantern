@@ -65,15 +65,15 @@ final class AsyncScheduler extends SchedulerBase {
         this.executor = Executors.newCachedThreadPool();
         this.lastProcessingTimestamp = System.nanoTime();
         while (true) {
-            this.recalibrateMinimumTimeout();
-            this.runTick();
+            recalibrateMinimumTimeout();
+            runTick();
         }
     }
 
     private void recalibrateMinimumTimeout() {
         this.lock.lock();
         try {
-            Set<Task> tasks = this.getScheduledTasks();
+            final Set<Task> tasks = getScheduledTasks();
             this.minimumTimeout = Long.MAX_VALUE;
             long now = System.nanoTime();
             for (Task tmpTask : tasks) {
@@ -147,7 +147,7 @@ final class AsyncScheduler extends SchedulerBase {
         }
     }
 
-    public Executor getExecutor() {
+    public ExecutorService getExecutor() {
         return this.executor;
     }
 }

@@ -48,7 +48,7 @@ public class Lantern {
     }
 
     public static AssetRepository getAssetRepository() {
-        return LanternGame.game.getAssetRepository();
+        return LanternGame.game.getAssetManager().getRepository();
     }
 
     public static LanternGame getGame() {

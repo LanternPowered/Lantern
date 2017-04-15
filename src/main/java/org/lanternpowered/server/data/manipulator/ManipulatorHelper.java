@@ -34,6 +34,7 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -49,8 +50,9 @@ public final class ManipulatorHelper {
 
     @SuppressWarnings("unchecked")
     public static DataContainer toContainer(AbstractValueContainer valueContainer) {
-        DataContainer dataContainer = new MemoryDataContainer();
-        Map<Key<?>, KeyRegistration> map = valueContainer.getRawValueMap();
+        final DataContainer dataContainer = new MemoryDataContainer();
+        final Map<Key<?>, KeyRegistration> map = valueContainer.getRawValueMap();
+        final LanternDataManager dataManager = Lantern.getGame().getDataManager();
         for (Map.Entry<Key<?>, KeyRegistration> entry : map.entrySet()) {
             if (!(entry.getValue() instanceof ElementHolder)) {
                 continue;
@@ -58,9 +60,9 @@ public final class ManipulatorHelper {
             Key<?> key = entry.getKey();
             DataQuery dataQuery = key.getQuery();
             TypeToken<?> typeToken = key.getElementToken();
-            DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.get().getTypeSerializer(typeToken)
+            DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
-            DataTypeSerializerContext context = LanternDataManager.get().getTypeSerializerContext();
+            DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
             // The value's shouldn't be null inside a data manipulator,
             // since it doesn't support removal of values
             dataContainer.set(dataQuery, typeSerializer.serialize(typeToken, context, checkNotNull(((ElementHolder) entry.getValue()).get(),
@@ -72,8 +74,9 @@ public final class ManipulatorHelper {
     @SuppressWarnings("unchecked")
     public static <T extends AbstractValueContainer> Optional<T> buildContent(DataView container, Supplier<T> manipulatorSupplier)
             throws InvalidDataException {
-        T manipulator = manipulatorSupplier.get();
-        Map<Key<?>, KeyRegistration> map = manipulator.getRawValueMap();
+        final T manipulator = manipulatorSupplier.get();
+        final Map<Key<?>, KeyRegistration> map = manipulator.getRawValueMap();
+        final LanternDataManager dataManager = Lantern.getGame().getDataManager();
         for (Map.Entry<Key<?>, KeyRegistration> entry : map.entrySet()) {
             if (!(entry.getValue() instanceof ElementHolder)) {
                 continue;
@@ -83,9 +86,9 @@ public final class ManipulatorHelper {
             TypeToken<?> typeToken = key.getElementToken();
             Object data = container.get(dataQuery).orElseThrow(
                     () -> new InvalidDataException("Key query (" + dataQuery.toString() + ") is missing."));
-            DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.get().getTypeSerializer(typeToken)
+            DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
-            DataTypeSerializerContext context = LanternDataManager.get().getTypeSerializerContext();
+            DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
             ((ElementHolder) map.get(key)).set(typeSerializer.deserialize(typeToken, context, data));
         }
         return Optional.of(manipulator);

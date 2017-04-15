@@ -26,8 +26,8 @@
 package org.lanternpowered.server.game.version;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.protocol.Protocol;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.MinecraftVersion;
 
 public class LanternMinecraftVersion implements MinecraftVersion {
@@ -40,7 +40,7 @@ public class LanternMinecraftVersion implements MinecraftVersion {
             UNKNOWN_NAME, -1, true);
 
     public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion(
-            LanternGame.MINECRAFT_VERSION, Protocol.CURRENT_VERSION, false);
+            InternalPluginsInfo.Minecraft.VERSION, Protocol.CURRENT_VERSION, false);
 
     private final String name;
     private final int protocol;

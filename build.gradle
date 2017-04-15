@@ -106,9 +106,15 @@ configurations {
 dependencies {
     compile api
 
+    // Launch Options
+    compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
+
     // Useful libraries
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'com.google.guava:guava:18.0'
+
+    // Injection
+    compile 'com.google.inject:guice:4.1.0'
 
     // Json library
     compile 'com.google.code.gson:gson:2.3.1'
@@ -152,7 +158,7 @@ idea.module {
 runConfigurations {
     theConfig {
         name = 'Lantern Server'
-        mainClass = 'org.lanternpowered.server.LanternServer'
+        mainClass = 'org.lanternpowered.server.LanternLaunch'
         workingDirectory = 'run'
         vmOptions = '-Dlog4j.configurationFile=log4j2_indev.xml'
     }

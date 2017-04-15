@@ -25,13 +25,14 @@
  */
 package org.lanternpowered.server.data.persistence;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.persistence.DataTranslator;
 
 public abstract class AbstractDataTranslator<T> extends PluginCatalogType.Base implements DataTranslator<T> {
 
-    protected final TypeToken<T> typeToken;
+    private final TypeToken<T> typeToken;
 
     public AbstractDataTranslator(String pluginId, String name, TypeToken<T> typeToken) {
         super(pluginId, name);
@@ -46,5 +47,11 @@ public abstract class AbstractDataTranslator<T> extends PluginCatalogType.Base i
     @Override
     public TypeToken<T> getToken() {
         return this.typeToken;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("typeToken", this.typeToken);
     }
 }

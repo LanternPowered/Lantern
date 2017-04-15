@@ -28,9 +28,9 @@ package org.lanternpowered.server.asset;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.asset.Asset;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.Sponge;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.util.GuavaCollectors;
 
 import java.io.File;
@@ -54,6 +54,13 @@ public abstract class AbstractAssetRepository implements AssetRepository {
      */
     final Map<Path, Optional<Asset>> loadedAssets = new ConcurrentHashMap<>();
 
+    private final PluginManager pluginManager;
+
+    protected AbstractAssetRepository(PluginManager pluginManager) {
+        checkNotNull(pluginManager, "pluginManager");
+        this.pluginManager = pluginManager;
+    }
+
     @Override
     public Optional<Asset> get(Object plugin, String name) {
         checkNotNull(plugin, "plugin");
@@ -62,9 +69,9 @@ public abstract class AbstractAssetRepository implements AssetRepository {
         String pluginId;
         if (plugin instanceof String) {
             pluginId = (String) plugin;
-            pluginContainer = Sponge.getPluginManager().getPlugin(pluginId).get();
+            pluginContainer = this.pluginManager.getPlugin(pluginId).get();
         } else {
-            pluginContainer = Sponge.getPluginManager().fromInstance(plugin).get();
+            pluginContainer = this.pluginManager.fromInstance(plugin).get();
             pluginId = pluginContainer.getId();
         }
         final String id = pluginId + ':' + name.toLowerCase(Locale.ENGLISH);
@@ -88,9 +95,9 @@ public abstract class AbstractAssetRepository implements AssetRepository {
 
     @Override
     public Optional<Asset> get(String id) {
-        int index = id.indexOf(':');
+        final int index = id.indexOf(':');
         if (index == -1) {
-            return get(Lantern.getMinecraftPlugin(), id);
+            return get(this.pluginManager.getPlugin(InternalPluginsInfo.Minecraft.IDENTIFIER).get(), id);
         } else {
             return get(id.substring(0, index), id.substring(index + 1));
         }

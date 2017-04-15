@@ -23,54 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.inject.provider;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.config.DefaultConfig;
+import static org.lanternpowered.server.inject.provider.ProviderHelper.provideNameOrFail;
 
-import java.lang.annotation.Annotation;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.lanternpowered.server.inject.InjectionPoint;
 
-@SuppressWarnings("all")
-public class ConfigFileAnnotation implements DefaultConfig {
+public class NamedLog4jLoggerProvider implements Provider<Logger> {
 
-    private final boolean shared;
-
-    public ConfigFileAnnotation(boolean shared) {
-        this.shared = shared;
-    }
+    @Inject private InjectionPoint point;
 
     @Override
-    public boolean sharedRoot() {
-        return this.shared;
+    public Logger get() {
+        return LogManager.getLogger(provideNameOrFail(this.point));
     }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return DefaultConfig.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof DefaultConfig)) {
-            return false;
-        }
-        final DefaultConfig that = (DefaultConfig) o;
-        return sharedRoot() == that.sharedRoot();
-    }
-
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
-
 }

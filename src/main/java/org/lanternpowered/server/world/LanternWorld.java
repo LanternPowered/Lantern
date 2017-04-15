@@ -248,7 +248,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, this);
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, this, Lantern.getLogger(), Lantern.getScheduler());
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type
@@ -269,9 +269,9 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         // Create a new world generator
         final WorldGenerator worldGenerator = properties.getGeneratorType().createGenerator(this);
         // Finally, create the chunk manager
-        this.chunkManager = new LanternChunkManager(this.game, this, this.worldConfig, chunkLoadService,
+        this.chunkManager = new LanternChunkManager(Lantern.getMinecraftPlugin(), this.game, this, this.worldConfig, chunkLoadService,
                 chunkIOService, worldGenerator, directory);
-        this.worldContext = new Context(Context.WORLD_KEY, this.getName());
+        this.worldContext = new Context(Context.WORLD_KEY, getName());
         this.worldEventListener.add(this.observedChunkManager);
     }
 

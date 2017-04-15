@@ -126,7 +126,7 @@ public class LanternSqlService implements SqlService, CloseableService {
 
     @Override
     public DataSource getDataSource(String jdbcConnection) throws SQLException {
-        return this.getDataSource(null, jdbcConnection);
+        return getDataSource(null, jdbcConnection);
     }
 
     @Override

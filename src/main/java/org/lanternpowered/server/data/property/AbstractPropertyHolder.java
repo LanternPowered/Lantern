@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.property;
 
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.data.property.PropertyStore;
@@ -41,14 +42,11 @@ public interface AbstractPropertyHolder extends PropertyHolder {
 
     @Override
     default Collection<Property<?, ?>> getApplicableProperties() {
-        return LanternPropertyRegistry.getInstance().getPropertiesFor(this);
+        return Lantern.getGame().getPropertyRegistry().getPropertiesFor(this);
     }
 
     static <T extends Property<?, ?>> Optional<T> getPropertyFor(PropertyHolder propertyHolder, Class<T> propertyClass) {
-        final Optional<PropertyStore<T>> optional = LanternPropertyRegistry.getInstance().getStore(propertyClass);
-        if (optional.isPresent()) {
-            return optional.get().getFor(propertyHolder);
-        }
-        return Optional.empty();
+        final Optional<PropertyStore<T>> optional = Lantern.getGame().getPropertyRegistry().getStore(propertyClass);
+        return optional.flatMap(store -> store.getFor(propertyHolder));
     }
 }

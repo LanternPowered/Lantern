@@ -31,14 +31,16 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 import java.net.URI;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 final class LanternResourcePack implements ResourcePack {
 
     private final URI uri;
     private final String name;
     private final String id;
-    private final Optional<String> hash;
+    @Nullable private final String hash;
 
-    LanternResourcePack(URI uri, String name, String id, Optional<String> hash) {
+    LanternResourcePack(URI uri, String name, String id, @Nullable String hash) {
         this.hash = hash;
         this.name = name;
         this.uri = uri;
@@ -62,7 +64,7 @@ final class LanternResourcePack implements ResourcePack {
 
     @Override
     public Optional<String> getHash() {
-        return this.hash;
+        return Optional.ofNullable(this.hash);
     }
 
     @Override
@@ -72,7 +74,7 @@ final class LanternResourcePack implements ResourcePack {
                 .add("uri", this.uri)
                 .add("id", this.id)
                 .add("name", this.name)
-                .add("hash", this.hash.orElse(null))
+                .add("hash", this.hash)
                 .toString();
     }
 }

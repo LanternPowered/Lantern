@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.rcon.RconSource;
@@ -75,6 +76,7 @@ public class LanternPermissionService implements PermissionService {
     private final LanternSubjectCollection defaultCollection;
     private final LanternSubject defaultData;
 
+    @Inject
     public LanternPermissionService(Game game) {
         this.game = game;
         this.subjects.put(SUBJECTS_DEFAULT, (this.defaultCollection = this.newCollection(SUBJECTS_DEFAULT)));
@@ -82,10 +84,10 @@ public class LanternPermissionService implements PermissionService {
         this.subjects.put(SUBJECTS_GROUP, new OpLevelCollection(this));
 
         this.subjects.put(SUBJECTS_COMMAND_BLOCK, new DataFactoryCollection(SUBJECTS_COMMAND_BLOCK, this,
-                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, this.getGroupForOpLevel(2)), NO_COMMAND_SOURCE));
+                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, getGroupForOpLevel(2)), NO_COMMAND_SOURCE));
 
         this.subjects.put(SUBJECTS_SYSTEM, new DataFactoryCollection(SUBJECTS_SYSTEM, this,
-                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, this.getGroupForOpLevel(4)),
+                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, getGroupForOpLevel(4)),
                 s -> {
                     if (s.equals(LanternConsoleSource.NAME)) {
                         return Sponge.getServer().getConsole();

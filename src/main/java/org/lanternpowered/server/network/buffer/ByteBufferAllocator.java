@@ -38,6 +38,15 @@ public interface ByteBufferAllocator {
     }
 
     /**
+     * Gets the default pooled {@link ByteBufferAllocator}.
+     *
+     * @return The pooled byte buffer allocator
+     */
+    static ByteBufferAllocator pooled() {
+        return LanternByteBufferAllocator.DEFAULT_POOLED;
+    }
+
+    /**
      * Allocates a {@link ByteBuffer}. If it is a direct or heap buffer
      * depends on the actual implementation.
      *

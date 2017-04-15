@@ -44,11 +44,15 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
+import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.util.FastSoftThreadLocal;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayImmutableBiomeBuffer;
@@ -68,6 +72,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.ChunkTicketManager;
@@ -145,6 +150,8 @@ public final class LanternChunkManager {
     // chunks loaded by loadChunk may not have been locked in the process,
     // and using a queue for removal should prevent the chunks from unloading too early
     private final Queue<UnloadingChunkEntry> pendingForUnload = new ConcurrentLinkedQueue<>();
+
+    private final PluginContainer minecraftPluginContainer;
 
     private class UnloadingChunkEntry {
 
@@ -324,20 +331,14 @@ public final class LanternChunkManager {
     // The world generator
     private volatile WorldGenerator worldGenerator;
 
-    /**
-     * Creates a new chunk manager.
-     * 
-     * @param game the game instance
-     * @param world the world this chunk manage is attached to
-     * @param worldConfig the configuration file of the world
-     * @param chunkLoadService the chunk load (ticket) service
-     * @param chunkIOService the chunk i/o service
-     * @param worldGenerator the world generator
-     * @param worldFolder the world data folder
-     */
-    public LanternChunkManager(LanternGame game, LanternWorld world, WorldConfig worldConfig,
+    @Inject
+    public LanternChunkManager(
+            @Named(InternalPluginsInfo.Minecraft.IDENTIFIER) PluginContainer minecraftPluginContainer,
+            LanternGame game, LanternWorld world, WorldConfig worldConfig,
             LanternChunkTicketManager chunkLoadService, ChunkIOService chunkIOService,
-            WorldGenerator worldGenerator, Path worldFolder) {
+            WorldGenerator worldGenerator,
+            @Named(DirectoryKeys.WORLD) Path worldFolder) {
+        this.minecraftPluginContainer = minecraftPluginContainer;
         this.chunkLoadService = chunkLoadService;
         this.chunkIOService = chunkIOService;
         this.worldGenerator = worldGenerator;

@@ -26,11 +26,8 @@
 package org.lanternpowered.server.plugin;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.lanternpowered.server.game.Lantern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.lanternpowered.server.inject.plugin.PluginModule;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -40,38 +37,35 @@ import javax.annotation.Nullable;
 
 public final class LanternPluginContainer extends AbstractPluginContainer {
 
-    private final Optional<String> description;
-    private final Optional<String> url;
     private final ImmutableList<String> authors;
-
-    private final Optional<Path> source;
-
-    private final Optional<?> instance;
-    private final Logger logger;
-
+    private final Object instance;
     private final Injector injector;
 
-    LanternPluginContainer(String id, Class<?> pluginClass, @Nullable String name, @Nullable String version,
-            @Nullable String description, @Nullable String url, List<String> authors, Optional<Path> source) {
-        super(id, name, version);
-        this.description = Optional.ofNullable(description);
-        this.url = Optional.ofNullable(url);
-        this.authors = ImmutableList.copyOf(authors);
-        this.logger = LoggerFactory.getLogger(id);
-        this.source = source;
+    @Nullable private final String description;
+    @Nullable private final String url;
 
-        this.injector = Guice.createInjector(new PluginModule(this, pluginClass, Lantern.getGame()));
+    @Nullable private final Path source;
+
+    LanternPluginContainer(Injector injector, String id, Class<?> pluginClass, @Nullable String name, @Nullable String version,
+            @Nullable String description, @Nullable String url, List<String> authors, @Nullable Path source) {
+        super(id, name, version);
+        this.authors = ImmutableList.copyOf(authors);
+        this.description = description;
+        this.source = source;
+        this.url = url;
+
+        this.injector = injector.createChildInjector(new PluginModule(this, pluginClass));
         this.instance = Optional.of(this.injector.getInstance(pluginClass));
     }
 
     @Override
     public Optional<String> getDescription() {
-        return this.description;
+        return Optional.ofNullable(this.description);
     }
 
     @Override
     public Optional<String> getUrl() {
-        return this.url;
+        return Optional.ofNullable(this.url);
     }
 
     @Override
@@ -81,17 +75,12 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
 
     @Override
     public Optional<Path> getSource() {
-        return this.source;
+        return Optional.ofNullable(this.source);
     }
 
     @Override
     public Optional<?> getInstance() {
-        return this.instance;
-    }
-
-    @Override
-    public Logger getLogger() {
-        return this.logger;
+        return Optional.of(this.instance);
     }
 
     public Injector getInjector() {

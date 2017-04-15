@@ -94,7 +94,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
             id += ";Hash:" + hash;
         }
         id += "}";
-        final ResourcePack resourcePack = new LanternResourcePack(uri, plainPath, id, Optional.ofNullable(hash));
+        final ResourcePack resourcePack = new LanternResourcePack(uri, plainPath, id, hash);
         this.resourcePacks.put(id, resourcePack);
         this.resourcePacksByKey.put(key, resourcePack);
         return resourcePack;

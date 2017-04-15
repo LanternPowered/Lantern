@@ -29,13 +29,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.util.Tuple;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -49,11 +47,6 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
 
     private final static String ID_PATTERN_VALUE = "^[a-z][a-z0-9-_]+:[a-z][a-z0-9-_]+$";
     private final static Pattern ID_PATTERN = Pattern.compile(ID_PATTERN_VALUE);
-
-    /**
-     * The order of the ids matter, lower value has higher priority for setting mappings.
-     */
-    private static final List<String> INBUILT_PLUGIN_IDS = Arrays.asList(LanternGame.MINECRAFT_ID, LanternGame.SPONGE_PLATFORM_ID);
 
     @Nullable private Map<String, T> typesByName = null;
 
@@ -84,7 +77,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
         final int index = id.indexOf(':');
         final String pluginId = id.substring(0, index);
         if (disallowInbuiltPluginIds) {
-            for (String pluginId1 : INBUILT_PLUGIN_IDS) {
+            for (String pluginId1 : InternalPluginsInfo.IDENTIFIERS) {
                 checkArgument(!pluginId.equals(pluginId1), "Plugin trying to register a fake %s catalog type!", pluginId1);
             }
         }
@@ -95,7 +88,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
         }
         final String id0 = id.substring(index + 1);
         if (id0.equals(name)) {
-            for (String pluginId1 : INBUILT_PLUGIN_IDS) {
+            for (String pluginId1 : InternalPluginsInfo.IDENTIFIERS) {
                 if (this.types.containsKey(pluginId1 + ':' + id0)) {
                     return;
                 }
@@ -127,7 +120,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
                 mapping = id.substring(index + 1);
             }
 
-            final int priority = INBUILT_PLUGIN_IDS.indexOf(pluginId);
+            final int priority = InternalPluginsInfo.IDENTIFIERS.indexOf(pluginId);
             if (mappings.containsKey(mapping)) {
                 if (priority == -1) {
                     continue;
@@ -147,7 +140,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
     public Optional<T> getById(String id) {
         id = checkNotNull(id, "id").toLowerCase(Locale.ENGLISH);
         if (id.indexOf(':') == -1) {
-            for (String pluginId : INBUILT_PLUGIN_IDS) {
+            for (String pluginId : InternalPluginsInfo.IDENTIFIERS) {
                 final T type = this.types.get(pluginId + ':' + id);
                 if (type != null) {
                     return Optional.of(type);

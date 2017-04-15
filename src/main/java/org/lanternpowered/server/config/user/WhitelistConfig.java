@@ -26,6 +26,10 @@
 package org.lanternpowered.server.config.user;
 
 import com.google.common.base.Throwables;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.CloseableService;
@@ -38,10 +42,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 
+@Singleton
 public final class WhitelistConfig extends SimpleUserConfig implements WhitelistService, Reloadable, CloseableService {
 
-    public WhitelistConfig(Path path) throws IOException {
-        super(path, false);
+    private static final String FILE_NAME = "whitelist.json";
+
+    @Inject
+    public WhitelistConfig(@Named(DirectoryKeys.CONFIG) Path configDirectory) throws IOException {
+        super(configDirectory.resolve(FILE_NAME), false);
     }
 
     @Override

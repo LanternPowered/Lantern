@@ -29,12 +29,16 @@ import static org.lanternpowered.server.config.ConfigConstants.ENABLED;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
+import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.util.IpSet;
 import org.lanternpowered.server.util.functions.Predicates;
@@ -50,10 +54,14 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+@Singleton
 public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
-    public GlobalConfig(Path path) throws IOException {
-        super(path, true);
+    private static final String FILE_NAME = "global.conf";
+
+    @Inject
+    private GlobalConfig(@Named(DirectoryKeys.CONFIG) Path configFolder) throws IOException {
+        super(configFolder.resolve(FILE_NAME), true);
     }
 
     @Setting(value = "server", comment = "Configuration for the server.")
@@ -72,7 +80,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     private Query query = new Query();
 
     @ConfigSerializable
-    public static class Commands {
+    private static class Commands {
 
         @Setting(value = "aliases", comment = "A mapping from unqualified command alias to plugin id"
                 + " of the plugin that should handle a certain command")

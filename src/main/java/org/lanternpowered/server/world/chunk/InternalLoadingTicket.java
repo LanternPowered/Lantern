@@ -28,7 +28,7 @@ package org.lanternpowered.server.world.chunk;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
 
@@ -62,7 +62,7 @@ final class InternalLoadingTicket implements ChunkLoadingTicket {
 
     @Override
     public String getPlugin() {
-        return LanternGame.MINECRAFT_ID;
+        return InternalPluginsInfo.Minecraft.IDENTIFIER;
     }
 
     @Override

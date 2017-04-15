@@ -23,54 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.inject;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.config.ConfigDir;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.lang.annotation.Annotation;
-
-@SuppressWarnings("all")
-public class ConfigDirAnnotation implements ConfigDir {
-
-    private final boolean shared;
-
-    public ConfigDirAnnotation(boolean shared) {
-        this.shared = shared;
-    }
-
-    @Override
-    public boolean sharedRoot() {
-        return this.shared;
-    }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return ConfigDir.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ConfigDir)) {
-            return false;
-        }
-        final ConfigDir that = (ConfigDir) o;
-        return sharedRoot() == that.sharedRoot();
-    }
-
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
+/**
+ * Used to mark a {@link Option} as a flag. This can only
+ * be used on {@code boolean} options. The flag will be set
+ * if the option is present.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.FIELD })
+public @interface Flag {
 
 }
+

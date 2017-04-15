@@ -29,6 +29,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.LanternDataManager;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.roman.IllegalRomanNumberException;
 import org.lanternpowered.server.util.roman.RomanNumber;
 import org.spongepowered.api.CatalogType;
@@ -76,7 +77,7 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public DataSerializable deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView data) throws InvalidDataException {
-            final DataBuilder<DataSerializable> dataBuilder = (DataBuilder<DataSerializable>) LanternDataManager.get()
+            final DataBuilder<DataSerializable> dataBuilder = (DataBuilder<DataSerializable>) Lantern.getGame().getDataManager()
                     .getBuilder((Class<? extends DataSerializable>) type.getRawType())
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a DataBuilder for the DataSerializable: " + type));
             return dataBuilder.build(data).orElseThrow(() -> new InvalidDataException("Unable to deserializer the " + type));

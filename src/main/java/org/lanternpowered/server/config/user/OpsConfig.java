@@ -25,20 +25,30 @@
  */
 package org.lanternpowered.server.config.user;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import ninja.leaping.configurate.objectmapping.Setting;
+import org.lanternpowered.server.game.DirectoryKeys;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Singleton
 public final class OpsConfig extends UserConfig<OpsEntry> {
+
+    // The name of the ops config file
+    private static final String FILE_NAME = "ops.json";
 
     @Setting(value = "entries")
     private List<OpsEntry> entries = new ArrayList<>();
 
-    public OpsConfig(Path path) throws IOException {
-        super(path, false);
+    @Inject
+    public OpsConfig(@Named(DirectoryKeys.CONFIG) Path configFolder) throws IOException {
+        super(configFolder.resolve(FILE_NAME), false);
+        load();
     }
 
     @Override

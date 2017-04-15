@@ -33,6 +33,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.api.script.context.Parameter;
 import org.lanternpowered.api.script.function.action.ActionType;
 import org.lanternpowered.api.script.function.condition.ConditionType;
@@ -162,6 +164,7 @@ import org.lanternpowered.server.game.registry.type.text.LocaleRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.SelectorFactoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.SelectorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TextColorRegistryModule;
+import org.lanternpowered.server.game.registry.type.text.TextFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TextSerializersRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TextStyleRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TranslationManagerRegistryModule;
@@ -383,6 +386,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -392,15 +396,16 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@Singleton
 public class LanternGameRegistry implements GameRegistry {
 
     private final LanternGame game;
     private final LanternResourcePackFactory resourcePackFactory = new LanternResourcePackFactory();
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
 
-    private final Map<Class<? extends CatalogType>, CatalogRegistryModule<?>> catalogRegistryMap = Maps.newIdentityHashMap();
-    private final Map<Class<? extends RegistryModule>, RegistryModule> classMap = Maps.newIdentityHashMap();
-    private final Map<Class<?>, Supplier<?>> builderSupplierMap = Maps.newIdentityHashMap();
+    private final Map<Class<? extends CatalogType>, CatalogRegistryModule<?>> catalogRegistryMap = new IdentityHashMap<>();
+    private final Map<Class<? extends RegistryModule>, RegistryModule> classMap = new IdentityHashMap<>();
+    private final Map<Class<?>, Supplier<?>> builderSupplierMap = new IdentityHashMap<>();
     private final List<Class<? extends RegistryModule>> orderedModules = new ArrayList<>();
     private final Set<RegistryModule> registryModules = new HashSet<>();
 
@@ -409,7 +414,8 @@ public class LanternGameRegistry implements GameRegistry {
     // Whether all the modules are synced
     private boolean modulesSynced = true;
 
-    LanternGameRegistry(LanternGame game) {
+    @Inject
+    private LanternGameRegistry(LanternGame game) {
         this.game = game;
     }
 
@@ -539,6 +545,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(new SelectorFactoryRegistryModule())
                 .registerModule(SelectorType.class, new SelectorTypeRegistryModule())
                 .registerModule(TextColor.class, new TextColorRegistryModule())
+                .registerModule(new TextFormatRegistryModule())
                 .registerModule(new TextSerializersRegistryModule())
                 .registerModule(TextStyle.Base.class, new TextStyleRegistryModule())
                 .registerModule(new TranslationManagerRegistryModule())
@@ -707,29 +714,29 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     public void earlyRegistry() {
-        this.registerModulePhase();
+        registerModulePhase();
     }
 
     public void preRegistry() {
         this.phase = RegistrationPhase.PRE_REGISTRY;
-        this.registerModulePhase();
+        registerModulePhase();
     }
 
     public void preInit() {
         this.phase = RegistrationPhase.PRE_INIT;
-        this.registerModulePhase();
+        registerModulePhase();
     }
 
     public void init() {
         DataRegistrar.setupRegistrations(this.game);
         this.phase = RegistrationPhase.INIT;
-        this.registerModulePhase();
+        registerModulePhase();
     }
 
     public void postInit() {
         DataRegistrar.finalizeRegistrations(this.game);
         this.phase = RegistrationPhase.POST_INIT;
-        this.registerModulePhase();
+        registerModulePhase();
         this.phase = RegistrationPhase.LOADED;
     }
 

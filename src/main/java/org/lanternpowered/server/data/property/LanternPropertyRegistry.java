@@ -25,13 +25,12 @@
  */
 package org.lanternpowered.server.data.property;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.block.PropertyProviderCollection;
 import org.lanternpowered.server.data.property.block.BlockPropertyStore;
 import org.lanternpowered.server.data.property.item.ItemPropertyStore;
@@ -40,29 +39,28 @@ import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.PropertyStore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class LanternPropertyRegistry implements PropertyRegistry {
+@Singleton
+public final class LanternPropertyRegistry implements PropertyRegistry {
 
-    private static final LanternPropertyRegistry INSTANCE = new LanternPropertyRegistry();
-
-    public static LanternPropertyRegistry getInstance() {
-        return INSTANCE;
-    }
-
-    private final Map<Class<? extends Property<?, ?>>, List<PropertyStore<?>>> propertyStoreMap = Maps.newConcurrentMap();
-    private final Map<Class<? extends Property<?, ?>>, PropertyStoreDelegate<?>> delegateMap = Maps.newConcurrentMap();
+    private final Map<Class<? extends Property<?, ?>>, List<PropertyStore<?>>> propertyStoreMap = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Property<?, ?>>, PropertyStoreDelegate<?>> delegateMap = new ConcurrentHashMap<>();
     private boolean allowRegistrations = true;
 
+    @Inject
     private LanternPropertyRegistry() {
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "Convert2streamapi", "SuspiciousMethodCalls"})
     public void registerBlockPropertyStores(PropertyProviderCollection collection) {
+        //noinspection Convert2streamapi
         for (Class<? extends Property> entry : collection.keys()) {
             if (!this.propertyStoreMap.containsKey(entry)) {
                 register(entry, new BlockPropertyStore(entry));
@@ -70,7 +68,7 @@ public class LanternPropertyRegistry implements PropertyRegistry {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "Convert2streamapi", "SuspiciousMethodCalls"})
     public void registerItemPropertyStores(org.lanternpowered.server.item.PropertyProviderCollection collection) {
         for (Class<? extends Property> entry : collection.keys()) {
             if (!this.propertyStoreMap.containsKey(entry)) {
@@ -83,7 +81,7 @@ public class LanternPropertyRegistry implements PropertyRegistry {
     public void completeRegistration() {
         this.allowRegistrations = false;
         for (Map.Entry<Class<? extends Property<?, ?>>, List<PropertyStore<?>>> entry : this.propertyStoreMap.entrySet()) {
-            ImmutableList.Builder<PropertyStore<?>> propertyStoreBuilder = ImmutableList.builder();
+            final ImmutableList.Builder<PropertyStore<?>> propertyStoreBuilder = ImmutableList.builder();
             Collections.sort(entry.getValue(), (o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()));
             propertyStoreBuilder.addAll(entry.getValue());
             this.delegateMap.put(entry.getKey(), new PropertyStoreDelegate(propertyStoreBuilder.build()));
@@ -93,19 +91,17 @@ public class LanternPropertyRegistry implements PropertyRegistry {
 
     @Override
     public <T extends Property<?, ?>> void register(Class<T> propertyClass, PropertyStore<T> propertyStore) {
-        checkState(allowRegistrations, "Registrations are no longer allowed!");
-        checkArgument(propertyClass != null, "The property class can not be null!");
-        if (!this.propertyStoreMap.containsKey(propertyClass)) {
-            this.propertyStoreMap.put(propertyClass, Collections.synchronizedList(Lists.<PropertyStore<?>>newArrayList()));
-        }
-        final List<PropertyStore<?>> propertyStores = this.propertyStoreMap.get(propertyClass);
-        propertyStores.add(checkNotNull(propertyStore));
+        checkState(this.allowRegistrations, "Registrations are no longer allowed!");
+        checkNotNull(propertyClass, "propertyClass");
+        checkNotNull(propertyStore, "propertyStore");
+        final List<PropertyStore<?>> propertyStores = this.propertyStoreMap.computeIfAbsent(propertyClass, c -> new ArrayList<>());
+        propertyStores.add(propertyStore);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Property<?, ?>> Optional<PropertyStore<T>> getStore(Class<T> propertyClass) {
-        checkArgument(propertyClass != null, "The property class can not be null!");
+        checkNotNull(propertyClass, "propertyClass");
         if (!this.delegateMap.containsKey(propertyClass)) {
             return Optional.empty();
         } else {
@@ -123,5 +119,4 @@ public class LanternPropertyRegistry implements PropertyRegistry {
         }
         return builder.build();
     }
-
 }

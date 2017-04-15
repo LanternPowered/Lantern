@@ -25,11 +25,15 @@
  */
 package org.lanternpowered.server;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.lanternpowered.server.advancement.AdvancementTrees;
@@ -39,27 +43,28 @@ import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.query.QueryServer;
-import org.lanternpowered.server.network.rcon.EmptyRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.status.LanternFavicon;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
+import org.slf4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.network.status.Favicon;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
@@ -68,6 +73,7 @@ import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.SimpleServiceManager;
+import org.spongepowered.api.service.rcon.RconService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.world.ChunkTicketManager;
@@ -76,7 +82,6 @@ import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.storage.ChunkLayout;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -100,118 +105,45 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-public class LanternServer implements Server {
-
-    public static void main(String[] args) {
-        try {
-            // Create the game instance
-            final LanternGame game = new LanternGame();
-            game.preInitialize();
-
-            final ConsoleManager consoleManager = new ConsoleManager();
-            // Start the console (command input/completer)
-            consoleManager.start();
-
-            final GlobalConfig globalConfig = game.getGlobalConfig();
-            if (globalConfig.getProxyType() == ProxyType.NONE && !globalConfig.isOnlineMode()) {
-                Lantern.getLogger().warn("It is not recommend to run the server in offline mode, this allows people to");
-                Lantern.getLogger().warn("choose any username they want. The server does will use the account attached");
-                Lantern.getLogger().warn("to the username, it doesn't care if it's in offline mode, this will only");
-                Lantern.getLogger().warn("disable the authentication and allow non registered usernames to be used.");
-            }
-
-            RconServer rconServer = null;
-            QueryServer queryServer = null;
-            // Enable the query server if needed
-            if (globalConfig.isQueryEnabled()) {
-                queryServer = new QueryServer(game, globalConfig.getShowPluginsToQuery());
-            }
-            // Enable the rcon server if needed
-            if (globalConfig.isRconEnabled()) {
-                rconServer = new RconServer(globalConfig.getRconPassword());
-            }
-
-            // Create the server instance
-            final LanternServer server = new LanternServer(game, consoleManager, rconServer, queryServer);
-
-            // Send some startup info
-            Lantern.getLogger().info("Starting Lantern Server {}", LanternPlatform.IMPL_VERSION.orElse(""));
-            Lantern.getLogger().info("   for  Minecraft {} with protocol version {}", LanternMinecraftVersion.CURRENT.getName(),
-                    LanternMinecraftVersion.CURRENT.getProtocol());
-            Lantern.getLogger().info("   with SpongeAPI {}", LanternPlatform.API_VERSION.orElse(""));
-
-            // The root world folder
-            final Path worldFolder = new File(game.getGlobalConfig().getRootWorldFolder()).toPath();
-
-            // Initialize the game
-            game.initialize(server, rconServer == null ? new EmptyRconService(globalConfig.getRconPassword()) :
-                    rconServer, worldFolder);
-
-            // Bind the network channel
-            server.bind();
-            // Bind the query server
-            server.bindQuery();
-            // Bind the rcon server
-            server.bindRcon();
-            // Start the server
-            server.start();
-            Lantern.getLogger().info("Ready for connections.");
-        } catch (BindException e) {
-            // descriptive bind error messages
-            Lantern.getLogger().error("The server could not bind to the requested address.");
-            if (e.getMessage().startsWith("Cannot assign requested address")) {
-                Lantern.getLogger().error("The 'server.ip' in your global.conf file may not be valid.");
-                Lantern.getLogger().error("Unless you are sure you need it, try removing it.");
-                Lantern.getLogger().error(e.toString());
-            } else if (e.getMessage().startsWith("Address already in use")) {
-                Lantern.getLogger().error("The address was already in use. Check that no server is");
-                Lantern.getLogger().error("already running on that port. If needed, try killing all");
-                Lantern.getLogger().error("Java processes using Task Manager or similar.");
-                Lantern.getLogger().error(e.toString());
-            } else {
-                Lantern.getLogger().error("An unknown bind error has occurred.", e);
-            }
-            System.exit(1);
-        } catch (Throwable t) {
-            // general server startup crash
-            Lantern.getLogger().error("Error during server startup.", t);
-            System.exit(1);
-        }
-    }
+@Singleton
+public final class LanternServer implements Server {
 
     // The executor service for the server ticks
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
-            runnable -> {
-                final Thread thread = new Thread(runnable, "server");
-                this.mainThread = thread;
-                return thread;
-            });
+            runnable -> this.mainThread = new Thread(runnable, "server"));
 
+    @SuppressWarnings("NullableProblems")
     private Thread mainThread;
 
     // The world manager
-    private LanternWorldManager worldManager;
+    @Inject private LanternWorldManager worldManager;
 
     // The network manager
-    private final NetworkManager networkManager = new NetworkManager(this);
+    @Inject private NetworkManager networkManager;
+
+    // The logger
+    @Inject private Logger logger;
+
+    // The implementation plugin container
+    @Inject @Named(InternalPluginsInfo.Implementation.IDENTIFIER) private PluginContainer pluginContainer;
+
+    // The game instance
+    @Inject private LanternGame game;
+
+    // The console manager
+    @Inject private ConsoleManager consoleManager;
 
     // The rcon server/service
-    @Nullable private final RconServer rconServer;
+    @Nullable private RconServer rconServer;
 
     // The query server
-    @Nullable private final QueryServer queryServer;
+    @Nullable private QueryServer queryServer;
 
     // The key pair used for authentication
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
 
     // The broadcast channel
     private volatile MessageChannel broadcastChannel = MessageChannel.TO_ALL;
-
-    // The game instance
-    private final LanternGame game;
-
-    // The console manager
-    private final ConsoleManager consoleManager;
 
     // The maximum amount of players that can join
     private int maxPlayers;
@@ -235,81 +167,79 @@ public class LanternServer implements Server {
 
     private volatile boolean shuttingDown;
 
-    public LanternServer(LanternGame game, ConsoleManager consoleManager, @Nullable RconServer rconServer,
-            @Nullable QueryServer queryServer) {
-        this.consoleManager = consoleManager;
-        this.queryServer = queryServer;
-        this.rconServer = rconServer;
-        this.game = game;
+    @Inject
+    private LanternServer() {
     }
 
     /**
-     * Get the socket address to bind to for a specified service.
-     * 
-     * @param port the port to use
-     * @return the socket address
+     * Gets the {@link LanternGame} instance.
+     *
+     * @return The game
      */
-    private InetSocketAddress getBindAddress(int port) {
-        final String ip = this.game.getGlobalConfig().getServerIp();
-        if (ip.length() == 0) {
-            return new InetSocketAddress(port);
-        } else {
-            return new InetSocketAddress(ip, port);
+    public LanternGame getGame() {
+        return this.game;
+    }
+
+    void initialize() {
+        try {
+            this.game.initialize();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to Pre Initialize the Game.", e);
         }
     }
 
-    public void bind() throws BindException {
-        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getServerPort());
-        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useServerEpollWhenAvailable();
+    void start() throws IOException {
+        this.logger.info("Starting Lantern Server {}",
+                firstNonNull(InternalPluginsInfo.Implementation.VERSION, ""));
+        this.logger.info("   for  Minecraft {} with protocol version {}",
+                LanternMinecraftVersion.CURRENT.getName(),
+                LanternMinecraftVersion.CURRENT.getProtocol());
+        this.logger.info("   with SpongeAPI {}",
+                firstNonNull(InternalPluginsInfo.Api.VERSION, ""));
 
-        ProtocolState.init();
-        final ChannelFuture future = this.networkManager.init(address, useEpollWhenAvailable);
-        final Channel channel = future.awaitUninterruptibly().channel();
-        if (!channel.isActive()) {
-            final Throwable cause = future.cause();
-            if (cause instanceof BindException) {
-                throw (BindException) cause;
+        final GlobalConfig globalConfig = this.game.getGlobalConfig();
+        // Enable the query server if needed
+        if (globalConfig.isQueryEnabled()) {
+            this.queryServer = new QueryServer(this.game, globalConfig.getShowPluginsToQuery());
+        }
+        // Enable the rcon server if needed
+        if (globalConfig.isRconEnabled()) {
+            this.rconServer = new RconServer(globalConfig.getRconPassword());
+            this.game.getServiceManager().setProvider(this.pluginContainer, RconService.class, this.rconServer);
+        }
+        if (globalConfig.getProxyType() == ProxyType.NONE && !globalConfig.isOnlineMode()) {
+            this.logger.warn("It is not recommend to run the server in offline mode, this allows people to");
+            this.logger.warn("choose any username they want. The server does will use the account attached");
+            this.logger.warn("to the username, it doesn't care if it's in offline mode, this will only");
+            this.logger.warn("disable the authentication and allow non registered usernames to be used.");
+        }
+
+        this.consoleManager.start();
+
+        try {
+            bind();
+        } catch (BindException e) {
+            // descriptive bind error messages
+            this.logger.error("The server could not bind to the requested address.");
+            if (e.getMessage().startsWith("Cannot assign requested address")) {
+                this.logger.error("The 'server.ip' in your global.conf file may not be valid.");
+                this.logger.error("Unless you are sure you need it, try removing it.");
+                this.logger.error(e.toString());
+            } else if (e.getMessage().startsWith("Address already in use")) {
+                this.logger.error("The address was already in use. Check that no server is");
+                this.logger.error("already running on that port. If needed, try killing all");
+                this.logger.error("Java processes using Task Manager or similar.");
+                this.logger.error(e.toString());
+            } else {
+                this.logger.error("An unknown bind error has occurred.", e);
             }
-            throw new RuntimeException("Failed to bind to address", cause);
-        }
-
-        Lantern.getLogger().info("Successfully bound to: " + channel.localAddress());
-    }
-
-    private void bindQuery() {
-        if (this.queryServer == null) {
+            System.exit(1);
             return;
         }
+        bindQuery();
+        bindRcon();
 
-        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getQueryPort());
-        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useQueryEpollWhenAvailable();
-        this.game.getLogger().info("Binding query to address: " + address + "...");
-
-        final ChannelFuture future = this.queryServer.init(address, useEpollWhenAvailable);
-        final Channel channel = future.awaitUninterruptibly().channel();
-        if (!channel.isActive()) {
-            this.game.getLogger().warn("Failed to bind query. Address already in use?");
-        }
-    }
-
-    private void bindRcon() {
-        if (this.rconServer == null) {
-            return;
-        }
-
-        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getRconPort());
-        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useRconEpollWhenAvailable();
-        this.game.getLogger().info("Binding rcon to address: " + address + "...");
-
-        final ChannelFuture future = this.rconServer.init(address, useEpollWhenAvailable);
-        final Channel channel = future.awaitUninterruptibly().channel();
-        if (!channel.isActive()) {
-            this.game.getLogger().warn("Failed to bind rcon. Address already in use?");
-        }
-    }
-
-    public void start() throws IOException {
-        this.worldManager = new LanternWorldManager(this.game, this.game.getSavesDirectory());
+        this.logger.info("Ready for connections.");
         this.worldManager.init();
 
         final Cause gameCause = Cause.source(this.game).build();
@@ -348,6 +278,71 @@ public class LanternServer implements Server {
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
         this.game.postGameStateChange(SpongeEventFactory.createGameStartedServerEvent(gameCause));
+    }
+
+    /**
+     * Get the socket address to bind to for a specified service.
+     * 
+     * @param port the port to use
+     * @return the socket address
+     */
+    private InetSocketAddress getBindAddress(int port) {
+        final String ip = this.game.getGlobalConfig().getServerIp();
+        if (ip.length() == 0) {
+            return new InetSocketAddress(port);
+        } else {
+            return new InetSocketAddress(ip, port);
+        }
+    }
+
+    private void bind() throws BindException {
+        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getServerPort());
+        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useServerEpollWhenAvailable();
+
+        ProtocolState.init();
+        final ChannelFuture future = this.networkManager.init(address, useEpollWhenAvailable);
+        final Channel channel = future.awaitUninterruptibly().channel();
+        if (!channel.isActive()) {
+            final Throwable cause = future.cause();
+            if (cause instanceof BindException) {
+                throw (BindException) cause;
+            }
+            throw new RuntimeException("Failed to bind to address", cause);
+        }
+
+        Lantern.getLogger().info("Successfully bound to: " + channel.localAddress());
+    }
+
+    private void bindQuery() {
+        if (this.queryServer == null) {
+            return;
+        }
+
+        final InetSocketAddress address = getBindAddress(this.game.getGlobalConfig().getQueryPort());
+        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useQueryEpollWhenAvailable();
+        this.game.getLogger().info("Binding query to address: " + address + "...");
+
+        final ChannelFuture future = this.queryServer.init(address, useEpollWhenAvailable);
+        final Channel channel = future.awaitUninterruptibly().channel();
+        if (!channel.isActive()) {
+            this.game.getLogger().warn("Failed to bind query. Address already in use?");
+        }
+    }
+
+    private void bindRcon() {
+        if (this.rconServer == null) {
+            return;
+        }
+
+        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getRconPort());
+        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useRconEpollWhenAvailable();
+        this.game.getLogger().info("Binding rcon to address: " + address + "...");
+
+        final ChannelFuture future = this.rconServer.init(address, useEpollWhenAvailable);
+        final Channel channel = future.awaitUninterruptibly().channel();
+        if (!channel.isActive()) {
+            this.game.getLogger().warn("Failed to bind rcon. Address already in use?");
+        }
     }
 
     /**

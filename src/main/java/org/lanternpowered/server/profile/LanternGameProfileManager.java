@@ -28,6 +28,10 @@ package org.lanternpowered.server.profile;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileCache;
@@ -46,7 +50,10 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
+@Singleton
 public final class LanternGameProfileManager implements GameProfileManager {
+
+    private static final String FILE_NAME = "profile-cache.json";
 
     // The game profile cache
     private GameProfileCache gameProfileCache;
@@ -54,8 +61,9 @@ public final class LanternGameProfileManager implements GameProfileManager {
     // The default game profile cache
     private final LanternGameProfileCache defaultGameProfileCache;
 
-    public LanternGameProfileManager(Path cacheFile) {
-        this.defaultGameProfileCache = new LanternGameProfileCache(cacheFile);
+    @Inject
+    public LanternGameProfileManager(@Named(DirectoryKeys.CONFIG) Path configDirectory) {
+        this.defaultGameProfileCache = new LanternGameProfileCache(configDirectory.resolve(FILE_NAME));
         this.gameProfileCache = this.defaultGameProfileCache;
     }
 

@@ -67,16 +67,10 @@ public final class LanternServiceListeners {
     @Listener
     public void onServiceChange(ChangeServiceProviderEvent event) {
         synchronized (this.serviceCallbacks) {
-            final Iterator<Predicate<Object>> it = this.serviceCallbacks.get(event.getService()).iterator();
-            while (it.hasNext()) {
-                if (!it.next().test(event.getNewProvider())) {
-                    it.remove();
-                }
-            }
+            this.serviceCallbacks.get(event.getService()).removeIf(objectPredicate -> !objectPredicate.test(event.getNewProvider()));
         }
     }
 
     private LanternServiceListeners() {
     }
-
 }

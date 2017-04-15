@@ -26,6 +26,8 @@
 package org.lanternpowered.server.network;
 
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -53,6 +55,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Singleton
 public final class NetworkManager extends ServerBase {
 
     private final static AtomicInteger threadCounter = new AtomicInteger(0);
@@ -67,6 +70,7 @@ public final class NetworkManager extends ServerBase {
 
     @Nullable private SocketAddress socketAddress;
 
+    @Inject
     public NetworkManager(LanternServer server) {
         this.server = server;
     }
@@ -101,7 +105,7 @@ public final class NetworkManager extends ServerBase {
      *
      * @param session The session
      */
-    public void onActive(NetworkSession session) {
+    void onActive(NetworkSession session) {
         this.sessions.add(session);
     }
 
@@ -110,7 +114,7 @@ public final class NetworkManager extends ServerBase {
      *
      * @param session The session
      */
-    public void onInactive(NetworkSession session) {
+    void onInactive(NetworkSession session) {
         this.sessions.remove(session);
     }
 

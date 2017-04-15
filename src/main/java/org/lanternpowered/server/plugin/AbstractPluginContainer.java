@@ -39,18 +39,19 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-abstract class AbstractPluginContainer implements PluginContainer {
+public abstract class AbstractPluginContainer implements PluginContainer {
 
     private final String id;
-    private final Optional<String> name;
-    private final Optional<String> version;
     private final Logger logger;
 
-    AbstractPluginContainer(String id, @Nullable String name, @Nullable String version) {
+    @Nullable private final String name;
+    @Nullable private final String version;
+
+    public AbstractPluginContainer(String id, @Nullable String name, @Nullable String version) {
         this.id = checkNotNull(id, "id");
-        this.name = Optional.ofNullable(name);
-        this.version = Optional.ofNullable(version);
         this.logger = LoggerFactory.getLogger(id);
+        this.version = version;
+        this.name = name;
     }
 
     @Override
@@ -60,12 +61,12 @@ abstract class AbstractPluginContainer implements PluginContainer {
 
     @Override
     public String getName() {
-        return this.name.orElse(this.id);
+        return this.name == null ? this.id : this.name;
     }
 
     @Override
     public Optional<String> getVersion() {
-        return this.version;
+        return Optional.ofNullable(this.version);
     }
 
     @Override
@@ -92,6 +93,9 @@ abstract class AbstractPluginContainer implements PluginContainer {
     public Logger getLogger() {
         return this.logger;
     }
+
+    @Override
+    public abstract Optional<?> getInstance();
 
     @Override
     public String toString() {

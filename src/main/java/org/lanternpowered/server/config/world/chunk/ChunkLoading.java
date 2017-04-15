@@ -30,7 +30,7 @@ import static org.lanternpowered.server.config.ConfigConstants.OVERRIDES;
 import com.google.common.collect.Maps;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public abstract class ChunkLoading implements ChunkLoadingConfig {
     @Override
     public ChunkLoadingTickets getChunkLoadingTickets(String plugin) {
         // Minecraft has no limits
-        if (plugin.equalsIgnoreCase(LanternGame.MINECRAFT_ID)) {
+        if (plugin.equalsIgnoreCase(InternalPluginsInfo.Minecraft.IDENTIFIER)) {
             return MINECRAFT;
         }
         // Check for overridden configuration

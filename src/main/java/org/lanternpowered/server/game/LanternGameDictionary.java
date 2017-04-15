@@ -32,10 +32,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
+import com.google.inject.Singleton;
 import org.spongepowered.api.GameDictionary;
 
 import java.util.Set;
 
+@Singleton
 public final class LanternGameDictionary implements GameDictionary {
 
     private final SetMultimap<String, GameDictionary.Entry> map = HashMultimap.create();

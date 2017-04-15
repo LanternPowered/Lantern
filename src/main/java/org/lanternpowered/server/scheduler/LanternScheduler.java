@@ -30,6 +30,8 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFutureTask;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -47,10 +49,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
+@Singleton
 public class LanternScheduler implements Scheduler {
 
     private final AsyncScheduler asyncScheduler = new AsyncScheduler();
     private final SyncScheduler syncScheduler = new SyncScheduler();
+
+    @Inject
+    public LanternScheduler() {
+    }
 
     @Override
     public LanternTaskBuilder createTaskBuilder() {

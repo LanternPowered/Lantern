@@ -25,29 +25,23 @@
  */
 package org.lanternpowered.server.game;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.MoreObjects;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@Singleton
 public class LanternPlatform implements Platform {
-
-    public static final String API_NAME = firstNonNull(Platform.class.getPackage()
-            .getSpecificationTitle(), LanternGame.API_NAME);
-    public static final Optional<String> API_VERSION = Optional.ofNullable(Platform.class.getPackage()
-            .getSpecificationVersion());
-
-    public static final String IMPL_NAME = firstNonNull(LanternPlatform.class.getPackage()
-            .getImplementationTitle(), LanternGame.IMPL_NAME);
-    public static final Optional<String> IMPL_VERSION = Optional.ofNullable(LanternPlatform.class.getPackage()
-            .getImplementationVersion());
 
     private final PluginContainer apiContainer;
     private final PluginContainer implContainer;
@@ -64,7 +58,11 @@ public class LanternPlatform implements Platform {
         }
     };
 
-    LanternPlatform(PluginContainer apiContainer, PluginContainer implContainer, PluginContainer minecraftContainer) {
+    @Inject
+    private LanternPlatform(
+            @Named(InternalPluginsInfo.Api.IDENTIFIER) PluginContainer apiContainer,
+            @Named(InternalPluginsInfo.Implementation.IDENTIFIER) PluginContainer implContainer,
+            @Named(InternalPluginsInfo.Minecraft.IDENTIFIER) PluginContainer minecraftContainer) {
         this.minecraftContainer = minecraftContainer;
         this.implContainer = implContainer;
         this.apiContainer = apiContainer;

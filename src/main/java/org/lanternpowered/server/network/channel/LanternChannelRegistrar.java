@@ -32,6 +32,8 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
@@ -39,6 +41,7 @@ import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
@@ -56,11 +59,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+@Singleton
 public final class LanternChannelRegistrar implements ChannelRegistrar {
 
     private final Map<String, LanternChannelBinding> bindings = new ConcurrentHashMap<>();
     private final Server server;
 
+    @Inject
     public LanternChannelRegistrar(Server server) {
         this.server = server;
     }
@@ -108,6 +113,11 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         if (binding.bound) {
             binding.bound = false;
             this.bindings.remove(channel.getName());
+            final MessagePlayInOutUnregisterChannels message = new MessagePlayInOutUnregisterChannels(
+                    Sets.newHashSet(channel.getName()));
+            for (Player player : this.server.getOnlinePlayers()) {
+                ((NetworkSession) player.getConnection()).send(message);
+            }
         }
     }
 
@@ -145,7 +155,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         }
     }
 
-    public void handlePlayload(ByteBuffer buf, String channel, RemoteConnection connection) {
+    public void handlePayload(ByteBuffer buf, String channel, RemoteConnection connection) {
         final LanternChannelBinding binding = this.bindings.get(channel);
         if (binding != null) {
             binding.handlePayload(buf, connection);

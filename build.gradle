@@ -146,8 +146,9 @@ dependencies {
     // Asm
     compile 'org.ow2.asm:asm-all:5.0.3'
 
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.mockito:mockito-core:1.9.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:2.7.4'
 }
 
 idea.module {
@@ -258,7 +259,7 @@ shadowJar {
     exclude 'Version.java.template'
     exclude 'log4j2_indev.xml'
 
-    from zipTree(api.tasks.genEventImpl.outputs.files.first())
+    from fileTree(api.tasks.genEventImpl.outputs.files.first())
 
     // Make sure that the jar is generated
     afterEvaluate {
@@ -326,9 +327,12 @@ shadowJar {
 
 task sourceJar(type: Jar) {
     classifier = 'sources'
-    from api.sourceSets.main.allSource
+
     from sourceSets.java6.allSource
     from sourceSets.main.allSource
+
+    from api.sourceSets.main.allSource
+    from api.sourceSets.ap.allSource
 }
 
 // Run shadowJar and sourceJar on build
@@ -407,5 +411,5 @@ license {
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
+    gradleVersion = '3.5'
 }

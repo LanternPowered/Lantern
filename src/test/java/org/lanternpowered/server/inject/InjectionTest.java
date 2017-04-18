@@ -29,12 +29,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Provider;
 import joptsimple.OptionParser;
 import org.junit.Test;
 import org.lanternpowered.server.inject.option.OptionModule;
-
-import javax.inject.Named;
 
 public class InjectionTest {
 
@@ -56,7 +53,13 @@ public class InjectionTest {
                 install(new InjectionPointProvider());
                 final OptionParser optionParser = new OptionParser();
                 optionParser.allowsUnrecognizedOptions();
-                install(new OptionModule.Simple(new String[] { "--my-option=500", "--my-other-option=10.684" }, optionParser));
+                install(new OptionModule() {
+                    @Override
+                    protected void configure0() {
+                        bindArguments().toInstance(new String[]{"--my-option=500", "--my-other-option=10.684"});
+                        bindParser().toInstance(optionParser);
+                    }
+                });
             }
         };
         final Injector injector = Guice.createInjector(module);

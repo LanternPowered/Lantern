@@ -30,40 +30,34 @@ import static org.lanternpowered.server.inject.provider.ProviderHelper.provideNa
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.lanternpowered.server.inject.InjectionPoint;
-import org.spongepowered.api.network.ChannelBinding;
-import org.spongepowered.api.network.ChannelId;
-import org.spongepowered.api.network.ChannelRegistrar;
+import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.asset.AssetId;
+import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public abstract class ChannelBindingProvider<B extends ChannelBinding> implements Provider<B> {
+import java.util.NoSuchElementException;
 
-    @Inject protected ChannelRegistrar registrar;
-    @Inject protected PluginContainer container;
-    @Inject protected Provider<InjectionPoint> point;
+public class PluginAssetProvider implements Provider<Asset> {
 
-    protected String getChannel() {
-        final InjectionPoint injectionPoint = this.point.get();
-        final ChannelId channelId = injectionPoint.getAnnotation(ChannelId.class);
-        if (channelId != null) {
-            return channelId.value();
+    @Inject private PluginContainer container;
+    @Inject private AssetManager assetManager;
+    @Inject private InjectionPoint point;
+
+    @Override
+    public Asset get() {
+        final AssetId assetId = this.point.getAnnotation(AssetId.class);
+        String name;
+        if (assetId != null) {
+            name = assetId.value();
+        } else {
+            name = provideName(this.point).orElseThrow(
+                    () -> new IllegalStateException("Missing @AssetId or @Named annotation."));
         }
-        return provideName(injectionPoint).orElse(this.container.getId());
-    }
-
-    public static class Indexed extends ChannelBindingProvider<ChannelBinding.IndexedMessageChannel> {
-
-        @Override
-        public ChannelBinding.IndexedMessageChannel get() {
-            return this.registrar.getOrCreate(this.container, getChannel());
+        if (name.indexOf(':') == -1) {
+            name = this.container.getId() + ':' + name;
         }
+        final String name1 = name;
+        return this.assetManager.getAsset(name)
+                .orElseThrow(() -> new NoSuchElementException("Cannot find asset " + name1));
     }
-
-    public static class Raw extends ChannelBindingProvider<ChannelBinding.RawDataChannel> {
-
-        @Override
-        public ChannelBinding.RawDataChannel get() {
-            return this.registrar.getOrCreateRaw(this.container, getChannel());
-        }
-    }
-
 }

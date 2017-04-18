@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world.extent;
 
+import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -95,6 +96,13 @@ public class ExtentViewDownsize implements AbstractExtent {
     public Location<? extends Extent> getLocation(Vector3d position) {
         checkRange(position.getX(), position.getY(), position.getZ());
         return new Location<>(this, position);
+    }
+
+    @Override
+    public int getHighestYAt(int x, int z) {
+        checkRange(x, this.blockMin.getY(), z);
+        final int y = this.extent.getHighestYAt(x, z);
+        return GenericMath.clamp(y, this.blockMin.getY(), this.blockMax.getY());
     }
 
     @Override

@@ -74,7 +74,7 @@ public class LightningSpawnerAction implements Action {
                 final int x = chunk1.getX() << 4 | value & 0xf;
                 final int z = chunk1.getZ() << 4 | (value >> 4) & 0xf;
 
-                final Entity entity = world.createEntity(EntityTypes.LIGHTNING, new Vector3d(x, world.getHighestBlockAt(x, z), z));
+                final Entity entity = world.createEntity(EntityTypes.LIGHTNING, new Vector3d(x, world.getHighestYAt(x, z), z));
                 world.spawnEntity(entity, cause);
             }
         }

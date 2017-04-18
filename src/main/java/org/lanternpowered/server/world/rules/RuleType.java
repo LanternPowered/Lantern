@@ -37,6 +37,7 @@ public final class RuleType<T> {
     private static final Map<String, RuleType> rulesByName = Maps.newHashMap();
 
     public static Optional<RuleType<?>> get(String name) {
+        checkNotNull(name, "name");
         //noinspection unchecked
         return Optional.ofNullable(rulesByName.get(name));
     }
@@ -51,9 +52,10 @@ public final class RuleType<T> {
      * @throws IllegalArgumentException if there is already a rule registered with that name
      */
     public static <T> RuleType<?> getOrCreate(String name, RuleDataType<T> dataType, T defaultValue) throws IllegalArgumentException {
+        checkNotNull(name, "name");
         checkNotNull(dataType, "dataType");
         checkNotNull(defaultValue, "defaultValue");
-        return rulesByName.computeIfAbsent(checkNotNull(name, "name"), rule0 -> new RuleType<>(name, dataType, defaultValue));
+        return rulesByName.computeIfAbsent(name, rule0 -> new RuleType<>(name, dataType, defaultValue));
     }
 
     /**

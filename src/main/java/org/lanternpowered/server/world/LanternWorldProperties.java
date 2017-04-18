@@ -589,6 +589,12 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
+    public boolean removeGameRule(String gameRule) {
+        final Optional<RuleType<?>> type = RuleType.get(gameRule);
+        return type.isPresent() && this.rules.removeRule((RuleType) type.get()).isPresent();
+    }
+
+    @Override
     public DataContainer getAdditionalProperties() {
         return this.additionalProperties;
     }

@@ -406,10 +406,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         return getLocation(position.getX(), position.getY(), position.getZ());
     }
 
-    public int getHighestBlockAt(int x, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getHighestBlockAt(x, z);
-    }
-
     @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
@@ -1079,6 +1075,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
+    public int getHighestYAt(int x, int z) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getHighestYAt(x, z);
+    }
+
+    @Override
     public Difficulty getDifficulty() {
         return this.properties.getDifficulty();
     }
@@ -1220,6 +1221,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     @Override
     public Map<String, String> getGameRules() {
         return this.properties.getGameRules();
+    }
+
+    @Override
+    public <T> Optional<Rule<T>> removeRule(RuleType<T> ruleType) {
+        return this.properties.getRules().removeRule(ruleType);
     }
 
     @Override

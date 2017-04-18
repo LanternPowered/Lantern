@@ -34,10 +34,12 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class LanternLiving extends LanternEntity implements Living {
@@ -104,5 +106,15 @@ public class LanternLiving extends LanternEntity implements Living {
             offer(Keys.POTION_EFFECTS, newPotionEffects.build());
         }
         offer(Keys.GLOWING, glowing);
+    }
+
+    @Override
+    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
+        return Optional.empty();
     }
 }

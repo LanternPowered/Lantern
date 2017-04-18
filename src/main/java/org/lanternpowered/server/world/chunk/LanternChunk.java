@@ -568,8 +568,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @param z The z coordinate
      * @return The y coordinate
      */
-    public int getHighestBlockAt(int x, int z) {
-        this.checkAreaBounds(x, z);
+    @Override
+    public int getHighestYAt(int x, int z) {
+        checkAreaBounds(x, z);
         if (!this.loaded) {
             return 0;
         }

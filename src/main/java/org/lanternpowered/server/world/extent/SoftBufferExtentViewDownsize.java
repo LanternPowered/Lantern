@@ -27,6 +27,7 @@ package org.lanternpowered.server.world.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -217,6 +218,13 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     public Location<? extends Extent> getLocation(Vector3d position) {
         checkRange(position);
         return new Location<Extent>(this, position);
+    }
+
+    @Override
+    public int getHighestYAt(int x, int z) {
+        checkRange(x, this.blockMin.getY(), z);
+        final int y = this.extent.getHighestYAt(x, z);
+        return GenericMath.clamp(y, this.blockMin.getY(), this.blockMax.getY());
     }
 
     @Override

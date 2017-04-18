@@ -232,11 +232,6 @@ public class LanternGame implements Game {
     @Inject
     private LanternGame() {
         game = this;
-        try {
-            ReflectionHelper.setField(Sponge.class.getDeclaredField("game"), null, this);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred while setting the game instance for the Sponge class.", e);
-        }
     }
 
     public void initialize() throws IOException {

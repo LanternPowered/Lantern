@@ -29,6 +29,8 @@ import java.util.Optional;
 
 public interface RuleHolder {
 
+    <T> Optional<Rule<T>> removeRule(RuleType<T> ruleType);
+
     <T> Optional<Rule<T>> getRule(RuleType<T> ruleType);
 
     <T> Rule<T> getOrCreateRule(RuleType<T> ruleType);

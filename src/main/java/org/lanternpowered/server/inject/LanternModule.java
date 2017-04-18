@@ -63,6 +63,7 @@ import org.lanternpowered.server.inject.option.OptionModule;
 import org.lanternpowered.server.inject.provider.ChannelBindingProvider;
 import org.lanternpowered.server.inject.provider.NamedLog4jLoggerProvider;
 import org.lanternpowered.server.inject.provider.NamedSlf4jLoggerProvider;
+import org.lanternpowered.server.inject.provider.PluginAssetProvider;
 import org.lanternpowered.server.inject.provider.PluginContainerProvider;
 import org.lanternpowered.server.inject.provider.ServiceObjectProvider;
 import org.lanternpowered.server.inject.provider.SpongeExecutorServiceProvider;
@@ -72,6 +73,7 @@ import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
+import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -79,6 +81,9 @@ import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.asset.AssetId;
 import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
@@ -86,6 +91,7 @@ import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.network.ChannelBinding;
+import org.spongepowered.api.network.ChannelId;
 import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
@@ -149,6 +155,9 @@ public class LanternModule extends PrivateModule {
 
     @Override
     protected void configure() {
+        // Inject into sponge
+        requestStaticInjection(Sponge.class);
+
         // Injection Points
         install(new InjectionPointProvider());
 
@@ -188,7 +197,7 @@ public class LanternModule extends PrivateModule {
         bindAndExpose(MinecraftVersion.class)
                 .toInstance(LanternMinecraftVersion.CURRENT);
         bindAndExpose(ServiceManager.class)
-                .to(SimpleServiceManager.class);
+                .to(LanternServiceManager.class);
         bindAndExpose(AssetManager.class)
                 .to(LanternAssetManager.class);
         bindAndExpose(GameRegistry.class)
@@ -230,9 +239,23 @@ public class LanternModule extends PrivateModule {
         // The Indexed Channel Binding
         bindAndExpose(ChannelBinding.IndexedMessageChannel.class)
                 .toProvider(ChannelBindingProvider.Indexed.class);
+        bindAndExpose(ChannelBinding.IndexedMessageChannel.class, Named.class)
+                .toProvider(ChannelBindingProvider.Indexed.class);
+        bindAndExpose(ChannelBinding.IndexedMessageChannel.class, ChannelId.class)
+                .toProvider(ChannelBindingProvider.Indexed.class);
         // The Raw Channel Binding
         bindAndExpose(ChannelBinding.RawDataChannel.class)
                 .toProvider(ChannelBindingProvider.Raw.class);
+        bindAndExpose(ChannelBinding.RawDataChannel.class, Named.class)
+                .toProvider(ChannelBindingProvider.Raw.class);
+        bindAndExpose(ChannelBinding.RawDataChannel.class, ChannelId.class)
+                .toProvider(ChannelBindingProvider.Raw.class);
+
+        // Assets
+        bindAndExpose(Asset.class, Named.class)
+                .toProvider(PluginAssetProvider.class);
+        bindAndExpose(Asset.class, AssetId.class)
+                .toProvider(PluginAssetProvider.class);
 
         // Internal Plugin Containers
         bindAndExpose(PluginContainer.class, Names.named(InternalPluginsInfo.Api.IDENTIFIER))

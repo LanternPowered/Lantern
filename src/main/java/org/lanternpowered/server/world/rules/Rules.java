@@ -48,11 +48,19 @@ public final class Rules implements RuleHolder {
         return ImmutableMap.copyOf(this.rules);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Optional<Rule<T>> removeRule(RuleType<T> ruleType) {
+        return Optional.ofNullable((Rule<T>) this.rules.remove(checkNotNull(ruleType, "ruleType")));
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<Rule<T>> getRule(RuleType<T> ruleType) {
         return Optional.ofNullable((Rule<T>) this.rules.get(checkNotNull(ruleType, "ruleType")));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Rule<T> getOrCreateRule(RuleType<T> ruleType) {
         return (Rule) this.rules.computeIfAbsent(checkNotNull(ruleType, "ruleType"), key -> new Rule(this, ruleType));
@@ -61,7 +69,7 @@ public final class Rules implements RuleHolder {
     /**
      * Gets the world instance attached to this rules, may be absent.
      *
-     * @return the world
+     * @return The world
      */
     public Optional<LanternWorld> getWorld() {
         return this.worldProperties.getWorld();

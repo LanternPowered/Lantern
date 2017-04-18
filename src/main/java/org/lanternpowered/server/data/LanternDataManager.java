@@ -35,9 +35,9 @@ import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.server.data.persistence.SimpleDataTypeSerializerCollection;
-import org.lanternpowered.server.game.Lantern;
 import org.slf4j.Logger;
 import org.spongepowered.api.data.DataManager;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.ImmutableDataBuilder;
@@ -49,8 +49,10 @@ import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.DataContentUpdater;
 import org.spongepowered.api.data.persistence.DataTranslator;
+import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -197,6 +199,11 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         }
     }
 
+    @Override
+    public void registerLegacyManipulatorIds(String legacyId, DataRegistration<?, ?> registration) {
+        // TODO
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends DataManipulator<T, I>, I extends ImmutableDataManipulator<I, T>> Optional<DataManipulatorBuilder<T, I>> getManipulatorBuilder(
@@ -224,5 +231,11 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
     @Override
     public <T> Optional<DataTranslator<T>> getTranslator(Class<T> objectClass) {
         return super.getTranslator(objectClass);
+    }
+
+    @Override
+    public Collection<Class<? extends DataManipulator<?, ?>>> getAllRegistrationsFor(PluginContainer container) {
+        // TODO
+        return Collections.emptyList();
     }
 }

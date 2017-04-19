@@ -24,4 +24,4 @@
  * THE SOFTWARE.
  */
 @org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.data.persistence.nbt;
+package org.lanternpowered.server.data.persistence.json;

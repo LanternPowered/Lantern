@@ -26,7 +26,7 @@
 package org.lanternpowered.server.game.registry.type.data.persistence;
 
 import org.lanternpowered.server.data.persistence.HoconDataFormat;
-import org.lanternpowered.server.data.persistence.JsonDataFormat;
+import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
 import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.spongepowered.api.data.persistence.DataFormat;

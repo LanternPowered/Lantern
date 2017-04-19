@@ -281,6 +281,9 @@ shadowJar {
         include dependency('io.netty:netty-all')
         include dependency('org.codehaus.groovy:groovy-all')
 
+        // Option Parsing
+        include dependency('net.sf.jopt-simple:jopt-simple')
+
         // Bytecode
         include dependency('org.ow2.asm:asm-all')
 

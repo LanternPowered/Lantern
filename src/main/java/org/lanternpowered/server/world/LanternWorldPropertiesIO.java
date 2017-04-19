@@ -403,7 +403,7 @@ final class LanternWorldPropertiesIO {
                     }
                     if (!options.isEmpty()) {
                         try {
-                            JsonObject json = GSON.fromJson(options, JsonObject.class);
+                            final JsonObject json = GSON.fromJson(options, JsonObject.class);
                             generatorSettings = JsonTranslator.instance().translate(json).copy();
                         } catch (Exception e) {
                             Lantern.getLogger().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",

@@ -87,6 +87,7 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.ban.BanService;
+import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.rcon.RconService;
@@ -212,7 +213,7 @@ public class LanternGame implements Game {
     // The User Storage Service
     @Inject @ServiceProvider(LanternUserStorageService.class) private Service<UserStorageService> userStorageService;
     // The Pagination Service
-    @Inject @ServiceProvider(LanternPaginationService.class) private Service<UserStorageService> paginationService;
+    @Inject @ServiceProvider(LanternPaginationService.class) private Service<PaginationService> paginationService;
     // The SQL Service
     @Inject @ServiceProvider(LanternSqlService.class) private Service<SqlService> sqlService;
     // The Permission Service

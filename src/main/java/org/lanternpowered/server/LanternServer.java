@@ -52,6 +52,7 @@ import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.CloseableService;
+import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
@@ -181,14 +182,6 @@ public final class LanternServer implements Server {
     }
 
     void initialize() {
-        try {
-            this.game.initialize();
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to Pre Initialize the Game.", e);
-        }
-    }
-
-    void start() throws IOException {
         this.logger.info("Starting Lantern Server {}",
                 firstNonNull(InternalPluginsInfo.Implementation.VERSION, ""));
         this.logger.info("   for  Minecraft {} with protocol version {}",
@@ -197,6 +190,14 @@ public final class LanternServer implements Server {
         this.logger.info("   with SpongeAPI {}",
                 firstNonNull(InternalPluginsInfo.Api.VERSION, ""));
 
+        try {
+            this.game.initialize();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to Pre Initialize the Game.", e);
+        }
+    }
+
+    void start() throws IOException {
         final GlobalConfig globalConfig = this.game.getGlobalConfig();
         // Enable the query server if needed
         if (globalConfig.isQueryEnabled()) {
@@ -581,7 +582,7 @@ public final class LanternServer implements Server {
         this.shuttingDown = true;
 
         final Cause gameCause = Cause.source(this.game).build();
-        this.game.postGameStateChange(SpongeEventFactory.createGameStoppingEvent(gameCause));
+        this.game.postGameStateChange(SpongeEventFactory.createGameStoppingServerEvent(gameCause));
 
         // Debug a message
         Lantern.getLogger().info("Stopping the server... ({})", LanternTexts.toLegacy(kickMessage));
@@ -614,11 +615,12 @@ public final class LanternServer implements Server {
 
         final Collection<ProviderRegistration<?>> serviceRegistrations;
         try {
-            final Field field = SimpleServiceManager.class.getDeclaredField("providers");
-            field.setAccessible(true);
-
             final ServiceManager serviceManager = this.game.getServiceManager();
-            checkState(serviceManager instanceof SimpleServiceManager);
+            checkState(serviceManager instanceof SimpleServiceManager || serviceManager instanceof LanternServiceManager);
+
+            final Field field = (serviceManager instanceof SimpleServiceManager ? SimpleServiceManager.class :
+                    LanternServiceManager.class).getDeclaredField("providers");
+            field.setAccessible(true);
 
             //noinspection unchecked
             final Map<Class<?>, ProviderRegistration<?>> map = (Map<Class<?>, ProviderRegistration<?>>) field.get(serviceManager);
@@ -656,7 +658,7 @@ public final class LanternServer implements Server {
             Lantern.getLogger().error("A error occurred while saving the ops config.", e);
         }
 
-        this.game.postGameStateChange(SpongeEventFactory.createGameStoppingServerEvent(gameCause));
+        this.game.postGameStateChange(SpongeEventFactory.createGameStoppedServerEvent(gameCause));
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppingEvent(gameCause));
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppedEvent(gameCause));
 

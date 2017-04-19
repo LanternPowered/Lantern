@@ -34,11 +34,11 @@ import joptsimple.BuiltinHelpFormatter;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSpec;
-import org.lanternpowered.server.inject.LanternGuice;
 import org.lanternpowered.server.inject.LanternModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.api.Platform;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public final class LanternLaunch {
             final OptionSpec<Void> version = optionParser.acceptsAll(Arrays.asList("version", "v"),
                     "Display the Lantern version");
             if (optionParser.parse(args).has(version)) {
-                final Package pack = LanternLaunch.class.getPackage();
+                final Package pack = Platform.class.getPackage();
                 logger.info(pack.getImplementationTitle() + ' ' + pack.getImplementationVersion());
                 logger.info(pack.getSpecificationTitle() + ' ' + pack.getSpecificationVersion());
                 return;
@@ -64,14 +64,10 @@ public final class LanternLaunch {
             final OptionSpec<Void> help = optionParser.acceptsAll(Arrays.asList("help", "h", "?"),
                     "Show this help text").forHelp();
 
-            // Get the stage for the injector
-            final Stage stage = LanternGuice.getInjectorStage(LanternLaunch.class.getPackage().getImplementationTitle() == null ?
-                    Stage.DEVELOPMENT : Stage.PRODUCTION);
-
             // Initialize the injector
             final LanternModule module = new LanternModule(logger, args, optionParser);
-            final Injector injector = Guice.createInjector(stage, module);
-            logger.info("Instantiated an Injector in {} mode", stage);
+            final Injector injector = Guice.createInjector(Stage.DEVELOPMENT, module);
+            logger.info("Instantiated the Injector.");
 
             // Create the server instance
             final LanternServer lanternServer = injector.getInstance(LanternServer.class);

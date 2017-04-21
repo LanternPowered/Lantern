@@ -43,5 +43,10 @@ public class InstrumentTypeRegistryModule extends PluginCatalogRegistryModule<In
         register(new LanternInstrumentType("minecraft", "snare", 2));
         register(new LanternInstrumentType("minecraft", "high_hat", 3));
         register(new LanternInstrumentType("minecraft", "bass_attack", 4));
+        register(new LanternInstrumentType("minecraft", "flute", 5));
+        register(new LanternInstrumentType("minecraft", "bell", 6));
+        register(new LanternInstrumentType("minecraft", "guitar", 7));
+        register(new LanternInstrumentType("minecraft", "chime", 8));
+        register(new LanternInstrumentType("minecraft", "xylophone", 9));
     }
 }

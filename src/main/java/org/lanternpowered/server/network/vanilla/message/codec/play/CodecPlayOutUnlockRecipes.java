@@ -50,10 +50,10 @@ public final class CodecPlayOutUnlockRecipes implements Codec<MessagePlayOutUnlo
             recipeIds.forEach(buf::writeInteger);
             buf.writeVarInt(0);
         } else {
-            IntList recipeIds = ((MessagePlayOutUnlockRecipes.Add) message).getRecipeIds();
+            IntList recipeIds = ((MessagePlayOutUnlockRecipes.Add) message).getRecipeIdsToBeDisplayed();
             buf.writeVarInt(recipeIds.size());
             recipeIds.forEach(buf::writeInteger);
-            recipeIds = ((MessagePlayOutUnlockRecipes.Add) message).getSilentRecipeIds();
+            recipeIds = ((MessagePlayOutUnlockRecipes.Add) message).getRecipeIds();
             buf.writeVarInt(recipeIds.size());
             recipeIds.forEach(buf::writeInteger);
         }

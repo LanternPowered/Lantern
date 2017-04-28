@@ -83,24 +83,24 @@ public abstract class MessagePlayOutUnlockRecipes implements Message {
 
     public final static class Add extends MessagePlayOutUnlockRecipes {
 
+        private final IntList recipeIdsToBeDisplayed;
         private final IntList recipeIds;
-        private final IntList silentRecipeIds;
         private final boolean notification;
 
         public Add(boolean openRecipeBook, boolean craftingFilter,
                 IntList recipeIds, IntList silentRecipeIds, boolean notification) {
             super(openRecipeBook, craftingFilter);
-            this.recipeIds = IntLists.unmodifiable(recipeIds);
-            this.silentRecipeIds = IntLists.unmodifiable(silentRecipeIds);
+            this.recipeIdsToBeDisplayed = IntLists.unmodifiable(recipeIds);
+            this.recipeIds = IntLists.unmodifiable(silentRecipeIds);
             this.notification = notification;
+        }
+
+        public IntList getRecipeIdsToBeDisplayed() {
+            return this.recipeIdsToBeDisplayed;
         }
 
         public IntList getRecipeIds() {
             return this.recipeIds;
-        }
-
-        public IntList getSilentRecipeIds() {
-            return this.silentRecipeIds;
         }
 
         public boolean hasNotification() {
@@ -110,8 +110,8 @@ public abstract class MessagePlayOutUnlockRecipes implements Message {
         @Override
         public MoreObjects.ToStringHelper toStringHelper() {
             return super.toStringHelper()
+                    .add("recipeIdsToBeDisplayed", Arrays.toString(this.recipeIdsToBeDisplayed.toIntArray()))
                     .add("recipeIds", Arrays.toString(this.recipeIds.toIntArray()))
-                    .add("silentRecipeIds", Arrays.toString(this.silentRecipeIds.toIntArray()))
                     .add("notification", this.notification);
         }
     }

@@ -28,17 +28,18 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 
 public abstract class Styleable extends PluginCatalogType.Base {
 
     private final Text title;
     private final Text description;
-    private final ItemType icon;
+    private final ItemStackSnapshot icon;
     private final FrameType frameType;
 
-    Styleable(String pluginId, String id, String name, Text title, Text description, ItemType icon, FrameType frameType) {
+    Styleable(String pluginId, String id, String name, Text title, Text description,
+            ItemStackSnapshot icon, FrameType frameType) {
         super(pluginId, id, name);
         checkNotNull(title, "title");
         checkNotNull(description, "description");
@@ -64,7 +65,7 @@ public abstract class Styleable extends PluginCatalogType.Base {
      *
      * @return The icon
      */
-    public ItemType getIcon() {
+    public ItemStackSnapshot getIcon() {
         return this.icon;
     }
 

@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
-import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 
 import javax.annotation.Nullable;
@@ -98,7 +98,7 @@ public final class AdvancementTreeBuilder extends StyleableBuilder<AdvancementTr
     public AdvancementTree build(String pluginId, String id) {
         final Text title;
         final Text description;
-        final ItemType icon;
+        final ItemStackSnapshot icon;
         final FrameType frameType;
         if (this.rootAdvancement == null) {
             //noinspection ConstantConditions

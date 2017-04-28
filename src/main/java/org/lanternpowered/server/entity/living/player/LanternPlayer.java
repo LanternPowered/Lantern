@@ -33,6 +33,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.advancement.TestAdvancementTree;
@@ -418,12 +419,6 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     }
                 }
                 this.tabList.init(tabListEntries);
-                this.session.send(new MessagePlayOutUnlockRecipes(ImmutableList.of(
-                        new MessagePlayOutUnlockRecipes.Entry("minecraft:crafting_table", true, false),
-                        new MessagePlayOutUnlockRecipes.Entry("minecraft:acacia_boat", true, false),
-                        new MessagePlayOutUnlockRecipes.Entry("minecraft:bread", true, false),
-                        new MessagePlayOutUnlockRecipes.Entry("minecraft:torch", true, false)
-                ), true, get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(), get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get()));
                 TestAdvancementTree.A.addRawTracker(this);
                 TestAdvancementTree.B.addRawTracker(this);
                 AdvancementTrees.INSTANCE.initialize(this);
@@ -456,6 +451,18 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
             // Add the player to the world
             world.addPlayer(this);
+            // TODO: Unlock all the recipes for now, mappings between the internal ids and
+            // TODO: the readable ids still has to be made
+            final int[] recipes = new int[435];
+            for (int i = 0; i < recipes.length; i++) {
+                recipes[i] = i;
+            }
+            this.session.send(new MessagePlayOutUnlockRecipes.Add(
+                    get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
+                    get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
+                    new IntArrayList(recipes),
+                    new IntArrayList(recipes),
+                    true));
         } else {
             AdvancementTrees.INSTANCE.removeTracker(this);
             this.session.getServer().removePlayer(this);

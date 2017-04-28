@@ -35,7 +35,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public final class AdvancementTree extends Styleable {
 
     private boolean refresh;
 
-    AdvancementTree(String pluginId, String id, String name, Text title, Text description, ItemType icon, FrameType frameType,
+    AdvancementTree(String pluginId, String id, String name, Text title, Text description, ItemStackSnapshot icon, FrameType frameType,
             String background, @Nullable Advancement rootAdvancement, Vector2i rootPosition) {
         super(pluginId, id, name, title, description, icon, frameType);
         this.background = background;
@@ -394,7 +394,7 @@ public final class AdvancementTree extends Styleable {
         return Object2LongMaps.singleton(formatCriterion0(id), time);
     }
 
-    private MessagePlayOutAdvancements.AdvStruct.Display createDisplay(LocalizedText title, LocalizedText description, ItemType icon,
+    private MessagePlayOutAdvancements.AdvStruct.Display createDisplay(LocalizedText title, LocalizedText description, ItemStackSnapshot icon,
             FrameType frameType, @Nullable String background, int x, int y) {
         return new MessagePlayOutAdvancements.AdvStruct.Display(title, description, icon, frameType, background, x, y);
     }

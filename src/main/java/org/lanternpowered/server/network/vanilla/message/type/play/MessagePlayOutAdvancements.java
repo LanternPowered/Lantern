@@ -32,6 +32,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -140,13 +141,13 @@ public final class MessagePlayOutAdvancements implements Message {
 
             private final LocalizedText title;
             private final LocalizedText description;
-            private final ItemType icon;
+            private final ItemStackSnapshot icon;
             private final FrameType frameType;
             @Nullable private final String background;
             private final int x;
             private final int y;
 
-            public Display(LocalizedText title, LocalizedText description, ItemType icon, FrameType frameType,
+            public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, FrameType frameType,
                     @Nullable String background, int x, int y) {
                 this.description = description;
                 this.background = background;
@@ -165,7 +166,7 @@ public final class MessagePlayOutAdvancements implements Message {
                 return this.title;
             }
 
-            public ItemType getIcon() {
+            public ItemStackSnapshot getIcon() {
                 return this.icon;
             }
 
@@ -189,7 +190,7 @@ public final class MessagePlayOutAdvancements implements Message {
             public String toString() {
                 return MoreObjects.toStringHelper(this)
                         .omitNullValues()
-                        .add("icon", this.icon.getId())
+                        .add("icon", this.icon)
                         .add("title", this.title.getText())
                         .add("description", this.description.getText())
                         .add("frameType", this.frameType.getId())

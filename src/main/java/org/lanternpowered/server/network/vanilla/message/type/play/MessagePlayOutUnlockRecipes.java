@@ -26,32 +26,20 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.util.collect.Lists2;
 
-import java.util.List;
+import java.util.Arrays;
 
-public final class MessagePlayOutUnlockRecipes implements Message {
+public abstract class MessagePlayOutUnlockRecipes implements Message {
 
-    private final boolean notification;
     private final boolean openRecipeBook;
     private final boolean craftingFilter;
-    private final List<Entry> entries;
 
-    public MessagePlayOutUnlockRecipes(List<Entry> entries, boolean notification, boolean openRecipeBook, boolean craftingFilter) {
-        this.entries = ImmutableList.copyOf(entries);
-        this.notification = notification;
+    MessagePlayOutUnlockRecipes(boolean openRecipeBook, boolean craftingFilter) {
         this.openRecipeBook = openRecipeBook;
         this.craftingFilter = craftingFilter;
-    }
-
-    public List<Entry> getEntries() {
-        return this.entries;
-    }
-
-    public boolean isNotification() {
-        return this.notification;
     }
 
     public boolean hasOpenCraftingBook() {
@@ -62,47 +50,69 @@ public final class MessagePlayOutUnlockRecipes implements Message {
         return this.craftingFilter;
     }
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("notification", this.notification)
+    public MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects.toStringHelper(getClass().getSuperclass().getSimpleName() + "." + getClass().getSimpleName())
                 .add("openRecipeBook", this.openRecipeBook)
-                .add("craftingFilter", this.craftingFilter)
-                .add("entries", Lists2.toString(this.entries))
-                .toString();
+                .add("craftingFilter", this.craftingFilter);
     }
 
-    public static final class Entry {
+    @Override
+    public String toString() {
+        return toStringHelper().toString();
+    }
 
-        private final String id;
-        private final boolean unlocked;
-        private final boolean displayed;
+    public final static class Remove extends MessagePlayOutUnlockRecipes {
 
-        public Entry(String id, boolean unlocked, boolean displayed) {
-            this.id = id;
-            this.unlocked = unlocked;
-            this.displayed = displayed;
+        private final IntList recipeIds;
+
+        public Remove(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds) {
+            super(openRecipeBook, craftingFilter);
+            this.recipeIds = IntLists.unmodifiable(recipeIds);
         }
 
-        public String getId() {
-            return this.id;
-        }
-
-        public boolean isUnlocked() {
-            return this.unlocked;
-        }
-
-        public boolean isDisplayed() {
-            return this.displayed;
+        public IntList getRecipeIds() {
+            return this.recipeIds;
         }
 
         @Override
-        public String toString() {
-            return MoreObjects.toStringHelper(this)
-                    .add("id", this.id)
-                    .add("unlocked", this.unlocked)
-                    .add("displayed", this.displayed)
-                    .toString();
+        public MoreObjects.ToStringHelper toStringHelper() {
+            return super.toStringHelper()
+                    .add("recipeIds", Arrays.toString(this.recipeIds.toIntArray()));
+        }
+    }
+
+    public final static class Add extends MessagePlayOutUnlockRecipes {
+
+        private final IntList recipeIds;
+        private final IntList silentRecipeIds;
+        private final boolean notification;
+
+        public Add(boolean openRecipeBook, boolean craftingFilter,
+                IntList recipeIds, IntList silentRecipeIds, boolean notification) {
+            super(openRecipeBook, craftingFilter);
+            this.recipeIds = IntLists.unmodifiable(recipeIds);
+            this.silentRecipeIds = IntLists.unmodifiable(silentRecipeIds);
+            this.notification = notification;
+        }
+
+        public IntList getRecipeIds() {
+            return this.recipeIds;
+        }
+
+        public IntList getSilentRecipeIds() {
+            return this.silentRecipeIds;
+        }
+
+        public boolean hasNotification() {
+            return this.notification;
+        }
+
+        @Override
+        public MoreObjects.ToStringHelper toStringHelper() {
+            return super.toStringHelper()
+                    .add("recipeIds", Arrays.toString(this.recipeIds.toIntArray()))
+                    .add("silentRecipeIds", Arrays.toString(this.silentRecipeIds.toIntArray()))
+                    .add("notification", this.notification);
         }
     }
 }

@@ -27,9 +27,11 @@ package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ResettableBuilder;
 
@@ -38,7 +40,7 @@ public abstract class StyleableBuilder<T extends Styleable, B extends StyleableB
 
     Text title;
     Text description;
-    ItemType icon;
+    ItemStackSnapshot icon;
     FrameType frameType;
 
     /**
@@ -82,7 +84,31 @@ public abstract class StyleableBuilder<T extends Styleable, B extends StyleableB
      * @return This builder, for chaining
      */
     public B icon(ItemType itemType) {
-        this.icon = checkNotNull(itemType, "itemType");
+        this.icon = new LanternItemStack(checkNotNull(itemType, "itemType")).createSnapshot();
+        return (B) this;
+    }
+
+    /**
+     * Sets the icon of the advancement with the
+     * specified {@link ItemStack}.
+     *
+     * @param itemStack The item stack
+     * @return This builder, for chaining
+     */
+    public B icon(ItemStack itemStack) {
+        this.icon = checkNotNull(itemStack, "itemStack").createSnapshot();
+        return (B) this;
+    }
+
+    /**
+     * Sets the icon of the advancement with the
+     * specified {@link ItemStackSnapshot}.
+     *
+     * @param itemStackSnapshot The item stack snapshot
+     * @return This builder, for chaining
+     */
+    public B icon(ItemStackSnapshot itemStackSnapshot) {
+        this.icon = checkNotNull(itemStackSnapshot, "itemStackSnapshot");
         return (B) this;
     }
 
@@ -94,9 +120,8 @@ public abstract class StyleableBuilder<T extends Styleable, B extends StyleableB
      * @return This builder, for chaining
      */
     public B icon(BlockType blockType) {
-        this.icon = checkNotNull(blockType, "blockType").getItem().orElseThrow(
-                () -> new IllegalArgumentException("The block type: " + blockType.getId() + " doesn't have a item type."));
-        return (B) this;
+        return icon(checkNotNull(blockType, "blockType").getItem().orElseThrow(
+                () -> new IllegalArgumentException("The block type: " + blockType.getId() + " doesn't have a item type.")));
     }
 
     @Override
@@ -110,7 +135,7 @@ public abstract class StyleableBuilder<T extends Styleable, B extends StyleableB
 
     @Override
     public B reset() {
-        this.icon = ItemTypes.NONE;
+        this.icon = ItemStackSnapshot.NONE;
         this.frameType = FrameTypes.TASK;
         this.description = Text.EMPTY;
         this.title = null;

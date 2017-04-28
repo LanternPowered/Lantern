@@ -73,7 +73,7 @@ public class LanternMinecraftVersion implements MinecraftVersion {
 
     @Override
     public int compareTo(MinecraftVersion o) {
-        if (this.equals(o) || (this.isLegacy() && o.isLegacy())) {
+        if (equals(o) || (isLegacy() && o.isLegacy())) {
             return 0;
         } else if (this.isLegacy()) {
             return -1;

@@ -27,7 +27,6 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -50,22 +49,18 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
             buf.writeString(struct.getId());
             final Optional<String> optParent = struct.getParentId();
             buf.writeBoolean(optParent.isPresent());
-            if (optParent.isPresent()) {
-                buf.writeString(optParent.get());
-            }
+            optParent.ifPresent(buf::writeString);
             final Optional<MessagePlayOutAdvancements.AdvStruct.Display> optDisplay = struct.getDisplay();
             buf.writeBoolean(optDisplay.isPresent());
             if (optDisplay.isPresent()) {
                 final MessagePlayOutAdvancements.AdvStruct.Display display = optDisplay.get();
                 buf.write(Types.LOCALIZED_TEXT, display.getTitle());
                 buf.write(Types.LOCALIZED_TEXT, display.getDescription());
-                buf.writeVarInt(ItemRegistryModule.get().getInternalId(display.getIcon()));
+                buf.write(Types.ITEM_STACK, display.getIcon().createStack());
                 buf.writeVarInt(display.getFrameType().getInternalId());
                 final Optional<String> optBackground = display.getBackground();
                 buf.writeBoolean(optBackground.isPresent());
-                if (optBackground.isPresent()) {
-                    buf.writeString(optBackground.get());
-                }
+                optBackground.ifPresent(buf::writeString);
                 buf.writeVarInt(display.getX());
                 buf.writeVarInt(display.getY());
             }

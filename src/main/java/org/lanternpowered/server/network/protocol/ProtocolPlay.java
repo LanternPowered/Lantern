@@ -283,6 +283,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
 
+@SuppressWarnings("ALL")
 final class ProtocolPlay extends ProtocolBase {
 
     ProtocolPlay() {
@@ -466,7 +467,10 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutTabListEntries.class, MessagePlayOutTabListEntries.class);
         outbound.bind(CodecPlayOutPlayerPositionAndLook.class, MessagePlayOutPlayerPositionAndLook.class);
         outbound.bind(); // TODO: Use Bed
-        outbound.bind(CodecPlayOutUnlockRecipes.class, MessagePlayOutUnlockRecipes.class);
+        final CodecRegistration<MessagePlayOutUnlockRecipes, CodecPlayOutUnlockRecipes> codecPlayOutUnlockRecipes =
+                outbound.bind(CodecPlayOutUnlockRecipes.class);
+        codecPlayOutUnlockRecipes.bind(MessagePlayOutUnlockRecipes.Add.class);
+        codecPlayOutUnlockRecipes.bind(MessagePlayOutUnlockRecipes.Remove.class);
         outbound.bind(CodecPlayOutDestroyEntities.class, MessagePlayOutDestroyEntities.class);
         outbound.bind(CodecPlayOutRemovePotionEffect.class, MessagePlayOutRemovePotionEffect.class);
         outbound.bind(CodecPlayOutSendResourcePack.class, MessagePlayOutSendResourcePack.class);

@@ -49,7 +49,7 @@ public final class CodecPlayInPrepareCraftingGrid implements Codec<MessagePlayIn
 
     private static List<MessagePlayInPrepareCraftingGrid.SlotUpdate> readUpdates(ByteBuffer buf) {
         final ImmutableList.Builder<MessagePlayInPrepareCraftingGrid.SlotUpdate> builder = ImmutableList.builder();
-        final int count = buf.readByte();
+        final int count = buf.readShort();
         for (int i = 0; i < count; i++) {
             final ItemStack itemStack = buf.read(Types.ITEM_STACK);
             final int craftingSlot = buf.readByte();

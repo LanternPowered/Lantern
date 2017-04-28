@@ -167,6 +167,7 @@ runConfigurations {
 
 jar {
     classifier = 'base'
+    exclude '**/*.max.json'
     from sourceSets.java6.output
     manifest {
         attributes(
@@ -228,6 +229,8 @@ task fastutilJar(type: ShadowJar) {
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectLinkedOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2LongOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntArrayList.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntLists.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/IntOpenHashSet.class'
         filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ObjectOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ShortOpenHashMap.class'
@@ -258,6 +261,7 @@ shadowJar {
     exclude '**/*.java'
     exclude 'Version.java.template'
     exclude 'log4j2_indev.xml'
+    exclude '**/*.max.json'
 
     from fileTree(api.tasks.genEventImpl.outputs.files.first())
 

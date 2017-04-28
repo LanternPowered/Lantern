@@ -40,7 +40,7 @@ public final class CodecPlayInCraftingBookData implements Codec<Message> {
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         final int type = buf.readInteger();
         if (type == 1) {
-            final String id = buf.readString();
+            final int id = buf.readInteger();
             return new MessagePlayInDisplayedRecipe(id);
         } else if (type == 2) {
             final boolean open = buf.readBoolean();

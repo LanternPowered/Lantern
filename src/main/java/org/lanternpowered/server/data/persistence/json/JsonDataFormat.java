@@ -25,16 +25,16 @@
  */
 package org.lanternpowered.server.data.persistence.json;
 
-import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import org.lanternpowered.server.data.persistence.AbstractDataFormat;
+import org.lanternpowered.server.data.persistence.AbstractStringDataFormat;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -43,8 +43,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +54,17 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public class JsonDataFormat extends AbstractDataFormat {
+public class JsonDataFormat extends AbstractStringDataFormat {
 
     public JsonDataFormat(String identifier) {
         super(identifier);
+    }
+
+    @Override
+    public DataContainer readFrom(Reader input) throws InvalidDataException, IOException {
+        try (JsonReader reader = new JsonReader(input)) {
+            return readFrom(reader);
+        }
     }
 
     @Override
@@ -65,19 +74,14 @@ public class JsonDataFormat extends AbstractDataFormat {
         }
     }
 
-    public static DataContainer serialize(Gson gson, Object o) throws IOException {
-        final DataViewJsonWriter writer = new DataViewJsonWriter();
-        gson.toJson(o, o.getClass(), writer);
-        return writer.getResult();
-    }
-
+    @Override
     public DataContainer read(String input) throws IOException {
         try (JsonReader reader = new JsonReader(new StringReader(input))) {
             return readFrom(reader);
         }
     }
 
-    public DataContainer readFrom(JsonReader reader) throws IOException {
+    private DataContainer readFrom(JsonReader reader) throws IOException {
         return createContainer(reader);
     }
 
@@ -158,6 +162,14 @@ public class JsonDataFormat extends AbstractDataFormat {
         }
     }
 
+    @Override
+    public void writeTo(Writer output, DataView data) throws IOException {
+        try (JsonWriter writer = new JsonWriter(output)) {
+            writeView(writer, data);
+        }
+    }
+
+    @Override
     public String write(DataView data) throws IOException {
         final StringWriter writer = new StringWriter();
         try (JsonWriter jsonWriter = new JsonWriter(writer)) {

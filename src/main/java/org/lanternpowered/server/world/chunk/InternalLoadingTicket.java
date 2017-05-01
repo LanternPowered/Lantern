@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.world.World;
 
 final class InternalLoadingTicket implements ChunkLoadingTicket {
 
@@ -49,6 +50,11 @@ final class InternalLoadingTicket implements ChunkLoadingTicket {
     @Override
     public int getMaxNumChunks() {
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public World getWorld() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

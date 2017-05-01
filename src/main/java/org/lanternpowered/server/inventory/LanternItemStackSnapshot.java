@@ -41,6 +41,7 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -88,6 +89,11 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
     @Override
     public int getCount() {
         return this.quantity;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.itemType == ItemTypes.NONE || this.quantity <= 0;
     }
 
     @Override

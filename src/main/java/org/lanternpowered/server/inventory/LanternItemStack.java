@@ -175,6 +175,11 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     }
 
     @Override
+    public boolean isEmpty() {
+        return this.itemType == ItemTypes.NONE || this.quantity <= 0;
+    }
+
+    @Override
     public LanternItemStack copy() {
         //noinspection ConstantConditions
         return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap(), copyRawAdditionalManipulators(ConcurrentHashMap::new));

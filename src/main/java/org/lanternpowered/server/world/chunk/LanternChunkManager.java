@@ -348,6 +348,10 @@ public final class LanternChunkManager {
         this.game = game;
     }
 
+    public LanternWorld getWorld() {
+        return this.world;
+    }
+
     public ChunkIOService getChunkIOService() {
         return this.chunkIOService;
     }

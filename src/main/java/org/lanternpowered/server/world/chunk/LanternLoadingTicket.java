@@ -36,6 +36,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -117,6 +118,11 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     @Override
     public int getMaxNumChunks() {
         return this.maxChunks;
+    }
+
+    @Override
+    public World getWorld() {
+        return this.chunkManager.getWorld();
     }
 
     @Override

@@ -41,7 +41,7 @@ public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends Entity
 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        this.spawn(context, this.entity.get(Keys.HELD_EXPERIENCE).orElse(1));
+        this.spawn(context, this.entity.get(Keys.CONTAINED_EXPERIENCE).orElse(1));
     }
 
     private void spawn(EntityProtocolUpdateContext context, int quantity) {
@@ -54,7 +54,7 @@ public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends Entity
 
     @Override
     protected void update(EntityProtocolUpdateContext context) {
-        final int quantity = this.entity.get(Keys.HELD_EXPERIENCE).orElse(1);
+        final int quantity = this.entity.get(Keys.CONTAINED_EXPERIENCE).orElse(1);
         if (this.lastQuantity != quantity) {
             spawn(context, quantity);
             update0(EntityProtocolUpdateContext.empty());

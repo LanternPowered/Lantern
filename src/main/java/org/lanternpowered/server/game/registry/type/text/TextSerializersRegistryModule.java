@@ -34,7 +34,6 @@ import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.lanternpowered.server.text.PlainTextSerializer;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
-import org.lanternpowered.server.text.xml.XmlTextSerializer;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.serializer.TextSerializer;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
@@ -75,7 +74,6 @@ public final class TextSerializersRegistryModule extends AdditionalPluginCatalog
         register(new FormattingCodeTextSerializer("minecraft", "formatting_code", '&'));
         register(new LanternJsonTextSerializer("minecraft", "json", Lantern.getGame().getRegistry().getRegistryModule(
                 TranslationManagerRegistryModule.class).get().getTranslationManager()));
-        register(new XmlTextSerializer("minecraft", "text_xml"));
     }
 
     @Override

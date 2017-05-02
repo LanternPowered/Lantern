@@ -39,22 +39,17 @@ public final class TextTypeSerializer implements TypeSerializer<Text> {
     public Text deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         final String value0 = value.getString();
         try {
-            // Try to deserialize as xml
-            return TextSerializers.TEXT_XML.deserialize(value0);
-        } catch (TextParseException e0) {
-            try {
-                // Try to deserialize as json
-                return TextSerializers.JSON.deserialize(value0);
-            } catch (TextParseException e1) {
-                // No format is possible, use plain
-                return Text.of(value0);
-            }
+            // Try to deserialize as json
+            return TextSerializers.JSON.deserialize(value0);
+        } catch (TextParseException e) {
+            // No format is possible, use plain
+            return Text.of(value0);
         }
     }
 
     @Override
     public void serialize(TypeToken<?> type, Text obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(TextSerializers.TEXT_XML.serialize(obj));
+        value.setValue(TextSerializers.JSON.serialize(obj));
     }
 
 }

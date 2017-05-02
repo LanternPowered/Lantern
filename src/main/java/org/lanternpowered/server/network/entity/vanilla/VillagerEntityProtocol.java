@@ -41,9 +41,8 @@ public class VillagerEntityProtocol<E extends LanternEntity> extends AgeableEnti
     }
 
     private int getProfessionId() {
-        return ((LanternProfession) this.entity.get(Keys.CAREER).map(Career::getProfession).orElseGet(
-                () -> this.entity.get(Keys.VILLAGER_ZOMBIE_PROFESSION).map(opt -> opt.orElse(Professions.FARMER))
-                        .orElse(Professions.FARMER))).getInternalId();
+        return ((LanternProfession) this.entity.get(Keys.CAREER).map(Career::getProfession)
+                .orElse(Professions.FARMER)).getInternalId();
     }
 
     @Override
@@ -54,13 +53,13 @@ public class VillagerEntityProtocol<E extends LanternEntity> extends AgeableEnti
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
-        parameterList.add(EntityParameters.Villager.PROFESSION, this.getProfessionId());
+        parameterList.add(EntityParameters.Villager.PROFESSION, getProfessionId());
     }
 
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final int profession = this.getProfessionId();
+        final int profession = getProfessionId();
         if (profession != this.lastProfession) {
             parameterList.add(EntityParameters.Villager.PROFESSION, profession);
             this.lastProfession = profession;

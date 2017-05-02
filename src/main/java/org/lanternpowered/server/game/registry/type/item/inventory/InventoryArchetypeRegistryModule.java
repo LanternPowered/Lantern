@@ -57,7 +57,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
     @Override
     public void registerDefaults() {
         final LanternInventoryArchetypeBuilder builder = new LanternInventoryArchetypeBuilder();
-        builder.property(InventoryDimension.PROPERTY_NAM, new InventoryDimension(1, 1));
+        builder.property(InventoryDimension.PROPERTY_NAME, new InventoryDimension(1, 1));
 
         final InventoryArchetype slotArchetype = builder.build("minecraft:slot", "Slot");
         register(slotArchetype);

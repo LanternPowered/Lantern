@@ -43,8 +43,8 @@ public class ZombieVillagerEntityProtocol<E extends LanternEntity> extends Abstr
     }
 
     private int getProfessionId() {
-        return ((LanternProfession) this.entity.get(Keys.VILLAGER_ZOMBIE_PROFESSION).map(opt -> opt.orElse(Professions.FARMER)).orElseGet(
-                () -> this.entity.get(Keys.CAREER).map(Career::getProfession).orElse(Professions.FARMER))).getInternalId();
+        return ((LanternProfession) this.entity.get(Keys.CAREER).map(Career::getProfession)
+                .orElse(Professions.FARMER)).getInternalId();
     }
 
     @Override

@@ -36,12 +36,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.server.data.persistence.SimpleDataTypeSerializerCollection;
 import org.slf4j.Logger;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.ImmutableDataBuilder;
 import org.spongepowered.api.data.ImmutableDataHolder;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -185,20 +187,6 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         return Optional.ofNullable((B) this.immutableDataBuilderMap.get(checkNotNull(holderClass)));
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends DataManipulator<T, I>, I extends ImmutableDataManipulator<I, T>> void register(Class<? extends T> manipulatorClass,
-            Class<? extends I> immutableManipulatorClass, DataManipulatorBuilder<T, I> builder) {
-        checkState(allowRegistrations, "Registrations are no longer allowed!");
-        if (!this.builderMap.containsKey(checkNotNull(manipulatorClass))) {
-            this.builderMap.put(manipulatorClass, checkNotNull(builder));
-            this.immutableBuilderMap.put(checkNotNull(immutableManipulatorClass), builder);
-            registerBuilder((Class<T>) manipulatorClass, builder);
-        } else {
-            throw new IllegalStateException("Already registered the DataUtil for " + manipulatorClass.getCanonicalName());
-        }
-    }
-
     @Override
     public void registerLegacyManipulatorIds(String legacyId, DataRegistration<?, ?> registration) {
         // TODO
@@ -237,5 +225,15 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
     public Collection<Class<? extends DataManipulator<?, ?>>> getAllRegistrationsFor(PluginContainer container) {
         // TODO
         return Collections.emptyList();
+    }
+
+    @Override
+    public DataContainer createContainer() {
+        return new MemoryDataContainer();
+    }
+
+    @Override
+    public DataContainer createContainer(DataView.SafetyMode safety) {
+        return new MemoryDataContainer(safety);
     }
 }

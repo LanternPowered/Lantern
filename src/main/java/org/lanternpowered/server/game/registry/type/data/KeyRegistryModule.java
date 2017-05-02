@@ -63,7 +63,6 @@ import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
-import org.spongepowered.api.data.type.HorseVariant;
 import org.spongepowered.api.data.type.LlamaVariant;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
@@ -80,7 +79,6 @@ import org.spongepowered.api.data.type.RailDirection;
 import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.ShrubType;
-import org.spongepowered.api.data.type.SkeletonType;
 import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.StairShape;
@@ -88,7 +86,6 @@ import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.data.type.WireAttachmentType;
-import org.spongepowered.api.data.type.ZombieType;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityArchetype;
@@ -225,7 +222,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Double.class, of("Health"), "sponge:health"));
         register(makeMutableBoundedValueKey(Double.class, of("HealthScale"), "sponge:health_scale"));
         register(makeMutableBoundedValueKey(Float.class, of("Height"), "sponge:height"));
-        register(makeMutableBoundedValueKey(Integer.class, of("HeldExperience"), "sponge:held_experience"));
         register(makeValueKey(Boolean.class, of("HideAttributes"), "sponge:hide_attributes"));
         register(makeValueKey(Boolean.class, of("HideCanDestroy"), "sponge:hide_can_destroy"));
         register(makeValueKey(Boolean.class, of("HideCanPlace"), "sponge:hide_can_place"));
@@ -235,7 +231,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Hinge.class, of("HingePosition"), "sponge:hinge_position"));
         register(makeValueKey(HorseColor.class, of("HorseColor"), "sponge:horse_color"));
         register(makeValueKey(HorseStyle.class, of("HorseStyle"), "sponge:horse_style"));
-        register(makeValueKey(HorseVariant.class, of("HorseVariant"), "sponge:horse_variant"));
         register(makeValueKey(Boolean.class, of("InfiniteDespawnDelay"), "sponge:infinite_despawn_delay"));
         register(makeValueKey(Boolean.class, of("InfinitePickupDelay"), "sponge:infinite_pickup_delay"));
         register(makeValueKey(Boolean.class, of("InvisibilityIgnoresCollision"), "sponge:invisibility_ignores_collision"));
@@ -319,7 +314,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("ShouldDrop"), "sponge:should_drop"));
         register(makeValueKey(ShrubType.class, of("ShrubType"), "sponge:shrub_type"));
         register(makeListKey(Text.class, of("SignLines"), "sponge:sign_lines"));
-        register(makeValueKey(SkeletonType.class, of("SkeletonType"), "sponge:skeleton_type"));
         register(makeValueKey(UUID.class, of("SkinUniqueId"), "sponge:skin_unique_id"));
         register(makeValueKey(SkullType.class, of("SkullType"), "sponge:skull_type"));
         register(makeValueKey(SlabType.class, of("SlabType"), "sponge:slab_type"));
@@ -364,7 +358,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(WireAttachmentType.class, of("WireAttachmentNorth"), "sponge:wire_attachment_north"));
         register(makeValueKey(WireAttachmentType.class, of("WireAttachmentSouth"), "sponge:wire_attachment_south"));
         register(makeValueKey(WireAttachmentType.class, of("WireAttachmentWest"), "sponge:wire_attachment_west"));
-        register(makeValueKey(ZombieType.class, of("ZombieType"), "sponge:zombie_type"));
 
         // Register the lantern keys
         for (Field field : LanternKeys.class.getFields()) {

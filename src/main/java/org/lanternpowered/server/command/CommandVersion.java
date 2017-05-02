@@ -45,13 +45,13 @@ public final class CommandVersion extends CommandProvider {
         specBuilder
                 .description(t("commands.version.description"))
                 .executor((src, args) -> {
-                    PluginContainer plugin = Lantern.getMinecraftPlugin();
+                    final Platform platform = Lantern.getGame().getPlatform();
+                    PluginContainer plugin = platform.getContainer(Platform.Component.GAME);
                     src.sendMessage(t("commands.version.minecraft", plugin.getVersion(),
                             LanternMinecraftVersion.CURRENT.getProtocol()));
-                    Platform platform = Lantern.getGame().getPlatform();
-                    plugin = platform.getImplementation();
+                    plugin = platform.getContainer(Platform.Component.IMPLEMENTATION);
                     src.sendMessage(t("commands.version.implementation", plugin.getName(), plugin.getVersion()));
-                    plugin = platform.getApi();
+                    plugin = platform.getContainer(Platform.Component.API);
                     src.sendMessage(t("commands.version.api", plugin.getName(), plugin.getVersion()));
                     return CommandResult.success();
                 });

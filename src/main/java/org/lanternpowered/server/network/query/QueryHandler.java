@@ -47,8 +47,6 @@
  */
 package org.lanternpowered.server.network.query;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -67,7 +65,9 @@ import org.spongepowered.api.world.World;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,14 +107,14 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-        ByteBuf buf = msg.content();
+        final ByteBuf buf = msg.content();
         if (buf.readableBytes() < 7) {
             return;
         }
 
-        int magic = buf.readUnsignedShort();
-        byte type = buf.readByte();
-        int sessionId = buf.readInt();
+        final int magic = buf.readUnsignedShort();
+        final byte type = buf.readByte();
+        final int sessionId = buf.readInt();
 
         if (magic != 0xFEFD) {
             return;
@@ -126,7 +126,7 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
             if (buf.readableBytes() < 4) {
                 return;
             }
-            int token = buf.readInt();
+            final int token = buf.readInt();
             if (this.queryServer.verifyChallengeToken(msg.sender(), token)) {
                 if (buf.readableBytes() == 4) {
                     this.handleFullStats(ctx, msg, sessionId);
@@ -172,23 +172,28 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     }
 
     private void handleFullStats(ChannelHandlerContext ctx, DatagramPacket packet, int sessionId) {
-        LanternGame game = this.queryServer.getGame();
-        Platform platform = game.getPlatform();
+        final LanternGame game = this.queryServer.getGame();
+        final LanternServer server = game.getServer();
+        final Platform platform = game.getPlatform();
+
+        final PluginContainer api = platform.getContainer(Platform.Component.API);
+        final PluginContainer impl = platform.getContainer(Platform.Component.IMPLEMENTATION);
+        final PluginContainer mc = platform.getContainer(Platform.Component.GAME);
 
         final StringBuilder plugins = new StringBuilder()
-                .append(platform.getImplementation().getName())
+                .append(impl.getName())
                 .append(" ")
-                .append(platform.getImplementation().getVersion())
+                .append(impl.getVersion())
                 .append(" on ")
-                .append(platform.getApi().getName())
+                .append(api.getName())
                 .append(" ")
-                .append(platform.getApi().getVersion());
+                .append(api.getVersion());
 
         if (this.showPlugins) {
-            final List<PluginContainer> containers = Lists.newArrayList(game.getPluginManager().getPlugins());
-            containers.remove(platform.getApi());
-            containers.remove(platform.getImplementation());
-            containers.remove(game.getMinecraftPlugin());
+            final List<PluginContainer> containers = new ArrayList<>(game.getPluginManager().getPlugins());
+            containers.remove(api);
+            containers.remove(impl);
+            containers.remove(mc);
 
             char delim = ':';
             for (PluginContainer plugin : containers) {
@@ -197,12 +202,14 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
             }
         }
 
-        final QueryServerEvent.Full event = SpongeEventFactory.createQueryServerEventFull(
-                Cause.source(ctx.channel().remoteAddress()).build(), (InetSocketAddress) ctx.channel().localAddress(), Maps.newHashMap(),
-                "MINECRAFT", "SMP", this.getWorldName(), game.getServer().getMotd().toPlain(), game.getServer().getOnlinePlayers()
-                .stream().map(CommandSource::getName).collect(Collectors.toList()), plugins.toString(),
-                game.getMinecraftPlugin().getVersion().orElse("unknown"),
-                game.getServer().getMaxPlayers(), Integer.MAX_VALUE, game.getServer().getOnlinePlayers().size(), 0);
+        final List<String> playerNames = server.getOnlinePlayers()
+                .stream().map(CommandSource::getName).collect(Collectors.toList());
+        final Cause cause = Cause.source(ctx.channel().remoteAddress()).build();
+
+        final QueryServerEvent.Full event = SpongeEventFactory.createQueryServerEventFull(cause,
+                (InetSocketAddress) ctx.channel().localAddress(), new HashMap<>(),
+                "MINECRAFT", "SMP", getWorldName(), server.getMotd().toPlain(), playerNames, plugins.toString(),
+                mc.getVersion().orElse("unknown"), server.getMaxPlayers(), Integer.MAX_VALUE, playerNames.size(), 0);
         final InetSocketAddress address = event.getAddress();
 
         final Map<String, Object> data = new LinkedHashMap<>();
@@ -219,7 +226,7 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         event.getCustomValuesMap().entrySet().stream().filter(entry -> !data.containsKey(entry.getKey()))
                 .forEach(entry -> data.put(entry.getKey(), entry.getValue()));
 
-        ByteBuf buf = ctx.alloc().buffer();
+        final ByteBuf buf = ctx.alloc().buffer();
         buf.writeByte(ACTION_STATS);
         buf.writeInt(sessionId);
         // constant: splitnum\x00\x80\x00

@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector2d;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
@@ -316,7 +317,7 @@ public final class AdvancementTree extends Styleable {
                     getIcon(), getFrameType(), this.background,
                     this.rootPosition.getX() + this.xOffset,
                     this.rootPosition.getY() + this.yOffset,
-                    doesShowToast())));
+                    doesShowToast()), Collections.singletonList(Collections.singletonList(AdvancementCriterion.DUMMY))));
         }
 
         if (!advancements.isEmpty()) {
@@ -341,6 +342,15 @@ public final class AdvancementTree extends Styleable {
                 } else {
                     parentId = rootId;
                 }
+                final List<List<String>> criteria;
+                if (!advancement.getCriteria().isEmpty()) {
+                    criteria = new ArrayList<>();
+                    for (List<AdvancementCriterion> list : advancement.getCriteria()) {
+                        criteria.add(list.stream().map(c -> c.id).collect(Collectors.toList()));
+                    }
+                } else {
+                    criteria = Collections.singletonList(Collections.singletonList(AdvancementCriterion.DUMMY));
+                }
 
                 final Vector2d pos = this.advancements.get(advancement);
                 addedStructs.add(createStruct(id, parentId, createDisplay(
@@ -348,7 +358,7 @@ public final class AdvancementTree extends Styleable {
                         new LocalizedText(advancement.getDescription(), locale),
                         advancement.getIcon(), advancement.getFrameType(), null,
                         pos.getX() + this.xOffset, pos.getY() + this.yOffset,
-                        advancement.doesShowToast())));
+                        advancement.doesShowToast()), criteria));
             }
         }
 
@@ -372,18 +382,25 @@ public final class AdvancementTree extends Styleable {
         if (this.rootAdvancement == null && (state == INITIALIZE || state == REFRESH)) {
             progressMap = new HashMap<>();
             final String rootId = formatId0(ROOT_ADVANCEMENT);
-            progressMap.put(rootId, createProgress(rootId, System.currentTimeMillis()));
+            progressMap.put(rootId, Object2LongMaps.singleton(AdvancementCriterion.DUMMY, System.currentTimeMillis()));
         }
 
         for (Advancement advancement : this.advancements.keySet()) {
             final AdvancementProgress progress1 = progress.getOrNull(advancement);
             if (progress1 != null && (state == INITIALIZE || state == REFRESH || progress1.isDirty())) {
-                final long achieveTime = progress1.getAchieveTime();
                 if (progressMap == null) {
                     progressMap = new HashMap<>();
                 }
-                final String id = formatId0(advancement.getId());
-                progressMap.put(id, createProgress(id, achieveTime));
+                final Object2LongMap<String> entries;
+                if (!advancement.getCriteria().isEmpty()) {
+                    entries = new Object2LongOpenHashMap<>();
+                    for (AdvancementCriterion criterion : progress1.getDirtyCriteria()) {
+                        entries.put(criterion.id, progress1.getOrInvalid(criterion));
+                    }
+                } else {
+                    entries = Object2LongMaps.singleton(AdvancementCriterion.DUMMY, progress1.getAchieveTime());
+                }
+                progressMap.put(formatId0(advancement.getId()), entries);
             }
         }
         return advancementsData == null && progressMap == null ? null : new MessagePlayOutAdvancements(false,
@@ -392,20 +409,15 @@ public final class AdvancementTree extends Styleable {
                 progressMap == null ? Collections.emptyMap() : progressMap);
     }
 
-    private Object2LongMap<String> createProgress(String id, long time) {
-        return Object2LongMaps.singleton(formatCriterion0(id), time);
-    }
-
     private MessagePlayOutAdvancements.AdvStruct.Display createDisplay(LocalizedText title, LocalizedText description, ItemStackSnapshot icon,
             FrameType frameType, @Nullable String background, double x, double y, boolean showToast) {
         return new MessagePlayOutAdvancements.AdvStruct.Display(title, description, icon, frameType, background, x, y, showToast);
     }
 
     private MessagePlayOutAdvancements.AdvStruct createStruct(String id, @Nullable String parentId,
-            @Nullable MessagePlayOutAdvancements.AdvStruct.Display display) {
-        final String criterion = formatCriterion0(id);
-        final List<String> criteria = Collections.singletonList(criterion);
-        final List<List<String>> requirements = Collections.singletonList(criteria);
-        return new MessagePlayOutAdvancements.AdvStruct(id, parentId, display, criteria, requirements);
+            @Nullable MessagePlayOutAdvancements.AdvStruct.Display display, List<List<String>> criteria) {
+        final List<String> criteria1 = new ArrayList<>();
+        criteria.forEach(criteria1::addAll);
+        return new MessagePlayOutAdvancements.AdvStruct(id, parentId, display, criteria1, criteria);
     }
 }

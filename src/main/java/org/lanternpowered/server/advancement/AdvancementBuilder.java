@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -51,6 +52,20 @@ public final class AdvancementBuilder extends StyleableBuilder<Advancement, Adva
      */
     public AdvancementBuilder parent(Advancement parent) {
         this.parent = checkNotNull(parent, "parent");
+        return this;
+    }
+
+    public AdvancementBuilder criteria(AdvancementCriterion... criteria) {
+        checkNotNull(criteria, "criteria");
+        this.criteria.add(Arrays.asList(criteria));
+        return this;
+    }
+
+    public AdvancementBuilder criteria(AdvancementCriterion[][] criteria) {
+        checkNotNull(criteria, "criteria");
+        for (AdvancementCriterion[] criteria1 : criteria) {
+            criteria(criteria1);
+        }
         return this;
     }
 

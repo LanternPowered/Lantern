@@ -30,8 +30,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.OptionalLong;
+import java.util.Set;
 
 public final class AdvancementProgress {
 
@@ -39,10 +41,9 @@ public final class AdvancementProgress {
 
     private final Advancement advancement;
     private final Object2LongMap<AdvancementCriterion> progress = new Object2LongOpenHashMap<>();
+    private final Set<AdvancementCriterion> dirtyCriterion = new HashSet<>();
 
     private long achieveTime = INVALID_TIME;
-
-    private boolean dirty;
 
     public AdvancementProgress(Advancement advancement) {
         this.advancement = advancement;
@@ -50,11 +51,19 @@ public final class AdvancementProgress {
     }
 
     boolean isDirty() {
-        return this.dirty;
+        return !this.dirtyCriterion.isEmpty();
     }
 
     void clearDirty() {
-        this.dirty = false;
+        this.dirtyCriterion.clear();
+    }
+
+    Set<AdvancementCriterion> getDirtyCriteria() {
+        return this.dirtyCriterion;
+    }
+
+    long getOrInvalid(AdvancementCriterion criterion) {
+        return this.progress.getLong(criterion);
     }
 
     /**
@@ -95,9 +104,6 @@ public final class AdvancementProgress {
         if (this.advancement.getCriteria().isEmpty()) {
             achieved = true;
         }
-        if (achieved != isAchieved()) {
-            this.dirty = true;
-        }
         if (achieved) {
             this.achieveTime = time;
         } else {
@@ -125,12 +131,14 @@ public final class AdvancementProgress {
         }
         final long achieveTime = System.currentTimeMillis();
         for (List<AdvancementCriterion> criteria : this.advancement.getCriteria()) {
+            //noinspection Convert2streamapi
             for (AdvancementCriterion criterion : criteria) {
-                this.progress.putIfAbsent(criterion, achieveTime);
+                if (this.progress.putIfAbsent(criterion, achieveTime) == null) {
+                    this.dirtyCriterion.add(criterion);
+                }
             }
         }
         this.achieveTime = achieveTime;
-        this.dirty = true;
         return achieveTime;
     }
 
@@ -146,10 +154,11 @@ public final class AdvancementProgress {
         if (!this.advancement.getAdvancementCriteria0().contains(criterion)) {
             return INVALID_TIME;
         }
-        long time = this.progress.get(criterion);
+        long time = this.progress.getLong(criterion);
         if (time == INVALID_TIME) {
             time = System.currentTimeMillis();
             this.progress.put(criterion, time);
+            this.dirtyCriterion.add(criterion);
             if (!isAchieved()) {
                 updateAchievedState(time);
             }
@@ -167,6 +176,7 @@ public final class AdvancementProgress {
         final long time = this.progress.getLong(criterion);
         if (time != INVALID_TIME) {
             this.progress.remove(criterion);
+            this.dirtyCriterion.add(criterion);
             if (isAchieved()) {
                 updateAchievedState(this.achieveTime);
             }

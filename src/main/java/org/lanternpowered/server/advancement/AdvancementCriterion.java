@@ -25,11 +25,23 @@
  */
 package org.lanternpowered.server.advancement;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public final class AdvancementCriterion extends SimpleCatalogType.Base {
+/**
+ * Represents a criterion that should be acquired
+ * to unlock a {@link Advancement}.
+ */
+public class AdvancementCriterion {
 
-    public AdvancementCriterion(String identifier) {
-        super(identifier);
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+    static final String DUMMY = newIdentifier();
+
+    private static String newIdentifier() {
+        return Integer.toUnsignedString(COUNTER.getAndIncrement(), 36);
     }
+
+    /**
+     * The identifier that is used to send the advancement progress to the client.
+     */
+    final String id = newIdentifier();
 }

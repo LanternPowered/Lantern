@@ -422,6 +422,12 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 TestAdvancementTree.A.addRawTracker(this);
                 TestAdvancementTree.B.addRawTracker(this);
                 AdvancementTrees.INSTANCE.initialize(this);
+                getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
+                        .achieve(TestAdvancementTree.DIG_DIRT_CRITERIA[0]);
+                getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
+                        .achieve(TestAdvancementTree.DIG_DIRT_CRITERIA[1]);
+                getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
+                        .achieve(TestAdvancementTree.DIG_DIRT_CRITERIA[2]);
             } else {
                 //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {

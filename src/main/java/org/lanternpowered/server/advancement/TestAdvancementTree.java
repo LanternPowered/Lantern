@@ -33,6 +33,9 @@ public final class TestAdvancementTree {
     public static final AdvancementTree A;
     public static final AdvancementTree B;
 
+    public static final Advancement DIG_DIRT;
+    public static final AdvancementCriterion[] DIG_DIRT_CRITERIA;
+
     static {
         A = AdvancementTree.builder()
                 .title(Text.of("Rule!"))
@@ -58,14 +61,19 @@ public final class TestAdvancementTree {
                 .icon(ItemTypes.IRON_PICKAXE)
                 .background("minecraft:textures/blocks/dirt.png")
                 .build("test", "digger");
-        final Advancement digDirt = Advancement.builder()
+        DIG_DIRT_CRITERIA = new AdvancementCriterion[5];
+        for (int i = 0; i < DIG_DIRT_CRITERIA.length; i++) {
+            DIG_DIRT_CRITERIA[i] = new AdvancementCriterion();
+        }
+        DIG_DIRT = Advancement.builder()
                 .parent(becomeKing)
                 .icon(ItemTypes.DIRT)
                 .title(Text.of("Dig Dirt"))
-                .description(Text.of("Dig a more then 100 dirt blocks."))
+                .description(Text.of("Dig 5 dirt blocks."))
+                .criteria(DIG_DIRT_CRITERIA)
                 .build("test", "dig_dirt");
         final Advancement dirtLover = Advancement.builder()
-                .parent(digDirt)
+                .parent(DIG_DIRT)
                 .icon(ItemTypes.DIRT)
                 .frameType(FrameTypes.GOAL)
                 .title(Text.of("Dirt Lover"))
@@ -78,7 +86,7 @@ public final class TestAdvancementTree {
                 .title(Text.of("Is it edible?"))
                 .description(Text.of("Attempt to cook dirt."))
                 .build("test", "cooking_dirt");
-        B.addAdvancement(1, 1, digDirt);
+        B.addAdvancement(1, 1, DIG_DIRT);
         B.addAdvancement(2, 1, dirtLover);
         B.addAdvancement(2, 2, wanderingChallenge);
     }

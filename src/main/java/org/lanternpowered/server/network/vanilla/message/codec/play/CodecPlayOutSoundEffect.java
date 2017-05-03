@@ -38,9 +38,8 @@ public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundE
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSoundEffect message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVarInt(((LanternSoundCategory) message.getCategory()).getInternalId());
         buf.writeVarInt(message.getType());
-        buf.writeString(message.getParrotedEntityType().orElse(""));
+        buf.writeVarInt(((LanternSoundCategory) message.getCategory()).getInternalId());
         final Vector3d pos = message.getPosition();
         buf.writeInteger((int) (pos.getX() * 8.0));
         buf.writeInteger((int) (pos.getY() * 8.0));

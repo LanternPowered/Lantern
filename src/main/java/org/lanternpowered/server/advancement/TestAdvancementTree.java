@@ -67,7 +67,7 @@ public final class TestAdvancementTree {
         final Advancement dirtLover = Advancement.builder()
                 .parent(digDirt)
                 .icon(ItemTypes.DIRT)
-                .frameType(FrameTypes.CHALLENGE)
+                .frameType(FrameTypes.GOAL)
                 .title(Text.of("Dirt Lover"))
                 .description(Text.of("Dig a more then 1000 dirt blocks."))
                 .build("test", "dirt_lover");

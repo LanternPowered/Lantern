@@ -37,9 +37,10 @@ public abstract class Styleable extends PluginCatalogType.Base {
     private final Text description;
     private final ItemStackSnapshot icon;
     private final FrameType frameType;
+    private final boolean showToast;
 
     Styleable(String pluginId, String id, String name, Text title, Text description,
-            ItemStackSnapshot icon, FrameType frameType) {
+            ItemStackSnapshot icon, FrameType frameType, boolean showToast) {
         super(pluginId, id, name);
         checkNotNull(title, "title");
         checkNotNull(description, "description");
@@ -47,6 +48,7 @@ public abstract class Styleable extends PluginCatalogType.Base {
         checkNotNull(frameType, "frameType");
         this.description = description;
         this.frameType = frameType;
+        this.showToast = showToast;
         this.title = title;
         this.icon = icon;
     }
@@ -87,4 +89,13 @@ public abstract class Styleable extends PluginCatalogType.Base {
         return this.title;
     }
 
+    /**
+     * Gets whether a toast should be shown. This is the notification
+     * that will be displayed in the top right corner.
+     *
+     * @return Show toast
+     */
+    public boolean doesShowToast() {
+        return this.showToast;
+    }
 }

@@ -34,15 +34,7 @@ import javax.annotation.Nullable;
 
 public final class MessagePlayOutSoundEffect extends MessagePlayOutSoundEffectBase<Integer> {
 
-    @Nullable private final String parrotedEntityType;
-
-    public MessagePlayOutSoundEffect(int type, Vector3d position, SoundCategory category, float volume, float pitch,
-            @Nullable String parrotedEntityType) {
+    public MessagePlayOutSoundEffect(int type, Vector3d position, SoundCategory category, float volume, float pitch) {
         super(type, position, category, volume, pitch);
-        this.parrotedEntityType = parrotedEntityType;
-    }
-
-    public Optional<String> getParrotedEntityType() {
-        return Optional.ofNullable(this.parrotedEntityType);
     }
 }

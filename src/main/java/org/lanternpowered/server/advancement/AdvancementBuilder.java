@@ -68,8 +68,9 @@ public final class AdvancementBuilder extends StyleableBuilder<Advancement, Adva
         checkArgument(this.title != null, "The title must be set");
         //noinspection ConstantConditions
         checkArgument(this.description != null, "The description must be set");
+        final boolean showToast = this.showToast == null ? true : this.showToast;
         return new Advancement(pluginId, id, this.title.toPlain(), this.parent, this.criteria,
-                this.title, this.description, this.icon, this.frameType);
+                this.title, this.description, this.icon, this.frameType, showToast);
     }
 
     @Override

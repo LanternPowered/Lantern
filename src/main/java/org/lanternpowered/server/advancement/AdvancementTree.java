@@ -28,7 +28,7 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector2d;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -60,7 +60,7 @@ public final class AdvancementTree extends Styleable {
     private static final String ROOT_ADVANCEMENT = "root:root";
     private static final AtomicInteger TREE_COUNTER = new AtomicInteger();
 
-    private final Map<Advancement, Vector2i> advancements = new HashMap<>();
+    private final Map<Advancement, Vector2d> advancements = new HashMap<>();
     private final int internalId;
 
     private final String background;
@@ -74,16 +74,16 @@ public final class AdvancementTree extends Styleable {
     private final List<LanternPlayer> addedTrackers = new ArrayList<>();
 
     @Nullable private final Advancement rootAdvancement;
-    private final Vector2i rootPosition;
+    private final Vector2d rootPosition;
 
-    private int xOffset;
-    private int yOffset;
+    private double xOffset;
+    private double yOffset;
 
     private boolean refresh;
 
     AdvancementTree(String pluginId, String id, String name, Text title, Text description, ItemStackSnapshot icon, FrameType frameType,
-            String background, @Nullable Advancement rootAdvancement, Vector2i rootPosition) {
-        super(pluginId, id, name, title, description, icon, frameType);
+            String background, @Nullable Advancement rootAdvancement, Vector2d rootPosition, boolean showToast) {
+        super(pluginId, id, name, title, description, icon, frameType, showToast);
         this.background = background;
         this.rootAdvancement = rootAdvancement;
         this.rootPosition = rootPosition;
@@ -179,24 +179,24 @@ public final class AdvancementTree extends Styleable {
      * @param y The y coordinate
      * @param advancement The advancement
      */
-    public void addAdvancement(int x, int y, Advancement advancement) {
+    public void addAdvancement(double x, double y, Advancement advancement) {
         checkNotNull(advancement, "advancement");
         checkArgument(!this.advancements.containsKey(advancement), "The advancement %s is already present in this tree", advancement.getId());
         if (x < 0) {
-            final int x1 = Math.abs(x);
+            final double x1 = Math.abs(x);
             if (x1 > this.xOffset) {
                 this.refresh = true;
                 this.xOffset = x1;
             }
         }
         if (y < 0) {
-            final int y1 = Math.abs(y);
+            final double y1 = Math.abs(y);
             if (y1 > this.yOffset) {
                 this.refresh = true;
                 this.yOffset = y1;
             }
         }
-        this.advancements.put(advancement, new Vector2i(x, y));
+        this.advancements.put(advancement, new Vector2d(x, y));
         this.addedAdvancements.add(advancement);
     }
 
@@ -207,15 +207,15 @@ public final class AdvancementTree extends Styleable {
      */
     public void removeAdvancement(Advancement advancement) {
         checkNotNull(advancement, "advancement");
-        final Vector2i position = this.advancements.remove(advancement);
+        final Vector2d position = this.advancements.remove(advancement);
         if (position != null) {
             this.removedAdvancements.add(advancement);
             if (position.getX() < 0 || position.getY() < 0) {
-                int xOffset = 0;
-                int yOffset = 0;
-                for (Vector2i pos : this.advancements.values()) {
-                    final int x = pos.getX();
-                    final int y = pos.getY();
+                double xOffset = 0;
+                double yOffset = 0;
+                for (Vector2d pos : this.advancements.values()) {
+                    final double x = pos.getX();
+                    final double y = pos.getY();
                     if (x < 0) {
                         xOffset = Math.max(Math.abs(x), this.xOffset);
                     }
@@ -315,7 +315,8 @@ public final class AdvancementTree extends Styleable {
                     new LocalizedText(getDescription(), Locale.ENGLISH),
                     getIcon(), getFrameType(), this.background,
                     this.rootPosition.getX() + this.xOffset,
-                    this.rootPosition.getY() + this.yOffset)));
+                    this.rootPosition.getY() + this.yOffset,
+                    doesShowToast())));
         }
 
         if (!advancements.isEmpty()) {
@@ -341,12 +342,13 @@ public final class AdvancementTree extends Styleable {
                     parentId = rootId;
                 }
 
-                final Vector2i pos = this.advancements.get(advancement);
+                final Vector2d pos = this.advancements.get(advancement);
                 addedStructs.add(createStruct(id, parentId, createDisplay(
                         new LocalizedText(advancement.getTitle(), locale),
                         new LocalizedText(advancement.getDescription(), locale),
                         advancement.getIcon(), advancement.getFrameType(), null,
-                        pos.getX() + this.xOffset, pos.getY() + this.yOffset)));
+                        pos.getX() + this.xOffset, pos.getY() + this.yOffset,
+                        advancement.doesShowToast())));
             }
         }
 
@@ -395,8 +397,8 @@ public final class AdvancementTree extends Styleable {
     }
 
     private MessagePlayOutAdvancements.AdvStruct.Display createDisplay(LocalizedText title, LocalizedText description, ItemStackSnapshot icon,
-            FrameType frameType, @Nullable String background, int x, int y) {
-        return new MessagePlayOutAdvancements.AdvStruct.Display(title, description, icon, frameType, background, x, y);
+            FrameType frameType, @Nullable String background, double x, double y, boolean showToast) {
+        return new MessagePlayOutAdvancements.AdvStruct.Display(title, description, icon, frameType, background, x, y, showToast);
     }
 
     private MessagePlayOutAdvancements.AdvStruct createStruct(String id, @Nullable String parentId,

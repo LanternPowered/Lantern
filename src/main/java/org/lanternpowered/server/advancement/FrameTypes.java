@@ -32,6 +32,8 @@ public final class FrameTypes {
 
     public static final FrameType CHALLENGE = new FrameType("minecraft", "challenge", 1);
 
+    public static final FrameType GOAL = new FrameType("minecraft", "goal", 2);
+
     public static final FrameType TASK = new FrameType("minecraft", "task", 0);
 
     private FrameTypes() {

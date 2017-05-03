@@ -28,7 +28,7 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector2d;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 
@@ -42,7 +42,7 @@ public final class AdvancementTreeBuilder extends StyleableBuilder<AdvancementTr
     public static final String DEFAULT_BACKGROUND = "minecraft:textures/gui/advancements/backgrounds/stone.png";
 
     @Nullable private Advancement rootAdvancement;
-    private Vector2i position;
+    private Vector2d position;
     private String background;
 
     AdvancementTreeBuilder() {
@@ -66,12 +66,12 @@ public final class AdvancementTreeBuilder extends StyleableBuilder<AdvancementTr
     /**
      * Sets the position of the root advancement or icon.
      * <p>
-     * Defaults to {@link Vector2i#ZERO}.
+     * Defaults to {@link Vector2d#ZERO}.
      *
      * @param position The position
      * @return This advancement tree builder, for chaining
      */
-    public AdvancementTreeBuilder rootPosition(Vector2i position) {
+    public AdvancementTreeBuilder rootPosition(Vector2d position) {
         checkNotNull(this.position, "position");
         this.position = position;
         return this;
@@ -100,6 +100,7 @@ public final class AdvancementTreeBuilder extends StyleableBuilder<AdvancementTr
         final Text description;
         final ItemStackSnapshot icon;
         final FrameType frameType;
+        final boolean showToast;
         if (this.rootAdvancement == null) {
             //noinspection ConstantConditions
             checkArgument(this.title != null, "The title must be set");
@@ -107,14 +108,16 @@ public final class AdvancementTreeBuilder extends StyleableBuilder<AdvancementTr
             description = this.description;
             icon = this.icon;
             frameType = this.frameType;
+            showToast = this.showToast == null ? false : this.showToast;
         } else {
             title = this.rootAdvancement.getTitle();
             description = this.rootAdvancement.getDescription();
             icon = this.rootAdvancement.getIcon();
             frameType = this.rootAdvancement.getFrameType();
+            showToast = this.showToast == null ? true : this.showToast;
         }
         return new AdvancementTree(pluginId, id, title.toPlain(), title, description, icon, frameType,
-                this.background, this.rootAdvancement, this.position);
+                this.background, this.rootAdvancement, this.position, showToast);
     }
 
     @Override
@@ -129,7 +132,7 @@ public final class AdvancementTreeBuilder extends StyleableBuilder<AdvancementTr
     public AdvancementTreeBuilder reset() {
         super.reset();
         this.rootAdvancement = null;
-        this.position = Vector2i.ZERO;
+        this.position = Vector2d.ZERO;
         this.background = DEFAULT_BACKGROUND;
         return this;
     }

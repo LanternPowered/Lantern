@@ -31,7 +31,6 @@ import org.lanternpowered.server.advancement.FrameType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.util.collect.Lists2;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Arrays;
@@ -144,14 +143,16 @@ public final class MessagePlayOutAdvancements implements Message {
             private final ItemStackSnapshot icon;
             private final FrameType frameType;
             @Nullable private final String background;
-            private final int x;
-            private final int y;
+            private final double x;
+            private final double y;
+            private final boolean showToast;
 
             public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, FrameType frameType,
-                    @Nullable String background, int x, int y) {
+                    @Nullable String background, double x, double y, boolean showToast) {
                 this.description = description;
                 this.background = background;
                 this.frameType = frameType;
+                this.showToast = showToast;
                 this.title = title;
                 this.icon = icon;
                 this.x = x;
@@ -178,12 +179,16 @@ public final class MessagePlayOutAdvancements implements Message {
                 return Optional.ofNullable(this.background);
             }
 
-            public int getX() {
+            public double getX() {
                 return this.x;
             }
 
-            public int getY() {
+            public double getY() {
                 return this.y;
+            }
+
+            public boolean doesShowToast() {
+                return this.showToast;
             }
 
             @Override
@@ -195,6 +200,7 @@ public final class MessagePlayOutAdvancements implements Message {
                         .add("description", this.description.getText())
                         .add("frameType", this.frameType.getId())
                         .add("background", this.background)
+                        .add("showToast", this.showToast)
                         .add("x", this.x)
                         .add("y", this.y)
                         .toString();

@@ -40,7 +40,7 @@ public final class CodecPlayOutNamedSoundEffect implements Codec<MessagePlayOutN
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeString(message.getType());
         buf.writeVarInt(((LanternSoundCategory) message.getCategory()).getInternalId());
-        Vector3d pos = message.getPosition();
+        final Vector3d pos = message.getPosition();
         buf.writeInteger((int) (pos.getX() * 8.0));
         buf.writeInteger((int) (pos.getY() * 8.0));
         buf.writeInteger((int) (pos.getZ() * 8.0));

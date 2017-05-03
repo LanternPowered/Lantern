@@ -35,6 +35,8 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ResettableBuilder;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings("unchecked")
 public abstract class StyleableBuilder<T extends Styleable, B extends StyleableBuilder<T, B>> implements ResettableBuilder<T, B> {
 
@@ -42,6 +44,7 @@ public abstract class StyleableBuilder<T extends Styleable, B extends StyleableB
     Text description;
     ItemStackSnapshot icon;
     FrameType frameType;
+    @Nullable Boolean showToast;
 
     /**
      * Sets the description of the advancement.
@@ -124,12 +127,25 @@ public abstract class StyleableBuilder<T extends Styleable, B extends StyleableB
                 () -> new IllegalArgumentException("The block type: " + blockType.getId() + " doesn't have a item type.")));
     }
 
+    /**
+     * Sets whether a toast should be shown. This is the notification
+     * that will be displayed in the top right corner.
+     *
+     * @param showToast Whether a a toast should be shown
+     * @return This builder, for chaining
+     */
+    public B showToast(boolean showToast) {
+        this.showToast = showToast;
+        return (B) this;
+    }
+
     @Override
     public B from(T value) {
         this.icon = value.getIcon();
         this.frameType = value.getFrameType();
         this.title = value.getTitle();
         this.description = value.getDescription();
+        this.showToast = value.doesShowToast();
         return (B) this;
     }
 
@@ -138,6 +154,7 @@ public abstract class StyleableBuilder<T extends Styleable, B extends StyleableB
         this.icon = ItemStackSnapshot.NONE;
         this.frameType = FrameTypes.TASK;
         this.description = Text.EMPTY;
+        this.showToast = null;
         this.title = null;
         return (B) this;
     }

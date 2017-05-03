@@ -29,8 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.GuavaCollectors;
@@ -52,9 +50,9 @@ public final class Advancement extends Styleable {
     private final List<List<AdvancementCriterion>> advancementCriteria;
     private final List<AdvancementCriterion> advancementCriteria0;
 
-    Advancement(String pluginId, String id, String name, @Nullable Advancement parent,
-            List<List<AdvancementCriterion>> advancementCriteria, Text title, Text description, ItemStackSnapshot icon, FrameType frameType) {
-        super(pluginId, id, name, title, description, icon, frameType);
+    Advancement(String pluginId, String id, String name, @Nullable Advancement parent, List<List<AdvancementCriterion>> advancementCriteria,
+            Text title, Text description, ItemStackSnapshot icon, FrameType frameType, boolean showToast) {
+        super(pluginId, id, name, title, description, icon, frameType, showToast);
         this.advancementCriteria = advancementCriteria.stream().map(ImmutableList::copyOf).collect(GuavaCollectors.toImmutableList());
         final ImmutableList.Builder<AdvancementCriterion> criteria = ImmutableList.builder();
         advancementCriteria.forEach(criteria::addAll);

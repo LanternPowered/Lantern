@@ -25,35 +25,49 @@
  */
 package org.lanternpowered.server.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.OptionalLong;
 
-import javax.annotation.Nullable;
+public abstract class Achievable {
 
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
+    static final long INVALID_TIME = -1L;
 
     /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
+     * Gets whether this {@link Achievable} is achieved.
      *
-     * @param advancement The advancement
-     * @return The advancement progress
+     * @return Is achieved
      */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    public boolean achieved() {
+        return get().isPresent();
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
-    }
+    /**
+     * Gets the time that the {@link Achievable} was achieved if present.
+     *
+     * @return The achieving time
+     */
+    public abstract OptionalLong get();
 
-    void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
-    }
+    /**
+     * Achieves this {@link Achievable}, if achieved before
+     * that time will be returned.
+     *
+     * @return The achieving time
+     */
+    public abstract long set();
+
+    /**
+     * Revokes the {@link Achievable} status. The time that the {@link Achievable}
+     * was achieved before will be returned if present.
+     *
+     * @return The previous achieving time
+     */
+    public abstract OptionalLong revoke();
+
+    abstract void resetDirtyState();
+
+    abstract void fillDirtyProgress(Object2LongMap<String> progress);
+
+    abstract void fillProgress(Object2LongMap<String> progress);
 }

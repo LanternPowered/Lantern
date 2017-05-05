@@ -245,10 +245,6 @@ public final class AdvancementTree extends Styleable {
         return formatId0(id, null);
     }
 
-    private String formatCriterion0(String id) {
-        return id + "_crit";
-    }
-
     void clearDirty() {
         this.addedAdvancements.clear();
         this.removedAdvancements.clear();
@@ -343,11 +339,8 @@ public final class AdvancementTree extends Styleable {
                     parentId = rootId;
                 }
                 final List<List<String>> criteria;
-                if (!advancement.getCriteria().isEmpty()) {
-                    criteria = new ArrayList<>();
-                    for (List<AdvancementCriterion> list : advancement.getCriteria()) {
-                        criteria.add(list.stream().map(c -> c.id).collect(Collectors.toList()));
-                    }
+                if (advancement.getCriterion() != AdvancementCriterion.EMPTY) {
+                    criteria = CriterionHelper.simplifyToIds(advancement.getCriterion());
                 } else {
                     criteria = Collections.singletonList(Collections.singletonList(AdvancementCriterion.DUMMY));
                 }
@@ -387,20 +380,24 @@ public final class AdvancementTree extends Styleable {
 
         for (Advancement advancement : this.advancements.keySet()) {
             final AdvancementProgress progress1 = progress.getOrNull(advancement);
-            if (progress1 != null && (state == INITIALIZE || state == REFRESH || progress1.isDirty())) {
-                if (progressMap == null) {
-                    progressMap = new HashMap<>();
-                }
+            if (progress1 != null) {
                 final Object2LongMap<String> entries;
-                if (!advancement.getCriteria().isEmpty()) {
+                if (advancement.getCriterion() != AdvancementCriterion.EMPTY) {
                     entries = new Object2LongOpenHashMap<>();
-                    for (AdvancementCriterion criterion : progress1.getDirtyCriteria()) {
-                        entries.put(criterion.id, progress1.getOrInvalid(criterion));
+                    if (state == INITIALIZE || state == REFRESH) {
+                        progress1.fillProgress(entries);
+                    } else {
+                        progress1.fillDirtyProgress(entries);
                     }
                 } else {
-                    entries = Object2LongMaps.singleton(AdvancementCriterion.DUMMY, progress1.getAchieveTime());
+                    entries = Object2LongMaps.singleton(AdvancementCriterion.DUMMY, progress1.get().orElse(-1L));
                 }
-                progressMap.put(formatId0(advancement.getId()), entries);
+                if (!entries.isEmpty()) {
+                    if (progressMap == null) {
+                        progressMap = new HashMap<>();
+                    }
+                    progressMap.put(formatId0(advancement.getId()), entries);
+                }
             }
         }
         return advancementsData == null && progressMap == null ? null : new MessagePlayOutAdvancements(false,

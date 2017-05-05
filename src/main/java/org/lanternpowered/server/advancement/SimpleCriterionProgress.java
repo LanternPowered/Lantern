@@ -25,35 +25,30 @@
  */
 package org.lanternpowered.server.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
-import java.util.HashMap;
-import java.util.Map;
+final class SimpleCriterionProgress extends AbstractCriterionProgress {
 
-import javax.annotation.Nullable;
+    private long lastAchievingTime = INVALID_TIME;
 
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
-
-    /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
-     *
-     * @param advancement The advancement
-     * @return The advancement progress
-     */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    SimpleCriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
+        super(progress, criterion);
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
-    }
-
+    @Override
     void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
+        this.lastAchievingTime = this.achievingTime;
+    }
+
+    @Override
+    void fillDirtyProgress(Object2LongMap<String> progress) {
+        if (this.lastAchievingTime != this.achievingTime) {
+            progress.put(getCriterion().id, this.achievingTime);
+        }
+    }
+
+    @Override
+    void fillProgress(Object2LongMap<String> progress) {
+        progress.put(getCriterion().id, this.achievingTime);
     }
 }

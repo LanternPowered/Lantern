@@ -25,35 +25,39 @@
  */
 package org.lanternpowered.server.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.OptionalLong;
 
-import java.util.HashMap;
-import java.util.Map;
+final class OrCriterionProgress extends MultiCriterionProgress {
 
-import javax.annotation.Nullable;
-
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
-
-    /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
-     *
-     * @param advancement The advancement
-     * @return The advancement progress
-     */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    OrCriterionProgress(AdvancementProgress progress, AdvancementCriterion.Or criterion) {
+        super(progress, criterion);
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
+    @Override
+    public AdvancementCriterion.Or getCriterion() {
+        return (AdvancementCriterion.Or) super.getCriterion();
     }
 
-    void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
+    @Override
+    public boolean achieved() {
+        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
+            final OptionalLong time1 = getProgress().get(criterion).get().get();
+            if (time1.isPresent()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public OptionalLong get() {
+        OptionalLong time = OptionalLong.empty();
+        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
+            final OptionalLong time1 = getProgress().get(criterion).get().get();
+            if (time1.isPresent() && (!time.isPresent() || time1.getAsLong() > time.getAsLong())) {
+                time = time1;
+            }
+        }
+        return time;
     }
 }

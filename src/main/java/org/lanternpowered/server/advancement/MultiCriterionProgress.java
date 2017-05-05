@@ -25,35 +25,54 @@
  */
 package org.lanternpowered.server.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.OptionalLong;
 
-import javax.annotation.Nullable;
+abstract class MultiCriterionProgress extends CriterionProgress {
 
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
-
-    /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
-     *
-     * @param advancement The advancement
-     * @return The advancement progress
-     */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    MultiCriterionProgress(AdvancementProgress progress, AdvancementCriterion.Multi criterion) {
+        super(progress, criterion);
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
+    @Override
+    public AdvancementCriterion.Multi getCriterion() {
+        return (AdvancementCriterion.Multi) super.getCriterion();
     }
 
+    @Override
+    public long set() {
+        long time = -1L;
+        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
+            final long time1 = getProgress().get(criterion).get().set();
+            if (time1 > time) {
+                time = time1;
+            }
+        }
+        return time;
+    }
+
+    @Override
+    public OptionalLong revoke() {
+        OptionalLong time = OptionalLong.empty();
+        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
+            final OptionalLong time1 = getProgress().get(criterion).get().revoke();
+            if (time1.isPresent() && (!time.isPresent() || time1.getAsLong() > time.getAsLong())) {
+                time = time1;
+            }
+        }
+        return time;
+    }
+
+    @Override
     void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
+    }
+
+    @Override
+    void fillDirtyProgress(Object2LongMap<String> progress) {
+    }
+
+    @Override
+    void fillProgress(Object2LongMap<String> progress) {
     }
 }

@@ -34,7 +34,7 @@ public final class TestAdvancementTree {
     public static final AdvancementTree B;
 
     public static final Advancement DIG_DIRT;
-    public static final AdvancementCriterion[] DIG_DIRT_CRITERIA;
+    public static final ScoreAdvancementCriterion DIG_DIRT_CRITERION;
 
     static {
         A = AdvancementTree.builder()
@@ -61,16 +61,13 @@ public final class TestAdvancementTree {
                 .icon(ItemTypes.IRON_PICKAXE)
                 .background("minecraft:textures/blocks/dirt.png")
                 .build("test", "digger");
-        DIG_DIRT_CRITERIA = new AdvancementCriterion[5];
-        for (int i = 0; i < DIG_DIRT_CRITERIA.length; i++) {
-            DIG_DIRT_CRITERIA[i] = new AdvancementCriterion();
-        }
+        DIG_DIRT_CRITERION = new ScoreAdvancementCriterion("count", 5);
         DIG_DIRT = Advancement.builder()
                 .parent(becomeKing)
                 .icon(ItemTypes.DIRT)
                 .title(Text.of("Dig Dirt"))
                 .description(Text.of("Dig 5 dirt blocks."))
-                .criteria(DIG_DIRT_CRITERIA)
+                .criteria(DIG_DIRT_CRITERION)
                 .build("test", "dig_dirt");
         final Advancement dirtLover = Advancement.builder()
                 .parent(DIG_DIRT)

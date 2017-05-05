@@ -125,6 +125,6 @@ public final class AdvancementTrees {
             }
             advancementTree.clearDirty();
         }
-        trackers.forEach(player -> player.getAdvancementsProgress().clearDirty());
+        trackers.forEach(player -> player.getAdvancementsProgress().resetDirtyState());
     }
 }

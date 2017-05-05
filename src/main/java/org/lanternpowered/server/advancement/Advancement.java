@@ -31,11 +31,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -47,16 +47,16 @@ public final class Advancement extends Styleable {
 
     @Nullable private final Advancement parent;
     private final List<Advancement> children = new ArrayList<>();
-    private final List<List<AdvancementCriterion>> advancementCriteria;
-    private final List<AdvancementCriterion> advancementCriteria0;
+    private final AdvancementCriterion advancementCriterion;
+    private final Set<AdvancementCriterion> leafCriteria;
+    private final Set<AdvancementCriterion> criteria;
 
-    Advancement(String pluginId, String id, String name, @Nullable Advancement parent, List<List<AdvancementCriterion>> advancementCriteria,
+    Advancement(String pluginId, String id, String name, @Nullable Advancement parent, AdvancementCriterion advancementCriterion,
             Text title, Text description, ItemStackSnapshot icon, FrameType frameType, boolean showToast) {
         super(pluginId, id, name, title, description, icon, frameType, showToast);
-        this.advancementCriteria = advancementCriteria.stream().map(ImmutableList::copyOf).collect(GuavaCollectors.toImmutableList());
-        final ImmutableList.Builder<AdvancementCriterion> criteria = ImmutableList.builder();
-        advancementCriteria.forEach(criteria::addAll);
-        this.advancementCriteria0 = criteria.build();
+        this.advancementCriterion = advancementCriterion;
+        this.leafCriteria = advancementCriterion.getLeafCriteria();
+        this.criteria = advancementCriterion.getCriteria(false);
         this.parent = parent;
     }
 
@@ -81,13 +81,16 @@ public final class Advancement extends Styleable {
     }
 
     /**
-     * Gets all the {@link AdvancementCriterion}s that should be achieved
+     * Gets all the {@link AdvancementCriterion} that should be achieved
      * before this advancement is unlocked.
+     * <p>
+     * This {@link AdvancementCriterion} can be a AND or OR operation that
+     * contains multiple possible {@link AdvancementCriterion}s.
      *
-     * @return The criteria
+     * @return The criterion
      */
-    public List<List<AdvancementCriterion>> getCriteria() {
-        return this.advancementCriteria;
+    public AdvancementCriterion getCriterion() {
+        return this.advancementCriterion;
     }
 
     /**
@@ -99,7 +102,11 @@ public final class Advancement extends Styleable {
         return Optional.ofNullable(this.parent);
     }
 
-    List<AdvancementCriterion> getAdvancementCriteria0() {
-        return this.advancementCriteria0;
+    Set<AdvancementCriterion> getLeafCriteria() {
+        return this.leafCriteria;
+    }
+
+    Set<AdvancementCriterion> getCriteria() {
+        return this.criteria;
     }
 }

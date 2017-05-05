@@ -28,16 +28,13 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
 public final class AdvancementBuilder extends StyleableBuilder<Advancement, AdvancementBuilder> {
 
-    private final List<List<AdvancementCriterion>> criteria = new ArrayList<>();
-
+    private AdvancementCriterion criterion = AdvancementCriterion.EMPTY;
     @Nullable private Advancement parent;
 
     AdvancementBuilder() {
@@ -55,17 +52,15 @@ public final class AdvancementBuilder extends StyleableBuilder<Advancement, Adva
         return this;
     }
 
-    public AdvancementBuilder criteria(AdvancementCriterion... criteria) {
-        checkNotNull(criteria, "criteria");
-        this.criteria.add(Arrays.asList(criteria));
+    public AdvancementBuilder criteria(AdvancementCriterion criterion) {
+        checkNotNull(criterion, "criterion");
+        this.criterion = criterion;
         return this;
     }
 
-    public AdvancementBuilder criteria(AdvancementCriterion[][] criteria) {
-        checkNotNull(criteria, "criteria");
-        for (AdvancementCriterion[] criteria1 : criteria) {
-            criteria(criteria1);
-        }
+    public AdvancementBuilder criteria(Function<AdvancementCriterion, AdvancementCriterion> criterionFunction) {
+        checkNotNull(criterionFunction, "criterionFunction");
+        this.criterion = criterionFunction.apply(this.criterion);
         return this;
     }
 
@@ -84,7 +79,7 @@ public final class AdvancementBuilder extends StyleableBuilder<Advancement, Adva
         //noinspection ConstantConditions
         checkArgument(this.description != null, "The description must be set");
         final boolean showToast = this.showToast == null ? true : this.showToast;
-        return new Advancement(pluginId, id, this.title.toPlain(), this.parent, this.criteria,
+        return new Advancement(pluginId, id, this.title.toPlain(), this.parent, this.criterion,
                 this.title, this.description, this.icon, this.frameType, showToast);
     }
 
@@ -92,8 +87,7 @@ public final class AdvancementBuilder extends StyleableBuilder<Advancement, Adva
     public AdvancementBuilder from(Advancement value) {
         super.reset();
         this.parent = value.getParent().orElse(null);
-        this.criteria.clear();
-        this.criteria.addAll(value.getCriteria());
+        this.criterion = AdvancementCriterion.EMPTY;
         return this;
     }
 
@@ -101,7 +95,7 @@ public final class AdvancementBuilder extends StyleableBuilder<Advancement, Adva
     public AdvancementBuilder reset() {
         super.reset();
         this.parent = null;
-        this.criteria.clear();
+        this.criterion = AdvancementCriterion.EMPTY;
         return this;
     }
 }

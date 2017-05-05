@@ -25,35 +25,40 @@
  */
 package org.lanternpowered.server.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.OptionalLong;
 
-import java.util.HashMap;
-import java.util.Map;
+public abstract class AbstractCriterionProgress extends CriterionProgress {
 
-import javax.annotation.Nullable;
+    long achievingTime = INVALID_TIME;
 
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
-
-    /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
-     *
-     * @param advancement The advancement
-     * @return The advancement progress
-     */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    AbstractCriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
+        super(progress, criterion);
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
+    @Override
+    public OptionalLong get() {
+        return this.achievingTime == INVALID_TIME ? OptionalLong.empty() : OptionalLong.of(this.achievingTime);
     }
 
-    void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
+    @Override
+    public long set() {
+        if (this.achievingTime == INVALID_TIME) {
+            this.achievingTime = System.currentTimeMillis();
+            getProgress().updateAchievedState(this.achievingTime);
+        }
+        return this.achievingTime;
+    }
+
+    @Override
+    public OptionalLong revoke() {
+        if (this.achievingTime == INVALID_TIME) {
+            return OptionalLong.empty();
+        }
+        try {
+            return OptionalLong.of(this.achievingTime);
+        } finally {
+            this.achievingTime = INVALID_TIME;
+            getProgress().updateAchievedState(INVALID_TIME);
+        }
     }
 }

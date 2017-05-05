@@ -25,35 +25,31 @@
  */
 package org.lanternpowered.server.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+public abstract class CriterionProgress extends Achievable {
 
-import java.util.HashMap;
-import java.util.Map;
+    private final AdvancementProgress progress;
+    private final AdvancementCriterion criterion;
 
-import javax.annotation.Nullable;
-
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
+    CriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
+        this.progress = progress;
+        this.criterion = criterion;
+    }
 
     /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
+     * Gets the {@link AdvancementProgress}.
      *
-     * @param advancement The advancement
      * @return The advancement progress
      */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    public AdvancementProgress getProgress() {
+        return this.progress;
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
-    }
-
-    void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
+    /**
+     * Gets the {@link AdvancementCriterion}.
+     *
+     * @return The criterion
+     */
+    public AdvancementCriterion getCriterion() {
+        return this.criterion;
     }
 }

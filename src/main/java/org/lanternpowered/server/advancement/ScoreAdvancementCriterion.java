@@ -25,35 +25,35 @@
  */
 package org.lanternpowered.server.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import java.util.HashMap;
-import java.util.Map;
+public class ScoreAdvancementCriterion extends AdvancementCriterion {
 
-import javax.annotation.Nullable;
-
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
+    private final int goal;
+    final String[] ids;
 
     /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
+     * Creates a new {@link ScoreAdvancementCriterion} with the target goal value
+     * that should be achieved to trigger this criterion.
      *
-     * @param advancement The advancement
-     * @return The advancement progress
+     * @param goal The goal value
      */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    public ScoreAdvancementCriterion(String name, int goal) {
+        super("score", String.format("%s{goal=%s}", name, goal));
+        checkState(goal > 0, "The goal must be greater then 0");
+        this.goal = goal;
+        this.ids = new String[goal];
+        for (int i = 0; i < goal; i++) {
+            this.ids[i] = newIdentifier();
+        }
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
-    }
-
-    void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
+    /**
+     * Gets the goal value.
+     *
+     * @return The goal value
+     */
+    public int getGoal() {
+        return this.goal;
     }
 }

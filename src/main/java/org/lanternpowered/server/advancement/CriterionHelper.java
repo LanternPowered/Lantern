@@ -46,9 +46,6 @@ final class CriterionHelper {
             return Collections.singletonList(Collections.singletonList(((One) wrapper).id));
         }
 
-        System.out.println(wrapper);
-        System.out.println(new Or(list));
-
         final List<List<String>> ids = new ArrayList<>();
         for (Wrapper wrapper1 : list) {
             if (wrapper1 instanceof Or) {

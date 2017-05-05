@@ -117,7 +117,7 @@ public class ScoreCriterionProgress extends AbstractCriterionProgress {
     public OptionalLong set(int score) {
         checkArgument(score >= 0, "score to add may not be negative");
         final int goal = getGoal();
-        this.score = score;
+        this.score = Math.min(score, goal);
         if (score == goal) {
             return OptionalLong.of(super.set());
         } else {
@@ -134,7 +134,7 @@ public class ScoreCriterionProgress extends AbstractCriterionProgress {
      * @return The achieving time, if achieved
      */
     public OptionalLong add(int score) {
-        checkArgument(score >= 0, "score to add may not be negative");
+        checkArgument(score > 0, "score to add must be greater then zero");
         final int goal = getGoal();
         if (this.score == goal) {
             return super.get();
@@ -154,7 +154,7 @@ public class ScoreCriterionProgress extends AbstractCriterionProgress {
      * @return The old achieving time, if achieved before
      */
     public OptionalLong remove(int score) {
-        checkArgument(score >= 0, "score to remove may not be negative");
+        checkArgument(score > 0, "score to remove must be greater then zero");
         this.score = Math.max(0, this.score - score);
         return super.revoke();
     }

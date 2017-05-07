@@ -170,6 +170,7 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
         registerKey(Keys.FIRE_TICKS, 0).notRemovable();
         registerKey(Keys.FALL_DISTANCE, 0f).notRemovable();
         registerKey(Keys.GLOWING, false).notRemovable();
+        registerKey(Keys.INVISIBLE, false);
         registerKey(LanternKeys.INVULNERABLE, false).notRemovable();
         registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).notRemovable();
     }

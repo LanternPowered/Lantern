@@ -72,7 +72,6 @@ import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.block.translation.SpongeTranslationProvider;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
@@ -890,6 +889,17 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(1.5)))
                         .build("minecraft", "stained_glass"),
                 this::dyedData);
+        ///////////////////
+        ///  Iron Bars  ///
+        ///////////////////
+        register(101, simpleBuilder()
+                        // TODO
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(10.0)))
+                        .translation("tile.fenceIron.name")
+                        .build("minecraft", "iron_bars"));
         //////////////////////////
         /// Double Wooden Slab ///
         //////////////////////////
@@ -964,6 +974,20 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.chestTrap.name")
                         .build("minecraft", "trapped_chest"),
                 this::chestData);
+        ///////////////////////////////////////
+        /// Weighted Pressure Plate (Light) ///
+        ///////////////////////////////////////
+        register(147, weightedPressurePlateBuilder()
+                        .translation("tile.weightedPlate_light.name")
+                        .build("minecraft", "light_weighted_pressure_plate"),
+                this::weightedPressurePlateData);
+        ///////////////////////////////////////
+        /// Weighted Pressure Plate (Heavy) ///
+        ///////////////////////////////////////
+        register(148, weightedPressurePlateBuilder()
+                        .translation("tile.weightedPlate_heavy.name")
+                        .build("minecraft", "heavy_weighted_pressure_plate"),
+                this::weightedPressurePlateData);
         ///////////////////////
         /// Redstone Block  ///
         ///////////////////////
@@ -1091,6 +1115,16 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.barrier.name")
                         .build("minecraft", "barrier"));
         /////////////////////
+        ///     Carpet    ///
+        /////////////////////
+        register(171, dyedBuilder("tile.carpet.%s.name")
+                        .properties(builder -> builder
+                                .add(hardness(0.1))
+                                .add(blastResistance(0.5)))
+                        .boundingBox(BoundingBoxes.carpet())
+                        .build("minecraft", "carpet"),
+                this::dyedData);
+        /////////////////////
         /// Red Sandstone ///
         /////////////////////
         register(179, simpleBuilder()
@@ -1125,6 +1159,17 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .boundingBox(BoundingBoxes::slab)
                         .build("minecraft", "stone_slab2"),
                 blockState -> stoneSlabData(blockState, blockState.getTraitValue(LanternEnumTraits.STONE_SLAB2_TYPE).get().getInternalId() - 8));
+        ///////////////////
+        ///   End Rod   ///
+        ///////////////////
+        register(198, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.0))
+                                .add(blastResistance(0.0))
+                                .add(lightEmission(14)))
+                        .translation("tile.endRod.name")
+                        .build("minecraft", "end_rod"));
         ///////////////////////////
         ///  White Shulker Box  ///
         ///////////////////////////
@@ -1286,6 +1331,22 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    private BlockTypeBuilder weightedPressurePlateBuilder() {
+        return simpleBuilder()
+                .itemType()
+                .traits(LanternIntegerTraits.POWER)
+                .boundingBox(BoundingBoxes::pressurePlate)
+                .defaultState(state -> state
+                        .withTrait(LanternIntegerTraits.POWER, 0).get())
+                .properties(builder -> builder
+                        .add(hardness(0.5))
+                        .add(blastResistance(2.5)));
+    }
+
+    private byte weightedPressurePlateData(BlockState blockState) {
+        return blockState.getTraitValue(LanternIntegerTraits.POWER).get().byteValue();
     }
 
     private BlockTypeBuilder pumpkinBuilder() {

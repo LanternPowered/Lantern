@@ -25,10 +25,13 @@
  */
 package org.lanternpowered.server.inventory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
@@ -169,7 +172,7 @@ public class PlayerContainerSession {
                 }
                 if (LanternItemStack.toNullable(oldCursorItemSnapshot) != null) {
                     final List<Entity> entities = new ArrayList<>();
-                    entities.add(this.createDroppedItem(oldCursorItemSnapshot));
+                    entities.add(createDroppedItem(oldCursorItemSnapshot));
 
                     final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities);
                     Sponge.getEventManager().post(event1);
@@ -373,7 +376,7 @@ public class PlayerContainerSession {
             return false;
         }
         final List<SlotTransaction> transactions = strictSlotMap.values().stream()
-                .map(StrictSlot::toTransaction).collect(Collectors.toList());
+                    .map(StrictSlot::toTransaction).collect(Collectors.toList());
         finishInventoryEvent(SpongeEventFactory.createChangeInventoryEventTransfer(
                 Cause.source(this.player).build(), this.openContainer, transactions));
         return true;
@@ -697,35 +700,17 @@ public class PlayerContainerSession {
                 final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
                 if (itemStack != null) {
-                    AbstractMutableInventory inventory;
-
                     final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
                     final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
-                    PeekOfferTransactionsResult result;
-                    if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
-                            (windowId == 0 && !mainInventory.isChild(slot) && !offhand)) {
-                        if (slot.isReverseShiftClickOfferOrder()) {
-                            inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
-                        } else {
-                            inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
-                        }
-                        result = inventory.peekOfferFastTransactions(itemStack.copy());
-                    } else {
-                        inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
-                                ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
-                        result = inventory.peekOfferFastTransactions(itemStack.copy());
-                        if (result.getOfferResult().getRest() != null) {
-                            if (slot.parent() instanceof LanternHotbar || offhand) {
-                                inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN);
-                            } else {
-                                inventory = this.openContainer.playerInventory.getHotbar();
-                            }
-                            PeekOfferTransactionsResult result1 = inventory.peekOfferFastTransactions(result.getOfferResult().getRest());
-                            if (result1.getOfferResult().isSuccess()) {
-                                result1.getTransactions().addAll(result.getTransactions());
-                                result = result1;
-                            }
-                        }
+                    final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, mainInventory, itemStack.copy(), offhand);
+
+                    // Force updates if the max stack size on the client and server don't match
+                    final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getItem());
+                    if (itemStack.getMaxStackQuantity() != originalMaxStackSize) {
+                        final LanternItemStack tempStack = (LanternItemStack) itemStack.copy();
+                        tempStack.setTempMaxQuantity(originalMaxStackSize);
+                        final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(windowId, slot, mainInventory, tempStack, offhand);
+                        result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
                     }
 
                     if (result.getOfferResult().isSuccess()) {
@@ -948,7 +933,42 @@ public class PlayerContainerSession {
             final ClickInventoryEvent.Middle event = SpongeEventFactory.createClickInventoryEventMiddle(
                     cause, cursorTransaction, this.openContainer, new ArrayList<>());
             finishInventoryEvent(event);
+        } else {
+            Lantern.getLogger().warn("Unknown action: mode: {}, button: {}", message.getMode(), message.getButton());
         }
+    }
+
+    private PeekOfferTransactionsResult getShiftPeekOfferResult(int windowId, LanternSlot slot, HumanMainInventory mainInventory,
+            ItemStack itemStack, boolean offhand) {
+        AbstractMutableInventory inventory;
+        PeekOfferTransactionsResult result;
+        checkNotNull(this.openContainer);
+        if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
+                (windowId == 0 && !mainInventory.isChild(slot) && !offhand)) {
+            if (slot.isReverseShiftClickOfferOrder()) {
+                inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
+            } else {
+                inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
+            }
+            result = inventory.peekOfferFastTransactions(itemStack);
+        } else {
+            inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
+                    ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
+            result = inventory.peekOfferFastTransactions(itemStack);
+            if (result.getOfferResult().getRest() != null) {
+                if (slot.parent() instanceof LanternHotbar || offhand) {
+                    inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN);
+                } else {
+                    inventory = this.openContainer.playerInventory.getHotbar();
+                }
+                PeekOfferTransactionsResult result1 = inventory.peekOfferFastTransactions(result.getOfferResult().getRest());
+                if (result1.getOfferResult().isSuccess()) {
+                    result1.getTransactions().addAll(result.getTransactions());
+                    result = result1;
+                }
+            }
+        }
+        return result;
     }
 
     private Entity createDroppedItem(ItemStackSnapshot snapshot) {

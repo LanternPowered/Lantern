@@ -23,42 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.flowpowered.math.GenericMath;
-import org.spongepowered.api.util.Direction;
+import org.lanternpowered.server.network.message.Message;
 
-public final class CodecUtils {
+/**
+ * This is the only message that we will use to modify the controls
+ * of the player. More info will come as I write the implementation.
+ */
+public final class MessagePlayInPlayerMovementInput implements Message {
 
-    public static Direction fromFace(int face) {
-        switch (face) {
-            case 0: return Direction.UP;
-            case 1: return Direction.DOWN;
-            case 2: return Direction.SOUTH;
-            case 3: return Direction.NORTH;
-            case 4: return Direction.EAST;
-            case 5: return Direction.WEST;
-            default:
-                throw new IllegalStateException("Unknown face: " + face);
-        }
+    private final float sideways;
+    private final float forwards;
+
+    public MessagePlayInPlayerMovementInput(float forwards, float sideways) {
+        this.sideways = sideways;
+        this.forwards = forwards;
     }
 
     /**
-     * Wraps the double angle into a byte.
+     * Gets the forwards value. (Positive is forwards, negative is backwards.)
      * 
-     * @param angle The angle
-     * @return The byte value
+     * @return the forwards value
      */
-    public static byte wrapAngle(double angle) {
-        while (angle >= 180.0) {
-            angle -= 360.0;
-        }
-        while (angle < -180.0) {
-            angle += 360.0;
-        }
-        return (byte) GenericMath.floor(angle / 360.0 * 256.0);
+    public float getForwards() {
+        return this.forwards;
     }
 
-    private CodecUtils() {
+    /**
+     * Gets the sideways value. (Positive is left, negative is right.)
+     * 
+     * @return the sideways value
+     */
+    public float getSideways() {
+        return this.sideways;
     }
 }

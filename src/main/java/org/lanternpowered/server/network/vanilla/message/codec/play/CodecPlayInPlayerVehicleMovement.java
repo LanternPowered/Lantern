@@ -25,40 +25,22 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.flowpowered.math.GenericMath;
-import org.spongepowered.api.util.Direction;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementAndLook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 
-public final class CodecUtils {
+public final class CodecPlayInPlayerVehicleMovement implements Codec<MessagePlayInPlayerVehicleMovement> {
 
-    public static Direction fromFace(int face) {
-        switch (face) {
-            case 0: return Direction.UP;
-            case 1: return Direction.DOWN;
-            case 2: return Direction.SOUTH;
-            case 3: return Direction.NORTH;
-            case 4: return Direction.EAST;
-            case 5: return Direction.WEST;
-            default:
-                throw new IllegalStateException("Unknown face: " + face);
-        }
-    }
-
-    /**
-     * Wraps the double angle into a byte.
-     * 
-     * @param angle The angle
-     * @return The byte value
-     */
-    public static byte wrapAngle(double angle) {
-        while (angle >= 180.0) {
-            angle -= 360.0;
-        }
-        while (angle < -180.0) {
-            angle += 360.0;
-        }
-        return (byte) GenericMath.floor(angle / 360.0 * 256.0);
-    }
-
-    private CodecUtils() {
+    @Override
+    public MessagePlayInPlayerVehicleMovement decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        double x = buf.readDouble();
+        double y = buf.readDouble();
+        double z = buf.readDouble();
+        float yaw = buf.readFloat();
+        float pitch = buf.readFloat();
+        return new MessagePlayInPlayerVehicleMovement(x, y, z, yaw, pitch);
     }
 }

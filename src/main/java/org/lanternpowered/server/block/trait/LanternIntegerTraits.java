@@ -26,11 +26,15 @@
 package org.lanternpowered.server.block.trait;
 
 import org.spongepowered.api.block.trait.IntegerTrait;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.util.Direction;
 
 public final class LanternIntegerTraits {
 
     public static final IntegerTrait SAPLING_GROWTH_STAGE = LanternIntegerTrait.of("stage", Keys.GROWTH_STAGE, 0, 1);
+
+    public static final IntegerTrait POWER = LanternIntegerTrait.ofRange("power", Keys.POWER, 0, 15);
 
     private LanternIntegerTraits() {
     }

@@ -45,9 +45,9 @@ public final class CodecPlayOutSpawnMob implements Codec<MessagePlayOutSpawnMob>
         buf.writeDouble(vector.getX());
         buf.writeDouble(vector.getY());
         buf.writeDouble(vector.getZ());
-        buf.writeByte((byte) message.getYaw());
-        buf.writeByte((byte) message.getPitch());
-        buf.writeByte((byte) message.getHeadPitch());
+        buf.writeByte(message.getYaw());
+        buf.writeByte(message.getPitch());
+        buf.writeByte(message.getHeadPitch());
         vector = message.getVelocity();
         buf.writeShort((short) Math.min(vector.getX() * 8000.0, Short.MAX_VALUE));
         buf.writeShort((short) Math.min(vector.getY() * 8000.0, Short.MAX_VALUE));

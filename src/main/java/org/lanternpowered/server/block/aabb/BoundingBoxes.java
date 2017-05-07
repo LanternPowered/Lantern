@@ -29,6 +29,7 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.util.AABB;
@@ -41,6 +42,26 @@ import javax.annotation.Nullable;
 public class BoundingBoxes {
 
     public static final AABB DEFAULT = new AABB(Vector3d.ZERO, Vector3d.ONE);
+
+    private final static class Carpet {
+
+        private static final AABB DEFAULT = new AABB(0.0, 0.0, 0.0, 1.0, 0.0625, 1.0);
+    }
+
+    public static AABB carpet() {
+        return DEFAULT;
+    }
+
+    private final static class PressurePlate {
+
+        private static final AABB PRESSED = new AABB(0.0625, 0.0, 0.0625, 0.9375, 0.03125, 0.9375);
+        private static final AABB UNPRESSED = new AABB(0.0625, 0.0, 0.0625, 0.9375, 0.0625, 0.9375);
+    }
+
+    public static AABB pressurePlate(BlockState blockState) {
+        return blockState.get(Keys.POWERED).orElse(false) || blockState.get(Keys.POWER).orElse(0) > 0 ?
+                PressurePlate.PRESSED : PressurePlate.UNPRESSED;
+    }
 
     private final static class Torch {
 

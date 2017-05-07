@@ -31,7 +31,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.lanternpowered.server.advancement.AdvancementTrees;
@@ -51,8 +51,8 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.extra.accessory.TopHats;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
@@ -267,6 +267,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         resetIdleTimeoutCounter();
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         offer(Keys.DISPLAY_NAME, Text.of(gameProfile.getName().get()));
+        offer(LanternKeys.ACCESSORIES, Lists.newArrayList(TopHats.GOLD));
     }
 
     public Set<LanternBossBar> getBossBars() {
@@ -297,6 +298,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public void registerKeys() {
         super.registerKeys();
+        registerKey(LanternKeys.ACCESSORIES, new ArrayList<>());
         registerKey(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
         registerKey(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
         registerKey(LanternKeys.MAX_SATURATION, 40.0, 0.0, Double.MAX_VALUE);

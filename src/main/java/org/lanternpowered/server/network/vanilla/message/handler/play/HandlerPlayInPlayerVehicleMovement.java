@@ -23,42 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import com.flowpowered.math.GenericMath;
-import org.spongepowered.api.util.Direction;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 
-public final class CodecUtils {
+public class HandlerPlayInPlayerVehicleMovement implements Handler<MessagePlayInPlayerVehicleMovement> {
 
-    public static Direction fromFace(int face) {
-        switch (face) {
-            case 0: return Direction.UP;
-            case 1: return Direction.DOWN;
-            case 2: return Direction.SOUTH;
-            case 3: return Direction.NORTH;
-            case 4: return Direction.EAST;
-            case 5: return Direction.WEST;
-            default:
-                throw new IllegalStateException("Unknown face: " + face);
-        }
-    }
-
-    /**
-     * Wraps the double angle into a byte.
-     * 
-     * @param angle The angle
-     * @return The byte value
-     */
-    public static byte wrapAngle(double angle) {
-        while (angle >= 180.0) {
-            angle -= 360.0;
-        }
-        while (angle < -180.0) {
-            angle += 360.0;
-        }
-        return (byte) GenericMath.floor(angle / 360.0 * 256.0);
-    }
-
-    private CodecUtils() {
+    @Override
+    public void handle(NetworkContext context, MessagePlayInPlayerVehicleMovement message) {
     }
 }

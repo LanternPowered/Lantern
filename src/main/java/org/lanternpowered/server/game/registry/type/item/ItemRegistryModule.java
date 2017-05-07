@@ -45,7 +45,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.game.Lantern;
@@ -353,6 +352,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////
         register(282, builder()
                 .translation("item.mushroomStew.name")
+                .maxStackQuantity(1)
                 .properties(builder -> builder
                         .add(useDuration(32))
                         .add(foodRestoration(6))
@@ -679,6 +679,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(329, builder()
                 .translation("item.saddle.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "saddle"));
         /////////////////////
         ///   Iron Door   ///
@@ -697,12 +698,14 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////
         register(332, builder()
                 .translation("item.snowball.name")
+                .maxStackQuantity(16)
                 .build("minecraft", "snowball"));
         ////////////////////
         ///   Oak Boat   ///
         ////////////////////
         register(333, builder()
                 .translation("item.boat.oak.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "boat"));
         ///////////////////
         ///   Leather   ///
@@ -1359,6 +1362,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(413, builder()
                 .translation("item.rabbitStew.name")
+                .maxStackQuantity(1)
                 .properties(builder -> builder
                         .add(useDuration(32))
                         .add(foodRestoration(10))
@@ -1366,7 +1370,6 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()
                                 .restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
-                .maxStackQuantity(1)
                 .build("minecraft", "rabbit_stew"));
         ///////////////////////
         ///   Rabbit Foot   ///

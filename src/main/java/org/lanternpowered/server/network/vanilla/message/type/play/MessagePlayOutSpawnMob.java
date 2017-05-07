@@ -37,14 +37,14 @@ public final class MessagePlayOutSpawnMob implements Message {
     private final UUID uniqueId;
     private final int mobType;
     private final Vector3d position;
-    private final int yaw;
-    private final int pitch;
-    private final int headPitch;
+    private final byte yaw;
+    private final byte pitch;
+    private final byte headPitch;
     private final Vector3d velocity;
     private final ParameterList parameterList;
 
-    public MessagePlayOutSpawnMob(int entityId, UUID uniqueId, int mobType, Vector3d position, int yaw, int pitch,
-            int headPitch, Vector3d velocity, ParameterList parameterList) {
+    public MessagePlayOutSpawnMob(int entityId, UUID uniqueId, int mobType, Vector3d position, byte yaw, byte pitch,
+            byte headPitch, Vector3d velocity, ParameterList parameterList) {
         this.entityId = entityId;
         this.uniqueId = uniqueId;
         this.mobType = mobType;
@@ -72,15 +72,15 @@ public final class MessagePlayOutSpawnMob implements Message {
         return this.position;
     }
 
-    public int getYaw() {
+    public byte getYaw() {
         return this.yaw;
     }
 
-    public int getPitch() {
+    public byte getPitch() {
         return this.pitch;
     }
 
-    public int getHeadPitch() {
+    public byte getHeadPitch() {
         return this.headPitch;
     }
 

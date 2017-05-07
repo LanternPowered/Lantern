@@ -54,6 +54,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInP
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerVehicleControls;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPrepareCraftingGrid;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInSpectate;
@@ -141,11 +142,13 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerLook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovementAndLook;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovementInput;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerOnGroundState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSprint;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
@@ -193,6 +196,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementAndLook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementInput;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerOnGroundState;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSprint;
@@ -325,7 +329,8 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInPlayerLook());
         inbound.bind(CodecPlayInPlayerOnGroundState.class, MessagePlayInPlayerOnGroundState.class)
                 .bindHandler(new HandlerPlayInPlayerOnGroundState());
-        inbound.bind(); // TODO: Vehicle Move
+        inbound.bind(CodecPlayInPlayerVehicleMovement.class, MessagePlayInPlayerVehicleMovement.class)
+                .bindHandler(new HandlerPlayInPlayerVehicleMovement());
         inbound.bind(); // TODO: Steer Boat
         inbound.bind(CodecPlayInPlayerAbilities.class, MessagePlayInPlayerAbilities.class)
                 .bindHandler(new HandlerPlayInPlayerAbilities());
@@ -396,7 +401,8 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInPlayerSprint());
         inbound.bindMessage(MessagePlayInPlayerVehicleJump.class); // TODO: Handler
         // Provided by CodecPlayInPlayerVehicleControls
-        inbound.bindMessage(MessagePlayInPlayerVehicleMovement.class); // TODO: Handler
+        inbound.bindMessage(MessagePlayInPlayerMovementInput.class)
+                .bindHandler(new HandlerPlayInPlayerMovementInput());
         // Provided by CodecPlayInCraftingBookData
         inbound.bindMessage(MessagePlayInDisplayedRecipe.class)
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleDisplayedRecipe));

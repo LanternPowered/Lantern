@@ -27,35 +27,40 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
 
-/**
- * This is the only message that we will use to modify the controls
- * of the player. More info will come as I write the implementation.
- */
 public final class MessagePlayInPlayerVehicleMovement implements Message {
 
-    private final float sideways;
-    private final float forwards;
+    private final double x;
+    private final double y;
+    private final double z;
 
-    public MessagePlayInPlayerVehicleMovement(float forwards, float sideways) {
-        this.sideways = sideways;
-        this.forwards = forwards;
+    private final float yaw;
+    private final float pitch;
+
+    public MessagePlayInPlayerVehicleMovement(double x, double y, double z, float yaw, float pitch) {
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
-    /**
-     * Gets the forwards value. (Positive is forwards, negative is backwards.)
-     * 
-     * @return the forwards value
-     */
-    public float getForwards() {
-        return this.forwards;
+    public double getX() {
+        return this.x;
     }
 
-    /**
-     * Gets the sideways value. (Positive is left, negative is right.)
-     * 
-     * @return the sideways value
-     */
-    public float getSideways() {
-        return this.sideways;
+    public double getY() {
+        return this.y;
+    }
+
+    public double getZ() {
+        return this.z;
+    }
+
+    public float getPitch() {
+        return this.pitch;
+    }
+
+    public float getYaw() {
+        return this.yaw;
     }
 }

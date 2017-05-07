@@ -41,15 +41,17 @@ public class HandlerPlayInPlayerLook implements Handler<MessagePlayInPlayerLook>
     }
 
     static Vector3d toRotation(float yaw, float pitch) {
-        yaw %= 360.0f;
-        pitch %= 360.0f;
-        if (yaw < 180.0f) {
-            yaw += 360.0f;
-        } else if (yaw > 180.0f) {
-            yaw -= 360.0f;
+        while (yaw >= 360.0) {
+            yaw -= 360.0;
         }
-        if (pitch < 0) {
-            pitch += 360.0f;
+        while (yaw < 0.0) {
+            yaw += 360.0;
+        }
+        while (pitch >= 360.0) {
+            pitch -= 360.0;
+        }
+        while (pitch < 0.0) {
+            pitch += 360.0;
         }
         return new Vector3d(yaw, pitch, 0);
     }

@@ -32,7 +32,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.api.script.context.Parameter;
@@ -83,10 +82,12 @@ import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
+import org.lanternpowered.server.game.registry.type.extra.HatRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
@@ -470,6 +471,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
+                .registerModule(Accessory.class, new HatRegistryModule())
                 .registerModule(DamageType.class, new DamageTypeRegistryModule())
                 .registerModule(DismountType.class, new DismountTypeRegistryModule())
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())

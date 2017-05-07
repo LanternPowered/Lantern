@@ -34,9 +34,9 @@ import org.lanternpowered.server.network.message.BulkMessage;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementInput;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,7 @@ public final class CodecPlayInPlayerVehicleControls implements Codec<Message> {
             forwards /= 0.3f;
         }
 
-        messages.add(new MessagePlayInPlayerVehicleMovement(forwards, sideways));
+        messages.add(new MessagePlayInPlayerMovementInput(forwards, sideways));
         return messages.size() == 1 ? messages.get(0) : new BulkMessage(messages);
     }
 }

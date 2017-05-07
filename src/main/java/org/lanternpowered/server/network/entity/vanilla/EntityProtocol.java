@@ -32,6 +32,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntSets;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
@@ -91,10 +94,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private long lastY;
     private long lastZ;
 
-    private byte lastYaw;
-    private byte lastPitch;
+    protected byte lastYaw;
+    protected byte lastPitch;
 
-    private byte lastHeadYaw;
+    protected byte lastHeadYaw;
 
     private double lastVelX;
     private double lastVelY;
@@ -107,7 +110,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Nullable private String lastCustomName;
 
-    private List<Entity> lastPassengers = Collections.emptyList();
+    protected IntSet lastPassengers = IntSets.EMPTY_SET;
 
     private final Int2ObjectMap<ItemStack> lastEquipment = new Int2ObjectOpenHashMap<>();
 
@@ -159,6 +162,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         // TODO: On ground state
 
         final int entityId = getRootEntityId();
+        final boolean passenger = this.entity.getVehicle().isPresent();
 
         if (dirtyRot) {
             this.lastYaw = yaw;
@@ -175,33 +179,34 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             // Don't send movement messages if the entity
             // is a passengers, otherwise glitches will
             // rule the world.
-            if (!this.entity.getVehicle().isPresent()) {
+            if (passenger) {
                 if (Math.abs(dxu) <= Short.MAX_VALUE && Math.abs(dyu) <= Short.MAX_VALUE && Math.abs(dzu) <= Short.MAX_VALUE) {
                     if (dirtyRot) {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
-                                (int) dxu, (int) dyu, (int) dzu, yaw, pitch, false));
+                                (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
                         // The rotation is already send
                         dirtyRot = false;
                     } else {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityRelativeMove(entityId,
-                                (int) dxu, (int) dyu, (int) dzu, false));
+                                (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
                     }
                 } else {
                     context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
-                            x, y, z, yaw, pitch, false));
+                            x, y, z, yaw, pitch, this.entity.isOnGround()));
                     // The rotation is already send
                     dirtyRot = false;
                 }
             }
         }
         if (dirtyRot) {
-            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, yaw, pitch, false));
-        }
-        if (headRot != null) {
-            final byte headYaw = wrapAngle(headRot.getY());
-            if (headYaw != this.lastHeadYaw) {
-                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, headYaw));
-                this.lastHeadYaw = headYaw;
+            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, yaw, pitch, this.entity.isOnGround()));
+        } else if (!passenger) {
+            if (headRot != null) {
+                final byte headYaw = wrapAngle(headRot.getY());
+                if (headYaw != this.lastHeadYaw) {
+                    context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, headYaw));
+                    this.lastHeadYaw = headYaw;
+                }
             }
         }
         final Vector3d velocity = this.entity.getVelocity();
@@ -261,26 +266,24 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Override
     protected void postUpdate(EntityProtocolUpdateContext context) {
-        final List<Entity> passengers = this.entity.getPassengers();
+        final IntSet passengers = getPassengerIds(context);
         if (!passengers.equals(this.lastPassengers)) {
             this.lastPassengers = passengers;
-            sendPassengers(context, passengers);
+            context.sendToAll(new MessagePlayOutSetEntityPassengers(getRootEntityId(), passengers.toIntArray()));
         }
     }
 
     @Override
     public void postSpawn(EntityProtocolUpdateContext context) {
-        sendPassengers(context, this.entity.getPassengers());
+        context.sendToAll(new MessagePlayOutSetEntityPassengers(getRootEntityId(), getPassengerIds(context).toIntArray()));
     }
 
-    private void sendPassengers(EntityProtocolUpdateContext context, List<Entity> passengers) {
-        context.sendToAll(() -> {
-            final IntList passengerIds = new IntArrayList();
-            for (Entity passenger : passengers) {
-                context.getId(passenger).ifPresent(passengerIds::add);
-            }
-            return new MessagePlayOutSetEntityPassengers(getRootEntityId(), passengerIds.toIntArray());
-        });
+    protected IntSet getPassengerIds(EntityProtocolUpdateContext context) {
+        final IntSet passengerIds = new IntOpenHashSet();
+        for (Entity passenger : this.entity.getPassengers()) {
+            context.getId(passenger).ifPresent(passengerIds::add);
+        }
+        return passengerIds;
     }
 
     /**

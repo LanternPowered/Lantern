@@ -25,9 +25,11 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
+import com.flowpowered.math.vector.Vector3f;
 import org.lanternpowered.server.network.entity.parameter.ParameterType;
 import org.lanternpowered.server.network.entity.parameter.ParameterTypeCollection;
 import org.lanternpowered.server.network.entity.parameter.ParameterValueTypes;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
@@ -115,6 +117,35 @@ public final class EntityParameters {
         }
     }
 
+    public static final class ArmorStand {
+
+        public static final ParameterTypeCollection PARAMETERS = Living.PARAMETERS.copy();
+
+        /**
+         * Bit mask Meaning
+         * 0x01	    Small
+         * 0x04	    Arms
+         * 0x08	    No base plate
+         * 0x10	    Marker
+         */
+        public static final ParameterType<Byte> FLAGS = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
+
+        public static final ParameterType<Vector3f> HEAD_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+
+        public static final ParameterType<Vector3f> BODY_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+
+        public static final ParameterType<Vector3f> LEFT_ARM_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+
+        public static final ParameterType<Vector3f> RIGHT_ARM_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+
+        public static final ParameterType<Vector3f> LEFT_LEG_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+
+        public static final ParameterType<Vector3f> RIGHT_LEG_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+
+        private ArmorStand() {
+        }
+    }
+
     public static final class Insentient {
 
         public static final ParameterTypeCollection PARAMETERS = Living.PARAMETERS.copy();
@@ -153,6 +184,16 @@ public final class EntityParameters {
          * The main hand. (0: Left, 1: Right)
          */
         public static final ParameterType<Byte> MAIN_HAND = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
+
+        /**
+         * Th entity on the left shoulder.
+         */
+        public static final ParameterType<Optional<DataView>> LEFT_SHOULDER_ENTITY = PARAMETERS.newParameterType(ParameterValueTypes.NBT_TAG);
+
+        /**
+         * Th entity on the right shoulder.
+         */
+        public static final ParameterType<Optional<DataView>> RIGHT_SHOULDER_ENTITY = PARAMETERS.newParameterType(ParameterValueTypes.NBT_TAG);
 
         private Humanoid() {
         }
@@ -524,6 +565,20 @@ public final class EntityParameters {
         }
     }
 
+    public static final class Vex {
+
+        public static final ParameterTypeCollection PARAMETERS = Insentient.PARAMETERS.copy();
+
+        /**
+         * Bit mask	Meaning
+         * 0x01	    Attack mode
+         */
+        public static final ParameterType<Byte> FLAGS = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
+
+        private Vex() {
+        }
+    }
+
     public static final class Item {
 
         public static final ParameterTypeCollection PARAMETERS = Base.PARAMETERS.copy();
@@ -539,7 +594,7 @@ public final class EntityParameters {
         public static final ParameterTypeCollection PARAMETERS = Insentient.PARAMETERS.copy();
 
         /**
-         * Whether the entity is a baby.
+         * The phase of the dragon.
          */
         public static final ParameterType<Integer> PHASE = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
 

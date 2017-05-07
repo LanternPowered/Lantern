@@ -66,6 +66,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     private final ItemType itemType;
 
     private int quantity;
+    private int tempMaxQuantity;
 
     public LanternItemStack(BlockType blockType) {
         this(blockType, 1);
@@ -159,7 +160,14 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     @Override
     public int getMaxStackQuantity() {
+        if (this.tempMaxQuantity != 0) {
+            return this.tempMaxQuantity;
+        }
         return this.itemType.getMaxStackQuantity();
+    }
+
+    void setTempMaxQuantity(int maxQuantity) {
+        this.tempMaxQuantity = maxQuantity;
     }
 
     @Override
@@ -182,7 +190,10 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     @Override
     public LanternItemStack copy() {
         //noinspection ConstantConditions
-        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap(), copyRawAdditionalManipulators(ConcurrentHashMap::new));
+        final LanternItemStack itemStack = new LanternItemStack(this.itemType, this.quantity, copyRawValueMap(),
+                copyRawAdditionalManipulators(ConcurrentHashMap::new));
+        itemStack.tempMaxQuantity = this.tempMaxQuantity;
+        return itemStack;
     }
 
     /**

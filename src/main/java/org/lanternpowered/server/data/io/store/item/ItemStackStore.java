@@ -135,6 +135,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         final DataValueItemTypeObjectSerializer<DyeColor> dyeColorSerializer =
                 new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get());
         add(BlockTypes.WOOL, dyeColorSerializer);
+        add(BlockTypes.CARPET, dyeColorSerializer);
         add(BlockTypes.STAINED_HARDENED_CLAY, dyeColorSerializer);
         add(BlockTypes.STAINED_GLASS, dyeColorSerializer);
         add(BlockTypes.STAINED_GLASS_PANE, dyeColorSerializer);
@@ -177,11 +178,6 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));
         add(ItemTypes.WRITABLE_BOOK, new WritableBookItemTypeObjectSerializer());
         add(ItemTypes.WRITTEN_BOOK, new WrittenBookItemTypeObjectSerializer());
-        final ColoredLeatherItemTypeObjectSerializer leatherSerializer = new ColoredLeatherItemTypeObjectSerializer();
-        add(ItemTypes.LEATHER_BOOTS, leatherSerializer);
-        add(ItemTypes.LEATHER_CHESTPLATE, leatherSerializer);
-        add(ItemTypes.LEATHER_HELMET, leatherSerializer);
-        add(ItemTypes.LEATHER_LEGGINGS, leatherSerializer);
         final PotionEffectsItemTypeObjectSerializer potionEffectsSerializer = new PotionEffectsItemTypeObjectSerializer();
         add(ItemTypes.POTION, potionEffectsSerializer);
         add(ItemTypes.SPLASH_POTION, potionEffectsSerializer);
@@ -193,10 +189,6 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(ItemTypes.WOODEN_AXE, durableSerializer);
         add(ItemTypes.WOODEN_HOE, durableSerializer);
         add(ItemTypes.WOODEN_SHOVEL, durableSerializer);
-        add(ItemTypes.LEATHER_BOOTS, durableSerializer);
-        add(ItemTypes.LEATHER_LEGGINGS, durableSerializer);
-        add(ItemTypes.LEATHER_CHESTPLATE, durableSerializer);
-        add(ItemTypes.LEATHER_HELMET, durableSerializer);
         add(ItemTypes.STONE_SWORD, durableSerializer);
         add(ItemTypes.STONE_PICKAXE, durableSerializer);
         add(ItemTypes.STONE_AXE, durableSerializer);
@@ -239,6 +231,11 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(ItemTypes.SHEARS, durableSerializer);
         add(ItemTypes.ELYTRA, durableSerializer);
         add(ItemTypes.SHIELD, durableSerializer);
+        final ColoredLeatherItemTypeObjectSerializer leatherSerializer = new ColoredLeatherItemTypeObjectSerializer();
+        add(ItemTypes.LEATHER_BOOTS, leatherSerializer);
+        add(ItemTypes.LEATHER_CHESTPLATE, leatherSerializer);
+        add(ItemTypes.LEATHER_HELMET, leatherSerializer);
+        add(ItemTypes.LEATHER_LEGGINGS, leatherSerializer);
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {

@@ -38,6 +38,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -308,7 +309,8 @@ public final class AdvancementTree extends Styleable {
         if (state != UPDATE || (this.rootAdvancement != null && advancements.contains(this.rootAdvancement))) {
             addedStructs = new ArrayList<>();
             addedStructs.add(createStruct(rootId, null, createDisplay(
-                    new LocalizedText(getTitle(), Locale.ENGLISH),
+                    // The title has to be reset afterwards, otherwise is the style also used for the description
+                    new LocalizedText(Text.builder().append(getTitle()).style(TextStyles.RESET).build(), Locale.ENGLISH),
                     new LocalizedText(getDescription(), Locale.ENGLISH),
                     getIcon(), getFrameType(), this.background,
                     this.rootPosition.getX() + this.xOffset,
@@ -347,7 +349,8 @@ public final class AdvancementTree extends Styleable {
 
                 final Vector2d pos = this.advancements.get(advancement);
                 addedStructs.add(createStruct(id, parentId, createDisplay(
-                        new LocalizedText(advancement.getTitle(), locale),
+                        // The title has to be reset afterwards, otherwise is the style also used for the description
+                        new LocalizedText(Text.builder().append(advancement.getTitle()).style(TextStyles.RESET).build(), locale),
                         new LocalizedText(advancement.getDescription(), locale),
                         advancement.getIcon(), advancement.getFrameType(), null,
                         pos.getX() + this.xOffset, pos.getY() + this.yOffset,

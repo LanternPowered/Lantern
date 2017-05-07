@@ -111,6 +111,10 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         return this.itemStack;
     }
 
+    public void setRawItemStack(@Nullable ItemStack itemStack) {
+        this.itemStack = itemStack;
+    }
+
     /**
      * Check whether the supplied item can be inserted into this slot. Returning
      * false from this method implies that {@link #offer} <b>would always return

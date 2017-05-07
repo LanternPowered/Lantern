@@ -75,7 +75,7 @@ public final class ParameterValueTypes {
     public static final ParameterValueType<Optional<DataView>> NBT_TAG = new ParameterValueType<>((buf, value) -> {
         if (value.isPresent()) {
             try {
-                NbtStreamUtils.write(value.get(), buf.asOutputStream(), true);
+                NbtStreamUtils.write(value.get(), buf.asOutputStream(), false);
             } catch (IOException e) {
                 throw Throwables.propagate(e);
             }

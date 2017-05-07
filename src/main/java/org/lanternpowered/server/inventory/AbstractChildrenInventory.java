@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -111,6 +112,14 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     }
 
     Iterable<LanternSlot> getSlotInventories() {
+        final ImmutableList.Builder<LanternSlot> slots = ImmutableList.builder();
+        for (AbstractInventory child : this.children) {
+            if (child instanceof AbstractChildrenInventory) {
+                slots.addAll(((AbstractChildrenInventory) child).getSlotInventories());
+            } else if (child instanceof LanternSlot) {
+                slots.add((LanternSlot) child);
+            }
+        }
         return Collections.emptyList();
     }
 

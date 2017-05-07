@@ -25,8 +25,13 @@
  */
 package org.lanternpowered.server.advancement;
 
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.util.Color;
 
 public final class TestAdvancementTree {
 
@@ -76,12 +81,20 @@ public final class TestAdvancementTree {
                 .title(Text.of("Dirt Lover"))
                 .description(Text.of("Dig a more then 1000 dirt blocks."))
                 .build("test", "dirt_lover");
+        /*
+        final LanternItemStack icon = new LanternItemStack(ItemTypes.LEATHER_CHESTPLATE);
+        icon.offer(Keys.COLOR, Color.RED);
+        */
+        /*
+        final LanternItemStack icon = new LanternItemStack(ItemTypes.POTION);
+        icon.offer(Keys.COLOR, Color.DARK_MAGENTA);
+        */
         final Advancement wanderingChallenge = Advancement.builder()
                 .parent(becomeKing)
                 .icon(ItemTypes.BREAD)
                 .frameType(FrameTypes.CHALLENGE)
-                .title(Text.of("Is it edible?"))
-                .description(Text.of("Attempt to cook dirt."))
+                .title(Text.builder("Is it edible?").color(TextColors.GOLD).build())
+                .description(Text.builder("Attempt to cook dirt.").style(TextStyles.ITALIC).build())
                 .build("test", "cooking_dirt");
         B.addAdvancement(1, 1, DIG_DIRT);
         B.addAdvancement(2, 1, dirtLover);

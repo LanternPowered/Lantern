@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.key;
 
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBoundedValueKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
@@ -34,11 +35,13 @@ import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.effect.potion.PotionType;
+import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.SkinPart;
+import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.OptionalValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
@@ -118,6 +121,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("RecipeBookGUIOpen"), "lantern:recipe_book_gui_open");
     public static final Key<Value<Boolean>> RECIPE_BOOK_FILTER_ACTIVE =
             makeValueKey(Boolean.class, DataQuery.of("RecipeBookFilterActive"), "lantern:recipe_book_filter_active");
+    public static final Key<ListValue<Accessory>> ACCESSORIES =
+            makeListKey(Accessory.class, DataQuery.of("Accessories"), "lantern:accessories");
 
     private LanternKeys() {
     }

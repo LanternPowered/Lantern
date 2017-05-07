@@ -23,42 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.extra.accessory;
 
-import com.flowpowered.math.GenericMath;
-import org.spongepowered.api.util.Direction;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.data.type.DyeColor;
 
-public final class CodecUtils {
+import java.util.Optional;
 
-    public static Direction fromFace(int face) {
-        switch (face) {
-            case 0: return Direction.UP;
-            case 1: return Direction.DOWN;
-            case 2: return Direction.SOUTH;
-            case 3: return Direction.NORTH;
-            case 4: return Direction.EAST;
-            case 5: return Direction.WEST;
-            default:
-                throw new IllegalStateException("Unknown face: " + face);
-        }
+import javax.annotation.Nullable;
+
+public class LanternTopHat extends PluginCatalogType.Base implements TopHat {
+
+    @Nullable private final DyeColor dyeColor;
+
+    public LanternTopHat(String identifier, String name) {
+        this(identifier, name, null);
     }
 
-    /**
-     * Wraps the double angle into a byte.
-     * 
-     * @param angle The angle
-     * @return The byte value
-     */
-    public static byte wrapAngle(double angle) {
-        while (angle >= 180.0) {
-            angle -= 360.0;
-        }
-        while (angle < -180.0) {
-            angle += 360.0;
-        }
-        return (byte) GenericMath.floor(angle / 360.0 * 256.0);
+    public LanternTopHat(String identifier, String name, @Nullable DyeColor dyeColor) {
+        super(identifier, name);
+        this.dyeColor = dyeColor;
     }
 
-    private CodecUtils() {
+    @Override
+    public Optional<DyeColor> getDyeColor() {
+        return Optional.ofNullable(this.dyeColor);
     }
 }

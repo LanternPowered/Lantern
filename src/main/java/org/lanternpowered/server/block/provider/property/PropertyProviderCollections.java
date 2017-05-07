@@ -23,21 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
-
-import static org.lanternpowered.server.block.PropertyProviders.blastResistance;
-import static org.lanternpowered.server.block.PropertyProviders.flammable;
-import static org.lanternpowered.server.block.PropertyProviders.gravityAffected;
-import static org.lanternpowered.server.block.PropertyProviders.hardness;
-import static org.lanternpowered.server.block.PropertyProviders.lightEmission;
-import static org.lanternpowered.server.block.PropertyProviders.matter;
-import static org.lanternpowered.server.block.PropertyProviders.passable;
-import static org.lanternpowered.server.block.PropertyProviders.replaceable;
-import static org.lanternpowered.server.block.PropertyProviders.solidCube;
-import static org.lanternpowered.server.block.PropertyProviders.solidSide;
-import static org.lanternpowered.server.block.PropertyProviders.statisticsTracked;
-import static org.lanternpowered.server.block.PropertyProviders.surrogateBlock;
-import static org.lanternpowered.server.block.PropertyProviders.unbreakable;
+package org.lanternpowered.server.block.provider.property;
 
 import org.spongepowered.api.data.property.block.MatterProperty;
 
@@ -48,48 +34,48 @@ import org.spongepowered.api.data.property.block.MatterProperty;
 public final class PropertyProviderCollections {
 
     public static final PropertyProviderCollection DEFAULT = PropertyProviderCollection.builder()
-            .add(matter(MatterProperty.Matter.SOLID))
-            .add(flammable(false))
-            .add(hardness(1.0))
-            .add(blastResistance(5.0))
-            .add(lightEmission(0))
-            .add(passable(false))
-            .add(solidCube(true))
-            .add(solidSide(true))
-            .add(gravityAffected(false))
-            .add(unbreakable(false))
-            .add(replaceable(false))
-            .add(surrogateBlock(false))
-            .add(statisticsTracked(true))
+            .add(PropertyProviders.matter(MatterProperty.Matter.SOLID))
+            .add(PropertyProviders.flammable(false))
+            .add(PropertyProviders.hardness(1.0))
+            .add(PropertyProviders.blastResistance(5.0))
+            .add(PropertyProviders.lightEmission(0))
+            .add(PropertyProviders.passable(false))
+            .add(PropertyProviders.solidCube(true))
+            .add(PropertyProviders.solidSide(true))
+            .add(PropertyProviders.gravityAffected(false))
+            .add(PropertyProviders.unbreakable(false))
+            .add(PropertyProviders.replaceable(false))
+            .add(PropertyProviders.surrogateBlock(false))
+            .add(PropertyProviders.statisticsTracked(true))
             .build();
 
     public static final PropertyProviderCollection PASSABLE = PropertyProviderCollection.builder()
-            .add(passable(true))
-            .add(solidCube(false))
-            .add(solidSide(false))
+            .add(PropertyProviders.passable(true))
+            .add(PropertyProviders.solidCube(false))
+            .add(PropertyProviders.solidSide(false))
             .build();
 
     public static final PropertyProviderCollection UNBREAKABLE = PropertyProviderCollection.builder()
-            .add(unbreakable(true))
-            .add(hardness(-1.0))
-            .add(blastResistance(6000000.0))
-            .add(statisticsTracked(false))
+            .add(PropertyProviders.unbreakable(true))
+            .add(PropertyProviders.hardness(-1.0))
+            .add(PropertyProviders.blastResistance(6000000.0))
+            .add(PropertyProviders.statisticsTracked(false))
             .build();
 
     public static final PropertyProviderCollection INSTANT_BROKEN = PropertyProviderCollection.builder()
-            .add(hardness(0.0))
-            .add(blastResistance(0.0))
+            .add(PropertyProviders.hardness(0.0))
+            .add(PropertyProviders.blastResistance(0.0))
             .build();
 
     public static final PropertyProviderCollection DEFAULT_GAS = DEFAULT.toBuilder()
-            .add(matter(MatterProperty.Matter.GAS))
-            .add(replaceable(true))
+            .add(PropertyProviders.matter(MatterProperty.Matter.GAS))
+            .add(PropertyProviders.replaceable(true))
             .add(PASSABLE)
             .build();
 
     public static final PropertyProviderCollection DEFAULT_LIQUID = DEFAULT.toBuilder()
-            .add(matter(MatterProperty.Matter.LIQUID))
-            .add(replaceable(true))
+            .add(PropertyProviders.matter(MatterProperty.Matter.LIQUID))
+            .add(PropertyProviders.replaceable(true))
             .add(PASSABLE)
             .build();
 

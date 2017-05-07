@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.property.block;
 
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.PropertyProvider;
+import org.lanternpowered.server.block.provider.property.PropertyProvider;
 import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Property;

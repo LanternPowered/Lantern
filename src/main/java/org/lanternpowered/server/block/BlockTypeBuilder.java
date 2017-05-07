@@ -28,6 +28,8 @@ package org.lanternpowered.server.block;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
+import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -40,13 +42,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 public interface BlockTypeBuilder {
 
-    BlockTypeBuilder boundingBox(AABB boundingBox);
+    BlockTypeBuilder boundingBox(@Nullable AABB boundingBox);
 
-    BlockTypeBuilder boundingBox(Function<BlockState, AABB> boundingBoxProvider);
+    BlockTypeBuilder boundingBox(@Nullable Function<BlockState, AABB> boundingBoxProvider);
 
-    BlockTypeBuilder boundingBox(ObjectProvider<AABB> boundingBoxProvider);
+    BlockTypeBuilder boundingBox(@Nullable ObjectProvider<AABB> boundingBoxProvider);
 
     BlockTypeBuilder defaultState(Function<BlockState, BlockState> function);
 

@@ -23,17 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
-
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-import javax.annotation.Nullable;
-
-@FunctionalInterface
-public interface ObjectProvider<T> {
-
-    T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face);
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.block.provider.property;

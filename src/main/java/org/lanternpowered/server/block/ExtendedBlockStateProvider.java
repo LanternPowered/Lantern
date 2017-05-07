@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block;
 
+import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;

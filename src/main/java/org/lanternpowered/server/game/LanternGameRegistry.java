@@ -87,7 +87,6 @@ import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
-import org.lanternpowered.server.game.registry.type.extra.HatRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
@@ -145,6 +144,7 @@ import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistry
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.game.registry.type.extra.AccessoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
@@ -471,7 +471,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
-                .registerModule(Accessory.class, new HatRegistryModule())
+                .registerModule(Accessory.class, new AccessoryRegistryModule())
                 .registerModule(DamageType.class, new DamageTypeRegistryModule())
                 .registerModule(DismountType.class, new DismountTypeRegistryModule())
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())

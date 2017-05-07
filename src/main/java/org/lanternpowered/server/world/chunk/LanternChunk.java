@@ -43,20 +43,19 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
-import org.lanternpowered.server.block.CachedSimpleObjectProvider;
-import org.lanternpowered.server.block.ConstantObjectProvider;
+import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
+import org.lanternpowered.server.block.provider.ConstantObjectProvider;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
-import org.lanternpowered.server.block.ObjectProvider;
-import org.lanternpowered.server.block.SimpleObjectProvider;
+import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.lanternpowered.server.block.TileEntityProvider;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.game.Lantern;
@@ -1212,11 +1211,17 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return Optional.empty();
         }
         final ObjectProvider<AABB> aabbObjectProvider = ((LanternBlockType) block.getType()).getBoundingBoxProvider();
+        if (aabbObjectProvider == null) {
+            return Optional.empty();
+        }
+        final AABB aabb;
         if (aabbObjectProvider instanceof ConstantObjectProvider || aabbObjectProvider instanceof CachedSimpleObjectProvider
                 || aabbObjectProvider instanceof SimpleObjectProvider) {
-            return Optional.of(aabbObjectProvider.get(block, null, null).offset(x, y, z));
+            aabb = aabbObjectProvider.get(block, null, null);
+        } else {
+            aabb = aabbObjectProvider.get(block, new Location<>(this.world, x, y, z), null);
         }
-        return Optional.of(aabbObjectProvider.get(block, new Location<>(this.world, x, y, z), null).offset(x, y, z));
+        return aabb == null ? Optional.empty() : Optional.of(aabb.offset(x, y, z));
     }
 
     @Override

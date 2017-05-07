@@ -43,13 +43,15 @@ public class BoundingBoxes {
 
     public static final AABB DEFAULT = new AABB(Vector3d.ZERO, Vector3d.ONE);
 
+    public static final AABB NULL = null;
+
     private final static class Carpet {
 
         private static final AABB DEFAULT = new AABB(0.0, 0.0, 0.0, 1.0, 0.0625, 1.0);
     }
 
     public static AABB carpet() {
-        return DEFAULT;
+        return Carpet.DEFAULT;
     }
 
     private final static class PressurePlate {

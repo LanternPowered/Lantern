@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block;
 
+import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;

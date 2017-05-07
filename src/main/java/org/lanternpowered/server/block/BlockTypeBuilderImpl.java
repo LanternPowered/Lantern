@@ -26,8 +26,8 @@
 package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.block.PropertyProviders.solidCube;
-import static org.lanternpowered.server.block.PropertyProviders.solidSide;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidCube;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidSide;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -36,6 +36,13 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
+import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
+import org.lanternpowered.server.block.provider.ConstantObjectProvider;
+import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.SimpleObjectProvider;
+import org.lanternpowered.server.block.provider.property.PropertyProvider;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.item.ItemTypeBuilder;
@@ -73,23 +80,21 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Nullable private TranslationProvider translationProvider;
     @Nullable private TileEntityProvider tileEntityProvider;
     @Nullable private ItemTypeBuilder itemTypeBuilder;
-    private ObjectProvider<AABB> boundingBoxProvider = new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
+    @Nullable private ObjectProvider<AABB> boundingBoxProvider = new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
 
     @Override
-    public BlockTypeBuilder boundingBox(AABB boundingBox) {
-        checkNotNull(boundingBox, "boundingBox");
-        return boundingBox(new ConstantObjectProvider<>(boundingBox));
+    public BlockTypeBuilder boundingBox(@Nullable AABB boundingBox) {
+        return boundingBox(boundingBox == null ? null : new ConstantObjectProvider<>(boundingBox));
     }
 
     @Override
-    public BlockTypeBuilder boundingBox(Function<BlockState, AABB> boundingBoxProvider) {
-        checkNotNull(boundingBoxProvider, "boundingBoxProvider");
+    public BlockTypeBuilder boundingBox(@Nullable Function<BlockState, AABB> boundingBoxProvider) {
         return boundingBox(new SimpleObjectProvider<>(boundingBoxProvider));
     }
 
     @Override
-    public BlockTypeBuilder boundingBox(ObjectProvider<AABB> boundingBoxProvider) {
-        this.boundingBoxProvider = checkNotNull(boundingBoxProvider, "boundingBoxProvider");
+    public BlockTypeBuilder boundingBox(@Nullable ObjectProvider<AABB> boundingBoxProvider) {
+        this.boundingBoxProvider = boundingBoxProvider;
         return this;
     }
 

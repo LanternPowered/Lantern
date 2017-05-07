@@ -23,25 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
-
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-import javax.annotation.Nullable;
-
-public class ConstantObjectProvider<T> implements ObjectProvider<T> {
-
-    private final T value;
-
-    public ConstantObjectProvider(T value) {
-        this.value = value;
-    }
-
-    @Override
-    public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
-        return this.value;
-    }
-}
+package org.lanternpowered.server.block.provider;

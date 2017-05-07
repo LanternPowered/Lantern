@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.lanternpowered.server.block.PropertyProviderCollection;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.data.property.block.BlockPropertyStore;
 import org.lanternpowered.server.data.property.item.ItemPropertyStore;
 import org.spongepowered.api.data.Property;

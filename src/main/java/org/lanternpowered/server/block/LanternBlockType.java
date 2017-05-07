@@ -28,6 +28,8 @@ package org.lanternpowered.server.block;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.RandomTickBehavior;
+import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
@@ -83,7 +85,7 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
      */
     private boolean tickRandomly;
 
-    private ObjectProvider<AABB> boundingBoxProvider;
+    @Nullable private ObjectProvider<AABB> boundingBoxProvider;
 
     LanternBlockType(String pluginId, String name, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
@@ -225,11 +227,12 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
         this.propertyProviderCollection = propertyProviderCollection;
     }
 
+    @Nullable
     public ObjectProvider<AABB> getBoundingBoxProvider() {
         return this.boundingBoxProvider;
     }
 
-    void setBoundingBoxProvider(ObjectProvider<AABB> boundingBoxProvider) {
+    void setBoundingBoxProvider(@Nullable ObjectProvider<AABB> boundingBoxProvider) {
         this.boundingBoxProvider = boundingBoxProvider;
     }
 }

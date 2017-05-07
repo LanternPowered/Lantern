@@ -28,13 +28,13 @@ package org.lanternpowered.server.game.registry.type.block;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.block.PropertyProviderCollections.INSTANT_BROKEN;
-import static org.lanternpowered.server.block.PropertyProviderCollections.PASSABLE;
-import static org.lanternpowered.server.block.PropertyProviders.blastResistance;
-import static org.lanternpowered.server.block.PropertyProviders.flammableInfo;
-import static org.lanternpowered.server.block.PropertyProviders.hardness;
-import static org.lanternpowered.server.block.PropertyProviders.lightEmission;
-import static org.lanternpowered.server.block.PropertyProviders.replaceable;
+import static org.lanternpowered.server.block.provider.property.PropertyProviderCollections.INSTANT_BROKEN;
+import static org.lanternpowered.server.block.provider.property.PropertyProviderCollections.PASSABLE;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.blastResistance;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.flammableInfo;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.hardness;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightEmission;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.replaceable;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
@@ -47,7 +47,7 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.BlockTypeBuilder;
 import org.lanternpowered.server.block.BlockTypeBuilderImpl;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.PropertyProviderCollections;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.TranslationProvider;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
@@ -854,6 +854,26 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                             throw new IllegalArgumentException();
                     }
                 });
+        //////////////
+        ///  Fire  ///
+        //////////////
+        register(51, simpleBuilder()
+                        .properties(builder -> builder
+                                .add(PropertyProviderCollections.PASSABLE)
+                                .add(PropertyProviderCollections.INSTANT_BROKEN)
+                                .add(lightEmission(15)))
+                        .boundingBox(BoundingBoxes.NULL)
+                        .translation("tile.fire.name")
+                        .build("minecraft", "fire"));
+        /////////////////////
+        ///  Mob Spawner  ///
+        /////////////////////
+        register(52, simpleBuilder()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(25.0)))
+                        .translation("tile.mobSpawner.name")
+                        .build("minecraft", "mob_spawner"));
         ////////////////////
         ///     Chest    ///
         ////////////////////
@@ -861,6 +881,20 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.chest.name")
                         .build("minecraft", "chest"),
                 this::chestData);
+        ////////////////////////////
+        /// Stone Pressure Plate ///
+        ////////////////////////////
+        register(70, pressurePlateBuilder()
+                        .translation("tile.pressurePlateStone.name")
+                        .build("minecraft", "stone_pressure_plate"),
+                this::pressurePlateData);
+        /////////////////////////////
+        /// Wooden Pressure Plate ///
+        /////////////////////////////
+        register(72, pressurePlateBuilder()
+                        .translation("tile.pressurePlateWood.name")
+                        .build("minecraft", "wooden_pressure_plate"),
+                this::pressurePlateData);
         ////////////////////
         ///    Pumpkin   ///
         ////////////////////
@@ -1331,6 +1365,22 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    private BlockTypeBuilder pressurePlateBuilder() {
+        return simpleBuilder()
+                .itemType()
+                .traits(LanternBooleanTraits.POWERED)
+                .boundingBox(BoundingBoxes::pressurePlate)
+                .defaultState(state -> state
+                        .withTrait(LanternBooleanTraits.POWERED, false).get())
+                .properties(builder -> builder
+                        .add(hardness(0.5))
+                        .add(blastResistance(2.5)));
+    }
+
+    private byte pressurePlateData(BlockState blockState) {
+        return (byte) (blockState.getTraitValue(LanternBooleanTraits.POWERED).get() ? 1 : 0);
     }
 
     private BlockTypeBuilder weightedPressurePlateBuilder() {

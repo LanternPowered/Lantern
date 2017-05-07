@@ -23,11 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
+package org.lanternpowered.server.block.provider.property;
 
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
 import org.lanternpowered.server.block.property.SolidSideProperty;
+import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.BlastResistanceProperty;
 import org.spongepowered.api.data.property.block.FlammableProperty;

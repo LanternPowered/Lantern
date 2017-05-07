@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
+package org.lanternpowered.server.block.provider.property;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,7 +39,7 @@ import java.util.Set;
 public final class PropertyProviderCollection {
 
     /**
-     * Creates a new {@link org.lanternpowered.server.block.PropertyProviderCollection.Builder}.
+     * Creates a new {@link PropertyProviderCollection.Builder}.
      *
      * @return The builder
      */
@@ -79,7 +79,7 @@ public final class PropertyProviderCollection {
     }
 
     /**
-     * Creates a new {@link org.lanternpowered.server.block.PropertyProviderCollection.Builder} with
+     * Creates a new {@link PropertyProviderCollection.Builder} with
      * the contents of this collection.
      *
      * @return The builder

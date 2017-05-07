@@ -23,9 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
+package org.lanternpowered.server.block.provider;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
+import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Direction;
@@ -42,7 +46,9 @@ public class CachedSimpleObjectProvider<T> implements ObjectProvider<T> {
 
     private final Object[] values;
 
-    CachedSimpleObjectProvider(LanternBlockType blockType, Function<BlockState, T> simpleObjectProvider) {
+    public CachedSimpleObjectProvider(LanternBlockType blockType, Function<BlockState, T> simpleObjectProvider) {
+        checkNotNull(blockType, "blockType");
+        checkNotNull(simpleObjectProvider, "simpleObjectProvider");
         final Collection<BlockState> blockStates = blockType.getAllBlockStates();
         final Object[] values = new Object[blockStates.size()];
         for (BlockState blockState : blockStates) {

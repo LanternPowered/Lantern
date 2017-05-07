@@ -23,17 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
+package org.lanternpowered.server.block.provider;
 
-import org.lanternpowered.server.block.provider.ObjectProvider;
-import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 @FunctionalInterface
-public interface TileEntityProvider extends ObjectProvider<TileEntity> {
+public interface ObjectProvider<T> {
 
-    static TileEntityProvider of(Supplier<TileEntity> supplier) {
-        return (blockState, location, face) -> supplier.get();
-    }
+    T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face);
 }

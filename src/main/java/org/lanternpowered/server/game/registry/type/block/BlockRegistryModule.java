@@ -47,7 +47,6 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.BlockTypeBuilder;
 import org.lanternpowered.server.block.BlockTypeBuilderImpl;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.TranslationProvider;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
@@ -66,6 +65,7 @@ import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlace
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
@@ -874,6 +874,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(25.0)))
                         .translation("tile.mobSpawner.name")
                         .build("minecraft", "mob_spawner"));
+        // TODO: Oak Stairs
         ////////////////////
         ///     Chest    ///
         ////////////////////
@@ -881,6 +882,79 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.chest.name")
                         .build("minecraft", "chest"),
                 this::chestData);
+        ///////////////////////////
+        ///     Redstone Wire   ///
+        ///////////////////////////
+        register(55, simpleBuilder()
+                        .traits(LanternIntegerTraits.POWER)
+                        .boundingBox(BoundingBoxes.NULL)
+                        .defaultState(state -> state
+                                .withTrait(LanternIntegerTraits.POWER, 0).get())
+                        .translation("tile.redstoneDust.name")
+                        .build("minecraft", "redstone_wire"),
+                state -> state.get(Keys.POWER).get().byteValue());
+        ///////////////////////
+        ///   Diamond Ore   ///
+        ///////////////////////
+        register(56, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(3.0))
+                                .add(blastResistance(5.0)))
+                        .translation("tile.oreDiamond.name")
+                        .build("minecraft", "diamond_ore"));
+        /////////////////////////
+        ///   Diamond Block   ///
+        /////////////////////////
+        register(57, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(10.0)))
+                        .translation("tile.blockDiamond.name")
+                        .build("minecraft", "diamond_block"));
+        //////////////////////////
+        ///   Crafting Table   ///
+        //////////////////////////
+        register(58, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.5))
+                                .add(blastResistance(12.5)))
+                        .translation("tile.workbench.name")
+                        .build("minecraft", "crafting_table"));
+        // TODO: Wheat
+        ////////////////////
+        ///   Farmland   ///
+        ////////////////////
+        register(60, simpleBuilder()
+                        .boundingBox(BoundingBoxes.farmland())
+                        .trait(LanternIntegerTraits.MOISTURE)
+                        .properties(builder -> builder
+                                .add(hardness(0.6))
+                                .add(blastResistance(3.0)))
+                        .defaultState(state ->
+                                state.withTrait(LanternIntegerTraits.MOISTURE, 0).get())
+                        .translation("tile.farmland.name")
+                        .build("minecraft", "farmland"),
+                state -> state.getTraitValue(LanternIntegerTraits.MOISTURE).get().byteValue());
+        ////////////////////
+        ///    Furnace   ///
+        ////////////////////
+        register(61, furnaceBuilder()
+                        .itemType()
+                        .translation("tile.furnace.name")
+                        .build("minecraft", "furnace"),
+                this::directionData);
+        ////////////////////
+        ///  Lit Furnace ///
+        ////////////////////
+        register(62, furnaceBuilder()
+                        .properties(builder -> builder
+                                .add(lightEmission(13)))
+                        .translation("tile.furnace.name")
+                        .build("minecraft", "lit_furnace"),
+                this::directionData);
         ////////////////////////////
         /// Stone Pressure Plate ///
         ////////////////////////////
@@ -904,7 +978,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .add(equipmentType(EquipmentTypes.HEADWEAR))))
                         .translation("tile.pumpkin.name")
                         .build("minecraft", "pumpkin"),
-                this::pumpkinData);
+                this::horizontalDirectionData);
         ////////////////////
         ///  Lit Pumpkin ///
         ////////////////////
@@ -913,7 +987,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(lightEmission(15)))
                         .translation("tile.litpumpkin.name")
                         .build("minecraft", "lit_pumpkin"),
-                this::pumpkinData);
+                this::horizontalDirectionData);
         /////////////////////
         /// Stained Glass ///
         /////////////////////
@@ -1399,20 +1473,35 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         return blockState.getTraitValue(LanternIntegerTraits.POWER).get().byteValue();
     }
 
-    private BlockTypeBuilder pumpkinBuilder() {
+    private BlockTypeBuilder horizontalFacingBuilder() {
         return simpleBuilder()
-                .itemType()
                 .traits(LanternEnumTraits.HORIZONTAL_FACING)
                 .defaultState(state -> state
                         .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
-                .properties(builder -> builder
-                        .add(hardness(1.0))
-                        .add(blastResistance(5.0)))
                 .behaviors(pipeline -> pipeline
                         .add(new HorizontalRotationPlacementBehavior()));
     }
 
-    private byte pumpkinData(BlockState blockState) {
+    private BlockTypeBuilder furnaceBuilder() {
+        return horizontalFacingBuilder()
+                .properties(builder -> builder
+                        .add(hardness(3.5))
+                        .add(blastResistance(17.5)));
+    }
+
+    private BlockTypeBuilder pumpkinBuilder() {
+        return horizontalFacingBuilder()
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.0))
+                        .add(blastResistance(5.0)));
+    }
+
+    private byte directionData(BlockState blockState) {
+        return (byte) directionData(blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get());
+    }
+
+    private byte horizontalDirectionData(BlockState blockState) {
         return (byte) horizontalDirectionData(blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get());
     }
 

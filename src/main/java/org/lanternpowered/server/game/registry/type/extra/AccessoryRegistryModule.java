@@ -58,6 +58,7 @@ public final class AccessoryRegistryModule extends PluginCatalogRegistryModule<A
         register(new LanternTopHat("minecraft", "purple", DyeColors.PURPLE));
         register(new LanternTopHat("minecraft", "red", DyeColors.RED));
         register(new LanternTopHat("minecraft", "silver", DyeColors.SILVER));
+        register(new LanternTopHat("minecraft", "snow"));
         register(new LanternTopHat("minecraft", "stone"));
         register(new LanternTopHat("minecraft", "white", DyeColors.WHITE));
         register(new LanternTopHat("minecraft", "wood"));

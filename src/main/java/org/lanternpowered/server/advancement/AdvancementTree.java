@@ -315,7 +315,7 @@ public final class AdvancementTree extends Styleable {
                     getIcon(), getFrameType(), this.background,
                     this.rootPosition.getX() + this.xOffset,
                     this.rootPosition.getY() + this.yOffset,
-                    doesShowToast()), Collections.singletonList(Collections.singletonList(AdvancementCriterion.DUMMY))));
+                    doesShowToast(), false), Collections.singletonList(Collections.singletonList(AdvancementCriterion.DUMMY))));
         }
 
         if (!advancements.isEmpty()) {
@@ -354,7 +354,7 @@ public final class AdvancementTree extends Styleable {
                         new LocalizedText(advancement.getDescription(), locale),
                         advancement.getIcon(), advancement.getFrameType(), null,
                         pos.getX() + this.xOffset, pos.getY() + this.yOffset,
-                        advancement.doesShowToast()), criteria));
+                        advancement.doesShowToast(), false), criteria));
             }
         }
 
@@ -410,8 +410,8 @@ public final class AdvancementTree extends Styleable {
     }
 
     private MessagePlayOutAdvancements.AdvStruct.Display createDisplay(LocalizedText title, LocalizedText description, ItemStackSnapshot icon,
-            FrameType frameType, @Nullable String background, double x, double y, boolean showToast) {
-        return new MessagePlayOutAdvancements.AdvStruct.Display(title, description, icon, frameType, background, x, y, showToast);
+            FrameType frameType, @Nullable String background, double x, double y, boolean showToast, boolean hidden) {
+        return new MessagePlayOutAdvancements.AdvStruct.Display(title, description, icon, frameType, background, x, y, showToast, hidden);
     }
 
     private MessagePlayOutAdvancements.AdvStruct createStruct(String id, @Nullable String parentId,

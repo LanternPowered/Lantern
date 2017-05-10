@@ -36,6 +36,8 @@ public final class LanternIntegerTraits {
 
     public static final IntegerTrait POWER = LanternIntegerTrait.ofRange("power", Keys.POWER, 0, 15);
 
+    public static final IntegerTrait MOISTURE = LanternIntegerTrait.ofRange("moisture", Keys.MOISTURE, 0, 7);
+
     private LanternIntegerTraits() {
     }
 }

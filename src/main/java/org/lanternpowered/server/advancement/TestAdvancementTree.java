@@ -25,13 +25,10 @@
  */
 package org.lanternpowered.server.advancement;
 
-import org.lanternpowered.server.inventory.LanternItemStack;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.Color;
 
 public final class TestAdvancementTree {
 

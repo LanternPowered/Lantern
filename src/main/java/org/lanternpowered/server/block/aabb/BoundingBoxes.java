@@ -45,6 +45,15 @@ public class BoundingBoxes {
 
     public static final AABB NULL = null;
 
+    private final static class Farmland {
+
+        private static final AABB DEFAULT = new AABB(0.0, 0.0, 0.0, 1.0, 0.9375, 1.0);
+    }
+
+    public static AABB farmland() {
+        return Farmland.DEFAULT;
+    }
+
     private final static class Carpet {
 
         private static final AABB DEFAULT = new AABB(0.0, 0.0, 0.0, 1.0, 0.0625, 1.0);

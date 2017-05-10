@@ -146,17 +146,23 @@ public final class MessagePlayOutAdvancements implements Message {
             private final double x;
             private final double y;
             private final boolean showToast;
+            private final boolean hidden;
 
             public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, FrameType frameType,
-                    @Nullable String background, double x, double y, boolean showToast) {
+                    @Nullable String background, double x, double y, boolean showToast, boolean hidden) {
                 this.description = description;
                 this.background = background;
                 this.frameType = frameType;
                 this.showToast = showToast;
+                this.hidden = hidden;
                 this.title = title;
                 this.icon = icon;
                 this.x = x;
                 this.y = y;
+            }
+
+            public boolean isHidden() {
+                return this.hidden;
             }
 
             public LocalizedText getDescription() {

@@ -103,7 +103,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private double lastVelY;
     private double lastVelZ;
 
-    private byte lastFlags;
+    protected byte lastFlags;
     private boolean lastSilent;
     private short lastAirLevel;
     private boolean lastCustomNameVisible;

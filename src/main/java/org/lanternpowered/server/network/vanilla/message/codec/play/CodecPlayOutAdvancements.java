@@ -59,9 +59,18 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
                 buf.write(Types.ITEM_STACK, display.getIcon().createStack());
                 buf.writeVarInt(display.getFrameType().getInternalId());
                 final Optional<String> optBackground = display.getBackground();
-                buf.writeBoolean(optBackground.isPresent());
+                int flags = 0;
+                if (optBackground.isPresent()) {
+                    flags |= 0x1;
+                }
+                if (display.doesShowToast()) {
+                    flags |= 0x2;
+                }
+                if (display.isHidden()) {
+                    flags |= 0x4;
+                }
+                buf.writeInteger(flags);
                 optBackground.ifPresent(buf::writeString);
-                buf.writeBoolean(display.doesShowToast());
                 buf.writeFloat((float) display.getX());
                 buf.writeFloat((float) display.getY());
             }

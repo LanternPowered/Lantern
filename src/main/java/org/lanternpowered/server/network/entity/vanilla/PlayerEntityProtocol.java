@@ -28,11 +28,13 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
+import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.extra.accessory.TopHat;
@@ -80,11 +82,12 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     private boolean lastCanFly;
     private float lastFlySpeed;
 
-    private int[] passengerStack = new int[12];
+    private int[] passengerStack = new int[13];
     @Nullable private TopHat lastTopHat;
 
     private byte lastYaw0;
     private byte lastPitch0;
+    private byte lastFlags0;
 
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
@@ -184,13 +187,21 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         } else if (hat == TopHats.STONE) {
             paneItem = new LanternItemStack(BlockTypes.STONE_PRESSURE_PLATE);
             blockItem = new LanternItemStack(BlockTypes.STONE);
+        } else if (hat == TopHats.SNOW) {
+            paneItem = new LanternItemStack(BlockTypes.SNOW_LAYER);
+            blockItem = new LanternItemStack(BlockTypes.SNOW);
         } else {
             throw new IllegalStateException();
         }
 
+        byte flags = 0x20;
+        if (getEntity().get(Keys.GLOWING).get()) {
+            flags |= 0x40;
+        }
+
         final ParameterList parameterList1 = new ByteBufParameterList(ByteBufferAllocator.unpooled());
         parameterList1.add(EntityParameters.ArmorStand.FLAGS, (byte) (0x08 | 0x10));
-        parameterList1.add(EntityParameters.Base.FLAGS, (byte) 0x20);
+        parameterList1.add(EntityParameters.Base.FLAGS, flags);
         final int id1 = this.passengerStack[10];
 
         context.sendToAll(() -> new MessagePlayOutSpawnObject(id1, UUID.randomUUID(), 78, 0,
@@ -200,7 +211,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
         final ParameterList parameterList2 = new ByteBufParameterList(ByteBufferAllocator.unpooled());
         parameterList2.add(EntityParameters.ArmorStand.FLAGS, (byte) (0x08 | 0x10 | 0x01));
-        parameterList2.add(EntityParameters.Base.FLAGS, (byte) 0x20);
+        parameterList2.add(EntityParameters.Base.FLAGS, flags);
         final int id2 = this.passengerStack[11];
 
         context.sendToAll(() -> new MessagePlayOutSpawnObject(id2, UUID.randomUUID(), 78, 0,
@@ -210,6 +221,32 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
         sendPassengers(context, 8, 10);
         sendPassengers(context, 9, 11);
+
+        /*
+        final LanternItemStack boneItem = new LanternItemStack(ItemTypes.BONE);
+
+        float angleA = 250f;
+        float angleB = 250f;
+        for (int i = 12; i <= 14; i++) {
+            final ParameterList parameterList3 = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+            parameterList3.add(EntityParameters.ArmorStand.FLAGS, (byte) (0x08 | 0x10 | 0x01 | 0x04));
+            parameterList3.add(EntityParameters.ArmorStand.LEFT_ARM_ROTATION, new Vector3f(50f, 360f - angleA, angleB));
+            parameterList3.add(EntityParameters.ArmorStand.RIGHT_ARM_ROTATION, new Vector3f(50f, angleA, 360f - angleB));
+            parameterList3.add(EntityParameters.Base.FLAGS, flags);
+            final int id3 = this.passengerStack[i];
+
+            context.sendToAll(() -> new MessagePlayOutSpawnObject(id3, UUID.randomUUID(), 78, 0,
+                    getEntity().getPosition(), 0, 0, Vector3d.ZERO));
+            context.sendToAll(() -> new MessagePlayOutEntityMetadata(id3, parameterList3));
+            context.sendToAll(() -> new MessagePlayOutEntityEquipment(id3, 0, boneItem));
+            context.sendToAll(() -> new MessagePlayOutEntityEquipment(id3, 1, boneItem));
+
+            angleA -= 15f;
+            angleB -= 15f;
+        }
+
+        sendPassengers(context, 7, 9, 12, 13, 14);
+        */
     }
 
     @Override
@@ -222,7 +259,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, getFlySpeed(), 0.01f));
 
         final TopHat topHat = getTopHat();
-        if (topHat != null) {
+        if (topHat != null && !getEntity().get(Keys.INVISIBLE).get()) {
             sendPassengerStack(context);
             sendHat(context, topHat);
         }
@@ -252,6 +289,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             this.lastCanFly = canFly;
             this.lastFlySpeed = flySpeed;
         }
+        super.update(context);
         final TopHat topHat = getTopHat();
         if (topHat != this.lastTopHat) {
             if (this.lastTopHat == null) {
@@ -264,17 +302,27 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             }
             this.lastTopHat = topHat;
         }
-        super.update(context);
-        if (this.lastYaw0 != this.lastYaw || this.lastPitch0 != this.lastPitch) {
+        if (this.lastYaw0 != this.lastYaw || this.lastPitch0 != this.lastPitch || this.lastFlags0 != this.lastFlags) {
             for (final int id : this.passengerStack) {
                 context.sendToSelf(() -> new MessagePlayOutEntityLook(id, this.lastYaw, this.lastPitch, this.entity.isOnGround()));
             }
-            this.lastYaw0 = this.lastYaw;
-            this.lastPitch0 = this.lastPitch;
             if (this.lastTopHat != null) {
                 context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[10], this.lastYaw));
                 context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[11], this.lastYaw));
+                context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[12], this.lastYaw));
+                // context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[13], this.lastYaw));
+                // context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[14], this.lastYaw));
+                if (this.lastFlags0 != this.lastFlags) {
+                    final boolean glow = (this.lastFlags & 0x40) != 0;
+                    final ParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+                    parameterList.add(EntityParameters.Base.FLAGS, (byte) (0x20 | (glow ? 0x40 : 0x00)));
+                    context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[10], parameterList));
+                    context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[11], parameterList));
+                }
             }
+            this.lastYaw0 = this.lastYaw;
+            this.lastPitch0 = this.lastPitch;
+            this.lastFlags0 = this.lastFlags;
         }
         // Some 1.11.2 magic, ultra secret stuff...
         final boolean elytraFlying = this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false);

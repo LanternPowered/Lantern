@@ -83,7 +83,6 @@ public class LanternLiving extends LanternEntity implements Living {
     public void pulse() {
         super.pulse();
 
-        boolean glowing = false;
         // TODO: Move potion effects to a component? + The key registration
         final List<PotionEffect> potionEffects = get(Keys.POTION_EFFECTS).get();
         if (!potionEffects.isEmpty()) {
@@ -98,14 +97,16 @@ public class LanternLiving extends LanternEntity implements Living {
                     if (!instant) {
                         newPotionEffects.add(newPotionEffect);
                     }
-                    if (potionEffect.getType() == PotionEffectTypes.GLOWING) {
-                        glowing = true;
-                    }
+                }
+                if (potionEffect.getType() == PotionEffectTypes.GLOWING) {
+                    offer(Keys.GLOWING, duration > 0);
+                }
+                if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY) {
+                    offer(Keys.INVISIBLE, duration > 0);
                 }
             }
             offer(Keys.POTION_EFFECTS, newPotionEffects.build());
         }
-        offer(Keys.GLOWING, glowing);
     }
 
     @Override

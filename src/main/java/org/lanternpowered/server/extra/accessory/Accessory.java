@@ -28,7 +28,7 @@ package org.lanternpowered.server.extra.accessory;
 import org.spongepowered.api.CatalogType;
 
 /**
- * Represents a accessory.
+ * Represents an accessory.
  */
 public interface Accessory extends CatalogType {
 

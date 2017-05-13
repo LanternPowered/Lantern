@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
@@ -67,14 +66,11 @@ import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
-import org.lanternpowered.server.util.ClassLoaderUtil;
-import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.EventManager;
@@ -98,9 +94,6 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.TeleportHelper;
 
 import java.io.IOException;
-import java.net.URLClassLoader;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 

@@ -23,20 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event.gen;
+package org.lanternpowered.server.util;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class DefineableClassLoader extends ClassLoader {
 
     public DefineableClassLoader(ClassLoader parent) {
         super(parent);
     }
 
+    public DefineableClassLoader() {
+        super(Thread.currentThread().getContextClassLoader());
+    }
+
     @SuppressWarnings("unchecked")
     public <T> Class<T> defineClass(String name, byte[] b) {
         return (Class<T>) defineClass(name, b, 0, b.length);
     }
-
 }

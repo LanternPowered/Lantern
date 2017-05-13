@@ -36,7 +36,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.server.event.filter.FilterFactory;
-import org.lanternpowered.server.event.gen.DefineableClassLoader;
+import org.lanternpowered.server.util.DefineableClassLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
@@ -69,7 +69,7 @@ public class LanternEventManager implements EventManager {
     private final Logger logger;
 
     private final Object lock = new Object();
-    private final DefineableClassLoader classLoader = new DefineableClassLoader(getClass().getClassLoader());
+    private final DefineableClassLoader classLoader = new DefineableClassLoader();
     private final AnnotatedEventListener.Factory listenerFactory = new ClassEventListenerFactory("org.lanternpowered.server.event.listener",
                     new FilterFactory("org.lanternpowered.server.event.filters", this.classLoader), this.classLoader);
     private final Multimap<Class<?>, RegisteredListener<?>> listenersByEvent = HashMultimap.create();

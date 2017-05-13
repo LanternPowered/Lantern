@@ -33,9 +33,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.lanternpowered.server.LanternClassLoader;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.util.ClassLoaderUtil;
 import org.slf4j.Logger;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -181,11 +181,11 @@ public final class LanternPluginManager implements PluginManager {
 
     private void loadPlugin(PluginCandidate candidate) {
         final String id = candidate.getId();
+        final LanternClassLoader classLoader = LanternClassLoader.get();
 
         if (candidate.getSource().isPresent()) {
             try {
-                ClassLoaderUtil.addURL((URLClassLoader) LanternPluginManager.class.getClassLoader(),
-                        candidate.getSource().get().toUri().toURL());
+                classLoader.addURL(candidate.getSource().get().toUri().toURL());
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Failed to add plugin '" + id + "' from " + candidate.getDisplaySource() + " to classpath", e);
             }

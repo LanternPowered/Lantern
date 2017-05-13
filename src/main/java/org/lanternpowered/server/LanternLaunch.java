@@ -25,83 +25,19 @@
  */
 package org.lanternpowered.server;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Stage;
-import jline.Terminal;
-import jline.TerminalFactory;
-import joptsimple.BuiltinHelpFormatter;
-import joptsimple.OptionException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSpec;
-import org.lanternpowered.server.inject.LanternModule;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.spongepowered.api.Platform;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-
 public final class LanternLaunch {
 
     public static void main(String[] args) {
-        // Get the default logger
-        final Logger logger = LoggerFactory.getLogger(InternalPluginsInfo.Implementation.NAME);
+        // Initialize the class loader
+        final LanternClassLoader classLoader = LanternClassLoader.get();
         try {
-            // Create the shared option parser
-            final OptionParser optionParser = new OptionParser();
-            optionParser.allowsUnrecognizedOptions();
-            final OptionSpec<Void> version = optionParser.acceptsAll(Arrays.asList("version", "v"),
-                    "Display the Lantern version");
-            if (optionParser.parse(args).has(version)) {
-                final Package pack = Platform.class.getPackage();
-                logger.info(pack.getImplementationTitle() + ' ' + pack.getImplementationVersion());
-                logger.info(pack.getSpecificationTitle() + ' ' + pack.getSpecificationVersion());
-                return;
-            }
-
-            final OptionSpec<Void> help = optionParser.acceptsAll(Arrays.asList("help", "h", "?"),
-                    "Show this help text").forHelp();
-
-            // Initialize the injector
-            final LanternModule module = new LanternModule(logger, args, optionParser);
-            final Injector injector = Guice.createInjector(Stage.DEVELOPMENT, module);
-            logger.info("Instantiated the Injector.");
-
-            // Create the server instance
-            final LanternServer lanternServer = injector.getInstance(LanternServer.class);
-            // Initialize and start the server
-            lanternServer.initialize();
-
-            try {
-                final Field field = OptionParser.class.getDeclaredField("allowsUnrecognizedOptions");
-                field.setAccessible(true);
-                field.set(optionParser, false);
-
-                optionParser.parse(args);
-            } catch (OptionException e) {
-                logger.warn("Something went wrong while parsing options", e);
-            } catch (Exception e) {
-                logger.error("Unexpected error", e);
-            }
-
-            // First initialize, then parse help, so that the @Option
-            // annotations will be detected
-            if (optionParser.parse(args).has(help)) {
-                if (System.console() != null) {
-                    // Terminal is (very likely) supported, use the terminal width provided by jline
-                    final Terminal terminal = TerminalFactory.get();
-                    optionParser.formatHelpWith(new BuiltinHelpFormatter(terminal.getWidth(), 3));
-                }
-                optionParser.printHelpOn(System.err);
-                return;
-            }
-
-            lanternServer.start();
-        } catch (Throwable t) {
-            logger.error("Error during server startup.", t);
-            System.exit(1);
+            final Class<?> serverLaunchClass = classLoader.forName("org.lanternpowered.server.LanternServerLaunch", true);
+            final Object serverLaunch = serverLaunchClass.newInstance();
+            serverLaunchClass.getMethod("main", String[].class).invoke(serverLaunch, new Object[] { args });
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

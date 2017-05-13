@@ -45,7 +45,7 @@ import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V1_6;
 
 import org.lanternpowered.api.script.Script;
-import org.lanternpowered.server.util.ClassLoaderUtil;
+import org.lanternpowered.server.util.DefineableClassLoader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -67,6 +67,7 @@ final class ScriptFunctionGenerator {
     }
 
     private final Map<Class<?>, Builder> functionProviders = new ConcurrentHashMap<>();
+    private final DefineableClassLoader classLoader = new DefineableClassLoader();
 
     public <F> Builder<F> get(ScriptFunctionMethod<F> functionMethod) {
         //noinspection unchecked
@@ -74,7 +75,7 @@ final class ScriptFunctionGenerator {
                 functionMethod.getFunctionClass(), functionClass -> getBuilder(functionMethod));
     }
 
-    private static <F> Builder<F> getBuilder(ScriptFunctionMethod<F> functionMethod) {
+    private <F> Builder<F> getBuilder(ScriptFunctionMethod<F> functionMethod) {
         //noinspection unchecked
         final Class<F> functionClass = (Class<F>) generateScriptFunctionClass(functionMethod);
         final Constructor<F> constructor;
@@ -98,7 +99,7 @@ final class ScriptFunctionGenerator {
      * @param functionMethod The script function method
      * @return The script function class
      */
-    private static Class<? extends ScriptFunction> generateScriptFunctionClass(ScriptFunctionMethod<?> functionMethod) {
+    private Class<? extends ScriptFunction> generateScriptFunctionClass(ScriptFunctionMethod<?> functionMethod) {
         final Class<?> functionClass = functionMethod.getFunctionClass();
 
         final String name = functionClass.getName() + ScriptFunction.class.getSimpleName() + "Impl35962493";
@@ -163,7 +164,7 @@ final class ScriptFunctionGenerator {
         for (int i = 1; i <= method.getParameterTypes().length; i++) {
             mv.visitVarInsn(ALOAD, i);
         }
-        mv.visitMethodInsn(getInvokeMethodInsnOpcode(method), Type.getDescriptor(method.getDeclaringClass()), method.getName(),
+        mv.visitMethodInsn(getInvokeMethodInsnOpcode(method), Type.getInternalName(method.getDeclaringClass()), method.getName(),
                 Type.getMethodDescriptor(method), true);
         final Class<?> returnType = method.getReturnType();
         mv.visitInsn(getReturnInsnOpcode(returnType));
@@ -174,7 +175,7 @@ final class ScriptFunctionGenerator {
 
         final byte[] byteCode = cw.toByteArray();
         //noinspection unchecked
-        return (Class<? extends ScriptFunction>) ClassLoaderUtil.defineClass(ScriptFunction.class.getClassLoader(), name, byteCode);
+        return this.classLoader.defineClass(name, byteCode);
     }
 
     /**

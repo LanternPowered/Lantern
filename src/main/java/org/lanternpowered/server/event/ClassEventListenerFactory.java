@@ -54,7 +54,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.lanternpowered.server.event.filter.EventFilter;
 import org.lanternpowered.server.event.filter.FilterFactory;
-import org.lanternpowered.server.event.gen.DefineableClassLoader;
+import org.lanternpowered.server.util.DefineableClassLoader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;

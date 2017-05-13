@@ -41,7 +41,8 @@ public class VersionCheckingMain {
 
     public static void main(String[] args) throws Exception {
         final String current = System.getProperty("java.version");
-        if (getVersionValue(current) < getVersionValue(REQUIRED_VERSION)) {
+        if (!current.equals("9-ea") &&
+                getVersionValue(current) < getVersionValue(REQUIRED_VERSION)) {
             final String error = String.format(ERROR_MESSAGE, current, REQUIRED_VERSION);
             if (!GraphicsEnvironment.isHeadless()) {
                 JOptionPane.showMessageDialog(null, error, "PEBKACException!", JOptionPane.ERROR_MESSAGE);

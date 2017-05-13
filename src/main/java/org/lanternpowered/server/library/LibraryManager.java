@@ -29,11 +29,10 @@ import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.lanternpowered.server.LanternClassLoader;
 import org.lanternpowered.server.game.DirectoryKeys;
-import org.lanternpowered.server.util.ClassLoaderUtil;
 
 import java.io.IOException;
-import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,7 +61,7 @@ public final class LibraryManager {
         try (DirectoryStream<Path> dir = Files.newDirectoryStream(this.librariesDir, path -> path.toString().endsWith(".jar"))) {
             for (Path path : dir) {
                 if (this.loadedFiles.add(path)) {
-                    ClassLoaderUtil.addURL((URLClassLoader) getClass().getClassLoader(), path.toUri().toURL());
+                    LanternClassLoader.get().addURL(path.toUri().toURL());
                 }
             }
         } catch (IOException e) {

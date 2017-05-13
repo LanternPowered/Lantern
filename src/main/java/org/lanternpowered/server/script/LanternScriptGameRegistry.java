@@ -103,7 +103,7 @@ public class LanternScriptGameRegistry implements ScriptGameRegistry {
             .create();
 
     private LanternScriptGameRegistry() {
-        this.classLoader = new GroovyClassLoader(this.getClass().getClassLoader());
+        this.classLoader = new GroovyClassLoader();
     }
 
     /**

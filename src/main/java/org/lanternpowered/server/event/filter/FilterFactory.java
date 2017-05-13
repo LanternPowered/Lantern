@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.lanternpowered.server.event.gen.DefineableClassLoader;
+import org.lanternpowered.server.util.DefineableClassLoader;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;

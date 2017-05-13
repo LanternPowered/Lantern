@@ -17,8 +17,6 @@ buildscript {
     dependencies {
         classpath 'org.spongepowered:spongegradle:0.8.1-SNAPSHOT'
         classpath 'org.lanternpowered:lanterngradle:1.0.0'
-        classpath 'org.apache.logging.log4j:log4j-core:2.8.1'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.17'
     }
 }
 
@@ -29,9 +27,6 @@ plugins {
 
 // Environment variables for the build set by the build server
 ext {
-    if (!project.hasProperty('artifactory_contextUrl')) artifactory_contextUrl = System.getenv('artifactory_contextUrl')
-    if (!project.hasProperty('artifactory_username')) artifactory_username = System.getenv('artifactory_username')
-    if (!project.hasProperty('artifactory_password')) artifactory_password = System.getenv('artifactory_password')
     buildNumber = System.env.BUILD_NUMBER ?: System.env.TRAVIS_BUILD_NUMBER ?: '0'
     ciSystem = System.env.CI_SYSTEM ?: (System.env.TRAVIS ? 'travis' : null)
     commit = System.env.GIT_COMMIT ?: System.env.TRAVIS_COMMIT
@@ -104,6 +99,7 @@ configurations {
     }
 }
 
+ext.fastutilVersion = '7.1.0'
 // Project dependencies
 dependencies {
     compile api
@@ -136,7 +132,7 @@ dependencies {
     compile 'net.minecrell:terminalconsoleappender:1.0.0-SNAPSHOT'
 
     // Fastutil
-    fastutil 'it.unimi.dsi:fastutil:7.1.0'
+    fastutil "it.unimi.dsi:fastutil:$fastutilVersion"
 
     // Database connectors
     compile 'com.zaxxer:HikariCP:2.6.1'
@@ -169,11 +165,29 @@ runConfigurations {
     }
 }
 
+// The base jar, includes all the lantern and sponge classes,
+// including generated event classes
 jar {
     classifier = 'base'
-    exclude '**/*.max.json'
+    duplicatesStrategy = 'exclude'
+
+    exclude 'log4j2_indev.xml'
+    // Include the api classes
+    from api.sourceSets.main.output
+    // Include generated event classes
+    from fileTree(api.tasks.genEventImpl.outputs.files.first())
+
+    // Include the java 6 classes
     from sourceSets.java6.output
-    manifest {
+}
+
+afterEvaluate {
+    applyManifest(jar)
+    applyManifest(fatJar)
+}
+
+void applyManifest(def jar) {
+    jar.manifest {
         attributes(
                 'Main-Class': 'org.lanternpowered.launch.VersionCheckingMain',
                 'Implementation-Name': project.name,
@@ -183,12 +197,6 @@ jar {
                 'Specification-Version': api.version,
                 'Specification-Vendor': api.url
         )
-    }
-}
-
-afterEvaluate {
-    jar.manifest {
-        attributes['Implementation-Version'] = project.version
         if (commit) attributes['Git-Commit'] = commit
         if (branch) attributes['Git-Branch'] = branch
     }
@@ -214,9 +222,8 @@ test {
     }
 }
 
-// A separate task to generate the fastutil jar,
-// doing this separate to avoid long wait times
-// Run "fastutilJar" to update the jar
+// A task to minimize the fastutil jar to only
+// include the classes we actually used
 task fastutilJar(type: ShadowJar) {
     // The classifier
     classifier = 'fastutil'
@@ -251,109 +258,56 @@ task fastutilJar(type: ShadowJar) {
         filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ShortOpenHashMap.class'
     }
 }
-// Sadly enough does the "overwrite: true" parameter not work,
-// so this task will delete the jar before running fastutilJar
-task deleteFastutilJar(type: Delete) {
-    delete fastutilJar.archivePath
-}
-fastutilJar.dependsOn deleteFastutilJar
 
 // A task to build faster
 task buildFast(dependsOn: build)
 
 gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-    if (graph.allTasks.contains(buildFast) && fastutilJar.archivePath.exists()) {
-        fastutilJar.enabled = false
-        deleteFastutilJar.enabled = false
-    }
+    // Mark the fast util jar as not update to make it regenerate
+    fastutilJar.outputs.upToDateWhen { graph.allTasks.contains(buildFast) && fastutilJar.archivePath.exists() }
 }
 
-shadowJar {
-    dependsOn fastutilJar
+task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
+    // Include the default jar
+    from zipTree(jar.archivePath)
 
-    // Empty classifier, this is the final jar
-    classifier = ''
-    // Exclude empty directories
-    includeEmptyDirs = false
-    // Include the java6 files
-    from sourceSets.java6.output
-    // Exclude source files
-    exclude '**/*.java'
-    exclude 'Version.java.template'
-    exclude 'log4j2_indev.xml'
-    exclude '**/*.max.json'
+    // Always update the fat jar
+    outputs.upToDateWhen { false }
 
-    from fileTree(api.tasks.genEventImpl.outputs.files.first())
+    // Generate the dependencies
+    classifier = 'fat'
 
-    // Make sure that the jar is generated
-    afterEvaluate {
-        // Include the fastutil classes
-        from zipTree(fastutilJar.archivePath)
+    // All the entries that should be ignored
+    Set<String> entries = []
+    // Don't include the api again
+    entries.add "$api.group:$api.name"
+    // We already include 'asm-all'
+    entries.add 'org.ow2.asm:asm'
+
+    Map<String, Tuple2<Dependency, File>> filesMap = new HashMap<>()
+    configurations.compile.resolvedConfiguration.resolvedArtifacts.each { a ->
+        def id = a.moduleVersion.id
+        def e = "$id.group:$id.name"
+        // Check if we want the artifact, check for the java (String) and groovy strings (GString)
+        if (!entries.contains(e) && !entries.contains((String) e)) {
+            filesMap[(String) e] = new Tuple2<>(dependencies.create(id.toString()), a.file)
+        }
     }
 
-    dependencies {
-        // SpongeAPI
-        include project(api.path)
-        include dependency('org.spongepowered:event-gen-core')
-        include dependency('org.spongepowered:plugin-meta')
+    // Replace the fastutil dependency
+    filesMap['it.unimi.dsi:fastutil'] = new Tuple2<>(
+            dependencies.create("it.unimi.dsi:fastutil:$fastutilVersion-minimized"), fastutilJar.archivePath)
 
-        include dependency('com.google.guava:guava')
-        include dependency('com.google.code.findbugs:jsr305')
-        include dependency('com.github.ben-manes.caffeine:caffeine')
-        include dependency('com.github.ben-manes.caffeine:guava')
-        include dependency('org.apache.commons:commons-lang3')
-        include dependency('io.netty:netty-all')
-        include dependency('org.codehaus.groovy:groovy-all')
-
-        // Option Parsing
-        include dependency('net.sf.jopt-simple:jopt-simple')
-
-        // Bytecode
-        include dependency('org.ow2.asm:asm-all')
-
-        // Logging and Console
-        include dependency('org.slf4j:slf4j-api')
-        include dependency('org.apache.logging.log4j:log4j-slf4j-impl')
-        include dependency('org.apache.logging.log4j:log4j-core')
-        include dependency('org.apache.logging.log4j:log4j-api')
-        include dependency('org.apache.logging.log4j:log4j-iostreams')
-        include dependency('org.jline:jline-terminal')
-        include dependency('org.jline:jline-terminal-jna')
-        include dependency('org.jline:jline-reader')
-        include dependency('net.java.dev.jna:jna')
-        include dependency('net.minecrell:terminalconsoleappender')
-
-        // Guice
-        include dependency('com.google.inject:guice')
-        include dependency('javax.inject:javax.inject')
-        include dependency('aopalliance:aopalliance')
-
-        // Math and Noise
-        include dependency('com.flowpowered:flow-math')
-        include dependency('com.flowpowered:flow-noise')
-
-        // Configuration
-        include dependency('ninja.leaping.configurate:configurate-core')
-        include dependency('ninja.leaping.configurate:configurate-hocon')
-        include dependency('ninja.leaping.configurate:configurate-gson')
-        include dependency('ninja.leaping.configurate:configurate-yaml')
-        include dependency('org.yaml:snakeyaml')
-        include dependency('com.google.code.gson:gson')
-        include dependency('com.typesafe:config')
-
-        // Database
-        include dependency('com.zaxxer:HikariCP')
-        include dependency('org.mariadb.jdbc:mariadb-java-client')
-        include dependency('com.h2database:h2')
-        include dependency('org.xerial:sqlite-jdbc')
-
-        mergeServiceFiles()
-
-        // Merge the Log4j2Plugins.dat file properly
-        transform(Log4jPluginCacheFileTransformer)
+    // Include all the dependencies
+    for (Map.Entry<String, Tuple2<Dependency, File>> entry : filesMap.entrySet()) {
+        Tuple2<Dependency, File> t = entry.value
+        from (t.second, { spec ->
+            Dependency d = t.first
+            spec.rename {
+                "libraries/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
+            }
+        })
     }
-
-    exclude 'LICENSE', 'NOTICE'
 }
 
 task sourceJar(type: Jar) {
@@ -367,51 +321,8 @@ task sourceJar(type: Jar) {
 }
 
 // Run shadowJar and sourceJar on build
-assemble.dependsOn shadowJar
 assemble.dependsOn sourceJar
-
-if (artifactory_contextUrl && artifactory_username && artifactory_password) {
-    apply plugin: 'maven-publish'
-    apply plugin: 'com.jfrog.artifactory'
-
-    publishing {
-        publications {
-            thePublication(MavenPublication) {
-                artifact shadowJar
-                artifact sourceJar
-                artifactId archivesBaseName
-            }
-        }
-    }
-
-    artifactory {
-        contextUrl = "${artifactory_contextUrl}"
-        publish {
-            repository {
-                repoKey = project.version.contains("SNAPSHOT") ? 'libs-snapshot-local' : 'libs-release-local'
-                username = "${artifactory_username}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-            defaults {
-                publications('thePublication')
-                publishArtifacts = true
-            }
-        }
-
-        resolve {
-            repository {
-                repoKey = 'repo'
-                username = "${artifactory_username}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-        }
-    }
-    clientConfig.setIncludeEnvVars(true)
-    clientConfig.info.setBuildNumber(buildNumber)
-    if (ciSystem) clientConfig.info.addEnvironmentProperty('ci-system', ciSystem)
-}
+assemble.dependsOn fatJar
 
 license {
     header rootProject.file('HEADER.txt')

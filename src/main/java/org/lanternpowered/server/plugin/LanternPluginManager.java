@@ -33,7 +33,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.lanternpowered.server.LanternClassLoader;
+import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.slf4j.Logger;

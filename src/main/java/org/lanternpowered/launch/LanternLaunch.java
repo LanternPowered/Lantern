@@ -23,13 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server;
+package org.lanternpowered.launch;
 
 public final class LanternLaunch {
 
     public static void main(String[] args) {
         // Initialize the class loader
         final LanternClassLoader classLoader = LanternClassLoader.get();
+
         try {
             final Class<?> serverLaunchClass = classLoader.forName("org.lanternpowered.server.LanternServerLaunch", true);
             final Object serverLaunch = serverLaunchClass.newInstance();

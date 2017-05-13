@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.launch;
 
-import org.lanternpowered.server.LanternLaunch;
-
 import java.awt.GraphicsEnvironment;
 
 import javax.swing.JOptionPane;

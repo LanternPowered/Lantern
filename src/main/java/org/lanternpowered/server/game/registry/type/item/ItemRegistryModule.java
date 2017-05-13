@@ -1719,7 +1719,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(2267, recordBuilder("wait")
                 .build("minecraft", "record_wait"));
         try {
-            ReflectionHelper.setField(ItemStackSnapshot.class.getDeclaredField("NONE"), null,
+            ReflectionHelper.setField(ItemStackSnapshot.class.getField("NONE"), null,
                     new LanternItemStack(none, 0).createSnapshot());
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -141,7 +141,7 @@ dependencies {
     compile 'com.h2database:h2:1.4.192'
 
     // Scripting
-    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+    compile 'org.codehaus.groovy:groovy-all:2.4.11'
 
     // Asm
     compile 'org.ow2.asm:asm-all:5.0.3'

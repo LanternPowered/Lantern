@@ -46,8 +46,8 @@ public interface SimpleCatalogType extends CatalogType {
         }
 
         @Override
-        public String getId() {
-            return this.identifier;
+        public String getName() {
+            return this.name;
         }
 
         public static abstract class Translatable extends Base implements org.spongepowered.api.text.translation.Translatable {

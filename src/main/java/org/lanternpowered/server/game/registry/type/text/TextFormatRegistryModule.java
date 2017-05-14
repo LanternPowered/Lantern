@@ -32,6 +32,7 @@ import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.text.format.TextStyles;
 
 import java.lang.reflect.Field;
 
@@ -43,8 +44,10 @@ public class TextFormatRegistryModule implements RegistryModule {
     public void registerDefaults() {
         try {
             // Make sure that the color is updated properly
-            final Field field = TextFormat.class.getDeclaredField("color");
-            ReflectionHelper.setField(field, TextFormat.NONE, TextColors.NONE);
+            final Field colorField = TextFormat.class.getDeclaredField("color");
+            final Field styleField = TextFormat.class.getDeclaredField("style");
+            ReflectionHelper.setField(colorField, TextFormat.NONE, TextColors.NONE);
+            ReflectionHelper.setField(styleField, TextFormat.NONE, TextStyles.NONE);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }

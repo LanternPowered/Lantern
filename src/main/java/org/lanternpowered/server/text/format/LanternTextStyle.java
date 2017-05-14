@@ -32,16 +32,14 @@ import org.spongepowered.api.text.format.TextStyle;
 
 import javax.annotation.Nullable;
 
-public final class LanternTextStyle extends TextStyle.Base implements SimpleCatalogType, FormattingCodeHolder {
+public class LanternTextStyle extends TextStyle.Base implements SimpleCatalogType {
 
     private final String identifier;
-    private final char code;
 
     public LanternTextStyle(String identifier, @Nullable Boolean bold, @Nullable Boolean italic, @Nullable Boolean underline,
-            @Nullable Boolean strikethrough, @Nullable Boolean obfuscated, char code) {
+            @Nullable Boolean strikethrough, @Nullable Boolean obfuscated) {
         super(bold, italic, underline, strikethrough, obfuscated);
         this.identifier = checkNotNullOrEmpty(identifier, "identifier");
-        this.code = code;
     }
 
     @Override
@@ -49,8 +47,19 @@ public final class LanternTextStyle extends TextStyle.Base implements SimpleCata
         return this.identifier;
     }
 
-    @Override
-    public char getCode() {
-        return this.code;
+    public static final class Formatting extends LanternTextStyle implements FormattingCodeHolder {
+
+        private final char code;
+
+        public Formatting(String identifier, @Nullable Boolean bold, @Nullable Boolean italic, @Nullable Boolean underline,
+                @Nullable Boolean strikethrough, @Nullable Boolean obfuscated, char code) {
+            super(identifier, bold, italic, underline, strikethrough, obfuscated);
+            this.code = code;
+        }
+
+        @Override
+        public char getCode() {
+            return this.code;
+        }
     }
 }

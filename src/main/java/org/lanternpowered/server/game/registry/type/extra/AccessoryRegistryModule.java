@@ -25,43 +25,61 @@
  */
 package org.lanternpowered.server.game.registry.type.extra;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.extra.accessory.LanternTopHat;
+import org.lanternpowered.server.extra.accessory.TopHat;
 import org.lanternpowered.server.extra.accessory.TopHats;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
+import java.util.List;
+
 @RegistrationDependency(DyeColorRegistryModule.class)
 public final class AccessoryRegistryModule extends PluginCatalogRegistryModule<Accessory> {
 
     public AccessoryRegistryModule() {
-        super(TopHats.class);
+        super(null);
     }
 
     @Override
     public void registerDefaults() {
-        register(new LanternTopHat("minecraft", "black", DyeColors.BLACK));
-        register(new LanternTopHat("minecraft", "blue", DyeColors.BLUE));
-        register(new LanternTopHat("minecraft", "brown", DyeColors.BROWN));
-        register(new LanternTopHat("minecraft", "cyan", DyeColors.CYAN));
-        register(new LanternTopHat("minecraft", "gold"));
-        register(new LanternTopHat("minecraft", "gray", DyeColors.GRAY));
-        register(new LanternTopHat("minecraft", "green", DyeColors.GREEN));
-        register(new LanternTopHat("minecraft", "iron"));
-        register(new LanternTopHat("minecraft", "light_blue", DyeColors.LIGHT_BLUE));
-        register(new LanternTopHat("minecraft", "lime", DyeColors.LIME));
-        register(new LanternTopHat("minecraft", "magenta", DyeColors.MAGENTA));
-        register(new LanternTopHat("minecraft", "orange", DyeColors.ORANGE));
-        register(new LanternTopHat("minecraft", "pink", DyeColors.PINK));
-        register(new LanternTopHat("minecraft", "purple", DyeColors.PURPLE));
-        register(new LanternTopHat("minecraft", "red", DyeColors.RED));
-        register(new LanternTopHat("minecraft", "silver", DyeColors.SILVER));
-        register(new LanternTopHat("minecraft", "snow"));
-        register(new LanternTopHat("minecraft", "stone"));
-        register(new LanternTopHat("minecraft", "white", DyeColors.WHITE));
-        register(new LanternTopHat("minecraft", "wood"));
-        register(new LanternTopHat("minecraft", "yellow", DyeColors.YELLOW));
+        register(new LanternTopHat("minecraft", "black_top_hat", DyeColors.BLACK));
+        register(new LanternTopHat("minecraft", "blue_top_hat", DyeColors.BLUE));
+        register(new LanternTopHat("minecraft", "brown_top_hat", DyeColors.BROWN));
+        register(new LanternTopHat("minecraft", "cyan_top_hat", DyeColors.CYAN));
+        register(new LanternTopHat("minecraft", "gold_top_hat"));
+        register(new LanternTopHat("minecraft", "gray_top_hat", DyeColors.GRAY));
+        register(new LanternTopHat("minecraft", "green_top_hat", DyeColors.GREEN));
+        register(new LanternTopHat("minecraft", "iron_top_hat"));
+        register(new LanternTopHat("minecraft", "light_blue_top_hat", DyeColors.LIGHT_BLUE));
+        register(new LanternTopHat("minecraft", "lime_top_hat", DyeColors.LIME));
+        register(new LanternTopHat("minecraft", "magenta_top_hat", DyeColors.MAGENTA));
+        register(new LanternTopHat("minecraft", "orange_top_hat", DyeColors.ORANGE));
+        register(new LanternTopHat("minecraft", "pink_top_hat", DyeColors.PINK));
+        register(new LanternTopHat("minecraft", "purple_top_hat", DyeColors.PURPLE));
+        register(new LanternTopHat("minecraft", "red_top_hat", DyeColors.RED));
+        register(new LanternTopHat("minecraft", "silver_top_hat", DyeColors.SILVER));
+        register(new LanternTopHat("minecraft", "snow_top_hat"));
+        register(new LanternTopHat("minecraft", "stone_top_hat"));
+        register(new LanternTopHat("minecraft", "white_top_hat", DyeColors.WHITE));
+        register(new LanternTopHat("minecraft", "wood_top_hat"));
+        register(new LanternTopHat("minecraft", "yellow_top_hat", DyeColors.YELLOW));
+    }
+
+    @Override
+    public List<CatalogMappingData> getCatalogMappings() {
+        final ImmutableList.Builder<CatalogMappingData> mappingData = ImmutableList.builder();
+        mappingData.addAll(super.getCatalogMappings());
+        final ImmutableMap.Builder<String, Accessory> topHatMappings = ImmutableMap.builder();
+        getAll().stream()
+                .filter(accessory -> accessory instanceof TopHat)
+                .forEach(accessory -> topHatMappings.put(accessory.getId().replace("_top_hat", ""), accessory));
+        mappingData.add(new CatalogMappingData(TopHats.class, topHatMappings.build()));
+        return mappingData.build();
     }
 }

@@ -236,20 +236,25 @@ task fastutilJar(type: ShadowJar) {
         filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ShortOpenHashMap.class'
     }
 }
-
 // Sadly enough does the "overwrite: true" parameter not work,
 // so this task will delete the jar before running fastutilJar
 task deleteFastutilJar(type: Delete) {
-    delete project.fastutilJar.archivePath
+    delete fastutilJar.archivePath
 }
 fastutilJar.dependsOn deleteFastutilJar
 
-shadowJar {
-    // The fastutil jar should be generated if missing,
-    // regeneration after changes require manual triggering
-    if (!project.fastutilJar.archivePath.exists()) {
-        dependsOn fastutilJar
+// A task to build faster
+task buildFast(dependsOn: build)
+
+gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+    if (graph.allTasks.contains(buildFast) && fastutilJar.archivePath.exists()) {
+        fastutilJar.enabled = false
+        deleteFastutilJar.enabled = false
     }
+}
+
+shadowJar {
+    dependsOn fastutilJar
 
     // Empty classifier, this is the final jar
     classifier = ''
@@ -268,7 +273,7 @@ shadowJar {
     // Make sure that the jar is generated
     afterEvaluate {
         // Include the fastutil classes
-        from zipTree(project.fastutilJar.archivePath)
+        from zipTree(fastutilJar.archivePath)
     }
 
     dependencies {
@@ -389,16 +394,10 @@ if (artifactory_contextUrl && artifactory_username && artifactory_password) {
     if (ciSystem) clientConfig.info.addEnvironmentProperty('ci-system', ciSystem)
 }
 
-// The fastutil jar should be generated if missing
-if (!project.fastutilJar.archivePath.exists()) {
-    assemble.dependsOn fastutilJar
-}
-
 license {
     header rootProject.file('HEADER.txt')
     sourceSets = project.sourceSets
     include '**/*.java'
-    include '**/*.groovy'
 
     strictCheck true
     ignoreFailures = false

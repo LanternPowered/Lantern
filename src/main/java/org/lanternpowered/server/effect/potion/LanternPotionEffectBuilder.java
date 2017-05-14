@@ -98,7 +98,6 @@ public class LanternPotionEffectBuilder extends AbstractDataBuilder<PotionEffect
 
     @Override
     public PotionEffect.Builder amplifier(int amplifier) throws IllegalArgumentException {
-        checkArgument(amplifier >= 0, "Amplifier must not be negative");
         this.amplifier = amplifier;
         return this;
     }

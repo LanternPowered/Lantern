@@ -32,7 +32,6 @@ import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.SubBehaviorPipeline;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class MutableBehaviorPipelineImpl<B extends Behavior> extends BehaviorPip
     SubBehaviorPipeline<?> load(Class<?> type) {
         //noinspection unchecked
         return new SubBehaviorPipelineImpl((Class) this.behaviorType, (List) getBehaviors().stream()
-                .filter(type::isInstance).collect(GuavaCollectors.toImmutableList()), this);
+                .filter(type::isInstance).collect(ImmutableList.toImmutableList()), this);
     }
 
     @Override

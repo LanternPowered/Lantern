@@ -23,12 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.console.launch;
+package org.lanternpowered.server.console;
 
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
+import org.lanternpowered.server.game.Lantern;
 
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -55,8 +56,8 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
     public void format(LogEvent event, StringBuilder builder) {
         final String name = event.getLoggerName();
         final StackTraceElement element;
-        if (ConsoleLaunch.initialized && (ConsoleLaunch.REDIRECT_ERR.equals(name) || ConsoleLaunch.REDIRECT_OUT.equals(name))) {
-            element = calculateLocation(ConsoleLaunch.REDIRECT_FQCNS);
+        if (ConsoleManager.active && (ConsoleManager.REDIRECT_ERR.equals(name) || ConsoleManager.REDIRECT_OUT.equals(name))) {
+            element = calculateLocation(ConsoleManager.REDIRECT_FQCNS);
         } else {
             element = event.getSource();
         }

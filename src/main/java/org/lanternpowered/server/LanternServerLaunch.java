@@ -28,12 +28,12 @@ package org.lanternpowered.server;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
-import jline.Terminal;
-import jline.TerminalFactory;
 import joptsimple.BuiltinHelpFormatter;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSpec;
+import net.minecrell.terminalconsole.TerminalConsoleAppender;
+import org.jline.terminal.Terminal;
 import org.lanternpowered.server.inject.LanternModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.slf4j.Logger;
@@ -91,8 +91,10 @@ public final class LanternServerLaunch {
             if (optionParser.parse(args).has(help)) {
                 if (System.console() != null) {
                     // Terminal is (very likely) supported, use the terminal width provided by jline
-                    final Terminal terminal = TerminalFactory.get();
-                    optionParser.formatHelpWith(new BuiltinHelpFormatter(terminal.getWidth(), 3));
+                    final Terminal terminal = TerminalConsoleAppender.getTerminal();
+                    if (terminal != null) {
+                        optionParser.formatHelpWith(new BuiltinHelpFormatter(terminal.getWidth(), 3));
+                    }
                 }
                 optionParser.printHelpOn(System.err);
                 return;

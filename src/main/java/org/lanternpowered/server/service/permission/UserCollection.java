@@ -65,7 +65,7 @@ public class UserCollection extends LanternSubjectCollection {
         try {
             return Lantern.getGame().getGameProfileManager().get(uuid, true).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

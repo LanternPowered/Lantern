@@ -162,8 +162,6 @@ public final class LanternTextHelper {
     public static RawAction raw(HoverAction<?> hoverAction) {
         if (hoverAction instanceof HoverAction.ShowText) {
             return new RawAction("show_text", ((HoverAction.ShowText) hoverAction).getResult());
-        } else if (hoverAction instanceof HoverAction.ShowAchievement) {
-            return new RawAction("show_achievement", ((HoverAction.ShowAchievement) hoverAction).getResult().getId());
         } else if (hoverAction instanceof HoverAction.ShowEntity) {
             HoverAction.ShowEntity.Ref ref = ((HoverAction.ShowEntity) hoverAction).getResult();
 

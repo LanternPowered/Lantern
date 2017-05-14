@@ -38,7 +38,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.command.TabCompleteEvent;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -81,7 +80,7 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
             if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
                 suggestions = suggestions.stream()
                         .map(suggestion -> '/' + suggestion)
-                        .collect(GuavaCollectors.toImmutableList());
+                        .collect(ImmutableList.toImmutableList());
             }
 
             context.getSession().send(new MessagePlayOutTabComplete(suggestions));

@@ -46,7 +46,7 @@ public class TextFormatRegistryModule implements RegistryModule {
             final Field field = TextFormat.class.getDeclaredField("color");
             ReflectionHelper.setField(field, TextFormat.NONE, TextColors.NONE);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 }

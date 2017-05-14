@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.world.biome;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.util.collect.Lists2;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.GroundCoverLayer;
 import org.spongepowered.api.world.gen.GenerationPopulator;
@@ -91,7 +91,7 @@ public final class LanternBiomeGenerationSettings implements BiomeGenerationSett
 
     @Override
     public List<GenerationPopulator> getGenerationPopulators(Class<? extends GenerationPopulator> type) {
-        return this.generationPopulators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
+        return this.generationPopulators.stream().filter(type::isInstance).collect(ImmutableList.toImmutableList());
     }
 
     @Override
@@ -102,6 +102,6 @@ public final class LanternBiomeGenerationSettings implements BiomeGenerationSett
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Populator> List<T> getPopulators(Class<T> type) {
-        return (List<T>) this.populators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
+        return (List<T>) this.populators.stream().filter(type::isInstance).collect(ImmutableList.toImmutableList());
     }
 }

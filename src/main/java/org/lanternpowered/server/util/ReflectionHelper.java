@@ -50,7 +50,7 @@ public final class ReflectionHelper {
             MODIFIERS_FIELD = Field.class.getDeclaredField("modifiers");
             MODIFIERS_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

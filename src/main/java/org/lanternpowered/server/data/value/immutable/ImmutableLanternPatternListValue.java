@@ -39,7 +39,6 @@ import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutablePatternListValue;
 import org.spongepowered.api.data.value.mutable.PatternListValue;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -88,21 +87,21 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
     public ImmutablePatternListValue without(PatternLayer element) {
         return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existingElement -> !existingElement.equals(element))
-                .collect(GuavaCollectors.toImmutableList()));
+                .collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public ImmutablePatternListValue withoutAll(Iterable<PatternLayer> elements) {
         return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existingElement -> !Iterables.contains(elements, existingElement))
-                .collect(GuavaCollectors.toImmutableList()));
+                .collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public ImmutablePatternListValue withoutAll(Predicate<PatternLayer> predicate) {
         return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existing -> checkNotNull(predicate).test(existing))
-                .collect(GuavaCollectors.toImmutableList()));
+                .collect(ImmutableList.toImmutableList()));
     }
 
     @Override

@@ -25,13 +25,18 @@
  */
 package org.lanternpowered.server.console;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import jline.console.ConsoleReader;
-import jline.console.history.FileHistory;
-import jline.console.history.History;
-import org.lanternpowered.server.console.launch.ConsoleLaunch;
+import net.minecrell.terminalconsole.TerminalConsoleAppender;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.io.IoBuilder;
+import org.jline.reader.History;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReader.Option;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.scheduler.LanternScheduler;
@@ -42,11 +47,18 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
 public final class ConsoleManager {
+
+    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(PrintStream.class.getName());
+    static final String REDIRECT_ERR = "STDERR";
+    static final String REDIRECT_OUT = "STDOUT";
+    static volatile boolean active;
 
     private static final String HISTORY_FILE_NAME = "console_history.txt";
 
@@ -55,8 +67,6 @@ public final class ConsoleManager {
     private final Scheduler scheduler;
     private final CommandManager commandManager;
     private final PluginContainer pluginContainer;
-
-    private volatile boolean active;
 
     @Inject
     public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager,
@@ -70,34 +80,37 @@ public final class ConsoleManager {
     }
 
     public void start() {
-        // Set the colored console formatter
-        ConsoleLaunch.setFormatter(new ColoredConsoleFormatter());
-
         // Register the fqcn for the console source
-        ConsoleLaunch.addFqcn(LanternConsoleSource.class.getName());
+        REDIRECT_FQCNS.add((LanternConsoleSource.class.getName()));
         // Register the fqcn for the message channel
-        ConsoleLaunch.addFqcn(MessageChannel.class.getName());
+        REDIRECT_FQCNS.add((MessageChannel.class.getName()));
 
-        // Add the command completer
-        final ConsoleReader reader = ConsoleLaunch.getReader();
-        if (reader == null) {
-            return;
+        final Terminal terminal = TerminalConsoleAppender.getTerminal();
+
+        if (terminal != null) {
+            LineReader reader = LineReaderBuilder.builder()
+                    .appName("LanternServer")
+                    .terminal(terminal)
+                    .completer(new ConsoleCommandCompleter())
+                    .build();
+            reader.unsetOpt(Option.INSERT_TAB);
+
+            TerminalConsoleAppender.setReader(reader);
+
+            reader.setVariable(LineReader.HISTORY_FILE, consoleHistoryFile);
+
+            System.setOut(IoBuilder.forLogger(REDIRECT_OUT).setLevel(Level.INFO).buildPrintStream());
+            System.setErr(IoBuilder.forLogger(REDIRECT_ERR).setLevel(Level.ERROR).buildPrintStream());
+
+            this.active = true;
+
+            final Thread thread = new Thread(this::readCommandTask, "console");
+            thread.setDaemon(true);
+            thread.start();
+
+            this.scheduler.createAsyncExecutor(this.pluginContainer).scheduleAtFixedRate(
+                    this::saveHistory, 120, 120, TimeUnit.SECONDS);
         }
-        reader.addCompleter(new ConsoleCommandCompleter());
-        try {
-            reader.setHistory(new FileHistory(this.consoleHistoryFile.toFile()));
-        } catch (IOException e) {
-            this.logger.error("Error while loading the console history!", e);
-        }
-
-        this.active = true;
-
-        final Thread thread = new Thread(this::readCommandTask, "console");
-        thread.setDaemon(true);
-        thread.start();
-
-        this.scheduler.createAsyncExecutor(this.pluginContainer).scheduleAtFixedRate(
-                this::saveHistory, 120, 120, TimeUnit.SECONDS);
     }
 
     public void shutdown() {
@@ -105,16 +118,18 @@ public final class ConsoleManager {
         saveHistory();
     }
 
+    public boolean isActive() {
+        return this.active;
+    }
+
     private void saveHistory() {
-        final ConsoleReader reader = ConsoleLaunch.getReader();
+        final LineReader reader = TerminalConsoleAppender.getReader();
         if (reader != null) {
             final History history = reader.getHistory();
-            if (history instanceof FileHistory) {
-                try {
-                    ((FileHistory) history).flush();
-                } catch (IOException e) {
-                    this.logger.error("Error while saving the console history!", e);
-                }
+            try {
+                history.save();
+            } catch (IOException e) {
+                this.logger.error("Error while saving the console history!", e);
             }
         }
     }
@@ -123,22 +138,18 @@ public final class ConsoleManager {
      * This task handles the commands that are executed through the console.
      */
     private void readCommandTask() {
-        final ConsoleReader reader = ConsoleLaunch.getReader();
+        final LineReader lineReader = TerminalConsoleAppender.getReader();
         while (this.active) {
-            try {
-                //noinspection ConstantConditions
-                String command = reader.readLine("> ");
-                if (command != null) {
-                    command = command.trim();
-                    if (!command.isEmpty()) {
-                        final String runCommand = command.startsWith("/") ? command.substring(1) : command;
-                        this.scheduler.createTaskBuilder()
-                                .execute(() -> this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand))
-                                .submit(this.pluginContainer);
-                    }
+            //noinspection ConstantConditions
+            String command = lineReader.readLine("> ");
+            if (command != null) {
+                command = command.trim();
+                if (!command.isEmpty()) {
+                    final String runCommand = command.startsWith("/") ? command.substring(1) : command;
+                    this.scheduler.createTaskBuilder()
+                            .execute(() -> this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand))
+                            .submit(this.pluginContainer);
                 }
-            } catch (IOException e) {
-                this.logger.error("Error while reading commands!", e);
             }
         }
     }

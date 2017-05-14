@@ -15,16 +15,17 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.spongepowered:spongegradle:0.3.1-SNAPSHOT'
+        classpath 'org.spongepowered:spongegradle:0.8.1-SNAPSHOT'
         classpath 'org.lanternpowered:lanterngradle:1.0.0'
-        classpath 'org.apache.logging.log4j:log4j-core:2.5'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0'
+        classpath 'org.apache.logging.log4j:log4j-core:2.8.1'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.17'
+        classpath 'de.sebastianboegl.gradle.plugins:shadow-log4j-transformer:1.0.1'
     }
 }
 
 plugins {
-    id "com.github.hierynomus.license" version "0.13.1"
-    id "com.github.johnrengelman.shadow" version "1.2.3"
+    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.github.johnrengelman.shadow" version "1.2.4"
 }
 
 // Environment variables for the build set by the build server
@@ -46,6 +47,7 @@ apply plugin: 'com.github.hierynomus.license'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'org.lanternpowered.gradle'
 apply plugin: 'org.lanternpowered.run-configs'
+apply plugin: 'de.sebastianboegl.shadow.transformer.log4j'
 
 // Minimum version of Java required
 sourceCompatibility = '1.8'
@@ -66,6 +68,9 @@ repositories {
     }
     maven {
         url 'https://oss.sonatype.org/content/groups/public'
+    }
+    maven {
+        url = "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 }
 
@@ -100,6 +105,7 @@ configurations {
     compile {
         extendsFrom fastutil
     }
+    log4j
 }
 
 // Project dependencies
@@ -110,35 +116,37 @@ dependencies {
     compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
 
     // Useful libraries
-    compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'com.google.guava:guava:18.0'
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'com.google.guava:guava:21.0'
 
     // Injection
     compile 'com.google.inject:guice:4.1.0'
 
     // Json library
-    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.google.code.gson:gson:2.8.0'
 
     // Network
-    compile 'io.netty:netty-all:4.1.1.Final'
+    compile 'io.netty:netty-all:4.1.9.Final'
 
     // Logging
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.5'
-    compile 'org.apache.logging.log4j:log4j-core:2.5'
-    compile 'org.apache.logging.log4j:log4j-api:2.5'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.8.1'
+    compile 'org.apache.logging.log4j:log4j-api:2.8.1'
+    compile 'org.apache.logging.log4j:log4j-iostreams:2.8.1'
 
     // Console
-    compile 'org.fusesource.jansi:jansi:1.12'
-    compile 'jline:jline:2.14.2'
+    compile 'org.jline:jline-terminal-jna:3.3.0'
+    compile 'net.java.dev.jna:jna:4.4.0'
+    compile 'net.minecrell:terminalconsoleappender:1.0.0-SNAPSHOT'
 
     // Fastutil
-    fastutil 'it.unimi.dsi:fastutil:7.0.12'
+    fastutil 'it.unimi.dsi:fastutil:7.1.0'
 
     // Database connectors
-    compile 'com.zaxxer:HikariCP:2.4.7'
-    compile 'org.mariadb.jdbc:mariadb-java-client:1.4.6'
-    compile 'org.xerial:sqlite-jdbc:3.8.11.2'
-    compile 'com.h2database:h2:1.4.192'
+    compile 'com.zaxxer:HikariCP:2.6.1'
+    compile 'org.mariadb.jdbc:mariadb-java-client:1.6.0'
+    compile 'org.xerial:sqlite-jdbc:3.16.1'
+    compile 'com.h2database:h2:1.4.195'
 
     // Scripting
     compile 'org.codehaus.groovy:groovy-all:2.4.11'
@@ -146,9 +154,18 @@ dependencies {
     // Asm
     compile 'org.ow2.asm:asm-all:5.0.3'
 
+    // Configuration until Sponge includes these versions
+    compile 'ninja.leaping.configurate:configurate-hocon:3.3'
+    compile 'ninja.leaping.configurate:configurate-gson:3.3'
+    compile 'ninja.leaping.configurate:configurate-yaml:3.3'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile 'org.mockito:mockito-core:2.7.4'
+    testCompile 'org.mockito:mockito-core:2.7.22'
+
+    log4j('org.apache.logging.log4j:log4j-core:2.8.1') {
+        transitive = false
+    }
 }
 
 idea.module {
@@ -271,6 +288,10 @@ shadowJar {
         from zipTree(project.fastutilJar.archivePath)
     }
 
+    from({zipTree(project.configurations.log4j.resolve().first())}) {
+        include 'META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat'
+    }
+
     dependencies {
         // SpongeAPI
         include project(api.path)
@@ -296,8 +317,12 @@ shadowJar {
         include dependency('org.apache.logging.log4j:log4j-slf4j-impl')
         include dependency('org.apache.logging.log4j:log4j-core')
         include dependency('org.apache.logging.log4j:log4j-api')
-        include dependency('org.fusesource.jansi:jansi')
-        include dependency('jline:jline')
+        include dependency('org.apache.logging.log4j:log4j-iostreams')
+        include dependency('org.jline:jline-terminal')
+        include dependency('org.jline:jline-terminal-jna')
+        include dependency('org.jline:jline-reader')
+        include dependency('net.java.dev.jna:jna')
+        include dependency('net.minecrell:terminalconsoleappender')
 
         // Guice
         include dependency('com.google.inject:guice')

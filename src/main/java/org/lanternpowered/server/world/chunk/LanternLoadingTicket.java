@@ -35,7 +35,6 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
@@ -153,7 +152,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
             }
             return this.queue.stream()
                     .map(v -> new Vector3i(v.getX(), 0, v.getY()))
-                    .collect(GuavaCollectors.toImmutableSet());
+                    .collect(ImmutableSet.toImmutableSet());
         }
     }
 

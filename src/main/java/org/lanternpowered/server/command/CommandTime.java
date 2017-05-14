@@ -28,6 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -39,7 +40,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -89,7 +89,7 @@ public final class CommandTime extends CommandProvider {
                                     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                                         final String prefix = args.nextIfPresent().orElse("");
                                         return presets.keySet().stream().filter(new StartsWithPredicate(prefix)).collect(
-                                                GuavaCollectors.toImmutableList());
+                                                ImmutableList.toImmutableList());
                                     }
                                 }
                         )

@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import ninja.leaping.configurate.objectmapping.Setting;
@@ -39,7 +40,6 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.ProfileNotFoundException;
 import org.spongepowered.api.profile.property.ProfileProperty;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -406,6 +406,6 @@ public final class LanternGameProfileCache implements GameProfileCache {
         return getProfiles().stream()
                 .filter(profile -> profile.getName().isPresent() &&
                         profile.getName().get().toLowerCase(Locale.ROOT).startsWith(search))
-                .collect(GuavaCollectors.toImmutableSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 }

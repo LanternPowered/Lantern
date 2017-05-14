@@ -44,7 +44,6 @@ import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.List;
@@ -177,7 +176,7 @@ public class LanternPaginationService implements PaginationService {
                 return paginations.keys().stream()
                         .map(Object::toString)
                         .filter(new StartsWithPredicate(optNext.get()))
-                        .collect(GuavaCollectors.toImmutableList());
+                        .collect(ImmutableList.toImmutableList());
             } else {
                 return ImmutableList.copyOf(Iterables.transform(paginations.keys(), Object::toString));
             }

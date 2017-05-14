@@ -33,7 +33,6 @@ import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.function.Predicate;
 
@@ -99,7 +98,7 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
         checkNotNull(key, "key");
         checkState(enumClass.getEnumConstants().length != 0, "enumClass must contain values");
         return new LanternEnumTrait<>(name, enumClass, key, ImmutableSet.copyOf(enumClass.getEnumConstants())
-                .stream().filter(predicate).collect(GuavaCollectors.toImmutableSet()));
+                .stream().filter(predicate).collect(ImmutableSet.toImmutableSet()));
     }
 
     /**

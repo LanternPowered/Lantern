@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.io.store.item;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -34,7 +35,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Color;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.stream.Collectors;
 
@@ -68,7 +68,7 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
             valueContainer.set(Keys.POTION_EFFECTS, effects.stream()
                     .map(PotionEffectSerializer::deserialize)
                     .filter(effect -> effect != null)
-                    .collect(GuavaCollectors.toImmutableList()));
+                    .collect(ImmutableList.toImmutableList()));
         });
         dataView.getString(POTION).ifPresent(id -> PotionTypeRegistryModule.get().getById(id).ifPresent(
                 potionType -> valueContainer.set(LanternKeys.POTION_TYPE, potionType)));

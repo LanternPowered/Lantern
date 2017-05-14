@@ -27,6 +27,7 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.game.Lantern;
@@ -43,7 +44,6 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.List;
@@ -75,7 +75,7 @@ public final class CommandOp extends CommandProvider {
                                         .filter(p -> p.getName().isPresent() && !config.getEntryByUUID(p.getUniqueId()).isPresent())
                                         .map(p -> p.getName().get())
                                         .filter(new StartsWithPredicate(prefix))
-                                        .collect(GuavaCollectors.toImmutableList());
+                                        .collect(ImmutableList.toImmutableList());
                             }
                         },
                         GenericArguments.optional(GenericArguments.integer(Text.of("level")))

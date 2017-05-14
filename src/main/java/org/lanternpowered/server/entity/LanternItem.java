@@ -55,7 +55,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.statistic.achievement.Achievements;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 
@@ -206,21 +205,6 @@ public class LanternItem extends LanternEntity implements Item {
                 added = itemStack.getQuantity();
             }
             if (added != 0 && entity instanceof Living) {
-                // Trigger achievements
-                if (entity instanceof Player) {
-                    final LanternPlayer player = (LanternPlayer) entity;
-                    final ItemType itemType = itemStack.getItem();
-                    if (itemType == BlockTypes.LOG.getItem().get() ||
-                            itemType == BlockTypes.LOG2.getItem().get()) {
-                        player.triggerAchievement(Achievements.MINE_WOOD);
-                    } else if (itemType == ItemTypes.LEATHER) {
-                        player.triggerAchievement(Achievements.KILL_COW);
-                    } else if (itemType == ItemTypes.DIAMOND) {
-                        player.triggerAchievement(Achievements.DIAMONDS);
-                    } else if (itemType == ItemTypes.BLAZE_ROD) {
-                        player.triggerAchievement(Achievements.BLAZE_ROD);
-                    }
-                }
                 triggerEvent(new CollectEntityEvent((Living) entity, added));
             }
             if (rest == null || isRemoved()) {

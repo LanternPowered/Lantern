@@ -44,7 +44,6 @@ import org.spongepowered.api.text.selector.ArgumentTypes;
 import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorFactory;
 import org.spongepowered.api.text.selector.SelectorType;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -80,7 +79,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     Lantern.getLogger().debug(m + " failed with parameter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
-                    throw Throwables.propagate(e.getCause());
+                    throw new RuntimeException(e.getCause());
                 }
             };
         } else {
@@ -94,7 +93,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     Lantern.getLogger().debug(m + " failed with parameter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
-                    throw Throwables.propagate(e.getCause());
+                    throw new RuntimeException(e.getCause());
                 }
             };
         }
@@ -333,7 +332,7 @@ public class LanternSelectorFactory implements SelectorFactory {
             }
             choices = choices.map(input -> prefix + input);
         }
-        return choices.filter(choice -> choice.startsWith(selector)).collect(GuavaCollectors.toImmutableList());
+        return choices.filter(choice -> choice.startsWith(selector)).collect(ImmutableList.toImmutableList());
     }
 
 }

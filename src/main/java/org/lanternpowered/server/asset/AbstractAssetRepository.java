@@ -27,11 +27,11 @@ package org.lanternpowered.server.asset;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.io.File;
 import java.net.URL;
@@ -108,6 +108,6 @@ public abstract class AbstractAssetRepository implements AssetRepository {
 
     @Override
     public Collection<Asset> getLoadedAssets() {
-        return this.loadedAssets.values().stream().filter(Optional::isPresent).map(Optional::get).collect(GuavaCollectors.toImmutableList());
+        return this.loadedAssets.values().stream().filter(Optional::isPresent).map(Optional::get).collect(ImmutableList.toImmutableList());
     }
 }

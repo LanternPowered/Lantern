@@ -29,6 +29,8 @@ import org.spongepowered.api.world.gamerule.DefaultGameRules;
 
 public final class RuleTypes {
 
+    public static final RuleType<Boolean> ANNOUNCE_ADVANCEMENTS =
+            RuleType.create(DefaultGameRules.ANNOUNCE_ADVANCEMENTS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> COMMAND_BLOCK_OUTPUT =
             RuleType.create(DefaultGameRules.COMMAND_BLOCK_OUTPUT, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DISABLE_ELYTRA_MOVEMENT_CHECK =
@@ -40,7 +42,7 @@ public final class RuleTypes {
     public static final RuleType<Boolean> DO_FIRE_TICK =
             RuleType.create(DefaultGameRules.DO_FIRE_TICK, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_LIMITED_CRAFTING =
-            RuleType.create("doLimitedCrafting", RuleDataTypes.BOOLEAN, false);
+            RuleType.create(DefaultGameRules.DO_LIMITED_CRAFTING, RuleDataTypes.BOOLEAN, false);
     public static final RuleType<Boolean> DO_MOB_LOOT =
             RuleType.create(DefaultGameRules.DO_MOB_LOOT, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_MOB_SPAWNING =
@@ -49,10 +51,14 @@ public final class RuleTypes {
             RuleType.create(DefaultGameRules.DO_TILE_DROPS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_WEATHER_CYCLE =
             RuleType.create(DefaultGameRules.DO_WEATHER_CYCLE, RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<String> GAME_LOOP_FUNCTION =
+            RuleType.create(DefaultGameRules.GAME_LOOP_FUNCTION, RuleDataTypes.STRING, "-");
     public static final RuleType<Boolean> KEEP_INVENTORY =
             RuleType.create(DefaultGameRules.KEEP_INVENTORY, RuleDataTypes.BOOLEAN, false);
     public static final RuleType<Boolean> LOG_ADMIN_COMMANDS =
             RuleType.create(DefaultGameRules.LOG_ADMIN_COMMANDS, RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<Integer> MAX_COMMAND_CHAIN_LENGTH =
+            RuleType.create(DefaultGameRules.MAX_COMMAND_CHAIN_LENGTH, RuleDataTypes.INTEGER, 65536);
     public static final RuleType<Integer> MAX_ENTITY_CRAMMING =
             RuleType.create(DefaultGameRules.MAX_ENTITY_CRAMMING, RuleDataTypes.INTEGER, 24);
     public static final RuleType<Boolean> MOB_GRIEFING =

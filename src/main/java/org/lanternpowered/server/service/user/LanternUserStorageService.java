@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -51,7 +52,6 @@ import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -220,7 +220,7 @@ public class LanternUserStorageService implements UserStorageService {
         try {
             return this.userCache.get(profile.getUniqueId(), () -> new LanternUser((LanternGameProfile) profile));
         } catch (ExecutionException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -252,7 +252,7 @@ public class LanternUserStorageService implements UserStorageService {
         return getAllProfiles().stream().filter(profile -> {
             final Optional<String> optName = profile.getName();
             return optName.isPresent() && optName.get().startsWith(lastKnownName0);
-        }).collect(GuavaCollectors.toImmutableList());
+        }).collect(ImmutableList.toImmutableList());
     }
 
 }

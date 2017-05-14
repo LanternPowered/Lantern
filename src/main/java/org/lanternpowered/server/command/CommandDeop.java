@@ -27,6 +27,7 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.game.Lantern;
@@ -39,7 +40,6 @@ import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.List;
@@ -72,7 +72,7 @@ public final class CommandDeop extends CommandProvider {
                                         .filter(e -> e.getProfile().getName().isPresent())
                                         .map(e -> e.getProfile().getName().get())
                                         .filter(new StartsWithPredicate(prefix))
-                                        .collect(GuavaCollectors.toImmutableList());
+                                        .collect(ImmutableList.toImmutableList());
                             }
                         }
                 )

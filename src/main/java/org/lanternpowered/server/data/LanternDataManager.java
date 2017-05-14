@@ -211,7 +211,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         checkState(this.allowRegistrations, "Registrations are no longer allowed");
         checkNotNull(objectClass, "objectClass");
         checkNotNull(serializer, "serializer");
-        checkArgument(serializer.getToken().isAssignableFrom(objectClass),
+        checkArgument(serializer.getToken().isSupertypeOf(objectClass),
                 "DataTranslator is not compatible with the target object class: " +objectClass);
         registerTranslator(serializer);
     }

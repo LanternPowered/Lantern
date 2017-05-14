@@ -29,10 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.SubBehaviorPipeline;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class BehaviorPipelineImpl<B extends Behavior> implements BehaviorPipelin
     SubBehaviorPipeline<?> load(Class<?> type) {
         //noinspection unchecked
         return new SubBehaviorPipelineImpl((Class) this.behaviorType, (List) this.behaviors.stream()
-                .filter(type::isInstance).collect(GuavaCollectors.toImmutableList()), this);
+                .filter(type::isInstance).collect(ImmutableList.toImmutableList()), this);
     }
 
     public BehaviorPipelineImpl(Class<B> behaviorType, List<B> behaviors) {

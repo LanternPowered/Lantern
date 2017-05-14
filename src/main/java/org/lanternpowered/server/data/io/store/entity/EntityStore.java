@@ -30,6 +30,7 @@ import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
 import static org.lanternpowered.server.data.util.DataUtil.getSerializedManipulatorList;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.io.store.IdentifiableObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
@@ -45,7 +46,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.Optional;
@@ -235,7 +235,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
             valueContainer.set(Keys.POTION_EFFECTS, v.stream()
                     .map(PotionEffectSerializer::deserialize)
                     .filter(effect -> effect != null)
-                    .collect(GuavaCollectors.toImmutableList()));
+                    .collect(ImmutableList.toImmutableList()));
         });
         dataView.getInt(FOOD_LEVEL).ifPresent(v -> valueContainer.set(Keys.FOOD_LEVEL, v));
         dataView.getDouble(EXHAUSTION).ifPresent(v -> valueContainer.set(Keys.EXHAUSTION, v));

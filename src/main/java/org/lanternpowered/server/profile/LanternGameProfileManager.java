@@ -28,6 +28,7 @@ package org.lanternpowered.server.profile;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -38,7 +39,6 @@ import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.profile.ProfileNotFoundException;
 import org.spongepowered.api.profile.property.ProfileProperty;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -130,7 +130,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
         return Lantern.getScheduler().submitAsyncTask(() -> {
             if (useCache) {
                 final Map<String, Optional<GameProfile>> profiles = this.gameProfileCache.getOrLookupByNames(names);
-                return profiles.values().stream().filter(Optional::isPresent).map(Optional::get).collect(GuavaCollectors.toImmutableSet());
+                return profiles.values().stream().filter(Optional::isPresent).map(Optional::get).collect(ImmutableSet.toImmutableSet());
             }
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
             final Map<String, UUID> results = GameProfileQuery.queryUUIDByName(names);

@@ -27,6 +27,7 @@ package org.lanternpowered.server.command.element;
 
 import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
 
+import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.command.CommandMessageFormatting;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -34,7 +35,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.Iterator;
@@ -200,7 +200,7 @@ public final class ChoicesElement extends CommandElement {
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
         final String prefix = args.nextIfPresent().orElse("");
         return this.choicesFunction.apply(src).keySet().stream().filter(new StartsWithPredicate(prefix))
-                .collect(GuavaCollectors.toImmutableList());
+                .collect(ImmutableList.toImmutableList());
     }
 
     @Override

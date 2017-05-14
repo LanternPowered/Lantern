@@ -28,6 +28,7 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -48,7 +49,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.util.Functional;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
@@ -175,7 +175,7 @@ public final class LanternWorldManager {
      * @return a collection of loaded worlds
      */
     public Collection<World> getWorlds() {
-        return this.worldByUUID.values().stream().map(e -> e.world).collect(GuavaCollectors.toImmutableList());
+        return this.worldByUUID.values().stream().map(e -> e.world).collect(ImmutableList.toImmutableList());
     }
 
     /**
@@ -196,7 +196,7 @@ public final class LanternWorldManager {
      * @return a collection of world properties
      */
     public Collection<WorldProperties> getAllWorldProperties() {
-        return this.worldByUUID.values().stream().map(e -> e.properties).collect(GuavaCollectors.toImmutableList());
+        return this.worldByUUID.values().stream().map(e -> e.properties).collect(ImmutableList.toImmutableList());
     }
 
     /**
@@ -205,7 +205,7 @@ public final class LanternWorldManager {
      * @return a collection of world properties
      */
     public Collection<WorldProperties> getUnloadedWorlds() {
-        return this.worldByUUID.values().stream().filter(e -> e.world == null).map(e -> e.properties).collect(GuavaCollectors.toImmutableList());
+        return this.worldByUUID.values().stream().filter(e -> e.world == null).map(e -> e.properties).collect(ImmutableList.toImmutableList());
     }
 
     /**

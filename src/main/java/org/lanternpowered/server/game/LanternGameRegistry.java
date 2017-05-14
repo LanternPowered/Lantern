@@ -155,7 +155,6 @@ import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.ObjectiveDisplayModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.VisibilityRegistryModule;
-import org.lanternpowered.server.game.registry.type.statistic.AchievementRegistryModule;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
@@ -198,8 +197,6 @@ import org.lanternpowered.server.script.function.condition.ConditionTypeRegistry
 import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
-import org.lanternpowered.server.statistic.achievement.AchievementBuilder;
-import org.lanternpowered.server.statistic.achievement.IAchievement;
 import org.lanternpowered.server.statistic.builder.BlockStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.EntityStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.ItemStatisticBuilder;
@@ -348,7 +345,6 @@ import org.spongepowered.api.statistic.EntityStatistic;
 import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.StatisticType;
-import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.format.TextColor;
@@ -456,7 +452,6 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
                 .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
                 .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
-                .registerBuilderSupplier(AchievementBuilder.class, IAchievement::builder)
                 .registerBuilderSupplier(BlockStatisticBuilder.class, BlockStatisticBuilder::create)
                 .registerBuilderSupplier(EntityStatisticBuilder.class, EntityStatisticBuilder::create)
                 .registerBuilderSupplier(ItemStatisticBuilder.class, ItemStatisticBuilder::create)
@@ -578,7 +573,6 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SkullType.class, SkullTypeRegistryModule.get())
                 .registerModule(PotionType.class, PotionTypeRegistryModule.get())
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
-                .registerModule(Achievement.class, AchievementRegistryModule.get())
                 .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
                 // Script registry modules

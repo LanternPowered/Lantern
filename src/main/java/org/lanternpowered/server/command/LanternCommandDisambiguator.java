@@ -28,6 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.command.CommandMapping;
@@ -35,7 +36,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.dispatcher.Disambiguator;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public final class LanternCommandDisambiguator implements Disambiguator {
                 } else {
                     final Set<CommandMapping> ownedCommands = this.game.getCommandManager().getOwnedBy(container.get());
                     final List<CommandMapping> ownedMatchingCommands = availableOptions.stream()
-                            .filter(Predicates.in(ownedCommands)::apply).collect(GuavaCollectors.toImmutableList());
+                            .filter(Predicates.in(ownedCommands)::apply).collect(ImmutableList.toImmutableList());
                     if (ownedMatchingCommands.isEmpty()) {
                         this.game.getServer().getConsole().sendMessage(t("Plugin %s was specified as the preferred owner for %s, "
                                 + "but does not have any such command!", container.get().getName(), aliasUsed));

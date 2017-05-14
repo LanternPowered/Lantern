@@ -112,7 +112,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -121,7 +121,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
         try {
             return fromUri(uri, true);
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -49,7 +49,7 @@ public class TextFormatRegistryModule implements RegistryModule {
             ReflectionHelper.setField(colorField, TextFormat.NONE, TextColors.NONE);
             ReflectionHelper.setField(styleField, TextFormat.NONE, TextStyles.NONE);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 }

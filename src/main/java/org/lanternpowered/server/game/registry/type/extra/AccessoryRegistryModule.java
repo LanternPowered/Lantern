@@ -48,27 +48,27 @@ public final class AccessoryRegistryModule extends PluginCatalogRegistryModule<A
 
     @Override
     public void registerDefaults() {
-        register(new LanternTopHat("minecraft", "black_top_hat", DyeColors.BLACK));
-        register(new LanternTopHat("minecraft", "blue_top_hat", DyeColors.BLUE));
-        register(new LanternTopHat("minecraft", "brown_top_hat", DyeColors.BROWN));
-        register(new LanternTopHat("minecraft", "cyan_top_hat", DyeColors.CYAN));
-        register(new LanternTopHat("minecraft", "gold_top_hat"));
-        register(new LanternTopHat("minecraft", "gray_top_hat", DyeColors.GRAY));
-        register(new LanternTopHat("minecraft", "green_top_hat", DyeColors.GREEN));
-        register(new LanternTopHat("minecraft", "iron_top_hat"));
-        register(new LanternTopHat("minecraft", "light_blue_top_hat", DyeColors.LIGHT_BLUE));
-        register(new LanternTopHat("minecraft", "lime_top_hat", DyeColors.LIME));
-        register(new LanternTopHat("minecraft", "magenta_top_hat", DyeColors.MAGENTA));
-        register(new LanternTopHat("minecraft", "orange_top_hat", DyeColors.ORANGE));
-        register(new LanternTopHat("minecraft", "pink_top_hat", DyeColors.PINK));
-        register(new LanternTopHat("minecraft", "purple_top_hat", DyeColors.PURPLE));
-        register(new LanternTopHat("minecraft", "red_top_hat", DyeColors.RED));
-        register(new LanternTopHat("minecraft", "silver_top_hat", DyeColors.SILVER));
-        register(new LanternTopHat("minecraft", "snow_top_hat"));
-        register(new LanternTopHat("minecraft", "stone_top_hat"));
-        register(new LanternTopHat("minecraft", "white_top_hat", DyeColors.WHITE));
-        register(new LanternTopHat("minecraft", "wood_top_hat"));
-        register(new LanternTopHat("minecraft", "yellow_top_hat", DyeColors.YELLOW));
+        register(new LanternTopHat("lantern", "black_top_hat", DyeColors.BLACK));
+        register(new LanternTopHat("lantern", "blue_top_hat", DyeColors.BLUE));
+        register(new LanternTopHat("lantern", "brown_top_hat", DyeColors.BROWN));
+        register(new LanternTopHat("lantern", "cyan_top_hat", DyeColors.CYAN));
+        register(new LanternTopHat("lantern", "gold_top_hat"));
+        register(new LanternTopHat("lantern", "gray_top_hat", DyeColors.GRAY));
+        register(new LanternTopHat("lantern", "green_top_hat", DyeColors.GREEN));
+        register(new LanternTopHat("lantern", "iron_top_hat"));
+        register(new LanternTopHat("lantern", "light_blue_top_hat", DyeColors.LIGHT_BLUE));
+        register(new LanternTopHat("lantern", "lime_top_hat", DyeColors.LIME));
+        register(new LanternTopHat("lantern", "magenta_top_hat", DyeColors.MAGENTA));
+        register(new LanternTopHat("lantern", "orange_top_hat", DyeColors.ORANGE));
+        register(new LanternTopHat("lantern", "pink_top_hat", DyeColors.PINK));
+        register(new LanternTopHat("lantern", "purple_top_hat", DyeColors.PURPLE));
+        register(new LanternTopHat("lantern", "red_top_hat", DyeColors.RED));
+        register(new LanternTopHat("lantern", "silver_top_hat", DyeColors.SILVER));
+        register(new LanternTopHat("lantern", "snow_top_hat"));
+        register(new LanternTopHat("lantern", "stone_top_hat"));
+        register(new LanternTopHat("lantern", "white_top_hat", DyeColors.WHITE));
+        register(new LanternTopHat("lantern", "wood_top_hat"));
+        register(new LanternTopHat("lantern", "yellow_top_hat", DyeColors.YELLOW));
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class AccessoryRegistryModule extends PluginCatalogRegistryModule<A
         final ImmutableMap.Builder<String, Accessory> topHatMappings = ImmutableMap.builder();
         getAll().stream()
                 .filter(accessory -> accessory instanceof TopHat)
-                .forEach(accessory -> topHatMappings.put(accessory.getId().replace("_top_hat", ""), accessory));
+                .forEach(accessory -> topHatMappings.put(accessory.getName().replace("_top_hat", ""), accessory));
         mappingData.add(new CatalogMappingData(TopHats.class, topHatMappings.build()));
         return mappingData.build();
     }

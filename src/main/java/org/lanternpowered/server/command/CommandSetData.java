@@ -107,7 +107,9 @@ public final class CommandSetData extends CommandProvider {
                                 final Object data = element == null ? null : JsonTranslator.fromJson(element);
                                 final Key key = currentKey.get();
                                 final TypeToken<?> typeToken = key.getElementToken();
-
+                                if (content.isEmpty()) {
+                                    return null;
+                                }
                                 final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager()
                                         .getTypeSerializer(typeToken).orElse(null);
                                 if (dataTypeSerializer == null) {
@@ -116,8 +118,9 @@ public final class CommandSetData extends CommandProvider {
                                 } else {
                                     final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
                                     try {
+                                        // Put it in a holder object, the command element separates iterable objects
                                         //noinspection unchecked
-                                        return dataTypeSerializer.deserialize(typeToken, context, data);
+                                        return new ValueHolder(dataTypeSerializer.deserialize(typeToken, context, data));
                                     } catch (InvalidDataException e) {
                                         throw args.createError(t("Invalid data: %s", e.getMessage()));
                                     }
@@ -133,11 +136,20 @@ public final class CommandSetData extends CommandProvider {
                 .executor((src, args) -> {
                     final Player target = args.<Player>getOne("player").get();
                     final Key key = args.<Key>getOne("key").get();
-                    final Object data = args.getOne("data").get();
+                    final Object data = args.<ValueHolder>getOne("data").get().data;
                     //noinspection unchecked
                     target.offer(key, data);
                     src.sendMessage(t("Successfully offered the data for the key %s to the player %s", key.getId(), target.getName()));
                     return CommandResult.success();
                 });
+    }
+
+    private static final class ValueHolder {
+
+        private final Object data;
+
+        private ValueHolder(Object data) {
+            this.data = data;
+        }
     }
 }

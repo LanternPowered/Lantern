@@ -174,7 +174,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             paneItem = new LanternItemStack(BlockTypes.CARPET);
             paneItem.offer(Keys.DYE_COLOR, dyeColor.get());
             blockItem = new LanternItemStack(BlockTypes.WOOL);
-            paneItem.offer(Keys.DYE_COLOR, dyeColor.get());
+            blockItem.offer(Keys.DYE_COLOR, dyeColor.get());
         } else if (hat == TopHats.GOLD) {
             paneItem = new LanternItemStack(BlockTypes.LIGHT_WEIGHTED_PRESSURE_PLATE);
             blockItem = new LanternItemStack(BlockTypes.GOLD_BLOCK);

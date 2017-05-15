@@ -99,7 +99,6 @@ evaluationDependsOn api.path
 
 configurations {
     fastutil
-    //noinspection All
     compile {
         extendsFrom fastutil
     }

@@ -51,7 +51,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.Ban.Ip;
 
@@ -170,12 +169,12 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public Collection<Ban.Profile> getProfileBans() {
-        return (Collection) this.entries0.stream().filter(e -> e instanceof Ban.Profile).collect(GuavaCollectors.toImmutableList());
+        return (Collection) this.entries0.stream().filter(e -> e instanceof Ban.Profile).collect(ImmutableList.toImmutableList());
     }
 
     @Override
     public Collection<Ban.Ip> getIpBans() {
-        return (Collection) this.entries0.stream().filter(e -> e instanceof Ban.Ip).collect(GuavaCollectors.toImmutableList());
+        return (Collection) this.entries0.stream().filter(e -> e instanceof Ban.Ip).collect(ImmutableList.toImmutableList());
     }
 
     @Override

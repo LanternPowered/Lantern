@@ -78,7 +78,7 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
 
     private Optional<DataTypeSerializer<?,?>> loadTypeSerializer(TypeToken<?> key) {
         for (Map.Entry<TypeToken<?>, DataTypeSerializer<?,?>> entry : this.dataTypeSerializers.entrySet()) {
-            if (entry.getKey().isAssignableFrom(key)) {
+            if (entry.getKey().isSupertypeOf(key)) {
                 return Optional.of(entry.getValue());
             }
         }
@@ -89,7 +89,7 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
             }
         }
         for (Map.Entry<TypeToken<?>, DataTranslator<?>> entry : this.dataTranslators.entrySet()) {
-            if (entry.getKey().isAssignableFrom(key)) {
+            if (entry.getKey().isSupertypeOf(key)) {
                 return Optional.of(new DataSerializerToDataTypeSerializer<>(entry.getValue()));
             }
         }
@@ -101,7 +101,7 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
 
     private Optional<DataTranslator<?>> loadTranslator(TypeToken<?> key) {
         for (Map.Entry<TypeToken<?>, DataTranslator<?>> entry : this.dataTranslators.entrySet()) {
-            if (entry.getKey().isAssignableFrom(key)) {
+            if (entry.getKey().isSupertypeOf(key)) {
                 return Optional.of(entry.getValue());
             }
         }

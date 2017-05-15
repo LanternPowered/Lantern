@@ -27,11 +27,11 @@ package org.lanternpowered.server.world.gen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -80,7 +80,7 @@ public final class LanternWorldGenerator implements WorldGenerator {
 
     @Override
     public List<GenerationPopulator> getGenerationPopulators(Class<? extends GenerationPopulator> type) {
-        return this.generationPopulators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
+        return this.generationPopulators.stream().filter(type::isInstance).collect(ImmutableList.toImmutableList());
     }
 
     @Override
@@ -90,7 +90,7 @@ public final class LanternWorldGenerator implements WorldGenerator {
 
     @Override
     public List<Populator> getPopulators(Class<? extends Populator> type) {
-        return this.populators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
+        return this.populators.stream().filter(type::isInstance).collect(ImmutableList.toImmutableList());
     }
 
     @Override

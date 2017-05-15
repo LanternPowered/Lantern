@@ -44,7 +44,6 @@ import org.spongepowered.api.command.args.PatternMatchingCommandElement;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
@@ -281,7 +280,7 @@ public final class GenericArguments2 {
                     return Collections.singletonList(Integer.toString(this.defaultColor.getRed()));
                 } else {
                     return INBUILT_COLOR_NAMES.stream().filter(new StartsWithPredicate(rStr.toLowerCase()))
-                            .collect(GuavaCollectors.toImmutableList());
+                            .collect(ImmutableList.toImmutableList());
                 }
             }
             return Collections.emptyList();
@@ -627,7 +626,7 @@ public final class GenericArguments2 {
             if (arg.isPresent()) {
                 if (arg.get().startsWith("#")) {
                     return SPECIAL_TOKENS.stream().filter(new StartsWithPredicate(arg.get()))
-                            .collect(GuavaCollectors.toImmutableList());
+                            .collect(ImmutableList.toImmutableList());
                 } else if (arg.get().contains(",") || !args.hasNext()) {
                     return ImmutableList.of(arg.get());
                 } else {

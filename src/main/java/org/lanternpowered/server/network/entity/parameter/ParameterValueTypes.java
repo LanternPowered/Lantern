@@ -77,7 +77,7 @@ public final class ParameterValueTypes {
             try {
                 NbtStreamUtils.write(value.get(), buf.asOutputStream(), false);
             } catch (IOException e) {
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         } else {
             buf.writeByte((byte) 0);

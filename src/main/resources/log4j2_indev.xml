@@ -2,16 +2,16 @@
 <Configuration status="WARN" packages="org.lanternpowered.server.console.launch">
     <Appenders>
         <TerminalConsole name="Console">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger{1}]%fqcn{ [%path]}: %msg%n"/>
+            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss} %level] [%logger{1}]%loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
         </TerminalConsole>
         <TerminalConsole name="DefaultConsole">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]%fqcn{ [%path]}: %msg%n"/>
+            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss} %level]%loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
         </TerminalConsole>
         <!-- Keep a console appender open so log4j2 doesn't close our main out stream if we redirect System.out to the logger -->
         <Console name="SysOut" target="SYSTEM_OUT"/>
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
             <!-- The last regex is used to strip all the color codes from the message. -->
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %replace{%msg}{(?i)\u00A7[0-9A-FK-OR]}{}%n"/>
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger{1}]: %minecraftFormatting{%msg}{strip}%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
                 <OnStartupTriggeringPolicy/>

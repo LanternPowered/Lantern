@@ -35,7 +35,6 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableListValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -84,21 +83,21 @@ public class ImmutableLanternListValue<E> extends ImmutableLanternCollectionValu
     public ImmutableListValue<E> without(E element) {
         return new ImmutableLanternListValue<>(this.getKey(), this.actualValue.stream()
                 .filter(existingElement -> !existingElement.equals(element))
-                .collect(GuavaCollectors.toImmutableList()));
+                .collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public ImmutableListValue<E> withoutAll(Iterable<E> elements) {
         return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existingElement -> !Iterables.contains(elements, existingElement))
-                .collect(GuavaCollectors.toImmutableList()));
+                .collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public ImmutableListValue<E> withoutAll(Predicate<E> predicate) {
         return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existing -> checkNotNull(predicate).test(existing))
-                .collect(GuavaCollectors.toImmutableList()));
+                .collect(ImmutableList.toImmutableList()));
     }
 
     @Override

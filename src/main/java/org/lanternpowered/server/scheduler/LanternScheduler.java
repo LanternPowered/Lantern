@@ -39,7 +39,6 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Functional;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.Optional;
 import java.util.Set;
@@ -78,7 +77,7 @@ public class LanternScheduler implements Scheduler {
         final Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
         return getScheduledTasks().stream()
                 .filter(task -> searchPattern.matcher(task.getName()).matches())
-                .collect(GuavaCollectors.toImmutableSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
@@ -103,7 +102,7 @@ public class LanternScheduler implements Scheduler {
         final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
         return getScheduledTasks().stream()
                 .filter(task -> task.getOwner().equals(pluginContainer))
-                .collect(GuavaCollectors.toImmutableSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override

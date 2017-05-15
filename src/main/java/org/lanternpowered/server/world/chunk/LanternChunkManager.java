@@ -73,7 +73,6 @@ import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
@@ -571,7 +570,7 @@ public final class LanternChunkManager {
      * @return the loaded chunks
      */
     public ImmutableSet<Chunk> getLoadedChunks() {
-        return this.loadedChunks.values().stream().filter(Chunk::isLoaded).collect(GuavaCollectors.toImmutableSet());
+        return this.loadedChunks.values().stream().filter(Chunk::isLoaded).collect(ImmutableSet.toImmutableSet());
     }
 
     /**

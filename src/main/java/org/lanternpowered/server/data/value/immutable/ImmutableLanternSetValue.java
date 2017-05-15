@@ -35,7 +35,6 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -82,21 +81,21 @@ public class ImmutableLanternSetValue<E> extends ImmutableLanternCollectionValue
     public ImmutableSetValue<E> without(E element) {
         return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existing -> !existing.equals(element))
-                .collect(GuavaCollectors.toImmutableSet()));
+                .collect(ImmutableSet.toImmutableSet()));
     }
 
     @Override
     public ImmutableSetValue<E> withoutAll(Iterable<E> elements) {
         return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existingElement -> !Iterables.contains(elements, existingElement))
-                .collect(GuavaCollectors.toImmutableSet()));
+                .collect(ImmutableSet.toImmutableSet()));
     }
 
     @Override
     public ImmutableSetValue<E> withoutAll(Predicate<E> predicate) {
         return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existingElement -> checkNotNull(predicate).test(existingElement))
-                .collect(GuavaCollectors.toImmutableSet()));
+                .collect(ImmutableSet.toImmutableSet()));
     }
 
     @Override

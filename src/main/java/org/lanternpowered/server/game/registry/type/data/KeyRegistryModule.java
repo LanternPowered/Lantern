@@ -99,7 +99,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.merchant.TradeOffer;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Color;
@@ -126,7 +125,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
-        register(makeSetKey(Achievement.class, of("Achievements"), "sponge:achievements"));
         register(makeValueKey(Boolean.class, of("AffectsSpawning"), "sponge:affects_spawning"));
         register(makeMutableBoundedValueKey(Integer.class, of("Age"), "sponge:age"));
         register(makeValueKey(Boolean.class, of("AIEnabled"), "sponge:ai_enabled"));

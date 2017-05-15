@@ -55,7 +55,7 @@ public final class LibraryManager {
             try {
                 Files.createDirectories(this.librariesDir);
             } catch (IOException e) {
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
         try (DirectoryStream<Path> dir = Files.newDirectoryStream(this.librariesDir, path -> path.toString().endsWith(".jar"))) {

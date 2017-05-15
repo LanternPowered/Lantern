@@ -94,7 +94,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Chunk;
@@ -1085,7 +1084,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final Vector3i position = new Vector3i(x, y, z);
         return this.scheduledBlockUpdateQueue.stream()
                 .filter(update -> update.getLocation().getBlockPosition().equals(position))
-                .collect(GuavaCollectors.toImmutableSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
@@ -1396,7 +1395,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
-        return getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
+        return getEntities().stream().filter(filter).collect(ImmutableList.toImmutableList());
     }
 
     @SuppressWarnings("unchecked")
@@ -1457,7 +1456,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
-        return getTileEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableSet());
+        return getTileEntities().stream().filter(filter).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
@@ -1604,7 +1603,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
         return Arrays.stream(CARDINAL_FACES)
                 .filter(direction -> AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, store.get()).isPresent())
-                .collect(GuavaCollectors.toImmutableList());
+                .collect(ImmutableList.toImmutableList());
     }
 
     @Override

@@ -115,7 +115,6 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.ChunkPreGenerate;
@@ -604,7 +603,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
-        return getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
+        return getEntities().stream().filter(filter).collect(ImmutableList.toImmutableList());
     }
 
     @Override

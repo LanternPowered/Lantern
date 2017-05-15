@@ -32,7 +32,6 @@ import org.lanternpowered.server.statistic.LanternStatistic;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.Statistics;
-import org.spongepowered.api.statistic.achievement.Achievement;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,9 +60,6 @@ public final class StatisticRegistryModule extends AdditionalPluginCatalogRegist
     @Override
     protected void register(Statistic catalogType, boolean disallowInbuiltPluginIds) {
         internalRegister(catalogType, disallowInbuiltPluginIds);
-        if (catalogType instanceof Achievement) {
-            AchievementRegistryModule.get().internalRegister((Achievement) catalogType, disallowInbuiltPluginIds);
-        }
     }
 
     void internalRegister(Statistic catalogType, boolean disallowInbuiltPluginIds) {

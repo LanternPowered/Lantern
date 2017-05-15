@@ -42,7 +42,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -81,7 +80,7 @@ public final class CommandGameRule extends CommandProvider {
                             @Override
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                                 final String prefix = args.nextIfPresent().orElse("");
-                                return defaultRules.stream().filter(new StartsWithPredicate(prefix)).collect(GuavaCollectors.toImmutableList());
+                                return defaultRules.stream().filter(new StartsWithPredicate(prefix)).collect(ImmutableList.toImmutableList());
                             }
                         },
                         new CommandElement(Text.of("value")) {

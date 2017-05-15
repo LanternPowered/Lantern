@@ -51,6 +51,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCamera;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
@@ -82,7 +83,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     private boolean lastCanFly;
     private float lastFlySpeed;
 
-    private int[] passengerStack = new int[13];
+    protected int[] passengerStack = new int[20];
     @Nullable private TopHat lastTopHat;
 
     private byte lastYaw0;
@@ -99,7 +100,6 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         super.init(context);
         this.elytraRocketId = context.acquire();
         context.acquire(this.passengerStack);
-        getEntity().offer(Keys.INVISIBLE, false);
     }
 
     @Override
@@ -126,8 +126,12 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             parameterList.add(EntityParameters.AbstractSlime.SIZE, -1);
         } else if (type == 101) {
             parameterList.add(EntityParameters.Ageable.IS_BABY, true);
+        } else if (type == -55) {
+            parameterList.add(EntityParameters.AbstractSlime.SIZE, 1);
+            type = 55;
         }
-        context.sendToAll(() -> new MessagePlayOutSpawnMob(this.passengerStack[index], UUID.randomUUID(), type, getEntity().getPosition(),
+        final int type0 = type;
+        context.sendToAll(() -> new MessagePlayOutSpawnMob(this.passengerStack[index], UUID.randomUUID(), type0, getEntity().getPosition(),
                 (byte) 0, (byte) 0, (byte) 0, Vector3d.ZERO, parameterList));
     }
 
@@ -163,6 +167,29 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     private void removePassengerStack(EntityProtocolUpdateContext context) {
         context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.passengerStack));
+    }
+
+    private void sendWolf(EntityProtocolUpdateContext context) {
+        sendStackEntry(context, 16, 101);
+        sendStackEntry(context, 15, 55);
+        sendStackEntry(context, 14, 55);
+        sendStackEntry(context, 13, 55);
+
+        final ParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+        parameterList.add(EntityParameters.Ageable.IS_BABY, true);
+        /*
+        parameterList.add(EntityParameters.TameableAnimal.FLAGS, (byte) 0x02);
+        context.sendToSelf(() -> new MessagePlayOutSpawnMob(this.passengerStack[12], UUID.randomUUID(), 95, getEntity().getPosition(),
+                (byte) 0, (byte) 0, (byte) 0, Vector3d.ZERO, parameterList));
+        */
+        context.sendToSelf(() -> new MessagePlayOutSpawnMob(this.passengerStack[12], UUID.randomUUID(), 98, getEntity().getPosition(),
+                (byte) 0, (byte) 0, (byte) 0, Vector3d.ZERO, parameterList));
+
+        sendPassengers(context, 12, 13);
+        sendPassengers(context, 13, 14);
+        sendPassengers(context, 14, 15);
+        sendPassengers(context, 15, 16);
+        context.sendToAll(() -> new MessagePlayOutSetEntityPassengers(this.passengerStack[16], getRootEntityId()));
     }
 
     private void sendHat(EntityProtocolUpdateContext context, TopHat hat) {
@@ -252,6 +279,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
+        sendWolf(context);
         context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillParameters(true)));
         final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
         context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
@@ -309,9 +337,6 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             if (this.lastTopHat != null) {
                 context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[10], this.lastYaw));
                 context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[11], this.lastYaw));
-                context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[12], this.lastYaw));
-                // context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[13], this.lastYaw));
-                // context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[14], this.lastYaw));
                 if (this.lastFlags0 != this.lastFlags) {
                     final boolean glow = (this.lastFlags & 0x40) != 0;
                     final ParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());

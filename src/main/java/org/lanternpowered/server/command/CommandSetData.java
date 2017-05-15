@@ -107,9 +107,6 @@ public final class CommandSetData extends CommandProvider {
                                 final Object data = element == null ? null : JsonTranslator.fromJson(element);
                                 final Key key = currentKey.get();
                                 final TypeToken<?> typeToken = key.getElementToken();
-                                if (content.isEmpty()) {
-                                    return null;
-                                }
                                 final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager()
                                         .getTypeSerializer(typeToken).orElse(null);
                                 if (dataTypeSerializer == null) {

@@ -25,6 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import com.flowpowered.math.imaginary.Quaterniond;
+import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementInput;
@@ -33,5 +36,9 @@ public class HandlerPlayInPlayerMovementInput implements Handler<MessagePlayInPl
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerMovementInput message) {
+        final LanternPlayer player = context.getSession().getPlayer();
+        final Vector3d vector = new Vector3d(message.getSideways(), 0, message.getForwards());
+        final Quaterniond rot = Quaterniond.fromAxesAnglesDeg(0, -player.getRotation().getY(), 0);
+        player.setRawPosition(player.getPosition().add(rot.rotate(vector)));
     }
 }

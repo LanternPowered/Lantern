@@ -168,6 +168,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             this.lastYaw = yaw;
             this.lastPitch = pitch;
         }
+        dirtyPos = true;
         if (dirtyPos) {
             final long dxu = xu - this.lastX;
             final long dyu = yu - this.lastY;
@@ -179,20 +180,56 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             // Don't send movement messages if the entity
             // is a passengers, otherwise glitches will
             // rule the world.
-            if (passenger) {
+            if (!passenger) {
                 if (Math.abs(dxu) <= Short.MAX_VALUE && Math.abs(dyu) <= Short.MAX_VALUE && Math.abs(dzu) <= Short.MAX_VALUE) {
                     if (dirtyRot) {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
                                 (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
                         // The rotation is already send
                         dirtyRot = false;
+                        if (this instanceof PlayerEntityProtocol) {
+                            context.sendToAll(new MessagePlayOutEntityLookAndRelativeMove(((PlayerEntityProtocol) this).passengerStack[12],
+                                    (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityLookAndRelativeMove(((PlayerEntityProtocol) this).passengerStack[13],
+                                    (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityLookAndRelativeMove(((PlayerEntityProtocol) this).passengerStack[14],
+                                    (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityLookAndRelativeMove(((PlayerEntityProtocol) this).passengerStack[15],
+                                    (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityLookAndRelativeMove(((PlayerEntityProtocol) this).passengerStack[16],
+                                    (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
+                        }
                     } else {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityRelativeMove(entityId,
                                 (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
+                        if (this instanceof PlayerEntityProtocol) {
+                            context.sendToAll(new MessagePlayOutEntityRelativeMove(((PlayerEntityProtocol) this).passengerStack[16],
+                                    (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityRelativeMove(((PlayerEntityProtocol) this).passengerStack[15],
+                                    (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityRelativeMove(((PlayerEntityProtocol) this).passengerStack[14],
+                                    (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityRelativeMove(((PlayerEntityProtocol) this).passengerStack[13],
+                                    (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
+                            context.sendToAll(new MessagePlayOutEntityRelativeMove(((PlayerEntityProtocol) this).passengerStack[12],
+                                    (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
+                        }
                     }
                 } else {
                     context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
                             x, y, z, yaw, pitch, this.entity.isOnGround()));
+                    if (this instanceof PlayerEntityProtocol) {
+                        context.sendToAll(new MessagePlayOutEntityTeleport(((PlayerEntityProtocol) this).passengerStack[12],
+                                x, y, z, yaw, pitch, this.entity.isOnGround()));
+                        context.sendToAll(new MessagePlayOutEntityTeleport(((PlayerEntityProtocol) this).passengerStack[13],
+                                x, y, z, yaw, pitch, this.entity.isOnGround()));
+                        context.sendToAll(new MessagePlayOutEntityTeleport(((PlayerEntityProtocol) this).passengerStack[14],
+                                x, y, z, yaw, pitch, this.entity.isOnGround()));
+                        context.sendToAll(new MessagePlayOutEntityTeleport(((PlayerEntityProtocol) this).passengerStack[15],
+                                x, y, z, yaw, pitch, this.entity.isOnGround()));
+                        context.sendToAll(new MessagePlayOutEntityTeleport(((PlayerEntityProtocol) this).passengerStack[16],
+                                x, y, z, yaw, pitch, this.entity.isOnGround()));
+                    }
                     // The rotation is already send
                     dirtyRot = false;
                 }
@@ -200,12 +237,31 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         }
         if (dirtyRot) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, yaw, pitch, this.entity.isOnGround()));
+            if (this instanceof PlayerEntityProtocol) {
+                context.sendToAll(new MessagePlayOutEntityLook(((PlayerEntityProtocol) this).passengerStack[12],
+                        yaw, pitch, this.entity.isOnGround()));
+                context.sendToAll(new MessagePlayOutEntityLook(((PlayerEntityProtocol) this).passengerStack[13],
+                        yaw, pitch, this.entity.isOnGround()));
+                context.sendToAll(new MessagePlayOutEntityLook(((PlayerEntityProtocol) this).passengerStack[14],
+                        yaw, pitch, this.entity.isOnGround()));
+                context.sendToAll(new MessagePlayOutEntityLook(((PlayerEntityProtocol) this).passengerStack[15],
+                        yaw, pitch, this.entity.isOnGround()));
+                context.sendToAll(new MessagePlayOutEntityLook(((PlayerEntityProtocol) this).passengerStack[16],
+                        yaw, pitch, this.entity.isOnGround()));
+            }
         } else if (!passenger) {
             if (headRot != null) {
                 final byte headYaw = wrapAngle(headRot.getY());
                 if (headYaw != this.lastHeadYaw) {
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, headYaw));
                     this.lastHeadYaw = headYaw;
+                    if (this instanceof PlayerEntityProtocol) {
+                        context.sendToAll(new MessagePlayOutEntityHeadLook(((PlayerEntityProtocol) this).passengerStack[12], headYaw));
+                        context.sendToAll(new MessagePlayOutEntityHeadLook(((PlayerEntityProtocol) this).passengerStack[13], headYaw));
+                        context.sendToAll(new MessagePlayOutEntityHeadLook(((PlayerEntityProtocol) this).passengerStack[14], headYaw));
+                        context.sendToAll(new MessagePlayOutEntityHeadLook(((PlayerEntityProtocol) this).passengerStack[15], headYaw));
+                        context.sendToAll(new MessagePlayOutEntityHeadLook(((PlayerEntityProtocol) this).passengerStack[16], headYaw));
+                    }
                 }
             }
         }
@@ -370,10 +426,14 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (this.entity.get(Keys.GLOWING).orElse(false)) {
             flags |= 0x40;
         }
-        if (this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false)) {
+        if (isElytraFlying()) {
             flags |= 0x80;
         }
         return flags;
+    }
+
+    protected boolean isElytraFlying() {
+        return this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false);
     }
 
     /**

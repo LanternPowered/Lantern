@@ -38,7 +38,7 @@ import org.jline.reader.LineReader.Option;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.lanternpowered.server.game.DirectoryKeys;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
+import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandManager;
@@ -69,9 +69,8 @@ public final class ConsoleManager {
     private final PluginContainer pluginContainer;
 
     @Inject
-    public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager,
-            @Named(DirectoryKeys.CONFIG) Path configFolder,
-            @Named(InternalPluginsInfo.Implementation.IDENTIFIER) PluginContainer pluginContainer) {
+    public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager, @Named(DirectoryKeys.CONFIG) Path configFolder,
+            @Named(Implementation.IDENTIFIER) PluginContainer pluginContainer) {
         this.consoleHistoryFile = configFolder.resolve(HISTORY_FILE_NAME);
         this.pluginContainer = pluginContainer;
         this.commandManager = commandManager;
@@ -89,7 +88,7 @@ public final class ConsoleManager {
 
         if (terminal != null) {
             LineReader reader = LineReaderBuilder.builder()
-                    .appName("LanternServer")
+                    .appName(Implementation.NAME)
                     .terminal(terminal)
                     .completer(new ConsoleCommandCompleter())
                     .build();
@@ -102,7 +101,7 @@ public final class ConsoleManager {
             System.setOut(IoBuilder.forLogger(REDIRECT_OUT).setLevel(Level.INFO).buildPrintStream());
             System.setErr(IoBuilder.forLogger(REDIRECT_ERR).setLevel(Level.ERROR).buildPrintStream());
 
-            this.active = true;
+            active = true;
 
             final Thread thread = new Thread(this::readCommandTask, "console");
             thread.setDaemon(true);
@@ -114,12 +113,8 @@ public final class ConsoleManager {
     }
 
     public void shutdown() {
-        this.active = false;
+        active = false;
         saveHistory();
-    }
-
-    public boolean isActive() {
-        return this.active;
     }
 
     private void saveHistory() {
@@ -139,7 +134,7 @@ public final class ConsoleManager {
      */
     private void readCommandTask() {
         final LineReader lineReader = TerminalConsoleAppender.getReader();
-        while (this.active) {
+        while (active) {
             //noinspection ConstantConditions
             String command = lineReader.readLine("> ");
             if (command != null) {

@@ -2,10 +2,10 @@
 <Configuration status="WARN" packages="org.lanternpowered.server.console.launch">
     <Appenders>
         <TerminalConsole name="Console">
-            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss} %level] [%logger{1}] %loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
+            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss} %level] [%logger{1}]%loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
         </TerminalConsole>
         <TerminalConsole name="DefaultConsole">
-            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss} %level] %loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
+            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss} %level]%loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
         </TerminalConsole>
         <!-- Keep a console appender open so log4j2 doesn't close our main out stream if we redirect System.out to the logger -->
         <Console name="SysOut" target="SYSTEM_OUT"/>

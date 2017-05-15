@@ -103,7 +103,6 @@ configurations {
     compile {
         extendsFrom fastutil
     }
-    log4j
 }
 
 // Project dependencies
@@ -152,18 +151,9 @@ dependencies {
     // Asm
     compile 'org.ow2.asm:asm-all:5.0.3'
 
-    // Configuration until Sponge includes these versions
-    compile 'ninja.leaping.configurate:configurate-hocon:3.3'
-    compile 'ninja.leaping.configurate:configurate-gson:3.3'
-    compile 'ninja.leaping.configurate:configurate-yaml:3.3'
-
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.mockito:mockito-core:2.7.22'
-
-    log4j('org.apache.logging.log4j:log4j-core:2.8.1') {
-        transitive = false
-    }
 }
 
 idea.module {

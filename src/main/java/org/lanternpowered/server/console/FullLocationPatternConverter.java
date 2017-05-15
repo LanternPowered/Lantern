@@ -29,7 +29,6 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
-import org.lanternpowered.server.game.Lantern;
 
 import java.util.Set;
 import java.util.regex.Matcher;

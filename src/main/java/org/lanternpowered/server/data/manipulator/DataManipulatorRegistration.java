@@ -25,78 +25,30 @@
  */
 package org.lanternpowered.server.data.manipulator;
 
-import com.google.common.base.MoreObjects;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
+import org.spongepowered.api.data.persistence.DataBuilder;
 
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class DataManipulatorRegistration<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> {
+public interface DataManipulatorRegistration<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>>
+        extends DataRegistration<M, I> {
 
-    private final Class<M> manipulatorType;
-    private final Supplier<M> manipulatorSupplier;
-    private final Function<M, M> manipulatorCopyFunction;
-    private final Function<I, M> immutableToMutableFunction;
-    private final Class<I> immutableManipulatorType;
-    private final Supplier<I> immutableManipulatorSupplier;
-    private final Function<M, I> mutableToImmutableFunction;
-    private final Set<Key<?>> requiredKeys;
+    M createMutable();
 
-    DataManipulatorRegistration(
-            Class<M> manipulatorType, Supplier<M> manipulatorSupplier, Function<M, M> manipulatorCopyFunction,
-            Function<I, M> immutableToMutableFunction,
-            Class<I> immutableManipulatorType, Supplier<I> immutableManipulatorSupplier, Function<M, I> mutableToImmutableFunction,
-            Set<Key<?>> requiredKeys) {
-        this.manipulatorType = manipulatorType;
-        this.manipulatorSupplier = manipulatorSupplier;
-        this.manipulatorCopyFunction = manipulatorCopyFunction;
-        this.immutableToMutableFunction = immutableToMutableFunction;
-        this.immutableManipulatorType = immutableManipulatorType;
-        this.immutableManipulatorSupplier = immutableManipulatorSupplier;
-        this.mutableToImmutableFunction = mutableToImmutableFunction;
-        this.requiredKeys = requiredKeys;
-    }
+    I createImmutable();
 
-    public Class<M> getManipulatorType() {
-        return this.manipulatorType;
-    }
+    M copyMutable(M manipulator);
 
-    public Supplier<M> getManipulatorSupplier() {
-        return this.manipulatorSupplier;
-    }
+    M toMutable(I manipulator);
 
-    public Class<I> getImmutableManipulatorType() {
-        return this.immutableManipulatorType;
-    }
+    I toImmutable(M manipulator);
 
-    public Supplier<I> getImmutableManipulatorSupplier() {
-        return this.immutableManipulatorSupplier;
-    }
+    DataBuilder<I> getImmutableDataBuilder();
 
-    public Function<M, M> getManipulatorCopyFunction() {
-        return this.manipulatorCopyFunction;
-    }
-
-    public Function<I, M> getImmutableToMutableFunction() {
-        return this.immutableToMutableFunction;
-    }
-
-    public Function<M, I> getMutableToImmutableFunction() {
-        return this.mutableToImmutableFunction;
-    }
-
-    public Set<Key<?>> getRequiredKeys() {
-        return this.requiredKeys;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("manipulatorType", this.manipulatorType.getName())
-                .add("immutableManipulatorType", this.immutableManipulatorType.getName())
-                .toString();
-    }
+    Set<Key<?>> getRequiredKeys();
 }

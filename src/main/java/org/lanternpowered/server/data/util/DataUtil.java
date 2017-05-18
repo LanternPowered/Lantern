@@ -28,12 +28,15 @@ package org.lanternpowered.server.data.util;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.data.LanternDataManager;
+import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.List;
@@ -56,11 +59,24 @@ public final class DataUtil {
     public static List<DataView> getSerializedManipulatorList(Iterable<DataManipulator<?, ?>> manipulators) {
         checkNotNull(manipulators);
         final ImmutableList.Builder<DataView> builder = ImmutableList.builder();
+        final LanternDataManager dataManager = Lantern.getGame().getDataManager();
         for (DataManipulator<?, ?> manipulator : manipulators) {
-            builder.add(DataContainer.createNew()
-                    .set(DataQueries.DATA_CLASS, manipulator.getClass().getName())
-                    .set(DataQueries.INTERNAL_DATA, manipulator.toContainer()));
+            Class<?> manipulatorType;
+            if (manipulator instanceof IDataManipulator) {
+                manipulatorType = ((IDataManipulator) manipulator).getMutableType();
+            } else {
+                manipulatorType = manipulator.getClass();
+            }
+            final Optional<DataRegistration> optRegistration = dataManager.get(manipulatorType);
+            if (!optRegistration.isPresent()) {
+                Lantern.getLogger().error("Could not serialize {}. No registration could be found.", manipulatorType.getName());
+            } else {
+                builder.add(DataContainer.createNew()
+                        .set(DataQueries.DATA_CLASS, optRegistration.get().getId())
+                        .set(DataQueries.INTERNAL_DATA, manipulator.toContainer()));
+            }
         }
+        // TODO: Save failed deserialized containers
         return builder.build();
     }
 
@@ -68,19 +84,27 @@ public final class DataUtil {
     public static ImmutableList<DataManipulator<?, ?>> deserializeManipulatorList(List<DataView> containers) {
         checkNotNull(containers);
         final ImmutableList.Builder<DataManipulator<?, ?>> builder = ImmutableList.builder();
+        final LanternDataManager dataManager = Lantern.getGame().getDataManager();
+        // TODO: Save failed deserialized containers
         for (DataView view : containers) {
-            final String clazzName = view.getString(DataQueries.DATA_CLASS).get();
+            final String id = view.getString(DataQueries.DATA_CLASS).get();
             final DataView manipulatorView = view.getView(DataQueries.INTERNAL_DATA).get();
-            try {
-                final Class<?> clazz = Class.forName(clazzName);
-                final Optional<DataManipulatorBuilder<?, ?>> optional = Lantern.getGame().getDataManager().getBuilder((Class) clazz);
-                if (optional.isPresent()) {
-                    final Optional<? extends DataManipulator<?, ?>> manipulatorOptional = optional.get().build(manipulatorView);
-                    manipulatorOptional.ifPresent(builder::add);
+            Optional<DataRegistration> optRegistration = DataManipulatorRegistryModule.get().getById(id);
+            if (!optRegistration.isPresent()) {
+                optRegistration = dataManager.getLegacyRegistration(id);
+            }
+            if (optRegistration.isPresent()) {
+                try {
+                    final Optional<DataManipulator> optManipulator = optRegistration.get().getDataManipulatorBuilder().build(manipulatorView);
+                    if (optManipulator.isPresent()) {
+                        builder.add(optManipulator.get());
+                    }
+                } catch (InvalidDataException e) {
+                    Lantern.getLogger().error("Could not deserialize " + id
+                            + "! Don't worry though, we'll try to deserialize the rest of the data.", e);
                 }
-            } catch (Exception e) {
-                new InvalidDataException("Could not deserialize " + clazzName
-                        + "! Don't worry though, we'll try to deserialize the rest of the data.", e).printStackTrace();
+            } else {
+                Lantern.getLogger().warn("Missing DataRegistration for ID: " + id + ". Don't worry, the data will be kept safe.");
             }
         }
         return builder.build();

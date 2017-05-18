@@ -50,7 +50,7 @@ public interface AbstractImmutableDataHolder<H extends ImmutableDataHolder<H>> e
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByImmutable((Class) containerClass);
         if (optRegistration.isPresent()) {
             final DataManipulatorRegistration registration = optRegistration.get();
-            final DataManipulator manipulator = (DataManipulator) optRegistration.get().getManipulatorSupplier().get();
+            final DataManipulator manipulator = optRegistration.get().createMutable();
             for (Key key : (Set<Key>) registration.getRequiredKeys()) {
                 final Optional value = getValue(key);
                 if (!value.isPresent()) {
@@ -105,7 +105,7 @@ public interface AbstractImmutableDataHolder<H extends ImmutableDataHolder<H>> e
     default List<ImmutableDataManipulator<?, ?>> getManipulators() {
         final ImmutableList.Builder<ImmutableDataManipulator<?, ?>> builder = ImmutableList.builder();
         for (DataManipulatorRegistration registration : DataManipulatorRegistry.get().getAll()) {
-            DataManipulator manipulator = (DataManipulator<?, ?>) registration.getImmutableManipulatorSupplier().get();
+            DataManipulator manipulator = (DataManipulator<?, ?>) registration.createMutable();
             for (Key key : (Set<Key>) registration.getRequiredKeys()) {
                 final Optional value = getValue(key);
                 if (value.isPresent()) {

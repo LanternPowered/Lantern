@@ -64,6 +64,7 @@ import org.lanternpowered.server.cause.entity.teleport.LanternPortalTeleportCaus
 import org.lanternpowered.server.cause.entity.teleport.LanternTeleportCauseBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
+import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
 import org.lanternpowered.server.data.type.LanternBigMushroomType;
 import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternComparatorType;
@@ -107,6 +108,7 @@ import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegis
 import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
@@ -221,6 +223,7 @@ import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.DataFormat;
 import org.spongepowered.api.data.type.ArmorType;
@@ -457,6 +460,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EntityStatisticBuilder.class, EntityStatisticBuilder::create)
                 .registerBuilderSupplier(ItemStatisticBuilder.class, ItemStatisticBuilder::create)
                 .registerBuilderSupplier(StatisticBuilder.class, StatisticBuilder::create)
+                .registerBuilderSupplier(DataRegistration.Builder.class, LanternDataRegistrationBuilder::new)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
@@ -577,6 +581,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
                 .registerModule(new AdvancementTreeRegistryModule())
+                .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

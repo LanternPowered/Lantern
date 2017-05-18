@@ -62,18 +62,18 @@ public class ImmutableLanternBoundedValue<E> extends ImmutableLanternValue<E> im
     @Override
     public ImmutableBoundedValue<E> with(E value) {
         return (this.comparator.compare(checkNotNull(value), this.minimum) > 0 || this.comparator.compare(checkNotNull(value), this.maximum) < 0) ?
-                new ImmutableLanternBoundedValue<>(this.getKey(), this.getDefault(), this.getComparator(), this.getMinValue(), this.getMaxValue()) :
-                new ImmutableLanternBoundedValue<>(this.getKey(), value, this.getDefault(), this.getComparator(), this.getMinValue(), this.getMaxValue());
+                new ImmutableLanternBoundedValue<>(getKey(), getDefault(), getComparator(), getMinValue(), getMaxValue()) :
+                new ImmutableLanternBoundedValue<>(getKey(), value, getDefault(), getComparator(), getMinValue(), getMaxValue());
     }
 
     @Override
     public ImmutableBoundedValue<E> transform(Function<E, E> function) {
-        return this.with(checkNotNull(checkNotNull(function).apply(this.get())));
+        return this.with(checkNotNull(checkNotNull(function).apply(get())));
     }
 
     @Override
     public MutableBoundedValue<E> asMutable() {
-        return new LanternBoundedValue<>(this.getKey(), this.getDefault(), this.getComparator(), this.getMinValue(), this.getMaxValue(), this.get());
+        return new LanternBoundedValue<>(getKey(), getDefault(), getComparator(), getMinValue(), getMaxValue(), get());
     }
 
     @Override

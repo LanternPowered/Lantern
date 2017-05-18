@@ -32,7 +32,7 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.meta.PatternLayer;
-import org.spongepowered.api.data.persistence.DataBuilder;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.type.BannerPatternShape;
 import org.spongepowered.api.data.type.DyeColor;
@@ -80,16 +80,17 @@ public final class LanternPatternLayer implements PatternLayer {
                 .toString();
     }
 
-    public static class Builder implements DataBuilder<PatternLayer> {
+    public static class Builder extends AbstractDataBuilder<PatternLayer> {
 
         private final Game game;
 
         public Builder(Game game) {
+            super(PatternLayer.class, 1);
             this.game = game;
         }
 
         @Override
-        public Optional<PatternLayer> build(DataView container) throws InvalidDataException {
+        protected Optional<PatternLayer> buildContent(DataView container) throws InvalidDataException {
             final String bannerShape = container.getString(BANNER_SHAPE).orElse(null);
             final String dyeColor = container.getString(DYE_COLOR).orElse(null);
             if (bannerShape == null || dyeColor == null) {
@@ -103,5 +104,4 @@ public final class LanternPatternLayer implements PatternLayer {
             return Optional.of(new LanternPatternLayer(shape, color));
         }
     }
-
 }

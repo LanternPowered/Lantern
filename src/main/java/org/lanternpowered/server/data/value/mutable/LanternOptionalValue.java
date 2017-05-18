@@ -26,27 +26,46 @@
 package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
+import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternOptionalValue;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableOptionalValue;
 import org.spongepowered.api.data.value.mutable.OptionalValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
+import java.lang.reflect.TypeVariable;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implements OptionalValue<E> {
 
+    private static final TypeVariable<Class<Optional>> optionalType = Optional.class.getTypeParameters()[0];
+    private static final Map<Key<?>, Key<?>> nonOptionalKey = new ConcurrentHashMap<>();
+
+    @SuppressWarnings("unchecked")
+    public static <E> Key<? extends BaseValue<E>> unwrap(Key<? extends BaseValue<Optional<E>>> key) {
+        return (Key<Value<E>>) nonOptionalKey.computeIfAbsent(key, key1 -> {
+            final TypeToken newElementType = key1.getElementToken().resolveType(optionalType);
+            return makeValueKey(newElementType, DataQuery.of('.', key1.getQuery().asString('.') + "Required"),
+                    key1.getId() + "_required", key1.getName() + "Required");
+        });
+    }
+
     public LanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key) {
-        this(key, Optional.<E>empty());
+        this(key, Optional.empty());
     }
 
     public LanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key, Optional<E> actualValue) {
-        this(key, Optional.<E>empty(), actualValue);
+        this(key, Optional.empty(), actualValue);
     }
 
     public LanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key, Optional<E> defaultValue, Optional<E> actualValue) {
@@ -67,16 +86,17 @@ public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implement
 
     @Override
     public ImmutableOptionalValue<E> asImmutable() {
-        return new ImmutableLanternOptionalValue<>(this.getKey(), this.getDefault(), this.actualValue);
+        return new ImmutableLanternOptionalValue<>(getKey(), getDefault(), getActualValue());
     }
 
     @Override
     public OptionalValue<E> setTo(@Nullable E value) {
-        return this.set(Optional.ofNullable(value));
+        return set(Optional.ofNullable(value));
     }
 
     @Override
-    public Value<E> or(E defaultValue) { // TODO actually construct the keys
-        return new LanternValue<>(null, null, this.get().isPresent() ? this.get().get() : checkNotNull(defaultValue));
+    public Value<E> or(E defaultValue) {
+        checkNotNull(defaultValue);
+        return new LanternValue<>(unwrap(getKey()), defaultValue, get().orElse(defaultValue));
     }
 }

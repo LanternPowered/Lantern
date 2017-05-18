@@ -99,8 +99,8 @@ public final class ImmutableDataCachingUtil {
 
     @SuppressWarnings("unchecked")
     public static <E, V extends ImmutableValue<?>, T extends ImmutableValue<E>> T getValue(final Class<V> valueClass,
-            final Key<? extends BaseValue<E>> usedKey, final E defaultArg, final E arg, @Nullable final Object... extraArgs) {
-        final String key = getKey(valueClass, usedKey.getQuery().asString('.'), arg.getClass(), arg);
+            final Key<? extends BaseValue<E>> usedKey, final E defaultArg, @Nullable final E arg, @Nullable final Object... extraArgs) {
+        final String key = getKey(valueClass, usedKey.getQuery().asString('.'), arg == null ? defaultArg.getClass() : arg.getClass(), arg);
         try {
             return (T) ImmutableDataCachingUtil.valueCache.get(key, (Callable<ImmutableValue<?>>) () -> {
                 try {

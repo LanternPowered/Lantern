@@ -27,12 +27,15 @@ package org.lanternpowered.server.data.manipulator.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.manipulator.ManipulatorHelper;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
+import org.lanternpowered.server.data.value.ElementHolderKeyRegistration;
 import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
@@ -48,6 +51,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.Nullable;
 
 public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
         implements AbstractValueContainer<I, M>, IImmutableDataManipulator<I, M> {
@@ -81,6 +86,15 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
     }
 
     @Override
+    public <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key, @Nullable E defaultValue) {
+        final ElementHolderKeyRegistration<V, E> registration = AbstractValueContainer.super.registerKey(key, defaultValue);
+        if (defaultValue != null) {
+            registration.notRemovable();
+        }
+        return registration;
+    }
+
+    @Override
     public Map<Key<?>, KeyRegistration> getRawValueMap() {
         return this.rawValueMap;
     }
@@ -110,11 +124,11 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public M asMutable() {
         final DataManipulatorRegistration<M, I> registration = DataManipulatorRegistry.get().getByImmutable(this.immutableManipulatorType).get();
-        //noinspection unchecked
-        return registration.getImmutableToMutableFunction().apply((I) this);
+        return registration.toMutable((I) this);
     }
 
     @Override
@@ -137,18 +151,27 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
         return this.manipulatorType;
     }
 
-    public static abstract class AbstractImmutableManipulatorDataBuilder<T extends AbstractImmutableData> extends AbstractDataBuilder<T> {
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("type", getMutableType().getName())
+                .add("values", Collections3.toString(getValues()))
+                .toString();
+    }
 
-        protected AbstractImmutableManipulatorDataBuilder(Class<T> requiredClass, int supportedVersion) {
+    public static abstract class AbstractImmutableManipulatorDataBuilder<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
+            extends AbstractDataBuilder<I> {
+
+        protected AbstractImmutableManipulatorDataBuilder(Class<I> requiredClass, int supportedVersion) {
             super(requiredClass, supportedVersion);
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        protected Optional<T> buildContent(DataView container) throws InvalidDataException {
-            return ManipulatorHelper.buildContent(container, this::buildManipulator);
+        protected Optional<I> buildContent(DataView container) throws InvalidDataException {
+            return (Optional) ManipulatorHelper.buildContent(container, () ->  (AbstractValueContainer) create());
         }
 
-        protected abstract T buildManipulator();
+        protected abstract I create();
     }
 }

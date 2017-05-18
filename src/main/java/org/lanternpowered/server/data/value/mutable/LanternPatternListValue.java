@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.data.value.mutable;
 
-import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.meta.LanternPatternLayer;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternPatternListValue;
 import org.spongepowered.api.data.key.Key;
@@ -139,6 +138,6 @@ public class LanternPatternListValue extends LanternListValue<PatternLayer> impl
 
     @Override
     public ImmutablePatternListValue asImmutable() {
-        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue);
+        return new ImmutableLanternPatternListValue(getKey(), getDefault(), getActualValue());
     }
 }

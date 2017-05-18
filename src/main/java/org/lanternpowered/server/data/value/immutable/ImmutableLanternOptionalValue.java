@@ -39,10 +39,11 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class ImmutableLanternOptionalValue<E> extends ImmutableLanternValue<Optional<E>> implements ImmutableOptionalValue<E> {
 
     public ImmutableLanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key) {
-        super(key, Optional.<E>empty());
+        super(key, Optional.empty());
     }
 
     public ImmutableLanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key, Optional<E> actualValue) {
@@ -55,26 +56,27 @@ public class ImmutableLanternOptionalValue<E> extends ImmutableLanternValue<Opti
 
     @Override
     public ImmutableOptionalValue<E> with(Optional<E> value) {
-        return new ImmutableLanternOptionalValue<>(this.getKey(), this.getDefault(), checkNotNull(value));
+        return new ImmutableLanternOptionalValue<>(getKey(), getDefault(), checkNotNull(value));
     }
 
     @Override
     public ImmutableOptionalValue<E> transform(Function<Optional<E>, Optional<E>> function) {
-        return new ImmutableLanternOptionalValue<>(this.getKey(), this.getDefault(), checkNotNull(function.apply(this.get())));
+        return new ImmutableLanternOptionalValue<>(getKey(), getDefault(), checkNotNull(function.apply(get())));
     }
 
     @Override
     public OptionalValue<E> asMutable() {
-        return new LanternOptionalValue<>(this.getKey(), this.getDefault(), this.actualValue);
+        return new LanternOptionalValue<>(getKey(), getDefault(), getActualValue());
     }
 
     @Override
     public ImmutableOptionalValue<E> instead(@Nullable E value) {
-        return new ImmutableLanternOptionalValue<>(this.getKey(), this.getDefault(), Optional.ofNullable(value));
+        return new ImmutableLanternOptionalValue<>(getKey(), getDefault(), Optional.ofNullable(value));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public ImmutableValue<E> or(E value) { // TODO actually construct a new key for this kind...
-        return new ImmutableLanternValue<>(null, this.get().isPresent() ? this.get().get() : checkNotNull(value));
+    public ImmutableValue<E> or(E value) {
+        return new ImmutableLanternValue<>(LanternOptionalValue.unwrap(getKey()), get().orElse(checkNotNull(value)));
     }
 }

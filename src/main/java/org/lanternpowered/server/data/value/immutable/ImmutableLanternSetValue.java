@@ -57,54 +57,54 @@ public class ImmutableLanternSetValue<E> extends ImmutableLanternCollectionValue
 
     @Override
     public ImmutableSetValue<E> with(Set<E> value) {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), value);
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(), value);
     }
 
     @Override
     public ImmutableSetValue<E> transform(Function<Set<E>, Set<E>> function) {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), checkNotNull(checkNotNull(function).apply(this.actualValue)));
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(), checkNotNull(checkNotNull(function).apply(getActualValue())));
     }
 
     @Override
     public ImmutableSetValue<E> withElement(E element) {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(),
-                ImmutableSet.<E>builder().addAll(this.actualValue).add(element).build());
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(),
+                ImmutableSet.<E>builder().addAll(getActualValue()).add(element).build());
     }
 
     @Override
     public ImmutableSetValue<E> withAll(Iterable<E> elements) {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(),
-                ImmutableSet.<E>builder().addAll(this.actualValue).addAll(elements).build());
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(),
+                ImmutableSet.<E>builder().addAll(getActualValue()).addAll(elements).build());
     }
 
     @Override
     public ImmutableSetValue<E> without(E element) {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(existing -> !existing.equals(element))
                 .collect(ImmutableSet.toImmutableSet()));
     }
 
     @Override
     public ImmutableSetValue<E> withoutAll(Iterable<E> elements) {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(existingElement -> !Iterables.contains(elements, existingElement))
                 .collect(ImmutableSet.toImmutableSet()));
     }
 
     @Override
     public ImmutableSetValue<E> withoutAll(Predicate<E> predicate) {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(existingElement -> checkNotNull(predicate).test(existingElement))
                 .collect(ImmutableSet.toImmutableSet()));
     }
 
     @Override
     public Set<E> getAll() {
-        return Sets.newHashSet(this.actualValue);
+        return Sets.newHashSet(getActualValue());
     }
 
     @Override
     public SetValue<E> asMutable() {
-        return new LanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue);
+        return new LanternSetValue<>(getKey(), getDefault(), getActualValue());
     }
 }

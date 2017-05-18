@@ -34,14 +34,14 @@ import org.spongepowered.api.data.value.mutable.CollectionValue;
 import java.util.Collection;
 import java.util.function.Function;
 
-public abstract class ImmutableLanternCollectionValue<E, V extends Collection<E>, I extends ImmutableCollectionValue<E, V, I, L>,
+abstract class ImmutableLanternCollectionValue<E, V extends Collection<E>, I extends ImmutableCollectionValue<E, V, I, L>,
         L extends CollectionValue<E, V, L, I>> extends ImmutableLanternValue<V> implements ImmutableCollectionValue<E, V, I, L> {
 
-    protected ImmutableLanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue) {
+    ImmutableLanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue) {
         super(key, defaultValue);
     }
 
-    protected ImmutableLanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue, V actualValue) {
+    ImmutableLanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue, V actualValue) {
         super(key, defaultValue, actualValue);
     }
 
@@ -56,24 +56,24 @@ public abstract class ImmutableLanternCollectionValue<E, V extends Collection<E>
 
     @Override
     public int size() {
-        return this.actualValue.size();
+        return getActualValue().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return this.actualValue.isEmpty();
+        return getActualValue().isEmpty();
     }
 
 
     @Override
     public boolean contains(E element) {
-        return this.actualValue.contains(element);
+        return getActualValue().contains(element);
     }
 
     @Override
     public boolean containsAll(Iterable<E> iterable) {
         for (E element : iterable) {
-            if (!Iterables.contains(this.actualValue, element)) {
+            if (!Iterables.contains(getActualValue(), element)) {
                 return false;
             }
         }

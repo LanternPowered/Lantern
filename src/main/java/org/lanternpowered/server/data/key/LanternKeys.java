@@ -58,8 +58,6 @@ public final class LanternKeys {
             makeValueKey(Integer.class, DataQuery.of("PortalCooldownTicks"), "lantern:portal_cooldown_ticks");
     public static final Key<Value<Integer>> SCORE =
             makeValueKey(Integer.class, DataQuery.of("Score"), "lantern:score");
-    public static final Key<MutableBoundedValue<Double>> ABSORPTION_AMOUNT =
-            makeMutableBoundedValueKey(Double.class, DataQuery.of("AbsorptionAmount"), "lantern:absorption_amount");
     public static final Key<Value<Boolean>> CAN_PICK_UP_LOOT =
             makeValueKey(Boolean.class, DataQuery.of("CanPickupLoot"), "lantern:can_pickup_loot");
     public static final Key<Value<Boolean>> IS_EFFECT =
@@ -126,6 +124,8 @@ public final class LanternKeys {
             makeListKey(Accessory.class, DataQuery.of("Accessories"), "lantern:accessories");
     public static final Key<OptionalValue<AdvancementTree>> OPEN_ADVANCEMENT_TREE =
             makeOptionalKey(AdvancementTree.class, DataQuery.of("OpenAdvancementTree"), "lantern:open_advancement_tree");
+    public static final Key<Value<Boolean>> ARE_PLAYING =
+            makeValueKey(Boolean.class, DataQuery.of("ArePlaying"), "lantern:are_playing");
 
     private LanternKeys() {
     }

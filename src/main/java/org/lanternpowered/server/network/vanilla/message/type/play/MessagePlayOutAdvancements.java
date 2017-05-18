@@ -30,7 +30,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.advancement.FrameType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
-import org.lanternpowered.server.util.collect.Lists2;
+import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Arrays;
@@ -82,8 +82,8 @@ public final class MessagePlayOutAdvancements implements Message {
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
                 .add("clear", this.clear)
-                .add("addedAdvStructs", Lists2.toString(this.addedAdvStructs))
-                .add("removedAdvs", Lists2.toString(this.removedAdvs))
+                .add("addedAdvStructs", Collections3.toString(this.addedAdvStructs))
+                .add("removedAdvs", Collections3.toString(this.removedAdvs))
                 .add("progress", progress.toString())
                 .toString();
     }

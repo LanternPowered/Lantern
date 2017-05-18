@@ -28,7 +28,7 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.util.collect.Lists2;
+import org.lanternpowered.server.util.collect.Collections3;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -168,7 +168,7 @@ public class AdvancementCriterion {
         private final List<AdvancementCriterion> criteria;
 
         private Multi(String id, List<AdvancementCriterion> criteria) {
-            super(id, id + Lists2.toString(criteria.stream().map(AdvancementCriterion::getName).collect(Collectors.toList())));
+            super(id, id + Collections3.toString(criteria.stream().map(AdvancementCriterion::getName).collect(Collectors.toList())));
             this.criteria = criteria;
         }
 

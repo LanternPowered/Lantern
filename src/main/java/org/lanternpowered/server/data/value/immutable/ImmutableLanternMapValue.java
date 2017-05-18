@@ -44,7 +44,7 @@ import java.util.function.Predicate;
 public class ImmutableLanternMapValue<K, V> extends ImmutableLanternValue<Map<K, V>> implements ImmutableMapValue<K, V> {
 
     public ImmutableLanternMapValue(Key<? extends BaseValue<Map<K, V>>> key) {
-        this(key, ImmutableMap.<K, V>of());
+        this(key, ImmutableMap.of());
     }
 
     public ImmutableLanternMapValue(Key<? extends BaseValue<Map<K, V>>> key, Map<K, V> defaultValue, Map<K, V> actualValue) {
@@ -57,85 +57,85 @@ public class ImmutableLanternMapValue<K, V> extends ImmutableLanternValue<Map<K,
 
     @Override
     public ImmutableMapValue<K, V> with(Map<K, V> value) {
-        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), checkNotNull(value));
+        return new ImmutableLanternMapValue<>(getKey(), getDefault(), checkNotNull(value));
     }
 
     @Override
     public ImmutableMapValue<K, V> transform(Function<Map<K, V>, Map<K, V>> function) {
-        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), checkNotNull(checkNotNull(function).apply(this.actualValue)));
+        return new ImmutableLanternMapValue<>(getKey(), getDefault(), checkNotNull(checkNotNull(function).apply(getActualValue())));
     }
 
     @Override
     public MapValue<K, V> asMutable() {
-        return new LanternMapValue<>(this.getKey(), this.getDefault(), this.actualValue);
+        return new LanternMapValue<>(getKey(), getDefault(), getActualValue());
     }
 
     @Override
     public int size() {
-        return this.actualValue.size();
+        return getActualValue().size();
     }
 
     @Override
     public ImmutableMapValue<K, V> with(K key, V value) {
-        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), ImmutableMap.<K, V>builder()
-                .putAll(this.actualValue).put(checkNotNull(key), checkNotNull(value)).build());
+        return new ImmutableLanternMapValue<>(getKey(), getDefault(), ImmutableMap.<K, V>builder()
+                .putAll(getActualValue()).put(checkNotNull(key), checkNotNull(value)).build());
     }
 
     @Override
     public ImmutableMapValue<K, V> withAll(Map<K, V> map) {
-        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), ImmutableMap.<K, V>builder()
-                .putAll(this.actualValue).putAll(map).build());
+        return new ImmutableLanternMapValue<>(getKey(), getDefault(), ImmutableMap.<K, V>builder()
+                .putAll(getActualValue()).putAll(map).build());
     }
 
     @Override
     public ImmutableMapValue<K, V> without(K key) {
         final ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
-        this.actualValue.entrySet().stream()
+        getActualValue().entrySet().stream()
                 .filter(entry -> !entry.getKey().equals(key))
                 .forEach(entry -> builder.put(entry.getKey(), entry.getValue()));
-        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), builder.build());
+        return new ImmutableLanternMapValue<>(getKey(), getDefault(), builder.build());
     }
 
     @Override
     public ImmutableMapValue<K, V> withoutAll(Iterable<K> keys) {
         final ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
-        this.actualValue.entrySet().stream()
+        getActualValue().entrySet().stream()
                 .filter(entry -> !Iterables.contains(keys, entry.getKey()))
                 .forEach(entry -> builder.put(entry.getKey(), entry.getValue()));
-        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), builder.build());
+        return new ImmutableLanternMapValue<>(getKey(), getDefault(), builder.build());
     }
 
     @Override
     public ImmutableMapValue<K, V> withoutAll(Predicate<Map.Entry<K, V>> predicate) {
         final ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
-        this.actualValue.entrySet().stream()
+        getActualValue().entrySet().stream()
                 .filter(entry -> checkNotNull(predicate).test(entry))
                 .forEach(entry -> builder.put(entry.getKey(), entry.getValue()));
-        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), builder.build());
+        return new ImmutableLanternMapValue<>(getKey(), getDefault(), builder.build());
     }
 
     @Override
     public boolean containsKey(K key) {
-        return this.actualValue.containsKey(checkNotNull(key));
+        return getActualValue().containsKey(checkNotNull(key));
     }
 
     @Override
     public boolean containsValue(V value) {
-        return this.actualValue.containsValue(checkNotNull(value));
+        return getActualValue().containsValue(checkNotNull(value));
     }
 
     @Override
     public ImmutableSet<K> keySet() {
-        return (ImmutableSet<K>) this.actualValue.keySet();
+        return (ImmutableSet<K>) getActualValue().keySet();
     }
 
     @Override
     public ImmutableSet<Map.Entry<K, V>> entrySet() {
-        return (ImmutableSet<Map.Entry<K, V>>) this.actualValue.entrySet();
+        return (ImmutableSet<Map.Entry<K, V>>) getActualValue().entrySet();
     }
 
     @Override
     public ImmutableCollection<V> values() {
-        return (ImmutableCollection<V>) this.actualValue.values();
+        return (ImmutableCollection<V>) getActualValue().values();
     }
 }

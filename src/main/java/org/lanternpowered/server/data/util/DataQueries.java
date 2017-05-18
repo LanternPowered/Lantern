@@ -28,7 +28,6 @@ package org.lanternpowered.server.data.util;
 import static org.spongepowered.api.data.DataQuery.of;
 
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 public final class DataQueries {
 

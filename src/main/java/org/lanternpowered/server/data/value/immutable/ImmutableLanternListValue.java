@@ -54,66 +54,66 @@ public class ImmutableLanternListValue<E> extends ImmutableLanternCollectionValu
 
     @Override
     public ImmutableListValue<E> with(List<E> value) {
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), checkNotNull(value));
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), checkNotNull(value));
     }
 
     @Override
     public ImmutableListValue<E> transform(Function<List<E>, List<E>> function) {
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), checkNotNull(checkNotNull(function).apply(this.actualValue)));
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), checkNotNull(checkNotNull(function).apply(getActualValue())));
     }
 
     @Override
     public ListValue<E> asMutable() {
-        return new LanternListValue<>(this.getKey(), this.getDefault(), Lists.newArrayList(this.actualValue));
+        return new LanternListValue<>(getKey(), getDefault(), Lists.newArrayList(getActualValue()));
     }
 
     @Override
     public ImmutableListValue<E> withElement(E elements) {
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(),
-                ImmutableList.<E>builder().addAll(this.actualValue).add(elements).build());
+        return new ImmutableLanternListValue<>(getKey(), getDefault(),
+                ImmutableList.<E>builder().addAll(getActualValue()).add(elements).build());
     }
 
     @Override
     public ImmutableListValue<E> withAll(Iterable<E> elements) {
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(),
-                ImmutableList.<E>builder().addAll(this.actualValue).addAll(elements).build());
+        return new ImmutableLanternListValue<>(getKey(), getDefault(),
+                ImmutableList.<E>builder().addAll(getActualValue()).addAll(elements).build());
     }
 
     @Override
     public ImmutableListValue<E> without(E element) {
-        return new ImmutableLanternListValue<>(this.getKey(), this.actualValue.stream()
+        return new ImmutableLanternListValue<>(getKey(), getActualValue().stream()
                 .filter(existingElement -> !existingElement.equals(element))
                 .collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public ImmutableListValue<E> withoutAll(Iterable<E> elements) {
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(existingElement -> !Iterables.contains(elements, existingElement))
                 .collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public ImmutableListValue<E> withoutAll(Predicate<E> predicate) {
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(existing -> checkNotNull(predicate).test(existing))
                 .collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public List<E> getAll() {
-        return Lists.newArrayList(this.actualValue);
+        return Lists.newArrayList(getActualValue());
     }
 
     @Override
     public E get(int index) {
-        return this.actualValue.get(index);
+        return getActualValue().get(index);
     }
 
     @Override
     public ImmutableListValue<E> with(int index, E value) {
         final ImmutableList.Builder<E> builder = ImmutableList.builder();
-        for (final ListIterator<E> iterator = this.actualValue.listIterator(); iterator.hasNext(); ) {
+        for (final ListIterator<E> iterator = getActualValue().listIterator(); iterator.hasNext(); ) {
             if (iterator.nextIndex() - 1 == index) {
                 builder.add(checkNotNull(value));
                 iterator.next();
@@ -121,36 +121,36 @@ public class ImmutableLanternListValue<E> extends ImmutableLanternCollectionValu
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), builder.build());
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), builder.build());
     }
 
     @Override
     public ImmutableListValue<E> with(int index, Iterable<E> values) {
         final ImmutableList.Builder<E> builder = ImmutableList.builder();
-        for (final ListIterator<E> iterator = this.actualValue.listIterator(); iterator.hasNext(); ) {
+        for (final ListIterator<E> iterator = getActualValue().listIterator(); iterator.hasNext(); ) {
             if (iterator.nextIndex() - 1 == index) {
                 builder.addAll(values);
             }
             builder.add(iterator.next());
         }
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), builder.build());
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), builder.build());
     }
 
     @Override
     public ImmutableListValue<E> without(int index) {
         final ImmutableList.Builder<E> builder = ImmutableList.builder();
-        for (final ListIterator<E> iterator = this.actualValue.listIterator(); iterator.hasNext(); ) {
+        for (final ListIterator<E> iterator = getActualValue().listIterator(); iterator.hasNext(); ) {
             if (iterator.nextIndex() - 1 != index) {
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), builder.build());
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), builder.build());
     }
 
     @Override
     public ImmutableListValue<E> set(int index, E element) {
         final ImmutableList.Builder<E> builder = ImmutableList.builder();
-        for (final ListIterator<E> iterator = this.actualValue.listIterator(); iterator.hasNext(); ) {
+        for (final ListIterator<E> iterator = getActualValue().listIterator(); iterator.hasNext(); ) {
             if (iterator.nextIndex() - 1 == index) {
                 builder.add(checkNotNull(element));
                 iterator.next();
@@ -158,11 +158,11 @@ public class ImmutableLanternListValue<E> extends ImmutableLanternCollectionValu
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), builder.build());
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), builder.build());
     }
 
     @Override
     public int indexOf(E element) {
-        return this.actualValue.indexOf(element);
+        return getActualValue().indexOf(element);
     }
 }

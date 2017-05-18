@@ -146,7 +146,7 @@ public interface ValueProcessor<V extends BaseValue<E>, E> {
          * @return The builder for chaining
          */
         default B applicableTester(Predicate<IValueContainer<?>> tester) {
-            return this.applicableTester((key, valueContainer) -> tester.test(valueContainer));
+            return applicableTester((key, valueContainer) -> tester.test(valueContainer));
         }
 
         /**
@@ -164,7 +164,7 @@ public interface ValueProcessor<V extends BaseValue<E>, E> {
          * @return The builder for chaining
          */
         default B failAlwaysRemoveHandler() {
-            return this.removeHandler(RemoveHandlers.failAlways());
+            return removeHandler(RemoveHandlers.failAlways());
         }
 
         /**

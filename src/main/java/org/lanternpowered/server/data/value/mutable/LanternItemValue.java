@@ -64,6 +64,6 @@ public class LanternItemValue extends LanternValue<ItemStack> {
 
     @Override
     public ImmutableValue<ItemStack> asImmutable() {
-        return new ImmutableLanternItemValue(this.getKey(), this.getDefault(), this.get());
+        return new ImmutableLanternItemValue(getKey(), getDefault(), get());
     }
 }

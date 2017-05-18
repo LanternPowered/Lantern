@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.advancement;
 
-import org.lanternpowered.server.util.collect.Lists2;
+import org.lanternpowered.server.util.collect.Collections3;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -178,7 +178,7 @@ final class CriterionHelper {
 
         @Override
         public String toString() {
-            return Lists2.toString(this.wrappers);
+            return Collections3.toString(this.wrappers);
         }
     }
 

@@ -26,9 +26,9 @@
 package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.data.value.immutable.ImmutableLanternEntityValue;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Key;
@@ -53,44 +53,54 @@ import javax.annotation.Nullable;
 public class LanternEntityValue<T extends Entity> implements Value<T> {
 
     private final Key<? extends BaseValue<T>> key;
-    private UUID entityid;
+    private UUID entityId;
     private WeakReference<T> weakReference = new WeakReference<>(null);
 
     public LanternEntityValue(Key<? extends BaseValue<T>> key, T actualValue) {
         this.key = checkNotNull(key);
-        this.entityid = checkNotNull(actualValue).getUniqueId();
+        this.entityId = checkNotNull(actualValue).getUniqueId();
         this.weakReference = new WeakReference<>(actualValue);
+    }
 
+    @SuppressWarnings("unchecked")
+    private T getRaw() {
+        T entity = this.weakReference.get();
+        if (entity != null) {
+            return entity;
+        }
+        for (World world : Sponge.getGame().getServer().getWorlds()) {
+            final Optional<T> optional = (Optional<T>) world.getEntity(this.entityId);
+            if (optional.isPresent()) {
+                entity = optional.get();
+                this.weakReference = new WeakReference<>(entity);
+                return entity;
+            }
+        }
+        return null;
     }
 
     @Override
     public T get() {
-        @Nullable Entity entity = this.weakReference.get();
-        if (entity == null) {
-            for (World world : Sponge.getGame().getServer().getWorlds()) {
-                final Optional<T> optional = (Optional<T>) world.getEntity(this.entityid);
-                if (optional.isPresent()) {
-                    return optional.get();
-                }
-            }
+        final T entity = getRaw();
+        if (entity != null) {
+            return entity;
         }
-        throw new IllegalStateException("The entity has expired or has been permanently removed! The entity's id was: " + this.entityid.toString());
+        throw new IllegalStateException("The entity has expired or has been permanently removed! The entity's id was: " + this.entityId);
     }
 
     @Override
     public boolean exists() {
-        return this.weakReference.get() != null;
+        return getRaw() != null;
     }
 
     @Override
     public T getDefault() {
-        checkState(!exists(), "The entity reference expired!");
-        return this.weakReference.get();
+        return get();
     }
 
     @Override
     public Optional<T> getDirect() {
-        return Optional.ofNullable(this.weakReference.get());
+        return Optional.of(get());
     }
 
     @Override
@@ -100,7 +110,7 @@ public class LanternEntityValue<T extends Entity> implements Value<T> {
 
     @Override
     public Value<T> set(T value) {
-        this.entityid = checkNotNull(value).getUniqueId();
+        this.entityId = checkNotNull(value).getUniqueId();
         this.weakReference = new WeakReference<>(value);
         return this;
     }
@@ -109,27 +119,27 @@ public class LanternEntityValue<T extends Entity> implements Value<T> {
     public Value<T> transform(Function<T, T> function) {
         final T entity = checkNotNull(checkNotNull(function).apply(this.weakReference.get()));
         this.weakReference = new WeakReference<>(entity);
-        this.entityid = checkNotNull(entity).getUniqueId();
+        this.entityId = checkNotNull(entity).getUniqueId();
         return this;
     }
 
     @Override
     public ImmutableValue<T> asImmutable() {
-        return new ImmutableLanternValue<>(this.getKey(), this.weakReference.get());
+        return new ImmutableLanternEntityValue<>(getKey(), get());
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("key", this.key)
-                .add("entityid", this.entityid)
+                .add("entityId", this.entityId)
                 .add("weakReference", this.weakReference)
                 .toString();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.key, this.entityid, this.weakReference);
+        return Objects.hash(this.key, this.entityId, this.weakReference);
     }
 
     @Override
@@ -142,7 +152,7 @@ public class LanternEntityValue<T extends Entity> implements Value<T> {
         }
         final LanternEntityValue other = (LanternEntityValue) obj;
         return Objects.equals(this.key, other.key)
-                && Objects.equals(this.entityid, other.entityid)
+                && Objects.equals(this.entityId, other.entityId)
                 && Objects.equals(this.weakReference, other.weakReference);
     }
 }

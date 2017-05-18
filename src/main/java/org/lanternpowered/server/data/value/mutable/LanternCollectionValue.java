@@ -39,14 +39,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public abstract class LanternCollectionValue<E, V extends Collection<E>, I extends CollectionValue<E, V, I, L>,
+abstract class LanternCollectionValue<E, V extends Collection<E>, I extends CollectionValue<E, V, I, L>,
         L extends ImmutableCollectionValue<E, V, L, I>> extends LanternValue<V> implements CollectionValue<E, V, I, L> {
 
-    public LanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue) {
+    LanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue) {
         super(key, defaultValue);
     }
 
-    public LanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue, V actualValue) {
+    LanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue, V actualValue) {
         super(key, defaultValue, actualValue);
     }
 
@@ -58,51 +58,51 @@ public abstract class LanternCollectionValue<E, V extends Collection<E>, I exten
 
     @Override
     public I transform(Function<V, V> function) {
-        this.actualValue = checkNotNull(function).apply(this.actualValue);
+        this.actualValue = checkNotNull(checkNotNull(function).apply(this.actualValue));
         return (I) this;
     }
 
     @Override
     public int size() {
-        return this.actualValue.size();
+        return getActualValue().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return this.actualValue.isEmpty();
+        return getActualValue().isEmpty();
     }
 
     @Override
     public I add(E element) {
-        this.actualValue.add(checkNotNull(element));
+        getActualValue().add(checkNotNull(element));
         return (I) this;
     }
 
     @Override
     public I addAll(Iterable<E> elements) {
         for (E element : checkNotNull(elements)) {
-            this.actualValue.add(checkNotNull(element));
+            getActualValue().add(checkNotNull(element));
         }
         return (I) this;
     }
 
     @Override
     public I remove(E element) {
-        this.actualValue.remove(checkNotNull(element));
+        getActualValue().remove(checkNotNull(element));
         return (I) this;
     }
 
     @Override
     public I removeAll(Iterable<E> elements) {
         for (E element : elements) {
-            this.actualValue.remove(checkNotNull(element));
+            getActualValue().remove(checkNotNull(element));
         }
         return (I) this;
     }
 
     @Override
     public I removeAll(Predicate<E> predicate) {
-        for (Iterator<E> iterator = this.actualValue.iterator(); iterator.hasNext(); ) {
+        for (Iterator<E> iterator = getActualValue().iterator(); iterator.hasNext(); ) {
             if (checkNotNull(predicate).test(iterator.next())) {
                 iterator.remove();
             }
@@ -112,12 +112,12 @@ public abstract class LanternCollectionValue<E, V extends Collection<E>, I exten
 
     @Override
     public boolean contains(E element) {
-        return this.actualValue.contains(checkNotNull(element));
+        return getActualValue().contains(checkNotNull(element));
     }
 
     @Override
     public boolean containsAll(Collection<E> iterable) {
-        return this.actualValue.containsAll(iterable);
+        return getActualValue().containsAll(iterable);
     }
 
     @Override
@@ -130,11 +130,11 @@ public abstract class LanternCollectionValue<E, V extends Collection<E>, I exten
 
     @Override
     public Optional<V> getDirect() {
-        return Optional.of(this.actualValue);
+        return Optional.of(getActualValue());
     }
 
     @Override
     public Iterator<E> iterator() {
-        return this.actualValue.iterator();
+        return getActualValue().iterator();
     }
 }

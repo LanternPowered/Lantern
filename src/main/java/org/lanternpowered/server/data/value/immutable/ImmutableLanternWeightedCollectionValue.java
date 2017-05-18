@@ -57,72 +57,72 @@ public class ImmutableLanternWeightedCollectionValue<E> extends ImmutableLantern
 
     @Override
     public ImmutableWeightedCollectionValue<E> with(WeightedTable<E> value) {
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), value);
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), value);
     }
 
     @Override
     public ImmutableWeightedCollectionValue<E> withElement(TableEntry<E> elements) {
         WeightedTable<E> table = new WeightedTable<>();
-        table.addAll(this.actualValue);
+        table.addAll(getActualValue());
         table.add(elements);
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), table);
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), getDefault(), table);
     }
 
     @Override
     public ImmutableWeightedCollectionValue<E> transform(Function<WeightedTable<E>, WeightedTable<E>> function) {
         final WeightedTable<E> table = getAll();
         final WeightedTable<E> functionTable = function.apply(table);
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), functionTable);
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), getDefault(), functionTable);
     }
 
     @Override
     public ImmutableWeightedCollectionValue<E> withAll(Iterable<TableEntry<E>> elements) {
         final WeightedTable<E> newTable = getAll();
         elements.forEach(newTable::add);
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), newTable);
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), getDefault(), newTable);
     }
 
     @Override
     public ImmutableWeightedCollectionValue<E> without(TableEntry<E> element) {
-        final WeightedTable<E> newTable = this.actualValue.stream()
+        final WeightedTable<E> newTable = getActualValue().stream()
                 .filter(entry -> !entry.equals(element))
                 .map(entry -> element)
                 .collect(Collectors.toCollection(WeightedTable::new));
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), newTable);
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), getDefault(), newTable);
     }
 
     @Override
     public ImmutableWeightedCollectionValue<E> withoutAll(Iterable<TableEntry<E>> elements) {
         final WeightedTable<E> newTable = new WeightedTable<>();
-        this.actualValue.stream()
+        getActualValue().stream()
                 .filter(entry -> !Iterables.contains(elements, entry))
                 .forEach(newTable::add);
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), newTable);
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), getDefault(), newTable);
     }
 
     @Override
     public ImmutableWeightedCollectionValue<E> withoutAll(Predicate<TableEntry<E>> predicate) {
-        final WeightedTable<E> newTable = this.actualValue.stream()
+        final WeightedTable<E> newTable = getActualValue().stream()
                 .filter(predicate)
                 .collect(Collectors.toCollection(WeightedTable::new));
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), newTable);
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), getDefault(), newTable);
     }
 
     @Override
     public WeightedTable<E> getAll() {
         final WeightedTable<E> newTable = new WeightedTable<>();
-        newTable.addAll(this.actualValue);
+        newTable.addAll(getActualValue());
         return newTable;
     }
 
     @Override
     public WeightedCollectionValue<E> asMutable() {
-        return new LanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), this.getAll());
+        return new LanternWeightedCollectionValue<>(getKey(), getDefault(), getAll());
     }
 
     @Nullable
     @Override
     public List<E> get(Random random) {
-        return this.actualValue.get(random);
+        return getActualValue().get(random);
     }
 }

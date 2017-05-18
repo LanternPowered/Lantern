@@ -41,7 +41,7 @@ public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariant
             Key<? extends Value<E>> variantKey, E defaultValue) {
         super(immutableManipulatorType, manipulatorType);
         this.variantKey = variantKey;
-        registerKey(variantKey, defaultValue).notRemovable();
+        registerKey(variantKey, defaultValue);
     }
 
     public AbstractImmutableVariantData(M manipulator) {

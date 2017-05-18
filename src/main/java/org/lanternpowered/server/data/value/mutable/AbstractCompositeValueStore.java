@@ -27,6 +27,10 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
+import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
+import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipulator;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
@@ -37,19 +41,38 @@ import org.lanternpowered.server.util.functions.TriFunction;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
+import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>, H extends ValueContainer<?>>
         extends AbstractValueContainer<S, H>, CompositeValueStore<S, H> {
+
+    @SuppressWarnings("unchecked")
+    default <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> Optional<M> createManipulator(
+            DataManipulatorRegistration<M, I> registration) {
+        final M manipulator = registration.createMutable();
+        for (Key<?> key : registration.getRequiredKeys()) {
+            final Optional value = getValue((Key) key);
+            if (value.isPresent()) {
+                manipulator.set((Value) value.get());
+            } else if (!supports(key)) {
+                return Optional.empty();
+            }
+        }
+        return Optional.of(manipulator);
+    }
 
     @SuppressWarnings("unchecked")
     default <E> DataTransactionResult offerWith(Key<? extends BaseValue<E>> key, E element, ValueProcessor<BaseValue<E>, E> processor) {
@@ -183,8 +206,141 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
     }
 
     @Override
+    default DataTransactionResult remove(Class<? extends H> containerClass) {
+        checkNotNull(containerClass, "containerClass");
+        // You cannot remove default data manipulators?
+        final Optional optRegistration = DataManipulatorRegistry.get().getBy((Class) containerClass);
+        if (optRegistration.isPresent()) {
+            return DataTransactionResult.failNoData();
+        }
+
+        final Map<Class<?>, H> containers = getRawAdditionalContainers();
+        if (containers != null) {
+            final H old = containers.remove(containerClass);
+            if (old != null) {
+                return DataTransactionResult.successRemove(old.getValues());
+            }
+        }
+
+        return DataTransactionResult.failNoData();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default boolean supports(Class<? extends H> containerClass) {
+        checkNotNull(containerClass, "containerClass");
+
+        // Offer all the default key values as long if they are supported
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
+        if (optRegistration.isPresent()) {
+            final DataManipulatorRegistration registration = optRegistration.get();
+            for (Key key : (Set<Key>) registration.getRequiredKeys()) {
+                if (!supports(key)) {
+                       return false;
+                }
+            }
+            return true;
+        }
+
+        // Support all the additional manipulators
+        return getRawAdditionalContainers() != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default <T extends H> Optional<T> getOrCreate(Class<T> containerClass) {
+        return get(containerClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default <T extends H> Optional<T> get(Class<T> containerClass) {
+        checkNotNull(containerClass, "containerClass");
+
+        // Check default registrations
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
+        if (optRegistration.isPresent()) {
+            final DataManipulator manipulator = (DataManipulator) createManipulator(optRegistration.get()).orElse(null);
+            return manipulator == null ? Optional.empty() : Optional.of(
+                    (T) (IImmutableDataManipulator.class.isAssignableFrom(containerClass) ? manipulator.asImmutable() : manipulator));
+        }
+
+        // Try the additional containers if they are supported
+        final Map<Class<?>, H> containers = getRawAdditionalContainers();
+        if (containers != null) {
+            for (H container : containers.values()) {
+                if (containerClass.isInstance(containers)) {
+                    return Optional.of((T) (container instanceof DataManipulator ?
+                            ((DataManipulator) container).copy() : container));
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    default DataTransactionResult offer(H valueContainer, MergeFunction function, Cause cause) {
+        return offer(valueContainer, function);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     default DataTransactionResult offer(H valueContainer, MergeFunction function) {
-        // TODO
+        if (valueContainer instanceof IDataManipulatorBase) {
+            // Offer all the default key values as long if they are supported
+            final Optional<DataManipulatorRegistration> optRegistration =
+                    DataManipulatorRegistry.get().getByMutable(((IDataManipulatorBase) valueContainer).getMutableType());
+            if (optRegistration.isPresent()) {
+                if (function == MergeFunction.FORCE_NOTHING) {
+                    final DataTransactionResult.Builder builder = DataTransactionResult.builder();
+                    for (ImmutableValue value : valueContainer.getValues()) {
+                        getValue(value.getKey()).ifPresent(value1 -> builder.replace(((Value) value1).asImmutable()));
+                    }
+                    return builder.result(DataTransactionResult.Type.SUCCESS).build();
+                } else if (function != MergeFunction.IGNORE_ALL) {
+                    ValueContainer old = (ValueContainer) createManipulator(optRegistration.get()).orElse(null);
+                    if (valueContainer instanceof IImmutableDataManipulator) {
+                        old = ((DataManipulator) old).asImmutable();
+                    }
+                    valueContainer = (H) function.merge(old, valueContainer);
+                }
+                final DataTransactionResult.Builder builder = DataTransactionResult.builder();
+                boolean success = false;
+                for (ImmutableValue value : valueContainer.getValues()) {
+                    final DataTransactionResult result = offer(value);
+                    if (result.isSuccessful()) {
+                        builder.success(value);
+                        builder.replace(result.getReplacedData());
+                        success = true;
+                    } else {
+                        builder.reject(value);
+                    }
+                }
+                if (success) {
+                    builder.result(DataTransactionResult.Type.SUCCESS);
+                } else {
+                    builder.result(DataTransactionResult.Type.FAILURE);
+                }
+                return builder.build();
+            }
+        }
+        if (valueContainer instanceof DataManipulator ||
+                valueContainer instanceof ImmutableDataManipulator) {
+            final Map<Class<?>, H> manipulators = getRawAdditionalContainers();
+            if (manipulators != null) {
+                final Class<?> key = valueContainer.getClass();
+                final H old = manipulators.get(key);
+                final H merged = function.merge(old, valueContainer);
+
+                final DataTransactionResult.Builder builder = DataTransactionResult.builder().result(DataTransactionResult.Type.SUCCESS);
+                builder.success(merged.getValues());
+                if (old != null) {
+                    builder.replace(old.getValues());
+                }
+                return builder.build();
+            }
+        }
         return DataTransactionResult.failNoData();
     }
 

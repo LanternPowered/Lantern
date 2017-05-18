@@ -26,53 +26,77 @@
 package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.value.mutable.LanternEntityValue;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.World;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
 public class ImmutableLanternEntityValue<T extends Entity> implements ImmutableValue<T> {
 
-    private final WeakReference<T> weakReference;
     private final Key<? extends BaseValue<T>> key;
 
+    private final UUID entityId;
+    private WeakReference<T> weakReference;
+
     public ImmutableLanternEntityValue(Key<? extends BaseValue<T>> key, T entity) {
-        this.weakReference = new WeakReference<>(checkNotNull(entity));
         this.key = checkNotNull(key);
+        this.weakReference = new WeakReference<>(checkNotNull(entity));
+        this.entityId = entity.getUniqueId();
+    }
+
+    @SuppressWarnings("unchecked")
+    private T getRaw() {
+        T entity = this.weakReference.get();
+        if (entity != null) {
+            return entity;
+        }
+        for (World world : Sponge.getGame().getServer().getWorlds()) {
+            final Optional<T> optional = (Optional<T>) world.getEntity(this.entityId);
+            if (optional.isPresent()) {
+                entity = optional.get();
+                this.weakReference = new WeakReference<>(entity);
+                return entity;
+            }
+        }
+        return null;
     }
 
     @Override
     public ImmutableValue<T> with(T value) {
-        return new ImmutableLanternEntityValue<>(this.key, checkNotNull(value));
+        return new ImmutableLanternEntityValue<>(getKey(), checkNotNull(value));
     }
 
     @Override
     public ImmutableValue<T> transform(Function<T, T> function) {
-        return with(checkNotNull(function).apply(this.weakReference.get()));
+        return with(checkNotNull(function).apply(get()));
     }
 
     @Override
     public Value<T> asMutable() {
-        checkState(!exists(), "The entity reference expired!");
-        return new LanternEntityValue<>(this.key, this.weakReference.get());
+        return new LanternEntityValue<>(getKey(), get());
     }
 
     @Override
     public T get() {
-        checkState(!exists(), "The entity reference expired!");
-        return this.weakReference.get();
+        final T entity = getRaw();
+        if (entity != null) {
+            return entity;
+        }
+        throw new IllegalStateException("The entity has expired or has been permanently removed! The entity's id was: " + this.entityId);
     }
 
     @Override
@@ -82,13 +106,12 @@ public class ImmutableLanternEntityValue<T extends Entity> implements ImmutableV
 
     @Override
     public T getDefault() {
-        checkState(!exists(), "The entity reference expired!");
-        return this.weakReference.get();
+        return get();
     }
 
     @Override
     public Optional<T> getDirect() {
-        return Optional.ofNullable(this.weakReference.get());
+        return Optional.of(get());
     }
 
     @Override

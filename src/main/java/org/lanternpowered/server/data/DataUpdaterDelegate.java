@@ -29,13 +29,13 @@ import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataContentUpdater;
 
-public class DataUpdaterDelegate implements DataContentUpdater {
+final class DataUpdaterDelegate implements DataContentUpdater {
 
     private final ImmutableList<DataContentUpdater> updaters;
     private final int from;
     private final int to;
 
-    public DataUpdaterDelegate(ImmutableList<DataContentUpdater> updaters, int from, int to) {
+    DataUpdaterDelegate(ImmutableList<DataContentUpdater> updaters, int from, int to) {
         this.updaters = updaters;
         this.from = from;
         this.to = to;

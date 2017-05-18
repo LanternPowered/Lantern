@@ -27,13 +27,14 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternListValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableListValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +49,7 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
     }
 
     public LanternListValue(Key<? extends BaseValue<List<E>>> key, List<E> defaultList, List<E> actualList) {
-        super(key, Lists.newArrayList(defaultList), Lists.newArrayList(actualList));
+        super(key, ImmutableList.copyOf(defaultList), new ArrayList<>(actualList));
     }
 
     public LanternListValue(Key<? extends BaseValue<List<E>>> key, List<E> actualValue) {
@@ -57,35 +58,35 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
 
     @Override
     public ListValue<E> transform(Function<List<E>, List<E>> function) {
-        this.actualValue = Lists.newArrayList(checkNotNull(function.apply(this.actualValue)));
+        this.actualValue = new ArrayList<>(checkNotNull(function.apply(this.actualValue)));
         return this;
     }
 
     @Override
     public ListValue<E> filter(Predicate<? super E> predicate) {
-        return new LanternListValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
+        return new LanternListValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(element -> checkNotNull(predicate).test(element))
                 .collect(Collectors.toList()));
     }
 
     @Override
     public List<E> getAll() {
-        return Lists.newArrayList(this.actualValue);
+        return new ArrayList<>(getActualValue());
     }
 
     @Override
     public ImmutableListValue<E> asImmutable() {
-        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), this.actualValue);
+        return new ImmutableLanternListValue<>(getKey(), getDefault(), getActualValue());
     }
 
     @Override
     public E get(int index) {
-        return this.actualValue.get(index);
+        return getActualValue().get(index);
     }
 
     @Override
     public ListValue<E> add(int index, E value) {
-        this.actualValue.add(index, checkNotNull(value));
+        getActualValue().add(index, checkNotNull(value));
         return this;
     }
 
@@ -93,25 +94,25 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
     public ListValue<E> add(int index, Iterable<E> values) {
         int count = 0;
         for (Iterator<E> iterator = values.iterator(); iterator.hasNext(); count++) {
-            this.actualValue.add(index + count, checkNotNull(iterator.next()));
+            getActualValue().add(index + count, checkNotNull(iterator.next()));
         }
         return this;
     }
 
     @Override
     public ListValue<E> remove(int index) {
-        this.actualValue.remove(index);
+        getActualValue().remove(index);
         return this;
     }
 
     @Override
     public ListValue<E> set(int index, E element) {
-        this.actualValue.set(index, checkNotNull(element));
+        getActualValue().set(index, checkNotNull(element));
         return this;
     }
 
     @Override
     public int indexOf(E element) {
-        return this.actualValue.indexOf(checkNotNull(element));
+        return getActualValue().indexOf(checkNotNull(element));
     }
 }

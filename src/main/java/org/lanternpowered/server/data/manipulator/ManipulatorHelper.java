@@ -56,16 +56,16 @@ public final class ManipulatorHelper {
             if (!(entry.getValue() instanceof ElementHolder)) {
                 continue;
             }
-            Key<?> key = entry.getKey();
-            DataQuery dataQuery = key.getQuery();
-            TypeToken<?> typeToken = key.getElementToken();
-            DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
+            final Key<?> key = entry.getKey();
+            final DataQuery dataQuery = key.getQuery();
+            final TypeToken<?> typeToken = key.getElementToken();
+            final DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
-            DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
+            final DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
             // The value's shouldn't be null inside a data manipulator,
             // since it doesn't support removal of values
-            dataContainer.set(dataQuery, typeSerializer.serialize(typeToken, context, checkNotNull(((ElementHolder) entry.getValue()).get(),
-                    "element")));
+            dataContainer.set(dataQuery, typeSerializer.serialize(typeToken, context,
+                    checkNotNull(((ElementHolder) entry.getValue()).get(), "element")));
         }
         return dataContainer;
     }
@@ -80,16 +80,36 @@ public final class ManipulatorHelper {
             if (!(entry.getValue() instanceof ElementHolder)) {
                 continue;
             }
-            Key<?> key = entry.getKey();
-            DataQuery dataQuery = key.getQuery();
-            TypeToken<?> typeToken = key.getElementToken();
-            Object data = container.get(dataQuery).orElseThrow(
+            final Key<?> key = entry.getKey();
+            final DataQuery dataQuery = key.getQuery();
+            final TypeToken<?> typeToken = key.getElementToken();
+            final Object data = container.get(dataQuery).orElseThrow(
                     () -> new InvalidDataException("Key query (" + dataQuery.toString() + ") is missing."));
-            DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
+            final DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
-            DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
+            final DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
             ((ElementHolder) map.get(key)).set(typeSerializer.deserialize(typeToken, context, data));
         }
         return Optional.of(manipulator);
+    }
+
+    public static String camelToSnake(String value) {
+        final char[] name = value.toCharArray();
+        final StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < name.length; i++) {
+            if (Character.isUpperCase(name[i]) || name[i] == '.' || name[i] == '$') {
+                if (i != 0 && name[i - 1] != '.' && name[i - 1] != '$') {
+                    builder.append('_');
+                }
+                if (name[i] != '.' && name[i] != '$') {
+                    builder.append(Character.toLowerCase(name[i]));
+                }
+            } else {
+                builder.append(name[i]);
+            }
+        }
+
+        return builder.toString();
     }
 }

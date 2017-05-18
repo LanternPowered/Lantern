@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.util.collect.Lists2;
+import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.List;
@@ -70,8 +70,8 @@ public final class MessagePlayInPrepareCraftingGrid implements Message {
         return MoreObjects.toStringHelper(this)
                 .add("windowId", this.windowId)
                 .add("transactionId", this.transactionId)
-                .add("preparedItems", Lists2.toString(this.preparedItems))
-                .add("returnedItems", Lists2.toString(this.returnedItems))
+                .add("preparedItems", Collections3.toString(this.preparedItems))
+                .add("returnedItems", Collections3.toString(this.returnedItems))
                 .toString();
     }
 

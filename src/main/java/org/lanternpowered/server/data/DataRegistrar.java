@@ -25,24 +25,42 @@
  */
 package org.lanternpowered.server.data;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
+import org.lanternpowered.server.data.meta.LanternPatternLayer;
 import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
+import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.item.enchantment.ItemEnchantmentDataBuilder;
+import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
 import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
+import org.spongepowered.api.data.type.BodyPart;
+import org.spongepowered.api.data.type.BodyParts;
+import org.spongepowered.api.data.type.WireAttachmentType;
+import org.spongepowered.api.data.type.WireAttachmentTypes;
+import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.BookViewDataBuilder;
 import org.spongepowered.api.text.serializer.TextConfigSerializer;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RespawnLocation;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class DataRegistrar {
 
@@ -58,11 +76,123 @@ public class DataRegistrar {
         DataTranslators.registerSerializers(dataManager);
 
         // Register the data builders
+        dataManager.registerBuilder(PatternLayer.class, new LanternPatternLayer.Builder(game));
         dataManager.registerBuilder(Text.class, new TextConfigSerializer());
         dataManager.registerBuilder(BookView.class, new BookViewDataBuilder());
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
         dataManager.registerBuilder(ItemEnchantment.class, new ItemEnchantmentDataBuilder());
+
+        final LanternValueFactory valueFactory = LanternValueFactory.getInstance();
+        valueFactory.registerKey(Keys.CONNECTED_DIRECTIONS).applyValueProcessor(builder -> builder
+                .applicableTester((key, valueContainer) ->
+                        valueContainer.supports(Keys.CONNECTED_WEST) || valueContainer.supports(Keys.CONNECTED_EAST) ||
+                        valueContainer.supports(Keys.CONNECTED_NORTH) || valueContainer.supports(Keys.CONNECTED_SOUTH))
+                .retrieveHandler(((key, valueContainer) -> {
+                    final Set<Direction> directions = new HashSet<>();
+                    if (valueContainer.get(Keys.CONNECTED_WEST).orElse(false)) {
+                        directions.add(Direction.WEST);
+                    }
+                    if (valueContainer.get(Keys.CONNECTED_EAST).orElse(false)) {
+                        directions.add(Direction.EAST);
+                    }
+                    if (valueContainer.get(Keys.CONNECTED_SOUTH).orElse(false)) {
+                        directions.add(Direction.SOUTH);
+                    }
+                    if (valueContainer.get(Keys.CONNECTED_NORTH).orElse(false)) {
+                        directions.add(Direction.NORTH);
+                    }
+                    return Optional.of(directions);
+                }))
+                .offerHandler((key, valueContainer, directions) -> {
+                    if (valueContainer instanceof CompositeValueStore) {
+                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
+                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_WEST, directions.contains(Direction.WEST)));
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_EAST, directions.contains(Direction.EAST)));
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_SOUTH, directions.contains(Direction.SOUTH)));
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_NORTH, directions.contains(Direction.NORTH)));
+                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
+                    }
+                    return DataTransactionResult.successNoData();
+                })
+                .failAlwaysRemoveHandler());
+        valueFactory.registerKey(Keys.WIRE_ATTACHMENTS).applyValueProcessor(builder -> builder
+                .applicableTester((key, valueContainer) ->
+                        valueContainer.supports(Keys.WIRE_ATTACHMENT_WEST) || valueContainer.supports(Keys.WIRE_ATTACHMENT_EAST) ||
+                                valueContainer.supports(Keys.WIRE_ATTACHMENT_NORTH) || valueContainer.supports(Keys.WIRE_ATTACHMENT_SOUTH))
+                .retrieveHandler(((key, valueContainer) -> {
+                    final Map<Direction, WireAttachmentType> attachments = new HashMap<>();
+                    valueContainer.get(Keys.WIRE_ATTACHMENT_WEST).ifPresent(type -> attachments.put(Direction.WEST, type));
+                    valueContainer.get(Keys.WIRE_ATTACHMENT_EAST).ifPresent(type -> attachments.put(Direction.EAST, type));
+                    valueContainer.get(Keys.WIRE_ATTACHMENT_SOUTH).ifPresent(type -> attachments.put(Direction.SOUTH, type));
+                    valueContainer.get(Keys.WIRE_ATTACHMENT_NORTH).ifPresent(type -> attachments.put(Direction.NORTH, type));
+                    return Optional.of(attachments);
+                }))
+                .offerHandler((key, valueContainer, attachments) -> {
+                    if (valueContainer instanceof CompositeValueStore) {
+                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
+                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
+                        WireAttachmentType type = attachments.get(Direction.WEST);
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_WEST,
+                                type == null ? WireAttachmentTypes.NONE : type));
+                        type = attachments.get(Direction.EAST);
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_EAST,
+                                type == null ? WireAttachmentTypes.NONE : type));
+                        type = attachments.get(Direction.SOUTH);
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_SOUTH,
+                                type == null ? WireAttachmentTypes.NONE : type));
+                        type = attachments.get(Direction.NORTH);
+                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_NORTH,
+                                type == null ? WireAttachmentTypes.NONE : type));
+                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
+                    }
+                    return DataTransactionResult.successNoData();
+                })
+                .failAlwaysRemoveHandler());
+        valueFactory.registerKey(Keys.BODY_ROTATIONS).applyValueProcessor(builder -> builder
+                .applicableTester((key, valueContainer) ->
+                        valueContainer.supports(Keys.RIGHT_ARM_ROTATION) || valueContainer.supports(Keys.LEFT_ARM_ROTATION) ||
+                                valueContainer.supports(Keys.RIGHT_LEG_ROTATION) || valueContainer.supports(Keys.LEFT_LEG_ROTATION) ||
+                                valueContainer.supports(Keys.HEAD_ROTATION) || valueContainer.supports(Keys.CHEST_ROTATION))
+                .retrieveHandler(((key, valueContainer) -> {
+                    final Map<BodyPart, Vector3d> rotations = new HashMap<>();
+                    valueContainer.get(Keys.RIGHT_ARM_ROTATION).ifPresent(type -> rotations.put(BodyParts.RIGHT_ARM, type));
+                    valueContainer.get(Keys.RIGHT_LEG_ROTATION).ifPresent(type -> rotations.put(BodyParts.RIGHT_LEG, type));
+                    valueContainer.get(Keys.LEFT_ARM_ROTATION).ifPresent(type -> rotations.put(BodyParts.LEFT_ARM, type));
+                    valueContainer.get(Keys.LEFT_LEG_ROTATION).ifPresent(type -> rotations.put(BodyParts.LEFT_LEG, type));
+                    valueContainer.get(Keys.HEAD_ROTATION).ifPresent(type -> rotations.put(BodyParts.HEAD, type));
+                    valueContainer.get(Keys.CHEST_ROTATION).ifPresent(type -> rotations.put(BodyParts.CHEST, type));
+                    return Optional.of(rotations);
+                }))
+                .offerHandler((key, valueContainer, rotations) -> {
+                    if (valueContainer instanceof CompositeValueStore) {
+                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
+                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
+                        Vector3d rot;
+                        if ((rot = rotations.get(BodyParts.RIGHT_ARM)) != null) {
+                            resultBuilder.absorbResult(store.offer(Keys.RIGHT_ARM_ROTATION, rot));
+                        }
+                        if ((rot = rotations.get(BodyParts.RIGHT_LEG)) != null) {
+                            resultBuilder.absorbResult(store.offer(Keys.RIGHT_LEG_ROTATION, rot));
+                        }
+                        if ((rot = rotations.get(BodyParts.LEFT_ARM)) != null) {
+                            resultBuilder.absorbResult(store.offer(Keys.LEFT_ARM_ROTATION, rot));
+                        }
+                        if ((rot = rotations.get(BodyParts.LEFT_LEG)) != null) {
+                            resultBuilder.absorbResult(store.offer(Keys.LEFT_LEG_ROTATION, rot));
+                        }
+                        if ((rot = rotations.get(BodyParts.HEAD)) != null) {
+                            resultBuilder.absorbResult(store.offer(Keys.HEAD_ROTATION, rot));
+                        }
+                        if ((rot = rotations.get(BodyParts.CHEST)) != null) {
+                            resultBuilder.absorbResult(store.offer(Keys.CHEST_ROTATION, rot));
+                        }
+                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
+                    }
+                    return DataTransactionResult.successNoData();
+                })
+                .failAlwaysRemoveHandler());
 
         DataManipulatorRegistry.get();
     }

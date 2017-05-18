@@ -371,8 +371,11 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
 
     default <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKeySupplied(Key<? extends V> key,
             E defaultValue, Supplier<E> minimumSupplier, Supplier<E> maximumSupplier) {
-        // TODO: Permit absent bounded values
-        final ElementHolderKeyRegistration<V, E> registration = registerKey(key, defaultValue);
+        final Map<Key<?>, KeyRegistration> map = getRawValueMap();
+        checkArgument(!map.containsKey(key), "The specified key (%s) is already registered.", key);
+        final ElementHolderKeyRegistrationImpl<V, E> registration = new ElementHolderKeyRegistrationImpl<>(key);
+        registration.set(defaultValue);
+        map.put(key, registration);
         final boolean immutable = key.getValueToken().getRawType().isAssignableFrom(ImmutableValue.class);
         registration.applyValueProcessor(builder -> builder.offerHandler((key1, valueContainer, element) -> {
             final E minimum = minimumSupplier.get();

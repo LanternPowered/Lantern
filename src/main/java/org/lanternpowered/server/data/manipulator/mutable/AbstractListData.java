@@ -41,7 +41,7 @@ public abstract class AbstractListData<E, M extends ListData<E, M, I>, I extends
 
     public AbstractListData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<ListValue<E>> listKey, List<E> defaultList) {
         super(manipulatorType, immutableManipulatorType);
-        registerKey(listKey, defaultList).notRemovable();
+        registerKey(listKey, defaultList);
         this.listKey = listKey;
     }
 

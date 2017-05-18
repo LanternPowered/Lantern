@@ -173,7 +173,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.FALL_DISTANCE).ifPresent(v -> dataView.set(FALL_DISTANCE, v));
         valueContainer.remove(Keys.HEALTH).ifPresent(v -> dataView.set(HEALTH, v.floatValue()));
         valueContainer.remove(Keys.REMAINING_AIR).ifPresent(v -> dataView.set(REMAINING_AIR, v));
-        valueContainer.remove(LanternKeys.ABSORPTION_AMOUNT).ifPresent(v -> dataView.set(ABSORPTION_AMOUNT, v.floatValue()));
+        valueContainer.remove(Keys.ABSORPTION).ifPresent(v -> dataView.set(ABSORPTION_AMOUNT, v.floatValue()));
         final DataView spongeView = getOrCreateView(dataView, SPONGE_DATA);
         valueContainer.remove(Keys.MAX_AIR).ifPresent(v -> spongeView.set(MAX_AIR, v));
         valueContainer.remove(Keys.CAN_GRIEF).ifPresent(v -> spongeView.set(CAN_GRIEF, (byte) (v ? 1 : 0)));
@@ -225,7 +225,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
             view.getInt(MAX_AIR).ifPresent(v -> valueContainer.set(Keys.MAX_AIR, v));
             view.getInt(CAN_GRIEF).ifPresent(v -> valueContainer.set(Keys.CAN_GRIEF, v > 0));
         });
-        dataView.getDouble(ABSORPTION_AMOUNT).ifPresent(v -> valueContainer.set(LanternKeys.ABSORPTION_AMOUNT, v));
+        dataView.getDouble(ABSORPTION_AMOUNT).ifPresent(v -> valueContainer.set(Keys.ABSORPTION, v));
         dataView.getDouble(CAN_PICK_UP_LOOT).ifPresent(v -> valueContainer.set(LanternKeys.CAN_PICK_UP_LOOT, v > 0));
         dataView.getString(CUSTOM_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));
         dataView.getViewList(POTION_EFFECTS).ifPresent(v -> {

@@ -58,7 +58,7 @@ public class LanternInventoryItemData extends AbstractData<InventoryItemData, Im
 
     @Override
     public void registerKeys() {
-        registerKey(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory<>(null, this)).notRemovable();
+        registerKey(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory<>(null, this));
     }
 
     @Override

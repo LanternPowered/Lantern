@@ -376,10 +376,6 @@ public final class Lists2 {
         }
     }
 
-    public static String toString(List<?> list) {
-        return Arrays.toString(list.toArray(new Object[list.size()]));
-    }
-
     private Lists2() {
     }
 }

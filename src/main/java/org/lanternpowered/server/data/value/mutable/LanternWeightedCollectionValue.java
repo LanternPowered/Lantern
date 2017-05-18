@@ -65,12 +65,12 @@ public class LanternWeightedCollectionValue<E> extends LanternCollectionValue<Ta
 
     @Override
     public ImmutableWeightedCollectionValue<E> asImmutable() {
-        return new ImmutableLanternWeightedCollectionValue<>(this.getKey(), this.getDefault(), this.getAll());
+        return new ImmutableLanternWeightedCollectionValue<>(getKey(), getDefault(), getAll());
     }
 
     @Nullable
     @Override
     public List<E> get(Random random) {
-        return this.get().get(random);
+        return get().get(random);
     }
 }

@@ -30,11 +30,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.persistence.SimpleDataTypeSerializerCollection;
+import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
 import org.slf4j.Logger;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
@@ -78,6 +82,9 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
     private final Map<Class<? extends ImmutableDataManipulator<?, ?>>, DataManipulatorBuilder<?, ?>> immutableBuilderMap =
             new MapMaker().concurrencyLevel(4).makeMap();
     private final Map<Class<? extends DataSerializable>, List<DataContentUpdater>> updatersMap = new IdentityHashMap<>();
+    private final Multimap<PluginContainer, Class<? extends DataManipulator<?, ?>>> registrationsByPlugin = HashMultimap.create();
+    private final Map<Class<?>, DataRegistration> registrations = new HashMap<>();
+    private final Map<String, DataRegistration> legacyRegistrations = new HashMap<>();
 
     private final Logger logger;
 
@@ -188,7 +195,15 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
 
     @Override
     public void registerLegacyManipulatorIds(String legacyId, DataRegistration<?, ?> registration) {
-        // TODO
+        checkNotNull(registration, "registration");
+        checkNotNull(legacyId, "legacyId");
+        this.legacyRegistrations.put(legacyId, registration);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Optional<DataRegistration> getLegacyRegistration(String legacyId) {
+        checkNotNull(legacyId, "legacyId");
+        return Optional.ofNullable(this.legacyRegistrations.get(legacyId));
     }
 
     @SuppressWarnings("unchecked")
@@ -215,6 +230,41 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         registerTranslator(serializer);
     }
 
+    <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> void validateRegistration(
+            LanternDataRegistration<M, I> registration) {
+        checkState(this.allowRegistrations, "Registrations are no longer allowed");
+        final Class<M> manipulatorClass = registration.getManipulatorClass();
+        final Class<I> immutableClass = registration.getImmutableManipulatorClass();
+        final DataManipulatorBuilder<M, I> manipulatorBuilder = registration.getDataManipulatorBuilder();
+        checkState(!this.builders.containsKey(manipulatorClass), "DataManipulator already registered!");
+        checkState(!this.builderMap.containsKey(manipulatorClass), "DataManipulator already registered!");
+        checkState(!this.builderMap.containsValue(manipulatorBuilder), "DataManipulatorBuilder already registered!");
+        checkState(!this.builders.containsKey(immutableClass), "ImmutableDataManipulator already registered!");
+        checkState(!this.immutableBuilderMap.containsKey(immutableClass), "ImmutableDataManipulator already registered!");
+        checkState(!this.immutableBuilderMap.containsValue(manipulatorBuilder), "DataManipulatorBuilder already registered!");
+        checkState(!DataManipulatorRegistryModule.get().getById(registration.getId()).isPresent(),
+                "There is already a DataRegistration registered with the ID: " + registration.getId());
+    }
+
+    @SuppressWarnings("unchecked")
+    <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> void register(LanternDataRegistration<M, I> registration) {
+        checkNotNull(registration, "registration");
+        if (registration instanceof DataManipulatorRegistration) {
+            registerBuilder(registration.getImmutableManipulatorClass(),
+                    ((DataManipulatorRegistration) registration).getImmutableDataBuilder());
+        }
+        this.registrationsByPlugin.put(registration.getPluginContainer(), registration.getManipulatorClass());
+        this.registrations.put(registration.getManipulatorClass(), registration);
+        this.registrations.put(registration.getImmutableManipulatorClass(), registration);
+        registerBuilder(registration.getManipulatorClass(), registration.getDataManipulatorBuilder());
+        DataManipulatorRegistryModule.get().registerAdditionalCatalog(registration);
+    }
+
+    public Optional<DataRegistration> get(Class<?> type) {
+        checkNotNull(type, "type");
+        return Optional.ofNullable(this.registrations.get(type));
+    }
+
     @Override
     public <T> Optional<DataTranslator<T>> getTranslator(Class<T> objectClass) {
         return super.getTranslator(objectClass);
@@ -222,17 +272,17 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
 
     @Override
     public Collection<Class<? extends DataManipulator<?, ?>>> getAllRegistrationsFor(PluginContainer container) {
-        // TODO
-        return Collections.emptyList();
+        checkNotNull(container, "container");
+        return ImmutableList.copyOf(this.registrationsByPlugin.get(container));
     }
 
     @Override
     public DataContainer createContainer() {
-        return DataContainer.createNew();
+        return new MemoryDataContainer();
     }
 
     @Override
     public DataContainer createContainer(DataView.SafetyMode safety) {
-        return DataContainer.createNew(safety);
+        return new MemoryDataContainer(safety);
     }
 }

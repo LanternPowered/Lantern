@@ -40,7 +40,7 @@ public abstract class AbstractBaseValue<E> implements BaseValue<E> {
 
     private final Key<? extends BaseValue<E>> key;
     private final E defaultValue;
-    protected E actualValue;
+    @Nullable protected E actualValue;
 
     public AbstractBaseValue(Key<? extends BaseValue<E>> key, E defaultValue) {
         this.key = checkNotNull(key);
@@ -48,10 +48,15 @@ public abstract class AbstractBaseValue<E> implements BaseValue<E> {
         this.actualValue = defaultValue;
     }
 
-    protected AbstractBaseValue(Key<? extends BaseValue<E>> key, E defaultValue, E actualValue) {
+    protected AbstractBaseValue(Key<? extends BaseValue<E>> key, E defaultValue, @Nullable E actualValue) {
         this.key = checkNotNull(key);
         this.defaultValue = checkNotNull(defaultValue);
-        this.actualValue = checkNotNull(actualValue);
+        this.actualValue = actualValue;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    protected E getActualValue() {
+        return this.actualValue;
     }
 
     @Override

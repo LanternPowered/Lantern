@@ -28,7 +28,6 @@ package org.lanternpowered.server.data.value.mutable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternSetValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
@@ -36,6 +35,7 @@ import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -52,29 +52,29 @@ public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetVal
     }
 
     public LanternSetValue(Key<? extends BaseValue<Set<E>>> key, Set<E> defaultSet, Set<E> actualValue) {
-        super(key, Sets.newHashSet(defaultSet), Sets.newHashSet(actualValue));
+        super(key, ImmutableSet.copyOf(defaultSet), new HashSet<>(actualValue));
     }
 
     @Override
     public SetValue<E> transform(Function<Set<E>, Set<E>> function) {
-        this.actualValue = Sets.newHashSet(checkNotNull(checkNotNull(function).apply(this.actualValue)));
+        this.actualValue = new HashSet<>(checkNotNull(checkNotNull(function).apply(this.actualValue)));
         return this;
     }
 
     @Override
     public SetValue<E> filter(Predicate<? super E> predicate) {
-        return new LanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
+        return new LanternSetValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(element -> checkNotNull(predicate).test(element))
                 .collect(Collectors.toSet()));
     }
 
     @Override
     public Set<E> getAll() {
-        return Sets.newHashSet(this.actualValue);
+        return new HashSet<>(getActualValue());
     }
 
     @Override
     public ImmutableSetValue<E> asImmutable() {
-        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue);
+        return new ImmutableLanternSetValue<>(getKey(), getDefault(), getActualValue());
     }
 }

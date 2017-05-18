@@ -70,7 +70,7 @@ public interface DataTypeSerializerCollection {
      * @return The data serializer, if available
      */
     default <T, D> Optional<DataTypeSerializer<T, D>> getTypeSerializer(Class<T> objectClass) {
-        return this.getTypeSerializer(TypeToken.of(objectClass));
+        return getTypeSerializer(TypeToken.of(objectClass));
     }
 
     /**
@@ -90,6 +90,6 @@ public interface DataTypeSerializerCollection {
      * @return The data serializer, if available
      */
     default <T> Optional<DataTranslator<T>> getTranslator(Class<T> objectClass) {
-        return this.getTranslator(TypeToken.of(objectClass));
+        return getTranslator(TypeToken.of(objectClass));
     }
 }

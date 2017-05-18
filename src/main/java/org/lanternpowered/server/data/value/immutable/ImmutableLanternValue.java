@@ -37,6 +37,8 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
 public class ImmutableLanternValue<E> extends AbstractBaseValue<E> implements ImmutableValue<E> {
 
     /**
@@ -48,7 +50,7 @@ public class ImmutableLanternValue<E> extends AbstractBaseValue<E> implements Im
      * @param <T> The type of value
      * @return The cached immutable value
      */
-    public static <T> ImmutableValue<T> cachedOf(Key<? extends BaseValue<T>> key, T defaultValue, T actualValue) {
+    public static <T> ImmutableValue<T> cachedOf(Key<? extends BaseValue<T>> key, T defaultValue, @Nullable T actualValue) {
         return ImmutableDataCachingUtil.getValue(ImmutableLanternValue.class, key, defaultValue, actualValue);
     }
 
@@ -56,23 +58,23 @@ public class ImmutableLanternValue<E> extends AbstractBaseValue<E> implements Im
         super(key, defaultValue, defaultValue);
     }
 
-    public ImmutableLanternValue(Key<? extends BaseValue<E>> key, E defaultValue, E actualValue) {
+    public ImmutableLanternValue(Key<? extends BaseValue<E>> key, E defaultValue, @Nullable E actualValue) {
         super(key, defaultValue, actualValue);
     }
 
     @Override
     public ImmutableValue<E> with(E value) {
-        return new ImmutableLanternValue<>(this.getKey(), this.getDefault(), value);
+        return new ImmutableLanternValue<>(getKey(),getDefault(), value);
     }
 
     @Override
     public ImmutableValue<E> transform(Function<E, E> function) {
-        final E value = checkNotNull(function).apply(this.get());
-        return new ImmutableLanternValue<>(this.getKey(), this.getDefault(), value);
+        final E value = checkNotNull(function).apply(get());
+        return new ImmutableLanternValue<>(getKey(), getDefault(), value);
     }
 
     @Override
     public Value<E> asMutable() {
-        return new LanternValue<>(this.getKey(), this.getDefault(), this.get());
+        return new LanternValue<>(getKey(), getDefault(), get());
     }
 }

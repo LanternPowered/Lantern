@@ -37,11 +37,13 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeWeightedC
 import static org.spongepowered.api.data.DataQuery.of;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
@@ -83,6 +85,7 @@ import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.StairShape;
 import org.spongepowered.api.data.type.StoneType;
+import org.spongepowered.api.data.type.StructureMode;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.data.type.WireAttachmentType;
@@ -125,10 +128,22 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
+        register(makeMutableBoundedValueKey(Double.class, DataQuery.of("Absorption"), "sponge:absorption"));
         register(makeValueKey(Boolean.class, of("AffectsSpawning"), "sponge:affects_spawning"));
         register(makeMutableBoundedValueKey(Integer.class, of("Age"), "sponge:age"));
         register(makeValueKey(Boolean.class, of("AIEnabled"), "sponge:ai_enabled"));
         register(makeMutableBoundedValueKey(Integer.class, of("Anger"), "sponge:anger"));
+        register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudAge"), "sponge:area_effect_cloud_age"));
+        register(makeValueKey(Color.class, DataQuery.of("AreaEffectCloudColor"), "sponge:area_effect_cloud_color"));
+        register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudDuration"), "sponge:area_effect_cloud_duration"));
+        register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudDurationOnUse"), "sponge:area_effect_cloud_duration_on_use"));
+        register(makeValueKey(Color.class, DataQuery.of("AreaEffectCloudParticleType"), "sponge:area_effect_cloud_particle_type"));
+        register(makeMutableBoundedValueKey(Double.class, DataQuery.of("AreaEffectCloudRadius"), "sponge:area_effect_cloud_radius"));
+        register(makeMutableBoundedValueKey(Double.class, DataQuery.of("AreaEffectCloudRadiusOnUse"), "sponge:area_effect_cloud_radius_on_use"));
+        register(makeMutableBoundedValueKey(Double.class, DataQuery.of("AreaEffectCloudRadiusPerTick"), "sponge:area_effect_cloud_radius_per_tick"));
+        register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudRadiusReapplicationDelay"),
+                "sponge:area_effect_cloud_reapplication_delay"));
+        register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudWaitTime"), "sponge:area_effect_cloud_wait_time"));
         register(makeValueKey(Boolean.class, of("ArmorStandHasArms"), "sponge:armor_stand_has_arms"));
         register(makeValueKey(Boolean.class, of("ArmorStandHasBasePlate"), "sponge:armor_stand_has_base_plate"));
         register(makeValueKey(Boolean.class, of("ArmorStandIsSmall"), "sponge:armor_stand_is_small"));
@@ -185,7 +200,11 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(DoublePlantType.class, of("DoublePlantType"), "sponge:double_plant_type"));
         register(makeValueKey(DyeColor.class, of("DyeColor"), "sponge:dye_color"));
         register(makeValueKey(Boolean.class, of("ElderGuardian"), "sponge:elder_guardian"));
+        register(makeValueKey(Boolean.class, of("EndGatewayAge"), "sponge:end_gateway_age"));
+        register(makeValueKey(Boolean.class, of("EndGatewayTeleportCooldown"), "sponge:end_gateway_teleport_cooldown"));
         register(makeMutableBoundedValueKey(Double.class, of("Exhaustion"), "sponge:exhaustion"));
+        register(makeValueKey(Boolean.class, of("ExactTeleport"), "sponge:exact_teleport"));
+        register(makeValueKey(Vector3i.class, of("ExitPosition"), "sponge:exit_position"));
         register(makeImmutableBoundedValueKey(Integer.class, of("ExperienceFromStartOfLevel"), "sponge:experience_from_start_of_level"));
         register(makeMutableBoundedValueKey(Integer.class, of("ExperienceLevel"), "sponge:experience_level"));
         register(makeMutableBoundedValueKey(Integer.class, of("ExperienceSinceLevel"), "sponge:experience_since_level"));
@@ -236,6 +255,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("Invisible"), "sponge:invisible"));
         register(makeMutableBoundedValueKey(Integer.class, of("InvulnerabilityTicks"), "sponge:invulnerability_ticks"));
         register(makeValueKey(Boolean.class, of("InWall"), "sponge:in_wall"));
+        register(makeValueKey(Boolean.class, of("IsAdult"), "sponge:is_adult"));
         register(makeValueKey(Boolean.class, of("IsAflame"), "sponge:is_aflame"));
         register(makeValueKey(Boolean.class, of("IsFlying"), "sponge:is_flying"));
         register(makeValueKey(Boolean.class, of("IsPlaying"), "sponge:is_playing"));
@@ -331,6 +351,16 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMapKeyWithKeyAndValue(Statistic.class, Long.class, of("Statistics"), "sponge:statistics"));
         register(makeValueKey(StoneType.class, of("StoneType"), "sponge:stone_type"));
         register(makeListKey(ItemEnchantment.class, of("StoredEnchantments"), "sponge:stored_enchantments"));
+        register(makeValueKey(String.class, of("StructureAuthor"), "sponge:structure_author"));
+        register(makeValueKey(Boolean.class, of("StructureIgnoreEntities"), "sponge:structure_ignore_entities"));
+        register(makeValueKey(Float.class, of("StructureIntegrity"), "sponge:structure_integrity"));
+        register(makeValueKey(StructureMode.class, of("StructureMode"), "sponge:structure_mode"));
+        register(makeValueKey(Vector3i.class, of("StructurePosition"), "sponge:structure_position"));
+        register(makeValueKey(Boolean.class, of("StructurePowered"), "sponge:structure_powered"));
+        register(makeValueKey(Long.class, of("StructureSeed"), "sponge:structure_seed"));
+        register(makeValueKey(Boolean.class, of("StructureShowAir"), "sponge:structure_show_air"));
+        register(makeValueKey(Boolean.class, of("StructureShowBoundingBox"), "sponge:structure_show_bounding_box"));
+        register(makeValueKey(Vector3i.class, of("StructureSize"), "sponge:structure_size"));
         register(makeMutableBoundedValueKey(Integer.class, of("StuckArrows"), "sponge:stuck_arrows"));
         register(makeMutableBoundedValueKey(Integer.class, of("SuccessCount"), "sponge:success_count"));
         register(makeValueKey(Boolean.class, of("Suspended"), "sponge:suspended"));

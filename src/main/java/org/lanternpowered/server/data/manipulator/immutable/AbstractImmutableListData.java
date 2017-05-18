@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.manipulator.immutable;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.manipulator.mutable.IListData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
@@ -32,7 +33,6 @@ import org.spongepowered.api.data.manipulator.mutable.ListData;
 import org.spongepowered.api.data.value.immutable.ImmutableListValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>>
@@ -41,8 +41,12 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
     private final Key<? extends ListValue<E>> listKey;
 
     public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey) {
+        this(immutableManipulatorType, manipulatorType, listKey, ImmutableList.of());
+    }
+
+    public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey, List<E> list) {
         super(immutableManipulatorType, manipulatorType);
-        registerKey(listKey, new ArrayList<>()).notRemovable();
+        registerKey(listKey, ImmutableList.copyOf(list));
         this.listKey = listKey;
     }
 

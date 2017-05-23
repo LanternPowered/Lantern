@@ -78,29 +78,29 @@ public final class ConsoleManager {
         this.logger = logger;
     }
 
-    public void start() {
+    public void init() {
         // Register the fqcn for the console source
         REDIRECT_FQCNS.add((LanternConsoleSource.class.getName()));
         // Register the fqcn for the message channel
         REDIRECT_FQCNS.add((MessageChannel.class.getName()));
 
+        System.setOut(IoBuilder.forLogger(REDIRECT_OUT).setLevel(Level.INFO).buildPrintStream());
+        System.setErr(IoBuilder.forLogger(REDIRECT_ERR).setLevel(Level.ERROR).buildPrintStream());
+    }
+
+    public void start() {
         final Terminal terminal = TerminalConsoleAppender.getTerminal();
 
         if (terminal != null) {
-            LineReader reader = LineReaderBuilder.builder()
+            final LineReader reader = LineReaderBuilder.builder()
                     .appName(Implementation.NAME)
                     .terminal(terminal)
                     .completer(new ConsoleCommandCompleter())
                     .build();
             reader.unsetOpt(Option.INSERT_TAB);
+            reader.setVariable(LineReader.HISTORY_FILE, this.consoleHistoryFile);
 
             TerminalConsoleAppender.setReader(reader);
-
-            reader.setVariable(LineReader.HISTORY_FILE, consoleHistoryFile);
-
-            System.setOut(IoBuilder.forLogger(REDIRECT_OUT).setLevel(Level.INFO).buildPrintStream());
-            System.setErr(IoBuilder.forLogger(REDIRECT_ERR).setLevel(Level.ERROR).buildPrintStream());
-
             active = true;
 
             final Thread thread = new Thread(this::readCommandTask, "console");

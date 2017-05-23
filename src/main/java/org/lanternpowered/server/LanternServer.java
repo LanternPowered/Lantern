@@ -182,6 +182,9 @@ public final class LanternServer implements Server {
     }
 
     void initialize() {
+        // First initialize the console manager, but don't start to read anything yet
+        this.consoleManager.init();
+
         this.logger.info("Starting Lantern Server {}",
                 firstNonNull(InternalPluginsInfo.Implementation.VERSION, ""));
         this.logger.info("   for  Minecraft {} with protocol version {}",

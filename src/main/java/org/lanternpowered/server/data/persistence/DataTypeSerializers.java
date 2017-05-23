@@ -64,6 +64,7 @@ public final class DataTypeSerializers {
         dataManager.registerTypeSerializer(new TypeToken<Map<?,?>>() {}, new MapSerializer());
         dataManager.registerTypeSerializer(new TypeToken<List<?>>() {}, new ListSerializer());
         dataManager.registerTypeSerializer(new TypeToken<Set<?>>() {}, new SetSerializer());
+        dataManager.registerTypeSerializer(new TypeToken<Optional<?>>() {}, new OptionalSerializer());
         dataManager.registerTypeSerializer((TypeToken) new TypeToken<Enum<?>>() {}, new EnumSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(CatalogType.class), new CatalogTypeSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(Number.class), new NumberSerializer());
@@ -94,7 +95,7 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public CatalogType deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
-            Optional<CatalogType> catalogType = Sponge.getRegistry().getType((Class<CatalogType>) type.getRawType(), data);
+            final Optional<CatalogType> catalogType = Sponge.getRegistry().getType((Class<CatalogType>) type.getRawType(), data);
             if (!catalogType.isPresent()) {
                 throw new InvalidDataException("The catalog type " + data + " of type " + type.toString() + " is missing.");
             }
@@ -157,7 +158,7 @@ public final class DataTypeSerializers {
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + valueType.toString()));
             final List<DataView> dataViews = new ArrayList<>();
             for (Object key : obj.keySet()) {
-                final DataContainer dataContainer = new MemoryDataContainer();
+                final DataContainer dataContainer = DataContainer.createNew();
                 dataContainer.set(KEY, keySerial.serialize(keyType, ctx, key));
                 final Collection<Object> values = ((Multimap) obj).get(key);
                 if (values.size() == 1) {
@@ -208,7 +209,7 @@ public final class DataTypeSerializers {
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + keyType.toString()));
             final DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + valueType.toString()));
-            return obj.entrySet().stream().map(entry -> new MemoryDataContainer()
+            return obj.entrySet().stream().map(entry -> DataContainer.createNew()
                     .set(KEY, keySerial.serialize(keyType, ctx, entry.getKey()))
                     .set(VALUE, valueSerial.serialize(valueType, ctx, entry.getValue()))).collect(Collectors.toList());
         }
@@ -261,6 +262,31 @@ public final class DataTypeSerializers {
             final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
             return obj.stream().map(object -> elementSerial.serialize(elementType, ctx, object)).collect(Collectors.toList());
+        }
+    }
+
+    private static class OptionalSerializer implements DataTypeSerializer<Optional<?>, Object> {
+
+        private final static String EMPTY = "@empty";
+        private final TypeVariable<Class<Optional>> typeVariable = Optional.class.getTypeParameters()[0];
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Optional<?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Object data) throws InvalidDataException {
+            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
+            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
+                    .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
+            return data.toString().equals(EMPTY) ? Optional.empty() :
+                    Optional.of(elementSerial.deserialize(elementType, ctx, data));
+        }
+
+        @SuppressWarnings({"unchecked", "OptionalUsedAsFieldOrParameterType"})
+        @Override
+        public Object serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Optional<?> obj) throws InvalidDataException {
+            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
+            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
+                    .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
+            return obj.isPresent() ? elementSerial.serialize(elementType, ctx, obj) : EMPTY;
         }
     }
 

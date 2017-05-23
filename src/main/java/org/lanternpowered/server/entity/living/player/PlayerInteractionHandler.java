@@ -44,7 +44,6 @@ import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
@@ -190,8 +189,6 @@ public final class PlayerInteractionHandler {
     public void handleDigging(MessagePlayInPlayerDigging message) {
         final MessagePlayInPlayerDigging.Action action = message.getAction();
         final Vector3i blockPos = message.getPosition();
-
-        this.player.getConnection().send(new MessagePlayInAdvancementTree.Close());
 
         if (action == MessagePlayInPlayerDigging.Action.START) {
             // Check if the block is within the players reach

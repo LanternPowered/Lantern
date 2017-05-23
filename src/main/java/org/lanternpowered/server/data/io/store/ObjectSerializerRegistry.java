@@ -71,9 +71,9 @@ public final class ObjectSerializerRegistry {
     }
 
     public ObjectSerializerRegistry() {
-        this.register(LanternItemStack.class, new ItemStackStore());
-        this.register(LanternEntity.class, new EntitySerializer());
-        this.register(LanternTileEntity.class, new TileEntitySerializer());
+        register(LanternItemStack.class, new ItemStackStore());
+        register(LanternEntity.class, new EntitySerializer());
+        register(LanternTileEntity.class, new TileEntitySerializer());
     }
 
     /**

@@ -241,8 +241,6 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
             view.getInt(RECIPE_BOOK_GUI_OPEN).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_GUI_OPEN, v > 0));
         });
         dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> {
-            System.out.println(id);
-            System.out.println(AdvancementTrees.INSTANCE.get(id));
             valueContainer.set(
                     LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTrees.INSTANCE.get(id));
         });

@@ -286,7 +286,7 @@ public final class DataTypeSerializers {
             final TypeToken<?> elementType = type.resolveType(this.typeVariable);
             final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
-            return obj.isPresent() ? elementSerial.serialize(elementType, ctx, obj) : EMPTY;
+            return obj.isPresent() ? elementSerial.serialize(elementType, ctx, obj.get()) : EMPTY;
         }
     }
 
@@ -396,7 +396,7 @@ public final class DataTypeSerializers {
         @Override
         public Object serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Number obj) throws InvalidDataException {
             if (obj instanceof BigDecimal || obj instanceof BigInteger) {
-                return new MemoryDataContainer()
+                return DataContainer.createNew()
                         .set(TYPE, obj.getClass().getSimpleName())
                         .set(VALUE, obj.toString());
             }

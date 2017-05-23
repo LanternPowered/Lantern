@@ -342,7 +342,14 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 })
                 .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
                 .failAlwaysRemoveHandler());
-        registerKey(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty()).notRemovable();
+        registerKey(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty())
+                .notRemovable()
+                .addListener((oldElement, newElement) -> {
+                    //noinspection ConstantConditions
+                    if (getWorld() != null) {
+                        this.session.send(new MessagePlayOutSelectAdvancementTree(newElement.map(AdvancementTree::getInternalId).orElse(null)));
+                    }
+                });
     }
 
     @Nullable

@@ -88,6 +88,7 @@ import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
@@ -575,6 +576,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
+                .registerModule(new AdvancementTreeRegistryModule())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())
@@ -583,7 +585,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(FloatValueProviderType.class, FloatValueProviderTypeRegistryModule.get())
                 .registerModule(IntValueProviderType.class, IntValueProviderTypeRegistryModule.get())
                 ;
-        this.registerFactories();
+        registerFactories();
     }
 
     private void registerFactories() {

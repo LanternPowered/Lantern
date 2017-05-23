@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 public final class AdvancementTrees {
 
@@ -47,16 +48,22 @@ public final class AdvancementTrees {
 
     private final static int UPDATE_DELAY = 10;
 
-    private final List<AdvancementTree> advancementTrees = new ArrayList<>();
+    private final Map<String, AdvancementTree> advancementTrees = new HashMap<>();
 
     void add(AdvancementTree tree) {
-        this.advancementTrees.add(checkNotNull(tree, "tree"));
+        checkNotNull(tree, "tree");
+        this.advancementTrees.put(tree.getInternalId(), tree);
+        this.advancementTrees.put(tree.getId(), tree);
+    }
+
+    public Optional<AdvancementTree> get(String id) {
+        return Optional.ofNullable(this.advancementTrees.get(checkNotNull(id, "id")));
     }
 
     private int counter = UPDATE_DELAY;
 
     public void removeTracker(Player player) {
-        for (AdvancementTree advancementTree : this.advancementTrees) {
+        for (AdvancementTree advancementTree : this.advancementTrees.values()) {
             advancementTree.removeRawTracker(player);
         }
     }
@@ -77,7 +84,7 @@ public final class AdvancementTrees {
         List<MessagePlayOutAdvancements.AdvStruct> addedAdvStructs = null;
         Map<String, Object2LongMap<String>> progress = null;
 
-        for (AdvancementTree advancementTree : this.advancementTrees) {
+        for (AdvancementTree advancementTree : this.advancementTrees.values()) {
             final List<LanternPlayer> trackers1 = advancementTree.getTrackers();
             if (!trackers1.contains(player1)) {
                 continue;
@@ -111,7 +118,7 @@ public final class AdvancementTrees {
         }
         this.counter = UPDATE_DELAY;
         final List<LanternPlayer> trackers = new ArrayList<>();
-        for (AdvancementTree advancementTree : this.advancementTrees) {
+        for (AdvancementTree advancementTree : this.advancementTrees.values()) {
             final List<LanternPlayer> trackers1 = advancementTree.getUpdateTrackers();
             trackers.addAll(trackers1);
             final int state = advancementTree.isRefreshRequired() ? AdvancementTree.REFRESH : AdvancementTree.UPDATE;

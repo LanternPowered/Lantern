@@ -23,25 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.advancement.AdvancementTrees;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
 
-public interface Protocol {
+public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
 
-    int CURRENT_VERSION = 332;
-
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    @Override
+    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
+        if (message instanceof MessagePlayInAdvancementTree.Open) {
+            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
+            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTrees.INSTANCE.get(id));
+        } else {
+            // Do we need the close event?
+        }
+    }
 }

@@ -34,6 +34,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import org.lanternpowered.server.advancement.AdvancementTree;
 import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.advancement.TestAdvancementTree;
@@ -73,6 +74,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
@@ -340,6 +342,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 })
                 .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
                 .failAlwaysRemoveHandler());
+        registerKey(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty()).notRemovable();
     }
 
     @Nullable
@@ -447,6 +450,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
+            this.session.send(new MessagePlayOutSelectAdvancementTree(
+                    get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
             setScoreboard(world.getScoreboard());
             this.inventoryContainer.openInventoryForAndInitialize(this);
             this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));

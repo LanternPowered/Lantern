@@ -38,6 +38,9 @@ public final class TestAdvancementTree {
     public static final Advancement DIG_DIRT;
     public static final ScoreAdvancementCriterion DIG_DIRT_CRITERION;
 
+    public static void init() {
+    }
+
     static {
         A = AdvancementTree.builder()
                 .title(Text.of("Rule!"))

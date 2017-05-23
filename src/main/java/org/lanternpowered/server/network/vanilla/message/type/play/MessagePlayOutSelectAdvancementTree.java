@@ -23,25 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.message.Message;
 
-public interface Protocol {
+import javax.annotation.Nullable;
 
-    int CURRENT_VERSION = 332;
+public final class MessagePlayOutSelectAdvancementTree implements Message {
 
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
+    @Nullable private final String id;
 
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    public MessagePlayOutSelectAdvancementTree(@Nullable String id) {
+        this.id = id;
+    }
+
+    @Nullable
+    public String getId() {
+        return this.id;
+    }
 }

@@ -574,5 +574,17 @@
     {
         "version": 329,
         "name": "1.12-pre2"
+    },
+    {
+        "version": 330,
+        "name": "1.12-pre3"
+    },
+    {
+        "version": 331,
+        "name": "1.12-pre4"
+    },
+    {
+        "version": 332,
+        "name": "1.12-pre5"
     }
 ]

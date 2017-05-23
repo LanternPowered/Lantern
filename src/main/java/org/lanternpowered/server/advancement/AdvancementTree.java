@@ -77,6 +77,7 @@ public final class AdvancementTree extends Styleable {
 
     @Nullable private final Advancement rootAdvancement;
     private final Vector2d rootPosition;
+    private final String internalTabId;
 
     private double xOffset;
     private double yOffset;
@@ -92,6 +93,11 @@ public final class AdvancementTree extends Styleable {
         this.internalId = TREE_COUNTER.getAndIncrement();
         if (rootAdvancement != null) {
             this.advancements.put(rootAdvancement, rootPosition);
+        }
+        if (this.rootAdvancement != null) {
+            this.internalTabId = formatId0(this.rootAdvancement.getId());
+        } else {
+            this.internalTabId = formatId0(ROOT_ADVANCEMENT);
         }
         AdvancementTrees.INSTANCE.add(this);
     }
@@ -275,12 +281,7 @@ public final class AdvancementTree extends Styleable {
 
     @Nullable
     GlobalAdvancementsData createGlobalData(Locale locale, int state) {
-        final String rootId;
-        if (this.rootAdvancement != null) {
-            rootId = formatId0(this.rootAdvancement.getId());
-        } else {
-            rootId = formatId0(ROOT_ADVANCEMENT);
-        }
+        final String rootId = getInternalId();
 
         List<String> removed = null;
         if (state != INITIALIZE && !this.removedAdvancements.isEmpty()) {
@@ -364,6 +365,10 @@ public final class AdvancementTree extends Styleable {
     @Nullable
     private MessagePlayOutAdvancements createAdvancementsMessage(Locale locale, AdvancementsProgress progress, int state) {
         return createAdvancementsMessage(createGlobalData(locale, state), progress, state);
+    }
+
+    public String getInternalId() {
+        return this.internalTabId;
     }
 
     @Nullable

@@ -32,6 +32,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.advancement.AdvancementTree;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.effect.potion.PotionType;
@@ -123,6 +124,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("RecipeBookFilterActive"), "lantern:recipe_book_filter_active");
     public static final Key<ListValue<Accessory>> ACCESSORIES =
             makeListKey(Accessory.class, DataQuery.of("Accessories"), "lantern:accessories");
+    public static final Key<OptionalValue<AdvancementTree>> OPEN_ADVANCEMENT_TREE =
+            makeOptionalKey(AdvancementTree.class, DataQuery.of("OpenAdvancementTree"), "lantern:open_advancement_tree");
 
     private LanternKeys() {
     }

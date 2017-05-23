@@ -23,25 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.message.Message;
 
-public interface Protocol {
+public abstract class MessagePlayInAdvancementTree implements Message {
 
-    int CURRENT_VERSION = 332;
+    private MessagePlayInAdvancementTree() {
+    }
 
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
+    public static final class Open extends MessagePlayInAdvancementTree {
 
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+        private final String id;
+
+        public Open(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return this.id;
+        }
+    }
+
+    public static final class Close extends MessagePlayInAdvancementTree {
+    }
 }

@@ -23,25 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 
-public interface Protocol {
+public final class CodecPlayOutSelectAdvancementTree implements Codec<MessagePlayOutSelectAdvancementTree> {
 
-    int CURRENT_VERSION = 332;
-
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    @Override
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSelectAdvancementTree message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        final String id = message.getId();
+        buf.writeBoolean(id != null);
+        if (id != null) {
+            buf.writeString(id);
+        }
+        return buf;
+    }
 }

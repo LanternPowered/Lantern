@@ -56,7 +56,7 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
     }
 
     public LanternSlot getSelectedSlot() {
-        return this.getSlotAt(this.selectedSlotIndex).get();
+        return getSlotAt(this.selectedSlotIndex).orElseThrow(() -> new IllegalStateException("No slot at index: " + this.selectedSlotIndex));
     }
 
     @Override

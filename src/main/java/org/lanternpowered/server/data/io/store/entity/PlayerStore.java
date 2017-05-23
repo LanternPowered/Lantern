@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.io.store.entity;
 import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
@@ -105,6 +106,8 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static final DataQuery RECIPE_BOOK_GUI_OPEN = DataQuery.of("isGuiOpen");
     private static final DataQuery RECIPE_BOOK_FILTER_ACTIVE = DataQuery.of("isFilteringCraftable");
 
+    private static final DataQuery OPEN_ADVANCEMENT_TREE = DataQuery.of("openAdvancementTree"); // Lantern
+
     @Override
     public void deserialize(LanternPlayer player, DataView dataView) {
         super.deserialize(player, dataView);
@@ -168,6 +171,12 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         recipeBook.set(RECIPE_BOOK_FILTER_ACTIVE, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).orElse(false) ? 1 : 0));
         recipeBook.set(RECIPE_BOOK_GUI_OPEN, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_GUI_OPEN).orElse(false) ? 1 : 0));
 
+        valueContainer.remove(LanternKeys.OPEN_ADVANCEMENT_TREE).ifPresent(o -> {
+            if (o.isPresent()) {
+                dataView.set(OPEN_ADVANCEMENT_TREE, o.get().getId());
+            }
+        });
+
         super.serializeValues(player, valueContainer, dataView);
     }
 
@@ -230,6 +239,12 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         dataView.getView(RECIPE_BOOK).ifPresent(view -> {
             view.getInt(RECIPE_BOOK_FILTER_ACTIVE).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, v > 0));
             view.getInt(RECIPE_BOOK_GUI_OPEN).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_GUI_OPEN, v > 0));
+        });
+        dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> {
+            System.out.println(id);
+            System.out.println(AdvancementTrees.INSTANCE.get(id));
+            valueContainer.set(
+                    LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTrees.INSTANCE.get(id));
         });
 
         super.deserializeValues(player, valueContainer, dataView);

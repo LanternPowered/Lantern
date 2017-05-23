@@ -23,25 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.advancement.TestAdvancementTree;
+import org.spongepowered.api.registry.RegistrationPhase;
+import org.spongepowered.api.registry.RegistryModule;
+import org.spongepowered.api.registry.util.DelayedRegistration;
 
-public interface Protocol {
+public class AdvancementTreeRegistryModule implements RegistryModule {
 
-    int CURRENT_VERSION = 332;
-
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    @DelayedRegistration(RegistrationPhase.POST_INIT)
+    @Override
+    public void registerDefaults() {
+        TestAdvancementTree.init();
+    }
 }

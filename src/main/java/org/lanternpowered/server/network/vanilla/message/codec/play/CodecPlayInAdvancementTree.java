@@ -23,25 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
 
-public interface Protocol {
+public final class CodecPlayInAdvancementTree implements Codec<MessagePlayInAdvancementTree> {
 
-    int CURRENT_VERSION = 332;
-
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
+    @Override
+    public MessagePlayInAdvancementTree decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        final int type = buf.readVarInt();
+        if (type == 0) {
+            final String id = buf.readString();
+            return new MessagePlayInAdvancementTree.Open(id);
+        } else if (type == 1) {
+            return new MessagePlayInAdvancementTree.Close();
+        }
+        throw new IllegalArgumentException("Unknown type: " + type);
+    }
 }

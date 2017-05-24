@@ -31,7 +31,6 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -70,7 +69,7 @@ public final class LanternPatternLayer implements PatternLayer {
 
     @Override
     public DataContainer toContainer() {
-        return new MemoryDataContainer().set(BANNER_SHAPE, this.shape.getId()).set(DYE_COLOR, this.color.getId());
+        return DataContainer.createNew().set(BANNER_SHAPE, this.shape.getId()).set(DYE_COLOR, this.color.getId());
     }
 
     @Override

@@ -37,7 +37,6 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.List;
@@ -92,7 +91,7 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
     private static Object fromJson(@Nullable DataView container, JsonElement json) {
         if (json.isJsonObject()) {
             if (container == null) {
-                container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
             }
             for (Entry<String, JsonElement> en : json.getAsJsonObject().entrySet()) {
                 final String key = en.getKey();

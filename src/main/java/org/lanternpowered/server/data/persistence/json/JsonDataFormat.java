@@ -33,7 +33,6 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.io.BufferedReader;
@@ -86,7 +85,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
     }
 
     private DataContainer createContainer(JsonReader reader) throws IOException {
-        final DataContainer container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         readView(reader, container);
         return container;
     }

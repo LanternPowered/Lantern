@@ -58,7 +58,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
@@ -258,7 +257,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
 
     @Override
     public DataView serialize(LanternItemStack object) {
-        final DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         dataContainer.set(IDENTIFIER, object.getItem().getId());
         serialize(object, dataContainer);
         return dataContainer;
@@ -268,7 +267,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     public void deserialize(LanternItemStack object, DataView dataView) {
         object.setQuantity(dataView.getInt(QUANTITY).get());
         // All the extra data we will handle will be stored in the tag
-        final DataView tag = dataView.getView(TAG).orElseGet(() -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED));
+        final DataView tag = dataView.getView(TAG).orElseGet(() -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED));
         tag.set(ItemTypeObjectSerializer.DATA_VALUE, dataView.getShort(DATA).get());
         super.deserialize(object, tag);
     }
@@ -370,7 +369,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         }
         final List<DataView> dataViews = new ArrayList<>();
         for (ItemEnchantment enchantment : enchantments) {
-            final DataView enchantmentView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            final DataView enchantmentView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
             enchantmentView.set(ENCHANTMENT_ID, (short) ((LanternEnchantment) enchantment.getEnchantment()).getInternalId());
             enchantmentView.set(ENCHANTMENT_LEVEL, (short) enchantment.getLevel());
             dataViews.add(enchantmentView);

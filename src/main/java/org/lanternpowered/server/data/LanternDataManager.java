@@ -43,7 +43,6 @@ import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.ImmutableDataBuilder;
 import org.spongepowered.api.data.ImmutableDataHolder;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -229,11 +228,11 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
 
     @Override
     public DataContainer createContainer() {
-        return new MemoryDataContainer();
+        return DataContainer.createNew();
     }
 
     @Override
     public DataContainer createContainer(DataView.SafetyMode safety) {
-        return new MemoryDataContainer(safety);
+        return DataContainer.createNew(safety);
     }
 }

@@ -38,7 +38,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.CollisionRules;
 import org.spongepowered.api.scoreboard.Score;
@@ -235,7 +234,7 @@ public class ScoreboardIO {
     }
 
     public static void write(Path folder, Scoreboard scoreboard) throws IOException {
-        final List<DataView> objectives = scoreboard.getObjectives().stream().map(objective -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
+        final List<DataView> objectives = scoreboard.getObjectives().stream().map(objective -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                 .set(NAME, objective.getName())
                 .set(DISPLAY_NAME, ((LanternObjective) objective).getLegacyDisplayName())
                 .set(CRITERION_NAME, objective.getCriterion().getId())
@@ -244,7 +243,7 @@ public class ScoreboardIO {
         final List<DataView> scores = new ArrayList<>();
         for (Score score : scoreboard.getScores()) {
             final Iterator<Objective> it = score.getObjectives().iterator();
-            final DataView baseView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
+            final DataView baseView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(NAME, ((LanternScore) score).getLegacyName())
                     .set(SCORE, score.getScore());
             // TODO: Locked state
@@ -268,7 +267,7 @@ public class ScoreboardIO {
 
         final List<DataView> teams = new ArrayList<>();
         for (Team team : scoreboard.getTeams()) {
-           final DataView container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
+           final DataView container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(ALLOW_FRIENDLY_FIRE, (byte) (team.allowFriendlyFire() ? 1 : 0))
                     .set(CAN_SEE_FRIENDLY_INVISIBLES, (byte) (team.canSeeFriendlyInvisibles() ? 1 : 0))
                     .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getName())
@@ -287,7 +286,7 @@ public class ScoreboardIO {
             teams.add(container);
         }
 
-        final DataContainer rootDataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer rootDataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         final DataView dataView = rootDataContainer.createView(DATA)
                 .set(OBJECTIVES, objectives)
                 .set(SCORES, scores)

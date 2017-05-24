@@ -61,7 +61,6 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.NotePitch;
@@ -181,7 +180,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
 
     private static int[] toExtraItemData(ItemStack itemStack) {
         final ObjectStore<LanternItemStack> store = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
-        final DataContainer view = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer view = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         store.serialize((LanternItemStack) itemStack, view);
         final int data = view.getInt(ItemStackStore.DATA).get();
         final int internalId = ItemRegistryModule.get().getInternalId(itemStack.getItem());

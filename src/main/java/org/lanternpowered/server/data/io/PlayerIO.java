@@ -32,7 +32,6 @@ import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,7 +73,7 @@ public final class PlayerIO {
     public static void save(Path dataFolder, LanternPlayer player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
 
-        final DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         final ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
         objectStore.serialize(player, dataContainer);
 

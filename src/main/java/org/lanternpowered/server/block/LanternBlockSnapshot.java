@@ -37,7 +37,6 @@ import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -132,7 +131,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
 
     @Override
     public DataContainer toContainer() {
-        final DataContainer container = new MemoryDataContainer()
+        final DataContainer container = DataContainer.createNew()
             .set(DataQueries.BLOCK_STATE, this.state);
         if (this.location != null) {
             container.set(Queries.WORLD_ID, this.location.world.getUniqueId());

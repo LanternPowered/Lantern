@@ -37,7 +37,6 @@ import java.util.List;
 import org.junit.Test;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.collect.Lists;
 
@@ -54,7 +53,7 @@ public class NbtDataContainerStreamsTest {
 
     @Test
     public void test() throws IOException {
-        DataContainer container = new MemoryDataContainer();
+        DataContainer container = DataContainer.createNew();
         container.set(A, (byte) 54);
         container.set(B, (short) 5493);
         container.set(C, (int) 95601);

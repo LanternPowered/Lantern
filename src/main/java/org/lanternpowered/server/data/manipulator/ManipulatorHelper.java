@@ -38,7 +38,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
@@ -50,7 +49,7 @@ public final class ManipulatorHelper {
 
     @SuppressWarnings("unchecked")
     public static DataContainer toContainer(AbstractValueContainer valueContainer) {
-        final DataContainer dataContainer = new MemoryDataContainer();
+        final DataContainer dataContainer = DataContainer.createNew();
         final Map<Key<?>, KeyRegistration> map = valueContainer.getRawValueMap();
         final LanternDataManager dataManager = Lantern.getGame().getDataManager();
         for (Map.Entry<Key<?>, KeyRegistration> entry : map.entrySet()) {

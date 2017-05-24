@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data.io.store;
 
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.util.Identifiable;
 
@@ -58,7 +58,7 @@ final class IdentifiableObjectSerializer<T extends Identifiable> implements Obje
 
     @Override
     public DataView serialize(T object) {
-        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         if (this.objectStore instanceof IdentifiableObjectStore) {
             ((IdentifiableObjectStore) this.objectStore).serializeUniqueId(dataView, object.getUniqueId());
         }

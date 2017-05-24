@@ -47,7 +47,6 @@ import org.lanternpowered.server.data.persistence.DataContainerInput;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataFormatException;
 
 import java.io.Closeable;
@@ -178,7 +177,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return array;
         } else if (type == COMPOUND) {
             if (container == null) {
-                container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
             }
             Entry entry;
             final int depth1 = depth + 1;

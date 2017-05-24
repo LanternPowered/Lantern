@@ -29,9 +29,9 @@ import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.item.firework.LanternFireworkShape;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShape;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class FireworkChargeItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+final class FireworkChargeItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     private static final DataQuery EXPLOSION = DataQuery.of("Explosion");
     private static final DataQuery EXTRA_EXPLOSIONS = DataQuery.of("ExtraExplosions"); // Lantern
@@ -84,7 +84,7 @@ public class FireworkChargeItemTypeObjectSerializer extends ItemTypeObjectSerial
     private static final DataQuery FADE_COLORS = DataQuery.of("FadeColors");
 
     static DataView serializeExplosion(FireworkEffect effect) {
-        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         dataView.set(FLICKER, (byte) (effect.flickers() ? 1 : 0));
         dataView.set(TRAIL, (byte) (effect.hasTrail() ? 1 : 0));
         dataView.set(TYPE, (byte) ((LanternFireworkShape) effect.getShape()).getInternalId());

@@ -32,9 +32,9 @@ import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.TileEntityType;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class TileEntitySerializer implements ObjectSerializer<LanternTileEntity>
 
     @Override
     public DataView serialize(LanternTileEntity object) {
-        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         dataView.set(ID, object.getType().getId());
         //noinspection unchecked
         final ObjectStore<LanternTileEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();

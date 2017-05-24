@@ -45,8 +45,8 @@ import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -106,7 +106,10 @@ public final class Types {
             Lantern.getGame().getRegistry().getTranslationManager(), true).create();
 
     /**
-     * A utf-8 encoded text prefixed by the length in var-int.
+     * A serializer for {@link Text} objects,
+     * NULL {@code null} values are NOT SUPPORTED.
+     * <p>
+     * Text -> JSON -> UTF-8 encoded string prefixed by the length as a var-int.
      */
     public static final Type<Text> TEXT = Type.create(Text.class, new ValueSerializer<Text>() {
         @Override
@@ -121,7 +124,10 @@ public final class Types {
     });
 
     /**
-     * A localized text object.
+     * A serializer for {@link LocalizedText} objects,
+     * NULL {@code null} values are NOT SUPPORTED.
+     * <p>
+     * Text -> JSON -> UTF-8 encoded string prefixed by the length as a var-int.
      */
     public static final Type<LocalizedText> LOCALIZED_TEXT = Type.create(LocalizedText.class, new ValueSerializer<LocalizedText>() {
         @Override
@@ -143,7 +149,8 @@ public final class Types {
     });
 
     /**
-     * A item stack.
+     * A serializer for {@link ItemStack} objects,
+     * NULL {@code null} values are SUPPORTED.
      */
     public static final Type<ItemStack> ITEM_STACK = Type.create(ItemStack.class, new ValueSerializer<ItemStack>() {
 
@@ -154,7 +161,7 @@ public final class Types {
             if (object == null) {
                 buf.write(Types.RAW_ITEM_STACK, null);
             } else {
-                final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
                 this.store.serialize((LanternItemStack) object, dataView);
                 buf.write(Types.RAW_ITEM_STACK, new RawItemStack(ItemRegistryModule.get().getInternalId(object.getItem()),
                         dataView.getShort(ItemStackStore.DATA).orElse((short) 0), object.getQuantity(),
@@ -164,17 +171,17 @@ public final class Types {
 
         @Override
         public ItemStack read(ByteBuffer buf) throws CodecException {
-            RawItemStack rawItemStack = buf.read(Types.RAW_ITEM_STACK);
+            final RawItemStack rawItemStack = buf.read(Types.RAW_ITEM_STACK);
             //noinspection ConstantConditions
             if (rawItemStack == null) {
                 return null;
             }
-            ItemType itemType = ItemRegistryModule.get().getTypeByInternalId(rawItemStack.getItemType()).orElse(null);
+            final ItemType itemType = ItemRegistryModule.get().getTypeByInternalId(rawItemStack.getItemType()).orElse(null);
             if (itemType == null) {
                 return null;
             }
             final LanternItemStack itemStack = new LanternItemStack(itemType, rawItemStack.getAmount());
-            final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
             dataView.set(ItemStackStore.DATA, rawItemStack.getData());
             dataView.set(ItemStackStore.QUANTITY, rawItemStack.getAmount());
             final DataView tag = rawItemStack.getDataView();
@@ -187,7 +194,8 @@ public final class Types {
     });
 
     /**
-     * A raw item stack.
+     * A serializer for {@link RawItemStack} objects,
+     * NULL {@code null} values are SUPPORTED.
      */
     public static final Type<RawItemStack> RAW_ITEM_STACK = Type.create(RawItemStack.class, new ValueSerializer<RawItemStack>() {
         @Override

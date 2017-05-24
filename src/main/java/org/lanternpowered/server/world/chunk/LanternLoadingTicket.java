@@ -34,7 +34,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
@@ -127,7 +126,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     @Override
     public DataContainer getCompanionData() {
         synchronized (this.queue) {
-            return this.extraData == null ? new MemoryDataContainer() : this.extraData.copy();
+            return this.extraData == null ? DataContainer.createNew() : this.extraData.copy();
         }
     }
 

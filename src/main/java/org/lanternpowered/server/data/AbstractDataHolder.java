@@ -34,7 +34,6 @@ import org.lanternpowered.server.data.value.mutable.AbstractCompositeValueStore;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -233,6 +232,6 @@ public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHold
 
     @Override
     default DataContainer toContainer() {
-        return new MemoryDataContainer();
+        return DataContainer.createNew();
     }
 }

@@ -50,7 +50,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
@@ -448,7 +447,7 @@ final class LanternWorldPropertiesIO {
     }
 
     static LevelData convert(LanternWorldProperties properties, @Nullable Integer dimensionId, @Nullable BitSet dimensionMap) {
-        final DataContainer rootContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer rootContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         final DataView dataView = rootContainer.createView(DATA);
         final DataContainer spongeRootContainer = properties.getAdditionalProperties().copy();
         final DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
@@ -537,7 +536,7 @@ final class LanternWorldPropertiesIO {
         final List<UUID> uniqueIdsByIndex = properties.getTrackerIdAllocator().getUniqueIdsByIndex();
 
         for (UUID uniqueId : uniqueIdsByIndex) {
-            final DataView uniqueIdView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            final DataView uniqueIdView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
             if (uniqueId != null) {
                 uniqueIdView.set(UUID_MOST, uniqueId.getMostSignificantBits());
                 uniqueIdView.set(UUID_LEAST, uniqueId.getLeastSignificantBits());
@@ -573,7 +572,7 @@ final class LanternWorldPropertiesIO {
             return true;
         });
         final DataView spongeRootContainer = levelData.spongeWorldData == null ?
-                new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED) : levelData.spongeWorldData;
+                DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED) : levelData.spongeWorldData;
         final DataView spongeContainer = spongeRootContainer.getView(DataQueries.SPONGE_DATA)
                 .orElseGet(() -> spongeRootContainer.createView(DataQueries.SPONGE_DATA));
         spongeContainer.set(UUID_MOST, levelData.uniqueId.getMostSignificantBits());

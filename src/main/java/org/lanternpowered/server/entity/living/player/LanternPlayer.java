@@ -95,9 +95,9 @@ import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
@@ -819,7 +819,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     public void sendBookView(BookView bookView) {
         checkNotNull(bookView, "bookView");
 
-        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         WrittenBookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);
 
         // Written book internal id

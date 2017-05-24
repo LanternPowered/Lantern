@@ -37,7 +37,6 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 
@@ -130,17 +129,17 @@ public final class LanternGameProfile implements GameProfile {
 
     @Override
     public DataContainer toContainer() {
-        final DataContainer container = new MemoryDataContainer()
+        final DataContainer container = DataContainer.createNew()
                 .set(UNIQUE_ID, this.uniqueId.toString());
         if (this.name != null) {
             container.set(NAME, this.name);
         }
         if (!this.properties.isEmpty()) {
-            final DataContainer propertiesMap = new MemoryDataContainer();
+            final DataContainer propertiesMap = DataContainer.createNew();
             for (String key : this.properties.keySet()) {
                 final List<DataContainer> entries = Lists.newArrayList();
                 for (ProfileProperty property : this.properties.get(key)) {
-                    final DataContainer entry = new MemoryDataContainer()
+                    final DataContainer entry = DataContainer.createNew()
                             .set(VALUE, property.getValue());
                     property.getSignature().ifPresent(signature -> entry.set(SIGNATURE, signature));
                     entries.add(entry);

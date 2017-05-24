@@ -46,7 +46,6 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -130,7 +129,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public DataContainer toContainer() {
-        final DataContainer dataContainer = new MemoryDataContainer();
+        final DataContainer dataContainer = DataContainer.createNew();
         dataContainer.set(DataQuery.of("BlockType"), this.baseState.getBlockType().getId());
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : this.traitValues.entrySet()) {
             Object value = entry.getValue();
@@ -425,7 +424,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
      * @return whether the block trait and value are supported
      */
     public boolean supportsTraitValue(BlockTrait<?> blockTrait, Object value) {
-        return this.supportsTrait(checkNotNull(blockTrait, "blockTrait")) &&
+        return supportsTrait(checkNotNull(blockTrait, "blockTrait")) &&
                 ((Predicate) blockTrait.getPredicate()).test(checkNotNull(value, "value"));
     }
 

@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.buffer;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.ReferenceCounted;
 import org.lanternpowered.server.network.buffer.objects.Type;
+import org.lanternpowered.server.network.buffer.objects.ValueSerializer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
@@ -302,16 +303,17 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
     long getVarLong(int index);
 
     /**
-     * Writes the specified value for the {@link Type}.
+     * Writes the specified value for the {@link Type}. The value may be {@code null}
+     * depending on the underlying {@link ValueSerializer}.
      *
      * @param type The type
      * @param value The value
      * @param <V> The value type
      * @return This stream for chaining
      */
-    <V> ByteBuffer write(Type<V> type, @Nullable V value);
+    <V> ByteBuffer write(Type<V> type, V value);
 
-    <V> ByteBuffer set(int index, Type<V> type, @Nullable V value);
+    <V> ByteBuffer set(int index, Type<V> type, V value);
 
     <V> V read(Type<V> type);
 

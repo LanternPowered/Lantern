@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.biome.BiomeType;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public final class FlatGeneratorSettings {
     private final DataContainer extraData;
 
     public FlatGeneratorSettings(BiomeType biomeType, List<FlatLayer> layers) {
-        this(biomeType, layers, new MemoryDataContainer());
+        this(biomeType, layers, DataContainer.createNew());
     }
 
     public FlatGeneratorSettings(BiomeType biomeType, List<FlatLayer> layers, DataContainer extraData) {

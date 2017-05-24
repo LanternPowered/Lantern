@@ -30,7 +30,6 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.World;
 
 final class InternalLoadingTicket implements ChunkLoadingTicket {
@@ -59,7 +58,7 @@ final class InternalLoadingTicket implements ChunkLoadingTicket {
 
     @Override
     public DataContainer getCompanionData() {
-        return new MemoryDataContainer();
+        return DataContainer.createNew();
     }
 
     @Override

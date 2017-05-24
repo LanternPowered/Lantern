@@ -28,7 +28,6 @@ package org.lanternpowered.server.effect.particle;
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOption;
 
@@ -36,12 +35,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class LanternParticleEffect implements ParticleEffect {
+public final class LanternParticleEffect implements ParticleEffect {
 
     private final LanternParticleType type;
     private final Map<ParticleOption<?>, Object> options;
 
-    public LanternParticleEffect(LanternParticleType type, Map<ParticleOption<?>, Object> options) {
+    LanternParticleEffect(LanternParticleType type, Map<ParticleOption<?>, Object> options) {
         this.options = ImmutableMap.copyOf(options);
         this.type = type;
     }
@@ -69,9 +68,9 @@ public class LanternParticleEffect implements ParticleEffect {
 
     @Override
     public DataContainer toContainer() {
-        final DataContainer dataContainer = new MemoryDataContainer();
+        final DataContainer dataContainer = DataContainer.createNew();
         dataContainer.set(DataQueries.PARTICLE_TYPE, this.type);
-        dataContainer.set(DataQueries.PARTICLE_OPTIONS, this.options.entrySet().stream().map(entry -> new MemoryDataContainer()
+        dataContainer.set(DataQueries.PARTICLE_OPTIONS, this.options.entrySet().stream().map(entry -> DataContainer.createNew()
                 .set(DataQueries.PARTICLE_OPTION_KEY, entry.getKey())
                 .set(DataQueries.PARTICLE_OPTION_VALUE, entry.getValue()))
                 .collect(Collectors.toList()));

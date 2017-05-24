@@ -31,7 +31,6 @@ import com.google.gson.stream.JsonWriter;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -65,7 +64,7 @@ final class DataViewJsonWriter extends JsonWriter {
 
     private final List<Object> stack = new ArrayList<>();
     @Nullable private DataQuery pendingKey;
-    private DataContainer result = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+    private DataContainer result = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
 
     DataViewJsonWriter() {
         super(UNWRITABLE_WRITER);
@@ -123,7 +122,7 @@ final class DataViewJsonWriter extends JsonWriter {
             return this;
         }
 
-        put(new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED));
+        put(DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED));
         return this;
     }
 

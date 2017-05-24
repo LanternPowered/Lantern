@@ -31,7 +31,6 @@ import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
 
@@ -56,7 +55,7 @@ public final class WorldGeneration {
     private GeneratorType generatorType = GeneratorTypes.OVERWORLD;
 
     @Setting(value = "settings")
-    private DataContainer generatorSettings = new MemoryDataContainer();
+    private DataContainer generatorSettings = DataContainer.createNew();
 
     @Setting(value = "view-distance")
     private int viewDistance = 10;

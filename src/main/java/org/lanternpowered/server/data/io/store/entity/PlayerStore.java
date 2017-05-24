@@ -46,9 +46,9 @@ import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -152,7 +152,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
                 if (dimensionId == 0) {
                     serializeRespawnLocationTo(dataView, respawnLocation);
                 } else {
-                    respawnLocationViews.add(serializeRespawnLocationTo(new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED), respawnLocation)
+                    respawnLocationViews.add(serializeRespawnLocationTo(DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED), respawnLocation)
                             .set(RESPAWN_LOCATIONS_DIMENSION, dimensionId));
                 }
             });

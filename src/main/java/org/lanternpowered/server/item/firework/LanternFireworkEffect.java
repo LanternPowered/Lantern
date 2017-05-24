@@ -29,7 +29,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShape;
@@ -37,7 +36,7 @@ import org.spongepowered.api.util.Color;
 
 import java.util.List;
 
-public class LanternFireworkEffect implements FireworkEffect {
+final class LanternFireworkEffect implements FireworkEffect {
 
     private final boolean flicker;
     private final boolean trails;
@@ -85,8 +84,8 @@ public class LanternFireworkEffect implements FireworkEffect {
 
     @Override
     public DataContainer toContainer() {
-        return new MemoryDataContainer()
-                .set(Queries.CONTENT_VERSION, this.getContentVersion())
+        return DataContainer.createNew()
+                .set(Queries.CONTENT_VERSION, getContentVersion())
                 .set(DataQueries.FIREWORK_SHAPE, this.shape.getId())
                 .set(DataQueries.FIREWORK_COLORS, this.colors)
                 .set(DataQueries.FIREWORK_FADE_COLORS, this.fades)

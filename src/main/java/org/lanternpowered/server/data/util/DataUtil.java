@@ -29,9 +29,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -57,7 +57,7 @@ public final class DataUtil {
         checkNotNull(manipulators);
         final ImmutableList.Builder<DataView> builder = ImmutableList.builder();
         for (DataManipulator<?, ?> manipulator : manipulators) {
-            builder.add(new MemoryDataContainer()
+            builder.add(DataContainer.createNew()
                     .set(DataQueries.DATA_CLASS, manipulator.getClass().getName())
                     .set(DataQueries.INTERNAL_DATA, manipulator.toContainer()));
         }

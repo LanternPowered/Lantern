@@ -27,7 +27,6 @@ package org.lanternpowered.server.world.gen;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.GeneratorType;
 
 public abstract class LanternGeneratorType extends PluginCatalogType.Base implements GeneratorType {
@@ -55,7 +54,7 @@ public abstract class LanternGeneratorType extends PluginCatalogType.Base implem
 
     @Override
     public DataContainer getGeneratorSettings() {
-        return new MemoryDataContainer();
+        return DataContainer.createNew();
     }
 
     /**

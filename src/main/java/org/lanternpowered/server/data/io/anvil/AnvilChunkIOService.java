@@ -75,7 +75,6 @@ import org.slf4j.Logger;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
@@ -299,7 +298,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         final int regionX = x & REGION_MASK;
         final int regionZ = z & REGION_MASK;
 
-        final DataContainer rootView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer rootView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         final DataView levelDataView = rootView.createView(LEVEL);
 
         // Core properties
@@ -322,7 +321,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                 continue;
             }
 
-            final DataContainer sectionDataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            final DataContainer sectionDataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
             sectionDataView.set(Y, i);
 
             final byte[] rawTypes = new byte[section.types.length];
@@ -388,7 +387,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                 // Convert the index to the column based system
                 // index = z << 12 | y << 4 | x
                 index = ((index >> 4) & 0xf) << 12 | i << 8 | (index >> 4) & 0xf0 | index & 0xf;
-                final DataView trackerDataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                final DataView trackerDataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
                 trackerDataView.set(TRACKER_BLOCK_POS, (short) index);
                 trackerDataView.set(TRACKER_ENTRY_NOTIFIER, entry.getValue().getNotifierId());
                 trackerDataView.set(TRACKER_ENTRY_CREATOR, entry.getValue().getCreatorId());

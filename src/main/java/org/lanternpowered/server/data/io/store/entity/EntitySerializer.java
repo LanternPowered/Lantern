@@ -32,9 +32,9 @@ import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.entity.EntityType;
 
@@ -77,7 +77,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
 
     @Override
     public DataView serialize(LanternEntity object) {
-        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         dataView.set(ID, object.getType().getId());
         //noinspection unchecked
         final ObjectStore<LanternEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();

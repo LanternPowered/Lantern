@@ -34,7 +34,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
@@ -163,11 +162,11 @@ public final class LanternTextHelper {
         if (hoverAction instanceof HoverAction.ShowText) {
             return new RawAction("show_text", ((HoverAction.ShowText) hoverAction).getResult());
         } else if (hoverAction instanceof HoverAction.ShowEntity) {
-            HoverAction.ShowEntity.Ref ref = ((HoverAction.ShowEntity) hoverAction).getResult();
+            final HoverAction.ShowEntity.Ref ref = ((HoverAction.ShowEntity) hoverAction).getResult();
 
-            DataContainer dataContainer = new MemoryDataContainer();
-            dataContainer.set(SHOW_ENTITY_ID, ref.getUniqueId().toString());
-            dataContainer.set(SHOW_ENTITY_NAME, ref.getName());
+            final DataContainer dataContainer = DataContainer.createNew()
+                    .set(SHOW_ENTITY_ID, ref.getUniqueId().toString())
+                    .set(SHOW_ENTITY_NAME, ref.getName());
             // TODO
             // ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, ((LanternEntityType) type).getMinecraftId()));
 
@@ -186,12 +185,12 @@ public final class LanternTextHelper {
         @Nullable private String value;
         @Nullable private Text text;
 
-        public RawAction(String action, String value) {
+        RawAction(String action, String value) {
             this.action = action;
             this.value = value;
         }
 
-        public RawAction(String action, Text value) {
+        RawAction(String action, Text value) {
             this.action = action;
             this.text = value;
         }

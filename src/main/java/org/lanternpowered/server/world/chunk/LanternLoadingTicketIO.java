@@ -34,7 +34,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 
@@ -91,7 +90,7 @@ class LanternLoadingTicketIO {
 
             final List<DataView> ticketEntries = new ArrayList<>();
             for (LanternLoadingTicket ticket0 : tickets0) {
-                final DataContainer ticketData = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                final DataContainer ticketData = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
                 ticketData.set(TICKET_TYPE, ticket0 instanceof EntityLoadingTicket ? TYPE_ENTITY : TYPE_NORMAL);
                 final int numChunks = ticket0.getNumChunks();
                 // Store the list depth for backwards compatible or something,
@@ -123,12 +122,12 @@ class LanternLoadingTicketIO {
                 ticketEntries.add(ticketData);
             }
 
-            ticketHolders.add(new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
+            ticketHolders.add(DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(HOLDER_NAME, entry.getKey())
                     .set(TICKETS, ticketEntries));
         }
 
-        final DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
+        final DataContainer dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                 .set(HOLDER_LIST, ticketHolders);
         NbtStreamUtils.write(dataContainer, Files.newOutputStream(file), true);
     }

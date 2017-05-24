@@ -34,7 +34,6 @@ import org.lanternpowered.server.data.persistence.AbstractDataTranslator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.List;
@@ -67,7 +66,7 @@ public class ConfigurateTranslator extends AbstractDataTranslator<ConfigurationN
     @Override
     public DataContainer translate(ConfigurationNode node) throws InvalidDataException {
         checkNotNull(node, "node");
-        final DataContainer container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataContainer container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         final Object value = node.getValue();
         final Object key = node.getKey();
         if (value != null) {

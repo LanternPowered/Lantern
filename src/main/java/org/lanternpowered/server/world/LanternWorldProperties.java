@@ -52,7 +52,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
@@ -97,7 +96,7 @@ public final class LanternWorldProperties implements WorldProperties {
     SerializationBehavior serializationBehavior = SerializationBehaviors.AUTOMATIC;
 
     // The extra properties
-    private DataContainer additionalProperties = new MemoryDataContainer();
+    private DataContainer additionalProperties = DataContainer.createNew();
 
     // The type of the dimension
     private LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) DimensionTypes.OVERWORLD;

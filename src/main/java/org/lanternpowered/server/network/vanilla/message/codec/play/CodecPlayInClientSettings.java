@@ -41,7 +41,7 @@ public final class CodecPlayInClientSettings implements Codec<MessagePlayInClien
 
     @Override
     public MessagePlayInClientSettings decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final Locale locale = Locale.forLanguageTag(buf.readString());
+        final Locale locale = Locale.forLanguageTag(buf.readLimitedString(16));
         final int viewDistance = buf.readByte();
         final ChatVisibility visibility = ChatVisibilityRegistryModule.get().getByInternalId(buf.readByte()).get();
         final boolean enableColors = buf.readBoolean();

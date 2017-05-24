@@ -31,12 +31,11 @@ import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 
-public class LanternPotionEffect implements PotionEffect, AbstractPropertyHolder {
+final class LanternPotionEffect implements PotionEffect, AbstractPropertyHolder {
 
     private final PotionEffectType effectType;
     private final int duration;
@@ -44,7 +43,7 @@ public class LanternPotionEffect implements PotionEffect, AbstractPropertyHolder
     private final boolean ambient;
     private final boolean showParticles;
 
-    public LanternPotionEffect(PotionEffectType effectType, int duration, int amplifier, boolean ambient, boolean showParticles) {
+    LanternPotionEffect(PotionEffectType effectType, int duration, int amplifier, boolean ambient, boolean showParticles) {
         this.effectType = checkNotNull(effectType, "effectType");
         this.showParticles = showParticles;
         this.duration = duration;
@@ -84,7 +83,7 @@ public class LanternPotionEffect implements PotionEffect, AbstractPropertyHolder
 
     @Override
     public DataContainer toContainer() {
-        return new MemoryDataContainer()
+        return DataContainer.createNew()
                 .set(Queries.CONTENT_VERSION, getContentVersion())
                 .set(DataQueries.POTION_TYPE, this.effectType.getId())
                 .set(DataQueries.POTION_DURATION, this.duration)

@@ -248,47 +248,47 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer writeByteArray(byte[] data) {
-        this.writeVarInt(data.length);
-        this.writeBytes(data);
+        writeVarInt(data.length);
+        writeBytes(data);
         return this;
     }
 
     @Override
     public LanternByteBuffer writeByteArray(byte[] data, int start, int length) {
-        this.writeVarInt(length);
-        this.writeBytes(data, start, length);
+        writeVarInt(length);
+        writeBytes(data, start, length);
         return this;
     }
 
     @Override
     public LanternByteBuffer setByteArray(int index, byte[] data) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
-        this.writeByteArray(data);
+        writeByteArray(data);
         this.buf.writerIndex(oldIndex);
         return this;
     }
 
     @Override
     public LanternByteBuffer setByteArray(int index, byte[] data, int start, int length) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
-        this.writeVarInt(length);
-        this.writeBytes(data, start, length);
+        writeVarInt(length);
+        writeBytes(data, start, length);
         this.buf.writerIndex(oldIndex);
         return this;
     }
 
     @Override
     public byte[] readLimitedByteArray(int maxLength) throws DecoderException {
-        int length = this.readVarInt();
+        final int length = readVarInt();
         if (length < 0) {
             throw new DecoderException("Byte array length may not be negative.");
         }
         if (length > maxLength) {
             throw new DecoderException("Exceeded the maximum allowed length, got " + length + " which is greater then " + maxLength);
         }
-        byte[] bytes = new byte[length];
+        final byte[] bytes = new byte[length];
         this.buf.readBytes(bytes);
         return bytes;
     }
@@ -300,9 +300,9 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public byte[] readByteArray(int index) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        byte[] data = this.readByteArray();
+        final byte[] data = readByteArray();
         this.buf.readerIndex(oldIndex);
         return data;
     }
@@ -321,7 +321,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setBytes(int index, byte[] data) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
         this.buf.writeBytes(data);
         this.buf.writerIndex(oldIndex);
@@ -330,7 +330,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setBytes(int index, byte[] data, int start, int length) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
         this.buf.writeBytes(data, start, length);
         this.buf.writerIndex(oldIndex);
@@ -339,16 +339,16 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public byte[] readBytes(int length) {
-        byte[] data = new byte[length];
+        final byte[] data = new byte[length];
         this.buf.readBytes(data);
         return data;
     }
 
     @Override
     public byte[] readBytes(int index, int length) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        byte[] data = new byte[length];
+        final byte[] data = new byte[length];
         this.buf.readBytes(data);
         this.buf.readerIndex(oldIndex);
         return data;
@@ -530,43 +530,43 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public int getVarInt(int index) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        int data = this.readVarInt();
+        final int data = readVarInt();
         this.buf.readerIndex(oldIndex);
         return data;
     }
 
     @Override
     public LanternByteBuffer writeString(String data) {
-        this.writeByteArray(data.getBytes(StandardCharsets.UTF_8));
+        writeByteArray(data.getBytes(StandardCharsets.UTF_8));
         return this;
     }
 
     @Override
     public LanternByteBuffer setString(int index, String data) {
-        this.setByteArray(index, data.getBytes(StandardCharsets.UTF_8));
+        setByteArray(index, data.getBytes(StandardCharsets.UTF_8));
         return this;
     }
 
     @Override
     public String readLimitedString(int maxLength) throws DecoderException {
-        return new String(this.readLimitedByteArray(maxLength * 4), StandardCharsets.UTF_8);
+        return new String(readLimitedByteArray(maxLength * 4), StandardCharsets.UTF_8);
     }
 
     @Override
     public String readString() {
-        return this.readLimitedString(Short.MAX_VALUE);
+        return readLimitedString(Short.MAX_VALUE);
     }
 
     @Override
     public String getString(int index) {
-        return new String(this.readByteArray(index), StandardCharsets.UTF_8);
+        return new String(readByteArray(index), StandardCharsets.UTF_8);
     }
 
     @Override
     public LanternByteBuffer writeUTF(String data) {
-        byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+        final byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
         if (bytes.length > 32767) {
             throw new EncoderException("String too big (was " + data.length() + " bytes encoded, max " + 32767 + ")");
         }
@@ -578,25 +578,25 @@ public class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer setUTF(int index, String data) {
         checkNotNull(data, "data");
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
-        this.writeUTF(data);
+        writeUTF(data);
         this.buf.writerIndex(oldIndex);
         return this;
     }
 
     @Override
     public String readUTF() {
-        int length = this.readShort();
+        final int length = readShort();
         return new String(this.buf.readBytes(length).array(), StandardCharsets.UTF_8);
     }
 
     @Override
     public String getUTF(int index) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        int length = this.readShort();
-        String data = new String(this.buf.readBytes(length).array(), StandardCharsets.UTF_8);
+        final int length = readShort();
+        final String data = new String(this.buf.readBytes(length).array(), StandardCharsets.UTF_8);
         this.buf.readerIndex(oldIndex);
         return data;
     }
@@ -612,7 +612,7 @@ public class LanternByteBuffer implements ByteBuffer {
     public LanternByteBuffer setUniqueId(int index, UUID data) {
         final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
-        this.writeUniqueId(data);
+        writeUniqueId(data);
         this.buf.writerIndex(oldIndex);
         return this;
     }
@@ -628,7 +628,7 @@ public class LanternByteBuffer implements ByteBuffer {
     public UUID getUniqueId(int index) {
         final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        final UUID data = this.readUniqueId();
+        final UUID data = readUniqueId();
         this.buf.readerIndex(oldIndex);
         return data;
     }
@@ -651,7 +651,7 @@ public class LanternByteBuffer implements ByteBuffer {
     public LanternByteBuffer setDataView(int index, @Nullable DataView data) {
         final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
-        this.writeDataView(data);
+        writeDataView(data);
         this.buf.writerIndex(oldIndex);
         return this;
     }
@@ -677,15 +677,15 @@ public class LanternByteBuffer implements ByteBuffer {
     @Nullable
     @Override
     public DataView readDataView() {
-        return this.readLimitedDataView(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        return readLimitedDataView(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     @Nullable
     @Override
     public DataView getDataView(int index) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        DataView data = this.readDataView();
+        final DataView data = readDataView();
         this.buf.readerIndex(oldIndex);
         return data;
     }
@@ -732,9 +732,9 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setVarLong(int index, long value) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
-        this.writeVarLong(value);
+        writeVarLong(value);
         this.buf.writerIndex(oldIndex);
         return this;
     }
@@ -756,9 +756,9 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public long getVarLong(int index) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        long data = this.readVarLong();
+        final long data = readVarLong();
         this.buf.readerIndex(oldIndex);
         return data;
     }
@@ -771,9 +771,9 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public <V> LanternByteBuffer set(int index, Type<V> type, V value) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
-        this.write(type, value);
+        write(type, value);
         this.buf.writerIndex(oldIndex);
         return this;
     }
@@ -785,9 +785,9 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public <V> V get(int index, Type<V> type) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        V data = this.read(type);
+        final V data = read(type);
         this.buf.readerIndex(oldIndex);
         return data;
     }

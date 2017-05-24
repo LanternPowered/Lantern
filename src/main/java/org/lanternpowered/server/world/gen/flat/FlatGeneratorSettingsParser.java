@@ -37,37 +37,37 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.util.Coerce;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class FlatGeneratorSettingsParser {
+final class FlatGeneratorSettingsParser {
 
     public static String toString(FlatGeneratorSettings settings) {
         // All the parts
-        List<Object> parts = Lists.newArrayList();
+        final List<Object> parts = new ArrayList<>();
         // The current version
         parts.add(3);
 
         // All the layers
-        List<String> layers = Lists.newArrayList();
+        final List<String> layers = new ArrayList<>();
         settings.getLayers().forEach(layer -> {
-            StringBuilder builder = new StringBuilder();
-            int depth = layer.getDepth();
+            final StringBuilder builder = new StringBuilder();
+            final int depth = layer.getDepth();
             // Only append the depth if needed
             if (depth > 1) {
                 builder.append(depth).append('*');
             }
-            BlockState block = layer.getBlockState();
+            final BlockState block = layer.getBlockState();
             // Append the block id
             builder.append(block.getType().getId());
-            int data = BlockRegistryModule.get().getStateData(block);
+            final int data = BlockRegistryModule.get().getStateData(block);
             // Only append the data if needed
             if (data > 0) {
                 builder.append(':').append(data);
@@ -80,19 +80,19 @@ public final class FlatGeneratorSettingsParser {
         // Add the biome id part
         parts.add(BiomeRegistryModule.get().getInternalId(settings.getBiomeType()));
 
-        List<String> extraDataValues = Lists.newArrayList();
-        settings.getExtraData().getValues(false).entrySet().stream().forEach(e -> {
-            Object value = e.getValue();
+        final List<String> extraDataValues = new ArrayList<>();
+        settings.getExtraData().getValues(false).entrySet().forEach(e -> {
+            final Object value = e.getValue();
             if (value instanceof DataView) {
-                List<String> values = Lists.newArrayList();
-                ((DataView) value).getValues(false).entrySet().stream().forEach(e1 -> {
-                    Object value1 = e1.getValue();
+                final List<String> values = new ArrayList<>();
+                ((DataView) value).getValues(false).entrySet().forEach(e1 -> {
+                    final Object value1 = e1.getValue();
                     // Only integer numbers are currently supported
                     if (value instanceof Number) {
                         values.add(e1.getKey().getParts().get(0) + '=' + ((Number) value1).intValue());
                     }
                 });
-                StringBuilder builder = new StringBuilder();
+                final StringBuilder builder = new StringBuilder();
                 builder.append(e.getKey().getParts().get(0));
                 if (values.size() > 0) {
                     builder.append('(');
@@ -117,7 +117,7 @@ public final class FlatGeneratorSettingsParser {
         }
 
         // Split the value into parts
-        List<String> parts = Lists.newArrayList(Splitter.on(';').split(value));
+        final List<String> parts = Lists.newArrayList(Splitter.on(';').split(value));
 
         // Try to extract the version from the parts
         int version = 0;
@@ -131,10 +131,10 @@ public final class FlatGeneratorSettingsParser {
         }
 
         // The layers are stored in the first part
-        String layersPart = parts.remove(0);
+        final String layersPart = parts.remove(0);
 
         // The parsed layers
-        List<FlatLayer> layers = Lists.newArrayList();
+        final List<FlatLayer> layers = new ArrayList<>();
 
         // Can be empty if there are no layers
         if (!layersPart.isEmpty()) {
@@ -150,9 +150,9 @@ public final class FlatGeneratorSettingsParser {
                 int depth = 1;
 
                 // The depth seperated by the depth seperator followed by the block state
-                List<String> parts1 = Lists.newArrayList(Splitter.on(depthSeperator).limit(2).split(s));
+                final List<String> parts1 = Lists.newArrayList(Splitter.on(depthSeperator).limit(2).split(s));
                 if (parts1.size() > 1) {
-                    Optional<Integer> optDepth = Coerce.asInteger(parts1.remove(0));
+                    final Optional<Integer> optDepth = Coerce.asInteger(parts1.remove(0));
                     if (optDepth.isPresent()) {
                         depth = GenericMath.clamp(optDepth.get(), 0, 255);
                         if (depth <= 0) {
@@ -164,7 +164,7 @@ public final class FlatGeneratorSettingsParser {
 
                 String blockStatePart = parts1.get(0);
 
-                int index = blockStatePart.lastIndexOf(':');
+                final int index = blockStatePart.lastIndexOf(':');
                 if (index > 0) {
                     Optional<Integer> optData = Coerce.asInteger(blockStatePart.substring(index + 1));
                     if (optData.isPresent()) {
@@ -174,7 +174,7 @@ public final class FlatGeneratorSettingsParser {
                 }
 
                 // Try to parse the block id as internal (int) id
-                Optional<Integer> optId = Coerce.asInteger(blockStatePart);
+                final Optional<Integer> optId = Coerce.asInteger(blockStatePart);
                 if (optId.isPresent()) {
                     blockType = BlockRegistryModule.get().getStateByInternalId(optId.get()).orElse(BlockTypes.STONE.getDefaultState()).getType();
                 // Not an integer, try the catalog system
@@ -190,10 +190,10 @@ public final class FlatGeneratorSettingsParser {
         BiomeType biomeType = BiomeTypes.PLAINS;
 
         if (!parts.isEmpty()) {
-            String biomePart = parts.remove(0);
+            final String biomePart = parts.remove(0);
 
-            Optional<Integer> optBiomeId = Coerce.asInteger(biomePart);
-            Optional<BiomeType> optBiome;
+            final Optional<Integer> optBiomeId = Coerce.asInteger(biomePart);
+            final Optional<BiomeType> optBiome;
             if (optBiomeId.isPresent()) {
                 optBiome = BiomeRegistryModule.get().getByInternalId(optBiomeId.get());
             } else {
@@ -205,16 +205,16 @@ public final class FlatGeneratorSettingsParser {
         }
 
         // Extra data (like structures)
-        DataContainer extraData = new MemoryDataContainer();
+        final DataContainer extraData = DataContainer.createNew();
 
         if (!parts.isEmpty()) {
-            String extraPart = parts.remove(0);
+            final String extraPart = parts.remove(0);
             if (!extraPart.isEmpty()) {
                 Splitter.on(',').split(extraPart).forEach(s -> {
                     String key = s;
 
                     // Check if there is extra data attached to the key
-                    int valuesIndex = s.indexOf('(');
+                    final int valuesIndex = s.indexOf('(');
                     if (valuesIndex != -1) {
                         // Separate the key from the values
                         key = s.substring(0, valuesIndex);
@@ -228,10 +228,10 @@ public final class FlatGeneratorSettingsParser {
                         s = s.substring(valuesIndex + 1, endIndex);
 
                         // Create the view to store the values
-                        DataView dataView = extraData.createView(DataQuery.of(key));
+                        final DataView dataView = extraData.createView(DataQuery.of(key));
                         if (!s.isEmpty()) {
                             Splitter.on(' ').split(s).forEach(v -> {
-                                List<String> parts1 = Splitter.on('=').limit(2).splitToList(v);
+                                final List<String> parts1 = Splitter.on('=').limit(2).splitToList(v);
                                 // Must be greater then 1, otherwise it's invalid
                                 if (parts1.size() > 1) {
                                     // Currently, only integer values seem to be supported

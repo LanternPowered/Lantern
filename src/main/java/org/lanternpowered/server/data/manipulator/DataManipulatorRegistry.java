@@ -92,6 +92,8 @@ import org.lanternpowered.server.data.manipulator.mutable.item.LanternPagedData;
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternPlaceableData;
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternSpawnableData;
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternStoredEnchantmentData;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -245,6 +247,7 @@ public class DataManipulatorRegistry {
                 ImmutableStoredEnchantmentData.class, LanternImmutableStoredEnchantmentData::new, LanternImmutableStoredEnchantmentData::new);
     }
 
+    @SuppressWarnings("unchecked")
     public <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> DataManipulatorRegistration<M, I> register(
             Class<M> manipulatorType, Supplier<M> manipulatorSupplier, Function<M, M> manipulatorCopyFunction, Function<I, M> immutableToMutableFunction,
             Class<I> immutableManipulatorType, Supplier<I> immutableManipulatorSupplier, Function<M, I> mutableToImmutableFunction) {
@@ -274,6 +277,11 @@ public class DataManipulatorRegistry {
                 immutableManipulatorType, immutableManipulatorSupplier, mutableToImmutableFunction, requiredKeys);
         this.registrationByClass.put(manipulatorType, registration);
         this.registrationByClass.put(immutableManipulatorType, registration);
+        final DataManager dataManager = Lantern.getGame().getDataManager();
+        dataManager.registerBuilder(immutableManipulatorType,
+                new RegistrationImmutableManipulatorDataBuilder(immutableManipulatorType, 1, registration));
+        dataManager.registerBuilder(manipulatorType,
+                new RegistrationManipulatorDataBuilder(manipulatorType, 1, registration));
         return registration;
     }
 

@@ -34,8 +34,6 @@ import org.spongepowered.api.data.ImmutableDataHolder;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +47,7 @@ public interface AbstractImmutableDataHolder<H extends ImmutableDataHolder<H>> e
     @Override
     default <T extends ImmutableDataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
         // Check default registrations
-        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByMutable((Class) containerClass);
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByImmutable((Class) containerClass);
         if (optRegistration.isPresent()) {
             final DataManipulatorRegistration registration = optRegistration.get();
             final DataManipulator manipulator = (DataManipulator) optRegistration.get().getManipulatorSupplier().get();
@@ -68,7 +66,7 @@ public interface AbstractImmutableDataHolder<H extends ImmutableDataHolder<H>> e
         if (manipulators != null) {
             for (ImmutableDataManipulator<?, ?> manipulator : manipulators.values()) {
                 if (containerClass.isInstance(manipulator)) {
-                    return Optional.of((T) manipulator.copy());
+                    return Optional.of((T) manipulator);
                 }
             }
         }
@@ -86,7 +84,7 @@ public interface AbstractImmutableDataHolder<H extends ImmutableDataHolder<H>> e
     default boolean supports(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
         if (containerClass.isAssignableFrom(IImmutableDataManipulator.class)) {
             // Offer all the default key values as long if they are supported
-            final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByMutable((Class) containerClass);
+            final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByImmutable((Class) containerClass);
             if (optRegistration.isPresent()) {
                 final DataManipulatorRegistration registration = optRegistration.get();
                 for (Key key : (Set<Key>) registration.getRequiredKeys()) {
@@ -125,7 +123,7 @@ public interface AbstractImmutableDataHolder<H extends ImmutableDataHolder<H>> e
         // Try the additional manipulators if they are supported
         final Map<Class<?>, ImmutableDataManipulator<?, ?>> manipulators = getRawAdditionalContainers();
         if (manipulators != null) {
-            manipulators.values().forEach(manipulator -> builder.add(manipulator.copy()));
+            manipulators.values().forEach(builder::add);
         }
 
         return builder.build();

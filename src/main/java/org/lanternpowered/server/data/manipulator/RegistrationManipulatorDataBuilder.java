@@ -23,50 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.channel;
+package org.lanternpowered.server.data.manipulator;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.spongepowered.api.network.ChannelBinding;
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
 
-abstract class LanternChannelBinding implements ChannelBinding {
+final class RegistrationManipulatorDataBuilder<M extends AbstractData<M, ?>> extends AbstractData.AbstractManipulatorDataBuilder<M> {
 
-    private final LanternChannelRegistrar registrar;
-    private final PluginContainer owner;
-    private final String name;
+    private final DataManipulatorRegistration<M, ?> registration;
 
-    boolean bound;
-
-    LanternChannelBinding(LanternChannelRegistrar registrar, String name, PluginContainer owner) {
-        this.registrar = registrar;
-        this.owner = owner;
-        this.name = name;
+    RegistrationManipulatorDataBuilder(Class<M> requiredClass, int supportedVersion,
+            DataManipulatorRegistration<M, ?> registration) {
+        super(requiredClass, supportedVersion);
+        this.registration = registration;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public LanternChannelRegistrar getRegistrar() {
-        return this.registrar;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public PluginContainer getOwner() {
-        return this.owner;
-    }
-
-    abstract void handlePayload(ByteBuffer buf, RemoteConnection connection);
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("plugin", this.owner)
-                .add("name", this.name)
-                .toString();
+    protected M buildManipulator() {
+        return this.registration.getManipulatorSupplier().get();
     }
 }

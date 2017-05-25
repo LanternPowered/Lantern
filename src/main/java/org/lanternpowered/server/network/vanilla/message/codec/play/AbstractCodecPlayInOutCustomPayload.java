@@ -35,6 +35,7 @@ import io.netty.util.AttributeKey;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
+import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -78,7 +79,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
 
     @Override
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final String channel = buf.readString();
+        final String channel = buf.readLimitedString(LanternChannelRegistrar.MAX_NAME_LENGTH);
         final int length = buf.available();
         if (length > Short.MAX_VALUE) {
             throw new DecoderException("CustomPayload messages may not be longer then " + Short.MAX_VALUE + " bytes");
@@ -162,7 +163,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
      * @return the channels
      */
     private static Set<String> decodeChannels(ByteBuffer buffer) {
-        byte[] bytes = new byte[buffer.available()];
+        final byte[] bytes = new byte[buffer.available()];
         buffer.readBytes(bytes);
         return Sets.newHashSet(Splitter.on('\u0000').split(new String(bytes, StandardCharsets.UTF_8)));
     }

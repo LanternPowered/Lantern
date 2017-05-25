@@ -28,7 +28,6 @@ package org.lanternpowered.server.network.channel;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -77,7 +76,7 @@ final class LanternRawDataChannel extends LanternChannelBinding implements Chann
     @Override
     public void sendTo(Player player, Consumer<ChannelBuf> payload) {
         checkState(this.bound);
-        this.registrar.sendPayload(player, this.name, payload::accept);
+        getRegistrar().sendPayload(player, getName(), payload::accept);
     }
 
     @Override
@@ -89,7 +88,7 @@ final class LanternRawDataChannel extends LanternChannelBinding implements Chann
     @Override
     public void sendToAll(Consumer<ChannelBuf> payload) {
         checkState(this.bound);
-        this.registrar.sendPayloadToAll(this.name, payload::accept);
+        getRegistrar().sendPayloadToAll(getName(), payload::accept);
     }
 
     @Override

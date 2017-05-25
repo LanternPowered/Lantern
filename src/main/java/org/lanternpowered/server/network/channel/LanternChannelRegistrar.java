@@ -52,6 +52,7 @@ import org.spongepowered.api.network.ChannelRegistrationException;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -61,6 +62,8 @@ import java.util.function.Consumer;
 
 @Singleton
 public final class LanternChannelRegistrar implements ChannelRegistrar {
+
+    public static final int MAX_NAME_LENGTH = 20;
 
     private final Map<String, LanternChannelBinding> bindings = new ConcurrentHashMap<>();
     private final Server server;
@@ -89,7 +92,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
     private LanternChannelBinding create(Object plugin, String channel, boolean rawChannel) throws ChannelRegistrationException {
         final PluginContainer container = checkPlugin(plugin, "plugin");
         checkNotNullOrEmpty(channel, "channel");
-        checkArgument(channel.length() <= 20, "channel length may not be longer then 20");
+        checkArgument(channel.length() <= MAX_NAME_LENGTH, "channel length may not be longer then 20");
         if (!isChannelAvailable(channel)) {
             throw new ChannelRegistrationException("Channel with name \"" + channel + "\" is already registered!");
         }
@@ -113,8 +116,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         if (binding.bound) {
             binding.bound = false;
             this.bindings.remove(channel.getName());
-            final MessagePlayInOutUnregisterChannels message = new MessagePlayInOutUnregisterChannels(
-                    Sets.newHashSet(channel.getName()));
+            final MessagePlayInOutUnregisterChannels message = new MessagePlayInOutUnregisterChannels(Collections.singleton(channel.getName()));
             for (Player player : this.server.getOnlinePlayers()) {
                 ((NetworkSession) player.getConnection()).send(message);
             }

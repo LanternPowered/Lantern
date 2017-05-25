@@ -36,8 +36,11 @@ import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
+import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Collection;
@@ -48,21 +51,27 @@ import java.util.Set;
 public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHolder, DataManipulator<?,?>>, DataHolder, AbstractPropertyHolder {
 
     @SuppressWarnings("unchecked")
+    default <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> Optional<M> create(
+            DataManipulatorRegistration<M, I> registration) {
+        final M manipulator = registration.getManipulatorSupplier().get();
+        for (Key<?> key : registration.getRequiredKeys()) {
+            final Optional value = getValue(key);
+            if (value.isPresent()) {
+                manipulator.set((Key) key, value.get());
+            } else if (!supports(key)) {
+                return Optional.empty();
+            }
+        }
+        return Optional.of(manipulator);
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     default <T extends DataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
         // Check default registrations
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByMutable((Class) containerClass);
         if (optRegistration.isPresent()) {
-            final DataManipulatorRegistration registration = optRegistration.get();
-            final T manipulator = (T) optRegistration.get().getManipulatorSupplier().get();
-            for (Key key : (Set<Key>) registration.getRequiredKeys()) {
-                final Optional value = getValue(key);
-                if (!value.isPresent()) {
-                    return Optional.empty();
-                }
-                manipulator.set(key, value.get());
-            }
-            return Optional.of(manipulator);
+            return create(optRegistration.get());
         }
 
         // Try the additional manipulators if they are supported
@@ -84,17 +93,7 @@ public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHold
         // Offer all the default key values as long if they are supported
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByMutable((Class) containerClass);
         if (optRegistration.isPresent()) {
-            final DataManipulatorRegistration registration = optRegistration.get();
-            final T manipulator = (T) optRegistration.get().getImmutableManipulatorSupplier().get();
-            for (Key key : (Set<Key>) registration.getRequiredKeys()) {
-                final Optional value = getValue(key);
-                if (value.isPresent()) {
-                    manipulator.set(key, value.get());
-                } else if (!supports(key)) {
-                    return Optional.empty();
-                }
-            }
-            return Optional.of(manipulator);
+            return create(optRegistration.get());
         }
 
         // Try the additional manipulators if they are supported,
@@ -132,12 +131,23 @@ public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHold
         return getRawAdditionalContainers() != null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     default DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function, Cause cause) {
         if (valueContainer instanceof IDataManipulator) {
             // Offer all the default key values as long if they are supported
-            final Optional optRegistration = DataManipulatorRegistry.get().getByMutable(((IDataManipulator) valueContainer).getMutableType());
+            final Optional<DataManipulatorRegistration> optRegistration =
+                    DataManipulatorRegistry.get().getByMutable(((IDataManipulator) valueContainer).getMutableType());
             if (optRegistration.isPresent()) {
+                if (function == MergeFunction.FORCE_NOTHING) {
+                    final DataTransactionResult.Builder builder = DataTransactionResult.builder();
+                    for (ImmutableValue value : valueContainer.getValues()) {
+                        getValue(value.getKey()).ifPresent(value1 -> builder.replace(((Value) value1).asImmutable()));
+                    }
+                    return builder.result(DataTransactionResult.Type.SUCCESS).build();
+                } else if (function != MergeFunction.IGNORE_ALL) {
+                    valueContainer = function.merge((ValueContainer) create(optRegistration.get()).orElse(null), valueContainer);
+                }
                 final DataTransactionResult.Builder builder = DataTransactionResult.builder();
                 boolean success = false;
                 for (ImmutableValue value : valueContainer.getValues()) {
@@ -162,10 +172,11 @@ public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHold
         final Map<Class<?>, DataManipulator<?, ?>> manipulators = getRawAdditionalContainers();
         if (manipulators != null) {
             final Class<?> key = valueContainer.getClass();
-            final DataManipulator<?, ?> old = manipulators.put(key, valueContainer);
+            final DataManipulator<?, ?> old = manipulators.get(key);
+            final DataManipulator<?, ?> merged = function.merge(old, valueContainer);
 
             final DataTransactionResult.Builder builder = DataTransactionResult.builder().result(DataTransactionResult.Type.SUCCESS);
-            builder.success(valueContainer.getValues());
+            builder.success(merged.getValues());
             if (old != null) {
                 builder.replace(old.getValues());
             }

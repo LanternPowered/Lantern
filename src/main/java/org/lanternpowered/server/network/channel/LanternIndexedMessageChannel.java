@@ -29,8 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import org.lanternpowered.server.game.Lantern;
@@ -72,7 +70,7 @@ final class LanternIndexedMessageChannel extends LanternChannelBinding implement
         }
     }
 
-    private final EnumMap<Platform.Type, RegistrationLookup> registrations = Maps.newEnumMap(Platform.Type.class);
+    private final EnumMap<Platform.Type, RegistrationLookup> registrations = new EnumMap<>(Platform.Type.class);
 
     LanternIndexedMessageChannel(LanternChannelRegistrar registrar, String name, PluginContainer owner) {
         super(registrar, name, owner);
@@ -196,7 +194,7 @@ final class LanternIndexedMessageChannel extends LanternChannelBinding implement
         checkState(this.bound);
         checkNotNull(message, "message");
         validateRegistration(message.getClass(), Platform.Type.CLIENT);
-        this.registrar.sendPayload(player, this.name, buf -> encode(message, buf));
+        getRegistrar().sendPayload(player, getName(), buf -> encode(message, buf));
     }
 
     @Override
@@ -211,7 +209,7 @@ final class LanternIndexedMessageChannel extends LanternChannelBinding implement
         checkState(this.bound);
         checkNotNull(message, "message");
         validateRegistration(message.getClass(), Platform.Type.CLIENT);
-        this.registrar.sendPayloadToAll(this.name, buf -> encode(message, buf));
+        getRegistrar().sendPayloadToAll(getName(), buf -> encode(message, buf));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -223,7 +221,7 @@ final class LanternIndexedMessageChannel extends LanternChannelBinding implement
                 .opcodeToRegistration.get(opcode);
         if (registration == null) {
             Lantern.getLogger().warn("Received unexpected message type with id: {}" +
-                    " in the indexed message channel: {}", opcode, this.name);
+                    " in the indexed message channel: {}", opcode, getName());
             return;
         }
 

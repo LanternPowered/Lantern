@@ -23,50 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.channel;
+package org.lanternpowered.server.data.manipulator;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.spongepowered.api.network.ChannelBinding;
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableData;
 
-abstract class LanternChannelBinding implements ChannelBinding {
+final class RegistrationImmutableManipulatorDataBuilder<I extends AbstractImmutableData<I, ?>>
+        extends AbstractImmutableData.AbstractImmutableManipulatorDataBuilder<I> {
 
-    private final LanternChannelRegistrar registrar;
-    private final PluginContainer owner;
-    private final String name;
+    private final DataManipulatorRegistration<?, I> registration;
 
-    boolean bound;
-
-    LanternChannelBinding(LanternChannelRegistrar registrar, String name, PluginContainer owner) {
-        this.registrar = registrar;
-        this.owner = owner;
-        this.name = name;
+    RegistrationImmutableManipulatorDataBuilder(Class<I> requiredClass, int supportedVersion,
+            DataManipulatorRegistration<?, I> registration) {
+        super(requiredClass, supportedVersion);
+        this.registration = registration;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public LanternChannelRegistrar getRegistrar() {
-        return this.registrar;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public PluginContainer getOwner() {
-        return this.owner;
-    }
-
-    abstract void handlePayload(ByteBuffer buf, RemoteConnection connection);
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("plugin", this.owner)
-                .add("name", this.name)
-                .toString();
+    protected I buildManipulator() {
+        return this.registration.getImmutableManipulatorSupplier().get();
     }
 }

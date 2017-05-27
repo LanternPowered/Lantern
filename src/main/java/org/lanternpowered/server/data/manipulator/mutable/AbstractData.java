@@ -31,7 +31,7 @@ import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
-import org.lanternpowered.server.data.manipulator.ManipulatorHelper;
+import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipulator;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolder;
@@ -40,7 +40,6 @@ import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
 import org.lanternpowered.server.util.collect.Collections3;
-import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.util.functions.TriFunction;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -235,7 +234,7 @@ public abstract class AbstractData<M extends DataManipulator<M, I>, I extends Im
     @SuppressWarnings("unchecked")
     @Override
     public DataContainer toContainer() {
-        return ManipulatorHelper.toContainer(this);
+        return DataHelper.toContainer(this);
     }
 
     @Override
@@ -281,7 +280,7 @@ public abstract class AbstractData<M extends DataManipulator<M, I>, I extends Im
         @SuppressWarnings("unchecked")
         @Override
         protected Optional<M> buildContent(DataView container) throws InvalidDataException {
-            return (Optional) ManipulatorHelper.buildContent(container, () -> (AbstractValueContainer) create());
+            return (Optional) DataHelper.buildContent(container, () -> (AbstractValueContainer) create());
         }
     }
 }

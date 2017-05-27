@@ -28,10 +28,9 @@ package org.lanternpowered.server.data.manipulator.gen;
 import static org.lanternpowered.server.data.manipulator.gen.TypeGenerator.newInternalName;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
-import org.lanternpowered.server.data.manipulator.ManipulatorHelper;
+import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableData;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
 import org.lanternpowered.server.data.value.IValueContainer;
@@ -149,7 +148,7 @@ public final class DataManipulatorGenerator {
         Key[] keys = new Key[methods.size()];
         for (int i = 0; i < methods.size(); i++) {
             final Method method = methods.get(i);
-            final String methodName = ManipulatorHelper.camelToSnake(method.getName());
+            final String methodName = DataHelper.camelToSnake(method.getName());
 
             int closestDistance = Integer.MAX_VALUE;
             Key closestKey = null;

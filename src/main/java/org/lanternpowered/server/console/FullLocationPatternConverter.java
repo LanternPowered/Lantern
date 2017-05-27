@@ -33,8 +33,10 @@ import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-@ConverterKeys({ "fqcn", "loc" })
-@Plugin(name = "FQCN", category = "Converter")
+import javax.annotation.Nullable;
+
+@ConverterKeys({ "fullLocation", "loc" })
+@Plugin(name = "fullLocation", category = "Converter")
 public final class FullLocationPatternConverter extends LogEventPatternConverter {
 
     // Packages that will be ignored
@@ -43,7 +45,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
     private final String format;
 
     private FullLocationPatternConverter(String format) {
-        super("FQCN", "fqcn");
+        super("FullLocation", "fullLocation");
         this.format = format;
     }
 
@@ -66,6 +68,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
         }
     }
 
+    @Nullable
     private static StackTraceElement calculateLocation(Set<String> fqcns) {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         StackTraceElement last = null;
@@ -96,5 +99,4 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
 
         return null;
     }
-
 }

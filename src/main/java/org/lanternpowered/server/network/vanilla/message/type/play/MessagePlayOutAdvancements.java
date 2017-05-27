@@ -33,7 +33,6 @@ import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,10 +73,10 @@ public final class MessagePlayOutAdvancements implements Message {
     @Override
     public String toString() {
         final MoreObjects.ToStringHelper progress = MoreObjects.toStringHelper("");
-        this.progress.entrySet().forEach(e -> {
+        this.progress.forEach((key, value) -> {
             final MoreObjects.ToStringHelper progressEntry = MoreObjects.toStringHelper("");
-            e.getValue().object2LongEntrySet().forEach(e2 -> progressEntry.add(e2.getKey(), e2.getLongValue()));
-            progress.add(e.getKey(), progressEntry.toString());
+            value.object2LongEntrySet().forEach(e2 -> progressEntry.add(e2.getKey(), e2.getLongValue()));
+            progress.add(key, progressEntry.toString());
         });
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
@@ -132,7 +131,7 @@ public final class MessagePlayOutAdvancements implements Message {
                     .add("id", this.id)
                     .add("parentId", this.parentId)
                     .add("display", this.display)
-                    .add("criteria", Arrays.toString(this.criteria.toArray(new String[0])))
+                    .add("criteria", Collections3.toString(this.criteria))
                     .toString();
         }
 

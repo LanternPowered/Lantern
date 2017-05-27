@@ -42,7 +42,7 @@ import com.flowpowered.math.vector.Vector4f;
 import com.flowpowered.math.vector.Vector4i;
 import com.flowpowered.math.vector.Vector4l;
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.data.DataQueries;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataQuery;
@@ -649,6 +649,7 @@ public final class DataTranslators {
         dataManager.registerTranslator(LocalDate.class, LOCAL_DATE_DATA_SERIALIZER);
         dataManager.registerTranslator(LocalDateTime.class, LOCAL_DATE_TIME_DATA_SERIALIZER);
         dataManager.registerTranslator(ZonedDateTime.class, ZONED_DATE_TIME_DATA_SERIALIZER);
+        dataManager.registerTranslator(Instant.class, INSTANT_DATA_SERIALIZER);
     }
 
 }

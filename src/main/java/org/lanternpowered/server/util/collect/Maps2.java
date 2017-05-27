@@ -25,16 +25,17 @@
  */
 package org.lanternpowered.server.util.collect;
 
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValueMap;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
@@ -43,12 +44,12 @@ public final class Maps2 {
 
     public static <K, V, B extends ExpirableValue<V>> ExpirableValueMap<K, V, B> createExpirableValueMap(
             BiFunction<K, V, B> backingEntrySupplier) {
-        return new ExpirableValueMapImpl<>(Maps.newHashMap(), backingEntrySupplier);
+        return new ExpirableValueMapImpl<>(new HashMap<>(), backingEntrySupplier);
     }
 
     public static <K, V, B extends ExpirableValue<V>> ExpirableValueMap<K, V, B> createConcurrentExpirableValueMap(
             BiFunction<K, V, B> backingEntrySupplier) {
-        return new ExpirableValueMapImpl<>(Maps.newConcurrentMap(), backingEntrySupplier);
+        return new ExpirableValueMapImpl<>(new ConcurrentHashMap<>(), backingEntrySupplier);
     }
 
     private static class ExpirableValueMapImpl<K, V, E extends ExpirableValue<V>> extends AbstractMap<K, V> implements ExpirableValueMap<K, V, E> {

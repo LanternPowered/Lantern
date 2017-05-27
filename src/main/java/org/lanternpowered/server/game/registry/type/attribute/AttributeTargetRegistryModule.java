@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.attribute;
 
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.attribute.AttributeTargets;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.entity.living.Living;
@@ -34,12 +33,14 @@ import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
 public final class AttributeTargetRegistryModule implements RegistryModule {
 
-    @RegisterCatalog(AttributeTargets.class) private final Map<String, Predicate<DataHolder>> targets = Maps.newHashMap();
+    @RegisterCatalog(AttributeTargets.class)
+    private final Map<String, Predicate<DataHolder>> targets = new HashMap<>();
 
     @Override
     public void registerDefaults() {
@@ -47,5 +48,4 @@ public final class AttributeTargetRegistryModule implements RegistryModule {
         this.targets.put("horse", target -> target instanceof Horse);
         this.targets.put("zombie", target -> target instanceof Zombie);
     }
-
 }

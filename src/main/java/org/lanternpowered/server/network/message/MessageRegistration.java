@@ -25,33 +25,34 @@
  */
 package org.lanternpowered.server.network.message;
 
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MessageRegistration<M extends Message> {
 
     private final Class<M> messageType;
     Optional<CodecRegistration<? super M, Codec<? super M>>> codecRegistration = Optional.empty();
     private Optional<Handler<? super M>> handler = Optional.empty();
-    private List<Processor<? super M>> processors = Lists.newArrayList();
+    private List<Processor<? super M>> processors = new ArrayList<>();
     private List<Processor<? super M>> unmodifiableProcessors = Collections.unmodifiableList(this.processors);
 
-    public MessageRegistration(Class<M> messageType) {
+    MessageRegistration(Class<M> messageType) {
         this.messageType = messageType;
     }
 
     /**
      * Gets the message type of this registration.
      *
-     * @return the message type
+     * @return The message type
      */
     public Class<M> getMessageType() {
         return this.messageType;
@@ -61,7 +62,7 @@ public final class MessageRegistration<M extends Message> {
      * Gets the {@link CodecRegistration} that is bound to this message registration,
      * may be {@link Optional#empty()}.
      *
-     * @return the codec registration
+     * @return The codec registration, if present
      */
     public Optional<CodecRegistration<? super M, Codec<? super M>>> getCodecRegistration() {
         return this.codecRegistration;
@@ -71,7 +72,7 @@ public final class MessageRegistration<M extends Message> {
      * Gets the {@link Handler} that is bound to this message registration,
      * may be {@link Optional#empty()}.
      *
-     * @return the handler
+     * @return The handler, if present
      */
     public Optional<Handler<? super M>> getHandler() {
         return this.handler;
@@ -80,7 +81,7 @@ public final class MessageRegistration<M extends Message> {
     /**
      * Gets the {@link Processor}s that are bound to this message registration.
      *
-     * @return the processors
+     * @return The processors
      */
     public List<Processor<? super M>> getProcessors() {
         return this.unmodifiableProcessors;
@@ -89,8 +90,8 @@ public final class MessageRegistration<M extends Message> {
     /**
      * Binds the handler to this message registration.
      *
-     * @param handler the handler
-     * @return this message registration
+     * @param handler The handler
+     * @return This message registration, for chaining
      */
     public MessageRegistration<M> bindHandler(@Nullable Handler<? super M> handler) {
         this.handler = Optional.ofNullable(handler);
@@ -100,8 +101,8 @@ public final class MessageRegistration<M extends Message> {
     /**
      * Binds the processor to this message registration.
      *
-     * @param processor the processor
-     * @return this message registration
+     * @param processor The processor
+     * @return This message registration, for chaining
      */
     public MessageRegistration<M> bindProcessor(Processor<? super M> processor) {
         this.processors.add(processor);
@@ -111,9 +112,9 @@ public final class MessageRegistration<M extends Message> {
     /**
      * Binds the processor to this message registration.
      *
-     * @param index the index to insert the processor at
-     * @param processor the processor
-     * @return this message registration
+     * @param index The index to insert the processor at
+     * @param processor The processor
+     * @return This message registration, for chaining
      */
     public MessageRegistration<M> bindProcessor(int index, Processor<? super M> processor) {
         if (index >= this.processors.size()) {
@@ -123,5 +124,4 @@ public final class MessageRegistration<M extends Message> {
         }
         return this;
     }
-
 }

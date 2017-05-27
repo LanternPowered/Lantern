@@ -42,7 +42,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHolder, DataManipulator<?,?>>, DataHolder, AbstractPropertyHolder {
+public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHolder, DataManipulator<?,?>>,
+        DataHolder, AbstractPropertyHolder {
 
     @SuppressWarnings("unchecked")
     @Override

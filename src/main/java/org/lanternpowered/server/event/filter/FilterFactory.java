@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-public class FilterFactory {
+public final class FilterFactory {
 
     private final AtomicInteger id = new AtomicInteger();
     private final DefineableClassLoader classLoader;
@@ -63,7 +63,7 @@ public class FilterFactory {
         final Class<?> eventClass = method.getParameterTypes()[0];
         final String name = this.targetPackage + eventClass.getSimpleName() + "Filter_" + handle.getSimpleName() + '_'
                 + method.getName() + this.id.incrementAndGet();
-        final byte[] cls = FilterGenerator.getInstance().generateClass(name, method);
+        final byte[] cls = FilterGenerator.get().generateClass(name, method);
         return this.classLoader.defineClass(name, cls);
     }
 }

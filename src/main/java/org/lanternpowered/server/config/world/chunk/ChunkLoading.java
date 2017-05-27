@@ -27,11 +27,11 @@ package org.lanternpowered.server.config.world.chunk;
 
 import static org.lanternpowered.server.config.ConfigConstants.OVERRIDES;
 
-import com.google.common.collect.Maps;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @ConfigSerializable
@@ -45,7 +45,7 @@ public abstract class ChunkLoading implements ChunkLoadingConfig {
     private static final MinecraftChunkLoadingTickets MINECRAFT = new MinecraftChunkLoadingTickets();
 
     @Setting(value = OVERRIDES, comment = "Plugin specific configuration for chunk loading control.")
-    private Map<String, PluginChunkLoadingTickets> pluginOverrides = Maps.newHashMap();
+    private Map<String, PluginChunkLoadingTickets> pluginOverrides = new HashMap<>();
 
     protected abstract ChunkLoadingTickets getDefaults();
 
@@ -62,5 +62,4 @@ public abstract class ChunkLoading implements ChunkLoadingConfig {
         // Fall back to default if not found
         return this.getDefaults();
     }
-
 }

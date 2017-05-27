@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
-import org.lanternpowered.server.data.manipulator.ManipulatorHelper;
+import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolderKeyRegistration;
@@ -138,7 +138,7 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
 
     @Override
     public DataContainer toContainer() {
-        return ManipulatorHelper.toContainer(this);
+        return DataHelper.toContainer(this);
     }
 
     @Override
@@ -169,7 +169,7 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
         @SuppressWarnings("unchecked")
         @Override
         protected Optional<I> buildContent(DataView container) throws InvalidDataException {
-            return (Optional) ManipulatorHelper.buildContent(container, () ->  (AbstractValueContainer) create());
+            return (Optional) DataHelper.buildContent(container, () ->  (AbstractValueContainer) create());
         }
 
         protected abstract I create();

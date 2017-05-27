@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.util;
+package org.lanternpowered.server.data;
 
 import static org.spongepowered.api.data.DataQuery.of;
 
@@ -35,10 +35,11 @@ public final class DataQueries {
     }
 
     // General DataQueries
-    public static final DataQuery UNSAFE_NBT = of("UnsafeData");
     public static final DataQuery DATA_MANIPULATORS = of("Data");
-    public static final DataQuery DATA_CLASS = of("DataClass");
-    public static final DataQuery INTERNAL_DATA = of("ManipulatorData");
+    public static final DataQuery DATA_VALUES = of("DataValues");
+
+    public static final DataQuery MANIPULATOR_ID = of("ManipulatorId");
+    public static final DataQuery MANIPULATOR_DATA = of("ManipulatorData");
 
     // Snapshots
     public static final DataQuery SNAPSHOT_WORLD_POSITION = of("Position");

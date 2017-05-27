@@ -25,11 +25,13 @@
  */
 package org.lanternpowered.server.data.io.store.data;
 
+import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
+
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.data.DataHelper;
+import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipulator;
-import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
@@ -40,13 +42,10 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -98,10 +97,8 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 }
             }
 
-            final Map<Class<?>, H> additionalManipulators = valueContainer.getRawAdditionalContainers();
-            if (additionalManipulators != null) {
-                deserializeAdditionalData(object, new ArrayList<>(additionalManipulators.values()), dataView);
-            }
+            dataView.getView(DataQueries.SPONGE_DATA).ifPresent(view ->
+                    DataHelper.applyRawContainerData(dataView, valueContainer, DataQueries.CUSTOM_MANIPULATORS));
         } else {
             // Not sure what to do
         }
@@ -148,43 +145,11 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 }
             }
 
-            final Map<Class<?>, H> additionalContainers = valueContainer.getRawAdditionalContainers();
-            if (additionalContainers != null) {
-                final List<H> dataManipulators = new ArrayList<>();
-                serializeAdditionalData(object, dataManipulators, dataView);
-                for (H additionalContainer : dataManipulators) {
-                    if (additionalContainer instanceof IDataManipulator) {
-                        additionalContainers.put(((IDataManipulator) additionalContainer).getMutableType(), additionalContainer);
-                    } else if (additionalContainer instanceof IImmutableDataManipulator) {
-                        additionalContainers.put(((IImmutableDataManipulator) additionalContainer).getImmutableType(), additionalContainer);
-                    } else {
-                        additionalContainers.put(additionalContainer.getClass(), additionalContainer);
-                    }
-                }
-            }
+            DataHelper.serializeRawContainerData(getOrCreateView(dataView, DataQueries.SPONGE_DATA),
+                    valueContainer, DataQueries.CUSTOM_MANIPULATORS);
         } else {
             // Not sure what to do
         }
-    }
-
-    /**
-     * Serializes all the {@link DataManipulator}s and puts
-     * them into the {@link DataView}.
-     *
-     * @param manipulators The data manipulators
-     * @param dataView The data view
-     */
-    public void serializeAdditionalData(T object, List<H> manipulators, DataView dataView) {
-    }
-
-    /**
-     * Deserializes all the {@link ValueContainer<H>}s from the {@link DataView}
-     * and puts them into the {@link List}.
-     *
-     * @param valueContainers The value containers
-     * @param dataView The data view
-     */
-    public void deserializeAdditionalData(T object, List<H> valueContainers, DataView dataView) {
     }
 
     /**

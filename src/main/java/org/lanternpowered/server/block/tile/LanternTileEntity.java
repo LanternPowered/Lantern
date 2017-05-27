@@ -26,6 +26,7 @@
 package org.lanternpowered.server.block.tile;
 
 import org.lanternpowered.server.data.AbstractDataHolder;
+import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
@@ -34,6 +35,7 @@ import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -45,6 +47,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class LanternTileEntity implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
+
+    public static final DataQuery TILE_ENTITY_TYPE = DataQuery.of("TileEntityType");
+    public static final DataQuery POSITION = DataQuery.of("Position");
 
     private static boolean bypassEntityTypeLookup;
 
@@ -72,11 +77,12 @@ public abstract class LanternTileEntity implements TileEntity, AbstractDataHolde
 
     @Override
     public boolean validateRawData(DataView dataView) {
-        return false;
+        return true;
     }
 
     @Override
     public void setRawData(DataView dataView) throws InvalidDataException {
+        DataHelper.applyRawData(dataView, this);
     }
 
     @Override
@@ -116,14 +122,16 @@ public abstract class LanternTileEntity implements TileEntity, AbstractDataHolde
 
     @Override
     public DataContainer toContainer() {
-        final DataContainer dataContainer = AbstractDataHolder.super.toContainer();
-        // TODO: Add block position, tile type, etc.
+        final DataContainer dataContainer = DataContainer.createNew()
+                .set(TILE_ENTITY_TYPE, getType());
+        DataHelper.serializeVector3i(dataContainer.createView(POSITION), getLocation().getBlockPosition());
+        DataHelper.serializeRawData(dataContainer, this);
         return dataContainer;
     }
 
     @Override
     public DataHolder copy() {
-        return null;
+        return this;
     }
 
     /**

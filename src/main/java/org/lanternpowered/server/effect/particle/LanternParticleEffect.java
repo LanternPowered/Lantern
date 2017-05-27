@@ -26,7 +26,7 @@
 package org.lanternpowered.server.effect.particle;
 
 import com.google.common.collect.ImmutableMap;
-import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.data.DataQueries;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOption;

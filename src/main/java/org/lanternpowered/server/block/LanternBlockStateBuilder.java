@@ -26,9 +26,9 @@
 package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.util.DataUtil.checkDataExists;
+import static org.lanternpowered.server.data.DataHelper.checkDataExists;
 
-import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.data.DataQueries;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;

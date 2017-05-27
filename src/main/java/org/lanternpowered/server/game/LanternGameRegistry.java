@@ -31,7 +31,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.api.script.context.Parameter;
@@ -594,7 +593,7 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private void registerFactories() {
-        final List<FactoryRegistry<?, ?>> factoryRegistries = Lists.newArrayList();
+        final List<FactoryRegistry<?, ?>> factoryRegistries = new ArrayList<>();
         factoryRegistries.add(new ResourcePackFactoryModule());
 
         try {
@@ -863,15 +862,15 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private void registerModulePhase() {
-        this.syncModules();
+        syncModules();
         for (Class<? extends RegistryModule> moduleClass : this.orderedModules) {
             if (!this.classMap.containsKey(moduleClass)) {
                 throw new IllegalStateException("Something funky happened! The module "
                         + moduleClass + " is required but seems to be missing.");
             }
-            this.tryModulePhaseRegistration(this.classMap.get(moduleClass));
+            tryModulePhaseRegistration(this.classMap.get(moduleClass));
         }
-        this.registerAdditionalPhase();
+        registerAdditionalPhase();
     }
 
     private void registerAdditionalPhase() {
@@ -883,7 +882,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     private void addToGraph(RegistryModule module, DirectedGraph<Class<? extends RegistryModule>> graph) {
         graph.add(module.getClass());
-        RegistrationDependency dependency = module.getClass().getAnnotation(RegistrationDependency.class);
+        final RegistrationDependency dependency = module.getClass().getAnnotation(RegistrationDependency.class);
         if (dependency != null) {
             for (Class<? extends RegistryModule> dependent : dependency.value()) {
                 graph.addEdge(checkNotNull(module.getClass(), "Dependency class was null!"), dependent);
@@ -897,7 +896,7 @@ public class LanternGameRegistry implements GameRegistry {
      * @return the world generator modifier registry
      */
     public GeneratorModifierRegistryModule getWorldGeneratorModifierRegistry() {
-        return this.getRegistryModule(GeneratorModifierRegistryModule.class).get();
+        return getRegistryModule(GeneratorModifierRegistryModule.class).get();
     }
 
     /**
@@ -906,7 +905,7 @@ public class LanternGameRegistry implements GameRegistry {
      * @return the attribute registry
      */
     public AttributeRegistryModule getAttributeRegistry() {
-        return this.getRegistryModule(AttributeRegistryModule.class).get();
+        return getRegistryModule(AttributeRegistryModule.class).get();
     }
 
     /**
@@ -1053,13 +1052,13 @@ public class LanternGameRegistry implements GameRegistry {
     @Deprecated
     @Override
     public TextSerializerFactory getTextSerializerFactory() {
-        return this.getRegistryModule(TextSerializersRegistryModule.class).get().getTextSerializerFactory();
+        return getRegistryModule(TextSerializersRegistryModule.class).get().getTextSerializerFactory();
     }
 
     @Deprecated
     @Override
     public LanternSelectorFactory getSelectorFactory() {
-        return this.getRegistryModule(SelectorFactoryRegistryModule.class).get().getFactory();
+        return getRegistryModule(SelectorFactoryRegistryModule.class).get().getFactory();
     }
 
     @Override

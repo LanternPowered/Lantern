@@ -31,6 +31,7 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
@@ -302,6 +303,7 @@ public class LanternEventManager implements EventManager {
         unregister(handler -> plugin.equals(handler.getPlugin()));
     }
 
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     @Override
     public boolean post(Event event) {
         checkNotNull(event, "event");
@@ -310,7 +312,6 @@ public class LanternEventManager implements EventManager {
                 if (event instanceof AbstractEvent) {
                     ((AbstractEvent) event).currentOrder = listener.getOrder();
                 }
-                //noinspection unchecked
                 listener.handle(event);
             } catch (Throwable e) {
                 this.logger.error("Could not pass {} to {}", event.getClass().getSimpleName(),
@@ -318,7 +319,6 @@ public class LanternEventManager implements EventManager {
             }
         }
         if (event instanceof AbstractEvent) {
-            //noinspection ConstantConditions
             ((AbstractEvent) event).currentOrder = null;
         }
         return event instanceof Cancellable && ((Cancellable) event).isCancelled();

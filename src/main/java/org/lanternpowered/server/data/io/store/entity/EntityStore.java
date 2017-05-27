@@ -25,29 +25,25 @@
  */
 package org.lanternpowered.server.data.io.store.entity;
 
-import static org.lanternpowered.server.data.util.DataUtil.deserializeManipulatorList;
-import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
-import static org.lanternpowered.server.data.util.DataUtil.getSerializedManipulatorList;
+import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.IdentifiableObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -84,11 +80,6 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     private static final DataQuery ABSORPTION_AMOUNT = DataQuery.of("AbsorptionAmount");
     private static final DataQuery CAN_PICK_UP_LOOT = DataQuery.of("CanPickUpLoot");
     private static final DataQuery POTION_EFFECTS = DataQuery.of("ActiveEffects");
-    private static final DataQuery POTION_EFFECT_ID = DataQuery.of("Id");
-    private static final DataQuery POTION_EFFECT_AMPLIFIER = DataQuery.of("Amplifier");
-    private static final DataQuery POTION_EFFECT_DURATION = DataQuery.of("Duration");
-    private static final DataQuery POTION_EFFECT_AMBIENT = DataQuery.of("Ambient");
-    private static final DataQuery POTION_EFFECT_SHOW_PARTICLES = DataQuery.of("ShowParticles");
     private static final DataQuery EXHAUSTION = DataQuery.of("foodExhaustionLevel");
     private static final DataQuery SATURATION = DataQuery.of("foodSaturationLevel");
     private static final DataQuery FOOD_LEVEL = DataQuery.of("foodLevel");
@@ -234,7 +225,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
             }
             valueContainer.set(Keys.POTION_EFFECTS, v.stream()
                     .map(PotionEffectSerializer::deserialize)
-                    .filter(effect -> effect != null)
+                    .filter(Objects::nonNull)
                     .collect(ImmutableList.toImmutableList()));
         });
         dataView.getInt(FOOD_LEVEL).ifPresent(v -> valueContainer.set(Keys.FOOD_LEVEL, v));
@@ -244,23 +235,5 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         dataView.getInt(IS_GLOWING).ifPresent(v -> valueContainer.set(Keys.GLOWING, v > 0));
 
         super.deserializeValues(object, valueContainer, dataView);
-    }
-
-    @Override
-    public void serializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
-        DataView spongeData = getOrCreateView(dataView, SPONGE_DATA);
-        if (!manipulators.isEmpty()) {
-            spongeData.set(DataQueries.CUSTOM_MANIPULATORS, getSerializedManipulatorList(manipulators));
-        }
-    }
-
-    @Override
-    public void deserializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
-        try {
-            dataView.getView(SPONGE_DATA).ifPresent(view -> dataView.getViewList(DataQueries.CUSTOM_MANIPULATORS)
-                    .ifPresent(views -> manipulators.addAll(deserializeManipulatorList(views))));
-        } catch (InvalidDataException e) {
-            Lantern.getLogger().error("Could not deserialize custom plugin data! ", e);
-        }
     }
 }

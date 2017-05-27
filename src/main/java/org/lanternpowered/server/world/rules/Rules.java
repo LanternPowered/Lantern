@@ -28,16 +28,16 @@ package org.lanternpowered.server.world.rules;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public final class Rules implements RuleHolder {
 
-    private final Map<RuleType<?>, Rule<?>> rules = Maps.newHashMap();
+    private final Map<RuleType<?>, Rule<?>> rules = new HashMap<>();
     private final LanternWorldProperties worldProperties;
 
     public Rules(LanternWorldProperties worldProperties) {
@@ -74,5 +74,4 @@ public final class Rules implements RuleHolder {
     public Optional<LanternWorld> getWorld() {
         return this.worldProperties.getWorld();
     }
-
 }

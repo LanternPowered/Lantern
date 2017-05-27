@@ -30,8 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore;
@@ -45,6 +43,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,8 +52,8 @@ public class LanternObjective implements Objective {
 
     private final String name;
     private final Criterion criterion;
-    final Map<Text, Score> scores = Maps.newHashMap();
-    final Set<Scoreboard> scoreboards = Sets.newHashSet();
+    final Map<Text, Score> scores = new HashMap<>();
+    final Set<Scoreboard> scoreboards = new HashSet<>();
     private ObjectiveDisplayMode displayMode;
     private Text displayName;
     private String legacyDisplayName;

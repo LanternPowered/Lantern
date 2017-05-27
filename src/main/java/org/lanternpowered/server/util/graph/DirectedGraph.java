@@ -25,15 +25,14 @@
  */
 package org.lanternpowered.server.util.graph;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DirectedGraph<D> {
 
-    protected final List<DataNode<D>> nodes = Lists.newArrayList();
+    private final List<DataNode<D>> nodes = new ArrayList<>();
 
     public DirectedGraph() {
 
@@ -95,7 +94,7 @@ public class DirectedGraph<D> {
 
     public DirectedGraph<D> reverse() {
         DirectedGraph<D> rev = new DirectedGraph<>();
-        Map<DataNode<D>, DataNode<D>> siblings = Maps.newHashMap();
+        Map<DataNode<D>, DataNode<D>> siblings = new HashMap<>();
         for (DataNode<D> n : this.nodes) {
             DataNode<D> b = n.clone();
             siblings.put(n, b);
@@ -157,7 +156,7 @@ public class DirectedGraph<D> {
 
     public static class DataNode<D> {
 
-        private final List<DataNode<D>> adj = Lists.newArrayList();
+        private final List<DataNode<D>> adj = new ArrayList<>();
         private final D data;
 
         public DataNode(D obj) {

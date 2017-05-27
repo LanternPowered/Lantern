@@ -27,14 +27,15 @@ package org.lanternpowered.server.world.rules;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Maps;
+import com.google.common.base.MoreObjects;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public final class RuleType<T> {
 
-    private static final Map<String, RuleType> rulesByName = Maps.newHashMap();
+    private static final Map<String, RuleType> rulesByName = new HashMap<>();
 
     public static Optional<RuleType<?>> get(String name) {
         checkNotNull(name, "name");
@@ -91,7 +92,7 @@ public final class RuleType<T> {
     /**
      * Gets the name of the rule type.
      *
-     * @return the name
+     * @return The name
      */
     public String getName() {
         return this.name;
@@ -100,7 +101,7 @@ public final class RuleType<T> {
     /**
      * Gets the default value of this rule type.
      *
-     * @return the value
+     * @return The default value
      */
     public T getDefaultValue() {
         return this.defaultValue;
@@ -109,10 +110,18 @@ public final class RuleType<T> {
     /**
      * Gets the data type of this rule.
      *
-     * @return the data type
+     * @return The data type
      */
     public RuleDataType<T> getDataType() {
         return this.dataType;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("name", this.name)
+                .add("dataType", this.dataType.getType())
+                .add("defaultValue", this.defaultValue)
+                .toString();
+    }
 }

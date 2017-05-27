@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.util.collect;
 
-import com.google.common.collect.Maps;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -56,7 +56,7 @@ public final class Sets2 {
      * @return the weak hash set
      */
     public static <T> Set<T> newWeakHashSet(Iterable<? extends T> objects) {
-        Map<T, Boolean> map = Maps.newHashMap();
+        final Map<T, Boolean> map = new HashMap<>();
         for (T object : objects) {
             map.put(object, true);
         }

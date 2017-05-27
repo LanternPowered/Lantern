@@ -27,7 +27,10 @@ package org.lanternpowered.server.text;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.lanternpowered.server.data.io.store.ObjectSerializer;
+import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.data.translator.JsonTranslator;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -35,6 +38,8 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
@@ -62,6 +67,7 @@ public final class LanternTextHelper {
     private static final DataQuery SHOW_ENTITY_TYPE = DataQuery.of("type");
     private static final DataQuery SHOW_ENTITY_NAME = DataQuery.of("name");
 
+    @Nullable
     public static ClickAction<?> parseClickAction(String action, String value) {
         switch (action) {
             case "open_url":
@@ -96,7 +102,7 @@ public final class LanternTextHelper {
             case "suggest_command":
                 return TextActions.suggestCommand(value);
             case "change_page":
-                Optional<Integer> page = Coerce.asInteger(value);
+                final Optional<Integer> page = Coerce.asInteger(value);
                 if (page.isPresent()) {
                     return TextActions.changePage(page.get());
                 }
@@ -108,23 +114,28 @@ public final class LanternTextHelper {
         return null;
     }
 
+    private static final ObjectSerializer<LanternItemStack> itemStackSerializer =
+            ObjectSerializerRegistry.get().get(LanternItemStack.class).get();
+
     @SuppressWarnings("deprecation")
     public static HoverAction<?> parseHoverAction(String action, String value) {
+        final DataView dataView;
         switch (action) {
             case "show_text":
                 return TextActions.showText(TextSerializers.LEGACY_FORMATTING_CODE.deserializeUnchecked(value));
-            case "show_achievement":
-                return null; // TODO
             case "show_item":
-                return null; // TODO
+                dataView = JsonTranslator.instance().translate(GSON.fromJson(value, JsonObject.class));
+                final ItemStack itemStack = itemStackSerializer.deserialize(dataView);
+                return TextActions.showItem(itemStack.createSnapshot());
             case "show_entity":
-                DataView dataView = JsonTranslator.instance().translate(GSON.fromJson(value, JsonObject.class));
+                dataView = JsonTranslator.instance().translate(GSON.fromJson(value, JsonObject.class));
 
-                UUID uuid = UUID.fromString(dataView.getString(SHOW_ENTITY_ID).get());
-                String name = dataView.getString(SHOW_ENTITY_NAME).get();
+                final UUID uuid = UUID.fromString(dataView.getString(SHOW_ENTITY_ID).get());
+                final String name = dataView.getString(SHOW_ENTITY_NAME).get();
                 EntityType entityType = null;
                 if (dataView.contains(SHOW_ENTITY_TYPE)) {
-                    entityType = Sponge.getRegistry().getType(EntityType.class, dataView.getString(SHOW_ENTITY_TYPE).get()).orElse(null);
+                    entityType = Sponge.getRegistry().getType(EntityType.class,
+                            dataView.getString(SHOW_ENTITY_TYPE).get()).orElse(null);
                 }
 
                 return TextActions.showEntity(uuid, name, entityType);
@@ -167,12 +178,14 @@ public final class LanternTextHelper {
             final DataContainer dataContainer = DataContainer.createNew()
                     .set(SHOW_ENTITY_ID, ref.getUniqueId().toString())
                     .set(SHOW_ENTITY_NAME, ref.getName());
-            // TODO
-            // ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, ((LanternEntityType) type).getMinecraftId()));
+            ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, type.getId()));
 
             return new RawAction("show_entity", GSON.toJson(JsonTranslator.instance().translate(dataContainer)));
         } else if (hoverAction instanceof HoverAction.ShowItem) {
-            return null; // TODO
+            final ItemStackSnapshot itemStackSnapshot = ((HoverAction.ShowItem) hoverAction).getResult();
+            final LanternItemStack itemStack = (LanternItemStack) itemStackSnapshot.createStack();
+            final DataView dataView = itemStackSerializer.serialize(itemStack);
+            return new RawAction("show_item", GSON.toJson(JsonTranslator.instance().translate(dataView)));
         } else {
             throw new IllegalArgumentException("Unknown hover action type: " + hoverAction.getClass().getName());
         }

@@ -39,6 +39,7 @@ import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.SkinPart;
@@ -51,6 +52,13 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 public final class LanternKeys {
+
+    // Internal key when data failed to deserialize,
+    // please don't touch it!
+    public static final Key<ListValue<DataView>> FAILED_DATA_MANIPULATORS =
+            makeListKey(DataView.class, DataQuery.of("FailedDataManipulators"), "lantern:failed_data_manipulators");
+    public static final Key<Value<DataView>> FAILED_DATA_VALUES =
+            makeValueKey(DataView.class, DataQuery.of("FailedDataValues"), "lantern:failed_data_values");
 
     public static final Key<Value<Boolean>> INVULNERABLE =
             makeValueKey(Boolean.class, DataQuery.of("Invulnerable"), "lantern:invulnerability");

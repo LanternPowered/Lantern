@@ -28,7 +28,6 @@ package org.lanternpowered.server.world.gen.flat;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.event.cause.Cause;
@@ -37,6 +36,7 @@ import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class FlatGenerationPopulator implements GenerationPopulator {
@@ -54,7 +54,7 @@ public final class FlatGenerationPopulator implements GenerationPopulator {
     public FlatGenerationPopulator(FlatGeneratorSettings settings, int generatorHeight) {
         checkNotNull(settings, "settings");
 
-        List<BlockState> blockStates = Lists.newArrayList();
+        List<BlockState> blockStates = new ArrayList<>();
         for (FlatLayer layer : settings.getLayers()) {
             final BlockState blockState = layer.getBlockState();
             for (int i = 0; i < layer.getDepth(); i++) {

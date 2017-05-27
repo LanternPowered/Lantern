@@ -27,7 +27,6 @@ package org.lanternpowered.server.text.selector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
@@ -35,15 +34,16 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.selector.ArgumentType;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T>> implements ArgumentType<T> {
 
-    private static final Map<String, Function<String, ?>> converters = Maps.newHashMap();
+    private static final Map<String, Function<String, ?>> converters = new HashMap<>();
 
     static {
-        converters.put(String.class.getName(), Function.<String>identity());
+        converters.put(String.class.getName(), Function.identity());
         converters.put(EntityType.class.getName(), input ->
                 Sponge.getRegistry().getType(EntityType.class, input).orElse(null));
     }

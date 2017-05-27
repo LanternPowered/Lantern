@@ -41,7 +41,6 @@ import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
@@ -260,7 +259,7 @@ public final class LanternServer implements Server {
             try {
                 this.favicon = LanternFavicon.load(faviconPath);
             } catch (IOException e) {
-                Lantern.getLogger().error("Failed to load the favicon", e);
+                this.logger.error("Failed to load the favicon", e);
             }
         }
 
@@ -269,7 +268,7 @@ public final class LanternServer implements Server {
             try {
                 this.resourcePack = ResourcePacks.fromUri(URI.create(resourcePackPath));
             } catch (FileNotFoundException e) {
-                Lantern.getLogger().warn("Couldn't find a valid resource pack at the location: {}", resourcePackPath, e);
+                this.logger.warn("Couldn't find a valid resource pack at the location: {}", resourcePackPath, e);
             }
         }
 
@@ -277,7 +276,7 @@ public final class LanternServer implements Server {
             try {
                 pulse();
             } catch (Exception e) {
-                Lantern.getLogger().error("Error while pulsing", e);
+                this.logger.error("Error while pulsing", e);
             }
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
@@ -314,7 +313,7 @@ public final class LanternServer implements Server {
             throw new RuntimeException("Failed to bind to address", cause);
         }
 
-        Lantern.getLogger().info("Successfully bound to: " + channel.localAddress());
+        this.logger.info("Successfully bound to: " + channel.localAddress());
     }
 
     private void bindQuery() {
@@ -572,7 +571,7 @@ public final class LanternServer implements Server {
 
     @Override
     public void shutdown() {
-        this.shutdown(this.game.getGlobalConfig().getShutdownMessage());
+        shutdown(this.game.getGlobalConfig().getShutdownMessage());
     }
 
     @SuppressWarnings("deprecation")
@@ -588,7 +587,7 @@ public final class LanternServer implements Server {
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppingServerEvent(gameCause));
 
         // Debug a message
-        Lantern.getLogger().info("Stopping the server... ({})", LanternTexts.toLegacy(kickMessage));
+        this.logger.info("Stopping the server... ({})", LanternTexts.toLegacy(kickMessage));
 
         // Stop the console
         this.consoleManager.shutdown();
@@ -639,7 +638,7 @@ public final class LanternServer implements Server {
                 try {
                     ((CloseableService) service).close();
                 } catch (Exception e) {
-                    Lantern.getLogger().error("A error occurred while closing the {}.", provider.getService().getName(), e);
+                    this.logger.error("A error occurred while closing the {}.", provider.getService().getName(), e);
                 }
             }
         });
@@ -651,14 +650,14 @@ public final class LanternServer implements Server {
             try {
                 ((CloseableService) cache).close();
             } catch (Exception e) {
-                Lantern.getLogger().error("A error occurred while closing the GameProfileCache.", e);
+                this.logger.error("A error occurred while closing the GameProfileCache.", e);
             }
         }
 
         try {
             this.game.getOpsConfig().save();
         } catch (IOException e) {
-            Lantern.getLogger().error("A error occurred while saving the ops config.", e);
+            this.logger.error("A error occurred while saving the ops config.", e);
         }
 
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppedServerEvent(gameCause));
@@ -681,8 +680,7 @@ public final class LanternServer implements Server {
 
     @Override
     public double getTicksPerSecond() {
-        // TODO Auto-generated method stub
-        return 0;
+        return LanternGame.TICKS_PER_SECOND; // TODO
     }
 
     @Override

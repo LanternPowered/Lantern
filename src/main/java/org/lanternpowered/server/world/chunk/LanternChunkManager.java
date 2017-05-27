@@ -203,7 +203,7 @@ public final class LanternChunkManager {
         // The future attached to this callable
         @Nullable private Future<Void> future;
 
-        public LanternChunkQueueTask(Vector2i coords, Runnable runnable) {
+        LanternChunkQueueTask(Vector2i coords, Runnable runnable) {
             this.runnable = runnable;
             this.coords = coords;
         }

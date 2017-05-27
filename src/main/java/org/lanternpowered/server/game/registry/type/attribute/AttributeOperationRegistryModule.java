@@ -35,21 +35,27 @@ import org.lanternpowered.server.attribute.LanternOperations;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public final class AttributeOperationRegistryModule implements CatalogRegistryModule<LanternOperation> {
 
-    @RegisterCatalog(LanternOperations.class) private final Map<String, LanternOperation> operations = Maps.newHashMap();
+    @RegisterCatalog(LanternOperations.class)
+    private final Map<String, LanternOperation> operations = new HashMap<>();
 
     @Override
     public void registerDefaults() {
-        List<LanternOperation> types = Lists.newArrayList();
-        types.add(new LanternOperation("add_amount", 3, false, (base, modifier, current) -> modifier));
-        types.add(new LanternOperation("multiply", 2, false, (base, modifier, current) -> current * modifier - current));
-        types.add(new LanternOperation("multiply_base", 1, false, (base, modifier, current) -> base * modifier - current));
+        final List<LanternOperation> types = new ArrayList<>();
+        types.add(new LanternOperation("add_amount", 3, false,
+                (base, modifier, current) -> modifier));
+        types.add(new LanternOperation("multiply", 2, false,
+                (base, modifier, current) -> current * modifier - current));
+        types.add(new LanternOperation("multiply_base", 1, false,
+                (base, modifier, current) -> base * modifier - current));
         types.forEach(type -> this.operations.put(type.getId(), type));
     }
 
@@ -62,5 +68,4 @@ public final class AttributeOperationRegistryModule implements CatalogRegistryMo
     public Collection<LanternOperation> getAll() {
         return ImmutableList.copyOf(this.operations.values());
     }
-
 }

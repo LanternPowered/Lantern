@@ -33,10 +33,10 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.AbstractDataHolder;
+import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
-import org.lanternpowered.server.entity.event.DamageEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
@@ -46,6 +46,7 @@ import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -82,6 +83,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 public class LanternEntity implements Entity, AbstractDataHolder, AbstractPropertyHolder {
+
+    public static final DataQuery ENTITY_TYPE = DataQuery.of("EntityType");
+    public static final DataQuery POSITION = DataQuery.of("Position");
+    public static final DataQuery ROTATION = DataQuery.of("Rotation");
 
     @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;
@@ -312,8 +317,10 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
 
     @Override
     public void setRawData(DataView dataView) throws InvalidDataException {
-        // TODO Auto-generated method stub
-        
+        checkNotNull(dataView, "dataView");
+        setPosition(DataHelper.deserializeVector3d(dataView.getView(POSITION).get()));
+        setRotation(DataHelper.deserializeVector3d(dataView.getView(ROTATION).get()));
+        DataHelper.applyRawData(dataView, this);
     }
 
     @Override
@@ -323,8 +330,12 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
 
     @Override
     public DataContainer toContainer() {
-        // TODO Auto-generated method stub
-        return null;
+        final DataContainer dataContainer = DataContainer.createNew()
+                .set(ENTITY_TYPE, getType());
+        DataHelper.serializeVector3d(dataContainer.createView(POSITION), getPosition());
+        DataHelper.serializeVector3d(dataContainer.createView(ROTATION), getRotation());
+        DataHelper.serializeRawData(dataContainer, this);
+        return dataContainer;
     }
 
     @Override

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.io.store.item;
 
-import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
+import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.data.io.store.ObjectSerializer;

@@ -33,7 +33,7 @@ import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.IOHelper;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.translator.JsonTranslator;
-import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.world.MoonPhase;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;

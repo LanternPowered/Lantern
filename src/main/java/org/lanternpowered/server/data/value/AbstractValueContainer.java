@@ -234,7 +234,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
         final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
-                if (valueProcessor.getApplicableTester().test((Key) key, this)) {
+                if (valueProcessor.getApplicableTester().test(key, this)) {
                     return getWith(key, valueProcessor);
                 }
             }
@@ -286,7 +286,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
         final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
-                if (valueProcessor.getApplicableTester().test((Key) key, this)) {
+                if (valueProcessor.getApplicableTester().test(key, this)) {
                     return getValueWith(key, valueProcessor);
                 }
             }
@@ -329,9 +329,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
         for (Map.Entry<Key<?>, KeyRegistration> entry : getRawValueMap().entrySet()) {
             final Key key = entry.getKey();
             final Optional<BaseValue> optValue = getValue(key);
-            if (optValue.isPresent()) {
-                values.add(ValueHelper.toImmutable(optValue.get()));
-            }
+            optValue.ifPresent(baseValue -> values.add(ValueHelper.toImmutable(baseValue)));
         }
         final Map<Class<?>, H> valueContainers = getRawAdditionalContainers();
         // Custom data is supported by this container

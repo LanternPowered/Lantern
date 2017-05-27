@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.attribute.AttributeTargets;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
@@ -42,6 +41,7 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -49,7 +49,8 @@ import java.util.function.Predicate;
 @RegistrationDependency(AttributeTargetRegistryModule.class)
 public final class AttributeRegistryModule implements AdditionalCatalogRegistryModule<LanternAttribute> {
 
-    @RegisterCatalog(LanternAttributes.class) private final Map<String, LanternAttribute> attributes = Maps.newHashMap();
+    @RegisterCatalog(LanternAttributes.class)
+    private final Map<String, LanternAttribute> attributes = new HashMap<>();
 
     @Override
     public void registerAdditionalCatalog(LanternAttribute attribute) {
@@ -62,7 +63,7 @@ public final class AttributeRegistryModule implements AdditionalCatalogRegistryM
 
     @Override
     public void registerDefaults() {
-        Map<String, LanternAttribute> mappings = Maps.newHashMap();
+        final Map<String, LanternAttribute> mappings = new HashMap<>();
         mappings.put("generic_armor", this.defaultAttribute(
                 "generic.armor", 0.0, 0.0, Double.MAX_VALUE, AttributeTargets.GENERIC));
         mappings.put("generic_max_health", this.defaultAttribute(

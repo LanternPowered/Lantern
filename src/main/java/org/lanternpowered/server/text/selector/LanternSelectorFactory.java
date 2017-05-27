@@ -48,6 +48,7 @@ import org.spongepowered.api.text.selector.SelectorType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -254,7 +255,7 @@ public class LanternSelectorFactory implements SelectorFactory {
     }
 
     public Map<String, String> parseArgumentsMap(@Nullable String input) {
-        Map<String, String> map = Maps.newHashMap();
+        final Map<String, String> map = new HashMap<>();
         if (input == null) {
             return map;
         }

@@ -28,7 +28,6 @@ package org.lanternpowered.server.text;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2CharMap;
@@ -50,6 +49,7 @@ import org.spongepowered.api.text.serializer.TextParseException;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.text.translation.locale.Locales;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -159,7 +159,7 @@ public class FormattingCodeTextSerializer extends PluginCatalogType.Base
             return Text.of(input);
         }
 
-        List<Text> parts = Lists.newArrayList();
+        final List<Text> parts = new ArrayList<>();
 
         LiteralText.Builder current = null;
         boolean reset = false;

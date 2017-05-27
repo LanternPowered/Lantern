@@ -27,6 +27,8 @@ package org.lanternpowered.server.world.rules;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.function.Function;
 
 public final class RuleDataType<T>  {
@@ -40,6 +42,9 @@ public final class RuleDataType<T>  {
     }
 
     public RuleDataType(Class<T> type, Function<String, T> parser, Function<T, String> serializer) {
+        checkNotNull(serializer, "serializer");
+        checkNotNull(parser, "parser");
+        checkNotNull(type, "type");
         this.serializer = serializer;
         this.parser = parser;
         this.type = type;
@@ -64,4 +69,10 @@ public final class RuleDataType<T>  {
         return this.serializer.apply(checkNotNull(value, "value"));
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("type", this.type)
+                .toString();
+    }
 }

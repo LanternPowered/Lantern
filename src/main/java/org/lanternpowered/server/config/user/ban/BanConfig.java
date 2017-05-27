@@ -57,6 +57,7 @@ import org.spongepowered.api.util.ban.Ban.Ip;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -86,7 +87,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     }
 
     @Setting(value = "entries")
-    private List<BanEntry> entries = Lists.newArrayList();
+    private List<BanEntry> entries = new ArrayList<>();
 
     // A version of the entries list that allows concurrent operations
     private final List<BanEntry> entries0 = Collections.synchronizedList(Lists2.createExpirableValueListWithPredicate(BanEntry::isExpired));

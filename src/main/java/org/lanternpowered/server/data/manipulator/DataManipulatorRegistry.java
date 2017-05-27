@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.manipulator.gen.DataManipulatorGenerator;
 import org.lanternpowered.server.data.manipulator.immutable.block.LanternImmutableConnectedDirectionData;
@@ -245,7 +246,6 @@ import org.spongepowered.api.data.manipulator.mutable.block.DoublePlantData;
 import org.spongepowered.api.data.manipulator.mutable.block.DropData;
 import org.spongepowered.api.data.manipulator.mutable.block.ExtendedData;
 import org.spongepowered.api.data.manipulator.mutable.block.FilledData;
-import org.spongepowered.api.data.manipulator.mutable.block.FluidLevelData;
 import org.spongepowered.api.data.manipulator.mutable.block.GrowthData;
 import org.spongepowered.api.data.manipulator.mutable.block.HingeData;
 import org.spongepowered.api.data.manipulator.mutable.block.InWallData;
@@ -952,7 +952,7 @@ public class DataManipulatorRegistry {
 
             final PluginContainer pluginContainer = Lantern.getGame().getPluginManager().getPlugin(plugin)
                     .orElseThrow(() -> new IllegalStateException("The plugin " + plugin + " does not exist!"));
-            return new RegistrationInfo(pluginContainer, ManipulatorHelper.camelToSnake(fullName.substring(fullName.lastIndexOf('.') + 1)),
+            return new RegistrationInfo(pluginContainer, DataHelper.camelToSnake(fullName.substring(fullName.lastIndexOf('.') + 1)),
                     manipulatorType.getCanonicalName());
         }
 

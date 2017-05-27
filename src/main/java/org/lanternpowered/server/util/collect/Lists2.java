@@ -34,11 +34,13 @@ import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -49,25 +51,25 @@ import javax.annotation.Nullable;
 public final class Lists2 {
 
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createExpirableValueList(Function<V, B> backValueSupplier) {
-        return new ExpirableValueListImpl<>(Lists.newArrayList(), backValueSupplier);
+        return new ExpirableValueListImpl<>(new ArrayList<>(), backValueSupplier);
     }
 
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createExpirableValueListWithPredicate(
             Predicate<V> expirationChecker) {
         // Casting weirdness...
         //noinspection unchecked
-        return new ExpirableValueListImpl<>(Lists.newArrayList(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
+        return new ExpirableValueListImpl<>(new ArrayList<>(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
     }
 
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createCopyOnWriteExpirableValueList(Function<V, B> backValueSupplier) {
-        return new ExpirableValueListImpl<>(Lists.newCopyOnWriteArrayList(), backValueSupplier);
+        return new ExpirableValueListImpl<>(new CopyOnWriteArrayList<>(), backValueSupplier);
     }
 
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createCopyOnWriteExpirableValueListWithPredicate(
             Predicate<V> expirationChecker) {
         // Casting weirdness...
         //noinspection unchecked
-        return new ExpirableValueListImpl<>(Lists.newArrayList(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
+        return new ExpirableValueListImpl<>(new CopyOnWriteArrayList<>(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
     }
 
     private static class PredicateExpirableValue<V> extends SimpleExpirableValue<V> {

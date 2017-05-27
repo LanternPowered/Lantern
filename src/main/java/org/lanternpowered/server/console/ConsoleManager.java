@@ -32,6 +32,7 @@ import com.google.inject.name.Named;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.io.IoBuilder;
+import org.apache.logging.log4j.io.LoggerPrintStream;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReader.Option;
@@ -55,7 +56,8 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public final class ConsoleManager {
 
-    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(PrintStream.class.getName());
+    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(
+            PrintStream.class.getName(), LoggerPrintStream.class.getName());
     static final String REDIRECT_ERR = "STDERR";
     static final String REDIRECT_OUT = "STDOUT";
     static volatile boolean active;
@@ -69,7 +71,8 @@ public final class ConsoleManager {
     private final PluginContainer pluginContainer;
 
     @Inject
-    public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager, @Named(DirectoryKeys.CONFIG) Path configFolder,
+    public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager,
+            @Named(DirectoryKeys.CONFIG) Path configFolder,
             @Named(Implementation.IDENTIFIER) PluginContainer pluginContainer) {
         this.consoleHistoryFile = configFolder.resolve(HISTORY_FILE_NAME);
         this.pluginContainer = pluginContainer;
@@ -80,9 +83,9 @@ public final class ConsoleManager {
 
     public void init() {
         // Register the fqcn for the console source
-        REDIRECT_FQCNS.add((LanternConsoleSource.class.getName()));
+        REDIRECT_FQCNS.add(LanternConsoleSource.class.getName());
         // Register the fqcn for the message channel
-        REDIRECT_FQCNS.add((MessageChannel.class.getName()));
+        REDIRECT_FQCNS.add(MessageChannel.class.getName());
 
         System.setOut(IoBuilder.forLogger(REDIRECT_OUT).setLevel(Level.INFO).buildPrintStream());
         System.setErr(IoBuilder.forLogger(REDIRECT_ERR).setLevel(Level.ERROR).buildPrintStream());

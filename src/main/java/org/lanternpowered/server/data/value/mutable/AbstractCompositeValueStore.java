@@ -107,7 +107,7 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
-                if (valueProcessor.getApplicableTester().test((Key) key, this)) {
+                if (valueProcessor.getApplicableTester().test(key, this)) {
                     return offerWith(key, element, valueProcessor);
                 }
             }
@@ -127,12 +127,15 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
                     if (valueContainer instanceof CompositeValueStore) {
                         return ((CompositeValueStore) valueContainer).offer(key, element);
                     } else if (valueContainer instanceof DataManipulator) {
-                        final ImmutableValue oldImmutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                        final ImmutableValue oldImmutableValue = ValueHelper.toImmutable(
+                                (BaseValue) valueContainer.getValue((Key) key).get());
                         ((DataManipulator) valueContainer).set(key, element);
-                        final ImmutableValue immutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                        final ImmutableValue immutableValue = ValueHelper.toImmutable(
+                                (BaseValue) valueContainer.getValue((Key) key).get());
                         return DataTransactionResult.successReplaceResult(immutableValue, oldImmutableValue);
                     } else {
-                        final ImmutableValue immutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                        final ImmutableValue immutableValue = ValueHelper.toImmutable(
+                                (BaseValue) valueContainer.getValue((Key) key).get());
                         return DataTransactionResult.failResult(immutableValue);
                     }
                 }
@@ -171,7 +174,7 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
-                if (valueProcessor.getApplicableTester().test((Key) key, this)) {
+                if (valueProcessor.getApplicableTester().test(key, this)) {
                     return offerWith(value, valueProcessor);
                 }
             }
@@ -188,7 +191,8 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         if (valueContainers != null) {
             for (H valueContainer : valueContainers.values()) {
                 if (valueContainer.supports(key)) {
-                    final ImmutableValue oldImmutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                    final ImmutableValue oldImmutableValue = ValueHelper.toImmutable(
+                            (BaseValue) valueContainer.getValue((Key) key).get());
                     if (valueContainer instanceof CompositeValueStore) {
                         return ((CompositeValueStore) valueContainer).offer(key, element);
                     } else if (valueContainer instanceof DataManipulator) {
@@ -209,7 +213,7 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
     default DataTransactionResult remove(Class<? extends H> containerClass) {
         checkNotNull(containerClass, "containerClass");
         // You cannot remove default data manipulators?
-        final Optional optRegistration = DataManipulatorRegistry.get().getBy((Class) containerClass);
+        final Optional optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
         if (optRegistration.isPresent()) {
             return DataTransactionResult.failNoData();
         }

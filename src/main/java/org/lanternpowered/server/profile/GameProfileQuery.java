@@ -27,7 +27,6 @@ package org.lanternpowered.server.profile;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -45,6 +44,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -97,7 +97,7 @@ final class GameProfileQuery {
     }
 
     static Map<String, UUID> queryUUIDByName(Iterable<String> names) throws IOException {
-        final Map<String, UUID> results = Maps.newHashMap();
+        final Map<String, UUID> results = new HashMap<>();
         if (!names.iterator().hasNext()) {
             return results;
         }

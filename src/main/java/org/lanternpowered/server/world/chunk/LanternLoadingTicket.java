@@ -33,10 +33,10 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.World;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import javax.annotation.Nullable;
@@ -60,13 +60,11 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     // Whether the ticket is released and may not be used again
     private boolean released;
 
-    LanternLoadingTicket(String plugin, LanternChunkManager chunkManager,
-            int maxChunks) {
+    LanternLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks) {
         this(plugin, chunkManager, maxChunks, maxChunks);
     }
 
-    LanternLoadingTicket(String plugin, LanternChunkManager chunkManager,
-            int maxChunks, int numChunks) {
+    LanternLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks, int numChunks) {
         this.numChunks = Math.min(numChunks, maxChunks);
         this.chunkManager = chunkManager;
         this.maxChunks = maxChunks;
@@ -253,7 +251,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
                     .add("maxChunks", this.maxChunks)
                     .add("numChunks", this.numChunks)
                     .add("released", this.released)
-                    .add("chunks", Arrays.toString(this.queue.toArray(new Vector2i[this.queue.size()])));
+                    .add("chunks", Collections3.toString(this.queue));
         }
     }
 

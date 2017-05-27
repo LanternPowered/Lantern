@@ -41,7 +41,6 @@ import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V1_6;
 
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.event.filter.delegate.AfterCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.AllCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.BeforeCauseFilterSourceDelegate;
@@ -90,30 +89,34 @@ import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
-public class FilterGenerator {
+import javax.annotation.Nullable;
+
+final class FilterGenerator {
 
     private static final boolean FILTER_DEBUG = Boolean.parseBoolean(System.getProperty("sponge.filter.debug", "false"));
+    private static final FilterGenerator instance = new FilterGenerator();
 
-    public static FilterGenerator getInstance() {
-        return Holder.INSTANCE;
+    static FilterGenerator get() {
+        return instance;
     }
 
     private FilterGenerator() {
     }
 
-    public byte[] generateClass(String name, Method method) {
+    byte[] generateClass(String name, Method method) {
         name = name.replace('.', '/');
-        Parameter[] params = method.getParameters();
 
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        final Parameter[] params = method.getParameters();
+        final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         MethodVisitor mv;
 
         cw.visit(V1_6, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, name, null, "java/lang/Object", new String[] { Type.getInternalName(EventFilter.class) });
 
         SubtypeFilterDelegate sfilter = null;
-        List<FilterDelegate> additional = Lists.newArrayList();
+        final List<FilterDelegate> additional = new ArrayList<>();
         boolean cancellation = false;
         for (Annotation anno : method.getAnnotations()) {
             Object obj = filterFromAnnotation(anno.annotationType());
@@ -126,7 +129,7 @@ public class FilterGenerator {
                 }
                 sfilter = ((SubtypeFilter) obj).getDelegate(anno);
             } else if (obj instanceof EventTypeFilter) {
-                EventTypeFilter etf = (EventTypeFilter) obj;
+                final EventTypeFilter etf = (EventTypeFilter) obj;
                 additional.add(etf.getDelegate(anno));
                 if (etf == EventTypeFilter.CANCELLATION) {
                     cancellation = true;
@@ -165,11 +168,11 @@ public class FilterGenerator {
             }
 
             // local var indices of the parameters values
-            int[] plocals = new int[params.length - 1];
+            final int[] plocals = new int[params.length - 1];
             for (int i = 1; i < params.length; i++) {
-                Parameter param = params[i];
+                final Parameter param = params[i];
                 ParameterFilterSourceDelegate source = null;
-                List<ParameterFilterDelegate> paramFilters = Lists.newArrayList();
+                final List<ParameterFilterDelegate> paramFilters = new ArrayList<>();
                 for (Annotation anno : param.getAnnotations()) {
                     Object obj = filterFromAnnotation(anno.annotationType());
                     if (obj == null) {
@@ -192,7 +195,7 @@ public class FilterGenerator {
                     throw new IllegalStateException(
                             "Cannot have additional parameters filters without an array source (for " + param.getName() + ")");
                 }
-                Tuple<Integer, Integer> localState = source.write(cw, mv, method, param, local);
+                final Tuple<Integer, Integer> localState = source.write(cw, mv, method, param, local);
                 local = localState.getFirst();
                 plocals[i - 1] = localState.getSecond();
 
@@ -249,6 +252,7 @@ public class FilterGenerator {
         return data;
     }
 
+    @Nullable
     private static Object filterFromAnnotation(Class<? extends Annotation> cls) {
         Object filter;
         if ((filter = SubtypeFilter.valueOf(cls)) != null)
@@ -282,6 +286,7 @@ public class FilterGenerator {
             throw new UnsupportedOperationException();
         }
 
+        @Nullable
         public static SubtypeFilter valueOf(Class<? extends Annotation> cls) {
             for (SubtypeFilter value : values()) {
                 if (value.cls.equals(cls)) {
@@ -309,6 +314,7 @@ public class FilterGenerator {
             throw new UnsupportedOperationException();
         }
 
+        @Nullable
         public static EventTypeFilter valueOf(Class<? extends Annotation> cls) {
             for (EventTypeFilter value : values()) {
                 if (value.cls.equals(cls)) {
@@ -364,6 +370,7 @@ public class FilterGenerator {
             throw new UnsupportedOperationException();
         }
 
+        @Nullable
         public static ParameterSource valueOf(Class<? extends Annotation> cls) {
             for (ParameterSource value : values()) {
                 if (value.cls.equals(cls)) {
@@ -395,6 +402,7 @@ public class FilterGenerator {
             throw new UnsupportedOperationException();
         }
 
+        @Nullable
         public static ParameterFilter valueOf(Class<? extends Annotation> cls) {
             for (ParameterFilter value : values()) {
                 if (value.cls.equals(cls)) {
@@ -404,10 +412,4 @@ public class FilterGenerator {
             return null;
         }
     }
-
-    private static final class Holder {
-
-        static final FilterGenerator INSTANCE = new FilterGenerator();
-    }
-
 }

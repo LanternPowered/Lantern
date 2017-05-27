@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
@@ -148,8 +147,8 @@ public class SelectorResolver {
     private Predicate<Entity> makeFilter() {
         // for easier reading
         final Selector sel = this.selector;
-        Vector3d position = getPositionOrDefault(this.position, ArgumentTypes.POSITION);
-        List<Predicate<Entity>> filters = Lists.newArrayList();
+        final Vector3d position = getPositionOrDefault(this.position, ArgumentTypes.POSITION);
+        final List<Predicate<Entity>> filters = new ArrayList<>();
         addTypeFilters(filters);
         addDimensionFilters(position, filters);
         addRadiusFilters(position, filters);
@@ -160,9 +159,9 @@ public class SelectorResolver {
         addTeamFilters(filters);
         addScoreFilters(filters);
         SelectorType selectorType = sel.getType();
-        Optional<Argument.Invertible<EntityType>> type = sel.getArgument(ArgumentTypes.ENTITY_TYPE);
+        final Optional<Argument.Invertible<EntityType>> type = sel.getArgument(ArgumentTypes.ENTITY_TYPE);
         // isn't an ALL_ENTITIES selector or it is a RANDOM selector for only players
-        boolean isPlayerOnlySelector =
+        final boolean isPlayerOnlySelector =
             selectorType == SelectorTypes.ALL_PLAYERS || selectorType == SelectorTypes.NEAREST_PLAYER
                 || (selectorType == SelectorTypes.RANDOM && type.isPresent() && !type.get().isInverted()
                 && type.get().getValue() != EntityTypes.PLAYER);

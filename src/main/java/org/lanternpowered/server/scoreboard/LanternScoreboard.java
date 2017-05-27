@@ -32,9 +32,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardDisplayObjective;
@@ -52,6 +50,8 @@ import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +63,11 @@ import javax.annotation.Nullable;
 
 public class LanternScoreboard implements Scoreboard {
 
-    private final Set<LanternPlayer> players = Sets.newHashSet();
-    private final Map<String, Objective> objectives = Maps.newHashMap();
+    private final Set<LanternPlayer> players = new HashSet<>();
+    private final Map<String, Objective> objectives = new HashMap<>();
     private final Multimap<Criterion, Objective> objectivesByCriterion = HashMultimap.create();
-    private final Map<DisplaySlot, Objective> objectivesInSlot = Maps.newHashMap();
-    private final Map<String, Team> teams = Maps.newHashMap();
+    private final Map<DisplaySlot, Objective> objectivesInSlot = new HashMap<>();
+    private final Map<String, Team> teams = new HashMap<>();
 
     void sendToPlayers(Supplier<List<Message>> messageSupplier) {
         if (!this.players.isEmpty()) {

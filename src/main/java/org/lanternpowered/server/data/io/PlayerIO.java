@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.io;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;

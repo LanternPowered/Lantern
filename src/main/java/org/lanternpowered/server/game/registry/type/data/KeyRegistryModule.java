@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeImmutableBoundedValueKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMapKeyWithKeyAndValue;
@@ -113,7 +114,10 @@ import org.spongepowered.api.util.weighted.WeightedSerializableObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModule<Key> {
@@ -122,8 +126,21 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         return Holder.INSTANCE;
     }
 
+    private final Map<DataQuery, Key> byQuery = new HashMap<>();
+
     private KeyRegistryModule() {
         super(Keys.class);
+    }
+
+    @Override
+    protected void register(Key key, boolean disallowInbuiltPluginIds) {
+        super.register(key, disallowInbuiltPluginIds);
+        this.byQuery.putIfAbsent(key.getQuery(), key);
+    }
+
+    public Optional<Key> getByQuery(DataQuery query) {
+        checkNotNull(query, "query");
+        return Optional.ofNullable(this.byQuery.get(query));
     }
 
     @Override
@@ -402,6 +419,8 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
             }
         }
     }
+
+
 
     private final static class Holder {
         private static final KeyRegistryModule INSTANCE = new KeyRegistryModule();

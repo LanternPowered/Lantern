@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.io.store.entity;
 
-import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
+import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.advancement.AdvancementTrees;
@@ -34,7 +34,7 @@ import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;

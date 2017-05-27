@@ -27,16 +27,19 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.game.Lantern.getLogger;
 import static org.lanternpowered.server.inventory.LanternItemStackSnapshot.compareRawDataMaps;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.AbstractDataHolder;
+import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -60,6 +63,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 public class LanternItemStack implements ItemStack, AbstractPropertyHolder, AbstractDataHolder {
+
+    private static boolean warnSetRawData;
+
+    private static final DataQuery ITEM_TYPE = DataQuery.of("ItemType");
+    private static final DataQuery QUANTITY = DataQuery.of("Quantity");
 
     private final Map<Key<?>, KeyRegistration> rawValueMap;
     private final Map<Class<?>, DataManipulator<?, ?>> rawAdditionalManipulators;
@@ -112,19 +120,23 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     @Override
     public void setRawData(DataView dataView) throws InvalidDataException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public int getContentVersion() {
-        return 1;
+        checkNotNull(dataView, "dataView");
+        if (dataView.contains(ITEM_TYPE)) {
+            if (!warnSetRawData) {
+                warnSetRawData = true;
+                getLogger().warn("The ItemType will be ignored when setting setRawData on a ItemStack.");
+            }
+            dataView.remove(ITEM_TYPE);
+        }
+        this.quantity = dataView.getInt(QUANTITY).orElse(1);
+        DataHelper.applyRawData(dataView, this);
     }
 
     @Override
     public DataContainer toContainer() {
-        // TODO Auto-generated method stub
-        return null;
+        return AbstractDataHolder.super.toContainer()
+                .set(ITEM_TYPE, getItem())
+                .set(QUANTITY, getQuantity());
     }
 
     @Override
@@ -170,9 +182,9 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
         this.tempMaxQuantity = maxQuantity;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public ItemStackSnapshot createSnapshot() {
-        //noinspection ConstantConditions
         return new LanternItemStackSnapshot(this.itemType, this.quantity, copyRawValueMap(),
                 copyConvertedRawAdditionalManipulators(DataManipulator::asImmutable));
     }
@@ -187,9 +199,9 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
         return this.itemType == ItemTypes.NONE || this.quantity <= 0;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public LanternItemStack copy() {
-        //noinspection ConstantConditions
         final LanternItemStack itemStack = new LanternItemStack(this.itemType, this.quantity, copyRawValueMap(),
                 copyRawAdditionalManipulators(ConcurrentHashMap::new));
         itemStack.tempMaxQuantity = this.tempMaxQuantity;

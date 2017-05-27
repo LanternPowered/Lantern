@@ -31,7 +31,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -40,6 +39,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -137,7 +137,7 @@ public final class LanternGameProfile implements GameProfile {
         if (!this.properties.isEmpty()) {
             final DataContainer propertiesMap = DataContainer.createNew();
             for (String key : this.properties.keySet()) {
-                final List<DataContainer> entries = Lists.newArrayList();
+                final List<DataContainer> entries = new ArrayList<>();
                 for (ProfileProperty property : this.properties.get(key)) {
                     final DataContainer entry = DataContainer.createNew()
                             .set(VALUE, property.getValue());

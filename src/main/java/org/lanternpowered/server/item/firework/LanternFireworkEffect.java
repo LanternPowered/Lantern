@@ -27,7 +27,7 @@ package org.lanternpowered.server.item.firework;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.data.DataQueries;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.item.FireworkEffect;

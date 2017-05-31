@@ -586,5 +586,13 @@
     {
         "version": 332,
         "name": "1.12-pre5"
+    },
+    {
+        "version": 333,
+        "name": "1.12-pre6"
+    },
+    {
+        "version": 334,
+        "name": "1.12-pre7"
     }
 ]

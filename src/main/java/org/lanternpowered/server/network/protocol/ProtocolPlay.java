@@ -487,6 +487,7 @@ final class ProtocolPlay extends ProtocolBase {
         final CodecRegistration<MessagePlayOutUnlockRecipes, CodecPlayOutUnlockRecipes> codecPlayOutUnlockRecipes =
                 outbound.bind(CodecPlayOutUnlockRecipes.class);
         codecPlayOutUnlockRecipes.bind(MessagePlayOutUnlockRecipes.Add.class);
+        codecPlayOutUnlockRecipes.bind(MessagePlayOutUnlockRecipes.Init.class);
         codecPlayOutUnlockRecipes.bind(MessagePlayOutUnlockRecipes.Remove.class);
         outbound.bind(CodecPlayOutDestroyEntities.class, MessagePlayOutDestroyEntities.class);
         outbound.bind(CodecPlayOutRemovePotionEffect.class, MessagePlayOutRemovePotionEffect.class);

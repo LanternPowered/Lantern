@@ -38,7 +38,7 @@ public final class CodecPlayInCraftingBookData implements Codec<Message> {
 
     @Override
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final int type = buf.readInteger();
+        final int type = buf.readVarInt();
         if (type == 1) {
             final int id = buf.readInteger();
             return new MessagePlayInDisplayedRecipe(id);

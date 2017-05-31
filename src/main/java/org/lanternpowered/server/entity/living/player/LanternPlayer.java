@@ -470,12 +470,17 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             for (int i = 0; i < recipes.length; i++) {
                 recipes[i] = i;
             }
-            this.session.send(new MessagePlayOutUnlockRecipes.Add(
+            /*
+            this.session.send(new MessagePlayOutUnlockRecipes.Init(
                     get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
                     get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
                     new IntArrayList(recipes),
-                    new IntArrayList(recipes),
-                    true));
+                    new IntArrayList(recipes)));
+                    */
+            this.session.send(new MessagePlayOutUnlockRecipes.Add(
+                    get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
+                    get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
+                    new IntArrayList(recipes)));
         } else {
             AdvancementTrees.INSTANCE.removeTracker(this);
             this.session.getServer().removePlayer(this);

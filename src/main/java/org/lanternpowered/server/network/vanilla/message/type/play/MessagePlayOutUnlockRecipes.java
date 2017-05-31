@@ -36,8 +36,10 @@ public abstract class MessagePlayOutUnlockRecipes implements Message {
 
     private final boolean openRecipeBook;
     private final boolean craftingFilter;
+    private final IntList recipeIds;
 
-    MessagePlayOutUnlockRecipes(boolean openRecipeBook, boolean craftingFilter) {
+    private MessagePlayOutUnlockRecipes(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds) {
+        this.recipeIds = IntLists.unmodifiable(recipeIds);
         this.openRecipeBook = openRecipeBook;
         this.craftingFilter = craftingFilter;
     }
@@ -53,7 +55,12 @@ public abstract class MessagePlayOutUnlockRecipes implements Message {
     public MoreObjects.ToStringHelper toStringHelper() {
         return MoreObjects.toStringHelper(getClass().getSuperclass().getSimpleName() + "." + getClass().getSimpleName())
                 .add("openRecipeBook", this.openRecipeBook)
-                .add("craftingFilter", this.craftingFilter);
+                .add("craftingFilter", this.craftingFilter)
+                .add("recipeIds", Arrays.toString(this.recipeIds.toIntArray()));
+    }
+
+    public IntList getRecipeIds() {
+        return this.recipeIds;
     }
 
     @Override
@@ -63,56 +70,35 @@ public abstract class MessagePlayOutUnlockRecipes implements Message {
 
     public final static class Remove extends MessagePlayOutUnlockRecipes {
 
-        private final IntList recipeIds;
-
         public Remove(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds) {
-            super(openRecipeBook, craftingFilter);
-            this.recipeIds = IntLists.unmodifiable(recipeIds);
-        }
-
-        public IntList getRecipeIds() {
-            return this.recipeIds;
-        }
-
-        @Override
-        public MoreObjects.ToStringHelper toStringHelper() {
-            return super.toStringHelper()
-                    .add("recipeIds", Arrays.toString(this.recipeIds.toIntArray()));
+            super(openRecipeBook, craftingFilter, recipeIds);
         }
     }
 
-    public final static class Add extends MessagePlayOutUnlockRecipes {
+    public final static class Init extends MessagePlayOutUnlockRecipes {
 
         private final IntList recipeIdsToBeDisplayed;
-        private final IntList recipeIds;
-        private final boolean notification;
 
-        public Add(boolean openRecipeBook, boolean craftingFilter,
-                IntList recipeIds, IntList silentRecipeIds, boolean notification) {
-            super(openRecipeBook, craftingFilter);
-            this.recipeIdsToBeDisplayed = IntLists.unmodifiable(recipeIds);
-            this.recipeIds = IntLists.unmodifiable(silentRecipeIds);
-            this.notification = notification;
+        public Init(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds, IntList recipeIdsToBeDisplayed) {
+            super(openRecipeBook, craftingFilter, recipeIds);
+            this.recipeIdsToBeDisplayed = IntLists.unmodifiable(recipeIdsToBeDisplayed);
         }
 
         public IntList getRecipeIdsToBeDisplayed() {
             return this.recipeIdsToBeDisplayed;
         }
 
-        public IntList getRecipeIds() {
-            return this.recipeIds;
-        }
-
-        public boolean hasNotification() {
-            return this.notification;
-        }
-
         @Override
         public MoreObjects.ToStringHelper toStringHelper() {
             return super.toStringHelper()
-                    .add("recipeIdsToBeDisplayed", Arrays.toString(this.recipeIdsToBeDisplayed.toIntArray()))
-                    .add("recipeIds", Arrays.toString(this.recipeIds.toIntArray()))
-                    .add("notification", this.notification);
+                    .add("recipeIdsToBeDisplayed", Arrays.toString(this.recipeIdsToBeDisplayed.toIntArray()));
+        }
+    }
+
+    public final static class Add extends MessagePlayOutUnlockRecipes {
+
+        public Add(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds) {
+            super(openRecipeBook, craftingFilter, recipeIds);
         }
     }
 }

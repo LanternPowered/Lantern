@@ -29,19 +29,19 @@ import org.lanternpowered.server.network.message.MessageRegistry;
 
 public interface Protocol {
 
-    int CURRENT_VERSION = 332;
+    int CURRENT_VERSION = 334;
 
     /**
-     * Gets the inbound message registry.
+     * Gets the inbound {@link MessageRegistry}.
      * 
-     * @return the registry
+     * @return The registry
      */
     MessageRegistry inbound();
 
     /**
-     * Gets the outbound message registry.
+     * Gets the outbound {@link MessageRegistry}.
      * 
-     * @return the registry
+     * @return The registry
      */
     MessageRegistry outbound();
 }

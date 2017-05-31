@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
+import io.netty.handler.codec.EncoderException;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -38,24 +39,23 @@ public final class CodecPlayOutUnlockRecipes implements Codec<MessagePlayOutUnlo
     public ByteBuffer encode(CodecContext context, MessagePlayOutUnlockRecipes message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         if (message instanceof MessagePlayOutUnlockRecipes.Remove) {
-            buf.writeShort((short) 2);
+            buf.writeVarInt((short) 2);
+        } else if (message instanceof MessagePlayOutUnlockRecipes.Add) {
+            buf.writeVarInt((short) 1);
+        } else if (message instanceof MessagePlayOutUnlockRecipes.Init) {
+            buf.writeVarInt((short) 0);
         } else {
-            buf.writeShort((short) (((MessagePlayOutUnlockRecipes.Add) message).hasNotification() ? 1 : 3));
+            throw new EncoderException();
         }
         buf.writeBoolean(message.hasOpenCraftingBook());
         buf.writeBoolean(message.hasCraftingFilter());
-        if (message instanceof MessagePlayOutUnlockRecipes.Remove) {
-            final IntList recipeIds = ((MessagePlayOutUnlockRecipes.Remove) message).getRecipeIds();
+        IntList recipeIds = message.getRecipeIds();
+        buf.writeVarInt(recipeIds.size());
+        recipeIds.forEach(buf::writeVarInt);
+        if (message instanceof MessagePlayOutUnlockRecipes.Init) {
+            recipeIds = ((MessagePlayOutUnlockRecipes.Init) message).getRecipeIdsToBeDisplayed();
             buf.writeVarInt(recipeIds.size());
-            recipeIds.forEach(buf::writeInteger);
-            buf.writeVarInt(0);
-        } else {
-            IntList recipeIds = ((MessagePlayOutUnlockRecipes.Add) message).getRecipeIdsToBeDisplayed();
-            buf.writeVarInt(recipeIds.size());
-            recipeIds.forEach(buf::writeInteger);
-            recipeIds = ((MessagePlayOutUnlockRecipes.Add) message).getRecipeIds();
-            buf.writeVarInt(recipeIds.size());
-            recipeIds.forEach(buf::writeInteger);
+            recipeIds.forEach(buf::writeVarInt);
         }
         return buf;
     }

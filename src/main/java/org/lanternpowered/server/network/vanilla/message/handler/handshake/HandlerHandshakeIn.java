@@ -170,9 +170,9 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
             final int protocol = Lantern.getGame().getPlatform().getMinecraftVersion().getProtocol();
 
             if (message.getProtocolVersion() < protocol) {
-                session.disconnect(t("handshake.outdated.client", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
+                session.disconnect(t("multiplayer.disconnect.outdated_client", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
             } else if (message.getProtocolVersion() > protocol) {
-                session.disconnect(t("handshake.outdated.server", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
+                session.disconnect(t("multiplayer.disconnect.outdated_server", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
             }
         }
     }

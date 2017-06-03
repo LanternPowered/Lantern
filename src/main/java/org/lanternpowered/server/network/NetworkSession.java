@@ -28,6 +28,7 @@ package org.lanternpowered.server.network;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.MoreObjects;
@@ -130,11 +131,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     public static final AttributeKey<Boolean> FML_MARKER = AttributeKey.valueOf("fml-marker");
 
-    /**
-     * The formatter that is used to format the date used in the ban disconnect message.
-     */
-    private static final DateTimeFormatter BAN_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd 'at' HH:mm:ss z");
-
     private final NetworkManager networkManager;
     private final LanternServer server;
     private final Channel channel;
@@ -216,9 +212,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     private long keepAliveTime;
 
     /**
-     * The keep alive task.
+     * The keep alive/initial connection timer task.
      */
-    @Nullable private ScheduledFuture<?> keepAliveTask;
+    @Nullable private ScheduledFuture<?> connectionTask;
 
     /**
      * The protocol version.
@@ -306,10 +302,20 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         this.networkManager.onActive(this);
+        // If the connection isn't established after 30 seconds,
+        // kick the player. 30 seconds is the value used in vanilla
+        this.connectionTask = this.channel.eventLoop().schedule(
+                () -> disconnect(t("multiplayer.disconnect.slow_login")), 30, TimeUnit.SECONDS);
+    }
+
+    private void initKeepAliveTask() {
+        if (this.connectionTask != null) {
+            this.connectionTask.cancel(true);
+        }
         // Send a keep alive message to the client every 40 ticks (2 seconds),
         // doing this also in the event loop to keep it separate from the main
         // thread.
-        this.keepAliveTask = this.channel.eventLoop().scheduleAtFixedRate(() -> {
+        this.connectionTask = this.channel.eventLoop().scheduleAtFixedRate(() -> {
             final ProtocolState protocolState = this.protocolState;
             if (protocolState == ProtocolState.PLAY || protocolState == ProtocolState.FORGE_HANDSHAKE) {
                 this.keepAliveId = this.random.nextInt();
@@ -327,7 +333,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             if (this.channel.isOpen()) {
                 this.disconnectReason = t("disconnect.endOfStream");
             } else {
-                this.disconnectReason = t("disconnect.leftServer");
+                this.disconnectReason = t("multiplayer.disconnect.generic");
             }
         }
         // The player was able to spawn before the connection closed
@@ -343,8 +349,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                             " (" + this.gameProfile.getName().orElse("Unknown") + ')',
                     this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
         }
-        this.keepAliveTask.cancel(true);
-        this.keepAliveTask = null;
+        this.connectionTask.cancel(false);
+        this.connectionTask = null;
     }
 
     @Override
@@ -743,7 +749,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      * Disconnects the session with a unknown reason.
      */
     public void disconnect() {
-        this.disconnect(Text.of("Unknown reason."));
+        disconnect(Text.of("Unknown reason."));
     }
 
     /**
@@ -810,6 +816,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      * the server.
      */
     public void initPlayer() {
+        initKeepAliveTask();
         if (this.gameProfile == null) {
             throw new IllegalStateException("The game profile must first be available!");
         }
@@ -870,28 +877,30 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             // Generate the kick message
             Text.Builder builder = Text.builder();
             if (ban instanceof Ban.Profile) {
-                builder.append(Text.of("You are banned from this server!"));
+                builder.append(t("multiplayer.disconnect.ban.banned"));
             } else {
-                builder.append(Text.of("Your IP address is banned from this server!"));
+                builder.append(t("multiplayer.disconnect.ban.ip_banned"));
             }
             // There is optionally a reason
-            optReason.ifPresent(reason -> builder.append(Text.of("\nReason: ", reason)));
+            optReason.ifPresent(reason -> builder.append(Text.NEW_LINE).append(t("multiplayer.disconnect.ban.reason", reason)));
             // And a expiration date if present
-            optExpirationDate.ifPresent(expirationDate ->
-                    builder.append(Text.of("\nYour ban will be removed on ", BAN_TIME_FORMATTER.format(expirationDate))));
+            optExpirationDate.ifPresent(expirationDate -> {
+                final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(tr("multiplayer.disconnect.ban.expiration_date_format").get());
+                builder.append(Text.NEW_LINE).append(t("multiplayer.disconnect.ban.expiration", formatter.format(expirationDate)));
+            });
 
             kickReason = builder.build();
             // Check for white-list
         } else if (!isWhitelisted(this.gameProfile)) {
-            kickReason = Text.of("You are not white-listed on this server!");
+            kickReason = t("multiplayer.disconnect.not_whitelisted");
             // Check whether the server is full
         } else if (Lantern.getServer().getOnlinePlayers().size() >= Lantern.getServer().getMaxPlayers()
                 && !canBypassPlayerLimit(this.gameProfile)) {
-            kickReason = Text.of("The server is full!");
+            kickReason = t("multiplayer.disconnect.server_full");
         }
 
         final MessageEvent.MessageFormatter messageFormatter = new MessageEvent.MessageFormatter(
-                kickReason != null ? kickReason : t("disconnect.notAllowedToJoin"));
+                kickReason != null ? kickReason : t("multiplayer.disconnect.not_allowed_to_join"));
 
         final Cause cause = Cause.source(this.player).build();
         final Transform<World> fromTransform = this.player.getTransform();
@@ -904,7 +913,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         Sponge.getEventManager().post(loginEvent);
         if (loginEvent.isCancelled()) {
-            disconnect(loginEvent.isMessageCancelled() ? t("disconnect.disconnected") : loginEvent.getMessage());
+            disconnect(loginEvent.isMessageCancelled() ? t("multiplayer.disconnect.generic") : loginEvent.getMessage());
             return;
         }
 
@@ -936,7 +945,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         final MessageChannel messageChannel = this.player.getMessageChannel();
         final Text joinMessage;
 
-        final GameProfile previousProfile = this.channel.attr(PREVIOUS_GAME_PROFILE).getAndRemove();
+        final GameProfile previousProfile = this.channel.attr(PREVIOUS_GAME_PROFILE).getAndSet(null);
         if (previousProfile != null && previousProfile.getName().isPresent() &&
                 !previousProfile.getName().get().equals(this.gameProfile.getName().get())) {
             joinMessage = t("multiplayer.player.joined.renamed", this.player.getName(), previousProfile.getName().get());

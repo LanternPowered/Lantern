@@ -599,7 +599,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         // Check whether the player is still active
         int timeout = Lantern.getGame().getGlobalConfig().getPlayerIdleTimeout();
         if (timeout > 0 && System.currentTimeMillis() - this.lastActiveTime >= timeout * 60000) {
-            this.session.disconnect(t("disconnect.idleTimeout"));
+            this.session.disconnect(t("multiplayer.disconnect.idling"));
             return;
         }
 

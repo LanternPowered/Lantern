@@ -94,7 +94,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
         } else {
             // Remove the encryption handler placeholder
             context.getChannel().pipeline().remove(NetworkSession.ENCRYPTION);
-            LanternGameProfile profile = context.getChannel().attr(SPOOFED_GAME_PROFILE).getAndRemove();
+            LanternGameProfile profile = context.getChannel().attr(SPOOFED_GAME_PROFILE).getAndSet(null);
             if (profile != null) {
                 profile = new LanternGameProfile(profile.getUniqueId(), username, profile.getPropertyMap());
             } else {

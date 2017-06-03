@@ -98,7 +98,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
 
         String message1 = StringUtils.normalizeSpace(message0);
         if (!isAllowedString(message0)) {
-            session.disconnect(t("disconnect.invalidChatCharacters"));
+            session.disconnect(t("multiplayer.disconnect.illegal_characters"));
             return;
         }
         if (message1.startsWith("/")) {

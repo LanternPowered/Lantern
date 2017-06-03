@@ -39,13 +39,14 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("NullableProblems")
 public final class MinecraftTranslationManager implements TranslationManager, ReloadListener {
 
     private final Map<String, Translation> translations = new ConcurrentHashMap<>();
-    @SuppressWarnings("NullableProblems") private ResourceBundle resourceBundle;
+    private ResourceBundle resourceBundle;
 
     public MinecraftTranslationManager() {
-        this.onReload();
+        onReload();
     }
 
     @Override
@@ -54,7 +55,7 @@ public final class MinecraftTranslationManager implements TranslationManager, Re
 
     @Override
     public Translation get(String key) {
-        return this.getIfPresent(key).orElseGet(() -> this.translations.computeIfAbsent(key, FixedTranslation::new));
+        return getIfPresent(key).orElseGet(() -> this.translations.computeIfAbsent(key, FixedTranslation::new));
     }
 
     @Override

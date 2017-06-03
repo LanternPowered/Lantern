@@ -55,7 +55,7 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                     session.disconnect(t("Retrieved unexpected forge handshake ack message. (Got %s, expected %s)",
                             message.getPhase(), ForgeClientHandshakePhase.WAITING_SERVER_DATA));
                 } else {
-                    List<MessageForgeHandshakeOutRegistryData.Entry> entries = new ArrayList<>();
+                    final List<MessageForgeHandshakeOutRegistryData.Entry> entries = new ArrayList<>();
                     entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:items", new HashMap<>(), new ArrayList<>()));
                     entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:blocks", new HashMap<>(), new ArrayList<>()));
                     session.send(new MessageForgeHandshakeOutRegistryData(entries));

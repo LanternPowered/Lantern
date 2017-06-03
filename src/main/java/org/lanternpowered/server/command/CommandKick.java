@@ -54,7 +54,7 @@ public final class CommandKick extends CommandProvider {
                 .executor((src, args) -> {
                     final Player player = args.<Player>getOne("player").get();
                     final Optional<String> optReason = args.<String>getOne("reason");
-                    player.kick(optReason.<Text>map(Text::of).orElse(t("disconnect.kickedByOperator")));
+                    player.kick(optReason.<Text>map(Text::of).orElse(t("multiplayer.disconnect.kicked")));
                     if (optReason.isPresent()) {
                         src.sendMessage(t("commands.kick.success.reason", player.getName(), optReason.get()));
                     } else {

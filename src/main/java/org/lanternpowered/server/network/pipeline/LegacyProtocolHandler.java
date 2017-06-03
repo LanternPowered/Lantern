@@ -95,7 +95,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                     return;
                 }
                 legacy = true;
-                sendDisconnectMessage(ctx, LanternTexts.toPlain(t("handshake.outdated.client",
+                sendDisconnectMessage(ctx, LanternTexts.toPlain(t("multiplayer.disconnect.outdated_client",
                         Lantern.getGame().getPlatform().getMinecraftVersion().getName())));
                 final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol, true);
                 if (clientVersion == LanternMinecraftVersion.UNKNOWN_LEGACY) {

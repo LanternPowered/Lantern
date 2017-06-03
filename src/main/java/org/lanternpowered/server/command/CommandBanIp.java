@@ -106,7 +106,7 @@ public final class CommandBanIp extends CommandProvider {
                             .filter(player -> player.getConnection().getAddress().getAddress().equals(address))
                             .collect(Collectors.toList());
                     if (!playersToKick.isEmpty()) {
-                        final Text kickReason = t("disconnect.ipBanned");
+                        final Text kickReason = t("multiplayer.disconnect.ip_banned");
                         for (LanternPlayer player : playersToKick) {
                             player.kick(kickReason);
                         }

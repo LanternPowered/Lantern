@@ -47,12 +47,12 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import static org.lanternpowered.server.network.buffer.LanternByteBuffer.readVarInt;
 import static org.lanternpowered.server.network.buffer.LanternByteBuffer.writeVarInt;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+import io.netty.handler.codec.DecoderException;
 
 import java.util.List;
 
@@ -66,38 +66,47 @@ public final class MessageFramingHandler extends ByteToMessageCodec<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> output) throws Exception {
-        while (readableVarInt(buf)) {
-            buf.markReaderIndex();
-
-            final int length = readVarInt(buf);
-            if (buf.readableBytes() < length) {
-                buf.resetReaderIndex();
-                break;
-            }
-
+        int length;
+        while ((length = readableMessage(buf)) != -1) {
             final ByteBuf msg = ctx.alloc().buffer(length);
             buf.readBytes(msg, length);
-
             output.add(msg);
         }
     }
 
-    private static boolean readableVarInt(ByteBuf buf) {
-        if (buf.readableBytes() > 5) {
-            return true;
-        }
-
+    /**
+     * Reads the length and checks if the message can be read in one call.
+     *
+     * @param buf The byte buffer
+     * @return The message length, or -1 if it's not possible to read a message
+     */
+    private static int readableMessage(ByteBuf buf) {
         int idx = buf.readerIndex();
-        byte in;
+        int i = 0;
+        int length = 0;
+
+        byte b;
         do {
+            // The variable integer is not complete, try again next time
             if (buf.readableBytes() < 1) {
                 buf.readerIndex(idx);
-                return false;
+                return -1;
             }
-            in = buf.readByte();
-        } while ((in & 0x80) != 0);
-
-        buf.readerIndex(idx);
-        return true;
+            b = buf.readByte();
+            length |= (b & 0x7F) << i;
+            i += 7;
+            if (i > 35) {
+                throw new DecoderException("Variable length is too long!");
+            }
+        } while ((b & 0x80) != 0);
+        if (length < 0) {
+            throw new DecoderException("Message length cannot be negative: " + length);
+        }
+        // Not all the message bytes are available yet, try again later
+        if (buf.readableBytes() < length) {
+            buf.readerIndex(idx);
+            return -1;
+        }
+        return length;
     }
 }

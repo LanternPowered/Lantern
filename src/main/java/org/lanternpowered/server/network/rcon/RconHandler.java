@@ -60,7 +60,7 @@ import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 
 import java.nio.charset.StandardCharsets;
 
-public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
+final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private static final AttributeKey<RconSource> SOURCE = AttributeKey.valueOf("rcon-source");
 
@@ -72,7 +72,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final RconServer server;
     private final String password;
 
-    public RconHandler(RconServer server, String password) {
+    RconHandler(RconServer server, String password) {
         this.password = password;
         this.server = server;
     }
@@ -124,7 +124,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         final Channel channel = ctx.channel();
-        final RconSource source = channel.attr(SOURCE).getAndRemove();
+        final RconSource source = channel.attr(SOURCE).getAndSet(null);
 
         if (source == null) {
             return;

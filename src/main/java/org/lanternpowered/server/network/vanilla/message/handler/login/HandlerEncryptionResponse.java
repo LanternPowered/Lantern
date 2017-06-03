@@ -128,7 +128,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             return;
         }
 
-        LoginAuthData authData = context.getChannel().attr(HandlerLoginStart.AUTH_DATA).getAndRemove();
+        LoginAuthData authData = context.getChannel().attr(HandlerLoginStart.AUTH_DATA).getAndSet(null);
 
         // Check verify token
         if (!Arrays.equals(verifyToken, authData.getVerifyToken())) {
@@ -176,7 +176,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                     json = GSON.fromJson(new InputStreamReader(is), JsonObject.class);
                 } catch (Exception e) {
                     Lantern.getLogger().warn("Username \"{}\" failed to authenticate!", username);
-                    session.disconnect(t("Failed to verify username!"));
+                    session.disconnect(t("multiplayer.disconnect.unverified_username"));
                     return;
                 }
             }
@@ -202,11 +202,11 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             Lantern.getLogger().info("Finished authenticating.");
 
             final ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(Cause.source(gameProfile).build(),
-                    session, new MessageEvent.MessageFormatter(t("disconnect.notAllowedToJoin")), gameProfile, false);
+                    session, new MessageEvent.MessageFormatter(t("multiplayer.disconnect.not_allowed_to_join")), gameProfile, false);
 
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {
-                session.disconnect(event.isMessageCancelled() ? t("disconnect.disconnected") : event.getMessage());
+                session.disconnect(event.isMessageCancelled() ? t("multiplayer.disconnect.generic") : event.getMessage());
             } else {
                 session.messageReceived(new MessageLoginInFinish(gameProfile));
             }

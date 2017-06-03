@@ -58,7 +58,7 @@ final class PluginConfigurationModule extends AbstractModule {
      */
     private static class NonSharedDirAsFile extends PathAsFileProvider {
         @Inject
-        void init(@ConfigDir(sharedRoot = false) Path path) {
+        void init(@ConfigDir(sharedRoot = false) Provider<Path> path) {
             this.path = path;
         }
     }
@@ -70,7 +70,7 @@ final class PluginConfigurationModule extends AbstractModule {
      */
     private static class NonSharedPathAsFile extends PathAsFileProvider {
         @Inject
-        void init(@DefaultConfig(sharedRoot = false) Path path) {
+        void init(@DefaultConfig(sharedRoot = false) Provider<Path> path) {
             this.path = path;
         }
     }
@@ -82,7 +82,7 @@ final class PluginConfigurationModule extends AbstractModule {
      */
     private static class SharedDirAsFile extends PathAsFileProvider {
         @Inject
-        void init(@DefaultConfig(sharedRoot = true) Path path) {
+        void init(@DefaultConfig(sharedRoot = true) Provider<Path> path) {
             this.path = path;
         }
     }

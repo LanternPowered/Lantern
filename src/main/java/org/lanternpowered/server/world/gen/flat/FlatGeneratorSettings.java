@@ -61,4 +61,8 @@ public final class FlatGeneratorSettings {
         return this.extraData;
     }
 
+    @Override
+    public String toString() {
+        return FlatGeneratorSettingsParser.toString(this);
+    }
 }

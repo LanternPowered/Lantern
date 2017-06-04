@@ -26,59 +26,23 @@
 package org.lanternpowered.server.world.gen.flat;
 
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.world.gen.LanternGeneratorType;
-import org.lanternpowered.server.world.gen.LanternWorldGenerator;
-import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.gen.WorldGenerator;
 
 import java.util.List;
 
-public final class FlatGeneratorType extends LanternGeneratorType {
-
-    public final static DataQuery SETTINGS = DataQuery.of("customSettings");
-
-    /**
-     * Creates the default settings of the flat generator.
-     * 
-     * @return the default settings
-     */
-    public static FlatGeneratorSettings getDefaultSettings() {
-        final List<FlatLayer> layers = Lists.newArrayListWithCapacity(3);
-        layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
-        layers.add(new FlatLayer(BlockTypes.DIRT, 2));
-        layers.add(new FlatLayer(BlockTypes.GRASS, 1));
-        return new FlatGeneratorSettings(BiomeTypes.PLAINS, layers);
-    }
+public final class FlatGeneratorType extends AbstractFlatGeneratorType {
 
     public FlatGeneratorType(String pluginId, String name) {
         super(pluginId, name);
     }
 
     @Override
-    public DataContainer getGeneratorSettings() {
-        return super.getGeneratorSettings().set(SETTINGS, FlatGeneratorSettingsParser.toString(
-                getDefaultSettings()));
+    public FlatGeneratorSettings getDefaultSettings() {
+        final List<FlatLayer> layers = Lists.newArrayListWithCapacity(3);
+        layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
+        layers.add(new FlatLayer(BlockTypes.DIRT, 2));
+        layers.add(new FlatLayer(BlockTypes.GRASS, 1));
+        return new FlatGeneratorSettings(BiomeTypes.PLAINS, layers);
     }
-
-    @Override
-    public WorldGenerator createGenerator(World world) {
-        final DataContainer generatorSettings = world.getProperties().getGeneratorSettings();
-        FlatGeneratorSettings settings = null;
-        if (generatorSettings.contains(SETTINGS)) {
-            settings = FlatGeneratorSettingsParser.fromString(generatorSettings.getString(SETTINGS).get());
-        }
-        if (settings == null) {
-            settings = getDefaultSettings();
-        }
-        final SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(settings.getBiomeType());
-        final FlatGenerationPopulator populatorGenerator = new FlatGenerationPopulator(settings,
-                (LanternGeneratorType) world.getProperties().getGeneratorType());
-        return new LanternWorldGenerator(world, biomeGenerator, populatorGenerator);
-    }
-
 }

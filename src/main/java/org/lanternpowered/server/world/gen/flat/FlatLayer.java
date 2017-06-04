@@ -77,5 +77,4 @@ public final class FlatLayer {
     public int getDepth() {
         return this.depth;
     }
-
 }

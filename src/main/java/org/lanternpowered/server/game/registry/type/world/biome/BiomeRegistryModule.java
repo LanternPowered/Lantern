@@ -96,5 +96,6 @@ public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryMo
     public void registerDefaults() {
         register((byte) 0, new LanternBiomeType("minecraft", "ocean"));
         register((byte) 1, new LanternBiomeType("minecraft", "plains"));
+        register((byte) 8, new LanternBiomeType("minecraft", "hell"));
     }
 }

@@ -41,6 +41,7 @@ import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegist
 import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModule;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
+import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
@@ -414,7 +415,7 @@ final class LanternWorldPropertiesIO {
                         generatorSettings = generatorType.getGeneratorSettings();
                     }
                     if (customSettings != null) {
-                        generatorSettings.set(FlatGeneratorType.SETTINGS, customSettings);
+                        generatorSettings.set(AbstractFlatGeneratorType.SETTINGS, customSettings);
                     }
                 } else {
                     generatorSettings = generatorType.getGeneratorSettings();

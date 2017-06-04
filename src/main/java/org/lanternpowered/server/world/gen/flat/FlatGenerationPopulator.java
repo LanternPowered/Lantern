@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
@@ -75,16 +76,15 @@ public final class FlatGenerationPopulator implements GenerationPopulator {
         final Vector3i max = buffer.getBlockMax();
 
         final int height = this.blockStateCache.length;
-        for (int x = min.getX(); x <= max.getX(); x++) {
-            for (int z = min.getZ(); z <= max.getZ(); z++) {
-                for (int y = min.getY(); y <= max.getY(); y++) {
-                    if (y >= height) {
-                        break;
-                    }
+        for (int y = min.getY(); y < height; y++) {
+            if (this.blockStateCache[y] == BlockTypes.AIR) {
+                continue;
+            }
+            for (int x = min.getX(); x <= max.getX(); x++) {
+                for (int z = min.getZ(); z <= max.getZ(); z++) {
                     buffer.setBlock(x, y, z, this.blockStateCache[y], this.cause);
                 }
             }
         }
     }
-
 }

@@ -979,6 +979,16 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.pumpkin.name")
                         .build("minecraft", "pumpkin"),
                 this::horizontalDirectionData);
+        //////////////////////
+        ///   Netherrack   ///
+        //////////////////////
+        register(87, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.4))
+                                .add(blastResistance(2.0)))
+                        .translation("tile.hellrock.name")
+                        .build("minecraft", "netherrack"));
         ////////////////////
         ///  Lit Pumpkin ///
         ////////////////////

@@ -25,23 +25,23 @@
  */
 package org.lanternpowered.server.world.gen;
 
-import org.lanternpowered.server.world.gen.flat.FlatGenerationPopulator;
-import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.gen.WorldGenerator;
+import org.spongepowered.api.world.GeneratorType;
 
-public class LanternGeneratorTypeNether extends LanternGeneratorType {
+public interface IGeneratorType extends GeneratorType {
 
-    public LanternGeneratorTypeNether(String pluginId, String name) {
-        super(pluginId, name, 128, 1);
-    }
+    /**
+     * Gets the minimal spawn height that is required with
+     * this generator type.
+     *
+     * @return The minimal spawn height
+     */
+    int getMinimalSpawnHeight();
 
-    @Override
-    public WorldGenerator createGenerator(World world) {
-        SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(BiomeTypes.HELL);
-        // TODO
-        return new LanternWorldGenerator(world, biomeGenerator, new FlatGenerationPopulator(FlatGeneratorType.getDefaultSettings(), this));
-    }
-
+    /**
+     * Gets the maximum height that will generator type will
+     * generate.
+     *
+     * @return The generator height
+     */
+    int getGeneratorHeight();
 }

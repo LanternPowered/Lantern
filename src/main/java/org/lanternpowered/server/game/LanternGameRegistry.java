@@ -767,11 +767,11 @@ public class LanternGameRegistry implements GameRegistry {
 
     private void tryModulePhaseRegistration(RegistryModule module) {
         try {
-            Set<Method> methods = this.getCustomRegistrations(module);
-            methods.stream().filter(this::isProperPhase).forEach(method -> this.invokeCustomRegistration(module, method));
-            if (this.isProperPhase(module)) {
+            final Set<Method> methods = getCustomRegistrations(module);
+            methods.stream().filter(this::isProperPhase).forEach(method -> invokeCustomRegistration(module, method));
+            if (isProperPhase(module)) {
                 module.registerDefaults();
-                for (CatalogMappingData data : this.getCatalogMappingData(module)) {
+                for (CatalogMappingData data : getCatalogMappingData(module)) {
                     final Map<String, ?> mappings = data.getMappings();
                     if (mappings.isEmpty()) {
                         return;
@@ -842,7 +842,7 @@ public class LanternGameRegistry implements GameRegistry {
      */
     private boolean isProperPhase(RegistryModule module) {
         try {
-            return this.isProperPhase(module.getClass().getMethod("registerDefaults"));
+            return isProperPhase(module.getClass().getMethod("registerDefaults"));
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

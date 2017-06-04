@@ -23,25 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.gen.debug;
+package org.lanternpowered.server.world.gen.flat;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.world.gen.LanternGeneratorType;
-import org.lanternpowered.server.world.gen.LanternWorldGenerator;
-import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
-import org.spongepowered.api.world.World;
+import com.google.common.collect.Lists;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.gen.WorldGenerator;
 
-public final class DebugGeneratorType extends LanternGeneratorType {
+import java.util.List;
 
-    public DebugGeneratorType(String pluginId, String name) {
-        super(pluginId, name);
+public final class FlatNetherGeneratorType extends AbstractFlatGeneratorType {
+
+    public FlatNetherGeneratorType(String pluginId, String name) {
+        super(pluginId, name, 128, 4);
     }
 
     @Override
-    public WorldGenerator createGenerator(World world) {
-        return new LanternWorldGenerator(world, new SingleBiomeGenerator(BiomeTypes.PLAINS),
-                new DebugGenerationPopulator(Lantern.getGame().getRegistry()));
+    protected FlatGeneratorSettings getDefaultSettings() {
+        final List<FlatLayer> layers = Lists.newArrayListWithCapacity(2);
+        layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
+        layers.add(new FlatLayer(BlockTypes.NETHERRACK, 3));
+        layers.add(new FlatLayer(BlockTypes.AIR, 120));
+        layers.add(new FlatLayer(BlockTypes.NETHERRACK, 3));
+        layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
+        return new FlatGeneratorSettings(BiomeTypes.HELL, layers);
     }
 }

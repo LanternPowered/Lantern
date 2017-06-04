@@ -39,6 +39,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
+import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
@@ -186,7 +187,7 @@ public final class LanternWorldProperties implements WorldProperties {
         this.worldConfig.setPVPEnabled(worldArchetype.isPVPEnabled());
         setBuildHeight(worldArchetype.getBuildHeight());
         this.worldConfig.setHardcore(worldArchetype.isHardcore());
-        this.worldConfig.setLowHorizon(worldArchetype.getGeneratorType() == GeneratorTypes.FLAT);
+        this.worldConfig.setLowHorizon(worldArchetype.getGeneratorType() instanceof AbstractFlatGeneratorType);
         this.worldConfig.save();
     }
 

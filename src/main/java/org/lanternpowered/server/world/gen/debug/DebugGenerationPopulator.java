@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
@@ -102,5 +101,4 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
             }
         }
     }
-
 }

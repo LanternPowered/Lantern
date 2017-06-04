@@ -1434,6 +1434,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Collection<TileEntity> getTileEntities() {
+        if (this.chunkSections == null) {
+            return Collections.emptyList();
+        }
         final ImmutableSet.Builder<TileEntity> tileEntities = ImmutableSet.builder();
         for (int i = 0; i < CHUNK_SECTIONS; i++) {
             this.chunkSections.work(i, chunkSection -> {

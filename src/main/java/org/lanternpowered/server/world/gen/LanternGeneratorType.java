@@ -27,9 +27,8 @@ package org.lanternpowered.server.world.gen;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.world.GeneratorType;
 
-public abstract class LanternGeneratorType extends PluginCatalogType.Base implements GeneratorType {
+public abstract class LanternGeneratorType extends PluginCatalogType.Base implements IGeneratorType {
 
     // The maximum height the generator will generate the world,
     // for example 128 blocks in the nether and in overworld 256
@@ -57,24 +56,13 @@ public abstract class LanternGeneratorType extends PluginCatalogType.Base implem
         return DataContainer.createNew();
     }
 
-    /**
-     * Gets the minimal spawn height that is required with
-     * this generator type.
-     * 
-     * @return The minimal spawn height
-     */
+    @Override
     public int getMinimalSpawnHeight() {
         return this.minimalSpawnHeight;
     }
 
-    /**
-     * Gets the maximum height that will generator type will
-     * generate.
-     * 
-     * @return The generator height
-     */
+    @Override
     public int getGeneratorHeight() {
         return this.generatorHeight;
     }
-
 }

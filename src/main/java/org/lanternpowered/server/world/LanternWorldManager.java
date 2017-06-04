@@ -354,7 +354,7 @@ public final class LanternWorldManager {
             }
 
             // Save the changes once more to make sure that they will be saved
-            this.saveWorldProperties(worldProperties);
+            saveWorldProperties(worldProperties);
 
             // Copy the world folder
             final String folderPath = folder.toFile().getAbsolutePath();
@@ -540,20 +540,22 @@ public final class LanternWorldManager {
         if (entry != null) {
             return entry.properties;
         }
-        WorldConfig worldConfig;
+        WorldConfigResult worldConfigResult;
         // Create a config
         try {
-            worldConfig = getOrCreateWorldConfig(worldName).config;
+            worldConfigResult = getOrCreateWorldConfig(worldName);
         } catch (IOException e) {
             throw new IOException("Unable to read/write the world config, please fix this issue before"
                     + " creating the world.", e);
         }
         // Create the world properties
-        final LanternWorldProperties worldProperties = new LanternWorldProperties(settings0.getName(), worldConfig);
-        worldProperties.update(settings0);
+        final LanternWorldProperties worldProperties = new LanternWorldProperties(settings0.getName(), worldConfigResult.config);
+        if (worldConfigResult.newCreated) {
+            worldProperties.update(settings0);
+        }
 
         // Get the world folder
-        final Path worldFolder = this.getWorldFolder(folderName, dimensionId);
+        final Path worldFolder = getWorldFolder(folderName, dimensionId);
         try {
             Files.createDirectories(worldFolder);
         } catch (IOException e) {
@@ -621,7 +623,7 @@ public final class LanternWorldManager {
         }
         WorldConfigResult result;
         try {
-            result = this.getOrCreateWorldConfig(worldEntry.properties.getWorldName());
+            result = getOrCreateWorldConfig(worldEntry.properties.getWorldName());
         } catch (IOException e) {
             this.game.getLogger().error("Unable to read the world config, please fix this issue before loading the world.", e);
             return Optional.empty();
@@ -883,10 +885,8 @@ public final class LanternWorldManager {
         // Generate the root (default) world if missing
         if (rootWorldProperties0 == null) {
             final String name = "Overworld";
-            // TODO: Use the default generator type once implemented
-            rootWorldProperties0 = this.createWorld(WorldArchetype.builder()
+            rootWorldProperties0 = createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.OVERWORLD)
-                    //.generator(GeneratorTypes.DEBUG)
                     .generator(GeneratorTypes.FLAT)
                     .build(name, name), "", 0);
         }

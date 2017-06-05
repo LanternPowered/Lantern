@@ -683,7 +683,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public <T extends CatalogType> T register(Class<T> type, T obj) throws IllegalArgumentException, UnsupportedOperationException {
-        CatalogRegistryModule<T> registryModule = this.getCatalogRegistryModule(type).orElse(null);
+        final CatalogRegistryModule<T> registryModule = getCatalogRegistryModule(type).orElse(null);
         if (registryModule == null) {
             throw new UnsupportedOperationException("Failed to find a RegistryModule for that type.");
         } else {

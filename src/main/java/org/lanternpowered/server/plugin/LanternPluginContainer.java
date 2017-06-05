@@ -38,8 +38,8 @@ import javax.annotation.Nullable;
 public final class LanternPluginContainer extends AbstractPluginContainer {
 
     private final ImmutableList<String> authors;
-    private final Object instance;
     private final Injector injector;
+    private final Object instance;
 
     @Nullable private final String description;
     @Nullable private final String url;
@@ -55,7 +55,7 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
         this.url = url;
 
         this.injector = injector.createChildInjector(new PluginModule(this, pluginClass));
-        this.instance = Optional.of(this.injector.getInstance(pluginClass));
+        this.instance = this.injector.getInstance(pluginClass);
     }
 
     @Override

@@ -80,6 +80,8 @@ import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.weather.LanternWeather;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -172,6 +174,8 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     // The loading ticket to keep the spawn chunks loaded
     @Nullable private volatile ChunkLoadingTicket spawnLoadingTicket;
 
+    final Logger logger;
+
     // The game instance
     final LanternGame game;
 
@@ -241,13 +245,14 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     public LanternWorld(LanternGame game, WorldConfig worldConfig, Path directory,
             Scoreboard scoreboard, LanternWorldProperties properties) {
+        this.logger = LoggerFactory.getLogger("world/" + properties.getWorldName());
         this.directory = directory;
         this.worldConfig = worldConfig;
         this.scoreboard = scoreboard;
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, this, Lantern.getLogger(), Lantern.getScheduler());
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, this, this.logger, Lantern.getScheduler());
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type
@@ -334,7 +339,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
             final int chunkX = spawnPoint.getX() >> 4;
             final int chunkZ = spawnPoint.getZ() >> 4;
 
-            this.game.getLogger().info("Generating spawn volume...");
+            this.logger.info("Generating spawn volume...");
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
@@ -344,7 +349,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
                 }
             }
 
-            this.game.getLogger().info("Finished generating spawn volume.");
+            this.logger.info("Finished generating spawn volume.");
         } else if (this.spawnLoadingTicket != null) {
             this.spawnLoadingTicket.unforceChunks();
         }

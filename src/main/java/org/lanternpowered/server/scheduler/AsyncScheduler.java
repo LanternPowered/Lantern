@@ -29,7 +29,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.Set;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -51,14 +50,27 @@ final class AsyncScheduler extends SchedulerBase {
     AsyncScheduler() {
         super(ScheduledTask.TaskSynchronicity.ASYNCHRONOUS);
 
-        Thread thread = new Thread(AsyncScheduler.this::mainLoop);
+        final Thread thread = new Thread(AsyncScheduler.this::mainLoop);
         thread.setName("Lantern Async Scheduler Thread");
         thread.setDaemon(true);
         thread.start();
     }
 
-    void shutdown() {
+    /**
+     * Attempt to shutdown the underlying {@link ExecutorService}, and force
+     * the executor to shutdown after a timeout.
+     *
+     * @param timeout The timeout
+     * @param unit The time unit
+     */
+    void shutdown(long timeout, TimeUnit unit) {
         this.executor.shutdown();
+        try {
+            if (!this.executor.awaitTermination(timeout, unit)) {
+                this.executor.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
+        }
     }
 
     private void mainLoop() {

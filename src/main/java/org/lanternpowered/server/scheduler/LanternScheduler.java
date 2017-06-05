@@ -46,6 +46,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 @Singleton
@@ -153,8 +154,8 @@ public class LanternScheduler implements Scheduler {
         this.syncScheduler.tick();
     }
 
-    public void shutdownAsyncScheduler() {
-        this.asyncScheduler.shutdown();
+    public void shutdownAsyncScheduler(long timeout, TimeUnit unit) {
+        this.asyncScheduler.shutdown(timeout, unit);
     }
 
     @Override

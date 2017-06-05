@@ -101,12 +101,12 @@ abstract class SchedulerBase {
      * Process all tasks in the map.
      */
     protected final void runTick() {
-        this.preTick();
+        preTick();
         try {
             this.taskMap.values().forEach(this::processTask);
-            this.postTick();
+            postTick();
         } finally {
-            this.finallyPostTick();
+            finallyPostTick();
         }
     }
 

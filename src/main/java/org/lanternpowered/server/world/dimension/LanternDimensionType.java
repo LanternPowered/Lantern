@@ -112,6 +112,6 @@ public final class LanternDimensionType<T extends LanternDimension> extends Plug
 
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("dimensionClass", this.dimensionClass);
+        return super.toStringHelper().add("dimensionClass", this.dimensionClass.getName());
     }
 }

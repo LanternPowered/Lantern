@@ -38,7 +38,9 @@ import org.lanternpowered.server.world.gen.DelegateGeneratorType;
 import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatNetherGeneratorType;
+import org.lanternpowered.server.world.gen.flat.FlatTheEndGeneratorType;
 import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
+import org.lanternpowered.server.world.gen.thevoid.TheVoidGeneratorType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -71,23 +73,26 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
     public void registerDefaults() {
         final FlatGeneratorType flat = new FlatGeneratorType("minecraft", "flat");
         final FlatNetherGeneratorType flatNether = new FlatNetherGeneratorType("lantern", "flat_nether");
+        final FlatTheEndGeneratorType flatTheEnd = new FlatTheEndGeneratorType("lantern", "flat_the_end");
 
         // Default inbuilt generator types
         register(flat);
         register(flatNether);
+        register(flatTheEnd);
         register(new DebugGeneratorType("minecraft", "debug"));
 
         // Plugin provided generator types, these will fall back
         // to flat if missing
         register(new DelegateGeneratorType("minecraft", "default", flat));
         register(new DelegateGeneratorType("minecraft", "overworld", flat));
-        register(new DelegateGeneratorType("minecraft", "the_end", flat));
         register(new DelegateGeneratorType("minecraft", "large_biomes", flat));
         register(new DelegateGeneratorType("minecraft", "amplified", flat));
         register(new DelegateGeneratorType("minecraft", "nether", flatNether));
+        register(new DelegateGeneratorType("minecraft", "the_end", flatTheEnd));
 
         // Sponge
         register(new SkylandsGeneratorType("sponge", "skylands"));
+        register(new TheVoidGeneratorType("sponge", "void"));
     }
 
     /**

@@ -31,6 +31,7 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.command.element.RelativeDouble;
 import org.lanternpowered.server.command.element.RelativeVector3d;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -41,6 +42,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
 
@@ -89,7 +91,8 @@ public final class CommandTp extends CommandProvider {
                     } else {
                         final RelativeVector3d coords = args.<RelativeVector3d>getOne("coordinates").get();
                         final Transform<World> transform = target.getTransform();
-                        World world = args.<World>getOne(CommandHelper.WORLD_KEY).orElse(transform.getExtent());
+                        World world = args.<WorldProperties>getOne(CommandHelper.WORLD_KEY)
+                                .flatMap(p -> Lantern.getServer().getWorld(p.getUniqueId())).orElse(transform.getExtent());
                         Vector3d position = coords.applyToValue(transform.getPosition());
 
                         final Optional<RelativeDouble> optYRot = args.getOne("y-rot");
@@ -103,10 +106,11 @@ public final class CommandTp extends CommandProvider {
                         } else {
                             target.setLocation(new Location<>(world, position));
                         }
-                        src.sendMessage(t("commands.tp.success.coordinates", target.getName(),
+                        src.sendMessage(t("commands.tp.success.position", target.getName(),
                                 formatDouble(position.getX()),
                                 formatDouble(position.getY()),
-                                formatDouble(position.getZ())));
+                                formatDouble(position.getZ()),
+                                world.getName()));
                     }
                     return CommandResult.success();
                 });

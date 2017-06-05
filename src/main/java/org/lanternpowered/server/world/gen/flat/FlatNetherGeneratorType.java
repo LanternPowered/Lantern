@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
-import com.google.common.collect.Lists;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class FlatNetherGeneratorType extends AbstractFlatGeneratorType {
@@ -39,7 +39,7 @@ public final class FlatNetherGeneratorType extends AbstractFlatGeneratorType {
 
     @Override
     protected FlatGeneratorSettings getDefaultSettings() {
-        final List<FlatLayer> layers = Lists.newArrayListWithCapacity(2);
+        final List<FlatLayer> layers = new ArrayList<>(5);
         layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
         layers.add(new FlatLayer(BlockTypes.NETHERRACK, 3));
         layers.add(new FlatLayer(BlockTypes.AIR, 120));

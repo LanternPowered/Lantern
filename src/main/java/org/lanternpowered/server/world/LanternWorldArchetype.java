@@ -37,41 +37,43 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import java.util.Collection;
 
-public final class LanternWorldArchetype implements WorldArchetype {
+import javax.annotation.Nullable;
+
+final class LanternWorldArchetype implements WorldArchetype {
 
     private final String id;
     private final String name;
     private final GameMode gameMode;
     private final Difficulty difficulty;
     private final LanternDimensionType<?> dimensionType;
-    private final GeneratorType generatorType;
+    @Nullable final GeneratorType generatorType;
     private final Collection<WorldGeneratorModifier> generatorModifiers;
-    private final DataContainer generatorSettings;
+    @Nullable final DataContainer generatorSettings;
     private final SerializationBehavior serializationBehavior;
     private final LanternPortalAgentType portalAgentType;
 
     private final boolean hardcore;
     private final boolean enabled;
     private final boolean loadsOnStartup;
-    private final boolean keepsSpawnLoaded;
     private final boolean usesMapFeatures;
     private final boolean generateBonusChest;
     private final boolean commandsAllowed;
-    private final boolean waterEvaporates;
-    private final boolean allowPlayerRespawns;
     private final boolean pvpEnabled;
     private final boolean generateSpawnOnLoad;
     private final boolean isSeedRandomized;
+    @Nullable final Boolean allowPlayerRespawns;
+    @Nullable final Boolean keepsSpawnLoaded;
+    @Nullable final Boolean waterEvaporates;
 
     private final int buildHeight;
     private final long seed;
 
-    LanternWorldArchetype(String id, String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
-            Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, Difficulty difficulty,
+    LanternWorldArchetype(String id, String name, GameMode gameMode, LanternDimensionType<?> dimensionType, @Nullable GeneratorType generatorType,
+            Collection<WorldGeneratorModifier> generatorModifiers, @Nullable DataContainer generatorSettings, Difficulty difficulty,
             SerializationBehavior serializationBehavior, LanternPortalAgentType portalAgentType, boolean hardcore, boolean enabled,
-            boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures, boolean pvpEnabled, boolean generateBonusChest,
-            boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns, boolean generateSpawnOnLoad, boolean isSeedRandomized,
-            long seed, int buildHeight) {
+            boolean loadsOnStartup, @Nullable Boolean keepsSpawnLoaded, boolean usesMapFeatures, boolean pvpEnabled, boolean generateBonusChest,
+            boolean commandsAllowed, @Nullable Boolean waterEvaporates, @Nullable Boolean allowPlayerRespawns, boolean generateSpawnOnLoad,
+            boolean isSeedRandomized, long seed, int buildHeight) {
         this.serializationBehavior = serializationBehavior;
         this.generateSpawnOnLoad = generateSpawnOnLoad;
         this.allowPlayerRespawns = allowPlayerRespawns;
@@ -124,7 +126,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
 
     @Override
     public boolean doesKeepSpawnLoaded() {
-        return this.keepsSpawnLoaded;
+        return this.keepsSpawnLoaded == null ? this.dimensionType.doesKeepSpawnLoaded() : this.keepsSpawnLoaded;
     }
 
     @Override
@@ -149,7 +151,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
 
     @Override
     public GeneratorType getGeneratorType() {
-        return this.generatorType;
+        return this.generatorType == null ? this.dimensionType.getDefaultGeneratorType() : this.generatorType;
     }
 
     @Override
@@ -178,7 +180,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
     }
 
     public boolean waterEvaporates() {
-        return this.waterEvaporates;
+        return this.waterEvaporates == null ? this.dimensionType.doesWaterEvaporate() : this.waterEvaporates;
     }
 
     @Override
@@ -193,7 +195,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
 
     @Override
     public DataContainer getGeneratorSettings() {
-        return this.generatorSettings.copy();
+        return this.generatorSettings != null ? this.generatorSettings.copy() : getGeneratorType().getGeneratorSettings();
     }
 
     @Override
@@ -206,7 +208,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
     }
 
     public boolean allowPlayerRespawns() {
-        return this.allowPlayerRespawns;
+        return this.allowPlayerRespawns == null ? this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
     }
 
     @Override

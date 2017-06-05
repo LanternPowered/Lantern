@@ -83,12 +83,11 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     private boolean commandsAllowed; // No builder method available
     private boolean pvpEnabled;
     private boolean generateSpawnOnLoad;
-    private boolean isSeedRandomized;
 
     @Nullable private Long seed;
 
     public LanternWorldArchetypeBuilder() {
-        this.reset();
+        reset();
     }
 
     @Override
@@ -99,26 +98,21 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.hardcore = archetype0.isHardcore();
         this.enabled = archetype0.isEnabled();
         this.gameMode = archetype0.getGameMode();
-        this.keepsSpawnLoaded = archetype0.doesKeepSpawnLoaded();
+        this.keepsSpawnLoaded = archetype0.keepsSpawnLoaded;
         this.usesMapFeatures = archetype0.usesMapFeatures();
         this.generatorModifiers = archetype0.getGeneratorModifiers();
         this.dimensionType = archetype0.getDimensionType();
-        this.generatorType = archetype0.getGeneratorType();
-        this.generatorSettings = archetype0.getGeneratorSettings();
+        this.generatorType = archetype0.generatorType;
+        this.generatorSettings = archetype0.generatorSettings;
         this.generateBonusChest = archetype0.doesGenerateBonusChest();
         this.commandsAllowed = archetype0.areCommandsAllowed();
-        this.waterEvaporates = archetype0.waterEvaporates();
+        this.waterEvaporates = archetype0.waterEvaporates;
         this.buildHeight = archetype0.getBuildHeight();
-        this.allowPlayerRespawns = archetype0.allowPlayerRespawns();
+        this.allowPlayerRespawns = archetype0.allowPlayerRespawns;
         this.pvpEnabled = archetype0.isPVPEnabled();
         this.generateSpawnOnLoad = archetype0.doesGenerateSpawnOnLoad();
         this.portalAgentType = archetype0.getPortalAgentType();
-        this.isSeedRandomized = archetype0.isSeedRandomized();
-        if (!this.isSeedRandomized) {
-            this.seed = archetype0.getSeed();
-        } else {
-            this.seed = null;
-        }
+        this.seed = archetype0.isSeedRandomized() ? null : archetype0.getSeed();
         return this;
     }
 
@@ -178,7 +172,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
 
     @Override
     public WorldArchetype.Builder randomSeed() {
-        this.isSeedRandomized = true;
+        this.seed = null;
         return this;
     }
 
@@ -285,31 +279,11 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         checkNotNull(id, "id");
         checkNotNull(name, "name");
         checkArgument(this.dimensionType != null, "Dimension type must be set");
-        GeneratorType generatorType = this.generatorType;
-        if (generatorType == null) {
-            generatorType = this.dimensionType.getDefaultGeneratorType();
-        }
-        DataContainer generatorSettings = this.generatorSettings;
-        if (generatorSettings == null) {
-            generatorSettings = generatorType.getGeneratorSettings();
-        }
-        final boolean keepsSpawnLoaded = this.keepsSpawnLoaded == null ?
-                this.dimensionType.doesKeepSpawnLoaded() : this.keepsSpawnLoaded;
-        final boolean waterEvaporates = this.waterEvaporates == null ?
-                this.dimensionType.doesWaterEvaporate() : this.waterEvaporates;
-        final boolean allowPlayerRespawns = this.allowPlayerRespawns == null ?
-                this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
-        long seed;
-        if (this.seed == null || this.isSeedRandomized) {
-            seed = new Random().nextLong();
-        } else {
-            seed = this.seed;
-        }
-        return new LanternWorldArchetype(id, name, this.gameMode, this.dimensionType, generatorType,
-                this.generatorModifiers, generatorSettings, this.difficulty, this.serializationBehavior, this.portalAgentType,
-                this.hardcore, this.enabled, this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
-                this.generateBonusChest, this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.generateSpawnOnLoad,
-                this.isSeedRandomized, seed, this.buildHeight);
+        return new LanternWorldArchetype(id, name, this.gameMode, this.dimensionType, this.generatorType,
+                this.generatorModifiers, this.generatorSettings, this.difficulty, this.serializationBehavior, this.portalAgentType,
+                this.hardcore, this.enabled, this.loadsOnStartup, this.keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
+                this.generateBonusChest, this.commandsAllowed, this.waterEvaporates, this.allowPlayerRespawns, this.generateSpawnOnLoad,
+                this.seed == null, this.seed == null ? new Random().nextLong() : this.seed, this.buildHeight);
     }
 
     @Override
@@ -333,7 +307,6 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.waterEvaporates = null;
         this.buildHeight = 256;
         this.serializationBehavior = SerializationBehaviors.AUTOMATIC;
-        this.isSeedRandomized = false;
         return this;
     }
 }

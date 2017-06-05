@@ -38,7 +38,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
-import org.lanternpowered.server.world.gen.LanternGeneratorType;
+import org.lanternpowered.server.world.gen.IGeneratorType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.lanternpowered.server.world.rules.Rule;
@@ -57,7 +57,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehavior;
@@ -356,8 +355,8 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
-    public LanternGeneratorType getGeneratorType() {
-        return (LanternGeneratorType) this.worldConfig.getGeneration().getGeneratorType();
+    public IGeneratorType getGeneratorType() {
+        return (IGeneratorType) this.worldConfig.getGeneration().getGeneratorType();
     }
 
     @Override

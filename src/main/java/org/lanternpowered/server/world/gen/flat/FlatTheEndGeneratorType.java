@@ -31,18 +31,18 @@ import org.spongepowered.api.world.biome.BiomeTypes;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class FlatGeneratorType extends AbstractFlatGeneratorType {
+// TODO: Make the generated land finite
+public final class FlatTheEndGeneratorType extends AbstractFlatGeneratorType {
 
-    public FlatGeneratorType(String pluginId, String name) {
-        super(pluginId, name);
+    public FlatTheEndGeneratorType(String pluginId, String name) {
+        super(pluginId, name, 256, 4);
     }
 
     @Override
-    public FlatGeneratorSettings getDefaultSettings() {
-        final List<FlatLayer> layers = new ArrayList<>(3);
+    protected FlatGeneratorSettings getDefaultSettings() {
+        final List<FlatLayer> layers = new ArrayList<>(2);
         layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
-        layers.add(new FlatLayer(BlockTypes.DIRT, 2));
-        layers.add(new FlatLayer(BlockTypes.GRASS, 1));
-        return new FlatGeneratorSettings(BiomeTypes.PLAINS, layers);
+        layers.add(new FlatLayer(BlockTypes.END_STONE, 3));
+        return new FlatGeneratorSettings(BiomeTypes.SKY, layers);
     }
 }

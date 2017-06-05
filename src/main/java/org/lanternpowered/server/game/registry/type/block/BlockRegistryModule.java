@@ -1018,6 +1018,16 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(10.0)))
                         .translation("tile.fenceIron.name")
                         .build("minecraft", "iron_bars"));
+        /////////////////////
+        ///   End Stone   ///
+        /////////////////////
+        register(121, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(3.0))
+                                .add(blastResistance(15.0)))
+                        .translation("tile.whiteStone.name")
+                        .build("minecraft", "end_stone"));
         //////////////////////////
         /// Double Wooden Slab ///
         //////////////////////////

@@ -28,7 +28,7 @@ package org.lanternpowered.server.world.dimension;
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 import org.lanternpowered.server.world.LanternWorld;
-import org.lanternpowered.server.world.gen.LanternGeneratorType;
+import org.lanternpowered.server.world.gen.IGeneratorType;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
@@ -84,7 +84,7 @@ public abstract class LanternDimension implements Dimension {
     }
 
     @Override
-    public LanternGeneratorType getGeneratorType() {
+    public IGeneratorType getGeneratorType() {
         return this.world.getProperties().getGeneratorType();
     }
 

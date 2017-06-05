@@ -249,7 +249,7 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
 
             if (this.dirtyChunk) {
-                final MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true);
+                final MessagePlayOutChunkData message = createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true);
                 this.clientObservers.forEach(player -> player.getConnection().send(message));
                 this.dirtyChunk = false;
                 this.dirtyBlocks.clear();
@@ -272,7 +272,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
                 final int clumpingThreshold = world.getProperties().getConfig().getChunkClumpingThreshold();
                 if (changes.size() >= clumpingThreshold) {
-                    final MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, dirtySections, false);
+                    final MessagePlayOutChunkData message = createLoadChunkMessage(chunk, dirtySections, false);
                     this.clientObservers.forEach(player -> player.getConnection().send(message));
                 } else if (changes.size() > 1) {
                     final MessagePlayOutMultiBlockChange message = new MessagePlayOutMultiBlockChange(

@@ -175,7 +175,7 @@ public final class LanternWorldManager {
      * @return a collection of loaded worlds
      */
     public Collection<World> getWorlds() {
-        return this.worldByUUID.values().stream().map(e -> e.world).collect(ImmutableList.toImmutableList());
+        return this.worldByUUID.values().stream().filter(e -> e.world != null).map(e -> e.world).collect(ImmutableList.toImmutableList());
     }
 
     /**
@@ -335,7 +335,7 @@ public final class LanternWorldManager {
         checkNotNull(copyName, "copyName");
         return Functional.asyncFailableFuture(() -> {
             // Get the new dimension id
-            final int dimensionId = this.getNextFreeDimensionId();
+            final int dimensionId = getNextFreeDimensionId();
 
             // TODO: Save the world if loaded
             // TODO: Block world saving
@@ -389,8 +389,8 @@ public final class LanternWorldManager {
                 return Optional.empty();
             }
 
-            final LevelData newData = new LevelData(levelData.worldName, levelData.uniqueId, levelData.worldData, levelData.spongeWorldData,
-                    dimensionId, null);
+            final LevelData newData = new LevelData(levelData.worldName, levelData.uniqueId, levelData.worldData,
+                    levelData.spongeWorldData, dimensionId, null);
 
             // Store the new world
             this.addUpdatedWorldProperties(properties, targetFolder, dimensionId);
@@ -484,7 +484,7 @@ public final class LanternWorldManager {
         final LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
         final BitSet dimensionMap = entry.dimensionId == 0 ? (BitSet) this.dimensionMap.clone() : null;
         try {
-            LevelData levelData = LanternWorldPropertiesIO.convert(worldProperties0, entry.dimensionId, dimensionMap);
+            final LevelData levelData = LanternWorldPropertiesIO.convert(worldProperties0, entry.dimensionId, dimensionMap);
             LanternWorldPropertiesIO.write(entry.folder, levelData);
             worldProperties0.getConfig().save();
         } catch (IOException e) {
@@ -812,7 +812,7 @@ public final class LanternWorldManager {
         }
         // Get the dimension id and make sure that it's not already used
         if (dimensionId == null || this.worldByDimensionId.containsValue(dimensionId)) {
-            dimensionId = this.getNextFreeDimensionId();
+            dimensionId = getNextFreeDimensionId();
             // Ignore the root dimension
         } else if (dimensionId > MIN_CUSTOM_DIMENSION_ID) {
             this.dimensionMap.set(dimensionId);
@@ -841,11 +841,12 @@ public final class LanternWorldManager {
      * All the directories that should be ignored while loading worlds. We will
      * also add the nether and the end manually.
      */
-    private final Set<String> ignoredDirectoryNames = Sets.newHashSet("data", "playerdata", "region", "stats", "dim1", "dim-1");
+    private final Set<String> ignoredDirectoryNames = Sets.newHashSet("data", "playerdata", "region", "stats");
 
     /**
      * Initializes the root world and the dimension id map.
      */
+    @SuppressWarnings("SuspiciousMethodCalls")
     public void init() throws IOException {
         final Path rootWorldDir = this.rootWorldDirectory.get();
         // The properties of the root world
@@ -887,7 +888,7 @@ public final class LanternWorldManager {
             final String name = "Overworld";
             rootWorldProperties0 = createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.OVERWORLD)
-                    .generator(GeneratorTypes.FLAT)
+                    .generator(GeneratorTypes.OVERWORLD)
                     .build(name, name), "", 0);
         }
 
@@ -896,13 +897,12 @@ public final class LanternWorldManager {
         // Add the root dimension
         loadQueue.add(this.worldByDimensionId.get(0));
 
-        // TODO: The end and nether
-
         final Map<Integer, Tuple<Path, LevelData>> idToLevelData = new HashMap<>();
         final List<Tuple<Path, LevelData>> levelDataWithoutId = new ArrayList<>();
         if (rootWorldProperties != null) {
             for (Path path : Files.list(rootWorldDir).filter(Files::isDirectory).collect(Collectors.toList())) {
-                if (Files.list(path).count() == 0 || this.ignoredDirectoryNames.contains(path.getFileName().toString().toLowerCase())) {
+                if (Files.list(path).count() == 0 || this.ignoredDirectoryNames.contains(
+                        path.getFileName().toString().toLowerCase())) {
                     continue;
                 }
                 try {
@@ -913,11 +913,19 @@ public final class LanternWorldManager {
                                 path.getFileName().toString());
                         continue;
                     }
+                    final Integer dimensionId;
+                    if (path.getFileName().toString().equalsIgnoreCase("DIM1")) {
+                        dimensionId = 1;
+                    } else if (path.getFileName().toString().equalsIgnoreCase("DIM-1")) {
+                        dimensionId = -1;
+                    } else if (levelData.dimensionId != null && levelData.dimensionId >= MIN_CUSTOM_DIMENSION_ID) {
+                        dimensionId = levelData.dimensionId;
+                    } else {
+                        dimensionId = null;
+                    }
 
-                    final Integer dimensionId = levelData.dimensionId;
                     final Tuple<Path, LevelData> tuple = Tuple.of(path, levelData);
-                    //noinspection SuspiciousMethodCalls
-                    if (dimensionId == null || idToLevelData.containsValue(dimensionId) || dimensionId < MIN_CUSTOM_DIMENSION_ID) {
+                    if (dimensionId == null || idToLevelData.containsValue(dimensionId)) {
                         levelDataWithoutId.add(tuple);
                     } else {
                         idToLevelData.put(dimensionId, tuple);
@@ -957,7 +965,25 @@ public final class LanternWorldManager {
                 loadQueue.add(lookupEntry);
             }
         }
-        idToLevelData.clear();
+        if (!this.worldByDimensionId.containsKey(-1)) {
+            final String name = "Nether";
+            if (createWorld(WorldArchetype.builder()
+                    .from(WorldArchetypes.THE_NETHER)
+                    .generator(GeneratorTypes.NETHER)
+                    .build(name, name), "DIM-1", -1).loadOnStartup()) {
+                loadQueue.add(this.worldByDimensionId.get(-1));
+            }
+        }
+        // The end
+        if (!this.worldByDimensionId.containsKey(1)) {
+            final String name = "TheEnd";
+            if (createWorld(WorldArchetype.builder()
+                    .from(WorldArchetypes.THE_END)
+                    .generator(GeneratorTypes.THE_END)
+                    .build(name, name), "DIM1", 1).loadOnStartup()) {
+                loadQueue.add(this.worldByDimensionId.get(1));
+            }
+        }
 
         // The root world must be enabled
         rootWorldProperties0.setEnabled(true);

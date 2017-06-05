@@ -119,7 +119,7 @@ public final class CommandWhitelist extends CommandProvider {
                                     throw new CommandException(t("commands.whitelist.reload.failed", e.getMessage()), e);
                                 }
                             } else {
-                                src.sendMessage(t("commands.whitelist.reload.notSupported"));
+                                src.sendMessage(t("commands.whitelist.reload.not_supported"));
                                 return CommandResult.empty();
                             }
                             return CommandResult.success();

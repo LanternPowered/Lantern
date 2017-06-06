@@ -32,6 +32,7 @@ import org.lanternpowered.server.world.gen.IGeneratorType;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.GeneratorType;
 
 public abstract class LanternDimension implements Dimension {
 
@@ -55,7 +56,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public int getMinimumSpawnHeight() {
-        return getGeneratorType().getMinimalSpawnHeight();
+        return IGeneratorType.getMinimalSpawnHeight(getGeneratorType());
     }
 
     @Override
@@ -75,7 +76,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public int getHeight() {
-        return getGeneratorType().getGeneratorHeight();
+        return IGeneratorType.getGeneratorHeight(getGeneratorType());
     }
 
     @Override
@@ -84,7 +85,7 @@ public abstract class LanternDimension implements Dimension {
     }
 
     @Override
-    public IGeneratorType getGeneratorType() {
+    public GeneratorType getGeneratorType() {
         return this.world.getProperties().getGeneratorType();
     }
 

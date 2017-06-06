@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
-import org.lanternpowered.server.world.gen.IGeneratorType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.gen.LanternWorldGenerator;
 import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
@@ -68,8 +67,7 @@ public abstract class AbstractFlatGeneratorType extends LanternGeneratorType {
             settings = getDefaultSettings();
         }
         final SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(settings.getBiomeType());
-        final FlatGenerationPopulator populatorGenerator = new FlatGenerationPopulator(settings,
-                (IGeneratorType) world.getProperties().getGeneratorType());
+        final FlatGenerationPopulator populatorGenerator = new FlatGenerationPopulator(settings, world.getProperties().getGeneratorType());
         return new LanternWorldGenerator(world, biomeGenerator, populatorGenerator);
     }
 }

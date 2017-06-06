@@ -305,7 +305,7 @@ public final class PluginCandidate {
             }
         } else {
             if (this.dependenciesWithUnknownVersion.add(id)) {
-                Lantern.getLogger().warn("Cannot check version of dependency {} for plugin {} from {}: Version of dependency unknown",
+                Lantern.getLogger().warn("Cannot check version of dependency {} for plugin {} from {}: Unknown dependency version.",
                         id, this.id, this.source.map(Path::toString).orElse("unknown"));
             }
             return true;

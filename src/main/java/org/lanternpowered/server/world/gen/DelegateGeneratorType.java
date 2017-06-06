@@ -30,15 +30,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
 public final class DelegateGeneratorType extends PluginCatalogType.Base implements IGeneratorType {
-
-    private static final DataQuery MINIMAL_SPAWN_HEIGHT = DataQuery.of('.', "Lantern.MinimalSpawnHeight");
-    private static final DataQuery GENERATOR_HEIGHT = DataQuery.of('.', "Lantern.GeneratorHeight");
 
     private GeneratorType generatorType;
 
@@ -67,7 +63,7 @@ public final class DelegateGeneratorType extends PluginCatalogType.Base implemen
     /**
      * Sets the actual {@link GeneratorType}.
      *
-     * @return The generator type
+     * @param generatorType The generator type
      */
     public void setGeneratorType(GeneratorType generatorType) {
         checkNotNull(generatorType, "generatorType");
@@ -79,7 +75,7 @@ public final class DelegateGeneratorType extends PluginCatalogType.Base implemen
     @Override
     public int getMinimalSpawnHeight() {
         if (this.minimalSpawnHeight == Integer.MAX_VALUE) {
-            this.minimalSpawnHeight = getGeneratorSettings().getInt(MINIMAL_SPAWN_HEIGHT).orElse(1);
+            this.minimalSpawnHeight = IGeneratorType.getMinimalSpawnHeight(this.generatorType);
         }
         return this.minimalSpawnHeight;
     }
@@ -87,7 +83,7 @@ public final class DelegateGeneratorType extends PluginCatalogType.Base implemen
     @Override
     public int getGeneratorHeight() {
         if (this.generatorHeight == Integer.MAX_VALUE) {
-            this.generatorHeight = getGeneratorSettings().getInt(GENERATOR_HEIGHT).orElse(256);
+            this.generatorHeight = IGeneratorType.getGeneratorHeight(this.generatorType);
         }
         return this.generatorHeight;
     }

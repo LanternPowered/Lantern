@@ -138,7 +138,7 @@ abstract class SchedulerBase {
         // If the task is now slated to be cancelled, we just remove it as if it
         // no longer exists.
         if (task.getState() == ScheduledTask.ScheduledTaskState.CANCELED) {
-            this.removeTask(task);
+            removeTask(task);
             return;
         }
         long threshold = Long.MAX_VALUE;
@@ -150,7 +150,7 @@ abstract class SchedulerBase {
             threshold = task.period;
         }
         // This moment is 'now'
-        long now = this.getTimestamp(task);
+        long now = getTimestamp(task);
         // So, if the current time minus the timestamp of the task is greater
         // than the delay to wait before starting the task, then start the task.
         // Repeating tasks get a reset-timestamp each time they are set RUNNING
@@ -158,11 +158,11 @@ abstract class SchedulerBase {
         // is removed after we start it.
         if (threshold <= (now - task.getTimestamp())) {
             task.setState(ScheduledTask.ScheduledTaskState.SWITCHING);
-            task.setTimestamp(this.getTimestamp(task));
+            task.setTimestamp(getTimestamp(task));
             startTask(task);
             // If task is one time shot, remove it from the map.
             if (task.period == 0L) {
-                this.removeTask(task);
+                removeTask(task);
             }
         }
     }
@@ -173,12 +173,12 @@ abstract class SchedulerBase {
      * @param task The task to start
      */
     protected void startTask(final ScheduledTask task) {
-        this.executeTaskRunnable(() -> {
+        executeTaskRunnable(() -> {
             task.setState(ScheduledTask.ScheduledTaskState.RUNNING);
             try {
                 task.getConsumer().accept(task);
             } catch (Throwable t) {
-                Lantern.getLogger().error("The Scheduler tried to run the task {} owned by {}, but an error occured.",
+                Lantern.getLogger().error("The Scheduler tried to run the task {} owned by {}, but an error occurred.",
                         task.getName(), task.getOwner(), t);
             }
         });

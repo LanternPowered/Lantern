@@ -39,7 +39,7 @@ final class SyncScheduler extends SchedulerBase {
      */
     void tick() {
         this.counter++;
-        this.runTick();
+        runTick();
     }
 
     @Override

@@ -25,23 +25,53 @@
  */
 package org.lanternpowered.server.world.gen;
 
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.GeneratorType;
 
 public interface IGeneratorType extends GeneratorType {
 
+    DataQuery MINIMAL_SPAWN_HEIGHT = DataQuery.of('.', "Lantern.MinimalSpawnHeight");
+    DataQuery GENERATOR_HEIGHT = DataQuery.of('.', "Lantern.GeneratorHeight");
+
     /**
-     * Gets the minimal spawn height that is required with
-     * this generator type.
+     * Gets the minimal spawn height that is required for
+     * this {@link GeneratorType}.
      *
      * @return The minimal spawn height
      */
     int getMinimalSpawnHeight();
 
     /**
-     * Gets the maximum height that will generator type will
+     * Gets the maximum height that this {@link GeneratorType} will
      * generate.
      *
      * @return The generator height
      */
     int getGeneratorHeight();
+
+    /**
+     * Gets the minimal spawn height that is required
+     * for the specified {@link GeneratorType}.
+     *
+     * @return The minimal spawn height
+     */
+    static int getMinimalSpawnHeight(GeneratorType generatorType) {
+        if (generatorType instanceof IGeneratorType) {
+            return ((IGeneratorType) generatorType).getMinimalSpawnHeight();
+        }
+        return generatorType.getGeneratorSettings().getInt(MINIMAL_SPAWN_HEIGHT).orElse(1);
+    }
+
+    /**
+     * Gets the maximum height that the specified
+     * {@link GeneratorType} will generate.
+     *
+     * @return The generator height
+     */
+    static int getGeneratorHeight(GeneratorType generatorType) {
+        if (generatorType instanceof IGeneratorType) {
+            return ((IGeneratorType) generatorType).getGeneratorHeight();
+        }
+        return generatorType.getGeneratorSettings().getInt(GENERATOR_HEIGHT).orElse(256);
+    }
 }

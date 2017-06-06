@@ -26,17 +26,23 @@
 package org.lanternpowered.server.scheduler;
 
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.ThreadHelper;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 final class AsyncScheduler extends SchedulerBase {
+
+    // A counter for executor threads
+    private final AtomicInteger counter = new AtomicInteger();
 
     // Adjustable timeout for pending Tasks
     private long minimumTimeout = Long.MAX_VALUE;
@@ -74,7 +80,8 @@ final class AsyncScheduler extends SchedulerBase {
     }
 
     private void mainLoop() {
-        this.executor = Executors.newCachedThreadPool();
+        this.executor = Executors.newCachedThreadPool(ThreadHelper.newFastThreadLocalThreadFactory(
+                () -> "async-" + this.counter.getAndIncrement()));
         this.lastProcessingTimestamp = System.nanoTime();
         while (true) {
             recalibrateMinimumTimeout();

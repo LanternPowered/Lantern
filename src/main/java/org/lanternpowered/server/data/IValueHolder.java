@@ -23,16 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.manipulator;
+package org.lanternpowered.server.data;
 
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.ValueContainer;
+
+import java.util.Optional;
 
 public interface IValueHolder {
 
+    /**
+     * Gets a raw (newly) created {@link BaseValue} instance. This bypasses
+     * possible caching mechanics (see {@link IImmutableValueHolder}).
+     *
+     * @param key The key
+     * @param <E> The element type
+     * @param <V> The value type
+     * @return The value, if present
+     */
+    <E, V extends BaseValue<E>> Optional<V> getRawValueFor(Key<V> key);
+
+    default <E, V extends BaseValue<E>> Optional<V> getValueFor(Key<V> key) {
+        return getRawValueFor(key);
+    }
+
     @SuppressWarnings("unchecked")
-    default <E, V extends BaseValue<E>> V tryGetValue(Key<V> key) {
-        return ((ValueContainer<?>) this).getValue(key).orElseThrow(() -> new IllegalArgumentException("The key " + key + " isn't present!"));
+    default <E, V extends BaseValue<E>> V tryGetValueFor(Key<V> key) {
+        return getValueFor(key).orElseThrow(() -> new IllegalArgumentException("The key " + key + " isn't present!"));
     }
 }

@@ -38,6 +38,7 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.lanternpowered.server.catalog.AbstractCatalogType;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.data.IImmutableDataHolderBase;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.CatalogType;
@@ -56,7 +57,6 @@ import org.spongepowered.api.util.Cycleable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -67,8 +67,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
-public final class LanternBlockState extends AbstractCatalogType implements PluginCatalogType, BlockState, AbstractDirectionRelativePropertyHolder {
+@SuppressWarnings({"rawtypes", "unchecked", "SuspiciousMethodCalls"})
+public final class LanternBlockState extends AbstractCatalogType implements PluginCatalogType, BlockState,
+        AbstractDirectionRelativePropertyHolder, IImmutableDataHolderBase<BlockState> {
 
     // A lookup table to get a specific state when you would change a value
     ImmutableTable<BlockTrait<?>, Comparable<?>, BlockState> propertyValueTable;
@@ -81,6 +82,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     // The base block state
     private final LanternBlockStateMap baseState;
+
+    // A cache to reuse constructed data manipulators
+    private final ImmutableContainerCache immutableContainerCache = new ImmutableContainerCache();
 
     // The name of the block state
     private final String name;
@@ -102,12 +106,12 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         }
         this.keyToBlockTrait = builder.build();
 
-        StringBuilder idBuilder = new StringBuilder();
+        final StringBuilder idBuilder = new StringBuilder();
         idBuilder.append(baseState.getBlockType().getId().substring(baseState.getBlockType().getPluginId().length() + 1));
         if (!traitValues.isEmpty()) {
             idBuilder.append('[');
-            Joiner joiner = Joiner.on(',');
-            List<String> propertyValues = new ArrayList<>();
+            final Joiner joiner = Joiner.on(',');
+            final List<String> propertyValues = new ArrayList<>();
             for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
                 propertyValues.add(entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase(Locale.ENGLISH));
             }
@@ -123,8 +127,13 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     }
 
     @Override
+    public ImmutableContainerCache getContainerCache() {
+        return this.immutableContainerCache;
+    }
+
+    @Override
     public int getContentVersion() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -132,9 +141,8 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         final DataContainer dataContainer = DataContainer.createNew();
         dataContainer.set(DataQuery.of("BlockType"), this.baseState.getBlockType().getId());
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : this.traitValues.entrySet()) {
-            Object value = entry.getValue();
-            dataContainer.set(((LanternBlockTrait) entry.getKey()).getKey().getQuery(),
-                    value instanceof CatalogType ? ((CatalogType) value).getId() : value);
+            final Object value = entry.getValue();
+            dataContainer.set(((LanternBlockTrait) entry.getKey()).getKey().getQuery(), value);
         }
         return dataContainer;
     }
@@ -147,24 +155,6 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     @Override
     public BlockState withExtendedProperties(Location<World> location) {
         return this.baseState.getBlockType().getExtendedBlockStateProvider().get(this, checkNotNull(location, "location"), null);
-    }
-
-    @Override
-    public <T extends ImmutableDataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T extends ImmutableDataManipulator<?, ?>> Optional<T> getOrCreate(Class<T> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean supports(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override
@@ -181,7 +171,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     @Override
     public <E> Optional<BlockState> with(Key<? extends BaseValue<E>> key, E value) {
         BlockTrait trait;
-        if (!this.supports(key) || !(trait = this.keyToBlockTrait.get(key)).getPredicate().test(value)) {
+        if (!supports(key) || !(trait = this.keyToBlockTrait.get(key)).getPredicate().test(value)) {
             return Optional.empty();
         }
         if (this.traitValues.get(trait) == value) {
@@ -192,10 +182,10 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public Optional<BlockState> with(BaseValue<?> value) {
-        if (!this.supports(value)) {
+        if (!supports(value)) {
             return Optional.empty();
         }
-        BlockTrait trait = this.keyToBlockTrait.get(value.getKey());
+        final BlockTrait trait = this.keyToBlockTrait.get(value.getKey());
         if (this.traitValues.get(trait) == value.get()) {
             return Optional.of(this);
         }
@@ -218,7 +208,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     public Optional<BlockState> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
         Optional<BlockState> state = null;
         for (ImmutableDataManipulator<?, ?> valueContainer : valueContainers) {
-            state = this.with(valueContainer);
+            state = with(valueContainer);
             if (!state.isPresent()) {
                 return state;
             }
@@ -234,7 +224,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public BlockState merge(BlockState that) {
-        if (!this.getType().equals(that.getType())) {
+        if (!getType().equals(that.getType())) {
             return this;
         } else {
             BlockState temp = this;
@@ -257,8 +247,8 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         } else {
             BlockState temp = this;
             for (ImmutableDataManipulator<?, ?> manipulator : that.getManipulators()) {
-                @Nullable ImmutableDataManipulator old = temp.get(manipulator.getClass()).orElse(null);
-                Optional<BlockState> optional = temp.with(checkNotNull(function.merge(old, manipulator)));
+                final ImmutableDataManipulator old = temp.get(manipulator.getClass()).orElse(null);
+                final Optional<BlockState> optional = temp.with(checkNotNull(function.merge(old, manipulator)));
                 if (optional.isPresent()) {
                     temp = optional.get();
                 } else {
@@ -271,18 +261,18 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
-        if (!this.supports(key)) {
+        if (!supports(key)) {
             return Optional.empty();
         }
         return Optional.ofNullable((E) this.traitValues.get(this.keyToBlockTrait.get(key)));
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        if (!this.supports(key)) {
+    public <E, V extends BaseValue<E>> Optional<V> getRawValueFor(Key<V> key) {
+        if (!supports(key)) {
             return Optional.empty();
         }
-        BlockTrait<?> blockTrait = this.keyToBlockTrait.get(key);
+        final BlockTrait<?> blockTrait = this.keyToBlockTrait.get(key);
         return Optional.of((V) new LanternValue(key, this.traitValues.get(blockTrait)));
     }
 
@@ -309,10 +299,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public BlockState cycleValue(Key<? extends BaseValue<? extends Cycleable<?>>> key) {
-        if (!this.supports(key)) {
-            return this;
-        }
-        return this.cycleTraitValue(this.keyToBlockTrait.get(key)).get();
+        return supports(key) ? cycleTraitValue(this.keyToBlockTrait.get(key)).get() : this;
     }
 
     @Override
@@ -322,18 +309,6 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         // TODO: Tile entity data
         return new LanternBlockSnapshot(location, this, this,
                 world.getCreator(pos), world.getNotifier(pos), ImmutableMap.of());
-    }
-
-    @Override
-    public List<ImmutableDataManipulator<?, ?>> getManipulators() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<ImmutableDataManipulator<?, ?>> getContainers() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /**
@@ -347,7 +322,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     public <T extends Comparable<T>> Optional<BlockState> cycleTraitValue(BlockTrait<T> blockTrait) {
         checkNotNull(blockTrait, "blockTrait");
 
-        if (!this.supportsTrait(blockTrait)) {
+        if (!supportsTrait(blockTrait)) {
             return Optional.empty();
         }
 
@@ -363,7 +338,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
                 last = next;
             }
         } else {
-            Iterator<T> it = blockTrait.getPossibleValues().iterator();
+            final Iterator<T> it = blockTrait.getPossibleValues().iterator();
             while (it.hasNext()) {
                 if (it.next() == value) {
                     if (it.hasNext()) {
@@ -375,7 +350,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
             }
         }
 
-        return this.withTrait(blockTrait, value);
+        return withTrait(blockTrait, value);
     }
 
     @Override
@@ -383,7 +358,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         checkNotNull(trait, "trait");
         checkNotNull(value, "value");
         if (value instanceof String) {
-            if (!this.supportsTrait(trait)) {
+            if (!supportsTrait(trait)) {
                 return Optional.empty();
             }
             for (Object object : trait.getPossibleValues()) {

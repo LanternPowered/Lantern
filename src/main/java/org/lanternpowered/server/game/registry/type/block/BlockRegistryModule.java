@@ -274,8 +274,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .trait(LanternEnumTraits.STONE_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.STONE_TYPE, LanternStoneType.STONE).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.STONE_TYPE, LanternStoneType.STONE)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.STONE_TYPE, LanternStoneType.STONE)
                                 )
                         )
                         .properties(builder -> builder
@@ -307,8 +307,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternBooleanTraits.SNOWY, false).get())
                         .extendedStateProvider(new SnowyExtendedBlockStateProvider())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.DIRT_TYPE, LanternDirtType.DIRT)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.DIRT_TYPE, LanternDirtType.DIRT)
                                 )
                         )
                         .properties(builder -> builder
@@ -334,8 +334,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .trait(LanternEnumTraits.TREE_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.TREE_TYPE, LanternTreeType.OAK)
                                 )
                         )
                         .properties(builder -> builder
@@ -355,8 +355,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get()
                                 .withTrait(LanternIntegerTraits.SAPLING_GROWTH_STAGE, 0).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.TREE_TYPE, LanternTreeType.OAK)
                                 )
                         )
                         .properties(builder -> builder
@@ -386,8 +386,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .trait(LanternEnumTraits.SAND_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.SAND_TYPE, LanternSandType.NORMAL).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.SAND_TYPE, LanternSandType.NORMAL)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.SAND_TYPE, LanternSandType.NORMAL)
                                 )
                         )
                         .properties(builder -> builder
@@ -457,8 +457,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .trait(LanternBooleanTraits.IS_WET)
                         .defaultState(state -> state.withTrait(LanternBooleanTraits.IS_WET, false).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.IS_WET, false)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.IS_WET, false)
                                 )
                         )
                         .properties(builder -> builder
@@ -528,8 +528,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .trait(LanternEnumTraits.SANDSTONE_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT)
                                 )
                         )
                         .properties(builder -> builder
@@ -641,8 +641,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                             .defaultState(state -> state
                                     .withTrait(LanternEnumTraits.SHRUB_TYPE, LanternShrubType.DEAD_BUSH).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.SHRUB_TYPE, LanternShrubType.DEAD_BUSH)))
+                                .keysProvider(collection -> collection
+                                        .register(Keys.SHRUB_TYPE, LanternShrubType.DEAD_BUSH)))
                         .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
@@ -683,8 +683,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.YELLOW_FLOWER_TYPE, LanternPlantType.DANDELION).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.PLANT_TYPE, LanternPlantType.DANDELION)))
+                                .keysProvider(collection -> collection
+                                        .register(Keys.PLANT_TYPE, LanternPlantType.DANDELION)))
                         .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
@@ -700,8 +700,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.RED_FLOWER_TYPE, LanternPlantType.POPPY).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.PLANT_TYPE, LanternPlantType.POPPY)))
+                                .keysProvider(collection -> collection
+                                        .register(Keys.PLANT_TYPE, LanternPlantType.POPPY)))
                         .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
@@ -1038,8 +1038,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
                                 tr("tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.TREE_TYPE, LanternTreeType.OAK)
                                 )
                         )
                         .properties(builder -> builder
@@ -1062,8 +1062,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .add(new SlabItemInteractionBehavior<>(LanternEnumTraits.TREE_TYPE,
                                                 () -> BlockTypes.WOODEN_SLAB,
                                                 () -> BlockTypes.DOUBLE_WOODEN_SLAB)))
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.TREE_TYPE, LanternTreeType.OAK)
                                 )
                         )
                         .boundingBox(BoundingBoxes::slab)
@@ -1167,8 +1167,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.QUARTZ_TYPE, LanternQuartzType.DEFAULT).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.QUARTZ_TYPE, LanternQuartzType.DEFAULT)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.QUARTZ_TYPE, LanternQuartzType.DEFAULT)
                                 )
                         )
                         .properties(builder -> builder
@@ -1259,8 +1259,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .trait(LanternEnumTraits.SANDSTONE_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT).get())
                         .itemType(builder -> builder
-                                .keysProvider(valueContainer -> valueContainer
-                                        .registerKey(Keys.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT)
+                                .keysProvider(collection -> collection
+                                        .register(Keys.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT)
                                 )
                         )
                         .properties(builder -> builder
@@ -1531,8 +1531,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .defaultState(state -> state
                         .withTrait(LanternEnumTraits.DYE_COLOR, LanternDyeColor.WHITE).get())
                 .itemType(builder -> builder
-                        .keysProvider(valueContainer -> valueContainer
-                                .registerKey(Keys.DYE_COLOR, LanternDyeColor.WHITE)
+                        .keysProvider(collection -> collection
+                                .register(Keys.DYE_COLOR, LanternDyeColor.WHITE)
                         )
                 )
                 .properties(builder -> builder
@@ -1558,8 +1558,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .traits(LanternBooleanTraits.DECAYABLE, LanternBooleanTraits.CHECK_DECAY, enumTrait)
                 .defaultState(state -> state.withTrait(enumTrait, defaultTreeType).get())
                 .itemType(builder -> builder
-                        .keysProvider(valueContainer -> valueContainer
-                                .registerKey(Keys.TREE_TYPE, defaultTreeType)
+                        .keysProvider(collection -> collection
+                                .register(Keys.TREE_TYPE, defaultTreeType)
                         )
                 )
                 .properties(builder -> builder
@@ -1592,8 +1592,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .traits(LanternEnumTraits.LOG_AXIS, enumTrait)
                 .defaultState(state -> state.withTrait(enumTrait, defaultTreeType).get())
                 .itemType(builder -> builder
-                        .keysProvider(valueContainer -> valueContainer
-                                .registerKey(Keys.TREE_TYPE, defaultTreeType)
+                        .keysProvider(collection -> collection
+                                .register(Keys.TREE_TYPE, defaultTreeType)
                         )
                 )
                 .properties(builder -> builder
@@ -1640,8 +1640,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .trait(LanternEnumTraits.FACING)
                 .defaultState(state -> state.withTrait(LanternEnumTraits.FACING, Direction.UP).get())
                 .itemType(builder -> builder
-                        .keysProvider(valueContainer -> valueContainer
-                                .registerKey(LanternKeys.INVENTORY_SNAPSHOT, InventorySnapshot.EMPTY)
+                        .keysProvider(collection -> collection
+                                .register(LanternKeys.INVENTORY_SNAPSHOT, InventorySnapshot.EMPTY)
                         )
                         .maxStackQuantity(1)
                 )
@@ -1674,8 +1674,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .itemType(builder -> builder
                         .behaviors(pipeline -> pipeline
                                 .add(new SlabItemInteractionBehavior<>(enumTrait, halfSlabType, doubleSlabType)))
-                        .keysProvider(valueContainer -> valueContainer
-                                .registerKey(Keys.SLAB_TYPE, defaultValue)
+                        .keysProvider(collection -> collection
+                                .register(Keys.SLAB_TYPE, defaultValue)
                         )
                 )
                 .properties(builder -> builder
@@ -1696,8 +1696,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .withTrait(LanternBooleanTraits.SEAMLESS, false).get())
                 .translation(TranslationProvider.of(enumTrait))
                 .itemType(builder -> builder
-                        .keysProvider(valueContainer -> valueContainer
-                                .registerKey(Keys.SLAB_TYPE, defaultValue)
+                        .keysProvider(collection -> collection
+                                .register(Keys.SLAB_TYPE, defaultValue)
                         )
                 )
                 .properties(builder -> builder

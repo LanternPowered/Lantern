@@ -1044,7 +1044,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public ValueFactory getValueFactory() {
-        return LanternValueFactory.getInstance();
+        return LanternValueFactory.get();
     }
 
     @Override

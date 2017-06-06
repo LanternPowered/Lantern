@@ -29,11 +29,11 @@ import static org.lanternpowered.server.data.manipulator.gen.TypeGenerator.newIn
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableData;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
-import org.lanternpowered.server.data.value.IValueContainer;
 import org.lanternpowered.server.util.DefineableClassLoader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -115,7 +115,7 @@ public final class DataManipulatorGenerator {
             PluginContainer pluginContainer, String id, String name,
             Class<M> manipulatorType, Class<I> immutableManipulatorType,
             @Nullable Class<? extends M> mutableExpansion, @Nullable Class<? extends I> immutableExpansion,
-            @Nullable Consumer<IValueContainer<?>> registrationConsumer) {
+            @Nullable Consumer<ValueCollection> registrationConsumer) {
         Class<?>[] classes = mutableExpansion == null ?
                 new Class[] { AbstractData.class, manipulatorType } :
                 new Class[] { AbstractData.class, manipulatorType, mutableExpansion };

@@ -28,7 +28,7 @@ package org.lanternpowered.server.item;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
-import org.lanternpowered.server.data.value.AbstractValueContainer;
+import org.lanternpowered.server.data.ValueCollection;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 
 public interface ItemTypeBuilder {
 
-    ItemTypeBuilder keysProvider(Consumer<AbstractValueContainer> consumer);
+    ItemTypeBuilder keysProvider(Consumer<ValueCollection> consumer);
 
     ItemTypeBuilder blockType(BlockType blockType);
 

@@ -30,13 +30,13 @@ import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.data.IValueContainer;
+import org.lanternpowered.server.data.KeyRegistration;
+import org.lanternpowered.server.data.element.Element;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.lanternpowered.server.data.value.ElementHolder;
-import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.data.DataQuery;
@@ -56,8 +56,8 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
     @SuppressWarnings("unchecked")
     @Override
     public void deserialize(T object, DataView dataView) {
-        if (object instanceof AbstractValueContainer) {
-            final AbstractValueContainer<S, H> valueContainer = (AbstractValueContainer) object;
+        if (object instanceof IValueContainer) {
+            final IValueContainer<S> valueContainer = (IValueContainer<S>) object;
             final SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
 
             deserializeValues(object, simpleValueContainer, dataView);
@@ -88,9 +88,9 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
             }
 
             for (Map.Entry<Key<?>, Object> entry : simpleValueContainer.getValues().entrySet()) {
-                final ElementHolder elementHolder = valueContainer.getElementHolder((Key) entry.getKey());
-                if (elementHolder != null) {
-                    elementHolder.set(entry.getValue());
+                final Element element = (Element) valueContainer.getValueCollection().getElement((Key) entry.getKey()).orElse(null);
+                if (element != null) {
+                    element.set(entry.getValue());
                 } else {
                     Lantern.getLogger().warn("Attempted to offer a unsupported value with key \"{}\" to the object {}",
                             entry.getKey().toString(), object.toString());
@@ -98,7 +98,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
             }
 
             dataView.getView(DataQueries.SPONGE_DATA).ifPresent(view ->
-                    DataHelper.applyRawContainerData(dataView, valueContainer, DataQueries.CUSTOM_MANIPULATORS));
+                    DataHelper.deserializeRawContainerData(dataView, valueContainer, DataQueries.CUSTOM_MANIPULATORS));
         } else {
             // Not sure what to do
         }
@@ -107,17 +107,18 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
     @SuppressWarnings("unchecked")
     @Override
     public void serialize(T object, DataView dataView) {
-        if (object instanceof AbstractValueContainer) {
-            final AbstractValueContainer<S, H> valueContainer = (AbstractValueContainer) object;
+        if (object instanceof IValueContainer) {
+            final IValueContainer<S> valueContainer = (IValueContainer<S>) object;
             final SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
 
-            for (Map.Entry<Key<?>, KeyRegistration> entry : valueContainer.getRawValueMap().entrySet()) {
-                final Object value = entry.getValue();
-                if (value instanceof ElementHolder) {
-                    final Object element = ((ElementHolder) value).get();
-                    if (element != null) {
-                        simpleValueContainer.set((Key) entry.getKey(), element);
-                    }
+            for (KeyRegistration<?,?> registration : valueContainer.getValueCollection().getAll()) {
+                if (!(registration instanceof Element)) {
+                    continue;
+                }
+                final Key key = registration.getKey();
+                final Object element = ((Element) registration).get();
+                if (element != null) {
+                    simpleValueContainer.set(key, element);
                 }
             }
 

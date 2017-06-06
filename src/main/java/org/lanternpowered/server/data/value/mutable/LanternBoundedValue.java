@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.value.mutable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternBoundedValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
@@ -80,7 +81,7 @@ public class LanternBoundedValue<E> extends LanternValue<E> implements MutableBo
 
     @Override
     public MutableBoundedValue<E> transform(Function<E, E> function) {
-        return this.set(checkNotNull(checkNotNull(function).apply(get())));
+        return set(checkNotNull(checkNotNull(function).apply(get())));
     }
 
     @Override
@@ -88,4 +89,10 @@ public class LanternBoundedValue<E> extends LanternValue<E> implements MutableBo
         return new ImmutableLanternBoundedValue<>(getKey(), getActualValue(), getDefault(), this.comparator, this.minimum, this.maximum);
     }
 
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("minimum", this.minimum)
+                .add("maximum", this.maximum);
+    }
 }

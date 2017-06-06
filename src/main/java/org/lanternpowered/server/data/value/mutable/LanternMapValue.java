@@ -54,7 +54,7 @@ public class LanternMapValue<K, V> extends LanternValue<Map<K, V>> implements Ma
     }
 
     public LanternMapValue(Key<? extends BaseValue<Map<K, V>>> key, Map<K, V> defaultMap, Map<K, V> actualMap) {
-        super(key, ImmutableMap.copyOf(defaultMap), new HashMap<>(actualMap));
+        super(key, ImmutableMap.copyOf(defaultMap), actualMap);
     }
 
     @Override

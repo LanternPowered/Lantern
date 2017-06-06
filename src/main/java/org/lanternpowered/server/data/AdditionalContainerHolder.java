@@ -23,15 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value;
+package org.lanternpowered.server.data;
 
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.ValueContainer;
 
-import javax.annotation.Nullable;
+/**
+ * This interface may be applied to a {@link ValueContainer} to tag it supporting
+ * additional containers. These are containers that can be provided by plugins, etc.
+ *
+ * @param <H> The container types
+ */
+public interface AdditionalContainerHolder<H extends ValueContainer<?>> {
 
-@FunctionalInterface
-public interface ElementHolderChangeListener<V extends BaseValue<E>, E> {
-
-    void onChange(Key<? extends V> key, IValueContainer<?> valueContainer, @Nullable E oldValue, @Nullable E newValue);
+    /**
+     * Gets the {@link AdditionalContainerCollection}.
+     *
+     * @return The additional containers
+     */
+    AdditionalContainerCollection<H> getAdditionalContainers();
 }

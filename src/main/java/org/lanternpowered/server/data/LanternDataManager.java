@@ -39,6 +39,7 @@ import com.google.inject.Singleton;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.persistence.SimpleDataTypeSerializerCollection;
 import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
+import org.lanternpowered.server.util.copy.Copyable;
 import org.slf4j.Logger;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
@@ -58,7 +59,6 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -128,7 +128,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         checkNotNull(clazz, "clazz");
         final List<DataContentUpdater> updaters = this.updatersMap.computeIfAbsent(clazz, key -> new ArrayList<>());
         updaters.add(dataContentUpdater);
-        Collections.sort(updaters, dataContentUpdaterComparator);
+        updaters.sort(dataContentUpdaterComparator);
     }
 
     @Override
@@ -180,11 +180,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
     public <T extends DataSerializable> Optional<T> deserialize(Class<T> clazz, DataView dataView) {
         checkNotNull(dataView, "dataView");
         final Optional<DataBuilder<T>> optional = getBuilder(clazz);
-        if (optional.isPresent()) {
-            return optional.get().build(dataView);
-        } else {
-            return Optional.empty();
-        }
+        return optional.flatMap(builder -> builder.build(dataView));
     }
 
     @SuppressWarnings("unchecked")
@@ -201,7 +197,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
     }
 
     @SuppressWarnings("unchecked")
-    public Optional<DataRegistration> getLegacyRegistration(String legacyId) {
+    Optional<DataRegistration> getLegacyRegistration(String legacyId) {
         checkNotNull(legacyId, "legacyId");
         return Optional.ofNullable(this.legacyRegistrations.get(legacyId));
     }
@@ -258,6 +254,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         this.registrations.put(registration.getImmutableManipulatorClass(), registration);
         registerBuilder(registration.getManipulatorClass(), registration.getDataManipulatorBuilder());
         DataManipulatorRegistryModule.get().registerAdditionalCatalog(registration);
+        Copyable.register(registration.getManipulatorClass(), DataManipulator::copy);
     }
 
     public Optional<DataRegistration> get(Class<?> type) {

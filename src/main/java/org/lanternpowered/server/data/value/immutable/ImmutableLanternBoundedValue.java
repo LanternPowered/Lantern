@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.value.immutable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.value.mutable.LanternBoundedValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
@@ -89,5 +90,12 @@ public class ImmutableLanternBoundedValue<E> extends ImmutableLanternValue<E> im
     @Override
     public Comparator<E> getComparator() {
         return this.comparator;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("minimum", this.minimum)
+                .add("maximum", this.maximum);
     }
 }

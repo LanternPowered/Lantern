@@ -28,11 +28,15 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.data.AbstractImmutableDataHolder;
+import org.lanternpowered.server.data.AdditionalContainerCollection;
+import org.lanternpowered.server.data.AdditionalContainerHolder;
+import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.data.IImmutableDataHolder;
+import org.lanternpowered.server.data.IValueContainer;
+import org.lanternpowered.server.data.KeyRegistration;
+import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.lanternpowered.server.data.value.ElementHolder;
-import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.data.DataContainer;
@@ -45,40 +49,40 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+public class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDataHolder<ItemStackSnapshot>,
+        AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
-public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmutableDataHolder<ItemStackSnapshot>, AbstractPropertyHolder {
-
-    private final Map<Key<?>, KeyRegistration> rawValueMap;
-    private final Map<Class<?>, ImmutableDataManipulator<?, ?>> rawAdditionalManipulators;
+    private final ValueCollection valueCollection;
+    private final AdditionalContainerCollection<ImmutableDataManipulator<?,?>> dataManipulators;
     private final ItemType itemType;
     // TODO: Hmm, inconsistency the the name with itemstack?
     private final int quantity;
 
     public LanternItemStackSnapshot(ItemType itemType, int quantity) {
-        this(itemType, quantity, new HashMap<>(), new HashMap<>());
-        ((LanternItemType) itemType).getKeysProvider().accept(this);
+        this(itemType, quantity, ValueCollection.create(), AdditionalContainerCollection.create());
+        ((LanternItemType) itemType).getKeysProvider().accept(getValueCollection());
     }
 
-    LanternItemStackSnapshot(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap,
-            Map<Class<?>, ImmutableDataManipulator<?, ?>> rawAdditionalManipulators) {
-        this.rawAdditionalManipulators = rawAdditionalManipulators;
-        this.rawValueMap = rawValueMap;
+    LanternItemStackSnapshot(ItemType itemType, int quantity, ValueCollection valueCollection,
+            AdditionalContainerCollection<ImmutableDataManipulator<?,?>> dataManipulators) {
+        this.valueCollection = valueCollection;
+        this.dataManipulators = dataManipulators;
         this.itemType = itemType;
         this.quantity = quantity;
     }
 
-    @Nullable
     @Override
-    public Map<Class<?>, ImmutableDataManipulator<?,?>> getRawAdditionalContainers() {
-        return this.rawAdditionalManipulators;
+    public ValueCollection getValueCollection() {
+        return this.valueCollection;
+    }
+
+    @Override
+    public AdditionalContainerCollection<ImmutableDataManipulator<?,?>> getAdditionalContainers() {
+        return this.dataManipulators;
     }
 
     @Override
@@ -98,9 +102,8 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
 
     @Override
     public ItemStack createStack() {
-        //noinspection ConstantConditions,Convert2MethodRef
-        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap(),
-                copyConvertedRawAdditionalManipulators(ImmutableDataManipulator::asMutable, () -> new ConcurrentHashMap<>()));
+        return new LanternItemStack(this.itemType, this.quantity, getValueCollection().copy(),
+                this.dataManipulators.mapAndAsConcurrent(ImmutableDataManipulator::asMutable));
     }
 
     @Override
@@ -109,18 +112,10 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
     }
 
     @Override
-    public int getContentVersion() {
-        return 0;
-    }
-
-    @Override
     public DataContainer toContainer() {
-        return null;
-    }
-
-    @Override
-    public Map<Key<?>, KeyRegistration> getRawValueMap() {
-        return this.rawValueMap;
+        return IImmutableDataHolder.super.toContainer()
+                .set(DataQueries.ITEM_TYPE, getType())
+                .set(DataQueries.QUANTITY, getCount());
     }
 
     @Override
@@ -134,17 +129,11 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
     }
 
     @Override
-    public Optional<ItemStackSnapshot> with(BaseValue<?> value) {
-        return null;
-    }
-
-    @Override
     public Optional<ItemStackSnapshot> with(ImmutableDataManipulator<?, ?> valueContainer) {
         return null;
     }
 
-    @Override
-    public Optional<ItemStackSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
+    @Override public Optional<ItemStackSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
         return null;
     }
 
@@ -174,33 +163,20 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
 
     public boolean isSimilar(ItemStackSnapshot that) {
         checkNotNull(that, "that");
-        return this.itemType == that.getType() && compareRawDataMaps(this, (AbstractValueContainer) that);
+        return this.itemType == that.getType() && compareRawDataMaps(this, (IValueContainer) that);
     }
 
     @SuppressWarnings("unchecked")
-    static boolean compareRawDataMaps(AbstractValueContainer container1, AbstractValueContainer container2) {
-        final Map<Key<?>, KeyRegistration> rawValueMap1 = container1.getRawValueMap();
-        final Map<Key<?>, KeyRegistration> rawValueMap2 = container2.getRawValueMap();
-        for (Map.Entry<Key<?>, KeyRegistration> entry : rawValueMap1.entrySet()) {
-            if (!rawValueMap2.containsKey(entry.getKey())) {
+    static boolean compareRawDataMaps(IValueContainer container1, IValueContainer container2) {
+        final ValueCollection valueCollection1 = container1.getValueCollection();
+        final ValueCollection valueCollection2 = container2.getValueCollection();
+        for (KeyRegistration<?,?> registration1 : valueCollection1.getAll()) {
+            if (!valueCollection2.has(registration1.getKey())) {
                 return false;
             }
-            final Object value1;
-            final KeyRegistration keyRegistration1 = entry.getValue();
-            if (!(keyRegistration1 instanceof ElementHolder)) {
-                //noinspection unchecked
-                value1 = container1.get((Key) entry.getKey());
-            } else {
-                value1 = ((ElementHolder) keyRegistration1).get();
-            }
-            final Object value2;
-            final KeyRegistration keyRegistration2 = rawValueMap2.get(entry.getKey());
-            if (!(keyRegistration2 instanceof ElementHolder)) {
-                //noinspection unchecked
-                value2 = container2.get((Key) entry.getKey());
-            } else {
-                value2 = ((ElementHolder) keyRegistration2).get();
-            }
+            final KeyRegistration registration2 = (KeyRegistration) valueCollection2.get((Key) registration1.getKey()).get();
+            final Object value1 = ((Processor) registration1).getFrom(container1);
+            final Object value2 = ((Processor) registration2).getFrom(container2);
             if (!Objects.equals(value1, value2)) {
                 return false;
             }

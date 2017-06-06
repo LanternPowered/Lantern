@@ -39,7 +39,7 @@ public class AbstractVariantData<E, M extends VariantData<E, M, I>, I extends Im
 
     public AbstractVariantData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<? extends Value<E>> variantKey, E defaultVariant) {
         super(manipulatorType, immutableManipulatorType);
-        registerKey(variantKey, defaultVariant);
+        getValueCollection().register(variantKey, defaultVariant);
         this.variantKey = variantKey;
     }
 

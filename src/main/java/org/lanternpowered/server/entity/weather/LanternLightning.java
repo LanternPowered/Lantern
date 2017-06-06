@@ -49,7 +49,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
     @Override
     public void registerKeys() {
         super.registerKeys();
-        this.registerKey(LanternKeys.IS_EFFECT, false).notRemovable();
+        getValueCollection().registerNonRemovable(LanternKeys.IS_EFFECT, false);
     }
 
     @Override

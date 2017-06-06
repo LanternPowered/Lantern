@@ -23,40 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value;
+package org.lanternpowered.server.data.processor;
 
-import java.util.function.BiConsumer;
+import org.spongepowered.api.data.value.BaseValue;
 
-import javax.annotation.Nullable;
+public interface ElementProcessor<V extends BaseValue<E>, E> extends Processor<V, E> {
 
-public interface ElementHolder<E> {
-
-    /**
-     * Sets the new element and retrieves the old one if present.
-     *
-     * @param element The element
-     * @return The old element if present, otherwise {@code null}
-     */
-    @Nullable E set(@Nullable E element);
-
-    /**
-     * Gets the current value if present.
-     *
-     * @return The current element if present, otherwise {@code null}
-     */
-    @Nullable E get();
-
-    /**
-     * Adds a listener that tracks the changes of the internal value.
-     *
-     * @param listener The listener
-     */
-    void addListener(Listener<E> listener);
-
-    @FunctionalInterface
-    interface Listener<E> extends BiConsumer<E, E> {
-
-        @Override
-        void accept(E oldElement, E newElement);
-    }
 }

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.manipulator.mutable.block;
 
-import org.lanternpowered.server.data.manipulator.IValueHolder;
+import org.lanternpowered.server.data.IValueHolder;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.block.WireAttachmentData;
 import org.spongepowered.api.data.type.WireAttachmentType;
@@ -36,6 +36,6 @@ public interface LanternWireAttachmentData extends WireAttachmentData, IValueHol
 
     @Override
     default MapValue<Direction, WireAttachmentType> wireAttachments() {
-        return tryGetValue(Keys.WIRE_ATTACHMENTS);
+        return tryGetValueFor(Keys.WIRE_ATTACHMENTS);
     }
 }

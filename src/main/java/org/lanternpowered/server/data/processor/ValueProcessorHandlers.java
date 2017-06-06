@@ -23,29 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.processor;
+package org.lanternpowered.server.data.processor;
 
-import org.lanternpowered.server.data.value.IValueContainer;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 
-import java.util.function.BiFunction;
-
 @SuppressWarnings("unchecked")
-public final class RemoveHandlers {
+public final class ValueProcessorHandlers {
 
-    private static BiFunction<Key, IValueContainer, DataTransactionResult> FAIL_ALWAYS_REMOVE_HANDLER =
-            (key, container) -> DataTransactionResult.failNoData();
+    public static final class Remove {
 
-    /**
-     * Gets a remove handler that will always fail.
-     *
-     * @param <V> The type of the value
-     * @return The remove handler
-     */
-    public static <V extends BaseValue<?>> BiFunction<Key<? extends V>, IValueContainer<?>, DataTransactionResult> failAlways() {
-        return (BiFunction) FAIL_ALWAYS_REMOVE_HANDLER;
+        private static ValueProcessorBuilder.RemoveFunction FAIL_ALWAYS_REMOVE_HANDLER =
+                (key, container) -> DataTransactionResult.failNoData();
+
+        /**
+         * Gets a remove handler that will always fail.
+         *
+         * @param <V> The type of the value
+         * @return The remove handler
+         */
+        public static <V extends BaseValue<E>, E> ValueProcessorBuilder.RemoveFunction<V, E> failAlways() {
+            return (ValueProcessorBuilder.RemoveFunction<V, E>) FAIL_ALWAYS_REMOVE_HANDLER;
+        }
     }
 
+    private ValueProcessorHandlers() {
+    }
 }

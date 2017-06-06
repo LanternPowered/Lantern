@@ -33,7 +33,7 @@ import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
-import org.lanternpowered.server.data.value.AbstractValueContainer;
+import org.lanternpowered.server.data.ValueCollection;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -47,12 +47,12 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
     @Nullable private PropertyProviderCollection.Builder propertiesBuilder;
     @Nullable private MutableBehaviorPipeline<Behavior> behaviorPipeline;
     @Nullable private TranslationProvider translationProvider;
-    private Consumer<AbstractValueContainer> keysProvider = valueContainer -> {};
+    private Consumer<ValueCollection> keysProvider = valueContainer -> {};
     @Nullable private BlockType blockType;
     private int maxStackQuantity = 64;
 
     @Override
-    public ItemTypeBuilderImpl keysProvider(Consumer<AbstractValueContainer> consumer) {
+    public ItemTypeBuilderImpl keysProvider(Consumer<ValueCollection> consumer) {
         checkNotNull(consumer, "consumer");
         this.keysProvider = this.keysProvider.andThen(consumer);
         return this;

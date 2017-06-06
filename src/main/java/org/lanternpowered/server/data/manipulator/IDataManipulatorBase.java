@@ -33,4 +33,7 @@ public interface IDataManipulatorBase<M extends DataManipulator<M, I>, I extends
     Class<I> getImmutableType();
 
     Class<M> getMutableType();
+
+    default void registerKeys() {
+    }
 }

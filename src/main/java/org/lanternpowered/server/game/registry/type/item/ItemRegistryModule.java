@@ -222,8 +222,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////
         register(263, builder()
                 .translation(TranslationProvider.of(CoalTypes.COAL, Keys.COAL_TYPE))
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.COAL_TYPE, CoalTypes.COAL)
+                .keysProvider(c -> c
+                        .register(Keys.COAL_TYPE, CoalTypes.COAL)
                 )
                 .build("minecraft", "coal"));
         ///////////////////
@@ -621,8 +621,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////
         register(322, builder()
                 .translation("item.appleGold.name")
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.GOLDEN_APPLE_TYPE, GoldenApples.GOLDEN_APPLE)
+                .keysProvider(c -> c
+                        .register(Keys.GOLDEN_APPLE_TYPE, GoldenApples.GOLDEN_APPLE)
                 )
                 .properties(builder -> builder
                         .add(useDuration(32))
@@ -814,8 +814,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///   Fish   ///
         ////////////////
         register(349, builder()
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.FISH_TYPE, Fishes.COD).notRemovable())
+                .keysProvider(c -> c
+                        .registerNonRemovable(Keys.FISH_TYPE, Fishes.COD))
                 .translation(TranslationProvider.of(Fishes.COD, Keys.FISH_TYPE))
                 .properties(builder -> builder
                         .add(useDuration(32))
@@ -830,8 +830,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///   Cooked Fish   ///
         ///////////////////////
         register(350, builder()
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.COOKED_FISH, CookedFishes.COD).notRemovable())
+                .keysProvider(c -> c
+                        .registerNonRemovable(Keys.COOKED_FISH, CookedFishes.COD))
                 .translation(TranslationProvider.of(CookedFishes.COD, Keys.COOKED_FISH))
                 .properties(builder -> builder
                         .add(useDuration(32))
@@ -846,8 +846,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///   Dye   ///
         ///////////////
         register(351, builder()
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.DYE_COLOR, DyeColors.WHITE).notRemovable())
+                .keysProvider(c -> c
+                        .registerNonRemovable(Keys.DYE_COLOR, DyeColors.WHITE))
                 .translation(coloredTranslation("item.dyePowder.%s.name", DyeColors.WHITE))
                 .build("minecraft", "dye"));
         ////////////////
@@ -1123,8 +1123,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(386, builder()
                 .translation("item.writingBook.name")
                 .maxStackQuantity(1)
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.BOOK_PAGES, null))
+                .keysProvider(c -> c
+                        .register(Keys.BOOK_PAGES, null))
                 .build("minecraft", "writable_book"));
         ////////////////////////
         ///   Written Book   ///
@@ -1132,10 +1132,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(387, builder()
                 .translation("item.writtenBook.name")
                 .maxStackQuantity(1)
-                .keysProvider(valueContainer -> {
-                    valueContainer.registerKey(Keys.BOOK_PAGES, null);
-                    valueContainer.registerKey(Keys.BOOK_AUTHOR, null);
-                    valueContainer.registerKey(Keys.GENERATION, null);
+                .keysProvider(c -> {
+                    c.register(Keys.BOOK_PAGES, null);
+                    c.register(Keys.BOOK_AUTHOR, null);
+                    c.register(Keys.GENERATION, null);
                 })
                 .behaviors(pipeline -> pipeline
                         .add(new OpenHeldBookBehavior()))
@@ -1230,8 +1230,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////
         register(397, builder()
                 .translation(TranslationProvider.of(SkullTypes.SKELETON, Keys.SKULL_TYPE))
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.SKULL_TYPE, SkullTypes.SKELETON))
+                .keysProvider(c -> c
+                        .register(Keys.SKULL_TYPE, SkullTypes.SKELETON))
                 .properties(builder -> builder
                         .add(equipmentType(EquipmentTypes.HEADWEAR)))
                 .build("minecraft", "skull"));
@@ -1265,9 +1265,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////
         register(401, builder()
                 .translation("item.fireworks.name")
-                .keysProvider(valueContainer -> {
-                    valueContainer.registerKey(Keys.FIREWORK_EFFECTS, Collections.emptyList());
-                    valueContainer.registerKey(Keys.FIREWORK_FLIGHT_MODIFIER, 1);
+                .keysProvider(c -> {
+                    c.register(Keys.FIREWORK_EFFECTS, Collections.emptyList());
+                    c.register(Keys.FIREWORK_FLIGHT_MODIFIER, 1);
                 })
                 .build("minecraft", "fireworks"));
         ///////////////////////
@@ -1275,8 +1275,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(402, builder()
                 .translation("item.fireworksCharge.name")
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.FIREWORK_EFFECTS, Collections.emptyList())
+                .keysProvider(c -> c
+                        .register(Keys.FIREWORK_EFFECTS, Collections.emptyList())
                 )
                 .maxStackQuantity(1)
                 .build("minecraft", "firework_charge"));
@@ -1285,8 +1285,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////////
         register(403, builder()
                 .translation("item.enchantedBook.name")
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.STORED_ENCHANTMENTS, null))
+                .keysProvider(c -> c
+                        .register(Keys.STORED_ENCHANTMENTS, null))
                 .maxStackQuantity(1)
                 .build("minecraft", "enchanted_book"));
         //////////////////////
@@ -1737,10 +1737,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                     }
                     return tr("item.potion.name");
                 })
-                .keysProvider(valueContainer -> {
-                    valueContainer.registerKey(Keys.COLOR, null);
-                    valueContainer.registerKey(Keys.POTION_EFFECTS, null);
-                    valueContainer.registerKey(LanternKeys.POTION_TYPE, null);
+                .keysProvider(c -> {
+                    c.register(Keys.COLOR, null);
+                    c.register(Keys.POTION_EFFECTS, null);
+                    c.register(LanternKeys.POTION_TYPE, null);
                 });
     }
 
@@ -1759,9 +1759,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         return builder()
                 .maxStackQuantity(1)
                 .properties(builder -> useLimit(useLimit))
-                .keysProvider(valueContainer -> {
-                    valueContainer.registerKey(Keys.ITEM_DURABILITY, 0);
-                    valueContainer.registerKey(Keys.UNBREAKABLE, true); // True until durability is implemented
+                .keysProvider(c -> {
+                    c.register(Keys.ITEM_DURABILITY, 0);
+                    c.register(Keys.UNBREAKABLE, true); // True until durability is implemented
                 });
     }
 
@@ -1773,8 +1773,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
 
     private ItemTypeBuilder leatherArmorBuilder(int useLimit, EquipmentType equipmentType) {
         return armorBuilder(useLimit, ArmorTypes.LEATHER, equipmentType)
-                .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.COLOR, null));
+                .keysProvider(c -> c
+                        .register(Keys.COLOR, null));
     }
 
     private ItemTypeBuilder armorBuilder(int useLimit, ArmorType armorType, EquipmentType equipmentType) {

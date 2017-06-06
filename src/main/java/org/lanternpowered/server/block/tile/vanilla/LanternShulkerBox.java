@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -33,7 +34,6 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -47,8 +47,9 @@ public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory>
     @Override
     public void registerKeys() {
         super.registerKeys();
-        registerKey(Keys.DISPLAY_NAME, null);
-        registerProcessorKey(LanternKeys.INVENTORY_SNAPSHOT).applyValueProcessor(builder -> builder
+        final ValueCollection c = getValueCollection();
+        c.register(Keys.DISPLAY_NAME, null);
+        c.registerProcessor(LanternKeys.INVENTORY_SNAPSHOT).add(builder -> builder
                 .offerHandler(((key, valueContainer, inventorySnapshot) -> {
                     this.inventory.clear();
                     inventorySnapshot.offerTo(this.inventory);

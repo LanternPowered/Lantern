@@ -58,6 +58,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHolder {
 
     private static Cause RESTORE_CAUSE = Cause.of(NamedCause.of("EMPTY", "EMPTY"));

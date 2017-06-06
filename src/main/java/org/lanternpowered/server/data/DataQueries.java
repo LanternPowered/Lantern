@@ -93,4 +93,14 @@ public final class DataQueries {
     public static final DataQuery FIREWORK_FADE_COLORS = of("Fades");
     public static final DataQuery FIREWORK_TRAILS = of("Trails");
     public static final DataQuery FIREWORK_FLICKERS = of("Flickers");
+
+    // Others
+    public static final DataQuery ENTITY_TYPE = DataQuery.of("EntityType");
+    public static final DataQuery TILE_ENTITY_TYPE = DataQuery.of("TileEntityType");
+
+    public static final DataQuery ITEM_TYPE = DataQuery.of("ItemType");
+    public static final DataQuery QUANTITY = DataQuery.of("Quantity");
+
+    public static final DataQuery POSITION = DataQuery.of("Position");
+    public static final DataQuery ROTATION = DataQuery.of("Rotation");
 }

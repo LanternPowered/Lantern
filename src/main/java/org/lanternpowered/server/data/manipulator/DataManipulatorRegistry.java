@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.data.DataHelper;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.manipulator.gen.DataManipulatorGenerator;
 import org.lanternpowered.server.data.manipulator.immutable.block.LanternImmutableConnectedDirectionData;
@@ -48,7 +49,8 @@ import org.lanternpowered.server.data.manipulator.mutable.entity.LanternStatisti
 import org.lanternpowered.server.data.manipulator.mutable.fluid.LanternFluidTankData;
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternInventoryItemData;
 import org.lanternpowered.server.data.manipulator.mutable.tileentity.LanternBeaconData;
-import org.lanternpowered.server.data.value.IValueContainer;
+import org.lanternpowered.server.entity.LanternEntitySnapshot;
+import org.lanternpowered.server.fluid.LanternFluidStackSnapshot;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -464,26 +466,26 @@ public class DataManipulatorRegistry {
 
         /// normal containers
         register(ColoredData.class, ImmutableColoredData.class,
-                c -> c.registerKey(Keys.COLOR, Color.WHITE));
+                c -> c.register(Keys.COLOR, Color.WHITE));
         register(CommandData.class, ImmutableCommandData.class,
                 c -> {
-                    c.registerKey(Keys.COMMAND, "");
-                    c.registerKey(Keys.SUCCESS_COUNT, 0);
-                    c.registerKey(Keys.TRACKS_OUTPUT, true);
-                    c.registerKey(Keys.LAST_COMMAND_OUTPUT, Optional.empty());
+                    c.register(Keys.COMMAND, "");
+                    c.register(Keys.SUCCESS_COUNT, 0);
+                    c.register(Keys.TRACKS_OUTPUT, true);
+                    c.register(Keys.LAST_COMMAND_OUTPUT, Optional.empty());
                 });
         register(DisplayNameData.class, ImmutableDisplayNameData.class,
-                c -> c.registerKey(Keys.DISPLAY_NAME, Text.EMPTY));
+                c -> c.register(Keys.DISPLAY_NAME, Text.EMPTY));
         register(FireworkRocketData.class, ImmutableFireworkRocketData.class,
-                c -> c.registerKey(Keys.FIREWORK_FLIGHT_MODIFIER, 0));
+                c -> c.register(Keys.FIREWORK_FLIGHT_MODIFIER, 0));
         register(RepresentedItemData.class, ImmutableRepresentedItemData.class,
-                c -> c.registerKey(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE));
+                c -> c.register(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE));
         register(RepresentedPlayerData.class, ImmutableRepresentedPlayerData.class,
-                c -> c.registerKey(Keys.REPRESENTED_PLAYER, LanternGameProfile.UNKNOWN));
+                c -> c.register(Keys.REPRESENTED_PLAYER, LanternGameProfile.UNKNOWN));
         register(TargetedLocationData.class, ImmutableTargetedLocationData.class,
-                c -> c.registerKey(Keys.TARGETED_LOCATION, Vector3d.ZERO));
+                c -> c.register(Keys.TARGETED_LOCATION, Vector3d.ZERO));
         register(WetData.class, ImmutableWetData.class,
-                c -> c.registerKey(Keys.IS_WET, false));
+                c -> c.register(Keys.IS_WET, false));
 
         /// variant containers
         registerVariant(DyeableData.class, ImmutableDyeableData.class, Keys.DYE_COLOR, DyeColors.WHITE);
@@ -500,54 +502,54 @@ public class DataManipulatorRegistry {
 
         /// normal containers
         register(AttachedData.class, ImmutableAttachedData.class,
-                c -> c.registerKey(Keys.ATTACHED, false));
+                c -> c.register(Keys.ATTACHED, false));
         register(ConnectedDirectionData.class, ImmutableConnectedDirectionData.class, LanternConnectedDirectionData.class, LanternImmutableConnectedDirectionData.class,
                 c -> {
-                    c.registerKey(Keys.CONNECTED_WEST, false);
-                    c.registerKey(Keys.CONNECTED_EAST, false);
-                    c.registerKey(Keys.CONNECTED_SOUTH, false);
-                    c.registerKey(Keys.CONNECTED_NORTH, false);
+                    c.register(Keys.CONNECTED_WEST, false);
+                    c.register(Keys.CONNECTED_EAST, false);
+                    c.register(Keys.CONNECTED_SOUTH, false);
+                    c.register(Keys.CONNECTED_NORTH, false);
                 });
         register(DecayableData.class, ImmutableDecayableData.class,
-                c -> c.registerKey(Keys.DECAYABLE, true));
+                c -> c.register(Keys.DECAYABLE, true));
         register(DelayableData.class, ImmutableDelayableData.class,
-                c -> c.registerKey(Keys.DELAY, 1, 0, Integer.MAX_VALUE));
+                c -> c.register(Keys.DELAY, 1, 0, Integer.MAX_VALUE));
         register(DirectionalData.class, ImmutableDirectionalData.class,
-                c -> c.registerKey(Keys.DIRECTION, Direction.NORTH));
+                c -> c.register(Keys.DIRECTION, Direction.NORTH));
         register(DisarmedData.class, ImmutableDisarmedData.class,
-                c -> c.registerKey(Keys.DISARMED, false));
+                c -> c.register(Keys.DISARMED, false));
         register(DropData.class, ImmutableDropData.class,
-                c -> c.registerKey(Keys.SHOULD_DROP, true));
+                c -> c.register(Keys.SHOULD_DROP, true));
         register(ExtendedData.class, ImmutableExtendedData.class,
-                c -> c.registerKey(Keys.EXTENDED, false));
+                c -> c.register(Keys.EXTENDED, false));
         register(FilledData.class, ImmutableFilledData.class,
-                c -> c.registerKey(Keys.FILLED, false));
+                c -> c.register(Keys.FILLED, false));
         register(GrowthData.class, ImmutableGrowthData.class,
-                c -> c.registerKey(Keys.GROWTH_STAGE, 0));
+                c -> c.register(Keys.GROWTH_STAGE, 0));
         register(InWallData.class, ImmutableInWallData.class,
-                c -> c.registerKey(Keys.IN_WALL, false));
+                c -> c.register(Keys.IN_WALL, false));
         register(LayeredData.class, ImmutableLayeredData.class,
-                c -> c.registerKey(Keys.LAYER, 1));
+                c -> c.register(Keys.LAYER, 1));
         register(MoistureData.class, ImmutableMoistureData.class,
-                c -> c.registerKey(Keys.MOISTURE, 0));
+                c -> c.register(Keys.MOISTURE, 0));
         register(OccupiedData.class, ImmutableOccupiedData.class,
-                c -> c.registerKey(Keys.OCCUPIED, false));
+                c -> c.register(Keys.OCCUPIED, false));
         register(OpenData.class, ImmutableOpenData.class,
-                c -> c.registerKey(Keys.OPEN, false));
+                c -> c.register(Keys.OPEN, false));
         register(PoweredData.class, ImmutablePoweredData.class,
-                c -> c.registerKey(Keys.POWERED, false));
+                c -> c.register(Keys.POWERED, false));
         register(RedstonePoweredData.class, ImmutableRedstonePoweredData.class,
-                c -> c.registerKey(Keys.POWER, 0));
+                c -> c.register(Keys.POWER, 0));
         register(SeamlessData.class, ImmutableSeamlessData.class,
-                c -> c.registerKey(Keys.SEAMLESS, false));
+                c -> c.register(Keys.SEAMLESS, false));
         register(SnowedData.class, ImmutableSnowedData.class,
-                c -> c.registerKey(Keys.SNOWED, false));
+                c -> c.register(Keys.SNOWED, false));
         register(WireAttachmentData.class, ImmutableWireAttachmentData.class, LanternWireAttachmentData.class, LanternImmutableWireAttachmentData.class,
                 c -> {
-                    c.registerKey(Keys.WIRE_ATTACHMENT_WEST, WireAttachmentTypes.NONE);
-                    c.registerKey(Keys.WIRE_ATTACHMENT_EAST, WireAttachmentTypes.NONE);
-                    c.registerKey(Keys.WIRE_ATTACHMENT_SOUTH, WireAttachmentTypes.NONE);
-                    c.registerKey(Keys.WIRE_ATTACHMENT_NORTH, WireAttachmentTypes.NONE);
+                    c.register(Keys.WIRE_ATTACHMENT_WEST, WireAttachmentTypes.NONE);
+                    c.register(Keys.WIRE_ATTACHMENT_EAST, WireAttachmentTypes.NONE);
+                    c.register(Keys.WIRE_ATTACHMENT_SOUTH, WireAttachmentTypes.NONE);
+                    c.register(Keys.WIRE_ATTACHMENT_NORTH, WireAttachmentTypes.NONE);
                 });
 
         /// variant containers
@@ -583,207 +585,207 @@ public class DataManipulatorRegistry {
 
         /// normal containers
         register(AbsorptionData.class, ImmutableAbsorptionData.class,
-                c -> c.registerKey(Keys.ABSORPTION, 0.0));
+                c -> c.register(Keys.ABSORPTION, 0.0));
         register(AffectsSpawningData.class, ImmutableAffectsSpawningData.class,
-                c -> c.registerKey(Keys.AFFECTS_SPAWNING, false));
+                c -> c.register(Keys.AFFECTS_SPAWNING, false));
         register(AgeableData.class, ImmutableAgeableData.class,
                 c -> {
-                    c.registerKey(Keys.AGE, 0);
-                    c.registerKey(Keys.IS_ADULT, true);
+                    c.register(Keys.AGE, 0);
+                    c.register(Keys.IS_ADULT, true);
                 });
         register(AgentData.class, ImmutableAgentData.class,
-                c -> c.registerKey(Keys.AI_ENABLED, true));
+                c -> c.register(Keys.AI_ENABLED, true));
         register(AggressiveData.class, ImmutableAggressiveData.class,
-                c -> c.registerKey(Keys.ANGRY, false));
+                c -> c.register(Keys.ANGRY, false));
         register(AngerableData.class, ImmutableAngerableData.class,
-                c -> c.registerKey(Keys.ANGER, 0));
+                c -> c.register(Keys.ANGER, 0));
         register(AreaEffectCloudData.class, ImmutableAreaEffectCloudData.class,
                 c -> {
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_COLOR, Color.WHITE);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_AGE, 0);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_DURATION, 100);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_DURATION_ON_USE, 0);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_PARTICLE_TYPE, ParticleTypes.SPLASH_POTION);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_RADIUS, 10.0);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_RADIUS_ON_USE, 0.0);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_RADIUS_PER_TICK, 0.1);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_REAPPLICATION_DELAY, 20);
-                    c.registerKey(Keys.AREA_EFFECT_CLOUD_WAIT_TIME, 20);
-                    c.registerKey(Keys.POTION_EFFECTS, new ArrayList<>());
+                    c.register(Keys.AREA_EFFECT_CLOUD_COLOR, Color.WHITE);
+                    c.register(Keys.AREA_EFFECT_CLOUD_AGE, 0);
+                    c.register(Keys.AREA_EFFECT_CLOUD_DURATION, 100);
+                    c.register(Keys.AREA_EFFECT_CLOUD_DURATION_ON_USE, 0);
+                    c.register(Keys.AREA_EFFECT_CLOUD_PARTICLE_TYPE, ParticleTypes.SPLASH_POTION);
+                    c.register(Keys.AREA_EFFECT_CLOUD_RADIUS, 10.0);
+                    c.register(Keys.AREA_EFFECT_CLOUD_RADIUS_ON_USE, 0.0);
+                    c.register(Keys.AREA_EFFECT_CLOUD_RADIUS_PER_TICK, 0.1);
+                    c.register(Keys.AREA_EFFECT_CLOUD_REAPPLICATION_DELAY, 20);
+                    c.register(Keys.AREA_EFFECT_CLOUD_WAIT_TIME, 20);
+                    c.register(Keys.POTION_EFFECTS, new ArrayList<>());
                 });
         register(ArmorStandData.class, ImmutableArmorStandData.class,
                 c -> {
-                    c.registerKey(Keys.ARMOR_STAND_MARKER, false);
-                    c.registerKey(Keys.ARMOR_STAND_IS_SMALL, false);
-                    c.registerKey(Keys.ARMOR_STAND_HAS_ARMS, false);
-                    c.registerKey(Keys.ARMOR_STAND_HAS_BASE_PLATE, true);
+                    c.register(Keys.ARMOR_STAND_MARKER, false);
+                    c.register(Keys.ARMOR_STAND_IS_SMALL, false);
+                    c.register(Keys.ARMOR_STAND_HAS_ARMS, false);
+                    c.register(Keys.ARMOR_STAND_HAS_BASE_PLATE, true);
                 });
         register(BodyPartRotationalData.class, ImmutableBodyPartRotationalData.class, LanternBodyPartRotationalData.class, LanternImmutableBodyPartRotationalData.class,
                 c -> {
-                    c.registerKey(Keys.HEAD_ROTATION, Vector3d.ZERO);
-                    c.registerKey(Keys.CHEST_ROTATION, Vector3d.ZERO);
-                    c.registerKey(Keys.LEFT_ARM_ROTATION, Vector3d.ZERO);
-                    c.registerKey(Keys.LEFT_LEG_ROTATION, Vector3d.ZERO);
-                    c.registerKey(Keys.RIGHT_ARM_ROTATION, Vector3d.ZERO);
-                    c.registerKey(Keys.RIGHT_LEG_ROTATION, Vector3d.ZERO);
+                    c.register(Keys.HEAD_ROTATION, Vector3d.ZERO);
+                    c.register(Keys.CHEST_ROTATION, Vector3d.ZERO);
+                    c.register(Keys.LEFT_ARM_ROTATION, Vector3d.ZERO);
+                    c.register(Keys.LEFT_LEG_ROTATION, Vector3d.ZERO);
+                    c.register(Keys.RIGHT_ARM_ROTATION, Vector3d.ZERO);
+                    c.register(Keys.RIGHT_LEG_ROTATION, Vector3d.ZERO);
                 });
         register(BreathingData.class, ImmutableBreathingData.class,
                 c -> {
-                    c.registerKey(Keys.REMAINING_AIR, 400);
-                    c.registerKey(Keys.MAX_AIR, 400);
+                    c.register(Keys.REMAINING_AIR, 400);
+                    c.register(Keys.MAX_AIR, 400);
                 });
         register(BreedableData.class, ImmutableBreedableData.class,
-                c -> c.registerKey(Keys.CAN_BREED, true));
+                c -> c.register(Keys.CAN_BREED, true));
         register(ChargedData.class, ImmutableChargedData.class,
-                c -> c.registerKey(Keys.CREEPER_CHARGED, false));
+                c -> c.register(Keys.CREEPER_CHARGED, false));
         register(CriticalHitData.class, ImmutableCriticalHitData.class,
-                c -> c.registerKey(Keys.CRITICAL_HIT, false));
+                c -> c.register(Keys.CRITICAL_HIT, false));
         register(CustomNameVisibleData.class, ImmutableCustomNameVisibleData.class,
-                c -> c.registerKey(Keys.CUSTOM_NAME_VISIBLE, true));
+                c -> c.register(Keys.CUSTOM_NAME_VISIBLE, true));
         register(DamageableData.class, ImmutableDamageableData.class,
                 c -> {
-                    c.registerKey(Keys.LAST_ATTACKER, Optional.empty());
-                    c.registerKey(Keys.LAST_DAMAGE, Optional.empty());
+                    c.register(Keys.LAST_ATTACKER, Optional.empty());
+                    c.register(Keys.LAST_DAMAGE, Optional.empty());
                 });
         register(DamagingData.class, ImmutableDamagingData.class,
                 c -> {
-                    c.registerKey(Keys.ATTACK_DAMAGE, 1.0);
-                    c.registerKey(Keys.DAMAGE_ENTITY_MAP, new HashMap<>());
+                    c.register(Keys.ATTACK_DAMAGE, 1.0);
+                    c.register(Keys.DAMAGE_ENTITY_MAP, new HashMap<>());
                 });
         register(DespawnDelayData.class, ImmutableDespawnDelayData.class,
-                c -> c.registerKey(Keys.DESPAWN_DELAY, 2000));
+                c -> c.register(Keys.DESPAWN_DELAY, 2000));
         // TODO: ExperienceHolderData
         register(ExpirableData.class, ImmutableExpirableData.class,
-                c -> c.registerKey(Keys.EXPIRATION_TICKS, 200));
+                c -> c.register(Keys.EXPIRATION_TICKS, 200));
         register(ExplosionRadiusData.class, ImmutableExplosionRadiusData.class,
-                c -> c.registerKey(Keys.EXPLOSION_RADIUS, Optional.empty()));
+                c -> c.register(Keys.EXPLOSION_RADIUS, Optional.empty()));
         register(ExpOrbData.class, ImmutableExpOrbData.class,
-                c -> c.registerKey(Keys.CONTAINED_EXPERIENCE, 1));
+                c -> c.register(Keys.CONTAINED_EXPERIENCE, 1));
         register(FallDistanceData.class, ImmutableFallDistanceData.class,
-                c -> c.registerKey(Keys.FALL_DISTANCE, 0f));
+                c -> c.register(Keys.FALL_DISTANCE, 0f));
         register(FallingBlockData.class, ImmutableFallingBlockData.class,
                 c -> {
-                    c.registerKey(Keys.FALL_DAMAGE_PER_BLOCK, 0.3);
-                    c.registerKey(Keys.FALLING_BLOCK_STATE, BlockTypes.SAND.getDefaultState());
-                    c.registerKey(Keys.FALLING_BLOCK_CAN_HURT_ENTITIES, true);
-                    c.registerKey(Keys.MAX_FALL_DAMAGE, Double.MAX_VALUE);
-                    c.registerKey(Keys.CAN_PLACE_AS_BLOCK, true);
-                    c.registerKey(Keys.CAN_DROP_AS_ITEM, true);
-                    c.registerKey(Keys.FALL_TIME, 1);
+                    c.register(Keys.FALL_DAMAGE_PER_BLOCK, 0.3);
+                    c.register(Keys.FALLING_BLOCK_STATE, BlockTypes.SAND.getDefaultState());
+                    c.register(Keys.FALLING_BLOCK_CAN_HURT_ENTITIES, true);
+                    c.register(Keys.MAX_FALL_DAMAGE, Double.MAX_VALUE);
+                    c.register(Keys.CAN_PLACE_AS_BLOCK, true);
+                    c.register(Keys.CAN_DROP_AS_ITEM, true);
+                    c.register(Keys.FALL_TIME, 1);
                 });
         register(FlammableData.class, ImmutableFlammableData.class,
-                c -> c.registerKey(Keys.IS_AFLAME, false));
+                c -> c.register(Keys.IS_AFLAME, false));
         register(FlyingAbilityData.class, ImmutableFlyingAbilityData.class,
-                c -> c.registerKey(Keys.CAN_FLY, false));
+                c -> c.register(Keys.CAN_FLY, false));
         register(FlyingData.class, ImmutableFlyingData.class,
-                c -> c.registerKey(Keys.IS_FLYING, false));
+                c -> c.register(Keys.IS_FLYING, false));
         register(FoodData.class, ImmutableFoodData.class,
                 c -> {
-                    c.registerKey(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
-                    c.registerKey(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
-                    c.registerKey(Keys.EXHAUSTION, 0.0, 0.0, 40.0);
-                    c.registerKey(Keys.SATURATION, 0.0, 0.0, 5.0);
+                    c.register(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
+                    c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
+                    c.register(Keys.EXHAUSTION, 0.0, 0.0, 40.0);
+                    c.register(Keys.SATURATION, 0.0, 0.0, 5.0);
                 });
         register(FuseData.class, ImmutableFuseData.class,
-                c -> c.registerKey(Keys.FUSE_DURATION, 20));
+                c -> c.register(Keys.FUSE_DURATION, 20));
         register(GlowingData.class, ImmutableGlowingData.class,
-                c -> c.registerKey(Keys.GLOWING, false));
+                c -> c.register(Keys.GLOWING, false));
         register(GravityData.class, ImmutableGravityData.class,
-                c -> c.registerKey(Keys.HAS_GRAVITY, true));
+                c -> c.register(Keys.HAS_GRAVITY, true));
         register(GriefingData.class, ImmutableGriefingData.class,
-                c -> c.registerKey(Keys.CAN_GRIEF, true));
+                c -> c.register(Keys.CAN_GRIEF, true));
         register(HealthData.class, ImmutableHealthData.class,
                 c -> {
-                    c.registerKey(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH);
-                    c.registerKey(Keys.MAX_HEALTH, 20.0, 0.0, Double.MAX_VALUE);
+                    c.register(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH);
+                    c.register(Keys.MAX_HEALTH, 20.0, 0.0, Double.MAX_VALUE);
                 });
         register(HealthScalingData.class, ImmutableHealthScalingData.class,
-                c -> c.registerKey(Keys.HEALTH_SCALE, 1.0));
+                c -> c.register(Keys.HEALTH_SCALE, 1.0));
         register(HorseData.class, ImmutableHorseData.class,
                 c -> {
-                    c.registerKey(Keys.HORSE_STYLE, HorseStyles.NONE);
-                    c.registerKey(Keys.HORSE_COLOR, HorseColors.WHITE);
+                    c.register(Keys.HORSE_STYLE, HorseStyles.NONE);
+                    c.register(Keys.HORSE_COLOR, HorseColors.WHITE);
                 });
         register(IgniteableData.class, ImmutableIgniteableData.class,
                 c -> {
-                    c.registerKey(Keys.FIRE_TICKS, 0, 0, Integer.MAX_VALUE);
-                    c.registerKey(Keys.FIRE_DAMAGE_DELAY, 0, 0, Integer.MAX_VALUE);
+                    c.register(Keys.FIRE_TICKS, 0, 0, Integer.MAX_VALUE);
+                    c.register(Keys.FIRE_DAMAGE_DELAY, 0, 0, Integer.MAX_VALUE);
                 });
         register(InvisibilityData.class, ImmutableInvisibilityData.class,
-                c -> c.registerKey(Keys.INVISIBLE, false));
+                c -> c.register(Keys.INVISIBLE, false));
         register(JoinData.class, ImmutableJoinData.class,
                 c -> {
-                    c.registerKey(Keys.FIRST_DATE_PLAYED, Instant.now());
-                    c.registerKey(Keys.LAST_DATE_PLAYED, Instant.now());
+                    c.register(Keys.FIRST_DATE_PLAYED, Instant.now());
+                    c.register(Keys.LAST_DATE_PLAYED, Instant.now());
                 });
         register(KnockbackData.class, ImmutableKnockbackData.class,
-                c -> c.registerKey(Keys.KNOCKBACK_STRENGTH, 0));
+                c -> c.register(Keys.KNOCKBACK_STRENGTH, 0));
         // TODO: LeashData?
         register(MinecartBlockData.class, ImmutableMinecartBlockData.class,
                 c -> {
-                    c.registerKey(Keys.REPRESENTED_BLOCK, BlockTypes.STONE.getDefaultState());
-                    c.registerKey(Keys.OFFSET, 0);
+                    c.register(Keys.REPRESENTED_BLOCK, BlockTypes.STONE.getDefaultState());
+                    c.register(Keys.OFFSET, 0);
                 });
         register(MovementSpeedData.class, ImmutableMovementSpeedData.class,
                 c -> {
-                    c.registerKey(Keys.WALKING_SPEED, 0.1);
-                    c.registerKey(Keys.FLYING_SPEED, 0.2);
+                    c.register(Keys.WALKING_SPEED, 0.1);
+                    c.register(Keys.FLYING_SPEED, 0.2);
                 });
         register(PersistingData.class, ImmutablePersistingData.class,
-                c -> c.registerKey(Keys.PERSISTS, false));
+                c -> c.register(Keys.PERSISTS, false));
         register(PickupDelayData.class, ImmutablePickupDelayData.class,
                 c -> {
-                    c.registerKey(Keys.PICKUP_DELAY, 0);
-                    c.registerKey(Keys.INFINITE_PICKUP_DELAY, false);
+                    c.register(Keys.PICKUP_DELAY, 0);
+                    c.register(Keys.INFINITE_PICKUP_DELAY, false);
                 });
         register(PickupRuleData.class, ImmutablePickupRuleData.class,
-                c -> c.registerKey(Keys.PICKUP_RULE, PickupRules.ALLOWED));
+                c -> c.register(Keys.PICKUP_RULE, PickupRules.ALLOWED));
         register(PigSaddleData.class, ImmutablePigSaddleData.class,
-                c -> c.registerKey(Keys.PIG_SADDLE, false));
+                c -> c.register(Keys.PIG_SADDLE, false));
         register(PlayerCreatedData.class, ImmutablePlayerCreatedData.class,
-                c -> c.registerKey(Keys.PLAYER_CREATED, false));
+                c -> c.register(Keys.PLAYER_CREATED, false));
         register(PlayingData.class, ImmutablePlayingData.class,
-                c -> c.registerKey(LanternKeys.ARE_PLAYING, false));
+                c -> c.register(LanternKeys.ARE_PLAYING, false));
         register(ScreamingData.class, ImmutableScreamingData.class,
-                c -> c.registerKey(Keys.IS_SCREAMING, false));
+                c -> c.register(Keys.IS_SCREAMING, false));
         register(ShatteringData.class, ImmutableShatteringData.class,
-                c -> c.registerKey(Keys.WILL_SHATTER, false));
+                c -> c.register(Keys.WILL_SHATTER, false));
         register(ShearedData.class, ImmutableShearedData.class,
-                c -> c.registerKey(Keys.IS_SHEARED, false));
+                c -> c.register(Keys.IS_SHEARED, false));
         register(SilentData.class, ImmutableSilentData.class,
-                c -> c.registerKey(Keys.IS_SILENT, false));
+                c -> c.register(Keys.IS_SILENT, false));
         register(SittingData.class, ImmutableSittingData.class,
-                c -> c.registerKey(Keys.IS_SITTING, false));
+                c -> c.register(Keys.IS_SITTING, false));
         register(SizeData.class, ImmutableSizeData.class,
                 c -> {
-                    c.registerKey(Keys.BASE_SIZE, 1f);
-                    c.registerKey(Keys.HEIGHT, 1f);
-                    c.registerKey(Keys.SCALE, 1f);
+                    c.register(Keys.BASE_SIZE, 1f);
+                    c.register(Keys.HEIGHT, 1f);
+                    c.register(Keys.SCALE, 1f);
                 });
         register(SkinData.class, ImmutableSkinData.class,
-                c -> c.registerKey(Keys.SKIN_UNIQUE_ID, LanternGameProfile.UNKNOWN_UUID));
+                c -> c.register(Keys.SKIN_UNIQUE_ID, LanternGameProfile.UNKNOWN_UUID));
         register(SleepingData.class, ImmutableSleepingData.class,
-                c -> c.registerKey(Keys.IS_SLEEPING, false));
+                c -> c.register(Keys.IS_SLEEPING, false));
         register(SlimeData.class, ImmutableSlimeData.class,
-                c -> c.registerKey(Keys.SLIME_SIZE, 1));
+                c -> c.register(Keys.SLIME_SIZE, 1));
         register(SneakingData.class, ImmutableSneakingData.class,
-                c -> c.registerKey(Keys.IS_SNEAKING, false));
+                c -> c.register(Keys.IS_SNEAKING, false));
         register(SprintData.class, ImmutableSprintData.class,
-                c -> c.registerKey(Keys.IS_SPRINTING, false));
+                c -> c.register(Keys.IS_SPRINTING, false));
         register(StuckArrowsData.class, ImmutableStuckArrowsData.class,
-                c -> c.registerKey(Keys.STUCK_ARROWS, 0));
+                c -> c.register(Keys.STUCK_ARROWS, 0));
         register(TameableData.class, ImmutableTameableData.class,
-                c -> c.registerKey(Keys.TAMED_OWNER, Optional.empty()));
+                c -> c.register(Keys.TAMED_OWNER, Optional.empty()));
         // TODO
         // final EntitySnapshot noneEntitySnapshot = EntitySnapshot.builder().type(EntityTypes.UNKNOWN).build();
-        EntitySnapshot noneEntitySnapshot = null;
+        EntitySnapshot noneEntitySnapshot = new LanternEntitySnapshot();
         register(VehicleData.class, ImmutableVehicleData.class,
                 c -> {
-                    c.registerKey(Keys.BASE_VEHICLE, noneEntitySnapshot);
-                    c.registerKey(Keys.VEHICLE, noneEntitySnapshot);
+                    c.register(Keys.BASE_VEHICLE, noneEntitySnapshot);
+                    c.register(Keys.VEHICLE, noneEntitySnapshot);
                 });
         register(VelocityData.class, ImmutableVelocityData.class,
-                c -> c.registerKey(Keys.VELOCITY, Vector3d.ZERO));
+                c -> c.register(Keys.VELOCITY, Vector3d.ZERO));
 
         /// variant containers
         registerVariant(ArtData.class, ImmutableArtData.class, Keys.ART, Arts.AZTEC);
@@ -810,7 +812,7 @@ public class DataManipulatorRegistry {
 
         /// normal containers
         register(FluidItemData.class, ImmutableFluidItemData.class,
-                c -> c.registerKey(Keys.FLUID_ITEM_STACK, null)); // TODO
+                c -> c.register(Keys.FLUID_ITEM_STACK, new LanternFluidStackSnapshot())); // TODO
 
         /// variant containers
 
@@ -826,31 +828,31 @@ public class DataManipulatorRegistry {
 
         /// normal containers
         register(AuthorData.class, ImmutableAuthorData.class,
-                c -> c.registerKey(Keys.BOOK_AUTHOR, Text.EMPTY));
+                c -> c.register(Keys.BOOK_AUTHOR, Text.EMPTY));
         register(BlockItemData.class, ImmutableBlockItemData.class,
-                c -> c.registerKey(Keys.ITEM_BLOCKSTATE, BlockTypes.AIR.getDefaultState()));
+                c -> c.register(Keys.ITEM_BLOCKSTATE, BlockTypes.AIR.getDefaultState()));
         register(BreakableData.class, ImmutableBreakableData.class,
-                c -> c.registerKey(Keys.BREAKABLE_BLOCK_TYPES, new HashSet<>()));
+                c -> c.register(Keys.BREAKABLE_BLOCK_TYPES, new HashSet<>()));
         register(DurabilityData.class, ImmutableDurabilityData.class,
                 c -> {
-                    c.registerKey(Keys.ITEM_DURABILITY, 100);
-                    c.registerKey(Keys.UNBREAKABLE, false);
+                    c.register(Keys.ITEM_DURABILITY, 100);
+                    c.register(Keys.UNBREAKABLE, false);
                 });
         register(GenerationData.class, ImmutableGenerationData.class,
-                c -> c.registerKey(Keys.GENERATION, 0, 0, Integer.MAX_VALUE));
+                c -> c.register(Keys.GENERATION, 0, 0, Integer.MAX_VALUE));
         register(HideData.class, ImmutableHideData.class,
                 c -> {
-                    c.registerKey(Keys.HIDE_ENCHANTMENTS, false);
-                    c.registerKey(Keys.HIDE_ATTRIBUTES, false);
-                    c.registerKey(Keys.HIDE_UNBREAKABLE, false);
-                    c.registerKey(Keys.HIDE_CAN_DESTROY, false);
-                    c.registerKey(Keys.HIDE_CAN_PLACE, false);
-                    c.registerKey(Keys.HIDE_MISCELLANEOUS, false);
+                    c.register(Keys.HIDE_ENCHANTMENTS, false);
+                    c.register(Keys.HIDE_ATTRIBUTES, false);
+                    c.register(Keys.HIDE_UNBREAKABLE, false);
+                    c.register(Keys.HIDE_CAN_DESTROY, false);
+                    c.register(Keys.HIDE_CAN_PLACE, false);
+                    c.register(Keys.HIDE_MISCELLANEOUS, false);
                 });
         register(MapItemData.class, ImmutableMapItemData.class,
                 c -> {});
         register(PlaceableData.class, ImmutablePlaceableData.class,
-                c -> c.registerKey(Keys.PLACEABLE_BLOCKS, new HashSet<>()));
+                c -> c.register(Keys.PLACEABLE_BLOCKS, new HashSet<>()));
 
         /// variant containers
         registerVariant(CoalData.class, ImmutableCoalData.class, Keys.COAL_TYPE, CoalTypes.COAL);
@@ -876,50 +878,50 @@ public class DataManipulatorRegistry {
         /// normal containers
         register(BannerData.class, ImmutableBannerData.class,
                 c -> {
-                    c.registerKey(Keys.BANNER_BASE_COLOR, DyeColors.WHITE);
-                    c.registerKey(Keys.BANNER_PATTERNS, new ArrayList<>());
+                    c.register(Keys.BANNER_BASE_COLOR, DyeColors.WHITE);
+                    c.register(Keys.BANNER_PATTERNS, new ArrayList<>());
                 });
         register(BeaconData.class, ImmutableBeaconData.class, LanternBeaconData.class, LanternImmutableBeaconData.class,
                 c -> {
-                    c.registerKey(Keys.BEACON_PRIMARY_EFFECT, Optional.empty());
-                    c.registerKey(Keys.BEACON_SECONDARY_EFFECT, Optional.empty());
+                    c.register(Keys.BEACON_PRIMARY_EFFECT, Optional.empty());
+                    c.register(Keys.BEACON_SECONDARY_EFFECT, Optional.empty());
                 });
         register(BedData.class, ImmutableBedData.class,
-                c -> c.registerKey(Keys.DYE_COLOR, DyeColors.WHITE));
+                c -> c.register(Keys.DYE_COLOR, DyeColors.WHITE));
         register(BrewingStandData.class, ImmutableBrewingStandData.class,
-                c -> c.registerKey(Keys.REMAINING_BREW_TIME, 0, 0, Integer.MAX_VALUE));
+                c -> c.register(Keys.REMAINING_BREW_TIME, 0, 0, Integer.MAX_VALUE));
         register(CooldownData.class, ImmutableCooldownData.class,
-                c -> c.registerKey(Keys.COOLDOWN, 0, 0, Integer.MAX_VALUE));
+                c -> c.register(Keys.COOLDOWN, 0, 0, Integer.MAX_VALUE));
         register(EndGatewayData.class, ImmutableEndGatewayData.class,
                 c -> {
-                    c.registerKey(Keys.EXIT_POSITION, Vector3i.ZERO);
-                    c.registerKey(Keys.EXACT_TELEPORT, false);
-                    c.registerKey(Keys.END_GATEWAY_AGE, 0L);
-                    c.registerKey(Keys.END_GATEWAY_TELEPORT_COOLDOWN, 0);
+                    c.register(Keys.EXIT_POSITION, Vector3i.ZERO);
+                    c.register(Keys.EXACT_TELEPORT, false);
+                    c.register(Keys.END_GATEWAY_AGE, 0L);
+                    c.register(Keys.END_GATEWAY_TELEPORT_COOLDOWN, 0);
                 });
         register(FurnaceData.class, ImmutableFurnaceData.class,
                 c -> {
-                    c.registerKey(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE);
-                    c.registerKey(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME);
-                    c.registerKey(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE);
-                    c.registerKey(Keys.PASSED_COOK_TIME, 0, 0, Keys.MAX_COOK_TIME);
+                    c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE);
+                    c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME);
+                    c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE);
+                    c.register(Keys.PASSED_COOK_TIME, 0, 0, Keys.MAX_COOK_TIME);
                 });
         register(LockableData.class, ImmutableLockableData.class,
-                c -> c.registerKey(Keys.LOCK_TOKEN, ""));
+                c -> c.register(Keys.LOCK_TOKEN, ""));
         register(NoteData.class, ImmutableNoteData.class,
-                c -> c.registerKey(Keys.NOTE_PITCH, NotePitches.A1));
+                c -> c.register(Keys.NOTE_PITCH, NotePitches.A1));
         register(StructureData.class, ImmutableStructureData.class,
                 c -> {
-                    c.registerKey(Keys.STRUCTURE_AUTHOR, "");
-                    c.registerKey(Keys.STRUCTURE_IGNORE_ENTITIES, false);
-                    c.registerKey(Keys.STRUCTURE_INTEGRITY, 1f);
-                    c.registerKey(Keys.STRUCTURE_MODE, StructureModes.DATA);
-                    c.registerKey(Keys.STRUCTURE_POSITION, Vector3i.ZERO);
-                    c.registerKey(Keys.STRUCTURE_POWERED, false);
-                    c.registerKey(Keys.STRUCTURE_SEED, 0L);
-                    c.registerKey(Keys.STRUCTURE_SHOW_AIR, false);
-                    c.registerKey(Keys.STRUCTURE_SHOW_BOUNDING_BOX, false);
-                    c.registerKey(Keys.STRUCTURE_SIZE, Vector3i.ZERO);
+                    c.register(Keys.STRUCTURE_AUTHOR, "");
+                    c.register(Keys.STRUCTURE_IGNORE_ENTITIES, false);
+                    c.register(Keys.STRUCTURE_INTEGRITY, 1f);
+                    c.register(Keys.STRUCTURE_MODE, StructureModes.DATA);
+                    c.register(Keys.STRUCTURE_POSITION, Vector3i.ZERO);
+                    c.register(Keys.STRUCTURE_POWERED, false);
+                    c.register(Keys.STRUCTURE_SEED, 0L);
+                    c.register(Keys.STRUCTURE_SHOW_AIR, false);
+                    c.register(Keys.STRUCTURE_SHOW_BOUNDING_BOX, false);
+                    c.register(Keys.STRUCTURE_SIZE, Vector3i.ZERO);
                 });
 
         /// variant containers
@@ -1030,14 +1032,14 @@ public class DataManipulatorRegistry {
     }
 
     public <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> DataManipulatorRegistration<M, I> register(
-            Class<M> manipulatorType, Class<I> immutableManipulatorType, @Nullable Consumer<IValueContainer<?>> registrationConsumer) {
+            Class<M> manipulatorType, Class<I> immutableManipulatorType, @Nullable Consumer<ValueCollection> registrationConsumer) {
         return register(manipulatorType, immutableManipulatorType, null, null, registrationConsumer);
     }
 
     public <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> DataManipulatorRegistration<M, I> register(
             Class<M> manipulatorType, Class<I> immutableManipulatorType,
             @Nullable Class<? extends M> mutableExpansion, @Nullable Class<? extends I> immutableExpansion,
-            @Nullable Consumer<IValueContainer<?>> registrationConsumer) {
+            @Nullable Consumer<ValueCollection> registrationConsumer) {
         final RegistrationInfo registrationInfo = RegistrationInfo.build(manipulatorType);
         return register(registrationInfo.pluginContainer, registrationInfo.id, registrationInfo.name,
                 manipulatorType, immutableManipulatorType, mutableExpansion, immutableExpansion, registrationConsumer);
@@ -1051,7 +1053,7 @@ public class DataManipulatorRegistry {
     public <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> DataManipulatorRegistration<M, I> register(
             PluginContainer pluginContainer, String id, String name, Class<M> manipulatorType, Class<I> immutableManipulatorType,
             @Nullable Class<? extends M> mutableExpansion, @Nullable Class<? extends I> immutableExpansion,
-            @Nullable Consumer<IValueContainer<?>> registrationConsumer) {
+            @Nullable Consumer<ValueCollection> registrationConsumer) {
         final DataManipulatorRegistration<M, I> registration = this.dataManipulatorGenerator.newRegistrationFor(
                 pluginContainer, id, name, manipulatorType, immutableManipulatorType, mutableExpansion, immutableExpansion, registrationConsumer);
         return register(registration);

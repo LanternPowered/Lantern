@@ -28,6 +28,7 @@ package org.lanternpowered.server.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -87,10 +88,11 @@ public class LanternItem extends LanternEntity implements Item {
     @Override
     public void registerKeys() {
         super.registerKeys();
-        registerKey(Keys.REPRESENTED_ITEM, null);
-        registerKey(Keys.PICKUP_DELAY, 60);
-        registerKey(Keys.DESPAWN_DELAY, 6000);
-        registerKey(LanternKeys.GRAVITY_FACTOR, 0.002);
+        final ValueCollection c = getValueCollection();
+        c.register(Keys.REPRESENTED_ITEM, null);
+        c.register(Keys.PICKUP_DELAY, 60);
+        c.register(Keys.DESPAWN_DELAY, 6000);
+        c.register(LanternKeys.GRAVITY_FACTOR, 0.002);
     }
 
     @Override

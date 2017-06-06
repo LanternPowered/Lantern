@@ -49,7 +49,7 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
     }
 
     public LanternListValue(Key<? extends BaseValue<List<E>>> key, List<E> defaultList, List<E> actualList) {
-        super(key, ImmutableList.copyOf(defaultList), new ArrayList<>(actualList));
+        super(key, ImmutableList.copyOf(defaultList), actualList);
     }
 
     public LanternListValue(Key<? extends BaseValue<List<E>>> key, List<E> actualValue) {

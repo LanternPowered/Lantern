@@ -28,7 +28,7 @@ package org.lanternpowered.server.item;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.data.value.AbstractValueContainer;
+import org.lanternpowered.server.data.ValueCollection;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
@@ -44,7 +44,7 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
     private final PropertyProviderCollection propertyProviderCollection;
     private final MutableBehaviorPipeline<Behavior> behaviorPipeline;
     private final TranslationProvider translationProvider;
-    private final Consumer<AbstractValueContainer> keysProvider;
+    private final Consumer<ValueCollection> keysProvider;
 
     @Nullable private final BlockType blockType;
 
@@ -52,7 +52,7 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
 
     LanternItemType(String pluginId, String name, PropertyProviderCollection propertyProviderCollection,
             MutableBehaviorPipeline<Behavior> behaviorPipeline,
-            TranslationProvider translationProvider, Consumer<AbstractValueContainer> keysProvider,
+            TranslationProvider translationProvider, Consumer<ValueCollection> keysProvider,
             @Nullable BlockType blockType, int maxStackQuantity) {
         super(pluginId, name);
         this.keysProvider = keysProvider;
@@ -92,7 +92,7 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
         return this.behaviorPipeline;
     }
 
-    public Consumer<AbstractValueContainer> getKeysProvider() {
+    public Consumer<ValueCollection> getKeysProvider() {
         return this.keysProvider;
     }
 

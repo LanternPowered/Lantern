@@ -45,7 +45,7 @@ public abstract class AbstractMappedData<K, V, M extends MappedData<K, V, M, I>,
 
     public AbstractMappedData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<MapValue<K, V>> mapKey, Map<K, V> defaultMap) {
         super(manipulatorType, immutableManipulatorType);
-        registerKey(mapKey, defaultMap);
+        getValueCollection().register(mapKey, defaultMap);
         this.mapKey = mapKey;
     }
 

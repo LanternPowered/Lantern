@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.manipulator.mutable.entity;
 
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractMappedData;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableRespawnLocation;

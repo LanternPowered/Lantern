@@ -30,8 +30,6 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
-import java.util.Optional;
-
 public interface DataTypeSerializer<T, D> {
 
     /**

@@ -38,6 +38,7 @@ import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.advancement.TestAdvancementTree;
 import org.lanternpowered.server.boss.LanternBossBar;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -302,20 +303,21 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public void registerKeys() {
         super.registerKeys();
-        registerKey(LanternKeys.ACCESSORIES, new ArrayList<>());
-        registerKey(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
-        registerKey(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
-        registerKey(LanternKeys.MAX_SATURATION, 40.0, 0.0, Double.MAX_VALUE);
-        registerKey(Keys.SATURATION, 40.0, 0.0, LanternKeys.MAX_SATURATION);
-        registerKey(Keys.LAST_DATE_PLAYED, null);
-        registerKey(Keys.FIRST_DATE_PLAYED, null);
-        registerKey(Keys.IS_FLYING, false).notRemovable();
-        registerKey(Keys.IS_SNEAKING, false).notRemovable();
-        registerKey(Keys.IS_SPRINTING, false).notRemovable();
-        registerKey(Keys.FLYING_SPEED, 0.1).notRemovable();
-        registerKey(Keys.CAN_FLY, false).notRemovable();
-        registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).notRemovable();
-        registerKey(Keys.GAME_MODE, GameModes.NOT_SET).notRemovable().addListener(
+        final ValueCollection c = getValueCollection();
+        c.register(LanternKeys.ACCESSORIES, new ArrayList<>());
+        c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
+        c.register(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
+        c.register(LanternKeys.MAX_SATURATION, 40.0, 0.0, Double.MAX_VALUE);
+        c.register(Keys.SATURATION, 40.0, 0.0, LanternKeys.MAX_SATURATION);
+        c.register(Keys.LAST_DATE_PLAYED, null);
+        c.register(Keys.FIRST_DATE_PLAYED, null);
+        c.registerNonRemovable(Keys.IS_FLYING, false);
+        c.registerNonRemovable(Keys.IS_SNEAKING, false);
+        c.registerNonRemovable(Keys.IS_SPRINTING, false);
+        c.registerNonRemovable(Keys.FLYING_SPEED, 0.1);
+        c.registerNonRemovable(Keys.CAN_FLY, false);
+        c.registerNonRemovable(Keys.RESPAWN_LOCATIONS, new HashMap<>());
+        c.registerNonRemovable(Keys.GAME_MODE, GameModes.NOT_SET).addListener(
                 (oldElement, newElement) -> {
                     ((LanternGameMode) newElement).getAbilityApplier().accept(this);
                     // This MUST be updated, unless you want strange behavior on the client,
@@ -329,26 +331,25 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     // TODO: these kind of settings to avoid possible 'strange' behavior.
                     GlobalTabList.getInstance().get(this.gameProfile).ifPresent(e -> e.setGameMode(newElement));
                 });
-        registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).notRemovable();
-        registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
-        registerKey(LanternKeys.ELYTRA_GLIDE_SPEED, 0.1).notRemovable();
-        registerKey(LanternKeys.ELYTRA_SPEED_BOOST, false).notRemovable();
-        registerKey(LanternKeys.SUPER_STEVE, false).notRemovable();
-        registerKey(LanternKeys.CAN_WALL_JUMP, false).notRemovable();
-        registerKey(LanternKeys.CAN_DUAL_WIELD, false).notRemovable();
-        registerKey(LanternKeys.SCORE, 0).notRemovable();
-        registerKey(LanternKeys.ACTIVE_HAND, Optional.empty()).notRemovable();
-        registerKey(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, false).notRemovable();
-        registerKey(LanternKeys.RECIPE_BOOK_GUI_OPEN, false).notRemovable();
-        registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
+        c.registerNonRemovable(Keys.DOMINANT_HAND, HandPreferences.RIGHT);
+        c.registerNonRemovable(LanternKeys.IS_ELYTRA_FLYING, false);
+        c.registerNonRemovable(LanternKeys.ELYTRA_GLIDE_SPEED, 0.1);
+        c.registerNonRemovable(LanternKeys.ELYTRA_SPEED_BOOST, false);
+        c.registerNonRemovable(LanternKeys.SUPER_STEVE, false);
+        c.registerNonRemovable(LanternKeys.CAN_WALL_JUMP, false);
+        c.registerNonRemovable(LanternKeys.CAN_DUAL_WIELD, false);
+        c.registerNonRemovable(LanternKeys.SCORE, 0);
+        c.registerNonRemovable(LanternKeys.ACTIVE_HAND, Optional.empty());
+        c.registerNonRemovable(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, false);
+        c.registerNonRemovable(LanternKeys.RECIPE_BOOK_GUI_OPEN, false);
+        c.registerProcessor(Keys.STATISTICS).add(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
                     this.statisticMap.setStatisticValues(map);
                     return DataTransactionResult.successNoData();
                 })
                 .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
                 .failAlwaysRemoveHandler());
-        registerKey(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty())
-                .notRemovable()
+        c.registerNonRemovable(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty())
                 .addListener((oldElement, newElement) -> {
                     //noinspection ConstantConditions
                     if (getWorld() != null) {

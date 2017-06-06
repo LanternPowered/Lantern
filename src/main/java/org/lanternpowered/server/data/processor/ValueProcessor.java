@@ -23,5 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.data.value.processor;
+package org.lanternpowered.server.data.processor;
+
+import org.spongepowered.api.data.value.BaseValue;
+
+public interface ValueProcessor<V extends BaseValue<E>, E> extends Processor<V, E> {
+
+}

@@ -32,11 +32,13 @@ import static com.google.common.base.Preconditions.checkState;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.data.AbstractDataHolder;
+import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataHelper;
+import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.data.IAdditionalDataHolder;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
@@ -46,9 +48,7 @@ import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -72,21 +72,14 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
-public class LanternEntity implements Entity, AbstractDataHolder, AbstractPropertyHolder {
-
-    public static final DataQuery ENTITY_TYPE = DataQuery.of("EntityType");
-    public static final DataQuery POSITION = DataQuery.of("Position");
-    public static final DataQuery ROTATION = DataQuery.of("Rotation");
+public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPropertyHolder {
 
     @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;
@@ -101,8 +94,8 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
     private final Random random = new Random();
 
     // The raw value map
-    private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
-    private final Map<Class<?>, DataManipulator<?, ?>> rawAdditionalManipulators = new ConcurrentHashMap<>();
+    private final ValueCollection valueCollection = ValueCollection.create();
+    private final AdditionalContainerCollection<DataManipulator<?,?>> additionalContainers = AdditionalContainerCollection.createConcurrent();
 
     // The world this entity is located in, may be null
     private LanternWorld world;
@@ -142,6 +135,16 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
     @Nullable private LanternEntity vehicle;
     private final List<LanternEntity> passengers = new ArrayList<>();
 
+    @Override
+    public ValueCollection getValueCollection() {
+        return this.valueCollection;
+    }
+
+    @Override
+    public AdditionalContainerCollection<DataManipulator<?, ?>> getAdditionalContainers() {
+        return this.additionalContainers;
+    }
+
     public enum RemoveState {
         /**
          * The entity was destroyed through the {@link #remove()}
@@ -167,17 +170,17 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
         registerKeys();
     }
 
-    @Override
     public void registerKeys() {
-        registerKey(Keys.DISPLAY_NAME, Text.EMPTY);
-        registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
-        registerKey(Keys.VELOCITY, Vector3d.ZERO).notRemovable();
-        registerKey(Keys.FIRE_TICKS, 0).notRemovable();
-        registerKey(Keys.FALL_DISTANCE, 0f).notRemovable();
-        registerKey(Keys.GLOWING, false).notRemovable();
-        registerKey(Keys.INVISIBLE, false);
-        registerKey(LanternKeys.INVULNERABLE, false).notRemovable();
-        registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).notRemovable();
+        final ValueCollection c = getValueCollection();
+        c.register(Keys.DISPLAY_NAME, Text.EMPTY);
+        c.register(Keys.CUSTOM_NAME_VISIBLE, true);
+        c.registerNonRemovable(Keys.VELOCITY, Vector3d.ZERO);
+        c.registerNonRemovable(Keys.FIRE_TICKS, 0);
+        c.registerNonRemovable(Keys.FALL_DISTANCE, 0f);
+        c.registerNonRemovable(Keys.GLOWING, false);
+        c.registerNonRemovable(Keys.INVISIBLE, false);
+        c.registerNonRemovable(LanternKeys.INVULNERABLE, false);
+        c.registerNonRemovable(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
     }
 
     /**
@@ -300,27 +303,16 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
     }
 
     @Override
-    public Map<Key<?>, KeyRegistration> getRawValueMap() {
-        return this.rawValueMap;
-    }
-
-    @Override
-    public Map<Class<?>, DataManipulator<?, ?>> getRawAdditionalContainers() {
-        return this.rawAdditionalManipulators;
-    }
-
-    @Override
     public boolean validateRawData(DataView dataView) {
-        // TODO Auto-generated method stub
-        return false;
+        return dataView.contains(DataQueries.POSITION, DataQueries.ROTATION);
     }
 
     @Override
     public void setRawData(DataView dataView) throws InvalidDataException {
         checkNotNull(dataView, "dataView");
-        setPosition(DataHelper.deserializeVector3d(dataView.getView(POSITION).get()));
-        setRotation(DataHelper.deserializeVector3d(dataView.getView(ROTATION).get()));
-        DataHelper.applyRawData(dataView, this);
+        setPosition(dataView.getObject(DataQueries.POSITION, Vector3d.class).get());
+        setRotation(dataView.getObject(DataQueries.ROTATION, Vector3d.class).get());
+        DataHelper.deserializeRawData(dataView, this);
     }
 
     @Override
@@ -331,9 +323,9 @@ public class LanternEntity implements Entity, AbstractDataHolder, AbstractProper
     @Override
     public DataContainer toContainer() {
         final DataContainer dataContainer = DataContainer.createNew()
-                .set(ENTITY_TYPE, getType());
-        DataHelper.serializeVector3d(dataContainer.createView(POSITION), getPosition());
-        DataHelper.serializeVector3d(dataContainer.createView(ROTATION), getRotation());
+                .set(DataQueries.ENTITY_TYPE, getType())
+                .set(DataQueries.POSITION, getPosition())
+                .set(DataQueries.ROTATION, getRotation());
         DataHelper.serializeRawData(dataContainer, this);
         return dataContainer;
     }

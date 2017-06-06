@@ -43,7 +43,7 @@ public abstract class LanternHumanoid extends LanternLiving implements Humanoid,
     @Override
     public void registerKeys() {
         super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
+        getValueCollection().registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
     }
 
     @Override

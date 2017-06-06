@@ -36,7 +36,7 @@ import java.util.regex.Matcher;
 import javax.annotation.Nullable;
 
 @ConverterKeys({ "fullLocation", "loc" })
-@Plugin(name = "fullLocation", category = "Converter")
+@Plugin(name = "FullLocation", category = "Converter")
 public final class FullLocationPatternConverter extends LogEventPatternConverter {
 
     // Packages that will be ignored

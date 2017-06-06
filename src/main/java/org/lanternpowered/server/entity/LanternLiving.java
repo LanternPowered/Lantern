@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -53,11 +54,12 @@ public class LanternLiving extends LanternEntity implements Living {
     @Override
     public void registerKeys() {
         super.registerKeys();
-        registerKey(Keys.MAX_AIR, 300, 0, Integer.MAX_VALUE);
-        registerKey(Keys.REMAINING_AIR, 300, 0, Keys.MAX_AIR);
-        registerKey(Keys.MAX_HEALTH, 20.0, 0.0, 1024.0);
-        registerKey(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH);
-        registerKey(Keys.POTION_EFFECTS, new ArrayList<>());
+        final ValueCollection c = getValueCollection();
+        c.register(Keys.MAX_AIR, 300, 0, Integer.MAX_VALUE);
+        c.register(Keys.REMAINING_AIR, 300, 0, Keys.MAX_AIR);
+        c.register(Keys.MAX_HEALTH, 20.0, 0.0, 1024.0);
+        c.register(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH);
+        c.register(Keys.POTION_EFFECTS, new ArrayList<>());
     }
 
     protected void setRawHeadRotation(Vector3d rotation) {

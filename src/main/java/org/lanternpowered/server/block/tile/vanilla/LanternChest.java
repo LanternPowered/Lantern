@@ -49,7 +49,7 @@ public class LanternChest extends LanternContainer<TileChestInventory> implement
     @Override
     public void registerKeys() {
         super.registerKeys();
-        registerKey(Keys.DISPLAY_NAME, null);
+        getValueCollection().register(Keys.DISPLAY_NAME, null);
     }
 
     @Override

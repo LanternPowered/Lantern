@@ -25,36 +25,32 @@
  */
 package org.lanternpowered.server.block.tile;
 
-import org.lanternpowered.server.data.AbstractDataHolder;
+import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataHelper;
+import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.data.IAdditionalDataHolder;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class LanternTileEntity implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
-
-    public static final DataQuery TILE_ENTITY_TYPE = DataQuery.of("TileEntityType");
-    public static final DataQuery POSITION = DataQuery.of("Position");
+public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHolder, AbstractPropertyHolder {
 
     private static boolean bypassEntityTypeLookup;
 
     private final TileEntityType tileEntityType;
-    private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
+    private final ValueCollection valueCollection = ValueCollection.create();
+    private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers = AdditionalContainerCollection.createConcurrent();
     private volatile Location<World> location;
     private volatile boolean valid;
 
@@ -69,10 +65,23 @@ public abstract class LanternTileEntity implements TileEntity, AbstractDataHolde
         registerKeys();
     }
 
+    protected void registerKeys() {
+    }
+
     /**
      * Pulses this {@link LanternTileEntity}.
      */
     public void pulse() {
+    }
+
+    @Override
+    public ValueCollection getValueCollection() {
+        return this.valueCollection;
+    }
+
+    @Override
+    public AdditionalContainerCollection<DataManipulator<?, ?>> getAdditionalContainers() {
+        return this.additionalContainers;
     }
 
     @Override
@@ -82,12 +91,7 @@ public abstract class LanternTileEntity implements TileEntity, AbstractDataHolde
 
     @Override
     public void setRawData(DataView dataView) throws InvalidDataException {
-        DataHelper.applyRawData(dataView, this);
-    }
-
-    @Override
-    public Map<Key<?>, KeyRegistration> getRawValueMap() {
-        return this.rawValueMap;
+        DataHelper.deserializeRawData(dataView, this);
     }
 
     @Override
@@ -123,8 +127,8 @@ public abstract class LanternTileEntity implements TileEntity, AbstractDataHolde
     @Override
     public DataContainer toContainer() {
         final DataContainer dataContainer = DataContainer.createNew()
-                .set(TILE_ENTITY_TYPE, getType());
-        DataHelper.serializeVector3i(dataContainer.createView(POSITION), getLocation().getBlockPosition());
+                .set(DataQueries.TILE_ENTITY_TYPE, getType())
+                .set(DataQueries.POSITION, getLocation().getBlockPosition());
         DataHelper.serializeRawData(dataContainer, this);
         return dataContainer;
     }

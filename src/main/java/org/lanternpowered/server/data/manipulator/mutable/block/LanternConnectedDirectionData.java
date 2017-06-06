@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.manipulator.mutable.block;
 
-import org.lanternpowered.server.data.manipulator.IValueHolder;
+import org.lanternpowered.server.data.IValueHolder;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.block.ConnectedDirectionData;
 import org.spongepowered.api.data.value.mutable.SetValue;
@@ -35,6 +35,6 @@ public interface LanternConnectedDirectionData extends ConnectedDirectionData, I
 
     @Override
     default SetValue<Direction> connectedDirections() {
-        return tryGetValue(Keys.CONNECTED_DIRECTIONS);
+        return tryGetValueFor(Keys.CONNECTED_DIRECTIONS);
     }
 }

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.manipulator.mutable.entity;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.manipulator.IValueHolder;
+import org.lanternpowered.server.data.IValueHolder;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.BodyPartRotationalData;
 import org.spongepowered.api.data.type.BodyPart;
@@ -36,6 +36,6 @@ public interface LanternBodyPartRotationalData extends BodyPartRotationalData, I
 
     @Override
     default MapValue<BodyPart, Vector3d> partRotation() {
-        return tryGetValue(Keys.BODY_ROTATIONS);
+        return tryGetValueFor(Keys.BODY_ROTATIONS);
     }
 }

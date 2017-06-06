@@ -26,6 +26,9 @@
 package org.lanternpowered.server.data;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.meta.LanternPatternLayer;
 import org.lanternpowered.server.data.persistence.DataTranslators;
@@ -36,6 +39,7 @@ import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.item.enchantment.ItemEnchantmentDataBuilder;
+import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
@@ -56,8 +60,10 @@ import org.spongepowered.api.text.serializer.TextConfigSerializer;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RespawnLocation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -65,6 +71,13 @@ import java.util.Set;
 public class DataRegistrar {
 
     public static void setupRegistrations(LanternGame game) {
+        Copyable.register(ImmutableMap.class, map -> map);
+        Copyable.register(ImmutableList.class, list -> list);
+        Copyable.register(ImmutableSet.class, set -> set);
+        Copyable.register(List.class, ArrayList::new);
+        Copyable.register(Set.class, HashSet::new);
+        Copyable.register(Map.class, HashMap::new);
+
         final PropertyRegistry propertyRegistry = game.getPropertyRegistry();
         propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
         propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
@@ -83,12 +96,12 @@ public class DataRegistrar {
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
         dataManager.registerBuilder(ItemEnchantment.class, new ItemEnchantmentDataBuilder());
 
-        final LanternValueFactory valueFactory = LanternValueFactory.getInstance();
-        valueFactory.registerKey(Keys.CONNECTED_DIRECTIONS).applyValueProcessor(builder -> builder
-                .applicableTester((key, valueContainer) ->
+        final LanternValueFactory valueFactory = LanternValueFactory.get();
+        valueFactory.registerKey(Keys.CONNECTED_DIRECTIONS).add(builder -> builder
+                .applicableTester(valueContainer ->
                         valueContainer.supports(Keys.CONNECTED_WEST) || valueContainer.supports(Keys.CONNECTED_EAST) ||
                         valueContainer.supports(Keys.CONNECTED_NORTH) || valueContainer.supports(Keys.CONNECTED_SOUTH))
-                .retrieveHandler(((key, valueContainer) -> {
+                .retrieveHandler((valueContainer, key)  -> {
                     final Set<Direction> directions = new HashSet<>();
                     if (valueContainer.get(Keys.CONNECTED_WEST).orElse(false)) {
                         directions.add(Direction.WEST);
@@ -103,8 +116,8 @@ public class DataRegistrar {
                         directions.add(Direction.NORTH);
                     }
                     return Optional.of(directions);
-                }))
-                .offerHandler((key, valueContainer, directions) -> {
+                })
+                .offerHandler((valueContainer, key, directions) -> {
                     if (valueContainer instanceof CompositeValueStore) {
                         final CompositeValueStore store = (CompositeValueStore) valueContainer;
                         final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
@@ -117,18 +130,18 @@ public class DataRegistrar {
                     return DataTransactionResult.successNoData();
                 })
                 .failAlwaysRemoveHandler());
-        valueFactory.registerKey(Keys.WIRE_ATTACHMENTS).applyValueProcessor(builder -> builder
-                .applicableTester((key, valueContainer) ->
+        valueFactory.registerKey(Keys.WIRE_ATTACHMENTS).add(builder -> builder
+                .applicableTester(valueContainer ->
                         valueContainer.supports(Keys.WIRE_ATTACHMENT_WEST) || valueContainer.supports(Keys.WIRE_ATTACHMENT_EAST) ||
                                 valueContainer.supports(Keys.WIRE_ATTACHMENT_NORTH) || valueContainer.supports(Keys.WIRE_ATTACHMENT_SOUTH))
-                .retrieveHandler(((key, valueContainer) -> {
+                .retrieveHandler((valueContainer, key) -> {
                     final Map<Direction, WireAttachmentType> attachments = new HashMap<>();
                     valueContainer.get(Keys.WIRE_ATTACHMENT_WEST).ifPresent(type -> attachments.put(Direction.WEST, type));
                     valueContainer.get(Keys.WIRE_ATTACHMENT_EAST).ifPresent(type -> attachments.put(Direction.EAST, type));
                     valueContainer.get(Keys.WIRE_ATTACHMENT_SOUTH).ifPresent(type -> attachments.put(Direction.SOUTH, type));
                     valueContainer.get(Keys.WIRE_ATTACHMENT_NORTH).ifPresent(type -> attachments.put(Direction.NORTH, type));
                     return Optional.of(attachments);
-                }))
+                })
                 .offerHandler((key, valueContainer, attachments) -> {
                     if (valueContainer instanceof CompositeValueStore) {
                         final CompositeValueStore store = (CompositeValueStore) valueContainer;
@@ -150,12 +163,12 @@ public class DataRegistrar {
                     return DataTransactionResult.successNoData();
                 })
                 .failAlwaysRemoveHandler());
-        valueFactory.registerKey(Keys.BODY_ROTATIONS).applyValueProcessor(builder -> builder
-                .applicableTester((key, valueContainer) ->
+        valueFactory.registerKey(Keys.BODY_ROTATIONS).add(builder -> builder
+                .applicableTester(valueContainer ->
                         valueContainer.supports(Keys.RIGHT_ARM_ROTATION) || valueContainer.supports(Keys.LEFT_ARM_ROTATION) ||
                                 valueContainer.supports(Keys.RIGHT_LEG_ROTATION) || valueContainer.supports(Keys.LEFT_LEG_ROTATION) ||
                                 valueContainer.supports(Keys.HEAD_ROTATION) || valueContainer.supports(Keys.CHEST_ROTATION))
-                .retrieveHandler(((key, valueContainer) -> {
+                .retrieveHandler((valueContainer, key) -> {
                     final Map<BodyPart, Vector3d> rotations = new HashMap<>();
                     valueContainer.get(Keys.RIGHT_ARM_ROTATION).ifPresent(type -> rotations.put(BodyParts.RIGHT_ARM, type));
                     valueContainer.get(Keys.RIGHT_LEG_ROTATION).ifPresent(type -> rotations.put(BodyParts.RIGHT_LEG, type));
@@ -164,7 +177,7 @@ public class DataRegistrar {
                     valueContainer.get(Keys.HEAD_ROTATION).ifPresent(type -> rotations.put(BodyParts.HEAD, type));
                     valueContainer.get(Keys.CHEST_ROTATION).ifPresent(type -> rotations.put(BodyParts.CHEST, type));
                     return Optional.of(rotations);
-                }))
+                })
                 .offerHandler((key, valueContainer, rotations) -> {
                     if (valueContainer instanceof CompositeValueStore) {
                         final CompositeValueStore store = (CompositeValueStore) valueContainer;

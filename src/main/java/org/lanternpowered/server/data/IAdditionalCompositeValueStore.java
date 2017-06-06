@@ -23,31 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.processor;
+package org.lanternpowered.server.data;
 
-import org.lanternpowered.server.data.value.IValueContainer;
-import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.lanternpowered.server.util.functions.TriFunction;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.ValueContainer;
+import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 
-@SuppressWarnings("unchecked")
-public final class ValueBuilders {
-
-    private static final TriFunction<Key, IValueContainer, Object, Value> DEFAULT =
-            (key, valueContainer, object) -> (Value) LanternValueFactory.getInstance().createValueForKey(key, object);
-
-    /**
-     * Gets the default value builder. It will create a value through the{@link LanternValueFactory#createValueForKey(Key, Object)}
-     * which will try to create a value for the appropriate type of the {@link BaseValue} attached to the {@link Key}.
-     *
-     * @param <V> The value type
-     * @param <E> The element type
-     * @return The value builder
-     */
-    public static <V extends BaseValue<E>, E> TriFunction<Key<? extends V>, IValueContainer<?>, E, V> def() {
-        return (TriFunction) DEFAULT;
-    }
+public interface IAdditionalCompositeValueStore<S extends CompositeValueStore<S, H>, H extends ValueContainer<?>>
+        extends ICompositeValueStore<S, H>, AdditionalContainerHolder<H> {
 
 }

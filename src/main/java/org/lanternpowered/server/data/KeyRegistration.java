@@ -23,18 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.immutable;
+package org.lanternpowered.server.data;
 
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.value.BaseValue;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
-        ImmutableValueStore<S, H> {
+public interface KeyRegistration<V extends BaseValue<E>, E> {
 
-    @SuppressWarnings("unchecked")
-    @Override
-    default S copy() {
-        return (S) this;
-    }
+    /**
+     * Gets the {@link Key} this registration is applicable for.
+     *
+     * @return The key
+     */
+    Key<? extends V> getKey();
 }

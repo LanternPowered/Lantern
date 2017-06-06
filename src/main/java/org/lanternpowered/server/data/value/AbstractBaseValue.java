@@ -42,7 +42,7 @@ public abstract class AbstractBaseValue<E> implements BaseValue<E> {
     private final E defaultValue;
     @Nullable protected E actualValue;
 
-    public AbstractBaseValue(Key<? extends BaseValue<E>> key, E defaultValue) {
+    protected AbstractBaseValue(Key<? extends BaseValue<E>> key, E defaultValue) {
         this.key = checkNotNull(key);
         this.defaultValue = checkNotNull(defaultValue);
         this.actualValue = defaultValue;
@@ -106,10 +106,13 @@ public abstract class AbstractBaseValue<E> implements BaseValue<E> {
 
     @Override
     public String toString() {
+        return toStringHelper().toString();
+    }
+
+    protected MoreObjects.ToStringHelper toStringHelper() {
         return MoreObjects.toStringHelper(this)
                 .add("key", this.key)
                 .add("defaultValue", this.defaultValue)
-                .add("actualValue", this.actualValue)
-                .toString();
+                .add("actualValue", this.actualValue);
     }
 }

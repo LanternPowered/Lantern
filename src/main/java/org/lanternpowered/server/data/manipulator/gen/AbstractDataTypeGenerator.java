@@ -26,34 +26,22 @@
 package org.lanternpowered.server.data.manipulator.gen;
 
 import static java.lang.String.format;
-import static org.objectweb.asm.Opcodes.AALOAD;
 import static org.objectweb.asm.Opcodes.ACC_PROTECTED;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
 import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ARETURN;
-import static org.objectweb.asm.Opcodes.BIPUSH;
-import static org.objectweb.asm.Opcodes.CHECKCAST;
 import static org.objectweb.asm.Opcodes.GETSTATIC;
-import static org.objectweb.asm.Opcodes.ICONST_0;
-import static org.objectweb.asm.Opcodes.ICONST_1;
-import static org.objectweb.asm.Opcodes.ICONST_2;
-import static org.objectweb.asm.Opcodes.ICONST_3;
-import static org.objectweb.asm.Opcodes.ICONST_4;
-import static org.objectweb.asm.Opcodes.ICONST_5;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.RETURN;
-import static org.objectweb.asm.Opcodes.SIPUSH;
 import static org.objectweb.asm.Opcodes.V1_8;
 
-import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableData;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
-import org.lanternpowered.server.data.value.IValueContainer;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -73,9 +61,9 @@ final class AbstractDataTypeGenerator extends TypeGenerator {
     private static final String nAbstractImmutableData = Type.getInternalName(AbstractImmutableData.class);
     private static final String nAbstractData = Type.getInternalName(AbstractData.class);
     private static final String nIDataManipulatorBase = Type.getInternalName(IDataManipulatorBase.class);
-    private static final String nIValueContainer = Type.getInternalName(IValueContainer.class);
     private static final String dDataManipulator = Type.getDescriptor(DataManipulator.class);
     private static final String dImmutableDataManipulator = Type.getDescriptor(ImmutableDataManipulator.class);
+    private static final String dValueCollection = Type.getDescriptor(ValueCollection.class);
 
     @Override
     <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> void generateClasses(
@@ -117,7 +105,7 @@ final class AbstractDataTypeGenerator extends TypeGenerator {
 
             {
                 fv = cwM.visitField(ACC_PUBLIC + ACC_STATIC, REGISTRATION_CONSUMER, "Ljava/util/function/Consumer;",
-                        format("Ljava/util/function/Consumer<L%s<*>;>;", nIValueContainer), null);
+                        format("Ljava/util/function/Consumer<%s>;", dValueCollection), null);
                 fv.visitEnd();
             }
             {
@@ -172,6 +160,8 @@ final class AbstractDataTypeGenerator extends TypeGenerator {
                 mv.visitCode();
                 mv.visitFieldInsn(GETSTATIC, mutableClassName, REGISTRATION_CONSUMER, "Ljava/util/function/Consumer;");
                 mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKEVIRTUAL, mutableClassName, "getValueCollection",
+                        format("()%s", dValueCollection), false);
                 mv.visitMethodInsn(INVOKEINTERFACE, "java/util/function/Consumer", "accept", "(Ljava/lang/Object;)V", true);
                 mv.visitInsn(RETURN);
                 mv.visitMaxs(2, 1);
@@ -196,7 +186,7 @@ final class AbstractDataTypeGenerator extends TypeGenerator {
 
             {
                 fv = cwI.visitField(ACC_PUBLIC + ACC_STATIC, REGISTRATION_CONSUMER, "Ljava/util/function/Consumer;",
-                        format("Ljava/util/function/Consumer<L%s<*>;>;", nIValueContainer), null);
+                        format("Ljava/util/function/Consumer<%s>;", dValueCollection), null);
                 fv.visitEnd();
             }
             {
@@ -227,6 +217,8 @@ final class AbstractDataTypeGenerator extends TypeGenerator {
                 mv.visitCode();
                 mv.visitFieldInsn(GETSTATIC, immutableClassName, REGISTRATION_CONSUMER, "Ljava/util/function/Consumer;");
                 mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKEVIRTUAL, immutableClassName, "getValueCollection",
+                        format("()%s", dValueCollection), false);
                 mv.visitMethodInsn(INVOKEINTERFACE, "java/util/function/Consumer", "accept", "(Ljava/lang/Object;)V", true);
                 mv.visitInsn(RETURN);
                 mv.visitMaxs(2, 1);

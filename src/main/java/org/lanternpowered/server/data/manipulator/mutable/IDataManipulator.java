@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data.manipulator.mutable;
 
+import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
-import org.lanternpowered.server.data.value.IValueContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 

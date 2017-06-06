@@ -32,6 +32,7 @@ import org.spongepowered.api.data.manipulator.mutable.VariantData;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariantData<E, I, M>, M extends VariantData<E, M, I>>
         extends AbstractImmutableData<I, M> implements ImmutableVariantData<E, I, M> {
 
@@ -41,12 +42,11 @@ public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariant
             Key<? extends Value<E>> variantKey, E defaultValue) {
         super(immutableManipulatorType, manipulatorType);
         this.variantKey = variantKey;
-        registerKey(variantKey, defaultValue);
+        getValueCollection().register(variantKey, defaultValue);
     }
 
     public AbstractImmutableVariantData(M manipulator) {
         super(manipulator);
-        //noinspection unchecked
         this.variantKey = ((IVariantData<E, M, I>) manipulator).getVariantKey();
     }
 

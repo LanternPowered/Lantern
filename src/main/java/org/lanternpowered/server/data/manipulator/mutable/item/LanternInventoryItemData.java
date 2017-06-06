@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.manipulator.mutable.item;
 
+import org.lanternpowered.server.data.element.Element;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
@@ -50,15 +51,15 @@ public class LanternInventoryItemData extends AbstractData<InventoryItemData, Im
 
     protected LanternInventoryItemData(IDataManipulatorBase<InventoryItemData, ImmutableInventoryItemData> manipulator) {
         super(manipulator);
-        final CarriedInventory<?> inventory = getElementHolder(LanternKeys.ITEM_INVENTORY).get();
-        if (inventory instanceof LanternEmptyCarriedInventory) {
-            getElementHolder(LanternKeys.ITEM_INVENTORY).set(new LanternEmptyCarriedInventory<>(null, this));
+        final Element<CarriedInventory<?>> element = getValueCollection().getElement(LanternKeys.ITEM_INVENTORY).get();
+        if (element.get() instanceof LanternEmptyCarriedInventory) {
+            element.set(new LanternEmptyCarriedInventory<>(null, this));
         }
     }
 
     @Override
     public void registerKeys() {
-        registerKey(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory<>(null, this));
+        getValueCollection().register(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory<>(null, this));
     }
 
     @Override

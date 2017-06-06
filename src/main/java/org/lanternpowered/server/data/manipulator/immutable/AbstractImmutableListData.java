@@ -35,6 +35,7 @@ import org.spongepowered.api.data.value.mutable.ListValue;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>>
         extends AbstractImmutableData<I, M> implements IImmutableListData<E, I, M> {
 
@@ -46,7 +47,7 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
 
     public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey, List<E> list) {
         super(immutableManipulatorType, manipulatorType);
-        registerKey(listKey, ImmutableList.copyOf(list));
+        getValueCollection().register(listKey, ImmutableList.copyOf(list));
         this.listKey = listKey;
     }
 
@@ -58,7 +59,7 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
 
     @Override
     public ImmutableListValue<E> getListValue() {
-        return (ImmutableListValue<E>) getImmutableValue(this.listKey).get();
+        return (ImmutableListValue<E>) tryGetImmutableValueFor(this.listKey).get();
     }
 
     @Override

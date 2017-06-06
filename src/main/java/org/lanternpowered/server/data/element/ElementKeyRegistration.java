@@ -23,20 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.manipulator;
+package org.lanternpowered.server.data.element;
 
-import org.spongepowered.api.data.key.Key;
+import org.lanternpowered.server.data.KeyRegistration;
 import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
-import java.util.Optional;
+public interface ElementKeyRegistration<V extends BaseValue<E>, E> extends KeyRegistration<V, E>, Element<E> {
 
-public interface IImmutableValueHolder {
-
-    <E, R extends ImmutableValue<E>> Optional<R> getImmutableValue(Key<? extends BaseValue<E>> key);
-
-    @SuppressWarnings("unchecked")
-    default <E, R extends ImmutableValue<E>> R tryGetImmutableValue(Key<? extends BaseValue<E>> key) {
-        return (R) getImmutableValue(key).orElseThrow(() -> new IllegalArgumentException("The key " + key + " isn't present!"));
-    }
 }

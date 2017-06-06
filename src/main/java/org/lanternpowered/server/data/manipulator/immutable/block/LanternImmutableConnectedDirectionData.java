@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.manipulator.immutable.block;
 
-import org.lanternpowered.server.data.manipulator.IImmutableValueHolder;
+import org.lanternpowered.server.data.IImmutableValueHolder;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableConnectedDirectionData;
 import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
@@ -35,6 +35,6 @@ public interface LanternImmutableConnectedDirectionData extends ImmutableConnect
 
     @Override
     default ImmutableSetValue<Direction> connectedDirections() {
-        return tryGetImmutableValue(Keys.CONNECTED_DIRECTIONS);
+        return tryGetImmutableValueFor(Keys.CONNECTED_DIRECTIONS);
     }
 }

@@ -48,7 +48,7 @@ public class AbstractImmutableMappedData<K, V, I extends ImmutableMappedData<K, 
 
     public AbstractImmutableMappedData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<MapValue<K, V>> mapKey, Map<K, V> map) {
         super(immutableManipulatorType, manipulatorType);
-        registerKey(mapKey, ImmutableMap.copyOf(map));
+        getValueCollection().register(mapKey, ImmutableMap.copyOf(map));
         this.mapKey = mapKey;
     }
 
@@ -75,6 +75,6 @@ public class AbstractImmutableMappedData<K, V, I extends ImmutableMappedData<K, 
 
     @Override
     public ImmutableMapValue<K, V> getMapValue() {
-        return tryGetImmutableValue(this.mapKey);
+        return tryGetImmutableValueFor(this.mapKey);
     }
 }

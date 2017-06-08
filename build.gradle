@@ -194,8 +194,18 @@ afterEvaluate {
     }
 }
 
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+
 processResources {
     from 'LICENSE.txt'
+
+    // Minimize the json files
+    doLast {
+        fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each {
+            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+        }
+    }
 }
 
 test {

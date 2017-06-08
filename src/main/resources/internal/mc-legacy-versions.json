@@ -1,1 +1,230 @@
-[{"version":6,"name":"0.0.23a_01"},{"version":7,"name":"0.30c"},{"version":22,"name":"1.0.0"},{"version":23,"name":"1.1"},{"version":24,"name":"12w01-05a"},{"version":25,"name":"12w06a"},{"version":27,"name":"12w07a"},{"version":28,"name":"1.2.3"},{"version":29,"name":"1.2.5"},{"version":30,"name":"12w16a"},{"version":31,"name":"12w17a"},{"version":32,"name":"12w19a"},{"version":33,"name":"12w21ab"},{"version":34,"name":"12w22a"},{"version":35,"name":"12w23a"},{"version":36,"name":"12w24a"},{"version":37,"name":"12w26a"},{"version":38,"name":"12w27a"},{"version":39,"name":"1.3.2"},{"version":40,"name":"12w32a"},{"version":41,"name":"12w34a"},{"version":42,"name":"12w34b"},{"version":45,"name":"12w40a"},{"version":46,"name":"12w41a"},{"version":47,"name":"1.4.2"},{"version":48,"name":"1.4.3-pre"},{"version":49,"name":"1.4.5"},{"version":50,"name":"12w49a"},{"version":51,"name":"1.4.7"},{"version":52,"name":"13w01a"},{"version":53,"name":"13w02a"},{"version":54,"name":"13w03a"},{"version":55,"name":"13w04a"},{"version":56,"name":"13w05a"},{"version":57,"name":"13w05b"},{"version":58,"name":"13w06a"},{"version":59,"name":"13w09b"},{"version":60,"name":"1.5.1"},{"version":61,"name":"1.5.2"},{"version":63,"name":"13w16b"},{"version":64,"name":"13w17a"},{"version":65,"name":"13w18a"},{"version":66,"name":"13w19a"},{"version":67,"name":"13w23a"},{"version":68,"name":"13w23b"},{"version":69,"name":"13w24a"},{"version":70,"name":"13w24b"},{"version":71,"name":"13w25c"},{"version":72,"name":"1.6-pre"},{"version":73,"name":"1.6.1"},{"version":74,"name":"1.6.2"},{"version":75,"name":"13w36b"},{"version":76,"name":"13w37b"},{"version":77,"name":"1.6.3"},{"version":78,"name":"1.6.4"},{"version":79,"name":"13w38c"},{"version":80,"name":"13w39b"}]
+[
+    {
+        "version": 6,
+        "name": "0.0.23a_01"
+    },
+    {
+        "version": 7,
+        "name": "0.30c"
+    },
+    {
+        "version": 22,
+        "name": "1.0.0"
+    },
+    {
+        "version": 23,
+        "name": "1.1"
+    },
+    {
+        "version": 24,
+        "name": "12w01-05a"
+    },
+    {
+        "version": 25,
+        "name": "12w06a"
+    },
+    {
+        "version": 27,
+        "name": "12w07a"
+    },
+    {
+        "version": 28,
+        "name": "1.2.3"
+    },
+    {
+        "version": 29,
+        "name": "1.2.5"
+    },
+    {
+        "version": 30,
+        "name": "12w16a"
+    },
+    {
+        "version": 31,
+        "name": "12w17a"
+    },
+    {
+        "version": 32,
+        "name": "12w19a"
+    },
+    {
+        "version": 33,
+        "name": "12w21ab"
+    },
+    {
+        "version": 34,
+        "name": "12w22a"
+    },
+    {
+        "version": 35,
+        "name": "12w23a"
+    },
+    {
+        "version": 36,
+        "name": "12w24a"
+    },
+    {
+        "version": 37,
+        "name": "12w26a"
+    },
+    {
+        "version": 38,
+        "name": "12w27a"
+    },
+    {
+        "version": 39,
+        "name": "1.3.2"
+    },
+    {
+        "version": 40,
+        "name": "12w32a"
+    },
+    {
+        "version": 41,
+        "name": "12w34a"
+    },
+    {
+        "version": 42,
+        "name": "12w34b"
+    },
+    {
+        "version": 45,
+        "name": "12w40a"
+    },
+    {
+        "version": 46,
+        "name": "12w41a"
+    },
+    {
+        "version": 47,
+        "name": "1.4.2"
+    },
+    {
+        "version": 48,
+        "name": "1.4.3-pre"
+    },
+    {
+        "version": 49,
+        "name": "1.4.5"
+    },
+    {
+        "version": 50,
+        "name": "12w49a"
+    },
+    {
+        "version": 51,
+        "name": "1.4.7"
+    },
+    {
+        "version": 52,
+        "name": "13w01a"
+    },
+    {
+        "version": 53,
+        "name": "13w02a"
+    },
+    {
+        "version": 54,
+        "name": "13w03a"
+    },
+    {
+        "version": 55,
+        "name": "13w04a"
+    },
+    {
+        "version": 56,
+        "name": "13w05a"
+    },
+    {
+        "version": 57,
+        "name": "13w05b"
+    },
+    {
+        "version": 58,
+        "name": "13w06a"
+    },
+    {
+        "version": 59,
+        "name": "13w09b"
+    },
+    {
+        "version": 60,
+        "name": "1.5.1"
+    },
+    {
+        "version": 61,
+        "name": "1.5.2"
+    },
+    {
+        "version": 63,
+        "name": "13w16b"
+    },
+    {
+        "version": 64,
+        "name": "13w17a"
+    },
+    {
+        "version": 65,
+        "name": "13w18a"
+    },
+    {
+        "version": 66,
+        "name": "13w19a"
+    },
+    {
+        "version": 67,
+        "name": "13w23a"
+    },
+    {
+        "version": 68,
+        "name": "13w23b"
+    },
+    {
+        "version": 69,
+        "name": "13w24a"
+    },
+    {
+        "version": 70,
+        "name": "13w24b"
+    },
+    {
+        "version": 71,
+        "name": "13w25c"
+    },
+    {
+        "version": 72,
+        "name": "1.6-pre"
+    },
+    {
+        "version": 73,
+        "name": "1.6.1"
+    },
+    {
+        "version": 74,
+        "name": "1.6.2"
+    },
+    {
+        "version": 75,
+        "name": "13w36b"
+    },
+    {
+        "version": 76,
+        "name": "13w37b"
+    },
+    {
+        "version": 77,
+        "name": "1.6.3"
+    },
+    {
+        "version": 78,
+        "name": "1.6.4"
+    },
+    {
+        "version": 79,
+        "name": "13w38c"
+    },
+    {
+        "version": 80,
+        "name": "13w39b"
+    }
+]

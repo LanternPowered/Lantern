@@ -105,7 +105,7 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
 
     @Override
     public GameDictionary.Entry createGameDictionaryEntry() {
-        return null;
+        throw new UnsupportedOperationException("The GameDictionary isn't supported, check first if Game#getGameDictionary is present.");
     }
 
     @Override

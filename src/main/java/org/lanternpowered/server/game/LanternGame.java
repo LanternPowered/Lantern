@@ -95,6 +95,7 @@ import org.spongepowered.api.world.TeleportHelper;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -150,9 +151,6 @@ public class LanternGame implements Game {
 
     // The game registry
     @Inject private LanternGameRegistry gameRegistry;
-
-    // The game dictionary
-    @Inject private LanternGameDictionary gameDictionary;
 
     // The scheduler
     @Inject private LanternScheduler scheduler;
@@ -432,8 +430,8 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public GameDictionary getGameDictionary() {
-        return this.gameDictionary;
+    public Optional<GameDictionary> getGameDictionary() {
+        return Optional.empty();
     }
 
     @Override

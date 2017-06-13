@@ -34,7 +34,9 @@ import java.util.List;
 public final class FlatNetherGeneratorType extends AbstractFlatGeneratorType {
 
     public FlatNetherGeneratorType(String pluginId, String name) {
-        super(pluginId, name, 128, 4);
+        super(pluginId, name);
+        setDefaultGeneratorHeight(128);
+        setDefaultMinimalSpawnHeight(4);
     }
 
     @Override

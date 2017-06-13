@@ -36,7 +36,7 @@ import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.world.gen.DelegateGeneratorType;
 import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
-import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
+import org.lanternpowered.server.world.gen.flat.FlatOverworldGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatNetherGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatTheEndGeneratorType;
 import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
@@ -71,7 +71,7 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        final FlatGeneratorType flat = new FlatGeneratorType("minecraft", "flat");
+        final FlatOverworldGeneratorType flat = new FlatOverworldGeneratorType("minecraft", "flat");
         final FlatNetherGeneratorType flatNether = new FlatNetherGeneratorType("lantern", "flat_nether");
         final FlatTheEndGeneratorType flatTheEnd = new FlatTheEndGeneratorType("lantern", "flat_the_end");
 

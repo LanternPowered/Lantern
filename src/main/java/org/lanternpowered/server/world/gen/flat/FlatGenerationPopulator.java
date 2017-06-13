@@ -28,11 +28,9 @@ package org.lanternpowered.server.world.gen.flat;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.world.gen.IGeneratorType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -48,10 +46,6 @@ public final class FlatGenerationPopulator implements GenerationPopulator {
 
     // Using a cache to increase generation performance
     private final BlockState[] blockStateCache;
-
-    public FlatGenerationPopulator(FlatGeneratorSettings settings, GeneratorType generatorType) {
-        this(settings, IGeneratorType.getGeneratorHeight(generatorType));
-    }
 
     public FlatGenerationPopulator(FlatGeneratorSettings settings, int generatorHeight) {
         checkNotNull(settings, "settings");

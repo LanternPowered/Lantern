@@ -27,28 +27,36 @@ package org.lanternpowered.server.world.gen;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 
 public abstract class LanternGeneratorType extends PluginCatalogType.Base implements IGeneratorType {
 
     // The maximum height the generator will generate the world,
     // for example 128 blocks in the nether and in overworld 256
-    private final int generatorHeight;
+    private int generatorHeight;
 
     // The minimal spawn height
-    private final int minimalSpawnHeight;
+    private int minimalSpawnHeight;
 
-    public LanternGeneratorType(String pluginId, String name) {
-        this(pluginId, name, 256, 1);
-    }
+    private int seaLevel;
 
-    public LanternGeneratorType(String pluginId, String name, int minimalSpawnHeight) {
-        this(pluginId, name, 256, minimalSpawnHeight);
-    }
-
-    public LanternGeneratorType(String pluginId, String name, int generatorHeight, int minimalSpawnHeight) {
+    protected LanternGeneratorType(String pluginId, String name) {
         super(pluginId, name);
-        this.minimalSpawnHeight = minimalSpawnHeight;
+        setDefaultGeneratorHeight(256);
+        setDefaultMinimalSpawnHeight(1);
+        setDefaultSeaLevel(62);
+    }
+
+    protected void setDefaultGeneratorHeight(int generatorHeight) {
         this.generatorHeight = generatorHeight;
+    }
+
+    protected void setDefaultMinimalSpawnHeight(int minimalSpawnHeight) {
+        this.minimalSpawnHeight = minimalSpawnHeight;
+    }
+
+    protected void setDefaultSeaLevel(int seaLevel) {
+        this.seaLevel = seaLevel;
     }
 
     @Override
@@ -57,12 +65,17 @@ public abstract class LanternGeneratorType extends PluginCatalogType.Base implem
     }
 
     @Override
-    public int getMinimalSpawnHeight() {
-        return this.minimalSpawnHeight;
+    public int getSeaLevel(DataView settings) {
+        return settings.getInt(SEA_LEVEL).orElse(this.seaLevel);
     }
 
     @Override
-    public int getGeneratorHeight() {
-        return this.generatorHeight;
+    public int getMinimalSpawnHeight(DataView settings) {
+        return settings.getInt(MINIMAL_SPAWN_HEIGHT).orElse(this.minimalSpawnHeight);
+    }
+
+    @Override
+    public int getGeneratorHeight(DataView settings) {
+        return settings.getInt(GENERATOR_HEIGHT).orElse(this.generatorHeight);
     }
 }

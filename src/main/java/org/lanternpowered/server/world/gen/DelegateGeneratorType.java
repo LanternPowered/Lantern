@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.gen.WorldGenerator;
@@ -40,6 +41,7 @@ public final class DelegateGeneratorType extends PluginCatalogType.Base implemen
 
     private int minimalSpawnHeight;
     private int generatorHeight;
+    private int seaLevel;
 
     public DelegateGeneratorType(String pluginId, String id, GeneratorType generatorType) {
         super(pluginId, id);
@@ -73,19 +75,27 @@ public final class DelegateGeneratorType extends PluginCatalogType.Base implemen
     }
 
     @Override
-    public int getMinimalSpawnHeight() {
+    public int getMinimalSpawnHeight(DataView settings) {
         if (this.minimalSpawnHeight == Integer.MAX_VALUE) {
-            this.minimalSpawnHeight = IGeneratorType.getMinimalSpawnHeight(this.generatorType);
+            this.minimalSpawnHeight = IGeneratorType.getMinimalSpawnHeight(this.generatorType, settings);
         }
         return this.minimalSpawnHeight;
     }
 
     @Override
-    public int getGeneratorHeight() {
+    public int getGeneratorHeight(DataView settings) {
         if (this.generatorHeight == Integer.MAX_VALUE) {
-            this.generatorHeight = IGeneratorType.getGeneratorHeight(this.generatorType);
+            this.generatorHeight = IGeneratorType.getGeneratorHeight(this.generatorType, settings);
         }
         return this.generatorHeight;
+    }
+
+    @Override
+    public int getSeaLevel(DataView settings) {
+        if (this.seaLevel == Integer.MAX_VALUE) {
+            this.seaLevel = IGeneratorType.getSeaLevel(this.generatorType, settings);
+        }
+        return this.seaLevel;
     }
 
     @Override

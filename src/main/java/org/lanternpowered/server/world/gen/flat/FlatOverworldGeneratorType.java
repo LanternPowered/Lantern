@@ -31,9 +31,9 @@ import org.spongepowered.api.world.biome.BiomeTypes;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class FlatGeneratorType extends AbstractFlatGeneratorType {
+public final class FlatOverworldGeneratorType extends AbstractFlatGeneratorType {
 
-    public FlatGeneratorType(String pluginId, String name) {
+    public FlatOverworldGeneratorType(String pluginId, String name) {
         super(pluginId, name);
     }
 

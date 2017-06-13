@@ -42,7 +42,7 @@ import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModu
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
-import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
+import org.lanternpowered.server.world.gen.flat.FlatOverworldGeneratorType;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.weather.LanternWeather;
@@ -494,9 +494,9 @@ final class LanternWorldPropertiesIO {
         dataView.set(GENERATOR_VERSION, generatorId.equalsIgnoreCase("default") ? 1 : 0);
         // The flat world generator has a different settings format
         if (generatorId.equalsIgnoreCase("flat")) {
-            dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings().getString(FlatGeneratorType.SETTINGS).get());
+            dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings().getString(AbstractFlatGeneratorType.SETTINGS).get());
             dataView.set(GENERATOR_OPTIONS_EXTRA, GSON.toJson(JsonTranslator.instance().translate(
-                    properties.getGeneratorSettings().copy().remove(FlatGeneratorType.SETTINGS))));
+                    properties.getGeneratorSettings().copy().remove(AbstractFlatGeneratorType.SETTINGS))));
         } else {
             dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings());
         }

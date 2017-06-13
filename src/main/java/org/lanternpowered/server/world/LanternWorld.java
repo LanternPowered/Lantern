@@ -75,6 +75,7 @@ import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
+import org.lanternpowered.server.world.gen.IGeneratorType;
 import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
@@ -1297,6 +1298,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     @Override
     public PortalAgent getPortalAgent() {
         return this.portalAgent;
+    }
+
+    @Override
+    public int getSeaLevel() {
+        return IGeneratorType.getSeaLevel(getProperties().getGeneratorType(), getProperties().getGeneratorSettings());
     }
 
     public void pulse() {

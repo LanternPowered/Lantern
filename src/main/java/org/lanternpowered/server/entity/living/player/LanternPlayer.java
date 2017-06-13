@@ -139,6 +139,7 @@ import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldBorder;
 
 import java.util.ArrayList;
 import java.util.Collections;

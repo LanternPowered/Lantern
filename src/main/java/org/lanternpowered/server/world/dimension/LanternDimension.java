@@ -56,7 +56,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public int getMinimumSpawnHeight() {
-        return IGeneratorType.getMinimalSpawnHeight(getGeneratorType());
+        return IGeneratorType.getMinimalSpawnHeight(getGeneratorType(), this.world.getProperties().getGeneratorSettings());
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public int getHeight() {
-        return IGeneratorType.getGeneratorHeight(getGeneratorType());
+        return IGeneratorType.getGeneratorHeight(getGeneratorType(), this.world.getProperties().getGeneratorSettings());
     }
 
     @Override

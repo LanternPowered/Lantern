@@ -35,7 +35,9 @@ import java.util.List;
 public final class FlatTheEndGeneratorType extends AbstractFlatGeneratorType {
 
     public FlatTheEndGeneratorType(String pluginId, String name) {
-        super(pluginId, name, 256, 4);
+        super(pluginId, name);
+        setDefaultGeneratorHeight(256);
+        setDefaultGeneratorHeight(4);
     }
 
     @Override

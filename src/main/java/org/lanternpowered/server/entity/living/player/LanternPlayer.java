@@ -492,6 +492,9 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
                     new IntArrayList(recipes)));
         } else {
+            if (this.worldBorder != null) {
+                this.worldBorder.removePlayer(this);
+            }
             AdvancementTrees.INSTANCE.removeTracker(this);
             this.session.getServer().removePlayer(this);
             this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));

@@ -157,14 +157,14 @@ public class LanternEventManager implements EventManager {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void register(List<RegisteredListener<?>> listeners) {
+        final Set<Class<?>> types = new HashSet<>();
         synchronized (this.lock) {
-            final Set<Class<?>> types = new HashSet<>();
             listeners.stream()
                     .filter(listener -> this.listenersByEvent.put(listener.getEventClass(), listener))
                     .forEach(listener -> types.addAll(TypeToken.of(listener.getEventClass()).getTypes().rawTypes()));
-            if (!types.isEmpty()) {
-                this.listenersCache.invalidateAll(types);
-            }
+        }
+        if (!types.isEmpty()) {
+            this.listenersCache.invalidateAll(types);
         }
     }
 
@@ -267,8 +267,8 @@ public class LanternEventManager implements EventManager {
     }
 
     private void unregister(Predicate<RegisteredListener<?>> unregister) {
+        final Set<Class<?>> types = new HashSet<>();
         synchronized (this.lock) {
-            final Set<Class<?>> types = new HashSet<>();
             final Iterator<RegisteredListener<?>> it = this.listenersByEvent.values().iterator();
 
             while (it.hasNext()) {
@@ -283,10 +283,9 @@ public class LanternEventManager implements EventManager {
                     it.remove();
                 }
             }
-
-            if (!types.isEmpty()) {
-                this.listenersCache.invalidateAll(types);
-            }
+        }
+        if (!types.isEmpty()) {
+            this.listenersCache.invalidateAll(types);
         }
     }
 

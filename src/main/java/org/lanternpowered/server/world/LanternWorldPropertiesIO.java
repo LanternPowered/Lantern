@@ -239,15 +239,17 @@ final class LanternWorldPropertiesIO {
         properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
         properties.setInitialized(dataView.getInt(INITIALIZED).get() > 0);
         dataView.getInt(DIFFICULTY_LOCKED).ifPresent(v -> properties.setDifficultyLocked(v > 0));
-        dataView.getDouble(BORDER_CENTER_X).ifPresent(v -> properties.borderCenterX = v);
-        dataView.getDouble(BORDER_CENTER_Z).ifPresent(v -> properties.borderCenterZ = v);
-        dataView.getDouble(BORDER_SIZE_START).ifPresent(v -> properties.borderDiameterStart = v);
-        dataView.getDouble(BORDER_SIZE_END).ifPresent(v -> properties.borderDiameterEnd = v);
-        dataView.getLong(BORDER_SIZE_LERP_TIME).ifPresent(v -> properties.borderLerpTime = v);
-        dataView.getDouble(BORDER_DAMAGE).ifPresent(v -> properties.borderDamage = v);
-        dataView.getDouble(BORDER_DAMAGE_THRESHOLD).ifPresent(v -> properties.borderDamageThreshold = v);
-        dataView.getInt(BORDER_WARNING_BLOCKS).ifPresent(v -> properties.borderWarningDistance = v);
-        dataView.getInt(BORDER_WARNING_TIME).ifPresent(v -> properties.borderWarningTime = v);
+
+        final LanternWorldBorder border = properties.getWorldBorder();
+        dataView.getDouble(BORDER_CENTER_X).ifPresent(v -> border.centerX = v);
+        dataView.getDouble(BORDER_CENTER_Z).ifPresent(v -> border.centerZ = v);
+        dataView.getDouble(BORDER_SIZE_START).ifPresent(v -> border.diameterStart = v);
+        dataView.getDouble(BORDER_SIZE_END).ifPresent(v -> border.diameterEnd = v);
+        dataView.getLong(BORDER_SIZE_LERP_TIME).ifPresent(v -> border.lerpTime = v);
+        dataView.getDouble(BORDER_DAMAGE).ifPresent(v -> border.damage = v);
+        dataView.getDouble(BORDER_DAMAGE_THRESHOLD).ifPresent(v -> border.damageThreshold = v);
+        dataView.getInt(BORDER_WARNING_BLOCKS).ifPresent(v -> border.warningDistance = v);
+        dataView.getInt(BORDER_WARNING_TIME).ifPresent(v -> border.warningTime = v);
 
         if (spongeRootDataView != null) {
             properties.setAdditionalProperties(spongeRootDataView.copy().remove(DataQueries.SPONGE_DATA));
@@ -504,15 +506,16 @@ final class LanternWorldPropertiesIO {
         dataView.set(DIFFICULTY_LOCKED, (byte) (properties.isDifficultyLocked() ? 1 : 0));
         dataView.set(GAME_MODE, ((LanternGameMode) properties.getGameMode()).getInternalId());
         dataView.set(MAP_FEATURES, (byte) (properties.mapFeatures ? 1 : 0));
-        dataView.set(BORDER_CENTER_X, properties.borderCenterX);
-        dataView.set(BORDER_CENTER_Z, properties.borderCenterZ);
-        dataView.set(BORDER_DAMAGE, properties.borderDamage);
-        dataView.set(BORDER_DAMAGE_THRESHOLD, properties.borderDamageThreshold);
-        dataView.set(BORDER_SIZE_END, properties.borderDiameterEnd);
-        dataView.set(BORDER_SIZE_START, properties.getWorldBorderDiameter());
-        dataView.set(BORDER_SIZE_LERP_TIME, properties.getWorldBorderTimeRemaining());
-        dataView.set(BORDER_WARNING_BLOCKS, properties.borderWarningDistance);
-        dataView.set(BORDER_WARNING_TIME, properties.borderWarningTime);
+        final LanternWorldBorder border = properties.getWorldBorder();
+        dataView.set(BORDER_CENTER_X, border.centerX);
+        dataView.set(BORDER_CENTER_Z, border.centerZ);
+        dataView.set(BORDER_DAMAGE, border.damage);
+        dataView.set(BORDER_DAMAGE_THRESHOLD, border.damageThreshold);
+        dataView.set(BORDER_SIZE_END, border.diameterEnd);
+        dataView.set(BORDER_SIZE_START, border.getDiameter());
+        dataView.set(BORDER_SIZE_LERP_TIME, border.getTimeRemaining());
+        dataView.set(BORDER_WARNING_BLOCKS, border.warningDistance);
+        dataView.set(BORDER_WARNING_TIME, border.warningTime);
         final Vector3i spawn = properties.getSpawnPosition();
         dataView.set(SPAWN_X, spawn.getX());
         dataView.set(SPAWN_Y, spawn.getY());

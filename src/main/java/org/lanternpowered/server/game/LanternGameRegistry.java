@@ -210,6 +210,7 @@ import org.lanternpowered.server.util.LanguageUtil;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
 import org.lanternpowered.server.world.LanternWorldArchetypeBuilder;
+import org.lanternpowered.server.world.LanternWorldBorderBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeGenerationSettingsBuilder;
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
@@ -366,6 +367,7 @@ import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldArchetype;
+import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.VirtualBiomeType;
@@ -460,6 +462,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(ItemStatisticBuilder.class, ItemStatisticBuilder::create)
                 .registerBuilderSupplier(StatisticBuilder.class, StatisticBuilder::create)
                 .registerBuilderSupplier(DataRegistration.Builder.class, LanternDataRegistrationBuilder::new)
+                .registerBuilderSupplier(WorldBorder.Builder.class, LanternWorldBorderBuilder::new)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???

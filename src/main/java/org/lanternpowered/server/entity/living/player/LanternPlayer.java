@@ -31,7 +31,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.lanternpowered.server.advancement.AdvancementTree;
@@ -52,7 +51,6 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
-import org.lanternpowered.server.extra.accessory.TopHats;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternContainer;
@@ -87,6 +85,7 @@ import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldBorder;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
@@ -113,6 +112,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.event.world.ChangeWorldBorderEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -249,6 +249,10 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
      * The entity that is being spectated by this player.
      */
     @Nullable private Entity spectatorEntity;
+
+    // The world border the player is currently tracking, if null, it will track the
+    // border of the world the player is located in
+    @Nullable private LanternWorldBorder worldBorder;
 
     private final AdvancementsProgress advancementsProgress = new AdvancementsProgress();
 
@@ -403,6 +407,9 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             this.lastChunkPos = null;
             // Remove the player from the world
             oldWorld.removePlayer(this);
+            if (this.worldBorder == null) {
+                oldWorld.getWorldBorder().removePlayer(this);
+            }
         }
         if (world != null) {
             final LanternGameMode gameMode = (LanternGameMode) get(Keys.GAME_MODE).get();
@@ -452,9 +459,11 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
+            if (this.worldBorder == null) {
+                world.getWorldBorder().addPlayer(this);
+            }
             // Send the first chunks
             pulseChunkChanges();
-            this.session.send(world.getProperties().createWorldBorderMessage());
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
@@ -1034,6 +1043,38 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     public void setSpectatorTarget(@Nullable Entity entity) {
         this.spectatorEntity = entity;
         triggerEvent(new SpectateEntityEvent(entity));
+    }
+
+    @Override
+    public Optional<WorldBorder> getWorldBorder() {
+        return Optional.ofNullable(this.worldBorder);
+    }
+
+    @Override
+    public void setWorldBorder(@Nullable WorldBorder border, Cause cause) {
+        checkNotNull(cause, "cause");
+        if (this.worldBorder == border) {
+            return;
+        }
+        final ChangeWorldBorderEvent.TargetPlayer event = SpongeEventFactory.createChangeWorldBorderEventTargetPlayer(
+                cause, Optional.ofNullable(border), Optional.ofNullable(this.worldBorder), this);
+        Sponge.getEventManager().post(event);
+        if (event.isCancelled()) {
+            return;
+        }
+        if (this.worldBorder != null) {
+            this.worldBorder.removePlayer(this);
+        }
+        final LanternWorldBorder worldBorder = (LanternWorldBorder) border;
+        if (worldBorder != null) {
+            if (this.worldBorder == null) {
+                getWorld().getWorldBorder().removePlayer(this);
+            }
+            worldBorder.addPlayer(this);
+        } else {
+            getWorld().getWorldBorder().addPlayer(this);
+        }
+        this.worldBorder = worldBorder;
     }
 
     public PlayerInteractionHandler getInteractionHandler() {

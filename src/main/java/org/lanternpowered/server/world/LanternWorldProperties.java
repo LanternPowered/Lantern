@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -35,7 +34,6 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
@@ -78,8 +76,6 @@ import javax.annotation.Nullable;
 
 public final class LanternWorldProperties implements WorldProperties {
 
-    private static final int BOUNDARY = 29999984;
-
     // The unique id of the world
     final UUID uniqueId;
 
@@ -90,6 +86,9 @@ public final class LanternWorldProperties implements WorldProperties {
     private final Rules rules = new Rules(this);
 
     private final TrackerIdAllocator trackerIdAllocator = new TrackerIdAllocator();
+
+    // The world border attached to this properties
+    private final LanternWorldBorder worldBorder = new LanternWorldBorder();
 
     // The serialization behavior
     SerializationBehavior serializationBehavior = SerializationBehaviors.AUTOMATIC;
@@ -125,28 +124,6 @@ public final class LanternWorldProperties implements WorldProperties {
     private final WeatherData weatherData = new WeatherData();
 
     @Nullable private LanternWorld world;
-
-    // World border properties
-    double borderCenterX;
-    double borderCenterZ;
-
-    // The current radius of the border
-    double borderDiameterStart = 60000000f;
-    double borderDiameterEnd = this.borderDiameterStart;
-
-    int borderWarningDistance = 5;
-    int borderWarningTime = 15;
-
-    double borderDamage = 1;
-    double borderDamageThreshold = 5;
-
-    // The remaining time will be stored in this
-    // for the first world tick
-    long borderLerpTime;
-
-    // Shrink or growing times
-    private long borderTimeStart = -1;
-    private long borderTimeEnd;
 
     // The last time the world was played in
     private long lastPlayed;
@@ -641,178 +618,82 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public Vector3d getWorldBorderCenter() {
-        return new Vector3d(this.borderCenterX, 0, this.borderCenterZ);
-    }
-
-    public MessagePlayOutWorldBorder createWorldBorderMessage() {
-        return new MessagePlayOutWorldBorder.Initialize(this.borderCenterX, this.borderCenterZ, this.borderDiameterStart,
-                this.borderDiameterEnd, this.getWorldBorderTimeRemaining(), BOUNDARY, this.borderWarningDistance,
-                this.borderWarningTime);
-    }
-
-    public void setBorderDiameter(double startDiameter, double endDiameter, long time) {
-        checkArgument(startDiameter >= 0, "The start diameter cannot be negative!");
-        checkArgument(endDiameter >= 0, "The end diameter cannot be negative!");
-        checkArgument(time >= 0, "The duration cannot be negative!");
-
-        // Only shrink or grow if needed
-        if (time == 0 || startDiameter == endDiameter) {
-            this.borderDiameterStart = endDiameter;
-            this.borderDiameterEnd = endDiameter;
-            this.setCurrentBorderTime(0);
-            if (this.world != null) {
-                this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateDiameter(endDiameter));
-            }
-        } else {
-            this.borderDiameterStart = startDiameter;
-            this.borderDiameterEnd = endDiameter;
-            this.setCurrentBorderTime(time);
-            if (this.world != null) {
-                this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateLerpedDiameter(startDiameter,
-                        endDiameter, time));
-            }
-        }
+        return this.worldBorder.getCenter();
     }
 
     @Override
     public void setWorldBorderCenter(double x, double z) {
-        this.borderCenterX = x;
-        this.borderCenterZ = z;
-
-        if (this.world != null) {
-            this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateCenter(this.borderCenterX,
-                    this.borderCenterZ));
-        }
+        this.worldBorder.setCenter(x, z);
     }
 
     @Override
     public double getWorldBorderDiameter() {
-        if (this.borderTimeStart == -1) {
-            this.updateCurrentBorderTime();
-        }
-
-        if (this.borderDiameterStart != this.borderDiameterEnd) {
-            long lerpTime = this.borderTimeEnd - this.borderTimeStart;
-            if (lerpTime == 0) {
-                return this.borderDiameterStart;
-            }
-
-            long elapsedTime = System.currentTimeMillis() - this.borderTimeStart;
-            elapsedTime = elapsedTime > lerpTime ? lerpTime : elapsedTime < 0 ? 0 : elapsedTime;
-
-            double d = elapsedTime / lerpTime;
-            double diameter;
-
-            if (d == 0.0) {
-                diameter = this.borderDiameterStart;
-            } else {
-                diameter = this.borderDiameterStart + (this.borderDiameterEnd - this.borderDiameterStart) * d;
-            }
-
-            this.borderDiameterStart = diameter;
-            this.setCurrentBorderTime(lerpTime - elapsedTime);
-            return diameter;
-        } else {
-            return this.borderDiameterStart;
-        }
+        return this.worldBorder.getDiameter();
     }
 
     @Override
     public void setWorldBorderDiameter(double diameter) {
-        this.borderDiameterStart = diameter;
+        this.worldBorder.setDiameter(diameter);
     }
 
     @Override
     public long getWorldBorderTimeRemaining() {
-        if (this.borderTimeStart == -1) {
-            this.updateCurrentBorderTime();
-        }
-        return Math.max(this.borderTimeEnd - System.currentTimeMillis(), 0);
-    }
-
-    void updateCurrentBorderTime() {
-        this.updateCurrentBorderTime(this.borderLerpTime);
-    }
-
-    private void setCurrentBorderTime(long time) {
-        this.updateCurrentBorderTime(time);
-        this.borderLerpTime = time;
-    }
-
-    private void updateCurrentBorderTime(long time) {
-        this.borderTimeStart = System.currentTimeMillis();
-        this.borderTimeEnd = this.borderTimeStart + time;
+        return this.worldBorder.getTimeRemaining();
     }
 
     @Override
     public void setWorldBorderTimeRemaining(long time) {
-        this.setCurrentBorderTime(time);
-        if (this.world != null) {
-            this.world.broadcast(() -> time == 0 ? new MessagePlayOutWorldBorder.UpdateDiameter(this.borderDiameterEnd) :
-                new MessagePlayOutWorldBorder.UpdateLerpedDiameter(this.getWorldBorderDiameter(), this.borderDiameterEnd,
-                        this.getWorldBorderTimeRemaining()));
-        }
+        this.worldBorder.setRemainingTime(time);
     }
 
     @Override
     public double getWorldBorderTargetDiameter() {
-        return this.borderDiameterEnd;
+        return this.worldBorder.getNewDiameter();
     }
 
     @Override
     public void setWorldBorderTargetDiameter(double diameter) {
-        this.borderDiameterEnd = diameter;
-        if (this.world != null) {
-            this.world.broadcast(() -> this.getWorldBorderTimeRemaining() == 0 ? new MessagePlayOutWorldBorder.UpdateDiameter(
-                    diameter) : new MessagePlayOutWorldBorder.UpdateLerpedDiameter(this.getWorldBorderDiameter(),
-                            diameter, this.getWorldBorderTimeRemaining()));
-        }
+        this.worldBorder.setDiameter(diameter);
     }
 
     @Override
     public double getWorldBorderDamageThreshold() {
-        return this.borderDamageThreshold;
+        return this.worldBorder.getDamageThreshold();
     }
 
     @Override
     public void setWorldBorderDamageThreshold(double distance) {
-        this.borderDamageThreshold = distance;
+        this.worldBorder.setDamageThreshold(distance);
     }
 
     @Override
     public double getWorldBorderDamageAmount() {
-        return this.borderDamage;
+        return this.worldBorder.getDamageAmount();
     }
 
     @Override
     public void setWorldBorderDamageAmount(double damage) {
-        this.borderDamage = damage;
+        this.worldBorder.setDamageAmount(damage);
     }
 
     @Override
     public int getWorldBorderWarningTime() {
-        return this.borderWarningTime;
+        return this.worldBorder.getWarningTime();
     }
 
     @Override
     public void setWorldBorderWarningTime(int time) {
-        this.borderWarningTime = time;
-        if (this.world != null) {
-            this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningTime(time));
-        }
+        this.worldBorder.setWarningTime(time);
     }
 
     @Override
     public int getWorldBorderWarningDistance() {
-        return this.borderWarningDistance;
+        return this.worldBorder.getWarningDistance();
     }
 
     @Override
     public void setWorldBorderWarningDistance(int distance) {
-        this.borderWarningDistance = distance;
-        if (this.world != null) {
-            this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningDistance(distance));
-        }
+        this.worldBorder.setWarningDistance(distance);
     }
 
     @Override
@@ -853,5 +734,9 @@ public final class LanternWorldProperties implements WorldProperties {
 
     public TrackerIdAllocator getTrackerIdAllocator() {
         return this.trackerIdAllocator;
+    }
+
+    public LanternWorldBorder getWorldBorder() {
+        return this.worldBorder;
     }
 }

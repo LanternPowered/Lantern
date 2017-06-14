@@ -68,13 +68,13 @@ final class ConsoleCommandCompleter implements Completer {
             final List<String> suggestions = tabComplete.get();
             // If the suggestions are for the command and there was a prefix, then append the prefix
             if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
-                for (String completion : tabComplete.get()) {
+                for (String completion : suggestions) {
                     if (!completion.isEmpty()) {
                         candidates.add(new Candidate('/' + completion));
                     }
                 }
             } else {
-                for (String completion : tabComplete.get()) {
+                for (String completion : suggestions) {
                     if (!completion.isEmpty()) {
                         candidates.add(new Candidate(completion));
                     }

@@ -96,7 +96,7 @@ public final class ConsoleManager {
 
         if (terminal != null) {
             final LineReader reader = LineReaderBuilder.builder()
-                    .appName(Implementation.NAME)
+                    .appName(this.pluginContainer.getName())
                     .terminal(terminal)
                     .completer(new ConsoleCommandCompleter())
                     .build();

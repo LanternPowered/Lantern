@@ -180,9 +180,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     // The game instance
     final LanternGame game;
 
-    // The world border
-    final LanternWorldBorder worldBorder;
-
     // The weather universe
     @Nullable final LanternWeatherUniverse weatherUniverse;
     private final TimeUniverse timeUniverse;
@@ -265,8 +262,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
             this.weatherUniverse = null;
         }
         this.timeUniverse = new TimeUniverse(this);
-        // Create the world border
-        this.worldBorder = new LanternWorldBorder(this);
         // Create the dimension
         this.dimension = dimensionType.newDimension(this);
         // Create the portal agent
@@ -278,6 +273,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
                 chunkIOService, worldGenerator, directory);
         this.worldContext = new Context(Context.WORLD_KEY, getName());
         this.worldEventListener.add(this.observedChunkManager);
+        getWorldBorder().updateCurrentTime();
     }
 
     @Override
@@ -1209,7 +1205,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     @Override
     public LanternWorldBorder getWorldBorder() {
-        return this.worldBorder;
+        return this.properties.getWorldBorder();
     }
 
     @Override

@@ -37,8 +37,8 @@ import javax.annotation.Nullable;
 
 public interface IShapedCraftingRecipe extends ICraftingRecipe, ShapedCraftingRecipe {
 
-    static IShapedCraftingRecipe.Builder builder() {
-        return Sponge.getRegistry().createBuilder(IShapedCraftingRecipe.Builder.class);
+    static Builder builder() {
+        return Sponge.getRegistry().createBuilder(Builder.class);
     }
 
     interface Builder extends ShapedCraftingRecipe.Builder {

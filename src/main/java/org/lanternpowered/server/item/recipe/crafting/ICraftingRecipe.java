@@ -104,4 +104,8 @@ public interface ICraftingRecipe extends CraftingRecipe {
     static IShapedCraftingRecipe.Builder shapedBuilder() {
         return Sponge.getRegistry().createBuilder(IShapedCraftingRecipe.Builder.class);
     }
+
+    static IShapelessCraftingRecipe.Builder shapelessBuilder() {
+        return Sponge.getRegistry().createBuilder(IShapelessCraftingRecipe.Builder.class);
+    }
 }

@@ -55,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -434,23 +433,13 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
 
     @Override
     protected void addViewer(Viewer viewer, LanternContainer container) {
-        final Iterator<ContainerViewListener> it = this.viewerListeners.iterator();
-        while (it.hasNext()) {
-            final ContainerViewListener listener = it.next();
-            if (listener.onViewerAdded(viewer, container) == ContainerViewListener.Result.REMOVE_LISTENER) {
-                it.remove();
-            }
-        }
+        this.viewerListeners.removeIf(listener ->
+                listener.onViewerAdded(viewer, container) == ContainerViewListener.Result.REMOVE_LISTENER);
     }
 
     @Override
     protected void removeViewer(Viewer viewer, LanternContainer container) {
-        final Iterator<ContainerViewListener> it = this.viewerListeners.iterator();
-        while (it.hasNext()) {
-            final ContainerViewListener listener = it.next();
-            if (listener.onViewerRemoved(viewer, container) == ContainerViewListener.Result.REMOVE_LISTENER) {
-                it.remove();
-            }
-        }
+        this.viewerListeners.removeIf(listener ->
+                listener.onViewerRemoved(viewer, container) == ContainerViewListener.Result.REMOVE_LISTENER);
     }
 }

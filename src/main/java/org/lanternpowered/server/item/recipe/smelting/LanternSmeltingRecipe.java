@@ -23,51 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe.crafting;
+package org.lanternpowered.server.item.recipe.smelting;
 
-import org.spongepowered.api.Sponge;
+import org.lanternpowered.server.item.recipe.LanternRecipe;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
-import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
+import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
+import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
-public interface IShapelessCraftingRecipe extends ShapelessCraftingRecipe, ICraftingRecipe {
+final class LanternSmeltingRecipe extends LanternRecipe implements SmeltingRecipe {
 
-    static Builder builder() {
-        return Sponge.getRegistry().createBuilder(Builder.class);
+    private final ItemStackSnapshot exemplaryIngredient;
+    private final Ingredient ingredient;
+    private final ISmeltingResultProvider resultProvider;
+
+    LanternSmeltingRecipe(String pluginId, String name,
+            ItemStackSnapshot exemplaryResult, ItemStackSnapshot exemplaryIngredient,
+            Ingredient ingredient, ISmeltingResultProvider resultProvider) {
+        super(pluginId, name, exemplaryResult);
+        this.exemplaryIngredient = exemplaryIngredient;
+        this.ingredient = ingredient;
+        this.resultProvider = resultProvider;
     }
 
-    interface Builder extends ShapelessCraftingRecipe.Builder {
+    @Override
+    public ItemStackSnapshot getExemplaryIngredient() {
+        return this.exemplaryIngredient;
+    }
 
-        @Override
-        Builder.ResultStep addIngredient(Ingredient ingredient);
+    @Override
+    public boolean isValid(ItemStackSnapshot ingredient) {
+        return this.ingredient.test(ingredient.createStack());
+    }
 
-        interface ResultStep extends Builder, ShapelessCraftingRecipe.Builder.ResultStep {
-
-            /**
-             * Sets the {@link ICraftingResultProvider}.
-             *
-             * @param craftingResultProvider The crafting result provider
-             * @return This builder, for chaining
-             */
-            Builder.EndStep result(ICraftingResultProvider craftingResultProvider);
-
-            @Override
-            Builder.EndStep result(ItemStackSnapshot result);
-
-            @Override
-            Builder.EndStep result(ItemStack result);
-        }
-
-        interface EndStep extends Builder, ShapelessCraftingRecipe.Builder.EndStep {
-
-            @Override
-            Builder.EndStep group(@Nullable String name);
-
-            @Override
-            IShapelessCraftingRecipe build(String id, Object plugin);
-        }
+    @Override
+    public Optional<SmeltingResult> getResult(ItemStackSnapshot ingredient) {
+        final ItemStack itemStack = ingredient.createStack();
+        return this.ingredient.test(itemStack) ? Optional.of(this.resultProvider.get(itemStack)) : Optional.empty();
     }
 }

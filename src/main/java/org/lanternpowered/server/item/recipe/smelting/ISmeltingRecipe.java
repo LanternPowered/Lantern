@@ -23,51 +23,80 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe.crafting;
+package org.lanternpowered.server.item.recipe.smelting;
 
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
-import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
+import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 
-import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
-public interface IShapelessCraftingRecipe extends ShapelessCraftingRecipe, ICraftingRecipe {
+public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
 
     static Builder builder() {
         return Sponge.getRegistry().createBuilder(Builder.class);
     }
 
-    interface Builder extends ShapelessCraftingRecipe.Builder {
+    interface Builder extends SmeltingRecipe.Builder {
+
+        /**
+         * Sets the {@link Ingredient} that should be used.
+         *
+         * @param ingredient The ingredient
+         * @return The result step
+         */
+        ResultStep ingredient(Ingredient ingredient);
 
         @Override
-        Builder.ResultStep addIngredient(Ingredient ingredient);
+        ResultStep ingredient(Predicate<ItemStackSnapshot> ingredientPredicate, ItemStackSnapshot exemplaryIngredient);
 
-        interface ResultStep extends Builder, ShapelessCraftingRecipe.Builder.ResultStep {
+        @Override
+        ResultStep ingredient(ItemStackSnapshot ingredient);
+
+        @Override
+        ResultStep ingredient(ItemStack ingredient);
+
+        @Override
+        ResultStep ingredient(ItemType ingredient);
+
+        interface ResultStep extends Builder, SmeltingRecipe.Builder.ResultStep {
 
             /**
-             * Sets the {@link ICraftingResultProvider}.
+             * Sets the {@link ISmeltingResultProvider}.
              *
-             * @param craftingResultProvider The crafting result provider
+             * @param resultProvider The smelting result provider
              * @return This builder, for chaining
              */
-            Builder.EndStep result(ICraftingResultProvider craftingResultProvider);
+            Builder.EndStep result(ISmeltingResultProvider resultProvider);
 
             @Override
             Builder.EndStep result(ItemStackSnapshot result);
 
             @Override
             Builder.EndStep result(ItemStack result);
+
         }
 
-        interface EndStep extends Builder, ShapelessCraftingRecipe.Builder.EndStep {
+        interface EndStep extends Builder, SmeltingRecipe.Builder.EndStep {
 
             @Override
-            Builder.EndStep group(@Nullable String name);
+            Builder.EndStep experience(double experience);
 
             @Override
-            IShapelessCraftingRecipe build(String id, Object plugin);
+            ISmeltingRecipe build();
+
+            /**
+             * Builds the {@link ISmeltingRecipe} with the given id and plugin instance.
+             *
+             * @param id The id
+             * @param plugin The plugin instance
+             * @return The smelting recipe
+             */
+            ISmeltingRecipe build(String id, Object plugin);
         }
     }
 }

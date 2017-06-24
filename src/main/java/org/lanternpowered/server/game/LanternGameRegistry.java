@@ -47,6 +47,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.boss.LanternBossBarBuilder;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageSourceBuilder;
@@ -192,9 +193,15 @@ import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
 import org.lanternpowered.server.inventory.LanternItemStackBuilder;
 import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
+import org.lanternpowered.server.item.recipe.IIngredient;
+import org.lanternpowered.server.item.recipe.LanternIngredientBuilder;
+import org.lanternpowered.server.item.recipe.crafting.IShapedCraftingRecipe;
+import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipe;
+import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipeBuilder;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
+import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
@@ -331,7 +338,10 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
+import org.spongepowered.api.item.recipe.RecipeRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
+import org.spongepowered.api.item.recipe.crafting.Ingredient;
+import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipeRegistry;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
@@ -407,6 +417,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -478,6 +489,11 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(FluidStack.Builder.class, LanternFluidStackBuilder::new)
                 .registerBuilderSupplier(FluidStackSnapshot.Builder.class, LanternFluidStackSnapshotBuilder::new)
                 .registerBuilderSupplier(ItemStack.Builder.class, LanternItemStackBuilder::new)
+                // Recipes
+                .registerBuilderSupplier(ShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
+                .registerBuilderSupplier(IShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
+                .registerBuilderSupplier(Ingredient.Builder.class, LanternIngredientBuilder::new)
+                .registerBuilderSupplier(IIngredient.Builder.class, LanternIngredientBuilder::new)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
@@ -678,19 +694,35 @@ public class LanternGameRegistry implements GameRegistry {
         }
     }
 
+    private static String getPluginId(CatalogType catalogType) {
+        if (catalogType instanceof PluginCatalogType) {
+            ((PluginCatalogType) catalogType).getPluginId();
+        }
+        final String id = catalogType.getId();
+        final int index = id.indexOf(':');
+        if (index == -1) {
+            // Just fall back to minecraft?
+            return InternalPluginsInfo.Minecraft.IDENTIFIER;
+        }
+        return id.substring(0, index);
+    }
+
     @Override
     public <T extends CatalogType> Collection<T> getAllFor(String pluginId, Class<T> typeClass) {
         checkNotNull(pluginId);
-        final CatalogRegistryModule<T> registryModule = this.getCatalogRegistryModule(typeClass).orElse(null);
+        final CatalogRegistryModule<T> registryModule = getCatalogRegistryModule(typeClass).orElse(null);
         if (registryModule == null) {
             return Collections.emptyList();
         } else {
-            ImmutableList.Builder<T> builder = ImmutableList.builder();
-            registryModule.getAll().stream()
-                    .filter(type -> pluginId.equals(type.getId().split(":")[0]))
-                    .forEach(builder::add);
-            return builder.build();
+            return registryModule.getAll().stream()
+                    .filter(type -> pluginId.equals(getPluginId(type)))
+                    .collect(ImmutableList.toImmutableList());
         }
+    }
+
+    @Override
+    public <T extends CatalogType> Collection<T> getAllForMinecraft(Class<T> typeClass) {
+        return getAllFor(InternalPluginsInfo.Minecraft.IDENTIFIER, typeClass);
     }
 
     @SuppressWarnings("unchecked")
@@ -971,7 +1003,7 @@ public class LanternGameRegistry implements GameRegistry {
      * @return the translation manager
      */
     public TranslationManager getTranslationManager() {
-        return this.getRegistryModule(TranslationManagerRegistryModule.class).get().getTranslationManager();
+        return getRegistryModule(TranslationManagerRegistryModule.class).get().getTranslationManager();
     }
 
     public LanternAttributeCalculator getAttributeCalculator() {
@@ -1045,12 +1077,12 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public Optional<DisplaySlot> getDisplaySlotForColor(TextColor color) {
-        return this.getRegistryModule(DisplaySlotRegistryModule.class).get().getByTeamColor(color);
+        return getRegistryModule(DisplaySlotRegistryModule.class).get().getByTeamColor(color);
     }
 
     @Override
     public Optional<Translation> getTranslationById(String id) {
-        return this.getTranslationManager().getIfPresent(id);
+        return getTranslationManager().getIfPresent(id);
     }
 
     @Override

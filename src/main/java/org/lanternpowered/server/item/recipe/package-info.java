@@ -23,38 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
-
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
-import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
-import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
-import org.spongepowered.api.world.World;
-
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
-public class AltParentProxyCraftingInventory extends AltParentProxyGridInventory implements CraftingInventory {
-
-    protected AltParentProxyCraftingInventory(@Nullable Inventory parent,
-            CraftingInventory delegate) {
-        super(parent, delegate);
-    }
-
-    @Override
-    public CraftingGridInventory getCraftingGrid() {
-        return ((CraftingInventory) this.delegate).getCraftingGrid();
-    }
-
-    @Override
-    public CraftingOutput getResult() {
-        return ((CraftingInventory) this.delegate).getResult();
-    }
-
-    @Override
-    public Optional<CraftingRecipe> getRecipe(World world) {
-        return ((CraftingInventory) this.delegate).getRecipe(world);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.item.recipe;

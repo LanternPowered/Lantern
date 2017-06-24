@@ -100,19 +100,19 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
                 // Log duplicates or when there none present
                 if (slot == null && slotInRow == null && slotInColumn == null) {
                     Lantern.getLogger().warn("There is a slot missing in the inventory {} ({}) at position ({};{})",
-                            this.getClass().getName(), this.getName().get(), x, y);
+                            getClass().getName(), getName().get(), x, y);
                 } else if (slot == null && slotInRow != null && slotInColumn != null) {
                     Lantern.getLogger().warn("Duplicate slot found in the inventory {} ({}) at position ({};{}),"
                                     + "one found in the row and one in the column",
-                            this.getClass().getName(), this.getName().get(), x, y);
+                            getClass().getName(), getName().get(), x, y);
                 } else if (slot != null && slotInRow != null) {
                     Lantern.getLogger().warn("Duplicate slot found in the inventory {} ({}) at position ({};{}),"
                                     + "one found in the grid and one in the row",
-                            this.getClass().getName(), this.getName().get(), x, y);
+                            getClass().getName(), getName().get(), x, y);
                 } else if (slot != null && slotInColumn != null) {
                     Lantern.getLogger().warn("Duplicate slot found in the inventory {} ({}) at position ({};{}),"
                                     + "one found in the row and one in the column",
-                            this.getClass().getName(), this.getName().get(), x, y);
+                            getClass().getName(), getName().get(), x, y);
                 }
 
                 if (slot == null) {
@@ -286,7 +286,7 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
 
     @Override
     public Vector2i getDimensions() {
-        return new Vector2i(this.getRows(), this.getColumns());
+        return new Vector2i(getRows(), getColumns());
     }
 
     @Override

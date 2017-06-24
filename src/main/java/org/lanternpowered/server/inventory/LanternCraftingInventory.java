@@ -30,6 +30,7 @@ import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
 
@@ -53,7 +54,7 @@ public class LanternCraftingInventory extends LanternGridInventory implements Cr
         try {
             this.gridInventory = query(CraftingGridInventory.class).first();
         } catch (ClassCastException e) {
-            throw new IllegalStateException("Unable to find the GridInventory");
+            throw new IllegalStateException("Unable to find the CraftingGridInventory");
         }
         try {
             this.craftingOutput = query(CraftingOutput.class).first();

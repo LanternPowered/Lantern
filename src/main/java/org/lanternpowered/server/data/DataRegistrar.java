@@ -35,6 +35,8 @@ import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
+import org.lanternpowered.server.data.property.item.BurningFuelPropertyStore;
+import org.lanternpowered.server.data.property.item.SmeltablePropertyStore;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.game.LanternGame;
@@ -47,6 +49,8 @@ import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
 import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
+import org.spongepowered.api.data.property.item.BurningFuelProperty;
+import org.spongepowered.api.data.property.item.SmeltableProperty;
 import org.spongepowered.api.data.type.BodyPart;
 import org.spongepowered.api.data.type.BodyParts;
 import org.spongepowered.api.data.type.WireAttachmentType;
@@ -79,8 +83,12 @@ public class DataRegistrar {
         Copyable.register(Map.class, HashMap::new);
 
         final PropertyRegistry propertyRegistry = game.getPropertyRegistry();
+        // Block property stores
         propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
         propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
+        // Item property stores
+        propertyRegistry.register(SmeltableProperty.class, new SmeltablePropertyStore());
+        propertyRegistry.register(BurningFuelProperty.class, new BurningFuelPropertyStore());
 
         final LanternDataManager dataManager = game.getDataManager();
         // Register the data type serializers

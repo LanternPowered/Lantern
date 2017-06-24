@@ -26,13 +26,20 @@
 package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.container.FurnaceInventoryContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.item.recipe.crafting.CraftingMatrix;
+import org.lanternpowered.server.item.recipe.crafting.ExtendedCraftingResult;
+import org.lanternpowered.server.item.recipe.crafting.MatrixResult;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
@@ -45,7 +52,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -60,15 +66,24 @@ import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+import org.spongepowered.api.item.inventory.slot.FuelSlot;
+import org.spongepowered.api.item.inventory.slot.InputSlot;
 import org.spongepowered.api.item.inventory.slot.OutputSlot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+import org.spongepowered.api.item.recipe.crafting.CraftingResult;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -128,12 +143,20 @@ public class PlayerContainerSession {
      *
      * @param container The container
      */
-    public boolean setOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause) {
-        return setRawOpenContainer(container, cause, true);
+    public boolean setOpenContainer(@Nullable LanternContainer container, Cause cause) {
+        return setRawOpenContainer(container, cause, true, false);
     }
 
-    public boolean setRawOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause) {
-        return setRawOpenContainer(container, cause, false);
+    public boolean setRawOpenContainer(@Nullable LanternContainer container, Cause cause) {
+        return setRawOpenContainer(container, cause, false, false);
+    }
+
+    public void handleWindowClose(MessagePlayInOutCloseWindow message) {
+        if (this.openContainer == null || message.getWindow() != this.openContainer.windowId) {
+            return;
+        }
+        final Cause cause = Cause.source(this.player).build();
+        player.getContainerSession().setRawOpenContainer(null, cause, false, true);
     }
 
     /**
@@ -141,53 +164,53 @@ public class PlayerContainerSession {
      *
      * @param container The container
      */
-    private boolean setRawOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause, boolean sendClose) {
+    private boolean setRawOpenContainer(@Nullable LanternContainer container, Cause cause, boolean sendClose, boolean client) {
         if (this.openContainer != container) {
-            final ItemStackSnapshot oldCursorItemSnapshot = LanternItemStack.toSnapshot(this.cursorItem);
-            ItemStackSnapshot cursorItemSnapshot = oldCursorItemSnapshot;
+            ItemStackSnapshot cursorItemSnapshot = LanternItemStack.toSnapshot(this.cursorItem);
             if (this.openContainer != null) {
-                if (cause != null) {
-                    final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
-                            cause, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
-                    Sponge.getEventManager().post(event);
-                    if (event.isCancelled()) {
+                final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
+                        cause, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
+                Sponge.getEventManager().post(event);
+                if (event.isCancelled()) {
+                    // Stop the client from closing the container, resend the open message
+                    if (client) {
+                        // This can't be done to the player inventory, player inventory uses index 0
+                        if (this.openContainer.windowId != 0) {
+                            this.openContainer.openInventoryForAndInitialize(this.player);
+                            return false;
+                        }
+                    } else {
+                        // Just return
                         return false;
                     }
-                    final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
-                    if (transaction.isValid()) {
-                        cursorItemSnapshot = transaction.getFinal();
-                    }
-                } else {
-                    this.cursorItem = null;
                 }
-                if (LanternItemStack.toNullable(oldCursorItemSnapshot) != null) {
-                    final List<Entity> entities = new ArrayList<>();
-                    entities.add(createDroppedItem(oldCursorItemSnapshot));
-
-                    final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities);
-                    Sponge.getEventManager().post(event1);
-                    if (!event1.isCancelled()) {
-                        finishSpawnEntityEvent(event1);
-                    }
+                final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
+                if (transaction.isValid()) {
+                    cursorItemSnapshot = transaction.getFinal();
                 }
+                if (!cursorItemSnapshot.isEmpty()) {
+                    final ItemStackSnapshot cursorItemSnapshot0 = cursorItemSnapshot;
+                    LanternEventHelper.fireDropItemEventDispense(cause, entities -> entities.add(
+                            LanternEventHelper.createDroppedItem(this.player.getLocation(), cursorItemSnapshot0)));
+                }
+                // Close the inventory
+                this.openContainer.close();
             } else {
                 sendClose = false;
             }
             if (container != null) {
-                if (cause != null) {
-                    final InteractInventoryEvent.Open event = SpongeEventFactory.createInteractInventoryEventOpen(
-                            cause, new Transaction<>(cursorItemSnapshot, cursorItemSnapshot), container);
-                    Sponge.getEventManager().post(event);
-                    if (event.isCancelled()) {
-                        this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
-                        container.removeViewer(this.player, container);
-                        return false;
-                    }
-                    final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
-                    if (transaction.isValid()) {
-                        cursorItemSnapshot = transaction.getFinal();
-                        this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
-                    }
+                final InteractInventoryEvent.Open event = SpongeEventFactory.createInteractInventoryEventOpen(
+                        cause, new Transaction<>(cursorItemSnapshot, cursorItemSnapshot), container);
+                Sponge.getEventManager().post(event);
+                if (event.isCancelled()) {
+                    this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
+                    container.removeViewer(this.player, container);
+                    return false;
+                }
+                final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
+                if (transaction.isValid()) {
+                    cursorItemSnapshot = transaction.getFinal();
+                    this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
                 }
                 // The container is being used for the first time
                 if (container.getRawViewers().isEmpty()) {
@@ -202,8 +225,7 @@ public class PlayerContainerSession {
                 this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
             }
             if (sendClose && this.openContainer.windowId != -1) {
-                this.player.getConnection().send(
-                        new MessagePlayInOutCloseWindow(this.openContainer.windowId));
+                this.player.getConnection().send(new MessagePlayInOutCloseWindow(this.openContainer.windowId));
             }
             if (this.openContainer != null) {
                 this.openContainer.viewers.remove(this.player);
@@ -263,16 +285,8 @@ public class PlayerContainerSession {
             if (itemStack != null) {
                 final Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
                         .type(SpawnTypes.DROPPED_ITEM).build()).named(NamedCause.SOURCE, this.player).build();
-
-                final List<Entity> entities = new ArrayList<>();
-                entities.add(createDroppedItem(itemStack.createSnapshot()));
-
-                final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
-                Sponge.getEventManager().post(event);
-
-                if (!event.isCancelled()) {
-                    finishSpawnEntityEvent(event);
-                }
+                LanternEventHelper.fireDropItemEventDispense(cause, entities ->
+                        entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.createSnapshot())));
             }
         } else {
             final Optional<LanternSlot> optSlot = this.openContainer.playerInventory.getSlotAt(slotIndex);
@@ -301,14 +315,14 @@ public class PlayerContainerSession {
         final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
         if (itemStack.isPresent()) {
-            final Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
-                    .type(SpawnTypes.DROPPED_ITEM).build())
+            final Cause cause = Cause.builder()
+                    .named("SpawnCause", SpawnCause.builder().type(SpawnTypes.DROPPED_ITEM).build())
                     .named(NamedCause.SOURCE, this.player)
                     .named("Slot", slot)
                     .build();
 
             final List<Entity> entities = new ArrayList<>();
-            entities.add(createDroppedItem(itemStack.get().createSnapshot()));
+            entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.get().createSnapshot()));
 
             final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
             Sponge.getEventManager().post(event);
@@ -319,7 +333,7 @@ public class PlayerContainerSession {
                 } else {
                     slot.poll(1);
                 }
-                finishSpawnEntityEvent(event);
+                LanternEventHelper.finishSpawnEntityEvent(event);
             }
         }
     }
@@ -334,6 +348,32 @@ public class PlayerContainerSession {
         if (this.openContainer == null) {
             setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
         }
+    }
+
+    private void updateCraftingGrid(CraftingInventory craftingInventory, MatrixResult matrixResult,
+            List<SlotTransaction> transactions) {
+        final CraftingMatrix matrix = matrixResult.getCraftingMatrix();
+        final CraftingGridInventory grid = craftingInventory.getCraftingGrid();
+        for (int x = 0; x < matrix.width(); x++) {
+            for (int y = 0; y < matrix.height(); y++) {
+                final ItemStack itemStack = matrix.get(x, y);
+                final Slot slot = grid.getSlot(x, y).get();
+                transactions.add(new SlotTransaction(slot, slot.peek().map(LanternItemStackSnapshot::wrap)
+                        .orElse(LanternItemStackSnapshot.none()), LanternItemStackSnapshot.wrap(itemStack)));
+            }
+        }
+
+        final Cause cause = Cause.builder()
+                .named("SpawnCause", SpawnCause.builder().type(SpawnTypes.DROPPED_ITEM).build())
+                .named(NamedCause.SOURCE, this.player)
+                .build();
+        final Location<World> location = this.player.getLocation();
+        final List<Entity> entities = matrixResult.getRest().stream()
+                .map(itemStack -> LanternEventHelper.createDroppedItem(location, LanternItemStackSnapshot.wrap(itemStack)))
+                .collect(Collectors.toList());
+        final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
+        Sponge.getEventManager().post(event);
+        LanternEventHelper.finishSpawnEntityEvent(event);
     }
 
     public void handleWindowClick(MessagePlayInClickWindow message) {
@@ -440,6 +480,62 @@ public class PlayerContainerSession {
                 final LanternSlot slot = optSlot.get();
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
 
+                // Crafting slots have special click behavior
+                if (slot instanceof CraftingOutput) {
+                    final List<SlotTransaction> transactions = new ArrayList<>();
+                    Transaction<ItemStackSnapshot> cursorTransaction;
+
+                    final AbstractInventory parent = slot.parent();
+                    if (parent instanceof CraftingInventory) {
+                        ClickInventoryEvent event;
+
+                        final CraftingInventory inventory = (CraftingInventory) parent;
+                        final Optional<ExtendedCraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
+                                .getExtendedResult(inventory.getCraftingGrid(), this.player.getWorld());
+                        final ItemStackSnapshot originalCursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                        if (optResult.isPresent()) {
+                            final CraftingResult result = optResult.get().getResult();
+                            final ItemStackSnapshot resultItem = result.getResult();
+
+                            int quantity = -1;
+                            if (this.cursorItem == null) {
+                                quantity = resultItem.getQuantity();
+                            } else if (LanternItemStack.areSimilar(resultItem.createStack(), this.cursorItem)) {
+                                final int quantity1 = resultItem.getQuantity() + this.cursorItem.getQuantity();
+                                if (quantity1 < this.cursorItem.getMaxStackQuantity()) {
+                                    quantity = quantity1;
+                                }
+                            }
+                            if (quantity == -1) {
+                                cursorTransaction = new Transaction<>(originalCursorItem, originalCursorItem);
+                                transactions.add(new SlotTransaction(slot, resultItem, resultItem));
+                            } else {
+                                final LanternItemStack itemStack = (LanternItemStack) resultItem.createStack();
+                                itemStack.setQuantity(quantity);
+                                cursorTransaction = new Transaction<>(originalCursorItem, itemStack.createSnapshot());
+                                transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
+                                updateCraftingGrid(inventory, optResult.get().getMatrixResult(1), transactions);
+                            }
+                        } else {
+                            cursorTransaction = new Transaction<>(originalCursorItem, originalCursorItem);
+                            // No actual transaction, there shouldn't have been a item in the crafting result slot
+                            transactions.add(new SlotTransaction(slot, ItemStackSnapshot.NONE, ItemStackSnapshot.NONE));
+                        }
+
+                        if (button == 0) {
+                            event = SpongeEventFactory.createClickInventoryEventPrimary(cause, cursorTransaction,
+                                    this.openContainer, transactions);
+                        } else {
+                            event = SpongeEventFactory.createClickInventoryEventSecondary(cause, cursorTransaction,
+                                    this.openContainer, transactions);
+                        }
+                        finishInventoryEvent(event);
+                        return;
+                    } else {
+                        Lantern.getLogger().warn("Found a CraftingOutput slot without a CraftingInventory as parent.");
+                    }
+                }
+
                 ClickInventoryEvent event;
                 // Left click
                 if (button == 0) {
@@ -544,34 +640,89 @@ public class PlayerContainerSession {
                 final ItemStack itemStack = slot.peek().orElse(null);
 
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
+                final Transaction<ItemStackSnapshot> cursorTransaction;
                 final List<SlotTransaction> transactions = new ArrayList<>();
 
-                final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
-                final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(cursorItem, cursorItem);
+                if (slot instanceof CraftingOutput) {
+                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                    cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
-                if (itemStack != null) {
-                    final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
-                    final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
-                    final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, mainInventory, itemStack.copy(), offhand);
+                    final AbstractInventory parent = slot.parent();
+                    if (parent instanceof CraftingInventory) {
+                        final CraftingInventory inventory = (CraftingInventory) parent;
+                        final Optional<ExtendedCraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
+                                .getExtendedResult(inventory.getCraftingGrid(), this.player.getWorld());
+                        if (optResult.isPresent()) {
+                            final ExtendedCraftingResult result = optResult.get();
+                            final ItemStackSnapshot resultItem = result.getResult().getResult();
 
-                    // Force updates if the max stack size on the client and server don't match
-                    final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
-                    if (itemStack.getMaxStackQuantity() != originalMaxStackSize) {
-                        final LanternItemStack tempStack = (LanternItemStack) itemStack.copy();
-                        tempStack.setTempMaxQuantity(originalMaxStackSize);
-                        final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(windowId, slot, mainInventory, tempStack, offhand);
-                        result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
-                    }
+                            int times = result.getMaxTimes();
+                            final ItemStack itemStack1 = resultItem.createStack();
+                            itemStack1.setQuantity(times * itemStack1.getQuantity());
 
-                    if (result.getOfferResult().isSuccess()) {
-                        transactions.addAll(result.getTransactions());
-                        final ItemStack rest = result.getOfferResult().getRest();
-                        if (rest != null) {
-                            transactions.addAll(slot.peekPollTransactions(
-                                    itemStack.getQuantity() - rest.getQuantity(), stack -> true).get().getTransactions());
+                            final AbstractMutableInventory targetInventory = this.openContainer.playerInventory
+                                    .getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
+                            PeekOfferTransactionsResult peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
+
+                            if (peekResult.getOfferResult().isSuccess()) {
+                                transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
+
+                                final ItemStack restItem = peekResult.getOfferResult().getRest();
+                                if (restItem != null) {
+                                    final int added = itemStack1.getQuantity() - restItem.getQuantity();
+                                    times = added / resultItem.getQuantity();
+                                    final int diff = added % resultItem.getQuantity();
+                                    if (diff != 0) {
+                                        itemStack1.setQuantity(resultItem.getQuantity() * times);
+                                        peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
+                                        checkState(peekResult.getOfferResult().isSuccess());
+                                    }
+                                }
+
+                                transactions.addAll(peekResult.getTransactions());
+                                updateCraftingGrid(inventory, result.getMatrixResult(times), transactions);
+                            }
                         } else {
-                            transactions.addAll(slot.peekPollTransactions(
-                                    stack -> true).get().getTransactions());
+                            // No actual transaction, there shouldn't have been a item in the crafting result slot
+                            transactions.add(new SlotTransaction(slot, ItemStackSnapshot.NONE, ItemStackSnapshot.NONE));
+                        }
+                    } else {
+                        Lantern.getLogger().warn("Found a CraftingOutput slot without a CraftingInventory as parent.");
+                        return;
+                    }
+                } else {
+                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                    cursorTransaction = new Transaction<>(cursorItem, cursorItem);
+
+                    if (itemStack != null) {
+                        final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
+                        final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, itemStack.copy(), offhand);
+
+                        // Force updates if the max stack size on the client and server don't match
+                        final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+                        if (itemStack.getMaxStackQuantity() != originalMaxStackSize) {
+                            final LanternItemStack tempStack = (LanternItemStack) itemStack.copy();
+                            tempStack.setTempMaxQuantity(originalMaxStackSize);
+                            final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(windowId, slot, tempStack, offhand);
+                            result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
+                        }
+                        if (result.getOfferResult().isSuccess()) {
+                            transactions.addAll(result.getTransactions());
+                            final ItemStack rest = result.getOfferResult().getRest();
+                            if (rest != null) {
+                                transactions.addAll(slot.peekPollTransactions(
+                                        itemStack.getQuantity() - rest.getQuantity(), stack -> true).get().getTransactions());
+                            } else {
+                                transactions.addAll(slot.peekPollTransactions(
+                                        stack -> true).get().getTransactions());
+                            }
+                        }
+                        // Fix client glitches
+                        // TODO: Remove when refactoring shift clicking
+                        if (this.openContainer instanceof FurnaceInventoryContainer) {
+                            final LanternOrderedInventory inventory = this.openContainer.openInventory;
+                            this.openContainer.queueSlotChange(inventory.query(InputSlot.class).<InputSlot>first());
+                            this.openContainer.queueSlotChange(inventory.query(FuelSlot.class).<FuelSlot>first());
                         }
                     }
                 }
@@ -599,7 +750,7 @@ public class PlayerContainerSession {
 
                 final List<SlotTransaction> transactions = new ArrayList<>();
 
-                if (this.cursorItem != null) {
+                if (this.cursorItem != null && !(optSlot.get() instanceof OutputSlot)) {
                     final ItemStack cursorItem = this.cursorItem.copy();
                     int quantity = cursorItem.getQuantity();
                     final int maxQuantity = cursorItem.getMaxStackQuantity();
@@ -713,9 +864,9 @@ public class PlayerContainerSession {
                         stack.setQuantity(stack.getQuantity() - 1);
                         newItem = LanternItemStack.toSnapshot(stack);
                         stack.setQuantity(1);
-                        entities.add(createDroppedItem(LanternItemStack.toSnapshot(stack)));
+                        entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), LanternItemStack.toSnapshot(stack)));
                     } else {
-                        entities.add(createDroppedItem(oldItem));
+                        entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), oldItem));
                     }
                 }
                 cursorTransaction = new Transaction<>(oldItem, newItem);
@@ -739,7 +890,7 @@ public class PlayerContainerSession {
                         slotTransactions.addAll(transactions);
                         final ItemStack itemStack = transactions.get(0).getOriginal().createStack();
                         itemStack.setQuantity(itemStack.getQuantity() - transactions.get(0).getFinal().getQuantity());
-                        entities.add(createDroppedItem(itemStack.createSnapshot()));
+                        entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.createSnapshot()));
                     }
                     if (button == 0) {
                         event = SpongeEventFactory.createClickInventoryEventDropSingle(cause, cursorTransaction, entities,
@@ -788,28 +939,31 @@ public class PlayerContainerSession {
         }
     }
 
-    private PeekOfferTransactionsResult getShiftPeekOfferResult(int windowId, LanternSlot slot, HumanMainInventory mainInventory,
+    private PeekOfferTransactionsResult getShiftPeekOfferResult(int windowId, LanternSlot slot,
             ItemStack itemStack, boolean offhand) {
-        AbstractMutableInventory inventory;
+        final LanternPlayerInventory playerInventory = this.openContainer.playerInventory;
+        final HumanMainInventory mainInventory = playerInventory.getMain();
+        AbstractInventory inventory;
         PeekOfferTransactionsResult result;
         checkNotNull(this.openContainer);
         if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
                 (windowId == 0 && !mainInventory.isChild(slot) && !offhand)) {
             if (slot.isReverseShiftClickOfferOrder()) {
-                inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
+                inventory = playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
             } else {
-                inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
+                inventory = playerInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
             }
             result = inventory.peekOfferFastTransactions(itemStack);
         } else {
+            // In case the we can't shift click to the top inventory, the inventory will be used in the else statement
             inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
                     ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
             result = inventory.peekOfferFastTransactions(itemStack);
             if (result.getOfferResult().getRest() != null) {
                 if (slot.parent() instanceof LanternHotbar || offhand) {
-                    inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN);
+                    inventory = playerInventory.getInventoryView(HumanInventoryView.MAIN);
                 } else {
-                    inventory = this.openContainer.playerInventory.getHotbar();
+                    inventory = playerInventory.getHotbar();
                 }
                 PeekOfferTransactionsResult result1 = inventory.peekOfferFastTransactions(result.getOfferResult().getRest());
                 if (result1.getOfferResult().isSuccess()) {
@@ -819,23 +973,6 @@ public class PlayerContainerSession {
             }
         }
         return result;
-    }
-
-    private Entity createDroppedItem(ItemStackSnapshot snapshot) {
-        final Entity entity = this.player.getWorld().createEntity(EntityTypes.ITEM, this.player.getPosition());
-        entity.offer(Keys.REPRESENTED_ITEM, snapshot);
-        entity.offer(Keys.PICKUP_DELAY, 60);
-        return entity;
-    }
-
-    private void finishSpawnEntityEvent(SpawnEntityEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-        final Cause cause = Cause.source(event).build();
-        for (Entity entity : event.getEntities()) {
-            entity.getWorld().spawnEntity(entity, cause);
-        }
     }
 
     private void finishInventoryEvent(ChangeInventoryEvent event) {
@@ -859,7 +996,7 @@ public class PlayerContainerSession {
                 }
             }
             if (event instanceof SpawnEntityEvent) {
-                finishSpawnEntityEvent((SpawnEntityEvent) event);
+                LanternEventHelper.finishSpawnEntityEvent((SpawnEntityEvent) event);
             }
         } else {
             updateCursorItem();

@@ -31,18 +31,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
+import org.lanternpowered.server.block.tile.vanilla.LanternFurnace;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
 import org.lanternpowered.server.block.tile.vanilla.LanternNote;
 import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@RegistrationDependency({ KeyRegistryModule.class })
 public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<TileEntityType> {
 
     private static final TileEntityTypeRegistryModule INSTANCE = new TileEntityTypeRegistryModule();
@@ -75,6 +79,7 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
     public void registerDefaults() {
         register(LanternTileEntityType.of("minecraft", "chest", LanternChest::new));
         register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
+        register(LanternTileEntityType.of("minecraft", "furnace", LanternFurnace::new));
         register(LanternTileEntityType.of("minecraft", "jukebox", LanternJukebox::new));
         register(LanternTileEntityType.of("minecraft", "noteblock", LanternNote::new));
         register(LanternTileEntityType.of("minecraft", "shulker_box", LanternShulkerBox::new));

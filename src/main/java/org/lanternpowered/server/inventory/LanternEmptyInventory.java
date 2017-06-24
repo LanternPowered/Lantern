@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
@@ -67,6 +68,10 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     @Override
     public AbstractInventory parent() {
         return this.parent == null ? this : this.parent;
+    }
+
+    @Override
+    public void addChangeListener(SlotChangeListener listener) {
     }
 
     @Override
@@ -136,7 +141,11 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     }
 
     @Override
-    public void add(ContainerViewListener listener) {
+    public void addViewListener(ContainerViewListener listener) {
+    }
+
+    @Override
+    public void addCloseListener(InventoryCloseListener listener) {
     }
 
     @Override

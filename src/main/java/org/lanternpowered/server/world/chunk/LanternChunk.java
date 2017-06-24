@@ -926,8 +926,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (tileEntity != null) {
                 if (oldType == 0 || type1 == 0) {
                     remove = true;
-                } else if ((tileEntity instanceof ITileEntityRefreshBehavior &&
-                        ((ITileEntityRefreshBehavior) tileEntity).shouldRefresh(oldState, block)) || oldType >> 4 != type1 >> 4) {
+                } else if (tileEntity instanceof ITileEntityRefreshBehavior) {
+                    if (((ITileEntityRefreshBehavior) tileEntity).shouldRefresh(oldState, block)) {
+                        remove = true;
+                        refresh = true;
+                    }
+                } else if (oldType >> 4 != type1 >> 4) {
                     // The default behavior will only refresh if the
                     // block type is changed and not the block state
                     remove = true;

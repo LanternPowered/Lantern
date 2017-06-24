@@ -23,25 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.item.recipe;
 
-import org.lanternpowered.server.inventory.LanternOrderedInventory;
-import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
-import org.lanternpowered.server.inventory.slot.LanternInputSlot;
-import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.item.recipe.Recipe;
+import org.spongepowered.api.item.recipe.RecipeRegistry;
 
-import javax.annotation.Nullable;
+import java.util.Collection;
 
-public class FurnaceInventory extends LanternOrderedInventory {
+@SuppressWarnings("unchecked")
+public class LanternRecipeRegistry<T extends Recipe, I extends CatalogType & Recipe> implements RecipeRegistry<T> {
 
-    public FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+    private final LanternRecipeRegistryModule<I> registryModule;
 
-        this.registerSlot(new LanternInputSlot(this));
-        this.registerSlot(new LanternFuelSlot(this));
-        this.registerSlot(new LanternOutputSlot(this));
-        this.finalizeContent();
+    public LanternRecipeRegistry(LanternRecipeRegistryModule<I> registryModule) {
+        this.registryModule = registryModule;
+    }
+
+    @Override
+    public void register(T recipe) {
+        this.registryModule.register((I) recipe);
+    }
+
+    @Override
+    public Collection<T> getRecipes() {
+        return (Collection) this.registryModule.getAll();
+    }
+
+    public LanternRecipeRegistryModule<I> getRegistryModule() {
+        return this.registryModule;
     }
 }

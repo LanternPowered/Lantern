@@ -782,6 +782,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         final LanternWorld world = this.player.getWorld();
         //noinspection ConstantConditions
         if (world != null) {
+            // Close the open container
+            this.player.getContainerSession().setRawOpenContainer(null, Cause.source(this.player).build());
+
             final MessageChannel messageChannel = this.player.getMessageChannel();
             final Text quitMessage = t("multiplayer.player.left", this.player.getName());
 
@@ -803,7 +806,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                         this.gameProfile.getUniqueId(), e);
             }
 
-            this.player.getContainerSession().setRawOpenContainer(null, null);
             this.player.remove(LanternEntity.RemoveState.DESTROYED);
             this.player.setWorld(null);
             EntityProtocolManager.releaseEntityId(this.player.getNetworkId());

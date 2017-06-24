@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -74,6 +75,16 @@ public class AltParentProxyInventory extends AbstractInventory {
     @Override
     public AbstractInventory parent() {
         return this.parent == null ? this : this.parent;
+    }
+
+    @Override
+    public void addChangeListener(SlotChangeListener listener) {
+        this.delegate.addChangeListener(listener);
+    }
+
+    @Override
+    public void addCloseListener(InventoryCloseListener listener) {
+        this.delegate.addCloseListener(listener);
     }
 
     @Override
@@ -342,5 +353,10 @@ public class AltParentProxyInventory extends AbstractInventory {
     @Override
     public Translation getName() {
         return this.delegate.getName();
+    }
+
+    @Override
+    void close() {
+        this.delegate.close();
     }
 }

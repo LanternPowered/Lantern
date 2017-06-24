@@ -38,6 +38,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public final class GroundLuminancePropertyStore extends AbstractBlockPropertyStore<GroundLuminanceProperty> {
 
     // We will be using a cache since it can only be 16 different values
@@ -54,9 +55,9 @@ public final class GroundLuminancePropertyStore extends AbstractBlockPropertySto
         if (location == null) {
             return Optional.empty();
         }
-        final Optional<Chunk> chunk = location.getExtent().getChunk(location.getChunkPosition());
-        return chunk.isPresent() ? this.lookup[((LanternChunk) chunk.get()).getBlockLight(
-                location.getBlockX(), location.getBlockY(), location.getBlockZ())] : Optional.empty();
+        final Optional<Chunk> optChunk = location.getExtent().getChunk(location.getChunkPosition());
+        return optChunk.flatMap(chunk -> this.lookup[((LanternChunk) chunk).getBlockLight(
+                location.getBlockX(), location.getBlockY(), location.getBlockZ())]);
     }
 
 }

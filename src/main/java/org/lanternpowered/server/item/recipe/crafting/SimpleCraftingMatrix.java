@@ -23,28 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe;
+package org.lanternpowered.server.item.recipe.crafting;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.recipe.Recipe;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 
-public abstract class LanternRecipe extends PluginCatalogType.Base implements Recipe {
+import javax.annotation.Nullable;
 
-    private final ItemStackSnapshot exemplaryResult;
+final class SimpleCraftingMatrix implements CraftingMatrix {
 
-    public LanternRecipe(String pluginId, String name, ItemStackSnapshot exemplaryResult) {
-        super(pluginId, name);
-        this.exemplaryResult = exemplaryResult;
-    }
+    @Nullable private ItemStack[][] matrix;
+    private final CraftingGridInventory grid;
 
-    public LanternRecipe(String pluginId, String id, String name, ItemStackSnapshot exemplaryResult) {
-        super(pluginId, id, name);
-        this.exemplaryResult = exemplaryResult;
+    SimpleCraftingMatrix(CraftingGridInventory grid) {
+        this.grid = grid;
     }
 
     @Override
-    public ItemStackSnapshot getExemplaryResult() {
-        return this.exemplaryResult;
+    public ItemStack get(int x, int y) {
+        if (this.matrix == null) {
+            this.matrix = new ItemStack[this.grid.getColumns()][this.grid.getRows()];
+        }
+        ItemStack itemStack = this.matrix[x][y];
+        if (itemStack == null) {
+            itemStack = this.matrix[x][y] = this.grid.peek(x, y).orElse(ItemStack.empty());
+        }
+        return itemStack;
+    }
+
+    @Override
+    public int width() {
+        return this.grid.getColumns();
+    }
+
+    @Override
+    public int height() {
+        return this.grid.getRows();
     }
 }

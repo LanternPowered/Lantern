@@ -23,28 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe;
+package org.lanternpowered.server.item.recipe.crafting;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.recipe.Recipe;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.recipe.crafting.Ingredient;
 
-public abstract class LanternRecipe extends PluginCatalogType.Base implements Recipe {
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-    private final ItemStackSnapshot exemplaryResult;
+final class EmptyIngredientList implements IngredientList {
 
-    public LanternRecipe(String pluginId, String name, ItemStackSnapshot exemplaryResult) {
-        super(pluginId, name);
-        this.exemplaryResult = exemplaryResult;
-    }
+    static final EmptyIngredientList INSTANCE = new EmptyIngredientList();
 
-    public LanternRecipe(String pluginId, String id, String name, ItemStackSnapshot exemplaryResult) {
-        super(pluginId, id, name);
-        this.exemplaryResult = exemplaryResult;
+    @Override
+    public Optional<ItemStack> getOne(Ingredient ingredient) {
+        return Optional.empty();
     }
 
     @Override
-    public ItemStackSnapshot getExemplaryResult() {
-        return this.exemplaryResult;
+    public Collection<ItemStack> getAll(Ingredient ingredient) {
+        return Collections.emptyList();
     }
 }

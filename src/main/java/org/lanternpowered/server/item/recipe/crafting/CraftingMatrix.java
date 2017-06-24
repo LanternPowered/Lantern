@@ -1,3 +1,28 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.item.recipe.crafting;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -9,9 +34,9 @@ import javax.annotation.Nullable;
 
 /**
  * A crafting matrix that allows {@link ItemStack}s to be reused in the crafting
- * systems, all the items are also lazily copied.
+ * systems, all the {@link ItemStack}s are also lazily copied.
  */
-public class CraftingMatrix {
+public interface CraftingMatrix {
 
     /**
      * Creates a {@link CraftingMatrix} for the given {@link CraftingGridInventory}.
@@ -19,16 +44,9 @@ public class CraftingMatrix {
      * @param gridInventory The crafting grid inventory
      * @return The crafting matrix
      */
-    public static CraftingMatrix of(CraftingGridInventory gridInventory) {
+    static CraftingMatrix of(CraftingGridInventory gridInventory) {
         checkNotNull(gridInventory, "gridInventory");
-        return new CraftingMatrix(gridInventory);
-    }
-
-    @Nullable private ItemStack[][] matrix;
-    private final CraftingGridInventory grid;
-
-    private CraftingMatrix(CraftingGridInventory grid) {
-        this.grid = grid;
+        return new SimpleCraftingMatrix(gridInventory);
     }
 
     /**
@@ -39,51 +57,19 @@ public class CraftingMatrix {
      * @param y The y coordinate
      * @return The item stack
      */
-    public ItemStack get(int x, int y) {
-        if (this.matrix == null) {
-            this.matrix = new ItemStack[this.grid.getColumns()][this.grid.getRows()];
-        }
-        ItemStack itemStack = this.matrix[x][y];
-        if (itemStack == null) {
-            itemStack = this.matrix[x][y] = this.grid.peek(x, y).orElse(ItemStack.empty());
-        }
-        return itemStack;
-    }
+    ItemStack get(int x, int y);
 
     /**
      * Gets the width of the crafting matrix.
      *
      * @return The width
      */
-    public int width() {
-        return this.grid.getColumns();
-    }
+    int width();
 
     /**
      * Gets the height of the crafting matrix.
      *
      * @return The height
      */
-    public int height() {
-        return this.grid.getRows();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    static final CraftingMatrix EMPTY = new CraftingMatrix(null) {
-
-        @Override
-        public ItemStack get(int x, int y) {
-            return ItemStack.empty();
-        }
-
-        @Override
-        public int width() {
-            return 1;
-        }
-
-        @Override
-        public int height() {
-            return 1;
-        }
-    };
+    int height();
 }

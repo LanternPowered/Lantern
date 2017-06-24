@@ -1,5 +1,31 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.item.recipe.crafting;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
@@ -23,7 +49,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
 
     private final List<String> aisle = new ArrayList<>();
     private final Map<Character, Ingredient> ingredientMap = new Char2ObjectArrayMap<>();
-    @Nullable private ICraftingResultProvider craftingResultProvider;
+    @Nullable private ICraftingResultProvider resultProvider;
     @Nullable private String groupName;
 
     @Override
@@ -92,21 +118,23 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
     }
 
     @Override
-    public EndStep result(ICraftingResultProvider craftingResultProvider) {
-        checkNotNull(craftingResultProvider, "craftingResultProvider");
-        this.craftingResultProvider = craftingResultProvider;
+    public EndStep result(ICraftingResultProvider resultProvider) {
+        checkNotNull(resultProvider, "resultProvider");
+        this.resultProvider = resultProvider;
         return this;
     }
 
     @Override
     public EndStep result(ItemStackSnapshot result) {
         checkNotNull(result, "result");
+        checkArgument(!result.isEmpty(), "The result must not be empty.");
         return result(new ConstantCraftingResultProvider(result));
     }
 
     @Override
     public EndStep result(ItemStack result) {
         checkNotNull(result, "result");
+        checkArgument(!result.isEmpty(), "The result must not be empty.");
         return result(result.createSnapshot());
     }
 
@@ -114,7 +142,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
     public IShapedCraftingRecipe build(String id, Object plugin) {
         checkState(!this.aisle.isEmpty(), "aisle has not been set");
         checkState(!this.ingredientMap.isEmpty(), "no ingredients set");
-        checkState(this.craftingResultProvider != null, "no result set");
+        checkState(this.resultProvider != null, "no result provider");
         checkNotNull(id, "id");
         checkNotNull(id, "plugin");
 
@@ -150,9 +178,10 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
             }
         }
 
-        final ItemStackSnapshot exemplary = this.craftingResultProvider.getSnapshot(CraftingMatrix.EMPTY, IngredientList.EMPTY);
+        final ItemStackSnapshot exemplary = this.resultProvider.getSnapshot(
+                EmptyCraftingMatrix.INSTANCE, EmptyIngredientList.INSTANCE);
         return new LanternShapedCraftingRecipe(container.getId(), id, exemplary,
-                this.groupName, this.craftingResultProvider, ingredients);
+                this.groupName, this.resultProvider, ingredients);
     }
 
     @Override
@@ -170,7 +199,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
             }
             this.aisle.add(row.toString());
         }
-        this.craftingResultProvider = ((LanternShapedCraftingRecipe) value).craftingResultProvider;
+        this.resultProvider = ((LanternShapedCraftingRecipe) value).resultProvider;
         return this;
     }
 
@@ -178,7 +207,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
     public ShapedCraftingRecipe.Builder reset() {
         this.aisle.clear();
         this.ingredientMap.clear();
-        this.craftingResultProvider = null;
+        this.resultProvider = null;
         this.groupName = null;
         return this;
     }

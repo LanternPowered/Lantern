@@ -23,28 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe;
+package org.lanternpowered.server.item.recipe.crafting;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.recipe.Recipe;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public abstract class LanternRecipe extends PluginCatalogType.Base implements Recipe {
+final class EmptyCraftingMatrix implements CraftingMatrix {
 
-    private final ItemStackSnapshot exemplaryResult;
+    static final EmptyCraftingMatrix INSTANCE = new EmptyCraftingMatrix();
 
-    public LanternRecipe(String pluginId, String name, ItemStackSnapshot exemplaryResult) {
-        super(pluginId, name);
-        this.exemplaryResult = exemplaryResult;
-    }
-
-    public LanternRecipe(String pluginId, String id, String name, ItemStackSnapshot exemplaryResult) {
-        super(pluginId, id, name);
-        this.exemplaryResult = exemplaryResult;
+    @Override
+    public ItemStack get(int x, int y) {
+        return ItemStack.empty();
     }
 
     @Override
-    public ItemStackSnapshot getExemplaryResult() {
-        return this.exemplaryResult;
+    public int width() {
+        return 1;
+    }
+
+    @Override
+    public int height() {
+        return 1;
     }
 }

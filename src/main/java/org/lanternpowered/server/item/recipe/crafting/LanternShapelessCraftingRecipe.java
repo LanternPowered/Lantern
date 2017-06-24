@@ -1,3 +1,28 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.item.recipe.crafting;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -20,13 +45,13 @@ import javax.annotation.Nullable;
 @SuppressWarnings("ConstantConditions")
 final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe implements IShapelessCraftingRecipe {
 
-    final ICraftingResultProvider craftingResultProvider;
-    final List<Ingredient> ingredients;
+    final ICraftingResultProvider resultProvider;
+    private final List<Ingredient> ingredients;
 
     LanternShapelessCraftingRecipe(String pluginId, String name, ItemStackSnapshot exemplaryResult, @Nullable String group,
-            ICraftingResultProvider craftingResultProvider, List<Ingredient> ingredients) {
+            ICraftingResultProvider resultProvider, List<Ingredient> ingredients) {
         super(pluginId, name, exemplaryResult, group);
-        this.craftingResultProvider = craftingResultProvider;
+        this.resultProvider = resultProvider;
         this.ingredients = ingredients;
     }
 
@@ -49,7 +74,7 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
         final List<Ingredient> ingredients = new ArrayList<>(this.ingredients);
         // Generate a ingredient map that can be useful to generate a result item
         final Multimap<Ingredient, ItemStack> ingredientItems = resultItem &&
-                !(this.craftingResultProvider instanceof ConstantCraftingResultProvider) ? HashMultimap.create() : null;
+                !(this.resultProvider instanceof ConstantCraftingResultProvider) ? HashMultimap.create() : null;
         final ImmutableList.Builder<ItemStackSnapshot> remainingItemsBuilder = remainingItems ? ImmutableList.builder() : null;
 
         for (int j = 0; j < h; j++) {
@@ -89,8 +114,8 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
         // Generate the result item
         ItemStack resultItemStack = null;
         if (resultItem) {
-            resultItemStack = this.craftingResultProvider.get(craftingMatrix,
-                    ingredientItems == null ? null : new IngredientList(ingredientItems));
+            resultItemStack = this.resultProvider.get(craftingMatrix,
+                    ingredientItems == null ? null : new SimpleIngredientList(ingredientItems));
             checkNotNull(resultItemStack, "Something funky happened.");
         }
 

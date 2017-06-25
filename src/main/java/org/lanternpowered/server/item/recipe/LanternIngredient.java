@@ -39,7 +39,7 @@ final class LanternIngredient implements IIngredient {
 
     final Predicate<ItemStack> matcher;
     private final List<ItemStackSnapshot> displayedItems;
-    @Nullable private final Function<ItemStack, ItemStack> remainingItemProvider;
+    @Nullable final Function<ItemStack, ItemStack> remainingItemProvider;
 
     LanternIngredient(Predicate<ItemStack> matcher, List<ItemStackSnapshot> displayedItems,
             @Nullable Function<ItemStack, ItemStack> remainingItemProvider) {

@@ -200,6 +200,8 @@ import org.lanternpowered.server.item.recipe.crafting.IShapelessCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapelessCraftingRecipeBuilder;
+import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
+import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
@@ -345,6 +347,7 @@ import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
+import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipeRegistry;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
@@ -497,6 +500,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(IShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
                 .registerBuilderSupplier(ShapelessCraftingRecipe.Builder.class, LanternShapelessCraftingRecipeBuilder::new)
                 .registerBuilderSupplier(IShapelessCraftingRecipe.Builder.class, LanternShapelessCraftingRecipeBuilder::new)
+                .registerBuilderSupplier(SmeltingRecipe.Builder.class, LanternSmeltingRecipeBuilder::new)
+                .registerBuilderSupplier(ISmeltingRecipe.Builder.class, LanternSmeltingRecipeBuilder::new)
                 .registerBuilderSupplier(Ingredient.Builder.class, LanternIngredientBuilder::new)
                 .registerBuilderSupplier(IIngredient.Builder.class, LanternIngredientBuilder::new)
         ;

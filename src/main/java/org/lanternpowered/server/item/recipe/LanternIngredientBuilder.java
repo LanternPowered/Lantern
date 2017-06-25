@@ -51,9 +51,10 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
 
     @Override
     public Ingredient.Builder from(Ingredient value) {
-        reset();
+        this.matchers.clear();
         this.matchers.add(((LanternIngredient) value).matcher);
         this.displayItems.addAll(value.displayedItems());
+        this.remainingItemProvider = ((LanternIngredient) value).remainingItemProvider;
         return this;
     }
 
@@ -61,6 +62,7 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
     public Ingredient.Builder reset() {
         this.matchers.clear();
         this.displayItems.clear();
+        this.remainingItemProvider = null;
         return this;
     }
 

@@ -42,6 +42,12 @@ public interface IShapelessCraftingRecipe extends ShapelessCraftingRecipe, ICraf
     interface Builder extends ShapelessCraftingRecipe.Builder {
 
         @Override
+        Builder from(ShapelessCraftingRecipe value);
+
+        @Override
+        Builder reset();
+
+        @Override
         Builder.ResultStep addIngredient(Ingredient ingredient);
 
         interface ResultStep extends Builder, ShapelessCraftingRecipe.Builder.ResultStep {

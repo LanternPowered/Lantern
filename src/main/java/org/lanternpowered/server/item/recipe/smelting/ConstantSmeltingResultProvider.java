@@ -23,26 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe.crafting;
+package org.lanternpowered.server.item.recipe.smelting;
 
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 
-final class ConstantCraftingResultProvider implements ICraftingResultProvider {
+final class ConstantSmeltingResultProvider implements ISmeltingResultProvider {
 
-    private final ItemStackSnapshot snapshot;
+    private final SmeltingResult result;
 
-    ConstantCraftingResultProvider(ItemStackSnapshot snapshot) {
-        this.snapshot = snapshot;
+    ConstantSmeltingResultProvider(SmeltingResult result) {
+        this.result = result;
     }
 
     @Override
-    public ItemStack get(CraftingMatrix craftingMatrix, IngredientList ingredientList) {
-        return this.snapshot.createStack();
+    public SmeltingResult get(ItemStackSnapshot ingredient) {
+        return this.result;
     }
 
     @Override
-    public ItemStackSnapshot getSnapshot(CraftingMatrix craftingMatrix, IngredientList ingredientList) {
-        return this.snapshot;
+    public SmeltingResult get(ItemStack ingredient) {
+        return this.result;
     }
 }

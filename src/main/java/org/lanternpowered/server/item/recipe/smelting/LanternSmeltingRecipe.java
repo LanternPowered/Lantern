@@ -29,16 +29,15 @@ import org.lanternpowered.server.item.recipe.LanternRecipe;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
-import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 
 import java.util.Optional;
 
-final class LanternSmeltingRecipe extends LanternRecipe implements SmeltingRecipe {
+final class LanternSmeltingRecipe extends LanternRecipe implements ISmeltingRecipe {
 
     private final ItemStackSnapshot exemplaryIngredient;
-    private final Ingredient ingredient;
-    private final ISmeltingResultProvider resultProvider;
+    final Ingredient ingredient;
+    final ISmeltingResultProvider resultProvider;
 
     LanternSmeltingRecipe(String pluginId, String name,
             ItemStackSnapshot exemplaryResult, ItemStackSnapshot exemplaryIngredient,

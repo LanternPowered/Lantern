@@ -32,6 +32,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
+import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 
 import java.util.function.Predicate;
 
@@ -47,9 +48,10 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
          * Sets the {@link Ingredient} that should be used.
          *
          * @param ingredient The ingredient
+         * @param exemplaryIngredient The exemplary ingredient
          * @return The result step
          */
-        ResultStep ingredient(Ingredient ingredient);
+        ResultStep ingredient(Ingredient ingredient, ItemStackSnapshot exemplaryIngredient);
 
         @Override
         ResultStep ingredient(Predicate<ItemStackSnapshot> ingredientPredicate, ItemStackSnapshot exemplaryIngredient);
@@ -63,15 +65,33 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
         @Override
         ResultStep ingredient(ItemType ingredient);
 
+        @Override
+        Builder from(SmeltingRecipe value);
+
+        @Override
+        Builder reset();
+
         interface ResultStep extends Builder, SmeltingRecipe.Builder.ResultStep {
 
             /**
-             * Sets the {@link ISmeltingResultProvider}.
+             * Sets the {@link ISmeltingResultProvider}. When using this method,
+             * {@link org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe.Builder.EndStep#experience(double)}
+             * will no longer have any effect.
              *
              * @param resultProvider The smelting result provider
              * @return This builder, for chaining
              */
             Builder.EndStep result(ISmeltingResultProvider resultProvider);
+
+            /**
+             * Sets the {@link SmeltingResult}. When using this method,
+             * {@link org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe.Builder.EndStep#experience(double)}
+             * will no longer have any effect.
+             *
+             * @param result The smelting result
+             * @return This builder, for chaining
+             */
+            Builder.EndStep result(SmeltingResult result);
 
             @Override
             Builder.EndStep result(ItemStackSnapshot result);

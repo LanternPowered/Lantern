@@ -46,6 +46,12 @@ public interface IShapedCraftingRecipe extends ICraftingRecipe, ShapedCraftingRe
         @Override
         AisleStep aisle(String... aisle);
 
+        @Override
+        Builder from(ShapedCraftingRecipe value);
+
+        @Override
+        Builder reset();
+
         interface AisleStep extends Builder, ShapedCraftingRecipe.Builder.AisleStep {
 
             interface ResultStep extends Builder.AisleStep, Builder.ResultStep, ShapedCraftingRecipe.Builder.AisleStep.ResultStep {}

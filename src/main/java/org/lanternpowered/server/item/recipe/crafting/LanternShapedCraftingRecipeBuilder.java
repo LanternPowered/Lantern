@@ -185,7 +185,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
     }
 
     @Override
-    public ShapedCraftingRecipe.Builder from(ShapedCraftingRecipe value) {
+    public IShapedCraftingRecipe.Builder from(ShapedCraftingRecipe value) {
         this.aisle.clear();
         this.ingredientMap.clear();
         this.groupName = value.getGroup().orElse(null);
@@ -204,7 +204,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
     }
 
     @Override
-    public ShapedCraftingRecipe.Builder reset() {
+    public IShapedCraftingRecipe.Builder reset() {
         this.aisle.clear();
         this.ingredientMap.clear();
         this.resultProvider = null;

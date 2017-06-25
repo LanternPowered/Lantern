@@ -60,9 +60,13 @@ import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
 import org.spongepowered.api.item.inventory.slot.OutputSlot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -440,6 +444,86 @@ public class PlayerContainerSession {
                 final LanternSlot slot = optSlot.get();
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
 
+                // Crafting slots have special click behavior
+                if (slot instanceof CraftingOutput) {
+                    final List<SlotTransaction> transactions = new ArrayList<>();
+                    Transaction<ItemStackSnapshot> cursorTransaction;
+
+                    final AbstractInventory parent = slot.parent();
+                    if (parent instanceof CraftingInventory) {
+                        ClickInventoryEvent event;
+
+                        final CraftingInventory inventory = (CraftingInventory) parent;
+                        final Optional<CraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
+                                .getResult(inventory.getCraftingGrid(), this.player.getWorld());
+                        final ItemStackSnapshot originalCursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                        if (optResult.isPresent()) {
+                            final CraftingResult result = optResult.get();
+                            final ItemStackSnapshot resultItem = result.getResult();
+
+                            int quantity = -1;
+                            if (this.cursorItem == null) {
+                                quantity = resultItem.getCount();
+                            } else if (LanternItemStack.isSimilar(resultItem.createStack(), this.cursorItem)) {
+                                final int quantity1 = resultItem.getCount() + this.cursorItem.getQuantity();
+                                if (quantity1 < this.cursorItem.getMaxStackQuantity()) {
+                                    quantity = quantity1;
+                                }
+                            }
+                            if (quantity == -1) {
+                                cursorTransaction = new Transaction<>(originalCursorItem, originalCursorItem);
+                                transactions.add(new SlotTransaction(slot, resultItem, resultItem));
+                            } else {
+                                final LanternItemStack itemStack = (LanternItemStack) resultItem.createStack();
+                                itemStack.setQuantity(quantity);
+                                cursorTransaction = new Transaction<>(originalCursorItem, itemStack.createSnapshot());
+                                transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
+                                final List<ItemStackSnapshot> remainingItems = result.getRemainingItems();
+                                final CraftingGridInventory grid = inventory.getCraftingGrid();
+                                int i = 0;
+                                for (int y = 0; y < grid.getRows(); y++) {
+                                    for (int x = 0; x < grid.getColumns(); x++) {
+                                        final LanternSlot gridSlot = (LanternSlot) grid.getSlot(x, y).get();
+                                        final ItemStack oldItem = gridSlot.peek().orElse(null);
+                                        final ItemStackSnapshot oldItemSnapshot = LanternItemStack.toSnapshot(oldItem);
+                                        ItemStackSnapshot newItemSnapshot = null;
+                                        if (i < remainingItems.size()) {
+                                            final ItemStackSnapshot remainingItem = remainingItems.get(i);
+                                            if (!remainingItem.isEmpty()) {
+                                                newItemSnapshot = remainingItem;
+                                            }
+                                        }
+                                        if (newItemSnapshot == null && oldItem != null && !oldItem.isEmpty()) {
+                                            oldItem.setQuantity(oldItem.getQuantity() - 1);
+                                            newItemSnapshot = LanternItemStack.toSnapshot(oldItem);
+                                        }
+                                        if (newItemSnapshot != null) {
+                                            transactions.add(new SlotTransaction(gridSlot, oldItemSnapshot, newItemSnapshot));
+                                        }
+                                        i++;
+                                    }
+                                }
+                            }
+                        } else {
+                            cursorTransaction = new Transaction<>(originalCursorItem, originalCursorItem);
+                            // No actual transaction, there shouldn't have been a item in the crafting result slot
+                            transactions.add(new SlotTransaction(slot, ItemStackSnapshot.NONE, ItemStackSnapshot.NONE));
+                        }
+
+                        if (button == 0) {
+                            event = SpongeEventFactory.createClickInventoryEventPrimary(cause, cursorTransaction,
+                                    this.openContainer, transactions);
+                        } else {
+                            event = SpongeEventFactory.createClickInventoryEventSecondary(cause, cursorTransaction,
+                                    this.openContainer, transactions);
+                        }
+                        finishInventoryEvent(event);
+                        return;
+                    } else {
+                        Lantern.getLogger().warn("Found a CraftingOutput slot without a CraftingInventory as parent.");
+                    }
+                }
+
                 ClickInventoryEvent event;
                 // Left click
                 if (button == 0) {
@@ -599,7 +683,7 @@ public class PlayerContainerSession {
 
                 final List<SlotTransaction> transactions = new ArrayList<>();
 
-                if (this.cursorItem != null) {
+                if (this.cursorItem != null && !(optSlot.get() instanceof OutputSlot)) {
                     final ItemStack cursorItem = this.cursorItem.copy();
                     int quantity = cursorItem.getQuantity();
                     final int maxQuantity = cursorItem.getMaxStackQuantity();

@@ -77,7 +77,6 @@ public class LanternCraftingInventory extends LanternGridInventory implements Cr
                     .map(CraftingResult::getResult)
                     .map(ItemStackSnapshot::createStack)
                     .orElse(null));
-            System.out.println(optResult.orElse(null));
         });
     }
 

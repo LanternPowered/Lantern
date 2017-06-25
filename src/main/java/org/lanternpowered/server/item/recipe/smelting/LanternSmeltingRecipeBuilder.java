@@ -54,7 +54,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     private ISmeltingTimeProvider smeltingTimeProvider;
     private ItemStackSnapshot result;
     private ItemStackSnapshot exemplaryIngredient;
-    private Ingredient ingredient;
+    private IIngredient ingredient;
     private double experience;
 
     @Override
@@ -64,7 +64,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
         this.smeltingTimeProvider = ((LanternSmeltingRecipe) value).smeltingTimeProvider;
         this.exemplaryIngredient = value.getExemplaryIngredient();
         this.experience = value.getResult(this.exemplaryIngredient).get().getExperience();
-        this.ingredient = ((LanternSmeltingRecipe) value).ingredient;
+        this.ingredient = ((ISmeltingRecipe) value).getIngredient();
         this.result = null;
         return this;
     }
@@ -84,7 +84,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     public ISmeltingRecipe.Builder.ResultStep ingredient(Ingredient ingredient, ItemStackSnapshot exemplaryIngredient) {
         checkNotNull(ingredient, "ingredient");
         checkNotNull(exemplaryIngredient, "exemplaryIngredient");
-        this.ingredient = ingredient;
+        this.ingredient = (IIngredient) ingredient;
         this.exemplaryIngredient = exemplaryIngredient;
         return this;
     }

@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.recipe.fuel;
 
+import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.ItemType;
@@ -47,7 +48,7 @@ public interface IFuel extends CatalogType {
      *
      * @return The ingredient
      */
-    Ingredient getIngredient();
+    IIngredient getIngredient();
 
     /**
      * Gets the amount of ticks that this fuel

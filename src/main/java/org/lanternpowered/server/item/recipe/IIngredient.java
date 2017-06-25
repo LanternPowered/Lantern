@@ -61,6 +61,15 @@ public interface IIngredient extends Ingredient {
     }
 
     /**
+     * Gets the remaining {@link ItemStack}, if present.
+     *
+     * @return The remaining item
+     */
+    default Optional<ItemStack> getRemainingItem(ItemStackSnapshot itemStack) {
+        return getRemainingItem(itemStack.createStack());
+    }
+
+    /**
      * Tests whether the given {@link ItemStackSnapshot} is valid.
      *
      * @param itemStackSnapshot The item stack snapshot

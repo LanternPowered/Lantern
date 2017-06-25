@@ -26,27 +26,27 @@
 package org.lanternpowered.server.item.recipe.fuel;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.recipe.crafting.Ingredient;
 
 import java.util.OptionalInt;
 
 final class LanternFuel extends PluginCatalogType.Base implements IFuel {
 
     final IFuelBurnTimeProvider burnTimeProvider;
-    private final Ingredient ingredient;
+    private final IIngredient ingredient;
 
     LanternFuel(String pluginId, String name,
             IFuelBurnTimeProvider burnTimeProvider,
-            Ingredient ingredient) {
+            IIngredient ingredient) {
         super(pluginId, name);
         this.burnTimeProvider = burnTimeProvider;
         this.ingredient = ingredient;
     }
 
     @Override
-    public Ingredient getIngredient() {
+    public IIngredient getIngredient() {
         return this.ingredient;
     }
 

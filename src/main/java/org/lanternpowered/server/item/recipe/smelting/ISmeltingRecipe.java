@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.recipe.smelting;
 
+import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.ItemType;
@@ -42,6 +43,8 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
     static Builder builder() {
         return Sponge.getRegistry().createBuilder(Builder.class);
     }
+
+    IIngredient getIngredient();
 
     /**
      * Gets the amount of ticks that this recipe will

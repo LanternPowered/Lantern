@@ -38,6 +38,8 @@ import org.lanternpowered.server.inventory.property.SmeltingProgressProperty;
 import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
 import org.lanternpowered.server.inventory.slot.LanternInputSlot;
 import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
+import org.lanternpowered.server.item.recipe.IIngredient;
+import org.lanternpowered.server.item.recipe.fuel.IFuel;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -163,15 +165,16 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             int maxCookTime = 0;
 
             Optional<SmeltingResult> smeltingResult = null;
+            Optional<SmeltingRecipe> smeltingRecipe = null;
             ItemStack itemStack = this.inventory.inputSlot.getRawItemStack();
-            if (itemStack != null) {
+            final ItemStackSnapshot inputSlotItemSnapshot = itemStack == null ? null : itemStack.createSnapshot();
+            if (inputSlotItemSnapshot != null) {
                 // Check if the item can be smelted, this means finding a compatible
                 // recipe and the output has to be empty.
-                final ItemStackSnapshot itemStackSnapshot = itemStack.createSnapshot();
-                final Optional<SmeltingRecipe> smeltingRecipe = Lantern.getRegistry().getSmeltingRecipeRegistry()
-                        .findMatchingRecipe(itemStackSnapshot);
+                smeltingRecipe = Lantern.getRegistry().getSmeltingRecipeRegistry()
+                        .findMatchingRecipe(inputSlotItemSnapshot);
                 if (smeltingRecipe.isPresent()) {
-                    smeltingResult = smeltingRecipe.get().getResult(itemStackSnapshot);
+                    smeltingResult = smeltingRecipe.get().getResult(inputSlotItemSnapshot);
                     // Check if the item can be smelted
                     if (smeltingResult.isPresent()) {
                         // Check if the result could be added to the output
@@ -179,7 +182,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                                 smeltingResult.get().getResult().createStack());
                         if (peekResult.getOfferResult().isSuccess()) {
                             maxCookTime = ((ISmeltingRecipe) smeltingRecipe.get())
-                                    .getSmeltTime(itemStackSnapshot).orElse(200);
+                                    .getSmeltTime(inputSlotItemSnapshot).orElse(200);
                         }
                     }
                 }
@@ -212,12 +215,22 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                 itemStack = this.inventory.fuelSlot.getRawItemStack();
                 if (itemStack != null && maxCookTime > 0) {
                     // Check for the next fuel item
-                    final OptionalInt result = Lantern.getRegistry().getFuelRegistry().getResult(itemStack.createSnapshot());
-                    // We have a next matching burn item, check if we can poll one and then continue burning
-                    if (result.isPresent() && this.inventory.fuelSlot.poll(1).isPresent()) {
-                        maxBurnTime = result.getAsInt();
-                        remainingBurnTime = maxBurnTime;
-                        elapsedBurnTime = 0;
+                    final ItemStackSnapshot itemStackSnapshot = itemStack.createSnapshot();
+                    final Optional<IFuel> result = Lantern.getRegistry().getFuelRegistry().findMatching(itemStackSnapshot);
+                    if (result.isPresent()) {
+                        final OptionalInt optBurnTime = result.get().getBurnTime(itemStackSnapshot);
+                        // We have a next matching burn item, check if we can poll one and then continue burning
+                        if (optBurnTime.isPresent() && this.inventory.fuelSlot.poll(1).isPresent()) {
+                            maxBurnTime = optBurnTime.getAsInt();
+                            remainingBurnTime = maxBurnTime;
+                            elapsedBurnTime = 0;
+                            // Put the rest item in the slot, if the slot is empty
+                            if (this.inventory.fuelSlot.size() == 0) {
+                                final IIngredient ingredient = (IIngredient) result.get().getIngredient();
+                                final Optional<ItemStack> remainingItem = ingredient.getRemainingItem(itemStackSnapshot);
+                                remainingItem.ifPresent(this.inventory.fuelSlot::set);
+                            }
+                        }
                     }
                 }
                 if (maxBurnTime == 0) {
@@ -241,6 +254,13 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
                         this.inventory.outputSlot.offer(smeltingResult.get().getResult().createStack());
                         this.inventory.inputSlot.poll(1);
+
+                        // Put the rest item in the slot
+                        if (this.inventory.inputSlot.size() == 0) {
+                            final IIngredient ingredient = ((ISmeltingRecipe) smeltingRecipe.get()).getIngredient();
+                            final Optional<ItemStack> remainingItem = ingredient.getRemainingItem(inputSlotItemSnapshot);
+                            remainingItem.ifPresent(this.inventory.inputSlot::set);
+                        }
                     } else {
                         // Keep on smelting
                         offer(Keys.MAX_COOK_TIME, maxCookTime);

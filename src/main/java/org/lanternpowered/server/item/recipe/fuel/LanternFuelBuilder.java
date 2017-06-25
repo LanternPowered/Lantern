@@ -41,12 +41,12 @@ import org.spongepowered.api.plugin.PluginContainer;
 public class LanternFuelBuilder implements IFuel.Builder {
 
     private IFuelBurnTimeProvider burnTimeProvider;
-    private Ingredient ingredient;
+    private IIngredient ingredient;
 
     @Override
     public IFuel.Builder ingredient(Ingredient ingredient) {
         checkNotNull(ingredient, "ingredient");
-        this.ingredient = ingredient;
+        this.ingredient = (IIngredient) ingredient;
         return this;
     }
 

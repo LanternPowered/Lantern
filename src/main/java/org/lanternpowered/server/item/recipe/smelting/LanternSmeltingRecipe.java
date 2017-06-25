@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.recipe.smelting;
 
+import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.LanternRecipe;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -37,13 +38,13 @@ import java.util.OptionalInt;
 final class LanternSmeltingRecipe extends LanternRecipe implements ISmeltingRecipe {
 
     private final ItemStackSnapshot exemplaryIngredient;
-    final Ingredient ingredient;
+    private final IIngredient ingredient;
     final ISmeltingResultProvider resultProvider;
     final ISmeltingTimeProvider smeltingTimeProvider;
 
     LanternSmeltingRecipe(String pluginId, String name,
             ItemStackSnapshot exemplaryResult, ItemStackSnapshot exemplaryIngredient,
-            Ingredient ingredient, ISmeltingResultProvider resultProvider,
+            IIngredient ingredient, ISmeltingResultProvider resultProvider,
             ISmeltingTimeProvider smeltingTimeProvider) {
         super(pluginId, name, exemplaryResult);
         this.exemplaryIngredient = exemplaryIngredient;
@@ -66,6 +67,11 @@ final class LanternSmeltingRecipe extends LanternRecipe implements ISmeltingReci
     public Optional<SmeltingResult> getResult(ItemStackSnapshot ingredient) {
         final ItemStack itemStack = ingredient.createStack();
         return this.ingredient.test(itemStack) ? Optional.of(this.resultProvider.get(itemStack)) : Optional.empty();
+    }
+
+    @Override
+    public IIngredient getIngredient() {
+        return this.ingredient;
     }
 
     @Override

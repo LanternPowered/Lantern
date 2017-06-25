@@ -36,6 +36,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public final class CommandVersion extends CommandProvider {
 
+    private static final String UNKNOWN = "unknown";
+
     public CommandVersion() {
         super(4, "version");
     }
@@ -47,12 +49,12 @@ public final class CommandVersion extends CommandProvider {
                 .executor((src, args) -> {
                     final Platform platform = Lantern.getGame().getPlatform();
                     PluginContainer plugin = platform.getContainer(Platform.Component.GAME);
-                    src.sendMessage(t("commands.version.minecraft", plugin.getVersion(),
+                    src.sendMessage(t("commands.version.minecraft", plugin.getVersion().orElse(UNKNOWN),
                             LanternMinecraftVersion.CURRENT.getProtocol()));
                     plugin = platform.getContainer(Platform.Component.IMPLEMENTATION);
-                    src.sendMessage(t("commands.version.implementation", plugin.getName(), plugin.getVersion()));
+                    src.sendMessage(t("commands.version.implementation", plugin.getName(), plugin.getVersion().orElse(UNKNOWN)));
                     plugin = platform.getContainer(Platform.Component.API);
-                    src.sendMessage(t("commands.version.api", plugin.getName(), plugin.getVersion()));
+                    src.sendMessage(t("commands.version.api", plugin.getName(), plugin.getVersion().orElse(UNKNOWN)));
                     return CommandResult.success();
                 });
     }

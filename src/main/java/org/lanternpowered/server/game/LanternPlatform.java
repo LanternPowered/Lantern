@@ -30,10 +30,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.MoreObjects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.Platform;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.HashMap;

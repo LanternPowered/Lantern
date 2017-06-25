@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 
 public abstract class InternalPluginContainer extends AbstractPluginContainer {
 
-    public InternalPluginContainer(String id, @Nullable String name, @Nullable String version) {
+    InternalPluginContainer(String id, @Nullable String name, @Nullable String version) {
         super(id, name, version);
     }
 

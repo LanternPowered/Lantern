@@ -47,6 +47,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
     private FullLocationPatternConverter(String format) {
         super("FullLocation", "fullLocation");
         this.format = format;
+        System.out.println(format);
     }
 
     public static FullLocationPatternConverter newInstance(String[] options) {
@@ -63,6 +64,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
             element = event.getSource();
         }
         if (element != null) {
+            builder.append("TEST");
             // quoteReplacement is required for elements leading to inner class (containing a $ character)
             builder.append(this.format.replaceAll("%path", Matcher.quoteReplacement(element.toString())));
         }

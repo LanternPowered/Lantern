@@ -75,7 +75,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public ResultStep ingredient(Ingredient ingredient, ItemStackSnapshot exemplaryIngredient) {
+    public ISmeltingRecipe.Builder.ResultStep ingredient(Ingredient ingredient, ItemStackSnapshot exemplaryIngredient) {
         checkNotNull(ingredient, "ingredient");
         checkNotNull(exemplaryIngredient, "exemplaryIngredient");
         this.ingredient = ingredient;
@@ -84,7 +84,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public ResultStep ingredient(Predicate<ItemStackSnapshot> ingredientPredicate, ItemStackSnapshot exemplaryIngredient) {
+    public ISmeltingRecipe.Builder.ResultStep ingredient(Predicate<ItemStackSnapshot> ingredientPredicate, ItemStackSnapshot exemplaryIngredient) {
         checkNotNull(ingredientPredicate, "ingredientPredicate");
         checkNotNull(exemplaryIngredient, "exemplaryIngredient");
         this.ingredient = IIngredient.builder()
@@ -95,7 +95,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public ResultStep ingredient(ItemStackSnapshot ingredient) {
+    public ISmeltingRecipe.Builder.ResultStep ingredient(ItemStackSnapshot ingredient) {
         checkNotNull(ingredient, "ingredient");
         this.ingredient = IIngredient.builder()
                 .with(ingredient)
@@ -105,7 +105,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public ResultStep ingredient(ItemStack ingredient) {
+    public ISmeltingRecipe.Builder.ResultStep ingredient(ItemStack ingredient) {
         checkNotNull(ingredient, "ingredient");
         this.ingredient = IIngredient.builder()
                 .with(ingredient)
@@ -115,7 +115,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public ResultStep ingredient(ItemType ingredient) {
+    public ISmeltingRecipe.Builder.ResultStep ingredient(ItemType ingredient) {
         checkNotNull(ingredient, "ingredient");
         this.ingredient = IIngredient.builder()
                 .with(ingredient)
@@ -125,7 +125,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public EndStep result(ISmeltingResultProvider resultProvider) {
+    public ISmeltingRecipe.Builder.EndStep result(ISmeltingResultProvider resultProvider) {
         checkNotNull(resultProvider, "resultProvider");
         this.resultProvider = resultProvider;
         this.experience = 0;
@@ -134,7 +134,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public EndStep result(SmeltingResult result) {
+    public ISmeltingRecipe.Builder.EndStep result(SmeltingResult result) {
         checkNotNull(result, "result");
         this.resultProvider = new ConstantSmeltingResultProvider(result);
         this.experience = 0;
@@ -143,7 +143,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public EndStep result(ItemStackSnapshot result) {
+    public ISmeltingRecipe.Builder.EndStep result(ItemStackSnapshot result) {
         checkNotNull(result, "result");
         this.resultProvider = null;
         this.result = result;
@@ -152,13 +152,13 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
-    public EndStep result(ItemStack result) {
+    public ISmeltingRecipe.Builder.EndStep result(ItemStack result) {
         checkNotNull(result, "result");
         return result(result.createSnapshot());
     }
 
     @Override
-    public EndStep experience(double experience) {
+    public ISmeltingRecipe.Builder.EndStep experience(double experience) {
         this.experience = experience;
         return this;
     }

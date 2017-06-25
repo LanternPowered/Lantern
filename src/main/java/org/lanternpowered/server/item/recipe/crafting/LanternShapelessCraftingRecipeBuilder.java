@@ -50,7 +50,7 @@ public class LanternShapelessCraftingRecipeBuilder implements IShapelessCrafting
     @Nullable private String groupName = "";
 
     @Override
-    public EndStep group(@Nullable String name) {
+    public IShapelessCraftingRecipe.Builder.EndStep group(@Nullable String name) {
         this.groupName = name == null ? "" : name;
         return this;
     }
@@ -73,28 +73,28 @@ public class LanternShapelessCraftingRecipeBuilder implements IShapelessCrafting
     }
 
     @Override
-    public ResultStep addIngredient(Ingredient ingredient) {
+    public IShapelessCraftingRecipe.Builder.ResultStep addIngredient(Ingredient ingredient) {
         checkNotNull(ingredient, "ingredient");
         this.ingredients.add(ingredient);
         return this;
     }
 
     @Override
-    public EndStep result(ICraftingResultProvider resultProvider) {
+    public IShapelessCraftingRecipe.Builder.EndStep result(ICraftingResultProvider resultProvider) {
         checkNotNull(resultProvider, "resultProvider");
         this.resultProvider = resultProvider;
         return this;
     }
 
     @Override
-    public EndStep result(ItemStackSnapshot result) {
+    public IShapelessCraftingRecipe.Builder.EndStep result(ItemStackSnapshot result) {
         checkNotNull(result, "result");
         checkArgument(!result.isEmpty(), "The result must not be empty.");
         return result(new ConstantCraftingResultProvider(result));
     }
 
     @Override
-    public EndStep result(ItemStack result) {
+    public IShapelessCraftingRecipe.Builder.EndStep result(ItemStack result) {
         checkNotNull(result, "result");
         checkArgument(!result.isEmpty(), "The result must not be empty.");
         return result(new ConstantCraftingResultProvider(result.createSnapshot()));

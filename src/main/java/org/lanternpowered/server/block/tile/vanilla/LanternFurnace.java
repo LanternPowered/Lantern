@@ -25,7 +25,9 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
+import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
@@ -36,16 +38,21 @@ import org.lanternpowered.server.inventory.property.SmeltingProgressProperty;
 import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
 import org.lanternpowered.server.inventory.slot.LanternInputSlot;
 import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
+import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.Furnace;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -54,7 +61,7 @@ import java.util.OptionalInt;
 
 import javax.annotation.Nullable;
 
-public class LanternFurnace extends LanternTileEntity implements Furnace {
+public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior {
 
     private class FurnaceInventory extends LanternOrderedInventory implements TileEntityInventory<TileEntityCarrier>, IFurnaceInventory {
 
@@ -129,6 +136,12 @@ public class LanternFurnace extends LanternTileEntity implements Furnace {
     }
 
     @Override
+    public boolean shouldRefresh(BlockState oldBlockState, BlockState newBlockState) {
+        final BlockType block = newBlockState.getType();
+        return !(block == BlockTypes.FURNACE || block == BlockTypes.LIT_FURNACE);
+    }
+
+    @Override
     public void pulse() {
         super.pulse();
 
@@ -154,14 +167,20 @@ public class LanternFurnace extends LanternTileEntity implements Furnace {
             if (itemStack != null) {
                 // Check if the item can be smelted, this means finding a compatible
                 // recipe and the output has to be empty.
-                smeltingResult = Lantern.getRegistry().getSmeltingRecipeRegistry().getResult(itemStack.createSnapshot());
-                // Check if the item can be smelted
-                if (smeltingResult.isPresent()) {
-                    // Check if the result could be added to the output
-                    final PeekOfferTransactionsResult peekResult = this.inventory.outputSlot.peekOfferFastTransactions(
-                            smeltingResult.get().getResult().createStack());
-                    if (peekResult.getOfferResult().isSuccess()) {
-                        maxCookTime = 200; // TODO
+                final ItemStackSnapshot itemStackSnapshot = itemStack.createSnapshot();
+                final Optional<SmeltingRecipe> smeltingRecipe = Lantern.getRegistry().getSmeltingRecipeRegistry()
+                        .findMatchingRecipe(itemStackSnapshot);
+                if (smeltingRecipe.isPresent()) {
+                    smeltingResult = smeltingRecipe.get().getResult(itemStackSnapshot);
+                    // Check if the item can be smelted
+                    if (smeltingResult.isPresent()) {
+                        // Check if the result could be added to the output
+                        final PeekOfferTransactionsResult peekResult = this.inventory.outputSlot.peekOfferFastTransactions(
+                                smeltingResult.get().getResult().createStack());
+                        if (peekResult.getOfferResult().isSuccess()) {
+                            maxCookTime = ((ISmeltingRecipe) smeltingRecipe.get())
+                                    .getSmeltTime(itemStackSnapshot).orElse(200);
+                        }
                     }
                 }
             }
@@ -230,9 +249,27 @@ public class LanternFurnace extends LanternTileEntity implements Furnace {
                     }
                 } else if (elapsedCookTime > 0) {
                     // Undo smelting progress
-
+                    final long time = elapsedCookTime - elapsed1 * 2;
+                    offer(Keys.MAX_COOK_TIME, time <= 0 ? 0 : maxCookTime);
+                    offer(Keys.PASSED_COOK_TIME, (int) (time <= 0 ? 0 : time));
+                    break;
                 }
+            } else {
+                offer(Keys.MAX_COOK_TIME, 0);
+                offer(Keys.PASSED_COOK_TIME, 0);
             }
+        }
+
+        BlockState blockState = getLocation().getBlock();
+
+        final boolean burning = get(Keys.PASSED_BURN_TIME).get() < get(Keys.MAX_BURN_TIME).get();
+        final boolean blockBurning = blockState.getType() == BlockTypes.LIT_FURNACE;
+
+        if (burning != blockBurning) {
+            blockState = (burning ? BlockTypes.LIT_FURNACE : BlockTypes.FURNACE).getDefaultState()
+                    .withTrait(LanternEnumTraits.HORIZONTAL_FACING, blockState
+                            .getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get()).get();
+            getLocation().setBlock(blockState, Cause.source(this).build());
         }
     }
 

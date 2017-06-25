@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.recipe.smelting;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
@@ -47,7 +48,10 @@ import java.util.function.Predicate;
 public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
         ISmeltingRecipe.Builder.EndStep, ISmeltingRecipe.Builder.ResultStep {
 
+    private static final ISmeltingTimeProvider DEFAULT_SMELTING_TIME_PROVIDER = new ConstantSmeltingTimeProvider(200);
+
     private ISmeltingResultProvider resultProvider;
+    private ISmeltingTimeProvider smeltingTimeProvider;
     private ItemStackSnapshot result;
     private ItemStackSnapshot exemplaryIngredient;
     private Ingredient ingredient;
@@ -57,6 +61,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     public ISmeltingRecipe.Builder from(SmeltingRecipe value) {
         checkNotNull(value, "value");
         this.resultProvider = ((LanternSmeltingRecipe) value).resultProvider;
+        this.smeltingTimeProvider = ((LanternSmeltingRecipe) value).smeltingTimeProvider;
         this.exemplaryIngredient = value.getExemplaryIngredient();
         this.experience = value.getResult(this.exemplaryIngredient).get().getExperience();
         this.ingredient = ((LanternSmeltingRecipe) value).ingredient;
@@ -67,6 +72,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     @Override
     public ISmeltingRecipe.Builder reset() {
         this.resultProvider = null;
+        this.smeltingTimeProvider = null;
         this.result = null;
         this.exemplaryIngredient = null;
         this.ingredient = null;
@@ -158,6 +164,20 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     }
 
     @Override
+    public ISmeltingRecipe.Builder.EndStep smeltTime(ISmeltingTimeProvider smeltingTimeProvider) {
+        checkNotNull(smeltingTimeProvider, "smeltingTimeProvider");
+        this.smeltingTimeProvider = smeltingTimeProvider;
+        return this;
+    }
+
+    @Override
+    public ISmeltingRecipe.Builder.EndStep smeltTime(int smeltingTime) {
+        checkArgument(smeltingTime > 0, "The smelting time must be greater then 0");
+        this.smeltingTimeProvider = new ConstantSmeltingTimeProvider(smeltingTime);
+        return this;
+    }
+
+    @Override
     public ISmeltingRecipe.Builder.EndStep experience(double experience) {
         this.experience = experience;
         return this;
@@ -217,7 +237,11 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
     private ISmeltingRecipe build0(String id, PluginContainer plugin) {
         ISmeltingResultProvider resultProvider = getResultProvider();
         final ItemStackSnapshot exemplaryResult = resultProvider.get(this.exemplaryIngredient).getResult();
+        ISmeltingTimeProvider smeltingTimeProvider = this.smeltingTimeProvider;
+        if (smeltingTimeProvider == null) {
+            smeltingTimeProvider = DEFAULT_SMELTING_TIME_PROVIDER;
+        }
         return new LanternSmeltingRecipe(plugin.getId(), id, exemplaryResult,
-                this.exemplaryIngredient, this.ingredient, resultProvider);
+                this.exemplaryIngredient, this.ingredient, resultProvider, smeltingTimeProvider);
     }
 }

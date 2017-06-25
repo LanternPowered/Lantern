@@ -32,20 +32,24 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
 final class LanternSmeltingRecipe extends LanternRecipe implements ISmeltingRecipe {
 
     private final ItemStackSnapshot exemplaryIngredient;
     final Ingredient ingredient;
     final ISmeltingResultProvider resultProvider;
+    final ISmeltingTimeProvider smeltingTimeProvider;
 
     LanternSmeltingRecipe(String pluginId, String name,
             ItemStackSnapshot exemplaryResult, ItemStackSnapshot exemplaryIngredient,
-            Ingredient ingredient, ISmeltingResultProvider resultProvider) {
+            Ingredient ingredient, ISmeltingResultProvider resultProvider,
+            ISmeltingTimeProvider smeltingTimeProvider) {
         super(pluginId, name, exemplaryResult);
         this.exemplaryIngredient = exemplaryIngredient;
         this.ingredient = ingredient;
         this.resultProvider = resultProvider;
+        this.smeltingTimeProvider = smeltingTimeProvider;
     }
 
     @Override
@@ -62,5 +66,15 @@ final class LanternSmeltingRecipe extends LanternRecipe implements ISmeltingReci
     public Optional<SmeltingResult> getResult(ItemStackSnapshot ingredient) {
         final ItemStack itemStack = ingredient.createStack();
         return this.ingredient.test(itemStack) ? Optional.of(this.resultProvider.get(itemStack)) : Optional.empty();
+    }
+
+    @Override
+    public OptionalInt getSmeltTime(ItemStackSnapshot input) {
+        return isValid(input) ? OptionalInt.of(this.smeltingTimeProvider.get(input)) : OptionalInt.empty();
+    }
+
+    @Override
+    public OptionalInt getSmeltTime(ItemStack input) {
+        return getSmeltTime(input.createSnapshot());
     }
 }

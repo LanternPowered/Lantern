@@ -23,26 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.item.recipe.smelting;
 
-import org.lanternpowered.server.inventory.LanternOrderedInventory;
-import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
-import org.lanternpowered.server.inventory.slot.LanternInputSlot;
-import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import javax.annotation.Nullable;
+final class ConstantSmeltingTimeProvider implements ISmeltingTimeProvider {
 
-public class FurnaceInventory extends LanternOrderedInventory {
+    private final int time;
 
-    public FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+    ConstantSmeltingTimeProvider(int time) {
+        this.time = time;
+    }
 
-        registerSlot(new LanternInputSlot(this));
-        registerSlot(new LanternFuelSlot(this));
-        registerSlot(new LanternOutputSlot(this));
+    @Override
+    public int get(ItemStackSnapshot itemStackSnapshot) {
+        return this.time;
+    }
 
-        finalizeContent();
+    @Override
+    public int get(ItemStack itemStack) {
+        return this.time;
     }
 }

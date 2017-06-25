@@ -34,6 +34,7 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 
+import java.util.OptionalInt;
 import java.util.function.Predicate;
 
 public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
@@ -41,6 +42,24 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
     static Builder builder() {
         return Sponge.getRegistry().createBuilder(Builder.class);
     }
+
+    /**
+     * Gets the amount of ticks that this recipe will
+     * smelt for the given {@link ItemStackSnapshot}.
+     *
+     * @return The smelt time
+     */
+    default OptionalInt getSmeltTime(ItemStackSnapshot input) {
+        return getSmeltTime(input.createStack());
+    }
+
+    /**
+     * Gets the amount of ticks that this will
+     * smelt for the given {@link ItemStack}.
+     *
+     * @return The smelt time
+     */
+    OptionalInt getSmeltTime(ItemStack input);
 
     interface Builder extends SmeltingRecipe.Builder {
 
@@ -102,6 +121,10 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
         }
 
         interface EndStep extends Builder, SmeltingRecipe.Builder.EndStep {
+
+            Builder.EndStep smeltTime(ISmeltingTimeProvider smeltingTimeProvider);
+
+            Builder.EndStep smeltTime(int smeltingTime);
 
             @Override
             Builder.EndStep experience(double experience);

@@ -82,6 +82,7 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
                 final ItemStack itemStack = craftingMatrix.get(i, j);
                 // Don't check empty item stacks
                 if (itemStack.isEmpty()) {
+                    remainingItemsBuilder.add(ItemStackSnapshot.NONE);
                     continue;
                 }
                 final Iterator<Ingredient> it = ingredients.iterator();
@@ -109,6 +110,11 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
                     remainingItemsBuilder.add(remainingItem.map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE));
                 }
             }
+        }
+
+        // Not all the ingredients were found
+        if (!ingredients.isEmpty()) {
+            return null;
         }
 
         // Generate the result item

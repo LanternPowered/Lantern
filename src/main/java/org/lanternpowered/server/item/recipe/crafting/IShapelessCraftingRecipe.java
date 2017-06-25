@@ -50,6 +50,15 @@ public interface IShapelessCraftingRecipe extends ShapelessCraftingRecipe, ICraf
         @Override
         Builder.ResultStep addIngredient(Ingredient ingredient);
 
+        /**
+         * Adds the given {@link Ingredient} multiple times.
+         *
+         * @param ingredient The ingredient
+         * @param times The amount of times the ingredient should be added
+         * @return This builder, for chaining
+         */
+        Builder.ResultStep addIngredients(Ingredient ingredient, int times);
+
         interface ResultStep extends Builder, ShapelessCraftingRecipe.Builder.ResultStep {
 
             /**

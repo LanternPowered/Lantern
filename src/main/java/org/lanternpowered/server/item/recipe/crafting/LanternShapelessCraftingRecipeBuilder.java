@@ -80,6 +80,15 @@ public class LanternShapelessCraftingRecipeBuilder implements IShapelessCrafting
     }
 
     @Override
+    public IShapelessCraftingRecipe.Builder.ResultStep addIngredients(Ingredient ingredient, int times) {
+        checkNotNull(ingredient, "ingredient");
+        for (int i = 0; i < times; i++) {
+            this.ingredients.add(ingredient);
+        }
+        return this;
+    }
+
+    @Override
     public IShapelessCraftingRecipe.Builder.EndStep result(ICraftingResultProvider resultProvider) {
         checkNotNull(resultProvider, "resultProvider");
         this.resultProvider = resultProvider;

@@ -75,5 +75,18 @@ public class LanternCraftingRecipeRegistryModule extends LanternRecipeRegistryMo
                 .where('y', IIngredient.builder().with(ItemTypes.LAVA_BUCKET).withRemaining(ItemTypes.BUCKET).build())
                 .result(result)
                 .build("one_euro", plugin));
+        // Two sticks?
+        register(ICraftingRecipe.shapelessBuilder()
+                .addIngredients(Ingredient.of(ItemTypes.STICK), 2)
+                .result(ItemStack.of(ItemTypes.STICK, 2))
+                .build("two_sticks", plugin));
+        // Two buckets?
+        result = ItemStack.of(ItemTypes.LAVA_BUCKET, 1);
+        result.offer(Keys.DISPLAY_NAME, Text.of(TextColors.GOLD, "¿Compressed Lava?"));
+        register(ICraftingRecipe.shapelessBuilder()
+                .addIngredient(Ingredient.of(ItemTypes.LAVA_BUCKET))
+                .addIngredient(IIngredient.builder().with(ItemTypes.LAVA_BUCKET).withRemaining(ItemTypes.BUCKET).build())
+                .result(result)
+                .build("compressed_lava", plugin));
     }
 }

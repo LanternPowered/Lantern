@@ -23,26 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.property;
 
-import org.lanternpowered.server.inventory.LanternOrderedInventory;
-import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
-import org.lanternpowered.server.inventory.slot.LanternInputSlot;
-import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 
 import javax.annotation.Nullable;
 
-public class FurnaceInventory extends LanternOrderedInventory {
+public final class SmeltingProgressProperty extends AbstractInventoryProperty<String, SmeltingProgress> {
 
-    public FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+    public SmeltingProgressProperty(SmeltingProgress value) {
+        super(value);
+    }
 
-        registerSlot(new LanternInputSlot(this));
-        registerSlot(new LanternFuelSlot(this));
-        registerSlot(new LanternOutputSlot(this));
-
-        finalizeContent();
+    @Override
+    public int compareTo(@Nullable Property<?, ?> o) {
+        // Probably not used, no point in implementing
+        return 0;
     }
 }

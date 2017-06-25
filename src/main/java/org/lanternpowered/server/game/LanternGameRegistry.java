@@ -209,6 +209,7 @@ import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.lanternpowered.server.item.recipe.fuel.LanternFuelBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
+import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
@@ -441,7 +442,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
 
     private final LanternSmeltingRecipeRegistry smeltingRecipeRegistry =
-            new LanternSmeltingRecipeRegistry(new LanternRecipeRegistryModule<>(null));
+            new LanternSmeltingRecipeRegistry(new LanternSmeltingRecipeRegistryModule());
     private final LanternCraftingRecipeRegistry craftingRecipeRegistry =
             new LanternCraftingRecipeRegistry(new LanternCraftingRecipeRegistryModule());
     private final LanternFuelRegistryModule fuelRegistryModule =

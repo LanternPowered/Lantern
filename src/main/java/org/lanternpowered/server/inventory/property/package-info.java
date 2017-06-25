@@ -23,26 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
-
-import org.lanternpowered.server.inventory.LanternOrderedInventory;
-import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
-import org.lanternpowered.server.inventory.slot.LanternInputSlot;
-import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
-
-import javax.annotation.Nullable;
-
-public class FurnaceInventory extends LanternOrderedInventory {
-
-    public FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
-
-        registerSlot(new LanternInputSlot(this));
-        registerSlot(new LanternFuelSlot(this));
-        registerSlot(new LanternOutputSlot(this));
-
-        finalizeContent();
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.property;

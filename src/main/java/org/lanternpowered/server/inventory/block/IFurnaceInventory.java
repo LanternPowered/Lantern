@@ -25,24 +25,9 @@
  */
 package org.lanternpowered.server.inventory.block;
 
-import org.lanternpowered.server.inventory.LanternOrderedInventory;
-import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
-import org.lanternpowered.server.inventory.slot.LanternInputSlot;
-import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.server.inventory.IInventory;
+import org.spongepowered.api.item.inventory.type.OrderedInventory;
 
-import javax.annotation.Nullable;
+public interface IFurnaceInventory extends OrderedInventory, IInventory {
 
-public class FurnaceInventory extends LanternOrderedInventory {
-
-    public FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
-
-        registerSlot(new LanternInputSlot(this));
-        registerSlot(new LanternFuelSlot(this));
-        registerSlot(new LanternOutputSlot(this));
-
-        finalizeContent();
-    }
 }

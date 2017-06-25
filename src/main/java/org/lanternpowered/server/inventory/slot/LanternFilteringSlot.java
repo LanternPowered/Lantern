@@ -53,7 +53,7 @@ public class LanternFilteringSlot extends LanternSlot implements FilteringSlot {
 
     public LanternFilteringSlot(@Nullable Inventory parent, @Nullable Translation name, @Nullable ItemFilter itemFilter) {
         super(parent, name);
-        this.itemFilter = checkNotNull(itemFilter, "itemFilter");
+        this.itemFilter = itemFilter;
     }
 
     @Override
@@ -71,6 +71,6 @@ public class LanternFilteringSlot extends LanternSlot implements FilteringSlot {
         if (this.itemFilter != null && !this.itemFilter.isValidItem(type)) {
             return false;
         }
-        return this.doesAllowItem(type);
+        return doesAllowItem(type);
     }
 }

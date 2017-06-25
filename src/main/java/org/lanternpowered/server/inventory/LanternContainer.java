@@ -149,7 +149,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     protected abstract void openInventoryFor(LanternPlayer viewer);
 
     public void openInventoryForAndInitialize(Player viewer) {
-        this.openInventoryFor((LanternPlayer) viewer);
+        openInventoryFor((LanternPlayer) viewer);
 
         final List<ItemStack> items = this.slots.stream()
                 .map(slot -> slot.peek().orElse(null)).collect(Collectors.toList());
@@ -164,7 +164,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
      * @param slot The slot
      */
     public void queueSlotChange(Slot slot) {
-        this.queueSlotChange(slot, false);
+        queueSlotChange(slot, false);
     }
 
     /**
@@ -175,7 +175,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
      * @param slot The slot
      */
     public void queueSilentSlotChange(Slot slot) {
-        this.queueSlotChange(slot, true);
+        queueSlotChange(slot, true);
     }
 
     void queueSlotChange(Slot slot, boolean silent) {
@@ -214,9 +214,14 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             }
         }
         this.dirtySlots.clear();
+        collectPropertyChanges(messages);
         if (!messages.isEmpty()) {
             getRawViewers().forEach(player -> ((LanternPlayer) player).getConnection().send(messages));
         }
+    }
+
+    protected void collectPropertyChanges(List<Message> messages) {
+
     }
 
     @Override

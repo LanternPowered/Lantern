@@ -200,10 +200,13 @@ import org.lanternpowered.server.item.recipe.crafting.IShapedCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.IShapelessCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistry;
 import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistryModule;
-import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapelessCraftingRecipeBuilder;
+import org.lanternpowered.server.item.recipe.fuel.IFuel;
+import org.lanternpowered.server.item.recipe.fuel.IFuelRegistry;
+import org.lanternpowered.server.item.recipe.fuel.LanternFuelRegistryModule;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
+import org.lanternpowered.server.item.recipe.fuel.LanternFuelBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
@@ -346,10 +349,8 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
-import org.spongepowered.api.item.recipe.RecipeRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
-import org.spongepowered.api.item.recipe.crafting.CraftingRecipes;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
@@ -429,7 +430,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -444,6 +444,8 @@ public class LanternGameRegistry implements GameRegistry {
             new LanternSmeltingRecipeRegistry(new LanternRecipeRegistryModule<>(null));
     private final LanternCraftingRecipeRegistry craftingRecipeRegistry =
             new LanternCraftingRecipeRegistry(new LanternCraftingRecipeRegistryModule());
+    private final LanternFuelRegistryModule fuelRegistryModule =
+            new LanternFuelRegistryModule();
 
     private final Map<Class<? extends CatalogType>, CatalogRegistryModule<?>> catalogRegistryMap = new IdentityHashMap<>();
     private final Map<Class<? extends RegistryModule>, RegistryModule> classMap = new IdentityHashMap<>();
@@ -515,6 +517,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(ISmeltingRecipe.Builder.class, LanternSmeltingRecipeBuilder::new)
                 .registerBuilderSupplier(Ingredient.Builder.class, LanternIngredientBuilder::new)
                 .registerBuilderSupplier(IIngredient.Builder.class, LanternIngredientBuilder::new)
+                .registerBuilderSupplier(IFuel.Builder.class, LanternFuelBuilder::new)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
@@ -641,6 +644,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(ISmeltingRecipe.class, this.smeltingRecipeRegistry.getRegistryModule())
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
+                .registerModule(IFuel.class, this.fuelRegistryModule)
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())
@@ -1092,6 +1096,15 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public SmeltingRecipeRegistry getSmeltingRecipeRegistry() {
         return this.smeltingRecipeRegistry;
+    }
+
+    /**
+     * Gets the {@link IFuelRegistry}.
+     *
+     * @return The fuel registry
+     */
+    public IFuelRegistry getFuelRegistry() {
+        return this.fuelRegistryModule;
     }
 
     @Override

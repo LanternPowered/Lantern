@@ -199,6 +199,7 @@ import org.lanternpowered.server.item.recipe.LanternRecipeRegistryModule;
 import org.lanternpowered.server.item.recipe.crafting.IShapedCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.IShapelessCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistry;
+import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistryModule;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapelessCraftingRecipeBuilder;
@@ -442,7 +443,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternSmeltingRecipeRegistry smeltingRecipeRegistry =
             new LanternSmeltingRecipeRegistry(new LanternRecipeRegistryModule<>(null));
     private final LanternCraftingRecipeRegistry craftingRecipeRegistry =
-            new LanternCraftingRecipeRegistry(new LanternRecipeRegistryModule<>(CraftingRecipes.class));
+            new LanternCraftingRecipeRegistry(new LanternCraftingRecipeRegistryModule());
 
     private final Map<Class<? extends CatalogType>, CatalogRegistryModule<?>> catalogRegistryMap = new IdentityHashMap<>();
     private final Map<Class<? extends RegistryModule>, RegistryModule> classMap = new IdentityHashMap<>();

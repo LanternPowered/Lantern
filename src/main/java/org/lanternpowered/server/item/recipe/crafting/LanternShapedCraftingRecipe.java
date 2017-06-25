@@ -78,18 +78,18 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         final int w = craftingMatrix.width();
         final int h = craftingMatrix.height();
 
-        int wr = getWidth();
-        int hr = getHeight();
+        int rw = getWidth();
+        int rh = getHeight();
 
-        if (wr > w || hr > h) {
+        if (rw > w || rh > h) {
             return null;
         }
 
-        wr -= w;
-        hr -= h;
+        rw = w - rw + 1;
+        rh = h - rh + 1;
 
-        for (int i = 0; i < wr; i++) {
-            for (int j = 0; j < hr; j++) {
+        for (int i = 0; i < rw; i++) {
+            for (int j = 0; j < rh; j++) {
                 final Result result = matchAt(craftingMatrix, i, j, resultItem, remainingItems);
                 if (result != null) {
                     return result;
@@ -120,7 +120,7 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         final int eh = y + rh;
 
         // The recipe no longer fits within the grid when starting from the coordinates
-        if (ew >= cw || eh >= ch) {
+        if (ew > cw || eh > ch) {
             return null;
         }
 

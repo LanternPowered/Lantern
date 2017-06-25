@@ -76,7 +76,7 @@ public abstract class AbstractInventory implements IInventory {
     public abstract AbstractInventory parent();
 
     @Override
-    public void add(ContainerViewListener listener) {
+    public void addViewListener(ContainerViewListener listener) {
     }
 
     /**

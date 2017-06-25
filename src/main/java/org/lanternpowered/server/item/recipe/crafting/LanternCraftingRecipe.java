@@ -75,7 +75,7 @@ abstract class LanternCraftingRecipe extends LanternRecipe implements ICraftingR
 
     @Override
     public Optional<CraftingResult> getResult(CraftingMatrix craftingMatrix, @Nullable World world) {
-        final Result result = match(craftingMatrix, false, true);
+        final Result result = match(craftingMatrix, true, true);
         return result == null ? Optional.empty() : Optional.of(
                 new CraftingResult(result.resultItem.createSnapshot(), result.remainingItems));
     }

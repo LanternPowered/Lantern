@@ -33,6 +33,7 @@ import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
@@ -425,6 +426,11 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         public boolean test(ItemStack itemStack) {
             return ((LanternItemStack) this.itemStack).similarTo(itemStack);
         }
+    }
+
+    @Override
+    public void addChangeListener(SlotChangeListener listener) {
+        this.children.forEach(inv -> inv.addChangeListener(listener));
     }
 
     @Override

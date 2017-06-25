@@ -23,25 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile.vanilla;
+package org.lanternpowered.server.inventory.slot;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.item.inventory.Slot;
 
-public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
+import java.util.function.Consumer;
 
-    protected final I inventory;
+@FunctionalInterface
+public interface SlotChangeListener extends Consumer<Slot> {
 
-    protected LanternContainer() {
-        this.inventory = createInventory();
-        ((AbstractInventory) this.inventory).addViewListener(this);
-    }
-
-    protected abstract I createInventory();
-
+    /**
+     * Is called when the content of a
+     * {@link Slot} changed.
+     *
+     * @param slot The slot
+     */
     @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return this.inventory;
-    }
+    void accept(Slot slot);
 }

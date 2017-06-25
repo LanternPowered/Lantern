@@ -37,6 +37,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,19 +161,22 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         // item.
         List<ItemStackSnapshot> remainingItemsList = null;
         if (remainingItems) {
-            final ImmutableList.Builder<ItemStackSnapshot> builder = ImmutableList.builder();
-            for (int j = y; j < eh; j++) {
-                for (int i = x; i < ew; i++) {
+            final List<ItemStackSnapshot> builder = new ArrayList<>();
+            for (int i = 0; i < ch * cw; i++) {
+                builder.add(ItemStackSnapshot.NONE);
+            }
+            for (int j = 0; j < rh; j++) {
+                for (int i = 0; i < rw; i++) {
                     final IIngredient ingredient = (IIngredient) this.ingredients[i][j];
-                    if (ingredient == null) {
-                        builder.add(ItemStackSnapshot.NONE);
-                        continue;
+                    if (ingredient != null) {
+                        final Optional<ItemStack> remainingItem = ingredient.getRemainingItem(craftingMatrix.get(i, j));
+                        if (remainingItem.isPresent()) {
+                            builder.set((j + y) * cw + (i + x), LanternItemStack.toSnapshot(remainingItem.get()));
+                        }
                     }
-                    final Optional<ItemStack> remainingItem = ingredient.getRemainingItem(craftingMatrix.get(i, j));
-                    builder.add(remainingItem.orElse(ItemStack.empty()).createSnapshot());
                 }
             }
-            remainingItemsList = builder.build();
+            remainingItemsList = ImmutableList.copyOf(builder);
         }
 
         return new Result(resultItemStack, remainingItemsList);

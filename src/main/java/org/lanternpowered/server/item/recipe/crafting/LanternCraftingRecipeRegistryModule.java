@@ -30,6 +30,7 @@ import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.LanternRecipeRegistryModule;
 import org.lanternpowered.server.util.ReflectionHelper;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
@@ -38,6 +39,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.registry.RegistrationPhase;
 import org.spongepowered.api.registry.util.DelayedRegistration;
 import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 @RegistrationDependency({ ItemRegistryModule.class })
 public class LanternCraftingRecipeRegistryModule extends LanternRecipeRegistryModule<CraftingRecipe> {
@@ -55,11 +58,22 @@ public class LanternCraftingRecipeRegistryModule extends LanternRecipeRegistryMo
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        final PluginContainer plugin = Lantern.getMinecraftPlugin();
+        PluginContainer plugin = Lantern.getMinecraftPlugin();
         register(ICraftingRecipe.shapedBuilder()
                 .aisle("x", "x")
                 .where('x', Ingredient.of(ItemTypes.PLANKS))
                 .result(ItemStack.of(ItemTypes.STICK, 4))
                 .build("stick", plugin));
+
+        // Extra, testing stuff
+        plugin = Lantern.getImplementationPlugin();
+        ItemStack result = ItemStack.of(ItemTypes.GOLD_NUGGET, 4);
+        result.offer(Keys.DISPLAY_NAME, Text.of(TextColors.GOLD, "€1"));
+        register(ICraftingRecipe.shapedBuilder()
+                .aisle("x", "y")
+                .where('x', Ingredient.of(ItemTypes.GOLD_INGOT))
+                .where('y', IIngredient.builder().with(ItemTypes.LAVA_BUCKET).withRemaining(ItemTypes.BUCKET).build())
+                .result(result)
+                .build("one_euro", plugin));
     }
 }

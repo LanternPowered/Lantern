@@ -33,8 +33,7 @@ import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 
 public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> {
-
-    @SuppressWarnings("unchecked")
+    
     @Override
     public CatalogType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         return Sponge.getRegistry().getType(type.getRawType().asSubclass(CatalogType.class), value.getString())

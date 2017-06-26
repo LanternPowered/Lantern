@@ -23,26 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.config.serializer;
+package co.aikar.timings;
 
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.Sponge;
+import co.aikar.util.JSONUtil;
+import com.google.gson.JsonArray;
 
-public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> {
+class TimingHistoryEntry {
 
-    @Override
-    public CatalogType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return Sponge.getRegistry().getType(type.getRawType().asSubclass(CatalogType.class), value.getString())
-                .orElseThrow(() -> new ObjectMappingException("The catalog type is missing: " + value.getString()));
+    final TimingData data;
+    final TimingData[] children;
+
+    TimingHistoryEntry(TimingHandler handler) {
+        this.data = handler.record.clone();
+        this.children = new TimingData[handler.children.size()];
+        int i = 0;
+        for (TimingData child : handler.children.values()) {
+            this.children[i++] = child.clone();
+        }
     }
 
-    @Override
-    public void serialize(TypeToken<?> type, CatalogType obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(obj.getId());
+    JsonArray export() {
+        JsonArray result = this.data.export();
+        if (this.children.length > 0) {
+            result.add(JSONUtil.mapArray(this.children, TimingData::export));
+        }
+        return result;
     }
-
 }

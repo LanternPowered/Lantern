@@ -23,26 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.config.serializer;
+package co.aikar.timings;
 
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.Sponge;
-
-public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> {
+public final class NullTimingHandler implements Timing {
 
     @Override
-    public CatalogType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return Sponge.getRegistry().getType(type.getRawType().asSubclass(CatalogType.class), value.getString())
-                .orElseThrow(() -> new ObjectMappingException("The catalog type is missing: " + value.getString()));
+    public Timing startTiming() {
+        return this;
     }
 
     @Override
-    public void serialize(TypeToken<?> type, CatalogType obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(obj.getId());
+    public void stopTiming() {
+    }
+
+    @Override
+    public void startTimingIfSync() {
+    }
+
+    @Override
+    public void stopTimingIfSync() {
+    }
+
+    @Override
+    public void abort() {
+    }
+
+    @Override
+    public void close() {
     }
 
 }

@@ -179,7 +179,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             // Don't send movement messages if the entity
             // is a passengers, otherwise glitches will
             // rule the world.
-            if (passenger) {
+            if (!passenger) {
                 if (Math.abs(dxu) <= Short.MAX_VALUE && Math.abs(dyu) <= Short.MAX_VALUE && Math.abs(dzu) <= Short.MAX_VALUE) {
                     if (dirtyRot) {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,

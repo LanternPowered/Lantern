@@ -23,26 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.config.serializer;
+package org.lanternpowered.server.game.registry.factory;
 
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.Sponge;
+import co.aikar.timings.LanternTimingsFactory;
+import co.aikar.timings.Timings;
+import co.aikar.timings.TimingsFactory;
+import org.spongepowered.api.registry.FactoryRegistry;
 
-public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> {
+public class TimingsFactoryRegistryModule implements FactoryRegistry<TimingsFactory, Timings> {
 
     @Override
-    public CatalogType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return Sponge.getRegistry().getType(type.getRawType().asSubclass(CatalogType.class), value.getString())
-                .orElseThrow(() -> new ObjectMappingException("The catalog type is missing: " + value.getString()));
+    public Class<Timings> getFactoryOwner() {
+        return Timings.class;
     }
 
     @Override
-    public void serialize(TypeToken<?> type, CatalogType obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(obj.getId());
+    public TimingsFactory provideFactory() {
+        return Holder.INSTANCE;
+    }
+
+    @Override
+    public void initialize() {
+        Holder.INSTANCE.init();
+    }
+
+    private static final class Holder {
+        static final LanternTimingsFactory INSTANCE = new LanternTimingsFactory();
     }
 
 }

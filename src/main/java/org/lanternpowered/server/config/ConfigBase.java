@@ -37,6 +37,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.DataViewTypeSerializer;
 import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
@@ -67,7 +68,7 @@ public abstract class ConfigBase {
     protected static final ConfigurationOptions DEFAULT_OPTIONS;
 
     static {
-        final TypeSerializerCollection typeSerializers = ConfigurationOptions.defaults().getSerializers().newChild();
+        final TypeSerializerCollection typeSerializers = TypeSerializers.getDefaultSerializers();
         final DataViewTypeSerializer dataViewTypeSerializer = new DataViewTypeSerializer();
         typeSerializers.registerType(TypeToken.of(Text.class), new TextTypeSerializer())
                 .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
@@ -180,4 +181,7 @@ public abstract class ConfigBase {
         this.loader.save(this.root);
     }
 
+    public ConfigurationNode getRoot() {
+        return this.root;
+    }
 }

@@ -37,7 +37,7 @@ public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> 
     @SuppressWarnings("unchecked")
     @Override
     public CatalogType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return Sponge.getRegistry().getType((Class<CatalogType>) type.getRawType(), value.getString())
+        return Sponge.getRegistry().getType(type.getRawType().asSubclass(CatalogType.class), value.getString())
                 .orElseThrow(() -> new ObjectMappingException("The catalog type is missing: " + value.getString()));
     }
 

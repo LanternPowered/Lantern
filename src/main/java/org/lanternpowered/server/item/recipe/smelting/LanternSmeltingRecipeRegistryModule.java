@@ -27,14 +27,18 @@ package org.lanternpowered.server.item.recipe.smelting;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.LanternRecipeRegistryModule;
 import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistryModule;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.registry.RegistrationPhase;
 import org.spongepowered.api.registry.util.DelayedRegistration;
 import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 @RegistrationDependency({ ItemRegistryModule.class, LanternCraftingRecipeRegistryModule.class })
 public class LanternSmeltingRecipeRegistryModule extends LanternRecipeRegistryModule<ISmeltingRecipe> {
@@ -51,5 +55,13 @@ public class LanternSmeltingRecipeRegistryModule extends LanternRecipeRegistryMo
                 .ingredient(ItemTypes.COBBLESTONE)
                 .result(ItemStack.of(ItemTypes.STONE, 1))
                 .build("stone", plugin));
+
+        final ItemStack result = ItemStack.of(ItemTypes.IRON_INGOT, 1);
+        result.offer(Keys.DISPLAY_NAME, Text.of(TextColors.RESET, "Steel Ingot"));
+        register(ISmeltingRecipe.builder()
+                .ingredient(IIngredient.builder().with(ItemTypes.IRON_INGOT).withQuantity(2).build(),
+                        ItemStack.of(ItemTypes.IRON_INGOT, 1).createSnapshot())
+                .result(result)
+                .build("steel_ingot", plugin));
     }
 }

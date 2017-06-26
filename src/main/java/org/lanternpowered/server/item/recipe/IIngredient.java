@@ -80,9 +80,27 @@ public interface IIngredient extends Ingredient {
     }
 
     /**
+     * Gets the quantity of input items that are required to
+     * smelt, for the given {@link ItemStackSnapshot}.
+     *
+     * @param itemStackSnapshot The item stack snapshot
+     * @return The quantity
+     */
+    int getQuantity(ItemStackSnapshot itemStackSnapshot);
+
+    /**
      * A builder to construct {@link IIngredient}s.
      */
     interface Builder extends Ingredient.Builder {
+
+        /**
+         * Applies the quantity of input items that are required
+         * to smelt the item.
+         *
+         * @param quantity The quantity
+         * @return This builder, for chaining
+         */
+        Builder withQuantity(int quantity);
 
         /**
          * Applies the {@link ItemType} that should be returned when

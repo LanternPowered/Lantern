@@ -139,8 +139,9 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
     @Override
     public boolean shouldRefresh(BlockState oldBlockState, BlockState newBlockState) {
-        final BlockType block = newBlockState.getType();
-        return !(block == BlockTypes.FURNACE || block == BlockTypes.LIT_FURNACE);
+        final BlockType n = oldBlockState.getType();
+        final BlockType o = newBlockState.getType();
+        return !((n == BlockTypes.FURNACE || n == BlockTypes.LIT_FURNACE) && (o == BlockTypes.FURNACE || o == BlockTypes.LIT_FURNACE));
     }
 
     @Override
@@ -174,15 +175,18 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                 smeltingRecipe = Lantern.getRegistry().getSmeltingRecipeRegistry()
                         .findMatchingRecipe(inputSlotItemSnapshot);
                 if (smeltingRecipe.isPresent()) {
-                    smeltingResult = smeltingRecipe.get().getResult(inputSlotItemSnapshot);
-                    // Check if the item can be smelted
-                    if (smeltingResult.isPresent()) {
-                        // Check if the result could be added to the output
-                        final PeekOfferTransactionsResult peekResult = this.inventory.outputSlot.peekOfferFastTransactions(
-                                smeltingResult.get().getResult().createStack());
-                        if (peekResult.getOfferResult().isSuccess()) {
-                            maxCookTime = ((ISmeltingRecipe) smeltingRecipe.get())
-                                    .getSmeltTime(inputSlotItemSnapshot).orElse(200);
+                    final int quantity = ((ISmeltingRecipe) smeltingRecipe.get()).getIngredient().getQuantity(inputSlotItemSnapshot);
+                    if (inputSlotItemSnapshot.getCount() >= quantity) {
+                        smeltingResult = smeltingRecipe.get().getResult(inputSlotItemSnapshot);
+                        // Check if the item can be smelted
+                        if (smeltingResult.isPresent()) {
+                            // Check if the result could be added to the output
+                            final PeekOfferTransactionsResult peekResult = this.inventory.outputSlot.peekOfferFastTransactions(
+                                    smeltingResult.get().getResult().createStack());
+                            if (peekResult.getOfferResult().isSuccess()) {
+                                maxCookTime = ((ISmeltingRecipe) smeltingRecipe.get())
+                                        .getSmeltTime(inputSlotItemSnapshot).orElse(200);
+                            }
                         }
                     }
                 }
@@ -226,7 +230,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                             elapsedBurnTime = 0;
                             // Put the rest item in the slot, if the slot is empty
                             if (this.inventory.fuelSlot.size() == 0) {
-                                final IIngredient ingredient = (IIngredient) result.get().getIngredient();
+                                final IIngredient ingredient = result.get().getIngredient();
                                 final Optional<ItemStack> remainingItem = ingredient.getRemainingItem(itemStackSnapshot);
                                 remainingItem.ifPresent(this.inventory.fuelSlot::set);
                             }
@@ -252,8 +256,9 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                         offer(Keys.MAX_COOK_TIME, 0);
                         offer(Keys.PASSED_COOK_TIME, 0);
 
+                        final int quantity = ((ISmeltingRecipe) smeltingRecipe.get()).getIngredient().getQuantity(inputSlotItemSnapshot);
                         this.inventory.outputSlot.offer(smeltingResult.get().getResult().createStack());
-                        this.inventory.inputSlot.poll(1);
+                        this.inventory.inputSlot.poll(quantity);
 
                         // Put the rest item in the slot
                         if (this.inventory.inputSlot.size() == 0) {
@@ -299,17 +304,23 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         if (itemStack != null) {
             // Check if the item can be smelted, this means finding a compatible
             // recipe and the output has to be empty.
-            final Optional<SmeltingResult> smeltingResult = Lantern.getRegistry().getSmeltingRecipeRegistry()
-                    .getResult(itemStack.createSnapshot());
+            final ItemStackSnapshot itemStackSnapshot = itemStack.createSnapshot();
+            final Optional<SmeltingRecipe> smeltingRecipe = Lantern.getRegistry().getSmeltingRecipeRegistry()
+                    .findMatchingRecipe(itemStackSnapshot);
+            final Optional<SmeltingResult> smeltingResult = smeltingRecipe.flatMap(recipe -> recipe.getResult(itemStackSnapshot));
             // Check if the item can be smelted
             if (smeltingResult.isPresent()) {
-                final ItemStack result = smeltingResult.get().getResult().createStack();
-                // Check if the result could be added to the output
-                final PeekOfferTransactionsResult peekResult = this.inventory.outputSlot.peekOfferFastTransactions(result);
-                if (peekResult.getOfferResult().isSuccess()) {
-                    this.inventory.inputSlot.poll(1);
-                    this.inventory.outputSlot.offer(result);
-                    return true;
+                final int quantity = ((ISmeltingRecipe) smeltingRecipe.get()).getIngredient().getQuantity(itemStackSnapshot);
+                if (itemStack.getQuantity() >= quantity) {
+                    final ItemStack result = smeltingResult.get().getResult().createStack();
+                    // Check if the result could be added to the output
+                    final PeekOfferTransactionsResult peekResult = this.inventory.outputSlot
+                            .peekOfferFastTransactions(result);
+                    if (peekResult.getOfferResult().isSuccess()) {
+                        this.inventory.inputSlot.poll(quantity);
+                        this.inventory.outputSlot.offer(result);
+                        return true;
+                    }
                 }
             }
         }

@@ -23,26 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe.smelting;
+package org.lanternpowered.server.item.recipe;
 
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-final class ConstantSmeltingTimeProvider implements ISmeltingTimeProvider {
+final class ConstantIngredientQuantityProvider implements IIngredientQuantityProvider {
 
-    private final int time;
+    private final int quantity;
 
-    ConstantSmeltingTimeProvider(int time) {
-        this.time = time;
+    ConstantIngredientQuantityProvider(int quantity) {
+        this.quantity = quantity;
     }
 
     @Override
     public int get(ItemStackSnapshot itemStackSnapshot) {
-        return this.time;
+        return this.quantity;
     }
 
     @Override
     public int get(ItemStack itemStack) {
-        return this.time;
+        return this.quantity;
     }
 }

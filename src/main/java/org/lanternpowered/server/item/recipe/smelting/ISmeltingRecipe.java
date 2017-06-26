@@ -44,6 +44,11 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
         return Sponge.getRegistry().createBuilder(Builder.class);
     }
 
+    /**
+     * Gets the {@link IIngredient} of this recipe.
+     *
+     * @return The ingredient
+     */
     IIngredient getIngredient();
 
     /**

@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.recipe;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -45,8 +46,11 @@ import javax.annotation.Nullable;
 
 public class LanternIngredientBuilder implements IIngredient.Builder {
 
+    private static final IIngredientQuantityProvider DEFAULT_QUANTITY_PROVIDER = new ConstantIngredientQuantityProvider(1);
+
     private List<Predicate<ItemStack>> matchers = new ArrayList<>();
     private List<ItemStackSnapshot> displayItems = new ArrayList<>();
+    @Nullable private IIngredientQuantityProvider quantityProvider;
     @Nullable private Function<ItemStack, ItemStack> remainingItemProvider;
 
     @Override
@@ -55,6 +59,7 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         this.matchers.add(((LanternIngredient) value).matcher);
         this.displayItems.addAll(value.displayedItems());
         this.remainingItemProvider = ((LanternIngredient) value).remainingItemProvider;
+        this.quantityProvider = ((LanternIngredient) value).quantityProvider;
         return this;
     }
 
@@ -63,6 +68,14 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         this.matchers.clear();
         this.displayItems.clear();
         this.remainingItemProvider = null;
+        this.quantityProvider = null;
+        return this;
+    }
+
+    @Override
+    public IIngredient.Builder withQuantity(int quantity) {
+        checkArgument(quantity > 1, "The quantity must be greater then 1");
+        this.quantityProvider = new ConstantIngredientQuantityProvider(quantity);
         return this;
     }
 
@@ -171,6 +184,10 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
     @Override
     public IIngredient build() {
         checkState(!this.matchers.isEmpty(), "At least one matcher must be added");
-        return new LanternIngredient(Predicates.or(this.matchers), this.displayItems, this.remainingItemProvider);
+        IIngredientQuantityProvider quantityProvider = this.quantityProvider;
+        if (quantityProvider == null) {
+            quantityProvider = DEFAULT_QUANTITY_PROVIDER;
+        }
+        return new LanternIngredient(Predicates.or(this.matchers), quantityProvider, this.displayItems, this.remainingItemProvider);
     }
 }

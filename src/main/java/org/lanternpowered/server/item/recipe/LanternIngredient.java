@@ -38,12 +38,14 @@ import javax.annotation.Nullable;
 final class LanternIngredient implements IIngredient {
 
     final Predicate<ItemStack> matcher;
+    final IIngredientQuantityProvider quantityProvider;
     private final List<ItemStackSnapshot> displayedItems;
     @Nullable final Function<ItemStack, ItemStack> remainingItemProvider;
 
-    LanternIngredient(Predicate<ItemStack> matcher, List<ItemStackSnapshot> displayedItems,
-            @Nullable Function<ItemStack, ItemStack> remainingItemProvider) {
+    LanternIngredient(Predicate<ItemStack> matcher, IIngredientQuantityProvider quantityProvider,
+            List<ItemStackSnapshot> displayedItems, @Nullable Function<ItemStack, ItemStack> remainingItemProvider) {
         this.matcher = matcher;
+        this.quantityProvider = quantityProvider;
         this.displayedItems = displayedItems;
         this.remainingItemProvider = remainingItemProvider;
     }
@@ -52,6 +54,11 @@ final class LanternIngredient implements IIngredient {
     public Optional<ItemStack> getRemainingItem(ItemStack itemStack) {
         return this.remainingItemProvider == null ? Optional.empty() :
                 Optional.ofNullable(this.remainingItemProvider.apply(itemStack));
+    }
+
+    @Override
+    public int getQuantity(ItemStackSnapshot itemStackSnapshot) {
+        return this.quantityProvider.get(itemStackSnapshot);
     }
 
     @Override

@@ -70,7 +70,7 @@ public final class PropertyKeySetter {
                 return;
             }
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         throw new IllegalArgumentException("Unsupported property type: " + property.getClass().getName());
     }

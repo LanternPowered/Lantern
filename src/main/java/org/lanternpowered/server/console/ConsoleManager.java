@@ -33,12 +33,15 @@ import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.apache.logging.log4j.io.LoggerPrintStream;
+import org.jline.reader.EndOfFileException;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReader.Option;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.lanternpowered.server.game.DirectoryKeys;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.slf4j.Logger;
@@ -56,8 +59,7 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public final class ConsoleManager {
 
-    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(
-            PrintStream.class.getName(), LoggerPrintStream.class.getName());
+    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(PrintStream.class.getName(), LoggerPrintStream.class.getName());
     static final String REDIRECT_ERR = "STDERR";
     static final String REDIRECT_OUT = "STDOUT";
     static volatile boolean active;
@@ -137,18 +139,29 @@ public final class ConsoleManager {
      */
     private void readCommandTask() {
         final LineReader lineReader = TerminalConsoleAppender.getReader();
-        while (active) {
-            //noinspection ConstantConditions
-            String command = lineReader.readLine("> ");
-            if (command != null) {
-                command = command.trim();
-                if (!command.isEmpty()) {
-                    final String runCommand = command.startsWith("/") ? command.substring(1) : command;
-                    this.scheduler.createTaskBuilder()
-                            .execute(() -> this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand))
-                            .submit(this.pluginContainer);
+        try {
+            String command;
+
+            while (active) {
+                try {
+                    //noinspection ConstantConditions
+                    command = lineReader.readLine("> ");
+                } catch (EndOfFileException ignored) {
+                    continue;
+                }
+                if (command != null) {
+                    command = command.trim();
+                    if (!command.isEmpty()) {
+                        final String runCommand = command.startsWith("/") ? command.substring(1) : command;
+                        this.scheduler.createSyncExecutor(this.pluginContainer).execute(() ->
+                                this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand));
+                    }
                 }
             }
+        } catch (UserInterruptException e) {
+            Lantern.getServer().shutdown();
+        } finally {
+            TerminalConsoleAppender.setReader(null);
         }
     }
 }

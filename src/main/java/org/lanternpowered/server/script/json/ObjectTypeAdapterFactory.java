@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.script.json;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -49,6 +47,7 @@ public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements Typ
     private static final String DATA = "data";
 
     private final AbstractObjectTypeRegistryModule registry;
+    // TODO: Might be best to move to a Guava TypeToken in here
     protected final TypeToken<V> typeToken;
 
     public ObjectTypeAdapterFactory(AbstractObjectTypeRegistryModule<V, O> registry, TypeToken<V> type) {

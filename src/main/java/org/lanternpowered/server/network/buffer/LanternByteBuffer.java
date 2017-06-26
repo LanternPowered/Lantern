@@ -111,6 +111,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer order(ByteOrder order) {
+        // TODO: Move from deprecated usage of .order()
         if (this.buf.order().equals(order)) {
             return this;
         } else {

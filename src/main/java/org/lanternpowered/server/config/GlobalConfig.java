@@ -79,6 +79,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "query", comment = "Configuration for the query server.")
     private Query query = new Query();
 
+    @Setting(value = "timings", comment = "Configuration for timings.")
+    private Timings timings = new Timings();
+
     @ConfigSerializable
     private static class Commands {
 
@@ -213,6 +216,50 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    @ConfigSerializable
+    public static final class Timings {
+
+        @Setting(value = "enabled", comment = "Enables or disables timings.")
+        private boolean enabled = false;
+
+        @Setting(value = "verbose", comment = "Whether or not timings should monitor at the verbose level.")
+        private boolean verbose = true;
+
+        @Setting(value = "privacy", comment = "Whether or not to include server information, such as name, motd, icon, etc.")
+        private boolean privacy = false;
+
+        @Setting(value = "history-interval", comment = "The interval between timings history report generation.")
+        private int historyInterval = 300;
+
+        @Setting(value = "history-length", comment = "The length in ticks that timing history will be kept.")
+        private int historyLength = 3600;
+
+        public boolean isEnabled() {
+            return this.enabled;
+        }
+
+        public boolean isVerbose() {
+            return this.verbose;
+        }
+
+        public boolean isPrivate() {
+            return this.privacy;
+        }
+
+        public int getHistoryInterval() {
+            return this.historyInterval;
+        }
+
+        public int getHistoryLength() {
+            return this.historyLength;
+        }
+
+    }
+
+    public Timings getTimings() {
+        return this.timings;
     }
 
     public String getProxySecurityKey() {

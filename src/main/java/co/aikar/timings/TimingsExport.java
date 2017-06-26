@@ -218,7 +218,7 @@ class TimingsExport extends Thread {
             JsonObject object = new JsonObject();
             for (Entry<Object, ? extends ConfigurationNode> entry : node.getChildrenMap().entrySet()) {
                 String fullPath = CONFIG_PATH_JOINER.join(entry.getValue().getPath());
-                if (fullPath.equals("sponge.sql") || TimingsManager.hiddenConfigs.contains(fullPath)) {
+                if (fullPath.equals("sponge.sql") || TimingsManager.hiddenConfigs.contains(fullPath)) { // TODO: Add hidden config functionality
                     continue;
                 }
                 object.add(entry.getKey().toString(), serializeConfigNode(entry.getValue()));

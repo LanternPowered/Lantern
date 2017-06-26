@@ -50,7 +50,7 @@ public final class TimingsManager {
     public static final Timing PLUGIN_SCHEDULER_HANDLER = LanternTimingsFactory.ofSafe("Plugin Scheduler");
     public static final Timing PLUGIN_EVENT_HANDLER = LanternTimingsFactory.ofSafe("Plugin Events");
     public static final Timing PLUGIN_GROUP_HANDLER = LanternTimingsFactory.ofSafe("Plugins");
-    public static List<String> hiddenConfigs = new ArrayList<>();
+    public static List<String> hiddenConfigs = new ArrayList<>(); // TODO: Add this to configuration
     public static boolean privacy = false;
 
     static final Collection<TimingHandler> HANDLERS = new ArrayDeque<>();

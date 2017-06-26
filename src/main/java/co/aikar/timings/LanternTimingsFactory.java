@@ -28,6 +28,7 @@ package co.aikar.timings;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.EvictingQueue;
+import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -46,18 +47,19 @@ public class LanternTimingsFactory implements TimingsFactory {
     private boolean verboseEnabled = true;
     private int historyInterval = -1;
     private int historyLength = -1;
-    private final boolean moduleEnabled = false; // Set to false for now
+    private final boolean moduleEnabled;
 
     public LanternTimingsFactory() {
-        //this.moduleEnabled = SpongeImpl.getGlobalConfig().getConfig().getModules().usePluginTimings();
+        this.moduleEnabled = Lantern.getGame().getGlobalConfig().getTimings().isEnabled();
     }
 
     public void init() {
-        /*TimingsCategory config = SpongeImpl.getGlobalConfig().getConfig().getTimings();
+        final GlobalConfig.Timings config = Lantern.getGame().getGlobalConfig().getTimings();
+
+        setTimingsEnabled(config.isEnabled());
         setVerboseTimingsEnabled(config.isVerbose());
-        setTimingsEnabled(this.moduleEnabled && config.isEnabled());
         setHistoryInterval(config.getHistoryInterval());
-        setHistoryLength(config.getHistoryLength());*/
+        setHistoryLength(config.getHistoryLength());
 
         Lantern.getLogger().debug("Sponge Timings: " + this.timingsEnabled +
                                     " - Verbose: " + this.verboseEnabled +

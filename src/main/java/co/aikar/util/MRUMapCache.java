@@ -39,9 +39,9 @@ import java.util.Set;
  */
 public class MRUMapCache<K, V> extends AbstractMap<K, V> {
 
-    final Map<K, V> backingMap;
-    Object cacheKey;
-    V cacheValue;
+    private final Map<K, V> backingMap;
+    private Object cacheKey;
+    private V cacheValue;
 
     public MRUMapCache(final Map<K, V> backingMap) {
         this.backingMap = backingMap;

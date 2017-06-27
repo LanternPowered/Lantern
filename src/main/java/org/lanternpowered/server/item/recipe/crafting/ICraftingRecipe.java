@@ -101,10 +101,20 @@ public interface ICraftingRecipe extends CraftingRecipe {
         return getResult(CraftingMatrix.of(grid), world);
     }
 
+    /**
+     * Creates a new {@link IShapedCraftingRecipe.Builder}.
+     *
+     * @return The builder
+     */
     static IShapedCraftingRecipe.Builder shapedBuilder() {
         return Sponge.getRegistry().createBuilder(IShapedCraftingRecipe.Builder.class);
     }
 
+    /**
+     * Creates a new {@link IShapelessCraftingRecipe.Builder}.
+     *
+     * @return The builder
+     */
     static IShapelessCraftingRecipe.Builder shapelessBuilder() {
         return Sponge.getRegistry().createBuilder(IShapelessCraftingRecipe.Builder.class);
     }

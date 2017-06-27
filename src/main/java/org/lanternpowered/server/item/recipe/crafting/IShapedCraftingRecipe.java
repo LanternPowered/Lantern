@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.recipe.crafting;
 
+import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -37,9 +38,17 @@ import javax.annotation.Nullable;
 
 public interface IShapedCraftingRecipe extends ICraftingRecipe, ShapedCraftingRecipe {
 
+    /**
+     * Creates a new {@link Builder}.
+     *
+     * @return The builder
+     */
     static Builder builder() {
         return Sponge.getRegistry().createBuilder(Builder.class);
     }
+
+    @Override
+    IIngredient getIngredient(int x, int y);
 
     interface Builder extends ShapedCraftingRecipe.Builder {
 

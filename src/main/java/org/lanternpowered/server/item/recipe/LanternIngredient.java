@@ -62,6 +62,11 @@ final class LanternIngredient implements IIngredient {
     }
 
     @Override
+    public int getQuantity(ItemStack itemStack) {
+        return this.quantityProvider.get(itemStack);
+    }
+
+    @Override
     public boolean test(ItemStack itemStack) {
         return this.matcher.test(itemStack);
     }

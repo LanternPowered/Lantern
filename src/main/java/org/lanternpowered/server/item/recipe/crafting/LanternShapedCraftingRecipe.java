@@ -47,18 +47,18 @@ import javax.annotation.Nullable;
 public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implements IShapedCraftingRecipe {
 
     final ICraftingResultProvider resultProvider;
-    private final Ingredient[][] ingredients;
+    private final IIngredient[][] ingredients;
 
     LanternShapedCraftingRecipe(String pluginId, String name,
             ItemStackSnapshot exemplaryResult, @Nullable String group,
-            ICraftingResultProvider resultProvider, Ingredient[][] ingredients) {
+            ICraftingResultProvider resultProvider, IIngredient[][] ingredients) {
         super(pluginId, name, exemplaryResult, group);
         this.resultProvider = resultProvider;
         this.ingredients = ingredients;
     }
 
     @Override
-    public Ingredient getIngredient(int x, int y) {
+    public IIngredient getIngredient(int x, int y) {
         checkPositionIndex(x, getWidth());
         checkPositionIndex(y, getHeight());
         return this.ingredients[x][y];
@@ -132,14 +132,15 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         for (int j = 0; j < rh; j++) {
             for (int i = 0; i < rw; i++) {
                 final ItemStack itemStack = craftingMatrix.get(x + i, y + j);
-                final Ingredient ingredient = this.ingredients[i][j];
+                final IIngredient ingredient = this.ingredients[i][j];
                 if (ingredient == null) {
                     if (itemStack.isEmpty()) {
                         continue;
                     }
                     return null;
                 }
-                if (!ingredient.test(LanternItemStack.orEmpty(itemStack))) {
+                if (ingredient.test(LanternItemStack.orEmpty(itemStack)) &&
+                        itemStack.getQuantity() >= ingredient.getQuantity(itemStack)) {
                     return null;
                 }
                 if (ingredientItems != null) {
@@ -167,7 +168,7 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
             }
             for (int j = 0; j < rh; j++) {
                 for (int i = 0; i < rw; i++) {
-                    final IIngredient ingredient = (IIngredient) this.ingredients[i][j];
+                    final IIngredient ingredient = this.ingredients[i][j];
                     if (ingredient != null) {
                         final Optional<ItemStack> remainingItem = ingredient.getRemainingItem(craftingMatrix.get(i, j));
                         if (remainingItem.isPresent()) {

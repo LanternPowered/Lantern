@@ -28,6 +28,7 @@ package org.lanternpowered.server.block.tile.vanilla;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
@@ -124,10 +125,11 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
     public void registerKeys() {
         super.registerKeys();
 
-        registerKey(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE);
-        registerKey(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME);
-        registerKey(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE);
-        registerKey(Keys.PASSED_COOK_TIME, 0, 0, Keys.MAX_COOK_TIME);
+        final ValueCollection c = getValueCollection();
+        c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE);
+        c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME);
+        c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE);
+        c.register(Keys.PASSED_COOK_TIME, 0, 0, Keys.MAX_COOK_TIME);
     }
 
     @Override

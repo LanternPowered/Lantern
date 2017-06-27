@@ -80,6 +80,13 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
     }
 
     @Override
+    public IIngredient.Builder withQuantity(IIngredientQuantityProvider quantityProvider) {
+        checkNotNull(quantityProvider, "quantityProvider");
+        this.quantityProvider = quantityProvider;
+        return this;
+    }
+
+    @Override
     public IIngredient.Builder withRemaining(ItemType type) {
         checkNotNull(type, "type");
         this.remainingItemProvider = itemStack -> ItemStack.of(type, 1);

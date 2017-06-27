@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
+import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -160,7 +161,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
         final int w = this.aisle.get(0).length();
         checkState(w > 0, "The aisle cannot be empty.");
 
-        final Ingredient[][] ingredients = new Ingredient[w][h];
+        final IIngredient[][] ingredients = new IIngredient[w][h];
 
         for (int j = 0; j < h; j++) {
             final String s = this.aisle.get(j);
@@ -174,7 +175,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
                     ingredient = this.ingredientMap.get(c);
                     checkState(ingredient != null, "No ingredient is present for the character: %s", c);
                 }
-                ingredients[i][j] = ingredient;
+                ingredients[i][j] = (IIngredient) ingredient;
             }
         }
 

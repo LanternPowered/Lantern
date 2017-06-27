@@ -86,7 +86,18 @@ public interface IIngredient extends Ingredient {
      * @param itemStackSnapshot The item stack snapshot
      * @return The quantity
      */
-    int getQuantity(ItemStackSnapshot itemStackSnapshot);
+    default int getQuantity(ItemStackSnapshot itemStackSnapshot) {
+        return getQuantity(itemStackSnapshot.createStack());
+    }
+
+    /**
+     * Gets the quantity of input items that are required to
+     * smelt, for the given {@link ItemStack}.
+     *
+     * @param itemStack The item stack
+     * @return The quantity
+     */
+    int getQuantity(ItemStack itemStack);
 
     /**
      * A builder to construct {@link IIngredient}s.
@@ -101,6 +112,15 @@ public interface IIngredient extends Ingredient {
          * @return This builder, for chaining
          */
         Builder withQuantity(int quantity);
+
+        /**
+         * Applies the quantity of input items that are required
+         * to smelt the item.
+         *
+         * @param quantityProvider The quantity provider
+         * @return This builder, for chaining
+         */
+        Builder withQuantity(IIngredientQuantityProvider quantityProvider);
 
         /**
          * Applies the {@link ItemType} that should be returned when

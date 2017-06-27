@@ -628,15 +628,21 @@ public class PlayerContainerSession {
                 final ItemStack itemStack = slot.peek().orElse(null);
 
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
+                final Transaction<ItemStackSnapshot> cursorTransaction;
                 final List<SlotTransaction> transactions = new ArrayList<>();
 
-                final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
-                final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(cursorItem, cursorItem);
+                if (slot instanceof CraftingOutput) {
+                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                    cursorTransaction = new Transaction<>(cursorItem, cursorItem);
+                    // TODO
+                } else {
+                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                    cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
-                if (itemStack != null) {
-                    final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
-                    final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
-                    final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, mainInventory, itemStack.copy(), offhand);
+                    if (itemStack != null) {
+                        final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
+                        final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
+                        final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, mainInventory, itemStack.copy(), offhand);
 
                     // Force updates if the max stack size on the client and server don't match
                     final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
@@ -647,15 +653,16 @@ public class PlayerContainerSession {
                         result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
                     }
 
-                    if (result.getOfferResult().isSuccess()) {
-                        transactions.addAll(result.getTransactions());
-                        final ItemStack rest = result.getOfferResult().getRest();
-                        if (rest != null) {
-                            transactions.addAll(slot.peekPollTransactions(
-                                    itemStack.getQuantity() - rest.getQuantity(), stack -> true).get().getTransactions());
-                        } else {
-                            transactions.addAll(slot.peekPollTransactions(
-                                    stack -> true).get().getTransactions());
+                        if (result.getOfferResult().isSuccess()) {
+                            transactions.addAll(result.getTransactions());
+                            final ItemStack rest = result.getOfferResult().getRest();
+                            if (rest != null) {
+                                transactions.addAll(slot.peekPollTransactions(
+                                        itemStack.getQuantity() - rest.getQuantity(), stack -> true).get().getTransactions());
+                            } else {
+                                transactions.addAll(slot.peekPollTransactions(
+                                        stack -> true).get().getTransactions());
+                            }
                         }
                     }
                 }

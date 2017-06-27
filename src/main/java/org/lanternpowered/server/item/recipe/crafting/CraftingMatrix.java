@@ -30,8 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 
-import javax.annotation.Nullable;
-
 /**
  * A crafting matrix that allows {@link ItemStack}s to be reused in the crafting
  * systems, all the {@link ItemStack}s are also lazily copied.

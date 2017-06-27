@@ -47,7 +47,6 @@ public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements Typ
     private static final String DATA = "data";
 
     private final AbstractObjectTypeRegistryModule registry;
-    // TODO: Might be best to move to a Guava TypeToken in here
     protected final TypeToken<V> typeToken;
 
     public ObjectTypeAdapterFactory(AbstractObjectTypeRegistryModule<V, O> registry, TypeToken<V> type) {

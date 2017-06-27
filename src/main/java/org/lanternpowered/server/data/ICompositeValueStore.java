@@ -51,10 +51,24 @@ import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H extends ValueContainer<?>>
         extends IValueContainer<S>, CompositeValueStore<S, H> {
+
+    /**
+     * A fast equivalent of {@link #transform(Key, Function)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param key The key
+     * @param function The function
+     * @param <E> The element type
+     * @return Whether the offer was successful
+     */
+    default <E> boolean transformFast(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+        return supports(key) && offerFast(key, checkNotNull(function.apply(get(key).orElse(null))));
+    }
 
     /**
      * A fast equivalent of {@link #offer(Key, Object, Cause)} which
@@ -263,6 +277,62 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
         }
 
         return DataTransactionResult.failNoData();
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(Key, Object)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param key The key
+     * @param value The value
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(Key<? extends BaseValue<E>> key, E value) throws IllegalArgumentException {
+        final boolean result = offerFast(key, value);
+        if (!result) {
+            throw new IllegalArgumentException("Failed offer transaction!");
+        }
+        return true;
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(Key, Object, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param key The key
+     * @param value The value
+     * @param cause The cause
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(Key<? extends BaseValue<E>> key, E value, Cause cause) throws IllegalArgumentException {
+        final boolean result = offerFast(key, value, cause);
+        if (!result) {
+            throw new IllegalArgumentException("Failed offer transaction!");
+        }
+        return true;
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(BaseValue)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param value The value
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(BaseValue<E> value) throws IllegalArgumentException {
+        return tryOfferFast(value.getKey(), value.get());
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(BaseValue, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param value The value
+     * @param cause The cause
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(BaseValue<E> value, Cause cause) throws IllegalArgumentException {
+        return tryOfferFast(value.getKey(), value.get(), cause);
     }
 
     /**

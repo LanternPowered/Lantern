@@ -51,10 +51,24 @@ import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H extends ValueContainer<?>>
         extends IValueContainer<S>, CompositeValueStore<S, H> {
+
+    /**
+     * A fast equivalent of {@link #transform(Key, Function)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param key The key
+     * @param function The function
+     * @param <E> The element type
+     * @return Whether the offer was successful
+     */
+    default <E> boolean transformFast(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+        return supports(key) && offerFast(key, checkNotNull(function.apply(get(key).orElse(null))));
+    }
 
     /**
      * A fast equivalent of {@link #offer(Key, Object, Cause)} which
@@ -266,6 +280,62 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
     }
 
     /**
+     * A fast equivalent of {@link #tryOffer(Key, Object)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param key The key
+     * @param value The value
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(Key<? extends BaseValue<E>> key, E value) throws IllegalArgumentException {
+        final boolean result = offerFast(key, value);
+        if (!result) {
+            throw new IllegalArgumentException("Failed offer transaction!");
+        }
+        return true;
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(Key, Object, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param key The key
+     * @param value The value
+     * @param cause The cause
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(Key<? extends BaseValue<E>> key, E value, Cause cause) throws IllegalArgumentException {
+        final boolean result = offerFast(key, value, cause);
+        if (!result) {
+            throw new IllegalArgumentException("Failed offer transaction!");
+        }
+        return true;
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(BaseValue)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param value The value
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(BaseValue<E> value) throws IllegalArgumentException {
+        return tryOfferFast(value.getKey(), value.get());
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(BaseValue, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param value The value
+     * @param cause The cause
+     * @return Whether the offer was successful
+     */
+    default <E> boolean tryOfferFast(BaseValue<E> value, Cause cause) throws IllegalArgumentException {
+        return tryOfferFast(value.getKey(), value.get(), cause);
+    }
+
+    /**
      * A fast equivalent of {@link #remove(Key)} which
      * avoids the construction of {@link DataTransactionResult}s.
      *
@@ -390,13 +460,36 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
     }
 
     /**
+     * A fast equivalent of {@link #offer(ValueContainer)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainer The value container
+     * @return Whether the offer was successful
+     */
+    default boolean offerFast(H valueContainer) {
+        return offerFast(valueContainer, MergeFunction.IGNORE_ALL);
+    }
+
+    /**
+     * A fast equivalent of {@link #offer(ValueContainer, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainer The value container
+     * @param cause The cause
+     * @return Whether the offer was successful
+     */
+    default boolean offerFast(H valueContainer, Cause cause) {
+        return offerFast(valueContainer, MergeFunction.IGNORE_ALL, cause);
+    }
+
+    /**
      * A fast equivalent of {@link #offer(ValueContainer, MergeFunction, Cause)} which
      * avoids the construction of {@link DataTransactionResult}s.
      *
      * @param valueContainer The value container
      * @param function The merge function
      * @param cause The cause
-     * @return Whether the removal was successful
+     * @return Whether the offer was successful
      */
     default boolean offerFast(H valueContainer, MergeFunction function, Cause cause) {
         return offerFast(valueContainer, function);
@@ -508,6 +601,111 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
             return builder.build();
         }
         return DataTransactionResult.failNoData();
+    }
+
+    /**
+     * A fast equivalent of {@link #offer(Iterable)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainers The value containers
+     * @return Whether the offer was successful
+     */
+    default boolean offerFast(Iterable<H> valueContainers) {
+        return offerFast(valueContainers, MergeFunction.IGNORE_ALL);
+    }
+
+    /**
+     * A fast equivalent of {@link #offer(Iterable, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainers The value containers
+     * @return Whether the offer was successful
+     */
+    default boolean offerFast(Iterable<H> valueContainers, Cause cause) {
+        return offerFast(valueContainers, MergeFunction.IGNORE_ALL, cause);
+    }
+
+    /**
+     * A fast equivalent of {@link #offer(Iterable, MergeFunction, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainers The value containers
+     * @param function The merge function
+     * @return Whether the offer was successful
+     */
+    default boolean offerFast(Iterable<H> valueContainers, MergeFunction function, Cause cause) {
+        boolean success = false;
+        for (H valueContainer : valueContainers) {
+            if (offerFast(valueContainer, function, cause)) {
+                success = true;
+            }
+        }
+        return success;
+    }
+
+    /**
+     * A fast equivalent of {@link #offer(Iterable, MergeFunction)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainers The value containers
+     * @param function The merge function
+     * @return Whether the offer was successful
+     */
+    default boolean offerFast(Iterable<H> valueContainers, MergeFunction function) {
+        boolean success = false;
+        for (H valueContainer : valueContainers) {
+            if (offerFast(valueContainer, function)) {
+                success = true;
+            }
+        }
+        return success;
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(ValueContainer)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainer The value container
+     * @return Whether the offer was successful
+     */
+    default boolean tryOfferFast(H valueContainer) throws IllegalArgumentException {
+        final boolean result = offerFast(valueContainer);
+        if (!result) {
+            throw new IllegalArgumentException("Failed offer transaction!");
+        }
+        return true;
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(ValueContainer, MergeFunction)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainer The value container
+     * @param function The merge function
+     * @return Whether the offer was successful
+     */
+    default boolean tryOfferFast(H valueContainer, MergeFunction function) throws IllegalArgumentException {
+        final boolean result = offerFast(valueContainer, function);
+        if (!result) {
+            throw new IllegalArgumentException("Failed offer transaction!");
+        }
+        return true;
+    }
+
+    /**
+     * A fast equivalent of {@link #tryOffer(ValueContainer, MergeFunction, Cause)} which
+     * avoids the construction of {@link DataTransactionResult}s.
+     *
+     * @param valueContainer The value container
+     * @param function The merge function
+     * @return Whether the offer was successful
+     */
+    default boolean tryOfferFast(H valueContainer, MergeFunction function, Cause cause) throws IllegalArgumentException {
+        final boolean result = offerFast(valueContainer, function, cause);
+        if (!result) {
+            throw new IllegalArgumentException("Failed offer transaction!");
+        }
+        return true;
     }
 
     @SuppressWarnings("unchecked")

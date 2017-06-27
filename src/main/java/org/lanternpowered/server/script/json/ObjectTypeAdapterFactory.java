@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.script.json;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

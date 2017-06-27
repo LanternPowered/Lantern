@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Scheduler;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.io.IOException;
@@ -141,6 +142,7 @@ public final class ConsoleManager {
         final LineReader lineReader = TerminalConsoleAppender.getReader();
         try {
             String command;
+            final SpongeExecutorService executor = this.scheduler.createSyncExecutor(this.pluginContainer);
 
             while (active) {
                 try {
@@ -153,8 +155,7 @@ public final class ConsoleManager {
                     command = command.trim();
                     if (!command.isEmpty()) {
                         final String runCommand = command.startsWith("/") ? command.substring(1) : command;
-                        this.scheduler.createSyncExecutor(this.pluginContainer).execute(() ->
-                                this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand));
+                        executor.execute(() -> this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand));
                     }
                 }
             }

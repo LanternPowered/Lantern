@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" packages="org.lanternpowered.server.console">
     <Appenders>
         <TerminalConsole name="Console">
-            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss}] [%t/%level] [%logger{1}]: %minecraftFormatting{%msg}}%n"/>
+            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss}] [%t/%level] [%logger{1}]%loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
         </TerminalConsole>
         <TerminalConsole name="DefaultConsole">
-            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss}] [%t/%level]: %minecraftFormatting{%msg}}%n"/>
+            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss}] [%t/%level]%loc{ [%path]}: %minecraftFormatting{%msg}}%n"/>
         </TerminalConsole>
         <!-- Keep a console appender open so log4j2 doesn't close our main out stream if we redirect System.out to the logger -->
         <Console name="SysOut" target="SYSTEM_OUT"/>
@@ -21,11 +21,11 @@
     <Loggers>
         <!-- Log server messages without prefix. -->
         <Logger name="Lantern" level="all" additivity="false">
-            <AppenderRef ref="DefaultConsole" level="info"/>
+            <AppenderRef ref="DefaultConsole" level="debug"/>
             <AppenderRef ref="File"/>
         </Logger>
         <Logger name="Minecraft" level="all" additivity="false">
-            <AppenderRef ref="DefaultConsole" level="info"/>
+            <AppenderRef ref="DefaultConsole" level="debug"/>
             <AppenderRef ref="File"/>
         </Logger>
         <Logger name="STDOUT" level="all" additivity="false">
@@ -38,7 +38,7 @@
         </Logger>
         <!-- Log all other messages with prefix. -->
         <Root level="all">
-            <AppenderRef ref="Console" level="info"/>
+            <AppenderRef ref="Console" level="debug"/>
             <AppenderRef ref="File"/>
         </Root>
     </Loggers>

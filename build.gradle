@@ -150,9 +150,8 @@ idea.module {
 runConfigurations {
     theConfig {
         name = 'Lantern Server'
-        mainClass = 'org.lanternpowered.server.LanternLaunch'
+        mainClass = 'org.lanternpowered.launch.LanternLaunch'
         workingDirectory = 'run'
-        vmOptions = '-Dlog4j.configurationFile=log4j2_indev.xml'
     }
 }
 
@@ -198,6 +197,12 @@ import groovy.json.JsonOutput
 
 processResources {
     from 'LICENSE.txt'
+
+    // Remove the indev log4j2.xml and rename the production one
+    exclude 'log4j2.xml'
+    rename { name ->
+        name == 'log4j2_prod.xml' ? 'log4j2.xml' : name
+    }
 
     // Minimize the json files
     doLast {

@@ -34,6 +34,7 @@ import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
+import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,15 +62,18 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
     }
 
     @Override
-    Result match(CraftingMatrix craftingMatrix, boolean resultItem, boolean remainingItems) {
+    public Optional<Result> match(CraftingMatrix craftingMatrix, @Nullable World world, int flags) {
         final int w = craftingMatrix.width();
         final int h = craftingMatrix.height();
         final int s = w * h;
 
         // Check if all the ingredients can fit in the crafting grid
         if (this.ingredients.size() > s) {
-            return null;
+            return Optional.empty();
         }
+
+        final boolean resultItem = (flags & Flags.RESULT_ITEM) != 0;
+        final boolean remainingItems = (flags & Flags.REMAINING_ITEMS) != 0;
 
         final List<Ingredient> ingredients = new ArrayList<>(this.ingredients);
         // Generate a ingredient map that can be useful to generate a result item
@@ -104,7 +108,7 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
                 }
                 // A faulty input ingredient was found
                 if (!success) {
-                    return null;
+                    return Optional.empty();
                 }
                 if (remainingItemsBuilder != null) {
                     remainingItemsBuilder.add(remainingItem.map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE));
@@ -114,17 +118,17 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
 
         // Not all the ingredients were found
         if (!ingredients.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
         // Generate the result item
-        ItemStack resultItemStack = null;
+        ItemStackSnapshot resultItemStack = null;
         if (resultItem) {
-            resultItemStack = this.resultProvider.get(craftingMatrix,
+            resultItemStack = this.resultProvider.getSnapshot(craftingMatrix,
                     ingredientItems == null ? null : new SimpleIngredientList(ingredientItems));
             checkNotNull(resultItemStack, "Something funky happened.");
         }
 
-        return new Result(resultItemStack, remainingItemsBuilder == null ? null : remainingItemsBuilder.build());
+        return Optional.of(new Result(resultItemStack, remainingItemsBuilder == null ? null : remainingItemsBuilder.build()));
     }
 }

@@ -35,6 +35,11 @@ import javax.annotation.Nullable;
 
 public interface IShapelessCraftingRecipe extends ShapelessCraftingRecipe, ICraftingRecipe {
 
+    /**
+     * Creates a new {@link Builder}.
+     *
+     * @return The builder
+     */
     static Builder builder() {
         return Sponge.getRegistry().createBuilder(Builder.class);
     }

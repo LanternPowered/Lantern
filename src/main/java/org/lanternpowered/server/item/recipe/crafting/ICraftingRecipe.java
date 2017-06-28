@@ -45,6 +45,11 @@ import java.util.Optional;
  */
 public interface ICraftingRecipe extends CraftingRecipe {
 
+    @Override
+    default Optional<String> getGroup() {
+        return Optional.empty();
+    }
+
     /**
      * Checks if the given {@link CraftingMatrix} fits the required constraints
      * to craft this {@link ICraftingRecipe}.

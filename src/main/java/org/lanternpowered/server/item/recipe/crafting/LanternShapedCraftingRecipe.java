@@ -36,6 +36,7 @@ import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
+import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
     }
 
     @Override
-    Result match(CraftingMatrix craftingMatrix, boolean resultItem, boolean remainingItems) {
+    public Optional<Result> match(CraftingMatrix craftingMatrix, @Nullable World world, int flags) {
         final int w = craftingMatrix.width();
         final int h = craftingMatrix.height();
 
@@ -83,7 +84,7 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         int rh = getHeight();
 
         if (rw > w || rh > h) {
-            return null;
+            return Optional.empty();
         }
 
         rw = w - rw + 1;
@@ -91,14 +92,14 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
 
         for (int i = 0; i < rw; i++) {
             for (int j = 0; j < rh; j++) {
-                final Result result = matchAt(craftingMatrix, i, j, resultItem, remainingItems);
+                final Result result = matchAt(craftingMatrix, i, j, flags);
                 if (result != null) {
-                    return result;
+                    return Optional.of(result);
                 }
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -110,7 +111,8 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
      * @param y The initial y coordinate
      * @return Whether the recipe matches
      */
-    private Result matchAt(CraftingMatrix craftingMatrix, int x, int y, boolean resultItem, boolean remainingItems) {
+    @Nullable
+    private Result matchAt(CraftingMatrix craftingMatrix, int x, int y, int flags) {
         final int cw = craftingMatrix.width();
         final int ch = craftingMatrix.height();
 
@@ -124,6 +126,8 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         if (ew > cw || eh > ch) {
             return null;
         }
+
+        final boolean resultItem = (flags & Flags.RESULT_ITEM) != 0;
 
         // Generate a ingredient map that can be useful to generate a result item
         final Multimap<Ingredient, ItemStack> ingredientItems = resultItem &&
@@ -150,9 +154,9 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         }
 
         // Generate the result item
-        ItemStack resultItemStack = null;
+        ItemStackSnapshot resultItemStack = null;
         if (resultItem) {
-            resultItemStack = this.resultProvider.get(craftingMatrix,
+            resultItemStack = this.resultProvider.getSnapshot(craftingMatrix,
                     ingredientItems == null ? null : new SimpleIngredientList(ingredientItems));
             checkNotNull(resultItemStack, "Something funky happened.");
         }
@@ -161,7 +165,7 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         // slot, even empty ones, empty ones are added as a empty remaining
         // item.
         List<ItemStackSnapshot> remainingItemsList = null;
-        if (remainingItems) {
+        if ((flags & Flags.REMAINING_ITEMS) != 0) {
             final List<ItemStackSnapshot> builder = new ArrayList<>();
             for (int i = 0; i < ch * cw; i++) {
                 builder.add(ItemStackSnapshot.NONE);

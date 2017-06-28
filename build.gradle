@@ -308,6 +308,7 @@ task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
 
 task sourceJar(type: Jar) {
     classifier = 'sources'
+    duplicatesStrategy = 'exclude'
 
     from sourceSets.java6.allSource
     from sourceSets.main.allSource

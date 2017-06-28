@@ -253,8 +253,8 @@ public final class ValueCollection implements Copyable<ValueCollection> {
 
     private <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerSupplied(
             Key<? extends V> key, E defaultValue,
-            Function<IValueContainer, E> minimumSupplier,
-            Function<IValueContainer, E> maximumSupplier) {
+            Function<IValueContainer<?>, E> minimumSupplier,
+            Function<IValueContainer<?>, E> maximumSupplier) {
         checkKey(key);
         final ElementProcessorBuilder<V, E> builder = ElementProcessorBuilder.create(key);
         final boolean immutable = key.getValueToken().getRawType().isAssignableFrom(ImmutableValue.class);
@@ -354,18 +354,18 @@ public final class ValueCollection implements Copyable<ValueCollection> {
         return element;
     }
 
-    public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
-            E defaultValue, Function<IValueContainer, E> minimumSupplier, Function<IValueContainer, E> maximumSupplier) {
+    public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerWithSuppliedBounds(Key<? extends V> key,
+            E defaultValue, Function<IValueContainer<?>, E> minimumSupplier, Function<IValueContainer<?>, E> maximumSupplier) {
         return registerSupplied(key, defaultValue, minimumSupplier, maximumSupplier);
     }
 
-    public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
-            E defaultValue, E minimum, Function<IValueContainer, E> maximumSupplier) {
+    public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerWithSuppliedMax(Key<? extends V> key,
+            E defaultValue, E minimum, Function<IValueContainer<?>, E> maximumSupplier) {
         return registerSupplied(key, defaultValue, container -> minimum, maximumSupplier);
     }
 
-    public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
-            E defaultValue, Function<IValueContainer, E> minimumSupplier, E maximum) {
+    public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerWithSuppliedMin(Key<? extends V> key,
+            E defaultValue, Function<IValueContainer<?>, E> minimumSupplier, E maximum) {
         return registerSupplied(key, defaultValue, minimumSupplier, container -> maximum);
     }
 

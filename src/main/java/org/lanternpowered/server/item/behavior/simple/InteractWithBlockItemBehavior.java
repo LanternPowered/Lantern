@@ -46,6 +46,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
+@SuppressWarnings("ConstantConditions")
 public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
 
     @Override
@@ -57,7 +58,6 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
 
         final Direction blockFace = context.get(Parameters.INTERACTION_FACE).get();
         Location<World> location = optLocation.get();
-        //noinspection ConstantConditions
         if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
             location = location.add(blockFace.getOpposite().asBlockOffset());
         }
@@ -70,7 +70,7 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
 
         // Continue processing through the placement pipeline
         final boolean success = context.process(blockType.getPipeline().pipeline(PlaceBlockBehavior.class),
-                (context1, behavior1) -> behavior1.tryPlace(pipeline, context1));
+                (context1, behavior1) -> behavior1.tryPlace(pipeline, context1)).isSuccess();
 
         if (success) {
             for (BlockSnapshot blockSnapshot : context.getBlockSnapshots()) {

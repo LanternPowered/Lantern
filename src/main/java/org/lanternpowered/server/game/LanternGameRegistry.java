@@ -76,6 +76,7 @@ import org.lanternpowered.server.data.type.LanternPistonType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
 import org.lanternpowered.server.data.type.LanternWallType;
+import org.lanternpowered.server.data.type.record.RecordType;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
@@ -127,6 +128,7 @@ import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModul
 import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RailDirectionRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.RecordTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
@@ -584,6 +586,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
                 .registerModule(new AdvancementTreeRegistryModule())
                 .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
+                .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

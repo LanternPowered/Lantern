@@ -31,7 +31,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
@@ -458,7 +457,7 @@ public class PlayerContainerSession {
                     .build();
 
             final List<Entity> entities = new ArrayList<>();
-            entities.add(this.createDroppedItem(itemStack.get().createSnapshot()));
+            entities.add(createDroppedItem(itemStack.get().createSnapshot()));
 
             final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
             Sponge.getEventManager().post(event);
@@ -974,6 +973,7 @@ public class PlayerContainerSession {
     private Entity createDroppedItem(ItemStackSnapshot snapshot) {
         final Entity entity = this.player.getWorld().createEntity(EntityTypes.ITEM, this.player.getPosition());
         entity.offer(Keys.REPRESENTED_ITEM, snapshot);
+        entity.offer(Keys.PICKUP_DELAY, 60);
         return entity;
     }
 

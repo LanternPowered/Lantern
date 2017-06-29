@@ -23,32 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior;
+package org.lanternpowered.server.data.type.record;
 
-public enum BehaviorResult {
-    /**
-     * The block interaction was a success and the result
-     * should be returned directly.
-     */
-    SUCCESS,
-    /**
-     * Continue to the next {@link Behavior} in the context and
-     * keep all the stored changes.
-     */
-    CONTINUE,
-    /**
-     * The current {@link Behavior} failed failed. The pipeline
-     * handling will be interrupted.
-     */
-    FAIL,
-    /**
-     * The current {@link Behavior} failed and silently
-     * move to the next behavior, discarding all the current changes.
-     */
-    PASS,
-    ;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 
-    public boolean isSuccess() {
-        return this == SUCCESS || this == CONTINUE;
+public class LanternRecordType extends PluginCatalogType.Base.Translatable.Internal implements RecordType {
+
+    public LanternRecordType(String pluginId, String name, String translation, int internalId) {
+        super(pluginId, name, translation, internalId);
     }
 }

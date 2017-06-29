@@ -134,6 +134,8 @@ public final class LanternKeys {
             makeOptionalKey(AdvancementTree.class, DataQuery.of("OpenAdvancementTree"), "lantern:open_advancement_tree");
     public static final Key<Value<Boolean>> ARE_PLAYING =
             makeValueKey(Boolean.class, DataQuery.of("ArePlaying"), "lantern:are_playing");
+    public static final Key<Value<Boolean>> HAS_RECORD =
+            makeValueKey(Boolean.class, DataQuery.of("HasRecord"), "lantern:has_record");
 
     private LanternKeys() {
     }

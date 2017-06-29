@@ -28,6 +28,7 @@ package org.lanternpowered.server.entity.living.player;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
+import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
@@ -257,7 +258,7 @@ public final class PlayerInteractionHandler {
         final BlockState blockState = location.getBlock();
         final LanternBlockType blockType = (LanternBlockType) blockState.getType();
         if (context.process(blockType.getPipeline().pipeline(BreakBlockBehavior.class),
-                (ctx, behavior) -> behavior.tryBreak(blockType.getPipeline(), ctx))) {
+                (ctx, behavior) -> behavior.tryBreak(blockType.getPipeline(), ctx)).isSuccess()) {
             context.accept();
 
             this.diggingBlock = null;
@@ -325,7 +326,7 @@ public final class PlayerInteractionHandler {
         context.set(Parameters.INTERACTION_LOCATION, clickedLocation);
         context.set(Parameters.PLAYER, this.player);
 
-        final BehaviorContextImpl.Snapshot snapshot = context.createSnapshot();
+        BehaviorContextImpl.Snapshot snapshot = context.createSnapshot();
 
         if (!this.player.get(Keys.IS_SNEAKING).orElse(false)) {
             final BlockState blockState = this.player.getWorld().getBlock(message.getPosition());
@@ -339,8 +340,14 @@ public final class PlayerInteractionHandler {
             context.set(Parameters.USED_SLOT, hotbarSlot);
             context.set(Parameters.INTERACTION_HAND, HandTypes.MAIN_HAND);
 
-            if (context.process(blockType.getPipeline().pipeline(InteractWithBlockBehavior.class),
-                    (ctx, behavior) -> behavior.tryInteract(blockType.getPipeline(), ctx))) {
+            final BehaviorResult result = context.process(blockType.getPipeline().pipeline(InteractWithBlockBehavior.class),
+                    (ctx, behavior) -> behavior.tryInteract(blockType.getPipeline(), ctx));
+            if (result.isSuccess()) {
+                snapshot = context.createSnapshot();
+                // We can still continue, doing other operations
+                if (result == BehaviorResult.CONTINUE) {
+                    handleMainHandItemInteraction(context, snapshot);
+                }
                 context.accept();
                 return;
             }
@@ -350,8 +357,12 @@ public final class PlayerInteractionHandler {
             context.set(Parameters.USED_SLOT, offHandSlot);
             context.set(Parameters.INTERACTION_HAND, HandTypes.OFF_HAND);
 
-            if (context.process(blockType.getPipeline().pipeline(InteractWithBlockBehavior.class),
-                    (ctx, behavior) -> behavior.tryInteract(blockType.getPipeline(), ctx))) {
+            if (result.isSuccess()) {
+                snapshot = context.createSnapshot();
+                // We can still continue, doing other operations
+                if (result == BehaviorResult.CONTINUE) {
+                    handleOffHandItemInteraction(context, snapshot);
+                }
                 context.accept();
                 return;
             }
@@ -412,7 +423,7 @@ public final class PlayerInteractionHandler {
             context.set(Parameters.ITEM_TYPE, itemType);
 
             if (context.process(itemType.getPipeline().pipeline(FinishUsingItemBehavior.class),
-                    (ctx, behavior) -> behavior.tryUse(itemType.getPipeline(), ctx))) {
+                    (ctx, behavior) -> behavior.tryUse(itemType.getPipeline(), ctx)).isSuccess()) {
                 context.accept();
             }
         }
@@ -474,49 +485,53 @@ public final class PlayerInteractionHandler {
         }
     }
 
-    private boolean handleItemInteraction(BehaviorContextImpl context, BehaviorContextImpl.Snapshot snapshot) {
+    private boolean isInteracting() {
+        return this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty()).isPresent();
+    }
+
+    private boolean handleOffHandItemInteraction(BehaviorContextImpl context,
+            @Nullable BehaviorContextImpl.Snapshot snapshot) {
+        return handleHandItemInteraction(context, HandTypes.OFF_HAND,
+                this.player.getInventory().getOffhand(), snapshot);
+    }
+
+    private boolean handleMainHandItemInteraction(BehaviorContextImpl context,
+            @Nullable BehaviorContextImpl.Snapshot snapshot) {
+        return handleHandItemInteraction(context, HandTypes.MAIN_HAND,
+                this.player.getInventory().getHotbar().getSelectedSlot(), snapshot);
+    }
+
+    private boolean handleHandItemInteraction(BehaviorContextImpl context, HandType handType, LanternSlot slot,
+            @Nullable BehaviorContextImpl.Snapshot snapshot) {
         final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
         // The player is already interacting
         if (activeHand.isPresent()) {
             return true;
         }
-
-        // Try the action of the hotbar item first
-        final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
-        final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
-
-        Optional<ItemStack> handItem = hotbarSlot.peek();
+        final Optional<ItemStack> handItem = slot.peek();
         if (handItem.isPresent()) {
             final LanternItemType itemType = (LanternItemType) handItem.get().getItem();
             context.set(Parameters.USED_ITEM_STACK, handItem.get());
-            context.set(Parameters.USED_SLOT, hotbarSlot);
-            context.set(Parameters.INTERACTION_HAND, HandTypes.MAIN_HAND);
+            context.set(Parameters.USED_SLOT, slot);
+            context.set(Parameters.INTERACTION_HAND, handType);
             context.set(Parameters.ITEM_TYPE, itemType);
 
-            if (context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
-                    (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx))) {
+            final BehaviorResult result = context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
+                    (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx));
+            if (result.isSuccess()) {
                 context.accept();
                 return true;
             }
-
-            context.restoreSnapshot(snapshot);
-        }
-
-        handItem = offHandSlot.peek();
-        if (handItem.isPresent()) {
-            final LanternItemType itemType = (LanternItemType) handItem.get().getItem();
-            context.set(Parameters.USED_ITEM_STACK, handItem.get());
-            context.set(Parameters.USED_SLOT, offHandSlot);
-            context.set(Parameters.INTERACTION_HAND, HandTypes.OFF_HAND);
-            context.set(Parameters.ITEM_TYPE, itemType);
-
-            if (context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
-                    (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx))) {
-                context.accept();
-                return true;
+            if (snapshot != null) {
+                context.restoreSnapshot(snapshot);
             }
         }
-
         return false;
+    }
+
+    private boolean handleItemInteraction(BehaviorContextImpl context, BehaviorContextImpl.Snapshot snapshot) {
+        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+        return activeHand.isPresent() || handleMainHandItemInteraction(context, snapshot) ||
+                handleOffHandItemInteraction(context, null);
     }
 }

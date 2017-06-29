@@ -172,7 +172,7 @@ public interface BehaviorContext {
      */
     void populateBlockSnapshot(BlockSnapshot.Builder builder, int populationFlags);
 
-    <B extends Behavior> boolean process(BehaviorPipeline<B> pipeline, BehaviorProcessFunction<B> function);
+    <B extends Behavior> BehaviorResult process(BehaviorPipeline<B> pipeline, BehaviorProcessFunction<B> function);
 
     final class PopulationFlags {
 

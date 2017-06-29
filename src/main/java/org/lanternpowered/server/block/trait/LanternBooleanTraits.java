@@ -50,4 +50,6 @@ public final class LanternBooleanTraits {
     public static final BooleanTrait POWERED = LanternBooleanTrait.of("powered", Keys.POWERED);
 
     public static final BooleanTrait EXPLODE = LanternBooleanTrait.of("explode", LanternKeys.EXPLODE);
+
+    public static final BooleanTrait HAS_RECORD = LanternBooleanTrait.of("has_record", LanternKeys.HAS_RECORD);
 }

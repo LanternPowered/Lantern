@@ -23,32 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-public enum BehaviorResult {
-    /**
-     * The block interaction was a success and the result
-     * should be returned directly.
-     */
-    SUCCESS,
-    /**
-     * Continue to the next {@link Behavior} in the context and
-     * keep all the stored changes.
-     */
-    CONTINUE,
-    /**
-     * The current {@link Behavior} failed failed. The pipeline
-     * handling will be interrupted.
-     */
-    FAIL,
-    /**
-     * The current {@link Behavior} failed and silently
-     * move to the next behavior, discarding all the current changes.
-     */
-    PASS,
-    ;
+import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.data.type.record.RecordType;
+import org.lanternpowered.server.network.message.Message;
 
-    public boolean isSuccess() {
-        return this == SUCCESS || this == CONTINUE;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+
+public final class MessagePlayOutRecord implements Message {
+
+    private final Vector3i position;
+    @Nullable private final RecordType recordType;
+
+    public MessagePlayOutRecord(Vector3i position, @Nullable RecordType recordType) {
+        this.position = position;
+        this.recordType = recordType;
+    }
+
+    public Vector3i getPosition() {
+        return this.position;
+    }
+
+    public Optional<RecordType> getRecord() {
+        return Optional.ofNullable(this.recordType);
     }
 }

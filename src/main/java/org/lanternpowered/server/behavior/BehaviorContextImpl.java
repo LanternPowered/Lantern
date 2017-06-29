@@ -37,6 +37,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -52,7 +53,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,7 +63,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "ConstantConditions"})
 public class BehaviorContextImpl implements BehaviorContext {
 
     public static final class Snapshot implements BehaviorContext.Snapshot {
@@ -109,6 +109,7 @@ public class BehaviorContextImpl implements BehaviorContext {
 
     @Override
     public void restoreSnapshot(BehaviorContext.Snapshot snapshot) {
+        checkNotNull(snapshot, "snapshot");
         final Snapshot snapshot1 = (Snapshot) snapshot;
         this.parameterValues = new Int2ObjectOpenHashMap<>(snapshot1.parameterValues);
         this.blockSnapshots = new HashMap<>(snapshot1.blockSnapshots);
@@ -285,37 +286,33 @@ public class BehaviorContextImpl implements BehaviorContext {
     }
 
     @Override
-    public <B extends Behavior> boolean process(BehaviorPipeline<B> pipeline, BehaviorProcessFunction<B> function) {
+    public <B extends Behavior> BehaviorResult process(BehaviorPipeline<B> pipeline, BehaviorProcessFunction<B> function) {
         Snapshot snapshot = null;
         BehaviorResult result = null;
-        final Iterator<B> it = pipeline.getBehaviors().iterator();
-        while (it.hasNext()) {
-            final B behavior = it.next();
-            if (snapshot == null && it.hasNext()) {
+        for (B behavior : pipeline.getBehaviors()) {
+            if (snapshot == null) {
                 snapshot = createSnapshot();
             }
-            //noinspection unchecked
             result = function.process(this, behavior);
             if (result == BehaviorResult.SUCCESS) {
-                return true;
+                return result;
             } else if (result == BehaviorResult.PASS) {
-                if (it.hasNext()) {
-                    restoreSnapshot(snapshot);
-                }
+                restoreSnapshot(snapshot);
             } else if (result == BehaviorResult.FAIL) {
-                return false;
+                return result;
             } else if (result == BehaviorResult.CONTINUE) {
-                if (it.hasNext()) {
-                    snapshot = createSnapshot();
-                }
+                snapshot = createSnapshot();
             }
         }
-        return !(result == null || result == BehaviorResult.PASS);
+        return result == null ? BehaviorResult.FAIL : result;
     }
 
     public void accept() {
         for (Map.Entry<Location<World>, BlockSnapshot> entry : this.blockSnapshots.entrySet()) {
             entry.getValue().restore(true, BlockChangeFlag.ALL);
+        }
+        for (SlotTransaction slotTransaction : this.slotTransactions) {
+            slotTransaction.getSlot().set(LanternItemStack.toNullable(slotTransaction.getFinal()));
         }
     }
 }

@@ -170,6 +170,7 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
@@ -469,7 +470,9 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutChangeGameState.class, MessagePlayOutChangeGameState.class);
         outbound.bind(CodecInOutPing.class, MessageInOutKeepAlive.class);
         outbound.bind(CodecPlayOutChunkData.class, MessagePlayOutChunkData.class);
-        outbound.bind(CodecPlayOutEffect.class, MessagePlayOutEffect.class);
+        final CodecRegistration<Message, CodecPlayOutEffect> codecPlayOutEntityEffect = outbound.bind(CodecPlayOutEffect.class);
+        codecPlayOutEntityEffect.bind(MessagePlayOutEffect.class);
+        codecPlayOutEntityEffect.bind(MessagePlayOutRecord.class);
         outbound.bind(CodecPlayOutSpawnParticle.class, MessagePlayOutSpawnParticle.class);
         outbound.bind(CodecPlayOutPlayerJoinGame.class, MessagePlayOutPlayerJoinGame.class);
         outbound.bind(); // TODO: Map

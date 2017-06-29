@@ -26,21 +26,37 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
+import io.netty.handler.codec.EncoderException;
+import org.lanternpowered.server.data.type.record.LanternRecordType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 
-public final class CodecPlayOutEffect implements Codec<MessagePlayOutEffect> {
+public final class CodecPlayOutEffect implements Codec<Message> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutEffect message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, Message message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeInteger(message.getType());
-        buf.write(Types.VECTOR_3_I, message.getPosition());
-        buf.writeInteger(message.getData());
-        buf.writeBoolean(message.isBroadcast());
+        if (message instanceof MessagePlayOutEffect) {
+            final MessagePlayOutEffect message1 = (MessagePlayOutEffect) message;
+            buf.writeInteger(message1.getType());
+            buf.write(Types.VECTOR_3_I, message1.getPosition());
+            buf.writeInteger(message1.getData());
+            buf.writeBoolean(message1.isBroadcast());
+        } else if (message instanceof MessagePlayOutRecord) {
+            final MessagePlayOutRecord message1 = (MessagePlayOutRecord) message;
+            buf.writeInteger(1010);
+            buf.write(Types.VECTOR_3_I, message1.getPosition());
+            buf.writeInteger(message1.getRecord()
+                    .map(type -> 2256 + ((LanternRecordType) type).getInternalId()).orElse(0));
+            buf.writeBoolean(false);
+        } else {
+            throw new EncoderException("Unsupported message type: " + message.getClass().getName());
+        }
         return buf;
     }
 }

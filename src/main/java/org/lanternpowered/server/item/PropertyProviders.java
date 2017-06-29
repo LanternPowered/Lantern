@@ -28,12 +28,14 @@ package org.lanternpowered.server.item;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.data.type.record.RecordType;
 import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
 import org.lanternpowered.server.item.property.CooldownProperty;
 import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
+import org.lanternpowered.server.item.property.RecordProperty;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
@@ -243,6 +245,13 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(EquipmentProperty.class, (itemType, itemStack) ->
                         new EquipmentProperty(equipmentType.get(itemType, itemStack)))
+                .build();
+    }
+
+    public static PropertyProviderCollection recordType(RecordType recordType) {
+        final RecordProperty property = new RecordProperty(recordType);
+        return PropertyProviderCollection.builder()
+                .add(RecordProperty.class, (itemType, itemStack) -> property)
                 .build();
     }
 

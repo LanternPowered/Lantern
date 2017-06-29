@@ -34,6 +34,7 @@ import static org.lanternpowered.server.item.PropertyProviders.dualWield;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.item.PropertyProviders.foodRestoration;
 import static org.lanternpowered.server.item.PropertyProviders.maximumUseDuration;
+import static org.lanternpowered.server.item.PropertyProviders.recordType;
 import static org.lanternpowered.server.item.PropertyProviders.saturation;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
 import static org.lanternpowered.server.item.PropertyProviders.useDuration;
@@ -46,6 +47,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDyeColor;
+import org.lanternpowered.server.data.type.record.RecordType;
+import org.lanternpowered.server.data.type.record.RecordTypes;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
@@ -53,6 +56,7 @@ import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.RecordTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
@@ -109,6 +113,7 @@ import java.util.function.Function;
         FishRegistryModule.class,
         CookedFishRegistryModule.class,
         PotionEffectTypeRegistryModule.class,
+        RecordTypeRegistryModule.class,
 })
 public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
 
@@ -1661,62 +1666,62 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////
         ///   Record 13   ///
         /////////////////////
-        register(2256, recordBuilder("13")
+        register(2256, recordBuilder(RecordTypes.THIRTEEN)
                 .build("minecraft", "record_13"));
         //////////////////////
         ///   Record Cat   ///
         //////////////////////
-        register(2257, recordBuilder("cat")
+        register(2257, recordBuilder(RecordTypes.CAT)
                 .build("minecraft", "record_cat"));
         /////////////////////////
         ///   Record Blocks   ///
         /////////////////////////
-        register(2258, recordBuilder("blocks")
+        register(2258, recordBuilder(RecordTypes.BLOCKS)
                 .build("minecraft", "record_blocks"));
         ////////////////////////
         ///   Record Chirp   ///
         ////////////////////////
-        register(2259, recordBuilder("chirp")
+        register(2259, recordBuilder(RecordTypes.CHIRP)
                 .build("minecraft", "record_chirp"));
         //////////////////////
         ///   Record Far   ///
         //////////////////////
-        register(2260, recordBuilder("far")
+        register(2260, recordBuilder(RecordTypes.FAR)
                 .build("minecraft", "record_far"));
         ///////////////////////
         ///   Record Mall   ///
         ///////////////////////
-        register(2261, recordBuilder("mall")
+        register(2261, recordBuilder(RecordTypes.MALL)
                 .build("minecraft", "record_mall"));
         //////////////////////////
         ///   Record Mellohi   ///
         //////////////////////////
-        register(2262, recordBuilder("mellohi")
+        register(2262, recordBuilder(RecordTypes.MELLOHI)
                 .build("minecraft", "record_mellohi"));
         ///////////////////////
         ///   Record Stal   ///
         ///////////////////////
-        register(2263, recordBuilder("stal")
+        register(2263, recordBuilder(RecordTypes.STAL)
                 .build("minecraft", "record_stal"));
         /////////////////////
         ///   Record Strad   ///
         /////////////////////
-        register(2264, recordBuilder("strad")
+        register(2264, recordBuilder(RecordTypes.STRAD)
                 .build("minecraft", "record_strad"));
         ///////////////////////
         ///   Record Ward   ///
         ///////////////////////
-        register(2265, recordBuilder("ward")
+        register(2265, recordBuilder(RecordTypes.WARD)
                 .build("minecraft", "record_ward"));
         /////////////////////
         ///   Record 11   ///
         /////////////////////
-        register(2266, recordBuilder("11")
+        register(2266, recordBuilder(RecordTypes.ELEVEN)
                 .build("minecraft", "record_11"));
         ///////////////////////
         ///   Record Wait   ///
         ///////////////////////
-        register(2267, recordBuilder("wait")
+        register(2267, recordBuilder(RecordTypes.WAIT)
                 .build("minecraft", "record_wait"));
         try {
             ReflectionHelper.setField(ItemStackSnapshot.class.getField("NONE"), null,
@@ -1744,10 +1749,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 });
     }
 
-    private ItemTypeBuilder recordBuilder(String name) {
+    private ItemTypeBuilder recordBuilder(RecordType recordType) {
         return builder()
                 .maxStackQuantity(1)
-                .translation(String.format("item.record.%s.desc", name));
+                .properties(builder -> builder
+                        .add(recordType(recordType)))
+                .translation(tr("item.record.name"));
     }
 
     private TranslationProvider coloredTranslation(String pattern, DyeColor defaultColor) {
@@ -1758,10 +1765,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     private ItemTypeBuilder durableBuilder(int useLimit) {
         return builder()
                 .maxStackQuantity(1)
-                .properties(builder -> useLimit(useLimit))
+                .properties(builder -> builder
+                        .add(useLimit(useLimit)))
                 .keysProvider(c -> {
                     c.register(Keys.ITEM_DURABILITY, 0);
-                    c.register(Keys.UNBREAKABLE, true); // True until durability is implemented
+                    c.register(Keys.UNBREAKABLE, true); // TODO: True until durability is implemented
                 });
     }
 

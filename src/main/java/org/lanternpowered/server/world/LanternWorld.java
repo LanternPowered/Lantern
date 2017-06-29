@@ -1362,7 +1362,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         consumer.accept(context);
         // Just pass an object trough to make sure that a value is present when successful
         return context.process(pipeline.pipeline(InteractWithBlockBehavior.class),
-                (ctx, behavior) -> behavior.tryInteract(pipeline, ctx));
+                (ctx, behavior) -> behavior.tryInteract(pipeline, ctx)).isSuccess();
     }
 
     @Override
@@ -1376,7 +1376,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         context.set(Parameters.BLOCK_TYPE, blockType);
         // Just pass an object trough to make sure that a value is present when successful
         return context.process(pipeline.pipeline(PlaceBlockBehavior.class),
-                (ctx, behavior) -> behavior.tryPlace(pipeline, ctx));
+                (ctx, behavior) -> behavior.tryPlace(pipeline, ctx)).isSuccess();
     }
 
     @Override

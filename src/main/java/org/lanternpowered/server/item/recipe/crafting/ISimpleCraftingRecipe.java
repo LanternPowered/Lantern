@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.recipe;
+package org.lanternpowered.server.item.recipe.crafting;
 
 import org.lanternpowered.server.item.recipe.crafting.CraftingMatrix;
 import org.lanternpowered.server.item.recipe.crafting.ICraftingRecipe;

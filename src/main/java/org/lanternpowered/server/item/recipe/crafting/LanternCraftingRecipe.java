@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.item.recipe.crafting;
 
-import org.lanternpowered.server.item.recipe.ISimpleCraftingRecipe;
 import org.lanternpowered.server.item.recipe.LanternRecipe;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 

@@ -48,6 +48,8 @@ import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,9 +63,10 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class BehaviorContextImpl implements BehaviorContext {
 
-    public static final class Snapshot {
+    public static final class Snapshot implements BehaviorContext.Snapshot {
 
         private final Int2ObjectMap<Object> parameterValues;
         private final Map<Location<World>, BlockSnapshot> blockSnapshots;
@@ -95,6 +98,7 @@ public class BehaviorContextImpl implements BehaviorContext {
         this.cause = cause;
     }
 
+    @Override
     public Snapshot createSnapshot() {
         return new Snapshot(new Int2ObjectOpenHashMap<>(this.parameterValues),
                 ImmutableMap.copyOf(this.blockSnapshots),
@@ -103,19 +107,20 @@ public class BehaviorContextImpl implements BehaviorContext {
                 ImmutableSet.copyOf(this.entitySnapshots), this.cause);
     }
 
-    public void restoreSnapshot(Snapshot snapshot) {
-        this.parameterValues = new Int2ObjectOpenHashMap<>(snapshot.parameterValues);
-        this.blockSnapshots = new HashMap<>(snapshot.blockSnapshots);
-        this.positionlessBlockSnapshots = new HashSet<>(snapshot.positionlessBlockSnapshots);
-        this.slotTransactions = new HashSet<>(snapshot.slotTransactions);
-        this.entitySnapshots = new HashSet<>(snapshot.entitySnapshots);
-        this.cause = snapshot.cause;
+    @Override
+    public void restoreSnapshot(BehaviorContext.Snapshot snapshot) {
+        final Snapshot snapshot1 = (Snapshot) snapshot;
+        this.parameterValues = new Int2ObjectOpenHashMap<>(snapshot1.parameterValues);
+        this.blockSnapshots = new HashMap<>(snapshot1.blockSnapshots);
+        this.positionlessBlockSnapshots = new HashSet<>(snapshot1.positionlessBlockSnapshots);
+        this.slotTransactions = new HashSet<>(snapshot1.slotTransactions);
+        this.entitySnapshots = new HashSet<>(snapshot1.entitySnapshots);
+        this.cause = snapshot1.cause;
     }
 
     @Override
     public <V> Optional<V> get(Parameter<V> parameter) {
         checkNotNull(parameter, "parameter");
-        //noinspection unchecked
         return Optional.ofNullable((V) this.parameterValues.get(parameter.getIndex()));
     }
 
@@ -142,6 +147,11 @@ public class BehaviorContextImpl implements BehaviorContext {
     @Override
     public void insertCause(NamedCause cause) {
         this.cause = Cause.builder().from(this.cause).named(cause).build();
+    }
+
+    @Override
+    public Collection<BlockSnapshot> getBlockSnapshots() {
+        return Collections.unmodifiableCollection(this.blockSnapshots.values());
     }
 
     @Override

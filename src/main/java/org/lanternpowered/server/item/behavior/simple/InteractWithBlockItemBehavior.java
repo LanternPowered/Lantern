@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.item.behavior.simple;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -33,9 +35,11 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -62,11 +66,25 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
         final LanternBlockType blockType = (LanternBlockType) context.get(Parameters.ITEM_TYPE).get().getBlock().get();
         context.set(Parameters.BLOCK_TYPE, blockType);
 
+        final BehaviorContext.Snapshot snapshot = context.createSnapshot();
+
         // Continue processing through the placement pipeline
         final boolean success = context.process(blockType.getPipeline().pipeline(PlaceBlockBehavior.class),
                 (context1, behavior1) -> behavior1.tryPlace(pipeline, context1));
 
         if (success) {
+            for (BlockSnapshot blockSnapshot : context.getBlockSnapshots()) {
+                final Location<World> location1 = blockSnapshot.getLocation().get();
+                final int buildHeight = location1.getExtent().getDimension().getBuildHeight();
+                // Check if the block is placed within the building limits
+                if (location1.getBlockY() >= buildHeight) {
+                    context.restoreSnapshot(snapshot);
+                    context.get(Parameters.PLAYER).ifPresent(player -> {
+                        player.sendMessage(ChatTypes.ACTION_BAR, t("build.tooHigh", buildHeight));
+                    });
+                    return BehaviorResult.FAIL;
+                }
+            }
             context.get(Parameters.PLAYER).ifPresent(player -> {
                 if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
                     context.tryGet(Parameters.USED_SLOT).poll(1);

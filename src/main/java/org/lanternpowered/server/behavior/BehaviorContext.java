@@ -35,6 +35,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -44,6 +45,27 @@ import javax.annotation.Nullable;
 
 public interface BehaviorContext {
 
+    interface Snapshot {
+
+    }
+
+    /**
+     * Sets the value for the provided {@link Parameter}.
+     *
+     * @param parameter The parameter
+     * @param value The value
+     * @param <V> The value type
+     */
+    <V> void set(Parameter<V> parameter, @Nullable V value);
+
+    /**
+     * Gets the value for the provided
+     * {@link Parameter}, if present.
+     *
+     * @param parameter The parameter
+     * @param <V> The value type
+     * @return The value, if present
+     */
     <V> Optional<V> get(Parameter<V> parameter);
 
     default <V> V tryGet(Parameter<V> parameter) {
@@ -51,7 +73,19 @@ public interface BehaviorContext {
                 new IllegalStateException("The parameter " + parameter.getName() + " doesn't exist in this context."));
     }
 
-    <V> void set(Parameter<V> parameter, @Nullable V value);
+    /**
+     * Creates a {@link Snapshot}.
+     *
+     * @return The snapshot
+     */
+    Snapshot createSnapshot();
+
+    /**
+     * Restores the specified {@link Snapshot}.
+     *
+     * @param snapshot The snapshot
+     */
+    void restoreSnapshot(Snapshot snapshot);
 
     /**
      * The cause that triggered the block placement.
@@ -74,6 +108,13 @@ public interface BehaviorContext {
      * @param cause The named cause
      */
     void insertCause(NamedCause cause);
+
+    /**
+     * Gets all the {@link BlockSnapshot}s.
+     *
+     * @return The block snapshots
+     */
+    Collection<BlockSnapshot> getBlockSnapshots();
 
     void addEntity(EntitySnapshot entitySnapshot);
 

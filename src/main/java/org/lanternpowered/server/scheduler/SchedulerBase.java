@@ -31,6 +31,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -93,7 +94,7 @@ abstract class SchedulerBase {
 
     protected Set<Task> getScheduledTasks() {
         synchronized (this.taskMap) {
-            return Sets.newHashSet(this.taskMap.values());
+            return new HashSet<>(this.taskMap.values());
         }
     }
 

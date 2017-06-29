@@ -34,7 +34,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -53,6 +52,8 @@ final class AsyncScheduler extends SchedulerBase {
     // The dynamic thread pooling executor of asynchronous tasks.
     private ExecutorService executor;
 
+    private volatile boolean running;
+
     AsyncScheduler() {
         super(ScheduledTask.TaskSynchronicity.ASYNCHRONOUS);
 
@@ -60,6 +61,9 @@ final class AsyncScheduler extends SchedulerBase {
         thread.setName("Lantern Async Scheduler Thread");
         thread.setDaemon(true);
         thread.start();
+
+        // Whether the scheduler is running
+        this.running = true;
     }
 
     /**
@@ -70,6 +74,7 @@ final class AsyncScheduler extends SchedulerBase {
      * @param unit The time unit
      */
     void shutdown(long timeout, TimeUnit unit) {
+        this.running = false;
         this.executor.shutdown();
         try {
             if (!this.executor.awaitTermination(timeout, unit)) {
@@ -83,7 +88,7 @@ final class AsyncScheduler extends SchedulerBase {
         this.executor = Executors.newCachedThreadPool(ThreadHelper.newFastThreadLocalThreadFactory(
                 () -> "async-" + this.counter.getAndIncrement()));
         this.lastProcessingTimestamp = System.nanoTime();
-        while (true) {
+        while (this.running) {
             recalibrateMinimumTimeout();
             runTick();
         }

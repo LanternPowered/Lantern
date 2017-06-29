@@ -86,5 +86,4 @@ public interface AbstractArmorEquipable extends AbstractEquipable, ArmorEquipabl
     default void setItemInHand(HandType handType, @Nullable ItemStack itemInHand) {
         equip(LanternEquipmentTypes.forHand(handType), itemInHand);
     }
-
 }

@@ -50,20 +50,18 @@ public interface AbstractEquipable extends Equipable {
     @Override
     default boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
         checkNotNull(type, "type");
-        final Inventory inventory = getInventory().query(SimpleEquipmentInventory.class);
+        final Inventory inventory = getInventory().query(type);
         if (inventory instanceof EmptyInventory) {
             return false;
         }
         final LanternSlot slot = (LanternSlot) inventory.<SimpleEquipmentInventory>first().getSlot(type).orElse(null);
-        if (slot == null) {
-            return false;
-        }
-        return equipment == null || slot.isValidItem(equipment);
+        return slot != null && (equipment == null || slot.isValidItem(equipment));
     }
 
     @Override
     default Optional<ItemStack> getEquipped(EquipmentType type) {
-        final Inventory inventory = getInventory().query(SimpleEquipmentInventory.class);
+        checkNotNull(type, "type");
+        final Inventory inventory = getInventory().query(type);
         if (inventory instanceof EmptyInventory) {
             return Optional.empty();
         }
@@ -72,7 +70,8 @@ public interface AbstractEquipable extends Equipable {
 
     @Override
     default boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
-        final Inventory inventory = getInventory().query(SimpleEquipmentInventory.class);
+        checkNotNull(type, "type");
+        final Inventory inventory = getInventory().query(type);
         if (inventory instanceof EmptyInventory) {
             return false;
         }

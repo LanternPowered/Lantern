@@ -30,6 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
@@ -41,6 +42,7 @@ import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.property.ArmorSlotType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
@@ -364,7 +366,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
         }, false);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     @Override
     public <T extends Inventory> T query(Object... args) {
         checkNotNull(args, "args");
@@ -393,15 +395,17 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
                         return true;
                     }
                 } else if (arg instanceof EquipmentType) {
-                    for (EquipmentSlotType property : inventory.getProperties(EquipmentSlotType.class)) {
-                        //noinspection ConstantConditions
+                    for (EquipmentSlotType property : Iterables.concat(
+                            inventory.getProperties(EquipmentSlotType.class),
+                            inventory.getProperties(ArmorSlotType.class))) {
                         if (((LanternEquipmentType) arg).isChild(property.getValue())) {
                             return true;
                         }
                     }
                 } else if (arg instanceof EquipmentSlotType) {
-                    for (EquipmentSlotType property : inventory.getProperties(EquipmentSlotType.class)) {
-                        //noinspection ConstantConditions
+                    for (EquipmentSlotType property : Iterables.concat(
+                            inventory.getProperties(EquipmentSlotType.class),
+                            inventory.getProperties(ArmorSlotType.class))) {
                         if (((LanternEquipmentType) ((EquipmentSlotType) arg).getValue()).isChild(property.getValue())) {
                             return true;
                         }

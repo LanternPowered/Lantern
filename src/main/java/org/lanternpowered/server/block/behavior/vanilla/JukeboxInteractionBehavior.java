@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.block.behavior.vanilla;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -39,7 +38,6 @@ import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -60,14 +58,13 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
             final TileEntity tile = optTile.get();
             if (tile instanceof Jukebox) {
                 final LanternJukebox jukebox = (LanternJukebox) tile;
-                final Optional<ItemStack> optRejectedItem = jukebox.ejectRecordItem();
+                final Optional<Entity> optEjectedItem = jukebox.ejectRecordItem();
                 boolean success = false;
-                if (optRejectedItem.isPresent()) {
-                    final Vector3d entityPosition = location.getBlockPosition().toDouble().add(0.5, 0.9, 0.5);
-                    final Entity item = location.getExtent().createEntity(EntityTypes.ITEM, entityPosition);
-                    item.offer(Keys.VELOCITY, new Vector3d(0, 0.1, 0));
-                    item.offer(Keys.REPRESENTED_ITEM, optRejectedItem.get().createSnapshot());
-                    location.getExtent().spawnEntity(item, Cause.source(this).build());
+                if (optEjectedItem.isPresent()) {
+                    final Entity entity = optEjectedItem.get();
+                    final Cause.Builder cause = context.get(Parameters.PLAYER)
+                            .map(Cause::source).orElseGet(Cause::builder);
+                    entity.getWorld().spawnEntity(entity, cause.owner(tile).build());
                     // TODO: Include the entity in the behavior context
                     success = true;
                 }

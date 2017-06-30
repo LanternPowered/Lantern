@@ -54,7 +54,7 @@ public interface AbstractEquipable extends Equipable {
         if (inventory instanceof EmptyInventory) {
             return false;
         }
-        final LanternSlot slot = (LanternSlot) inventory.<SimpleEquipmentInventory>first().getSlot(type).orElse(null);
+        final LanternSlot slot = inventory.first().<LanternSlot>slots().iterator().next();
         return slot != null && (equipment == null || slot.isValidItem(equipment));
     }
 
@@ -75,7 +75,8 @@ public interface AbstractEquipable extends Equipable {
         if (inventory instanceof EmptyInventory) {
             return false;
         }
-        final InventoryTransactionResult result = inventory.<SimpleEquipmentInventory>first().set(type, equipment);
+        final LanternSlot slot = inventory.first().<LanternSlot>slots().iterator().next();
+        final InventoryTransactionResult result = slot.set(equipment);
         return result.getType().equals(InventoryTransactionResult.Type.SUCCESS);
     }
 }

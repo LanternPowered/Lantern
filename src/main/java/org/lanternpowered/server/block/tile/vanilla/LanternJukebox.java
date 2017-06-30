@@ -27,6 +27,7 @@ package org.lanternpowered.server.block.tile.vanilla;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.data.type.record.RecordType;
@@ -36,6 +37,9 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Jukebox;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -88,13 +92,8 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
 
     @Override
     public void ejectRecord() {
-        if (this.record == null) {
-            return;
-        }
-        stopRecord();
-        this.record = null;
-        updateBlockState();
-        // TODO: Drop the item
+        ejectRecordItem().ifPresent(entity -> entity.getWorld().spawnEntity(entity,
+                Cause.builder().owner(this).build()));
     }
 
     private void updateBlockState() {
@@ -111,17 +110,19 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
      *
      * @return The record item
      */
-    public Optional<ItemStack> ejectRecordItem() {
+    public Optional<Entity> ejectRecordItem() {
         if (this.record == null) {
             return Optional.empty();
         }
         stopRecord();
-        try {
-            return Optional.of(this.record);
-        } finally {
-            this.record = null;
-            updateBlockState();
-        }
+        final Location<World> location = getLocation();
+        final Vector3d entityPosition = location.getBlockPosition().toDouble().add(0.5, 0.9, 0.5);
+        final Entity item = location.getExtent().createEntity(EntityTypes.ITEM, entityPosition);
+        item.offer(Keys.VELOCITY, new Vector3d(0, 0.1, 0));
+        item.offer(Keys.REPRESENTED_ITEM, this.record.createSnapshot());
+        this.record = null;
+        updateBlockState();
+        return Optional.of(item);
     }
 
     @Override

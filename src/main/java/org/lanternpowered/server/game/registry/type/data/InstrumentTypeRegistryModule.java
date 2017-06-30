@@ -52,5 +52,7 @@ public class InstrumentTypeRegistryModule extends PluginCatalogRegistryModule<In
         register(new LanternInstrumentType("minecraft", "guitar", 7, SoundTypes.BLOCK_NOTE_GUITAR));
         register(new LanternInstrumentType("minecraft", "chime", 8, SoundTypes.BLOCK_NOTE_CHIME));
         register(new LanternInstrumentType("minecraft", "xylophone", 9, SoundTypes.BLOCK_NOTE_XYLOPHONE));
+        // Not officially registered as a instrument type
+        register(new LanternInstrumentType("minecraft", "pling", 100, SoundTypes.BLOCK_NOTE_PLING));
     }
 }

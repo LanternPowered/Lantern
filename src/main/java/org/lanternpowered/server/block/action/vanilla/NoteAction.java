@@ -44,7 +44,8 @@ public final class NoteAction implements BlockAction {
 
     @Override
     public void fill(BlockActionData actionData) {
-        actionData.set(0, ((LanternInstrumentType) this.instrumentType).getInternalId());
+        final int instrumentId = ((LanternInstrumentType) this.instrumentType).getInternalId();
+        actionData.set(0, instrumentId >= 100 ? 0 : instrumentId);
         actionData.set(1, ((LanternNotePitch) this.notePitch).getInternalId());
     }
 

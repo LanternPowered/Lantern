@@ -61,6 +61,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("ConstantConditions")
 public class LanternSlot extends AbstractMutableInventory implements Slot {
 
     /**
@@ -125,8 +126,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
      */
     @Override
     public boolean isValidItem(ItemStack stack) {
-        return this.doesAllowEquipmentType(stack) &&
-                this.doesAcceptItemType(stack);
+        return doesAllowEquipmentType(stack) && doesAcceptItemType(stack);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         } else {
             this.itemStack = null;
         }
-        this.queueUpdate();
+        queueUpdate();
         return Optional.of(itemStack);
     }
 
@@ -470,7 +470,10 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
 
     @Override
     public void clear() {
-        this.itemStack = null;
+        if (this.itemStack != null) {
+            this.itemStack = null;
+            queueUpdate();
+        }
     }
 
     @Override
@@ -495,8 +498,6 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
 
     @Override
     public boolean contains(ItemStack stack) {
-        checkNotNull(stack, "stack");
-        //noinspection ConstantConditions
         return containsAny(stack) && this.itemStack.getQuantity() >= stack.getQuantity();
     }
 

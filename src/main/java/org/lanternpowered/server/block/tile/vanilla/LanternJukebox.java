@@ -26,66 +26,76 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.block.tile.ITileEntityInventory;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.data.type.record.RecordType;
+import org.lanternpowered.server.inventory.slot.HasPropertyItemFilter;
+import org.lanternpowered.server.inventory.slot.LanternFilteringSlot;
 import org.lanternpowered.server.item.property.RecordProperty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Jukebox;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+public final class LanternJukebox extends LanternTileEntity implements Jukebox, TileEntityCarrier {
 
-public final class LanternJukebox extends LanternTileEntity implements Jukebox {
+    private final class JukeboxInventory extends LanternFilteringSlot implements ITileEntityInventory {
 
-    @Nullable private ItemStack record;
+        JukeboxInventory() {
+            super(null, new HasPropertyItemFilter(RecordProperty.class));
+        }
+
+        @Override
+        protected void queueUpdate() {
+            super.queueUpdate();
+            // Stop the record if it's already playing,
+            // don't eject the current one, who's interacting
+            // with the inventory should handle that
+            stopRecord();
+        }
+
+        @Override
+        public Optional<TileEntityCarrier> getTileEntity() {
+            return Optional.of(LanternJukebox.this);
+        }
+    }
+
+    // The internal inventory of the jukebox
+    private JukeboxInventory inventory = new JukeboxInventory();
     private boolean playing;
 
     @Override
     public void playRecord() {
-        if (this.record == null) {
+        final ItemStack recordItem = this.inventory.getRawItemStack();
+        if (recordItem == null) {
             return;
         }
         this.playing = true;
         final Location<World> location = getLocation();
-        final RecordProperty property = this.record.getProperty(RecordProperty.class).orElse(null);
+        final RecordProperty property = recordItem.getProperty(RecordProperty.class).orElse(null);
         final RecordType recordType = property == null ? null : property.getValue();
         if (recordType != null) {
             ((LanternWorld) location.getExtent()).broadcast(
                     () -> new MessagePlayOutRecord(location.getBlockPosition(), recordType));
         }
-    }
-
-    /**
-     * Whether currently a record is being played.
-     *
-     * @return Is playing
-     */
-    public boolean isPlaying() {
-        return this.playing;
-    }
-
-    /**
-     * Gets the raw record {@link ItemStack}, if present.
-     *
-     * @return The record item
-     */
-    public Optional<ItemStack> getRecordItem() {
-        return Optional.ofNullable(this.record);
     }
 
     @Override
@@ -109,7 +119,7 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
         final Location<World> location = getLocation();
         final BlockState block = location.getBlock();
         location.setBlock(block
-                .withTrait(LanternBooleanTraits.HAS_RECORD, this.record != null)
+                .withTrait(LanternBooleanTraits.HAS_RECORD, this.inventory.getRawItemStack() != null)
                 .orElse(block), Cause.source(this).build());
     }
 
@@ -120,7 +130,8 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
      * @return The record item
      */
     public Optional<Entity> ejectRecordItem() {
-        if (this.record == null) {
+        final ItemStack recordItem = this.inventory.getRawItemStack();
+        if (recordItem == null) {
             return Optional.empty();
         }
         stopRecord();
@@ -128,8 +139,8 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
         final Vector3d entityPosition = location.getBlockPosition().toDouble().add(0.5, 0.9, 0.5);
         final Entity item = location.getExtent().createEntity(EntityTypes.ITEM, entityPosition);
         item.offer(Keys.VELOCITY, new Vector3d(0, 0.1, 0));
-        item.offer(Keys.REPRESENTED_ITEM, this.record.createSnapshot());
-        this.record = null;
+        item.offer(Keys.REPRESENTED_ITEM, recordItem.createSnapshot());
+        this.inventory.clear();
         updateBlockState();
         return Optional.of(item);
     }
@@ -138,7 +149,8 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
     public void insertRecord(ItemStack record) {
         checkNotNull(record, "record");
         ejectRecord();
-        this.record = record.copy();
+        checkState(this.inventory.set(record).getType() == InventoryTransactionResult.Type.SUCCESS,
+                "Invalid record item stack: " + record);
         updateBlockState();
     }
 
@@ -146,5 +158,10 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
     public BlockState getBlock() {
         final BlockState block = getLocation().getBlock();
         return block.getType() == BlockTypes.JUKEBOX ? block : BlockTypes.JUKEBOX.getDefaultState();
+    }
+
+    @Override
+    public TileEntityInventory<TileEntityCarrier> getInventory() {
+        return this.inventory;
     }
 }

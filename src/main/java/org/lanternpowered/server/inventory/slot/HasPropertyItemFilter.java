@@ -23,29 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.property;
+package org.lanternpowered.server.inventory.slot;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.lanternpowered.server.data.type.record.LanternRecordType;
-import org.lanternpowered.server.data.type.record.RecordType;
 import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.AbstractProperty;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import javax.annotation.Nullable;
+public final class HasPropertyItemFilter implements ItemFilter {
 
-public final class RecordProperty extends AbstractProperty<String, RecordType> {
+    private final Class<? extends Property<?,?>> propertyType;
 
-    public RecordProperty(RecordType value) {
-        super(checkNotNull(value, "value"));
+    public HasPropertyItemFilter(Class<? extends Property<?, ?>> propertyType) {
+        this.propertyType = propertyType;
     }
 
     @Override
-    public int compareTo(@Nullable Property<?, ?> o) {
-        final LanternRecordType type0 = (LanternRecordType) getValue();
-        final LanternRecordType type1 = o == null ? null : (LanternRecordType) o.getValue();
-        return Integer.compare(
-                type0 == null ? 0 : type0.getInternalId() + 1,
-                type1 == null ? 0 : type1.getInternalId() + 1);
+    public boolean isValidItem(ItemStack stack) {
+        return stack.getProperty(this.propertyType).isPresent();
+    }
+
+    @Override
+    public boolean isValidItem(ItemType type) {
+        return type.getDefaultProperty(this.propertyType).isPresent();
     }
 }

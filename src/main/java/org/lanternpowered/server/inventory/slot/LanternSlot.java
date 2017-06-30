@@ -95,7 +95,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         this.containers.remove(container);
     }
 
-    private void queueUpdate() {
+    protected void queueUpdate() {
         for (LanternContainer container : this.containers) {
             container.queueSlotChange(this);
         }
@@ -478,7 +478,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
 
     @Override
     public int size() {
-        return this.itemStack == null ? 0 : 1;
+        return this.itemStack == null || this.itemStack.isEmpty() ? 0 : 1;
     }
 
     @Override

@@ -56,7 +56,7 @@ public class JukeboxTileEntitySerializer<T extends LanternJukebox> extends TileE
     @Override
     public void serializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(object, valueContainer, dataView);
-        object.getRecordItem().ifPresent(itemStack -> dataView
+        object.getInventory().peek().ifPresent(itemStack -> dataView
                 .set(RECORD_ITEM, ItemStackStore.INSTANCE.serialize((LanternItemStack) itemStack)));
     }
 }

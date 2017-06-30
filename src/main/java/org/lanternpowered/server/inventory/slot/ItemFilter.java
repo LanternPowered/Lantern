@@ -31,7 +31,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 public interface ItemFilter {
 
     default boolean isValidItem(ItemStack stack) {
-        return this.isValidItem(stack.getItem());
+        return isValidItem(stack.getItem());
     }
 
     boolean isValidItem(ItemType type);

@@ -29,12 +29,11 @@ import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.advancement.AdvancementTrees;
-import org.lanternpowered.server.data.io.store.ObjectSerializer;
-import org.lanternpowered.server.data.io.store.ObjectStore;
-import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
-import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.data.io.store.ObjectSerializer;
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.lanternpowered.server.data.io.store.item.ItemStackStore;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
@@ -73,6 +72,7 @@ import java.util.UUID;
  * into one {@link DataView}. This listed under a sub view with the data query
  * {@link DataQueries#SPONGE_DATA}.
  */
+@SuppressWarnings({"OptionalGetWithoutIsPresent", "unchecked", "ConstantConditions"})
 public class PlayerStore extends LivingStore<LanternPlayer> {
 
     private static final DataQuery ABILITIES = DataQuery.of("abilities");
@@ -240,10 +240,8 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
             view.getInt(RECIPE_BOOK_FILTER_ACTIVE).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, v > 0));
             view.getInt(RECIPE_BOOK_GUI_OPEN).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_GUI_OPEN, v > 0));
         });
-        dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> {
-            valueContainer.set(
-                    LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTrees.INSTANCE.get(id));
-        });
+        dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> valueContainer
+                .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTrees.INSTANCE.get(id)));
 
         super.deserializeValues(player, valueContainer, dataView);
     }
@@ -258,10 +256,6 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     }
 
     private static List<DataView> serializeEnderChest(GridInventory enderChestInventory) {
-        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
-        //noinspection unchecked
-        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
-
         final List<DataView> itemViews = new ArrayList<>();
         final Iterable<Slot> slots = enderChestInventory.slots();
         for (Slot slot : slots) {
@@ -269,8 +263,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
             if (!optItemStack.isPresent()) {
                 continue;
             }
-            final DataView itemView = itemStackSerializer.serialize((LanternItemStack) optItemStack.get());
-            //noinspection ConstantConditions
+            final DataView itemView = ItemStackStore.INSTANCE.serialize((LanternItemStack) optItemStack.get());
             itemView.set(SLOT, (byte) enderChestInventory.getProperty(slot, SlotIndex.class, null).get().getValue().intValue());
             itemViews.add(itemView);
         }
@@ -279,29 +272,21 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     }
 
     private static void deserializeEnderChest(GridInventory enderChestInventory, List<DataView> itemViews) {
-        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
-        //noinspection unchecked
-        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
-
         for (DataView itemView : itemViews) {
             final int slot = itemView.getByte(SLOT).get() & 0xff;
-            final LanternItemStack itemStack = itemStackSerializer.deserialize(itemView);
+            final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
             enderChestInventory.set(new SlotIndex(slot), itemStack);
         }
     }
 
     private static void deserializePlayerInventory(LanternPlayerInventory inventory, List<DataView> itemViews) {
-        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
-        //noinspection unchecked
-        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
-
         final HumanMainInventory mainInventory = inventory.getMain();
         final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
         final OffHandSlot offHandSlot = inventory.getOffhand();
 
         for (DataView itemView : itemViews) {
             final int slot = itemView.getByte(SLOT).get() & 0xff;
-            final LanternItemStack itemStack = itemStackSerializer.deserialize(itemView);
+            final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
 
             if (slot >= 0 && slot < mainInventory.slotCount()) {
                 mainInventory.set(new SlotIndex(slot), itemStack);
@@ -316,23 +301,19 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static List<DataView> serializePlayerInventory(LanternPlayerInventory inventory) {
         final List<DataView> itemViews = new ArrayList<>();
 
-        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
-        //noinspection unchecked
-        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
-
         final HumanMainInventory mainInventory = inventory.getMain();
         final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
         final OffHandSlot offHandSlot = inventory.getOffhand();
 
         Iterable<Slot> slots = mainInventory.slots();
         for (Slot slot : slots) {
-            serializeSlot(mainInventory, slot, 0, itemStackSerializer, itemViews);
+            serializeSlot(mainInventory, slot, 0, ItemStackStore.INSTANCE, itemViews);
         }
         slots = equipmentInventory.slots();
         for (Slot slot : slots) {
-            serializeSlot(equipmentInventory, slot, 100, itemStackSerializer, itemViews);
+            serializeSlot(equipmentInventory, slot, 100, ItemStackStore.INSTANCE, itemViews);
         }
-        serializeSlot(150, offHandSlot, itemStackSerializer, itemViews);
+        serializeSlot(150, offHandSlot, ItemStackStore.INSTANCE, itemViews);
 
         return itemViews;
     }
@@ -340,7 +321,6 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static void serializeSlot(Inventory parent, Slot slot, int indexOffset,
             ObjectSerializer<LanternItemStack> itemStackSerializer, List<DataView> views) {
         final SlotIndex index = parent.getProperty(slot, SlotIndex.class, "index").get(); // Key doesn't matter
-        //noinspection ConstantConditions
         serializeSlot(index.getValue() + indexOffset, slot, itemStackSerializer, views);
     }
 
@@ -351,7 +331,6 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         }
         final ItemStack itemStack = optItemStack.get();
         final DataView itemView = itemStackSerializer.serialize((LanternItemStack) itemStack);
-        //noinspection ConstantConditions
         itemView.set(SLOT, (byte) index);
         views.add(itemView);
     }

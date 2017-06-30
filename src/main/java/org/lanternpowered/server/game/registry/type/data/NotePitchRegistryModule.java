@@ -26,14 +26,20 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternNotePitch;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.NotePitches;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class NotePitchRegistryModule extends SimpleCatalogRegistryModule<NotePitch> {
+public final class NotePitchRegistryModule extends InternalPluginCatalogRegistryModule<NotePitch> {
+
+    private static final NotePitchRegistryModule INSTANCE = new NotePitchRegistryModule();
+
+    public static NotePitchRegistryModule get() {
+        return INSTANCE;
+    }
 
     private static final String[] SORTED_NOTE_PITCHES = {
             "F_SHARP0",
@@ -63,7 +69,7 @@ public final class NotePitchRegistryModule extends SimpleCatalogRegistryModule<N
             "F_SHARP2",
     };
 
-    public NotePitchRegistryModule() {
+    private NotePitchRegistryModule() {
         super(NotePitches.class);
     }
 
@@ -71,7 +77,7 @@ public final class NotePitchRegistryModule extends SimpleCatalogRegistryModule<N
     public void registerDefaults() {
         final List<LanternNotePitch> entries = new ArrayList<>(SORTED_NOTE_PITCHES.length);
         for (String noteName : SORTED_NOTE_PITCHES) {
-            final LanternNotePitch notePitch = new LanternNotePitch(noteName, entries.size());
+            final LanternNotePitch notePitch = new LanternNotePitch("minecraft", noteName, entries.size());
             entries.add(notePitch);
             register(notePitch);
         }

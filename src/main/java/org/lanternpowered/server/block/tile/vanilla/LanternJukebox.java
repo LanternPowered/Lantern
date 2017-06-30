@@ -79,6 +79,15 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox {
         return this.playing;
     }
 
+    /**
+     * Gets the raw record {@link ItemStack}, if present.
+     *
+     * @return The record item
+     */
+    public Optional<ItemStack> getRecordItem() {
+        return Optional.ofNullable(this.record);
+    }
+
     @Override
     public void stopRecord() {
         if (!this.playing) {

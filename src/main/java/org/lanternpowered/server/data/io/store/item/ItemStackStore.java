@@ -83,7 +83,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
+public final class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
+
+    public static final ItemStackStore INSTANCE = new ItemStackStore();
 
     private static final DataQuery IDENTIFIER = DataQuery.of("id");
     public static final DataQuery QUANTITY = DataQuery.of("Count");

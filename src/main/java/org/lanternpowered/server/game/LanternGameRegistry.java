@@ -507,7 +507,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
                 .registerModule(LogAxis.class,
                         new EnumValueRegistryModule<LogAxis>(LanternLogAxis.class, LogAxes.class) {})
-                .registerModule(NotePitch.class, new NotePitchRegistryModule())
+                .registerModule(NotePitch.class, NotePitchRegistryModule.get())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
                 .registerModule(LlamaVariant.class, new LlamaVariantRegistryModule())
                 .registerModule(Profession.class, new ProfessionRegistryModule())

@@ -31,12 +31,16 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.tile.vanilla.LanternContainer;
+import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
+import org.lanternpowered.server.block.tile.vanilla.LanternNote;
 import org.lanternpowered.server.data.io.store.entity.EntityStore;
 import org.lanternpowered.server.data.io.store.entity.ItemStore;
 import org.lanternpowered.server.data.io.store.entity.LivingStore;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.io.store.tile.ContainerTileEntityStore;
+import org.lanternpowered.server.data.io.store.tile.JukeboxTileEntitySerializer;
+import org.lanternpowered.server.data.io.store.tile.NoteblockTileEntitySerializer;
 import org.lanternpowered.server.data.io.store.tile.TileEntityObjectStore;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternItem;
@@ -83,9 +87,13 @@ public final class ObjectStoreRegistry {
         register(LanternItem.class, new ItemStore());
         register(LanternLiving.class, new LivingStore<>());
         register(LanternPlayer.class, new PlayerStore());
-        register(LanternItemStack.class, new ItemStackStore());
+        register(LanternItemStack.class, ItemStackStore.INSTANCE);
+
+        // Tile entities
         register(LanternTileEntity.class, new TileEntityObjectStore<>());
         register(LanternContainer.class, new ContainerTileEntityStore<>());
+        register(LanternJukebox.class, new JukeboxTileEntitySerializer<>());
+        register(LanternNote.class, new NoteblockTileEntitySerializer<>());
     }
 
     /**

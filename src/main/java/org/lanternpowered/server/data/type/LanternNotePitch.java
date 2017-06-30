@@ -25,18 +25,16 @@
  */
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.type.NotePitch;
 
 @SuppressWarnings({"ConstantConditions", "NullableProblems"})
-public final class LanternNotePitch extends SimpleCatalogType.Base implements NotePitch {
+public final class LanternNotePitch extends PluginCatalogType.Base.Internal implements NotePitch {
 
-    private final byte internalId;
     private NotePitch next;
 
-    public LanternNotePitch(String identifier, int internalId) {
-        super(identifier);
-        this.internalId = (byte) internalId;
+    public LanternNotePitch(String plugin, String identifier, int internalId) {
+        super(plugin, identifier, internalId);
     }
 
     @Override
@@ -50,9 +48,4 @@ public final class LanternNotePitch extends SimpleCatalogType.Base implements No
         }
         this.next = next;
     }
-
-    public byte getInternalId() {
-        return this.internalId;
-    }
-
 }

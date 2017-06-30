@@ -51,7 +51,7 @@ public abstract class EnumValueRegistryModule<V extends CatalogType>
     final Class<? extends Enum<?>> enumType;
     @Nullable private final Class<?> catalogClass;
 
-    public EnumValueRegistryModule(Class<? extends Enum<?>> enumType, @Nullable Class<?> catalogClass) {
+    protected EnumValueRegistryModule(Class<? extends Enum<?>> enumType, @Nullable Class<?> catalogClass) {
         this.enumType = checkNotNull(enumType, "enumType");
         this.catalogClass = catalogClass;
     }

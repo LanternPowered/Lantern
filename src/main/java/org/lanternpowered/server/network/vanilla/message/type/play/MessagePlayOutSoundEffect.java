@@ -28,10 +28,6 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.effect.sound.SoundCategory;
 
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
 public final class MessagePlayOutSoundEffect extends MessagePlayOutSoundEffectBase<Integer> {
 
     public MessagePlayOutSoundEffect(int type, Vector3d position, SoundCategory category, float volume, float pitch) {

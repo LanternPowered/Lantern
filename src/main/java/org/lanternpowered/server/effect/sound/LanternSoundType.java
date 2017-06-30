@@ -56,7 +56,7 @@ public final class LanternSoundType extends PluginCatalogType.Base implements So
         if (this.eventId != -1) {
             return new MessagePlayOutSoundEffect(this.eventId, position, soundCategory, volume, pitch);
         } else {
-            return new MessagePlayOutNamedSoundEffect(this.getName(), position, soundCategory, volume, pitch);
+            return new MessagePlayOutNamedSoundEffect(getName(), position, soundCategory, volume, pitch);
         }
     }
 }

@@ -23,23 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect;
+package org.lanternpowered.server.block.action.vanilla;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.effect.Viewer;
-import org.spongepowered.api.effect.sound.SoundCategory;
-import org.spongepowered.api.effect.sound.SoundType;
+import org.lanternpowered.server.block.action.BlockAction;
+import org.lanternpowered.server.block.action.BlockActionData;
+import org.lanternpowered.server.data.type.LanternInstrumentType;
+import org.lanternpowered.server.data.type.LanternNotePitch;
+import org.spongepowered.api.data.type.InstrumentType;
+import org.spongepowered.api.data.type.NotePitch;
 
-public interface AbstractViewer extends Viewer {
+public final class NoteAction implements BlockAction {
 
-    @Override
-    default void playSound(SoundType sound, SoundCategory category, Vector3d position, double volume) {
-        playSound(sound, category, position, volume, 1.0);
+    private final InstrumentType instrumentType;
+    private final NotePitch notePitch;
+
+    public NoteAction(InstrumentType instrumentType, NotePitch notePitch) {
+        this.instrumentType = instrumentType;
+        this.notePitch = notePitch;
     }
 
     @Override
-    default void playSound(SoundType sound, SoundCategory category, Vector3d position, double volume, double pitch) {
-        playSound(sound, category, position, volume, pitch, 0.0);
+    public void fill(BlockActionData actionData) {
+        actionData.set(0, ((LanternInstrumentType) this.instrumentType).getInternalId());
+        actionData.set(1, ((LanternNotePitch) this.notePitch).getInternalId());
     }
 
+    @Override
+    public Type type() {
+        return Type.SINGLE;
+    }
 }

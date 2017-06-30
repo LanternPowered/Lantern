@@ -65,7 +65,7 @@ public class LanternChest extends LanternContainer<TileChestInventory> implement
         final Location<World> location = getLocation();
         for (Direction directionToCheck : HORIZONTAL_DIRECTIONS) {
             final Location<World> loc = location.getRelative(directionToCheck);
-            if (loc.getBlock().getType() != this.getBlock().getType()) {
+            if (loc.getBlock().getType() != getBlock().getType()) {
                 continue;
             }
             final Optional<TileEntity> optTileEntity = location.getRelative(directionToCheck).getTileEntity();

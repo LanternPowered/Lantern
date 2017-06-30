@@ -23,23 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect;
+package org.lanternpowered.server.block.property;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.effect.Viewer;
-import org.spongepowered.api.effect.sound.SoundCategory;
-import org.spongepowered.api.effect.sound.SoundType;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public interface AbstractViewer extends Viewer {
+import org.lanternpowered.server.data.type.LanternInstrumentType;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.AbstractProperty;
+import org.spongepowered.api.data.type.InstrumentType;
 
-    @Override
-    default void playSound(SoundType sound, SoundCategory category, Vector3d position, double volume) {
-        playSound(sound, category, position, volume, 1.0);
+import javax.annotation.Nullable;
+
+public final class InstrumentProperty extends AbstractProperty<String, InstrumentType> {
+
+    public InstrumentProperty(InstrumentType value) {
+        super(checkNotNull(value, "value"));
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
-    default void playSound(SoundType sound, SoundCategory category, Vector3d position, double volume, double pitch) {
-        playSound(sound, category, position, volume, pitch, 0.0);
+    public int compareTo(@Nullable Property<?, ?> o) {
+        return !(o instanceof InstrumentProperty) ? -1 : Integer.compare(
+                ((LanternInstrumentType) getValue()).getInternalId(),
+                ((LanternInstrumentType) o.getValue()).getInternalId());
     }
-
 }

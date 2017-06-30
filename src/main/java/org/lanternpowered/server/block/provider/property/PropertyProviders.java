@@ -27,6 +27,7 @@ package org.lanternpowered.server.block.provider.property;
 
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
+import org.lanternpowered.server.block.property.InstrumentProperty;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.data.Property;
@@ -42,6 +43,7 @@ import org.spongepowered.api.data.property.block.SolidCubeProperty;
 import org.spongepowered.api.data.property.block.StatisticsTrackedProperty;
 import org.spongepowered.api.data.property.block.SurrogateBlockProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
+import org.spongepowered.api.data.type.InstrumentType;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -288,9 +290,15 @@ public final class PropertyProviders {
 
     public static PropertyProviderCollection flammableInfo(ObjectProvider<FlameInfo> provider) {
         return PropertyProviderCollection.builder()
-                .add(FlammableProperty.class, (blockState, location, face) -> FLAMMABLE_PROPERTY_TRUE)
+                .add(FlammableProperty.class, new ConstantPropertyProvider<>(FLAMMABLE_PROPERTY_TRUE))
                 .add(FlameInfoProperty.class, (blockState, location, face) ->
                         new FlameInfoProperty(provider.get(blockState, location, face)))
+                .build();
+    }
+
+    public static PropertyProviderCollection instrument(InstrumentType instrument) {
+        return PropertyProviderCollection.builder()
+                .add(InstrumentProperty.class, new ConstantPropertyProvider<>(new InstrumentProperty(instrument)))
                 .build();
     }
 }

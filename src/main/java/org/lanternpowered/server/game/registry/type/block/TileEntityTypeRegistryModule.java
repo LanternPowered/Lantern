@@ -32,6 +32,7 @@ import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
+import org.lanternpowered.server.block.tile.vanilla.LanternNote;
 import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -74,7 +75,8 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
     public void registerDefaults() {
         register(LanternTileEntityType.of("minecraft", "chest", LanternChest::new));
         register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
-        register(LanternTileEntityType.of("minecraft", "shulker_box", LanternShulkerBox::new));
         register(LanternTileEntityType.of("minecraft", "jukebox", LanternJukebox::new));
+        register(LanternTileEntityType.of("minecraft", "note", LanternNote::new));
+        register(LanternTileEntityType.of("minecraft", "shulker_box", LanternShulkerBox::new));
     }
 }

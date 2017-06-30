@@ -27,14 +27,18 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.type.InstrumentType;
+import org.spongepowered.api.effect.sound.SoundType;
 
 public class LanternInstrumentType extends PluginCatalogType.Base.Internal implements InstrumentType {
 
-    public LanternInstrumentType(String pluginId, String name, int internalId) {
+    private final SoundType soundType;
+
+    public LanternInstrumentType(String pluginId, String name, int internalId, SoundType soundType) {
         super(pluginId, name, internalId);
+        this.soundType = soundType;
     }
 
-    public LanternInstrumentType(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, internalId);
+    public SoundType getSound() {
+        return this.soundType;
     }
 }

@@ -60,6 +60,7 @@ import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.JukeboxInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.LogAxisRotationPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.NoteBlockInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.OpeneableContainerInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
@@ -88,6 +89,7 @@ import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
@@ -99,6 +101,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
@@ -110,7 +113,8 @@ import java.util.function.Supplier;
 
 @RegistrationDependency({
         KeyRegistryModule.class,
-        EquipmentTypeRegistryModule.class
+        EquipmentTypeRegistryModule.class,
+        InstrumentTypeRegistryModule.class,
 })
 public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry {
 
@@ -548,6 +552,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(hardness(0.8))
                                 .add(blastResistance(4.0)))
                         .translation("tile.musicBlock.name")
+                        .tileEntityType(() -> TileEntityTypes.NOTE)
+                        .behaviors(pipeline -> pipeline
+                                .add(new NoteBlockInteractionBehavior()))
                         .build("minecraft", "noteblock"));
         ////////////////////
         ///     Bed      ///

@@ -798,9 +798,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         ///   Fishing Rod   ///
         ///////////////////////
-        register(346, builder()
+        register(346, durableBuilder(65)
                 .translation("item.fishingRod.name")
-                .maxStackQuantity(1)
                 .build("minecraft", "fishing_rod"));
         /////////////////
         ///   Clock   ///

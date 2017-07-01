@@ -7,6 +7,6 @@
     "options": {
         "rain_strength": 1.0
     },
-    "weight": 100,
-    "duration": "@ 300 + $random.nextInt(600)"
+    "weight": 300,
+    "duration": "@ 250 + $random.nextInt(500)"
 }

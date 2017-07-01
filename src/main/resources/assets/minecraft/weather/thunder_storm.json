@@ -9,8 +9,8 @@
         "rain_strength": 1.0,
         "sky_darkness": 1.0
     },
-    "weight": 100,
-    "duration": "@ 300 + $random.nextInt(600)",
+    "weight": 200,
+    "duration": "@ 200 + $random.nextInt(300)",
     "action": {
         "condition": [
             "@ $context.get(Parameters.WORLD).get().weatherUniverse.get().darkness > 0.8"

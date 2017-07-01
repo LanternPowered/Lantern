@@ -23,23 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.behavior.simple;
+package org.lanternpowered.server.block.behavior.simple.drops;
 
-import org.lanternpowered.server.behavior.Behavior;
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.lanternpowered.server.block.behavior.types.BlockDropsProviderBehavior;
-import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
+import org.lanternpowered.server.block.behavior.simple.AbstractBlockDropsProviderBehavior;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-public class SimpleAddDropsBreakBehavior implements BreakBlockBehavior {
+import java.util.List;
+
+public class SimpleBlockDropsProviderBehavior extends AbstractBlockDropsProviderBehavior {
+
+    private final List<ItemStackSnapshot> itemStackSnapshots;
+
+    public SimpleBlockDropsProviderBehavior(List<ItemStackSnapshot> itemStackSnapshots) {
+        this.itemStackSnapshots = ImmutableList.copyOf(itemStackSnapshots);
+    }
+
+    public SimpleBlockDropsProviderBehavior(ItemStackSnapshot... itemStackSnapshots) {
+        this.itemStackSnapshots = ImmutableList.copyOf(itemStackSnapshots);
+    }
 
     @Override
-    public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        context.process(pipeline.pipeline(BlockDropsProviderBehavior.class), (ctx, behavior) -> {
-            behavior.tryAddDrops(pipeline, context);
-            return BehaviorResult.CONTINUE;
-        });
-        return BehaviorResult.CONTINUE;
-    }
+    protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
+            itemStacks.addAll(this.itemStackSnapshots);
+        }
 }

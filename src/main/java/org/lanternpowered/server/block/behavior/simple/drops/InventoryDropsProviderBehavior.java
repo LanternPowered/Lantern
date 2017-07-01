@@ -23,23 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.behavior.simple;
+package org.lanternpowered.server.block.behavior.simple.drops;
 
-import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.lanternpowered.server.block.behavior.types.BlockDropsProviderBehavior;
-import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
+import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.block.behavior.simple.AbstractBlockDropsProviderBehavior;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public class SimpleAddDropsBreakBehavior implements BreakBlockBehavior {
+import java.util.Collections;
+import java.util.List;
+
+public class InventoryDropsProviderBehavior extends AbstractBlockDropsProviderBehavior {
 
     @Override
-    public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        context.process(pipeline.pipeline(BlockDropsProviderBehavior.class), (ctx, behavior) -> {
-            behavior.tryAddDrops(pipeline, context);
-            return BehaviorResult.CONTINUE;
+    protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
+        final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
+        location.getTileEntity().ifPresent(tile -> {
+            if (tile instanceof TileEntityCarrier) {
+                final TileEntityInventory<TileEntityCarrier> inventory = ((TileEntityCarrier) tile).getInventory();
+                final Iterable<Slot> slots = inventory instanceof Slot ? Collections.singleton((Slot) inventory) : inventory.slots();
+                slots.forEach(slot -> slot.poll().ifPresent(itemStack -> itemStacks.add(itemStack.createSnapshot())));
+            }
         });
-        return BehaviorResult.CONTINUE;
     }
 }

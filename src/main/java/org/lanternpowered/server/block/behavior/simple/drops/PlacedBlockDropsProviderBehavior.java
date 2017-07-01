@@ -23,23 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.behavior.simple;
+package org.lanternpowered.server.block.behavior.simple.drops;
 
-import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.lanternpowered.server.block.behavior.types.BlockDropsProviderBehavior;
-import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
+import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.block.behavior.simple.AbstractBlockDropsProviderBehavior;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public class SimpleAddDropsBreakBehavior implements BreakBlockBehavior {
+import java.util.List;
+
+public class PlacedBlockDropsProviderBehavior extends AbstractBlockDropsProviderBehavior {
 
     @Override
-    public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        context.process(pipeline.pipeline(BlockDropsProviderBehavior.class), (ctx, behavior) -> {
-            behavior.tryAddDrops(pipeline, context);
-            return BehaviorResult.CONTINUE;
+    protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
+        final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
+        final BlockState blockState = location.getBlock();
+        blockState.getType().getItem().ifPresent(itemType -> {
+            final ItemStack itemStack = new LanternItemStack(itemType);// ItemStack.of(itemType, 1); TODO
+            blockState.getValues().forEach(itemStack::offer);
+            location.getTileEntity().ifPresent(tile -> tile.getValues().forEach(itemStack::offer));
+            itemStacks.add(itemStack.createSnapshot());
         });
-        return BehaviorResult.CONTINUE;
     }
 }

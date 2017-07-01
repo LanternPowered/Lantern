@@ -23,23 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.behavior.simple;
+package org.lanternpowered.server.block.behavior.vanilla;
 
-import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.lanternpowered.server.block.behavior.types.BlockDropsProviderBehavior;
-import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
+import org.lanternpowered.server.block.behavior.simple.AbstractBlockDropsProviderBehavior;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-public class SimpleAddDropsBreakBehavior implements BreakBlockBehavior {
+import java.util.List;
+import java.util.Random;
+
+public class GravelBlockDropsProviderBehavior extends AbstractBlockDropsProviderBehavior {
+
+    private static Random RANDOM = new Random();
 
     @Override
-    public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        context.process(pipeline.pipeline(BlockDropsProviderBehavior.class), (ctx, behavior) -> {
-            behavior.tryAddDrops(pipeline, context);
-            return BehaviorResult.CONTINUE;
-        });
-        return BehaviorResult.CONTINUE;
+    protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
+        final ItemStack itemStack;
+        // TODO: Use ItemStack.of(...)
+        if (RANDOM.nextInt(100) < 10) {
+            itemStack = new LanternItemStack(ItemTypes.FLINT);
+        } else {
+            itemStack = new LanternItemStack(ItemTypes.GRAVEL);
+        }
+        itemStacks.add(itemStack.createSnapshot());
     }
 }

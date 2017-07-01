@@ -51,12 +51,15 @@ import org.lanternpowered.server.block.TranslationProvider;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleAddDropsBreakBehavior;
-import org.lanternpowered.server.block.behavior.simple.SimpleBlockDropsProviderBehavior;
+import org.lanternpowered.server.block.behavior.simple.drops.InventoryDropsProviderBehavior;
+import org.lanternpowered.server.block.behavior.simple.drops.PlacedBlockDropsProviderBehavior;
+import org.lanternpowered.server.block.behavior.simple.drops.SimpleBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.GravelBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.JukeboxInteractionBehavior;
@@ -102,7 +105,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
@@ -412,7 +414,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(hardness(0.6))
                                 .add(blastResistance(3.0)))
                         .behaviors(pipeline -> pipeline
-                                .add(SimpleBlockDropsProviderBehavior.fromBlock())) // TODO: Flint
+                                .add(new GravelBlockDropsProviderBehavior()))
                         .translation("tile.gravel.name")
                         .build("minecraft", "gravel"));
         // TODO: Gravel physics behavior
@@ -494,7 +496,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(hardness(3.0))
                                 .add(blastResistance(15.0)))
                         .behaviors(pipeline -> pipeline
-                                .add(SimpleBlockDropsProviderBehavior.fromBlock())) // TODO: Lapis lazuli
+                                .add(new PlacedBlockDropsProviderBehavior())) // TODO: Lapis lazuli
                         .translation("tile.oreLapis.name")
                         .build("minecraft", "lapis_ore"));
         ////////////////////
@@ -999,7 +1001,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.jukebox.name")
                         .behaviors(pipeline -> pipeline
                                 .add(new JukeboxInteractionBehavior())
-                                .add(SimpleBlockDropsProviderBehavior.fromInventory()))
+                                .add(new InventoryDropsProviderBehavior()))
                         .build("minecraft", "jukebox"),
                 state -> (byte) (state.getTraitValue(LanternBooleanTraits.HAS_RECORD).get() ? 1 : 0));
         ////////////////////
@@ -1459,7 +1461,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     private BlockTypeBuilder simpleBuilderWithDrops() {
         return simpleBuilder()
                 .behaviors(pipeline -> pipeline
-                        .add(SimpleBlockDropsProviderBehavior.fromBlock()));
+                        .add(new PlacedBlockDropsProviderBehavior()));
     }
 
     private BlockTypeBuilder builder() {
@@ -1567,7 +1569,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     private BlockTypeBuilder dyedBuilderWithDrops(String translationKey) {
         return dyedBuilder(translationKey)
                 .behaviors(pipeline -> pipeline
-                        .add(SimpleBlockDropsProviderBehavior.fromBlock()));
+                        .add(new PlacedBlockDropsProviderBehavior()));
     }
 
     private BlockTypeBuilder dyedBuilder(String translationKey) {
@@ -1676,7 +1678,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(new ChestPlacementBehavior())
                         .add(new ChestInteractionBehavior())
                         .add(new SimpleBreakBehavior())
-                        .add(SimpleBlockDropsProviderBehavior.fromInventory()));
+                        .add(new InventoryDropsProviderBehavior()));
     }
 
     private BlockTypeBuilder shulkerBox() {

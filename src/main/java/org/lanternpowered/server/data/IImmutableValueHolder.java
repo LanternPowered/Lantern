@@ -87,7 +87,7 @@ public interface IImmutableValueHolder extends IValueHolder {
         if (cache != null) {
             cache.values.put(key, optValue.orElse(ImmutableContainerCache.NONE));
         }
-        return Optional.empty();
+        return optValue;
     }
 
     /**

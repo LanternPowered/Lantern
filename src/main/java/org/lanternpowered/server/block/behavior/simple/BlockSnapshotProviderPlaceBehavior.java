@@ -46,6 +46,7 @@ import java.util.Optional;
  * block state.
  * Note: The snapshot will <strong>not</strong> contain a <strong>location</strong>.
  */
+@SuppressWarnings({"OptionalGetWithoutIsPresent", "unchecked"})
 public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
 
     public static final String BLOCK_SNAPSHOT = "TheBlockSnapshot";
@@ -56,7 +57,6 @@ public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
         final Optional<ItemStack> optItem = context.get(Parameters.USED_ITEM_STACK);
         if (optItem.isPresent()) {
             builder.blockState(optItem.get().getItem().getBlock().get().getDefaultState());
-            //noinspection unchecked
             optItem.get().getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
         } else {
             final Optional<BlockState> optState = context.get(Parameters.USED_BLOCK_STATE);

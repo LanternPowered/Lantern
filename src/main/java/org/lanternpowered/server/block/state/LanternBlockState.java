@@ -293,8 +293,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public ImmutableSet<ImmutableValue<?>> getValues() {
-        // TODO Auto-generated method stub
-        return null;
+        final ImmutableSet.Builder<ImmutableValue<?>> builder = ImmutableSet.builder();
+        getKeys().forEach(key -> builder.add((ImmutableValue) getImmutableValueFor((Key) key).get()));
+        return builder.build();
     }
 
     @Override

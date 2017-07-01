@@ -73,16 +73,18 @@ public class BehaviorContextImpl implements BehaviorContext {
         private final Set<BlockSnapshot> positionlessBlockSnapshots;
         private final Set<SlotTransaction> slotTransactions;
         private final Set<EntitySnapshot> entitySnapshots;
+        private final Set<Entity> entities; // TODO: Use snapshots when implemented
         private final Cause cause;
 
         Snapshot(Int2ObjectMap<Object> parameterValues, Map<Location<World>, BlockSnapshot> blockSnapshots,
                 Set<BlockSnapshot> positionlessBlockSnapshots, Set<SlotTransaction> slotTransactions,
-                Set<EntitySnapshot> entitySnapshots, Cause cause) {
+                Set<EntitySnapshot> entitySnapshots, Set<Entity> entities, Cause cause) {
             this.parameterValues = parameterValues;
             this.blockSnapshots = blockSnapshots;
             this.positionlessBlockSnapshots = positionlessBlockSnapshots;
             this.slotTransactions = slotTransactions;
             this.entitySnapshots = entitySnapshots;
+            this.entities = entities;
             this.cause = cause;
         }
     }
@@ -93,6 +95,7 @@ public class BehaviorContextImpl implements BehaviorContext {
     private Set<BlockSnapshot> positionlessBlockSnapshots = new HashSet<>();
     private Set<SlotTransaction> slotTransactions = new HashSet<>();
     private Set<EntitySnapshot> entitySnapshots = new HashSet<>();
+    private Set<Entity> entities = new HashSet<>(); // TODO: Use snapshots when implemented
 
     public BehaviorContextImpl(Cause cause) {
         this.cause = cause;
@@ -104,7 +107,8 @@ public class BehaviorContextImpl implements BehaviorContext {
                 ImmutableMap.copyOf(this.blockSnapshots),
                 ImmutableSet.copyOf(this.positionlessBlockSnapshots),
                 ImmutableSet.copyOf(this.slotTransactions),
-                ImmutableSet.copyOf(this.entitySnapshots), this.cause);
+                ImmutableSet.copyOf(this.entitySnapshots),
+                ImmutableSet.copyOf(this.entities), this.cause);
     }
 
     @Override
@@ -116,6 +120,7 @@ public class BehaviorContextImpl implements BehaviorContext {
         this.positionlessBlockSnapshots = new HashSet<>(snapshot1.positionlessBlockSnapshots);
         this.slotTransactions = new HashSet<>(snapshot1.slotTransactions);
         this.entitySnapshots = new HashSet<>(snapshot1.entitySnapshots);
+        this.entities = new HashSet<>(snapshot1.entities);
         this.cause = snapshot1.cause;
     }
 
@@ -162,7 +167,8 @@ public class BehaviorContextImpl implements BehaviorContext {
 
     @Override
     public void addEntity(Entity entity) {
-
+        checkNotNull(entity, "entity");
+        this.entities.add(entity);
     }
 
     @Override
@@ -313,6 +319,9 @@ public class BehaviorContextImpl implements BehaviorContext {
         }
         for (SlotTransaction slotTransaction : this.slotTransactions) {
             slotTransaction.getSlot().set(LanternItemStack.toNullable(slotTransaction.getFinal()));
+        }
+        for (Entity entity : this.entities) {
+            entity.getWorld().spawnEntity(entity, this.cause);
         }
     }
 }

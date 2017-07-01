@@ -25,24 +25,100 @@
  */
 package org.lanternpowered.server.block.behavior.simple;
 
-import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.behavior.Behavior;
-import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.behavior.BehaviorContext;
+import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import java.util.Collections;
 import java.util.List;
 
-public class SimpleBlockDropsProviderBehavior extends AbstractBlockDropsProviderBehavior {
+public abstract class SimpleBlockDropsProviderBehavior extends AbstractBlockDropsProviderBehavior {
 
-    private final List<ItemStackSnapshot> itemStackSnapshots;
-
-    public SimpleBlockDropsProviderBehavior(ItemStackSnapshot... itemStackSnapshots) {
-        this.itemStackSnapshots = ImmutableList.copyOf(itemStackSnapshots);
+    /**
+     * Will generate drop {@link ItemStack}s based on the {@link Inventory}
+     * contents of a {@link TileEntity}.
+     *
+     * @return The behavior
+     */
+    public static SimpleBlockDropsProviderBehavior fromInventory() {
+        return Inventory.INSTANCE;
     }
 
-    @Override
-    protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
-        itemStacks.addAll(this.itemStackSnapshots);
+    /**
+     * Will generate a {@link ItemStack} based on the {@link BlockState}
+     * and {@link TileEntity} values of the block.
+     *
+     * @return The behavior
+     */
+    public static SimpleBlockDropsProviderBehavior fromBlock() {
+        return Block.INSTANCE;
+    }
+
+    public static SimpleBlockDropsProviderBehavior fromItems(ItemStackSnapshot... itemStackSnapshots) {
+        return new Items(ImmutableList.copyOf(itemStackSnapshots));
+    }
+
+    public static SimpleBlockDropsProviderBehavior fromItems(Iterable<ItemStackSnapshot> itemStackSnapshots) {
+        return new Items(ImmutableList.copyOf(itemStackSnapshots));
+    }
+
+    private static class Items extends SimpleBlockDropsProviderBehavior {
+
+        private final List<ItemStackSnapshot> itemStackSnapshots;
+
+        public Items(List<ItemStackSnapshot> itemStackSnapshots) {
+            this.itemStackSnapshots = itemStackSnapshots;
+        }
+
+        @Override
+        protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
+            itemStacks.addAll(this.itemStackSnapshots);
+        }
+    }
+
+    private static class Block extends SimpleBlockDropsProviderBehavior {
+
+        static final Block INSTANCE = new Block();
+
+        @Override
+        protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
+            final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
+            final BlockState blockState = location.getBlock();
+            blockState.getType().getItem().ifPresent(itemType -> {
+                final ItemStack itemStack = new LanternItemStack(itemType);// ItemStack.of(itemType, 1); TODO
+                blockState.getValues().forEach(itemStack::offer);
+                location.getTileEntity().ifPresent(tile -> tile.getValues().forEach(itemStack::offer));
+                itemStacks.add(itemStack.createSnapshot());
+            });
+        }
+    }
+
+    private static class Inventory extends SimpleBlockDropsProviderBehavior {
+
+        static final Inventory INSTANCE = new Inventory();
+
+        @Override
+        protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
+            final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
+            location.getTileEntity().ifPresent(tile -> {
+                if (tile instanceof TileEntityCarrier) {
+                    final TileEntityInventory<TileEntityCarrier> inventory = ((TileEntityCarrier) tile).getInventory();
+                    final Iterable<Slot> slots = inventory instanceof Slot ? Collections.singleton((Slot) inventory) : inventory.slots();
+                    slots.forEach(slot -> slot.poll().ifPresent(itemStack -> itemStacks.add(itemStack.createSnapshot())));
+                }
+            });
+        }
     }
 }

@@ -47,10 +47,6 @@ public class SimpleBreakBehavior implements BreakBlockBehavior {
         builder.blockState(BlockTypes.AIR.getDefaultState());
         // Add the block change
         context.addBlockChange(builder.build());
-        context.process(pipeline.pipeline(BlockDropsProviderBehavior.class), (ctx, behavior) -> {
-            behavior.tryAddDrops(pipeline, context);
-            return BehaviorResult.CONTINUE;
-        });
         return BehaviorResult.CONTINUE;
     }
 }

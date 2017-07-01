@@ -50,6 +50,7 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.TranslationProvider;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
+import org.lanternpowered.server.block.behavior.simple.SimpleAddDropsBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
@@ -275,7 +276,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         ///    Stone    ///
         ///////////////////
-        register(1, simpleBuilder()
+        register(1, simpleBuilderWithDrops()
                         .trait(LanternEnumTraits.STONE_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.STONE_TYPE, LanternStoneType.STONE).get())
                         .itemType(builder -> builder
@@ -292,7 +293,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         ///    Grass    ///
         ///////////////////
-        register(2, simpleBuilder()
+        register(2, simpleBuilderWithDrops()
                         .trait(LanternBooleanTraits.SNOWY)
                         .extendedStateProvider(new SnowyExtendedBlockStateProvider())
                         .defaultState(state -> state.withTrait(LanternBooleanTraits.SNOWY, false).get())
@@ -305,7 +306,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         ///    Dirt     ///
         ///////////////////
-        register(3, simpleBuilder()
+        register(3, simpleBuilderWithDrops()
                         .traits(LanternEnumTraits.DIRT_TYPE, LanternBooleanTraits.SNOWY)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.DIRT_TYPE, LanternDirtType.DIRT).get()
@@ -325,7 +326,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         /// Cobblestone ///
         ///////////////////
-        register(4, simpleBuilder()
+        register(4, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(2.0))
@@ -335,7 +336,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         ///    Planks   ///
         ///////////////////
-        register(5, simpleBuilder()
+        register(5, simpleBuilderWithDrops()
                         .trait(LanternEnumTraits.TREE_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
                         .itemType(builder -> builder
@@ -354,7 +355,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///    Sapling   ///
         ////////////////////
-        register(6, simpleBuilder()
+        register(6, simpleBuilderWithDrops()
                         .traits(LanternEnumTraits.TREE_TYPE, LanternIntegerTraits.SAPLING_GROWTH_STAGE)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get()
@@ -378,7 +379,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///    Bedrock   ///
         ////////////////////
-        register(7, simpleBuilder()
+        register(7, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(PropertyProviderCollections.UNBREAKABLE))
@@ -387,7 +388,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///     Sand     ///
         ////////////////////
-        register(12, simpleBuilder()
+        register(12, simpleBuilderWithDrops()
                         .trait(LanternEnumTraits.SAND_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.SAND_TYPE, LanternSandType.NORMAL).get())
                         .itemType(builder -> builder
@@ -410,13 +411,15 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .properties(builder -> builder
                                 .add(hardness(0.6))
                                 .add(blastResistance(3.0)))
+                        .behaviors(pipeline -> pipeline
+                                .add(SimpleBlockDropsProviderBehavior.fromBlock())) // TODO: Flint
                         .translation("tile.gravel.name")
                         .build("minecraft", "gravel"));
         // TODO: Gravel physics behavior
         ////////////////////
         ///   Gold Ore   ///
         ////////////////////
-        register(14, simpleBuilder()
+        register(14, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(3.0))
@@ -426,7 +429,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///   Iron Ore   ///
         ////////////////////
-        register(15, simpleBuilder()
+        register(15, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(3.0))
@@ -436,7 +439,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///   Coal Ore   ///
         ////////////////////
-        register(16, simpleBuilder()
+        register(16, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(3.0))
@@ -458,7 +461,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///    Sponge    ///
         ////////////////////
-        register(19, simpleBuilder()
+        register(19, simpleBuilderWithDrops()
                         .trait(LanternBooleanTraits.IS_WET)
                         .defaultState(state -> state.withTrait(LanternBooleanTraits.IS_WET, false).get())
                         .itemType(builder -> builder
@@ -475,7 +478,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///    Glass     ///
         ////////////////////
-        register(20, simpleBuilder()
+        register(20, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(0.3))
@@ -490,12 +493,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .properties(builder -> builder
                                 .add(hardness(3.0))
                                 .add(blastResistance(15.0)))
+                        .behaviors(pipeline -> pipeline
+                                .add(SimpleBlockDropsProviderBehavior.fromBlock())) // TODO: Lapis lazuli
                         .translation("tile.oreLapis.name")
                         .build("minecraft", "lapis_ore"));
         ////////////////////
         ///  Lapis Block ///
         ////////////////////
-        register(22, simpleBuilder()
+        register(22, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(3.0))
@@ -505,7 +510,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///   Dispenser  ///
         ////////////////////
-        register(23, simpleBuilder()
+        register(23, simpleBuilderWithDrops()
                         .traits(LanternEnumTraits.FACING, LanternBooleanTraits.TRIGGERED)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.FACING, Direction.NORTH).get()
@@ -515,6 +520,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(hardness(3.5))
                                 .add(blastResistance(17.5)))
                         // .tileEntityType(() -> TileEntityTypes.DISPENSER)
+                        // TODO: Inventory drops
                         .translation("tile.dispenser.name")
                         .behaviors(pipeline -> pipeline
                                 .add(new RotationPlacementBehavior()))
@@ -529,7 +535,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///   Sandstone  ///
         ////////////////////
-        register(24, simpleBuilder()
+        register(24, simpleBuilderWithDrops()
                         .trait(LanternEnumTraits.SANDSTONE_TYPE)
                         .defaultState(state -> state.withTrait(LanternEnumTraits.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT).get())
                         .itemType(builder -> builder
@@ -546,7 +552,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///   Noteblock  ///
         ////////////////////
-        register(25, simpleBuilder()
+        register(25, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(0.8))
@@ -568,6 +574,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .properties(builder -> builder
                                 .add(hardness(0.2))
                                 .add(blastResistance(1.0)))
+                        // TODO: Custom drops
                         .translation("tile.bed.name")
                         .build("minecraft", "bed"),
                 blockState -> {
@@ -586,7 +593,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////
         ///   Golden Rail  ///
         //////////////////////
-        register(27, simpleBuilder()
+        register(27, simpleBuilderWithDrops()
                         .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
@@ -609,7 +616,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////////
         ///   Detector Rail  ///
         ////////////////////////
-        register(28, simpleBuilder()
+        register(28, simpleBuilderWithDrops()
                         .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
@@ -633,7 +640,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////
         ///   Web   ///
         ///////////////
-        register(30, simpleBuilder()
+        register(30, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(PASSABLE)
@@ -676,7 +683,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         ///     Wool    ///
         ///////////////////
-        register(35, dyedBuilder("tile.wool.%s.name")
+        register(35, dyedBuilderWithDrops("tile.wool.%s.name")
                         .properties(builder -> builder
                                 .add(hardness(0.8))
                                 .add(blastResistance(4.0)))
@@ -686,7 +693,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////////
         ///   Yellow Flower   ///
         /////////////////////////
-        register(37, simpleBuilder()
+        register(37, simpleBuilderWithDrops()
                         .traits(LanternEnumTraits.YELLOW_FLOWER_TYPE)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.YELLOW_FLOWER_TYPE, LanternPlantType.DANDELION).get())
@@ -703,7 +710,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////
         ///   Red Flower   ///
         //////////////////////
-        register(38, simpleBuilder()
+        register(38, simpleBuilderWithDrops()
                         .traits(LanternEnumTraits.RED_FLOWER_TYPE)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.RED_FLOWER_TYPE, LanternPlantType.POPPY).get())
@@ -720,7 +727,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////////
         ///   Brown Mushroom   ///
         //////////////////////////
-        register(39, simpleBuilder()
+        register(39, simpleBuilderWithDrops()
                         .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
@@ -731,7 +738,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////////
         ///   Red Mushroom   ///
         ////////////////////////
-        register(40, simpleBuilder()
+        register(40, simpleBuilderWithDrops()
                         .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
@@ -741,7 +748,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////
         ///   Gold Block   ///
         //////////////////////
-        register(41, simpleBuilder()
+        register(41, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(3.0))
@@ -751,7 +758,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////
         ///   Iron Block   ///
         //////////////////////
-        register(42, simpleBuilder()
+        register(42, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(5.0))
@@ -778,7 +785,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////////
         ///   Brick Block   ///
         ///////////////////////
-        register(45, simpleBuilder()
+        register(45, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(2.0))
@@ -788,7 +795,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////
         ///   TNT   ///
         ///////////////
-        register(46, simpleBuilder()
+        register(46, simpleBuilderWithDrops()
                         .trait(LanternBooleanTraits.EXPLODE)
                         .defaultState(state -> state
                                 .withTrait(LanternBooleanTraits.EXPLODE, false).get())
@@ -801,7 +808,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////
         ///   Bookshelf   ///
         /////////////////////
-        register(47, simpleBuilder()
+        register(47, simpleBuilderWithDrops() // TODO: Drop books
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(1.5))
@@ -811,7 +818,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////////////
         ///   Mossy Cobblestone   ///
         /////////////////////////////
-        register(48, simpleBuilder()
+        register(48, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(2.0))
@@ -821,7 +828,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///   Obsidian   ///
         ////////////////////
-        register(49, simpleBuilder()
+        register(49, simpleBuilderWithDrops()
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(50.0))
@@ -831,7 +838,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////
         ///   Torch   ///
         /////////////////
-        register(50, builder()
+        register(50, simpleBuilderWithDrops()
                         .trait(LanternEnumTraits.TORCH_FACING)
                             .defaultState(state -> state
                                     .withTrait(LanternEnumTraits.TORCH_FACING, Direction.UP).get())
@@ -876,7 +883,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////
         ///  Mob Spawner  ///
         /////////////////////
-        register(52, simpleBuilder()
+        register(52, simpleBuilderWithDrops()
                         .properties(builder -> builder
                                 .add(hardness(5.0))
                                 .add(blastResistance(25.0)))
@@ -980,7 +987,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///    Jukebox   ///
         ////////////////////
-        register(84, simpleBuilder()
+        register(84, simpleBuilderWithDrops()
                         .itemType()
                         .traits(LanternBooleanTraits.HAS_RECORD)
                         .defaultState(state -> state
@@ -991,7 +998,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .tileEntityType(() -> TileEntityTypes.JUKEBOX)
                         .translation("tile.jukebox.name")
                         .behaviors(pipeline -> pipeline
-                                .add(new JukeboxInteractionBehavior()))
+                                .add(new JukeboxInteractionBehavior())
+                                .add(SimpleBlockDropsProviderBehavior.fromInventory()))
                         .build("minecraft", "jukebox"),
                 state -> (byte) (state.getTraitValue(LanternBooleanTraits.HAS_RECORD).get() ? 1 : 0));
         ////////////////////
@@ -1444,8 +1452,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .behaviors(pipeline -> pipeline
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new SimplePlacementBehavior())
-                        .add(new SimpleBreakBehavior()));
-        // TODO: Item drops?
+                        .add(new SimpleBreakBehavior())
+                        .add(new SimpleAddDropsBreakBehavior()));
+    }
+
+    private BlockTypeBuilder simpleBuilderWithDrops() {
+        return simpleBuilder()
+                .behaviors(pipeline -> pipeline
+                        .add(SimpleBlockDropsProviderBehavior.fromBlock()));
     }
 
     private BlockTypeBuilder builder() {
@@ -1550,6 +1564,12 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         return (byte) horizontalDirectionData(blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get());
     }
 
+    private BlockTypeBuilder dyedBuilderWithDrops(String translationKey) {
+        return dyedBuilder(translationKey)
+                .behaviors(pipeline -> pipeline
+                        .add(SimpleBlockDropsProviderBehavior.fromBlock()));
+    }
+
     private BlockTypeBuilder dyedBuilder(String translationKey) {
         return simpleBuilder()
                 .traits(LanternEnumTraits.DYE_COLOR)
@@ -1613,7 +1633,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
      * @return The block type builder
      */
     private <E extends Enum<E> & TreeType> BlockTypeBuilder logBuilder(EnumTrait<E> enumTrait, E defaultTreeType) {
-        return simpleBuilder()
+        return simpleBuilderWithDrops()
                 .traits(LanternEnumTraits.LOG_AXIS, enumTrait)
                 .defaultState(state -> state.withTrait(enumTrait, defaultTreeType).get())
                 .itemType(builder -> builder
@@ -1628,8 +1648,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .translation(TranslationProvider.of(enumTrait, type ->
                         tr("tile.log." + ((LanternTreeType) type).getTranslationKeyBase() + ".name")))
                 .behaviors(pipeline -> pipeline
-                        .add(new LogAxisRotationPlacementBehavior())
-                        .add(new SimpleBlockDropsProviderBehavior(/* No items yet? */)));
+                        .add(new LogAxisRotationPlacementBehavior()));
     }
 
     private byte logData(BlockState blockState, int type) {
@@ -1643,7 +1662,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     }
 
     private BlockTypeBuilder chestBuilder() {
-        return builder()
+        return simpleBuilderWithDrops()
                 .trait(LanternEnumTraits.HORIZONTAL_FACING)
                 .defaultState(state -> state.withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
                 .itemType()
@@ -1656,8 +1675,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new ChestPlacementBehavior())
                         .add(new ChestInteractionBehavior())
-                        .add(new SimpleBreakBehavior()));
-        // TODO: Item drops?
+                        .add(new SimpleBreakBehavior())
+                        .add(SimpleBlockDropsProviderBehavior.fromInventory()));
     }
 
     private BlockTypeBuilder shulkerBox() {
@@ -1690,7 +1709,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private <E extends Enum<E> & SlabType> BlockTypeBuilder stoneSlab(EnumTrait<E> enumTrait, E defaultValue,
             Supplier<BlockType> halfSlabType, Supplier<BlockType> doubleSlabType) {
-        return simpleBuilder()
+        return simpleBuilderWithDrops() // TODO: Drop 2 slabs
                 .traits(LanternEnumTraits.PORTION_TYPE, enumTrait)
                 .defaultState(state -> state
                         .withTrait(enumTrait, defaultValue).get()
@@ -1714,7 +1733,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     }
 
     private <E extends Enum<E> & SlabType> BlockTypeBuilder doubleStoneSlab(EnumTrait<E> enumTrait, E defaultValue) {
-        return simpleBuilder()
+        return simpleBuilderWithDrops()
                 .traits(LanternBooleanTraits.SEAMLESS, enumTrait)
                 .defaultState(state -> state
                         .withTrait(enumTrait, defaultValue).get()

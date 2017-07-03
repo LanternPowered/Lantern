@@ -161,7 +161,9 @@ jar {
     classifier = 'base'
     duplicatesStrategy = 'exclude'
 
-    exclude 'log4j2_indev.xml'
+    exclude 'log4j2.xml'
+    rename 'log4j2_prod.xml', 'log4j2.xml'
+
     // Include the api classes
     from api.sourceSets.main.output
     // Include generated event classes
@@ -196,13 +198,10 @@ import groovy.json.JsonSlurper
 import groovy.json.JsonOutput
 
 processResources {
-    from 'LICENSE.txt'
+    // Note: Do not use this method to remove resources, rename them, etc. this
+    // may lead to some unintentional side effects that resources can't be found.
 
-    // Remove the indev log4j2.xml and rename the production one
-    exclude 'log4j2.xml'
-    rename { name ->
-        name == 'log4j2_prod.xml' ? 'log4j2.xml' : name
-    }
+    from 'LICENSE.txt'
 
     // Minimize the json files
     doLast {

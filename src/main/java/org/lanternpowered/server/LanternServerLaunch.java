@@ -34,8 +34,11 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSpec;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.jline.terminal.Terminal;
+import org.lanternpowered.launch.LanternClassLoader;
+import org.lanternpowered.launch.transformer.Exclusion;
 import org.lanternpowered.server.inject.LanternModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
+import org.lanternpowered.server.transformer.data.FastValueContainerClassTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Platform;
@@ -46,6 +49,10 @@ import java.util.Arrays;
 public final class LanternServerLaunch {
 
     public void main(String[] args) {
+        final LanternClassLoader classLoader = LanternClassLoader.get();
+        classLoader.addTransformerExclusion(Exclusion.forPackage("org.lanternpowered.server.transformer"));
+        classLoader.addTransformer(new FastValueContainerClassTransformer());
+
         // Get the default logger
         final Logger logger = LoggerFactory.getLogger(InternalPluginsInfo.Implementation.NAME);
         try {

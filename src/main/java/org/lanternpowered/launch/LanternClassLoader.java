@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -58,6 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -77,6 +80,7 @@ import java.util.zip.ZipInputStream;
 public final class LanternClassLoader extends URLClassLoader {
 
     private static final LanternClassLoader classLoader;
+    private static final Method findBootstrapClassMethod;
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -187,6 +191,13 @@ public final class LanternClassLoader extends URLClassLoader {
 
         classLoader = serverClassLoader;
         Thread.currentThread().setContextClassLoader(serverClassLoader);
+
+        try {
+            findBootstrapClassMethod = ClassLoader.class.getDeclaredMethod("findBootstrapClassOrNull", String.class);
+            findBootstrapClassMethod.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -320,6 +331,63 @@ public final class LanternClassLoader extends URLClassLoader {
         }
     }
 
+    /**
+     * Attempts to get a loaded {@link Class} for the given class name.
+     *
+     * @param className The class name
+     * @return The loaded class, if found
+     */
+    public Optional<Class<?>> getLoadedClass(String className) {
+        requireNonNull(className, "className");
+        Class<?> loadedClass = findLoadedClass(className);
+        if (loadedClass == null) {
+            try {
+                loadedClass = (Class<?>) findBootstrapClassMethod.invoke(this, className);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(loadedClass);
+    }
+
+    /**
+     * Reads the bytecode for the give class name, a {@link ClassNotFoundException} may
+     * be thrown if there is no resource available.
+     *
+     * @param className The class name
+     * @return The byte code
+     */
+    public byte[] readByteCode(String className) throws ClassNotFoundException {
+        requireNonNull(className, "className");
+        final URL url = getResource(className.replace('.', '/').concat(".class"));
+        if (url == null) {
+            throw new ClassNotFoundException(className);
+        }
+        try (InputStream is = url.openStream()) {
+            // Get the buffer
+            byte[] buffer = this.loadBuffer.get();
+
+            int read;
+            int length = 0;
+            while ((read = is.read(buffer, length, buffer.length - length)) != -1) {
+                length += read;
+
+                // Expand the buffer
+                if (length >= buffer.length - 1) {
+                    final byte[] newBuffer = new byte[buffer.length + BUFFER_SIZE];
+                    System.arraycopy(buffer, 0, newBuffer, 0, buffer.length);
+                    buffer = newBuffer;
+                }
+            }
+
+            final byte[] result = new byte[length];
+            System.arraycopy(buffer, 0, result, 0, length);
+            return result;
+        } catch (IOException e) {
+            throw new ClassNotFoundException(className, e);
+        }
+    }
+
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         synchronized (getClassLoadingLock(name)) {
@@ -422,7 +490,8 @@ public final class LanternClassLoader extends URLClassLoader {
                     try {
                         result = transformer.transform(this, name, result);
                     } catch (Exception e) {
-                        System.err.println("An error occurred while transforming " + name + ": " + e);
+                        System.err.print("An error occurred while transforming " + name + ": ");
+                        e.printStackTrace();
                     }
                 }
 

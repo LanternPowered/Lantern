@@ -56,19 +56,19 @@ public class FishRegistryModule extends InternalPluginCatalogRegistryModule<Fish
         register(new LanternFish("minecraft", "cod", "item.fish.cod.raw.name", 0,
                 builder -> builder
                         .add(foodRestoration(2))
-                        .add(saturation(0.1))));
+                        .add(saturation(0.4))));
         register(new LanternFish("minecraft", "salmon", "item.fish.salmon.raw.name", 1,
                 builder -> builder
                         .add(foodRestoration(2))
-                        .add(saturation(0.1))));
+                        .add(saturation(0.4))));
         register(new LanternFish("minecraft", "clownfish", "item.fish.clownfish.raw.name", 2,
                 builder -> builder
                         .add(foodRestoration(1))
-                        .add(saturation(0.1))));
+                        .add(saturation(0.2))));
         register(new LanternFish("minecraft", "pufferfish", "item.fish.pufferfish.raw.name", 3,
                 builder -> builder
                         .add(foodRestoration(1))
-                        .add(saturation(0.1))
+                        .add(saturation(0.2))
                         .add(applicableEffects(
                                 PotionEffect.of(PotionEffectTypes.POISON, 3, 1200),
                                 PotionEffect.of(PotionEffectTypes.HUNGER, 2, 300),

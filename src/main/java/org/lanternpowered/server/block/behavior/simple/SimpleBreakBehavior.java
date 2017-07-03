@@ -34,6 +34,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.BlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
 
 public class SimpleBreakBehavior implements BreakBlockBehavior {
 
@@ -47,6 +48,7 @@ public class SimpleBreakBehavior implements BreakBlockBehavior {
         builder.blockState(BlockTypes.AIR.getDefaultState());
         // Add the block change
         context.addBlockChange(builder.build());
+        context.get(Parameters.PLAYER).ifPresent(p -> p.get(Keys.EXHAUSTION).ifPresent(aDouble -> p.offer(Keys.EXHAUSTION, aDouble + 0.005)));
         context.process(pipeline.pipeline(BlockDropsProviderBehavior.class), (ctx, behavior) -> {
             behavior.tryAddDrops(pipeline, context);
             return BehaviorResult.CONTINUE;

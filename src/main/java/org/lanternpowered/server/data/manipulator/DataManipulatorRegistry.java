@@ -681,10 +681,12 @@ public class DataManipulatorRegistry {
                 c -> c.register(Keys.IS_FLYING, false));
         register(FoodData.class, ImmutableFoodData.class,
                 c -> {
-                    c.register(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
+                    c.register(LanternKeys.MAX_EXHAUSTION, 40.0, 0.0, Double.MAX_VALUE);
+                    c.register(Keys.EXHAUSTION, 0.0, 0.0, LanternKeys.MAX_EXHAUSTION);
                     c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
-                    c.register(Keys.EXHAUSTION, 0.0, 0.0, 40.0);
-                    c.register(Keys.SATURATION, 0.0, 0.0, 5.0);
+                    c.register(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
+                    c.registerWithSuppliedMax(Keys.SATURATION, 5.0, 0.0,
+                            container -> container.get(Keys.FOOD_LEVEL).orElse(20).doubleValue());
                 });
         register(FuseData.class, ImmutableFuseData.class,
                 c -> c.register(Keys.FUSE_DURATION, 20));

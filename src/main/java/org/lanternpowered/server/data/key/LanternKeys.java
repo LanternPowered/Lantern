@@ -120,10 +120,10 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("CanDualWield"), "lantern:can_dual_wield");
     public static final Key<OptionalValue<HandType>> ACTIVE_HAND =
             makeOptionalKey(HandType.class, DataQuery.of("ActiveHand"), "lantern:active_hand");
+    public static final Key<MutableBoundedValue<Double>> MAX_EXHAUSTION =
+            makeMutableBoundedValueKey(Double.class, DataQuery.of("MaxExhaustion"), "lantern:max_exhaustion");
     public static final Key<MutableBoundedValue<Integer>> MAX_FOOD_LEVEL =
             makeMutableBoundedValueKey(Integer.class, DataQuery.of("MaxFoodLevel"), "lantern:max_food_level");
-    public static final Key<MutableBoundedValue<Double>> MAX_SATURATION =
-            makeMutableBoundedValueKey(Double.class, DataQuery.of("MaxSaturation"), "lantern:max_saturation");
     public static final Key<Value<Boolean>> RECIPE_BOOK_GUI_OPEN =
             makeValueKey(Boolean.class, DataQuery.of("RecipeBookGUIOpen"), "lantern:recipe_book_gui_open");
     public static final Key<Value<Boolean>> RECIPE_BOOK_FILTER_ACTIVE =

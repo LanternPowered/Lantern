@@ -23,9 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.behavior.vanilla;
+package org.lanternpowered.server.block.behavior.vanilla.drops;
 
 import org.lanternpowered.server.behavior.BehaviorContext;
+import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.block.behavior.simple.AbstractBlockDropsProviderBehavior;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.item.ItemTypes;
@@ -37,13 +38,12 @@ import java.util.Random;
 
 public class GravelBlockDropsProviderBehavior extends AbstractBlockDropsProviderBehavior {
 
-    private static Random RANDOM = new Random();
+    private final Random random = new Random();
 
     @Override
     protected void collectDrops(BehaviorContext context, List<ItemStackSnapshot> itemStacks) {
         final ItemStack itemStack;
-        // TODO: Use ItemStack.of(...)
-        if (RANDOM.nextInt(100) < 10) {
+        if (this.random.nextInt(10 - Math.min(context.get(Parameters.LOOTING_LEVEL).orElse(0), 3) * 3) == 0) {
             itemStack = new LanternItemStack(ItemTypes.FLINT);
         } else {
             itemStack = new LanternItemStack(ItemTypes.GRAVEL);

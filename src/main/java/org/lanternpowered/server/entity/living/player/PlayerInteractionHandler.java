@@ -345,8 +345,8 @@ public final class PlayerInteractionHandler {
             if (result.isSuccess()) {
                 snapshot = context.createSnapshot();
                 // We can still continue, doing other operations
-                if (result == BehaviorResult.CONTINUE) {
-                    handleMainHandItemInteraction(context, snapshot);
+                if (result == BehaviorResult.CONTINUE && handleMainHandItemInteraction(context, snapshot)) {
+                    return; // Is already accepted
                 }
                 context.accept();
                 return;
@@ -360,8 +360,8 @@ public final class PlayerInteractionHandler {
             if (result.isSuccess()) {
                 snapshot = context.createSnapshot();
                 // We can still continue, doing other operations
-                if (result == BehaviorResult.CONTINUE) {
-                    handleOffHandItemInteraction(context, snapshot);
+                if (result == BehaviorResult.CONTINUE && handleOffHandItemInteraction(context, snapshot)) {
+                    return; // Is already accepted
                 }
                 context.accept();
                 return;
@@ -531,7 +531,6 @@ public final class PlayerInteractionHandler {
 
     private boolean handleItemInteraction(BehaviorContextImpl context, BehaviorContextImpl.Snapshot snapshot) {
         final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
-        return activeHand.isPresent() || handleMainHandItemInteraction(context, snapshot) ||
-                handleOffHandItemInteraction(context, null);
+        return activeHand.isPresent() || handleMainHandItemInteraction(context, snapshot) || handleOffHandItemInteraction(context, null);
     }
 }

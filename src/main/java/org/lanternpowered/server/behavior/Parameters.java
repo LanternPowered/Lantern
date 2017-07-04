@@ -67,6 +67,8 @@ public final class Parameters {
 
     public static final Parameter<Player> PLAYER = Parameter.of(Player.class, "Player");
 
+    public static final Parameter<Integer> LOOTING_LEVEL = Parameter.of(Integer.class, "LootingLevel");
+
     private Parameters() {
     }
 }

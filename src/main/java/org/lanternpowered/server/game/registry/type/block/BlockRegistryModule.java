@@ -53,13 +53,12 @@ import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlac
 import org.lanternpowered.server.block.behavior.simple.SimpleAddDropsBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.drops.InventoryDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.simple.drops.PlacedBlockDropsProviderBehavior;
-import org.lanternpowered.server.block.behavior.simple.drops.SimpleBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.GravelBlockDropsProviderBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.drops.GravelBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.JukeboxInteractionBehavior;
@@ -70,6 +69,7 @@ import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalP
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.drops.OreBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.state.LanternBlockState;
@@ -98,20 +98,26 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.InventorySnapshot;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.behavior.vanilla.SlabItemInteractionBehavior;
+import org.lanternpowered.server.util.LazySupplier;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.util.Direction;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Supplier;
 
 @RegistrationDependency({
@@ -496,7 +502,13 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(hardness(3.0))
                                 .add(blastResistance(15.0)))
                         .behaviors(pipeline -> pipeline
-                                .add(new PlacedBlockDropsProviderBehavior())) // TODO: Lapis lazuli
+                                .add(new OreBlockDropsProviderBehavior(
+                                        LazySupplier.of(() -> {
+                                            final ItemStack itemStack = new LanternItemStack(ItemTypes.DYE); // TODO: ItemStack.of(...)
+                                            itemStack.offer(Keys.DYE_COLOR, DyeColors.BLUE);
+                                            return itemStack.createSnapshot();
+                                        }),
+                                        () -> 4 + new Random().nextInt(5))))
                         .translation("tile.oreLapis.name")
                         .build("minecraft", "lapis_ore"));
         ////////////////////
@@ -1454,13 +1466,13 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .behaviors(pipeline -> pipeline
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new SimplePlacementBehavior())
-                        .add(new SimpleBreakBehavior())
-                        .add(new SimpleAddDropsBreakBehavior()));
+                        .add(new SimpleBreakBehavior()));
     }
 
     private BlockTypeBuilder simpleBuilderWithDrops() {
         return simpleBuilder()
                 .behaviors(pipeline -> pipeline
+                        .add(new SimpleAddDropsBreakBehavior())
                         .add(new PlacedBlockDropsProviderBehavior()));
     }
 
@@ -1664,7 +1676,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     }
 
     private BlockTypeBuilder chestBuilder() {
-        return simpleBuilderWithDrops()
+        return builder()
                 .trait(LanternEnumTraits.HORIZONTAL_FACING)
                 .defaultState(state -> state.withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
                 .itemType()
@@ -1678,6 +1690,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(new ChestPlacementBehavior())
                         .add(new ChestInteractionBehavior())
                         .add(new SimpleBreakBehavior())
+                        .add(new SimpleAddDropsBreakBehavior())
+                        .add(new PlacedBlockDropsProviderBehavior())
                         .add(new InventoryDropsProviderBehavior()));
     }
 

@@ -79,9 +79,8 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
                 // Check if the block is placed within the building limits
                 if (location1.getBlockY() >= buildHeight) {
                     context.restoreSnapshot(snapshot);
-                    context.get(Parameters.PLAYER).ifPresent(player -> {
-                        player.sendMessage(ChatTypes.ACTION_BAR, t("build.tooHigh", buildHeight));
-                    });
+                    context.get(Parameters.PLAYER).ifPresent(player -> player
+                            .sendMessage(ChatTypes.ACTION_BAR, t("build.tooHigh", buildHeight)));
                     return BehaviorResult.FAIL;
                 }
             }

@@ -49,6 +49,7 @@ import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.CheckBuildHeightInteractionBehavior;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
@@ -346,6 +347,9 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                         // Only add the default behavior if there isn't any interaction behavior present
                         if (pipeline.pipeline(InteractWithItemBehavior.class).getBehaviors().isEmpty()) {
                             pipeline.add(new InteractWithBlockItemBehavior());
+                        }
+                        if (pipeline.pipeline(CheckBuildHeightInteractionBehavior.class).getBehaviors().isEmpty()) {
+                            pipeline.add(new CheckBuildHeightInteractionBehavior());
                         }
                     })
                     .build(blockType.getPluginId(), blockType.getName());

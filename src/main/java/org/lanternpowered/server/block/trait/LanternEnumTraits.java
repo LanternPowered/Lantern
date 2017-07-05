@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.trait;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
@@ -85,7 +86,7 @@ public final class LanternEnumTraits {
             LanternEnumTrait.of("variant", (Key) Keys.QUARTZ_TYPE, LanternQuartzType.class);
 
     public static final EnumTrait<LanternBedPart> BED_PART =
-            LanternEnumTrait.of("type", (Key) Keys.SANDSTONE_TYPE, LanternBedPart.class);
+            LanternEnumTrait.of("part", (Key) LanternKeys.BED_PART, LanternBedPart.class);
 
     public static final EnumTrait<Direction> HORIZONTAL_FACING =
             LanternEnumTrait.of("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);

@@ -50,6 +50,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractWithItemBehavior {
 
     private final Supplier<BlockType> halfSlabType;
@@ -84,7 +85,6 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
         BlockState state = location.getBlock();
         final BlockState.Builder stateBuilder = BlockState.builder();
         stateBuilder.blockType(blockType);
-        //noinspection unchecked
         context.get(Parameters.USED_ITEM_STACK).ifPresent(
                 itemStack -> itemStack.getValues().forEach(value -> stateBuilder.add((Key) value.getKey(), value.get())));
         BlockState blockState = stateBuilder.build();
@@ -120,6 +120,8 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
             }
         }
         if (success) {
+            final BehaviorContext.Snapshot snapshot = context.createSnapshot();
+            context.set(CheckBuildHeightInteractionBehavior.SNAPSHOT, snapshot);
             if (snapshotBuilder == null) {
                 PortionType portionType;
                 if (blockFace == Direction.UP) {
@@ -138,7 +140,6 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
             }
             final BlockSnapshotBuilder snapshotBuilder1 = snapshotBuilder;
             snapshotBuilder1.location(location);
-            //noinspection unchecked
             context.get(Parameters.USED_ITEM_STACK).ifPresent(
                     itemStack -> itemStack.getValues().forEach(value -> snapshotBuilder1.add((Key) value.getKey(), value.get())));
             context.addBlockChange(snapshotBuilder1.build());

@@ -66,6 +66,8 @@ import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.TranslationProvider;
 import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.BedItemInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.CheckBuildHeightInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.ConsumableInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior;
@@ -879,6 +881,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(355, builder()
                 .translation("item.bed.name")
                 .maxStackQuantity(1)
+                .behaviors(pipeline -> pipeline
+                        .add(new BedItemInteractionBehavior())
+                        .add(new CheckBuildHeightInteractionBehavior()))
                 .build("minecraft", "bed"));
         ////////////////////
         ///   Repeater   ///

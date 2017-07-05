@@ -36,7 +36,7 @@ public abstract class MessagePlayOutTeams implements Message {
 
     private final String teamName;
 
-    MessagePlayOutTeams(String teamName) {
+    private MessagePlayOutTeams(String teamName) {
         this.teamName = teamName;
     }
 

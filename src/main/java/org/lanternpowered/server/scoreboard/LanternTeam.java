@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.scoreboard.CollisionRule;
@@ -42,6 +41,7 @@ import org.spongepowered.api.text.format.TextColor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -53,8 +53,8 @@ public class LanternTeam implements Team {
 
     private final String name;
     @Nullable private LanternScoreboard scoreboard;
-    final Set<Text> members = Sets.newHashSet();
     private TextColor color;
+    final Set<Text> members = new HashSet<>();
     private Text prefix;
     private String legacyPrefix;
     private Text suffix;

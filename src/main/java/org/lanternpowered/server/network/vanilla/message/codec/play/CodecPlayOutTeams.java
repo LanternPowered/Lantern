@@ -31,6 +31,8 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
 
@@ -38,11 +40,11 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutTeams message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeString(message.getTeamName());
         if (message instanceof MessagePlayOutTeams.CreateOrUpdate) {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Create ? 0 : 2));
-            MessagePlayOutTeams.CreateOrUpdate message1 = (MessagePlayOutTeams.CreateOrUpdate) message;
+            final MessagePlayOutTeams.CreateOrUpdate message1 = (MessagePlayOutTeams.CreateOrUpdate) message;
             buf.writeString(message1.getDisplayName());
             buf.writeString(message1.getPrefix());
             buf.writeString(message1.getSuffix());
@@ -56,13 +58,15 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
             buf.writeByte((byte) flags);
             buf.writeString(message1.getNameTagVisibility().getId());
             buf.writeString(message1.getCollisionRule().getName());
-            buf.writeByte((byte) FormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(message1.getColor()));
+            final TextColor c = message1.getColor();
+            buf.writeByte((byte) (c == TextColors.NONE || c == TextColors.RESET ? -1 :
+                            FormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(c)));
         } else {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Remove ? 1 :
                     message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4));
         }
         if (message instanceof MessagePlayOutTeams.Players) {
-            List<String> players = ((MessagePlayOutTeams.Players) message).getPlayers();
+            final List<String> players = ((MessagePlayOutTeams.Players) message).getPlayers();
             buf.writeVarInt(players.size());
             players.forEach(buf::writeString);
         }

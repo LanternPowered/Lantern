@@ -43,6 +43,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
+@SuppressWarnings("unchecked")
 abstract class OptionObjectProvider<T> implements Provider<T> {
 
     static class IntegerImpl extends OptionObjectProvider<Integer> {
@@ -127,14 +128,13 @@ abstract class OptionObjectProvider<T> implements Provider<T> {
 
     private final Class<?> valueType;
 
-    OptionObjectProvider(Class<?> valueType) {
+    private OptionObjectProvider(Class<?> valueType) {
         this.valueType = valueType;
     }
 
     @Nullable
     @Override
     public T get() {
-        //noinspection unchecked
         return (T) get0();
     }
 
@@ -159,10 +159,8 @@ abstract class OptionObjectProvider<T> implements Provider<T> {
         }
         final OptionSet optionSet = this.optionParser.parse(this.arguments);
         if (flag != null) {
-            //noinspection unchecked
             return optionSet.has(optionSpec);
         } else {
-            //noinspection unchecked
             final Object object = optionSet.valueOf(optionSpec);
             if (this.injectionPoint.getType().getRawType() == boolean.class && object == null) {
                 return false;

@@ -34,6 +34,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.lanternpowered.launch.Environment;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.LanternAssetManager;
 import org.lanternpowered.server.command.DefaultCommandsCollection;
@@ -216,7 +217,7 @@ public class LanternGame implements Game {
     // The injector
     @Inject private Injector injector;
 
-    @Inject @Option("scanClasspath") private boolean scanClasspath;
+    @Inject @Option("scanClasspath") @Nullable private Boolean scanClasspath;
 
     // The current game state
     @Nullable private GameState gameState = null;
@@ -267,7 +268,13 @@ public class LanternGame implements Game {
 
         // Load the plugin instances
         try {
-            this.pluginManager.loadPlugins(this.scanClasspath);
+            // By default, use the '--scanClasspath <true|false>' option, if it can't
+            // be found, fall back to a environment based decision
+            Boolean scanClasspath = this.scanClasspath;
+            if (scanClasspath == null) {
+                scanClasspath = Environment.get() == Environment.DEVELOPMENT;
+            }
+            this.pluginManager.loadPlugins(scanClasspath);
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while loading the plugins.", e);
         }

@@ -79,6 +79,8 @@ import java.util.zip.ZipInputStream;
  */
 public final class LanternClassLoader extends URLClassLoader {
 
+    private static final String ENVIRONMENT = "lantern.environment";
+
     private static final LanternClassLoader classLoader;
     private static final Method findBootstrapClassMethod;
 
@@ -96,6 +98,22 @@ public final class LanternClassLoader extends URLClassLoader {
         // added in this case
         final CodeSource source = LanternClassLoader.class.getProtectionDomain().getCodeSource();
         final URL location = source == null ? null : source.getLocation();
+
+        // Setup the environment variable
+        final String env = System.getProperty(ENVIRONMENT);
+        final Environment environment;
+        if (env != null) {
+            try {
+                environment = Environment.valueOf(env.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid environment type: " + env);
+            }
+        } else {
+            environment = location == null || location.getProtocol().equals("file") ?
+                    Environment.DEVELOPMENT : Environment.PRODUCTION;
+            System.setProperty(ENVIRONMENT, environment.toString().toLowerCase());
+        }
+        Environment.set(environment);
 
         final String classPath = System.getProperty("java.class.path");
         final String[] libraries = classPath.split(File.pathSeparator);

@@ -53,6 +53,7 @@ import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlac
 import org.lanternpowered.server.block.behavior.simple.SimpleBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.BedBreakBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
@@ -559,7 +560,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         ///     Bed      ///
         ////////////////////
-        register(26, simpleBuilder()
+        register(26, builder()
                         .traits(LanternEnumTraits.HORIZONTAL_FACING, LanternEnumTraits.BED_PART, LanternBooleanTraits.OCCUPIED)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
@@ -568,6 +569,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .properties(builder -> builder
                                 .add(hardness(0.2))
                                 .add(blastResistance(1.0)))
+                        .behaviors(pipeline -> pipeline
+                                .add(new BlockSnapshotProviderPlaceBehavior())
+                                .add(new SimplePlacementBehavior()) // Doesn't matter, in handled in the bed item
+                                .add(new BedBreakBehavior()))
                         .translation("tile.bed.name")
                         .build("minecraft", "bed"),
                 blockState -> {

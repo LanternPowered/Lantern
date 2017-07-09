@@ -1,0 +1,25 @@
+apply from: rootProject.file('gradle/lantern.gradle')
+
+// Basic project information
+archivesBaseName = 'lantern-test-plugins'
+// No version, every test plugin has it's own version
+version = '' // 'cero.sero.zero'
+
+// Add a nice 'mcmod.info' file to the final jar
+sponge {
+    plugin {
+        id = archivesBaseName.replace('-', '_')
+        meta {
+            name = 'Lantern Test Plugins'
+            description = 'A collection of plugins that are used to test the functionality of the lantern server.'
+            authors = [
+                    'Cybermaxke',
+                    'Meronat',
+            ]
+        }
+    }
+}
+
+// The 'assemble' task is never called in this
+// sub project, so we need an alternative
+jar.dependsOn sourceJar

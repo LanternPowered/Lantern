@@ -1,0 +1,88 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'com.github.hierynomus.license'
+apply plugin: 'org.spongepowered.plugin'
+
+// Basic information
+group = 'org.lanternpowered'
+
+// Setup the default tasks
+defaultTasks 'licenseFormat', 'build'
+
+// Environment variables for the build set by the build server
+ext {
+    buildNumber = System.env.BUILD_NUMBER ?: System.env.TRAVIS_BUILD_NUMBER ?: '0'
+    ciSystem = System.env.CI_SYSTEM ?: (System.env.TRAVIS ? 'travis' : null)
+    commit = System.env.GIT_COMMIT ?: System.env.TRAVIS_COMMIT
+    branch = System.env.GIT_BRANCH ?: System.env.TRAVIS_BRANCH
+}
+
+// Repositories
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://repo.spongepowered.org/maven'
+    }
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public'
+    }
+    maven {
+        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+ext.api = rootProject.project('SpongeAPI')
+evaluationDependsOn api.path
+
+// Project dependencies
+dependencies {
+    compile api
+}
+
+// Process the resource files
+processResources {
+    // Note: Do not use this method to remove resources, rename them, etc. this
+    // may lead to some unintentional side effects that resources can't be found.
+
+    // Include the license file
+    from rootProject.file('LICENSE.txt')
+}
+
+// A task to generate a jar with all the compiled classes and resources
+jar {
+    classifier = 'base'
+    duplicatesStrategy = 'exclude'
+}
+
+// A task to generate a jar with all the source code and resources
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    duplicatesStrategy = 'exclude'
+
+    from sourceSets.main.allSource
+    // Include the license file
+    from rootProject.file('LICENSE.txt')
+}
+assemble.dependsOn sourceJar
+
+license {
+    header rootProject.file('HEADER.txt')
+    sourceSets = project.sourceSets
+    include '**/*.java'
+
+    strictCheck true
+    ignoreFailures = false
+
+    ext {
+        name = rootProject.name
+        urla = rootProject.url
+        organizationa = rootProject.organization
+        urlb = rootProject.api.url
+        organizationb = rootProject.api.organization
+    }
+
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}

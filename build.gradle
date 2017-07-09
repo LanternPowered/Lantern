@@ -16,33 +16,15 @@ plugins {
     id 'org.spongepowered.plugin' version '0.8.1'
 }
 
-// Environment variables for the build set by the build server
-ext {
-    buildNumber = System.env.BUILD_NUMBER ?: System.env.TRAVIS_BUILD_NUMBER ?: '0'
-    ciSystem = System.env.CI_SYSTEM ?: (System.env.TRAVIS ? 'travis' : null)
-    commit = System.env.GIT_COMMIT ?: System.env.TRAVIS_COMMIT
-    branch = System.env.GIT_BRANCH ?: System.env.TRAVIS_BRANCH
-}
+apply from: rootProject.file('gradle/lantern.gradle')
 
 // Apply plugin
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'com.github.hierynomus.license'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'org.lanternpowered.gradle'
 apply plugin: 'org.lanternpowered.run-configs'
 
-// Minimum version of Java required
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
 // Basic project information
-group = 'org.lanternpowered'
 archivesBaseName = 'lanternserver'
 version = '1.0.0-SNAPSHOT'
-
-defaultTasks 'licenseFormat', 'build'
 
 // Repositories
 repositories {
@@ -70,18 +52,14 @@ compileJava6Java {
     targetCompatibility = '1.6'
 }
 
-ext.api = project('SpongeAPI')
-
 // Disable some tasks to make the building go faster
-tasks.getByPath(':SpongeAPI:javadoc').enabled = false
-tasks.getByPath(':SpongeAPI:javadocJar').enabled = false
-tasks.getByPath(':SpongeAPI:checkstyleMain').enabled = false
-tasks.getByPath(':SpongeAPI:checkstyleTest').enabled = false
+api.tasks.javadoc.enabled = false
+api.tasks.javadocJar.enabled = false
+api.tasks.checkstyleMain.enabled = false
+api.tasks.checkstyleTest.enabled = false
 // Disable this task to avoid that we turn the dependency
 // dirty when we call this on our project
-tasks.getByPath(':SpongeAPI:wrapper').enabled = false
-
-evaluationDependsOn api.path
+api.tasks.wrapper.enabled = false
 
 configurations {
     fastutil
@@ -90,10 +68,12 @@ configurations {
     }
 }
 
+ext.testPlugins = project(':test-plugins')
 ext.fastutilVersion = '7.1.0'
 // Project dependencies
 dependencies {
-    compile api
+    // Add the test plugins to the class path
+    compile testPlugins
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
@@ -158,9 +138,6 @@ runConfigurations {
 // The base jar, includes all the lantern and sponge classes,
 // including generated event classes
 jar {
-    classifier = 'base'
-    duplicatesStrategy = 'exclude'
-
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
 
@@ -198,11 +175,6 @@ import groovy.json.JsonSlurper
 import groovy.json.JsonOutput
 
 processResources {
-    // Note: Do not use this method to remove resources, rename them, etc. this
-    // may lead to some unintentional side effects that resources can't be found.
-
-    from 'LICENSE.txt'
-
     // Minimize the json files
     doLast {
         fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each {
@@ -276,6 +248,7 @@ task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
     Set<String> entries = []
     // Don't include the api again
     entries.add "$api.group:$api.name"
+    entries.add "$testPlugins.group:$testPlugins.name"
     // We already include 'asm-all'
     entries.add 'org.ow2.asm:asm'
 
@@ -305,43 +278,27 @@ task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
     }
 }
 
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    duplicatesStrategy = 'exclude'
-
+sourceJar {
     from sourceSets.java6.allSource
-    from sourceSets.main.allSource
 
     from api.sourceSets.main.allSource
     from api.sourceSets.ap.allSource
 }
 
-// Run shadowJar and sourceJar on build
-assemble.dependsOn sourceJar
+// Run fatJar on build
 assemble.dependsOn fatJar
-
-license {
-    header rootProject.file('HEADER.txt')
-    sourceSets = project.sourceSets
-    include '**/*.java'
-
-    strictCheck true
-    ignoreFailures = false
-
-    ext {
-        name = rootProject.name
-        urla = rootProject.url
-        organizationa = rootProject.organization
-        urlb = rootProject.api.url
-        organizationb = rootProject.api.organization
-    }
-
-    mapping {
-        java = 'SLASHSTAR_STYLE'
-    }
-}
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0'
+}
+
+// A custom update wrapper task, using a custom task prevents
+// intellij from updating the wrapper constantly through
+// the wrapper task
+task updateWrapper(dependsOn: wrapper)
+
+gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+    // Only enable the wrapper task if the updateWrapper task is run
+    wrapper.enabled = graph.allTasks.contains(updateWrapper)
 }

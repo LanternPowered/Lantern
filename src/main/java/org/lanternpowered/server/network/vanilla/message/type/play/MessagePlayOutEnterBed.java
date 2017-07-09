@@ -23,23 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
+import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.network.message.Message;
 
-public final class CodecPlayOutChangeGameState implements Codec<MessagePlayOutChangeGameState> {
+public final class MessagePlayOutEnterBed implements Message {
 
-    private static final int LENGTH = Byte.BYTES + Float.BYTES;
+    private final Vector3i location;
+    private final int playerId;
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutChangeGameState message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
-        buf.writeByte((byte) message.getType());
-        buf.writeFloat(message.getValue());
-        return buf;
+    public MessagePlayOutEnterBed(Vector3i location, int playerId) {
+        this.location = location;
+        this.playerId = playerId;
+    }
+
+    public Vector3i getLocation() {
+        return this.location;
+    }
+
+    public int getPlayerId() {
+        return this.playerId;
     }
 }

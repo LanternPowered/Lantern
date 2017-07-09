@@ -27,19 +27,18 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEnterBed;
 
-public final class CodecPlayOutChangeGameState implements Codec<MessagePlayOutChangeGameState> {
-
-    private static final int LENGTH = Byte.BYTES + Float.BYTES;
+public final class CodecPlayOutEnterBed implements Codec<MessagePlayOutEnterBed> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutChangeGameState message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
-        buf.writeByte((byte) message.getType());
-        buf.writeFloat(message.getValue());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutEnterBed message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getPlayerId());
+        buf.write(Types.VECTOR_3_I, message.getLocation());
         return buf;
     }
 }

@@ -32,6 +32,7 @@ import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutPing;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInAdvancementTree;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEnterBed;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInChatMessage;
@@ -170,6 +171,8 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEnterBed;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutLeaveBed;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
@@ -465,6 +468,7 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutEntityStatus.bind(MessagePlayOutSetOpLevel.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutSetReducedDebug.class);
         codecPlayOutEntityStatus.bind(MessagePlayInOutFinishUsingItem.class);
+        codecPlayOutEntityStatus.bind(MessagePlayOutLeaveBed.class);
         outbound.bind(); // TODO: Explosion
         outbound.bind(CodecPlayOutUnloadChunk.class, MessagePlayOutUnloadChunk.class);
         outbound.bind(CodecPlayOutChangeGameState.class, MessagePlayOutChangeGameState.class);
@@ -486,7 +490,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(); // TODO: Combat Event
         outbound.bind(CodecPlayOutTabListEntries.class, MessagePlayOutTabListEntries.class);
         outbound.bind(CodecPlayOutPlayerPositionAndLook.class, MessagePlayOutPlayerPositionAndLook.class);
-        outbound.bind(); // TODO: Use Bed
+        outbound.bind(CodecPlayOutEnterBed.class, MessagePlayOutEnterBed.class);
         final CodecRegistration<MessagePlayOutUnlockRecipes, CodecPlayOutUnlockRecipes> codecPlayOutUnlockRecipes =
                 outbound.bind(CodecPlayOutUnlockRecipes.class);
         codecPlayOutUnlockRecipes.bind(MessagePlayOutUnlockRecipes.Add.class);

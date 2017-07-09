@@ -23,23 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
+import org.lanternpowered.server.network.message.Message;
 
-public final class CodecPlayOutChangeGameState implements Codec<MessagePlayOutChangeGameState> {
+public final class MessagePlayOutLeaveBed implements Message {
 
-    private static final int LENGTH = Byte.BYTES + Float.BYTES;
+    private final int playerId;
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutChangeGameState message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
-        buf.writeByte((byte) message.getType());
-        buf.writeFloat(message.getValue());
-        return buf;
+    public MessagePlayOutLeaveBed(int playerId) {
+        this.playerId = playerId;
+    }
+
+    public int getPlayerId() {
+        return this.playerId;
     }
 }

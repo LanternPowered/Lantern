@@ -34,34 +34,31 @@ import org.spongepowered.api.data.value.mutable.ListValue;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractListData<E, M extends ListData<E, M, I>, I extends ImmutableListData<E, I, M>> extends AbstractData<M, I>
         implements ListData<E, M, I> {
 
     private final Key<ListValue<E>> listKey;
 
-    public AbstractListData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<ListValue<E>> listKey, List<E> defaultList) {
+    protected AbstractListData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<ListValue<E>> listKey, List<E> defaultList) {
         super(manipulatorType, immutableManipulatorType);
         getValueCollection().register(listKey, defaultList);
         this.listKey = listKey;
     }
 
-    public AbstractListData(I manipulator) {
-        //noinspection unchecked
+    protected AbstractListData(I manipulator) {
         this((IDataManipulatorBase<M, I>) manipulator);
     }
 
-    public AbstractListData(M manipulator) {
-        //noinspection unchecked
+    protected AbstractListData(M manipulator) {
         this((IDataManipulatorBase<M, I>) manipulator);
     }
 
     protected AbstractListData(IDataManipulatorBase<M, I> manipulator) {
         super(manipulator);
         if (manipulator instanceof IListData) {
-            //noinspection unchecked
             this.listKey = ((IListData) manipulator).getListKey();
         } else {
-            //noinspection unchecked
             this.listKey = ((IImmutableListData) manipulator).getListKey();
         }
     }

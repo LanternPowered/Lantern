@@ -27,7 +27,6 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.inventory.LanternItemStackSnapshot.compareRawDataMaps;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
@@ -57,6 +56,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("ConstantConditions")
 public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdditionalDataHolder {
 
     private final ValueCollection valueCollection;
@@ -83,7 +83,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
         registerKeys();
     }
 
-    LanternItemStack(ItemType itemType, int quantity, ValueCollection valueCollection,
+    private LanternItemStack(ItemType itemType, int quantity, ValueCollection valueCollection,
             AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers) {
         checkArgument(quantity >= 0, "quantity may not be negative");
         checkNotNull(itemType, "itemType");
@@ -165,11 +165,9 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
         this.tempMaxQuantity = maxQuantity;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public ItemStackSnapshot createSnapshot() {
-        return new LanternItemStackSnapshot(this.itemType, this.quantity, getValueCollection().copy(),
-                this.additionalContainers.mapAndAsNormal(DataManipulator::asImmutable));
+        return new LanternItemStackSnapshot(copy());
     }
 
     @Override
@@ -182,7 +180,6 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
         return this.itemType == ItemTypes.NONE || this.quantity <= 0;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public LanternItemStack copy() {
         final LanternItemStack itemStack = new LanternItemStack(this.itemType, this.quantity, getValueCollection().copy(),
@@ -204,7 +201,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
      */
     public boolean isSimilar(ItemStack that) {
         checkNotNull(that, "that");
-        return this.itemType == that.getItem() && compareRawDataMaps(this, (IValueContainer) that);
+        return this.itemType == that.getItem() && IValueContainer.matchContents(this, (IValueContainer) that);
     }
 
     public static boolean isSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
@@ -251,7 +248,6 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
 
     public static ItemStackSnapshot toSnapshot(@Nullable ItemStack itemStack) {
         itemStack = toNullable(itemStack);
-        //noinspection ConstantConditions
         return itemStack == null ? ItemStackSnapshot.NONE : itemStack.createSnapshot();
     }
 }

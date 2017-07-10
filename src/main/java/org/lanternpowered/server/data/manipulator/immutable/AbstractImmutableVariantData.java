@@ -38,14 +38,14 @@ public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariant
 
     private final Key<? extends Value<E>> variantKey;
 
-    public AbstractImmutableVariantData(Class<I> immutableManipulatorType, Class<M> manipulatorType,
+    protected AbstractImmutableVariantData(Class<I> immutableManipulatorType, Class<M> manipulatorType,
             Key<? extends Value<E>> variantKey, E defaultValue) {
         super(immutableManipulatorType, manipulatorType);
         this.variantKey = variantKey;
         getValueCollection().register(variantKey, defaultValue);
     }
 
-    public AbstractImmutableVariantData(M manipulator) {
+    protected AbstractImmutableVariantData(M manipulator) {
         super(manipulator);
         this.variantKey = ((IVariantData<E, M, I>) manipulator).getVariantKey();
     }

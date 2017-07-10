@@ -57,7 +57,7 @@ abstract class AbstractFluidStackBuilder<T extends DataSerializable, B extends D
         if (fluidType != null) {
             if (this.fluidStack == null) {
                 this.fluidStack = new LanternFluidStack(fluidType, 0);
-            } else if (this.fluidStack != fluidType) {
+            } else if (this.fluidStack.getFluid() != fluidType) {
                 final FluidStack old = this.fluidStack;
                 this.fluidStack = new LanternFluidStack(fluidType, 0);
                 this.fluidStack.setVolume(old.getVolume());
@@ -76,8 +76,6 @@ abstract class AbstractFluidStackBuilder<T extends DataSerializable, B extends D
     }
 
     public B volume(int volume) {
-        checkArgument(volume >= 0, "volume cannot be negative");
-        checkArgument(volume <= 1000, "volume cannot be greater then 1000");
         fluidStack(null).setVolume(volume);
         return (B) this;
     }
@@ -107,6 +105,6 @@ abstract class AbstractFluidStackBuilder<T extends DataSerializable, B extends D
 
     @Override
     protected Optional<T> buildContent(DataView container) throws InvalidDataException {
-        return null;
+        throw new UnsupportedOperationException("TODO");
     }
 }

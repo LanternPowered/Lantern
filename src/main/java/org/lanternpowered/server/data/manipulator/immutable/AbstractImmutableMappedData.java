@@ -37,24 +37,24 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class AbstractImmutableMappedData<K, V, I extends ImmutableMappedData<K, V, I, M>, M extends MappedData<K, V, M, I>>
         extends AbstractImmutableData<I, M> implements IImmutableMappedData<K, V, I, M> {
 
     private final Key<? extends MapValue<K, V>> mapKey;
 
-    public AbstractImmutableMappedData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<MapValue<K, V>> mapKey) {
+    protected AbstractImmutableMappedData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<MapValue<K, V>> mapKey) {
         this(immutableManipulatorType, manipulatorType, mapKey, ImmutableMap.of());
     }
 
-    public AbstractImmutableMappedData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<MapValue<K, V>> mapKey, Map<K, V> map) {
+    protected AbstractImmutableMappedData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<MapValue<K, V>> mapKey, Map<K, V> map) {
         super(immutableManipulatorType, manipulatorType);
         getValueCollection().register(mapKey, ImmutableMap.copyOf(map));
         this.mapKey = mapKey;
     }
 
-    public AbstractImmutableMappedData(M manipulator) {
+    protected AbstractImmutableMappedData(M manipulator) {
         super(manipulator);
-        //noinspection unchecked
         this.mapKey = ((IMappedData<K, V, M, I>) manipulator).getMapKey();
     }
 

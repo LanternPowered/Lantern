@@ -32,8 +32,6 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.DataBuilder;
 
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public interface DataManipulatorRegistration<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>>
         extends DataRegistration<M, I> {

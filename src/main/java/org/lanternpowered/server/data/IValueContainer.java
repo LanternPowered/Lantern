@@ -37,10 +37,69 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public interface IValueContainer<C extends ValueContainer<C>> extends ValueContainer<C>, IValueHolder {
+
+    /**
+     * Matches the contents of the two {@link ValueContainer}s.
+     *
+     * @param valueContainerA The first value container
+     * @param valueContainerB The second value container
+     * @return Whether the contents match
+     */
+    static boolean matchContents(IValueContainer<?> valueContainerA, IValueContainer<?> valueContainerB) {
+        final boolean additional = valueContainerA instanceof IAdditionalCompositeValueStore;
+        if (additional != valueContainerB instanceof IAdditionalCompositeValueStore) {
+            return false;
+        }
+
+        final ValueCollection valueCollectionA = valueContainerA.getValueCollection();
+        final ValueCollection valueCollectionB = valueContainerB.getValueCollection();
+
+        final Collection<Key<?>> keysA = valueCollectionA.getKeys();
+        final Collection<Key<?>> keysB = valueCollectionB.getKeys();
+
+        // The same keys have to be present in both of the containers
+        if (keysA.size() != keysB.size() || !keysA.containsAll(keysB)) {
+            return false;
+        }
+
+        for (KeyRegistration<?,?> registration1 : valueCollectionA.getAll()) {
+            final KeyRegistration registration2 = (KeyRegistration) valueCollectionB.get((Key) registration1.getKey()).get();
+            // Get the values from both of the containers and match them
+            final Object value1 = ((Processor) registration1).getFrom(valueContainerA).orElse(null);
+            final Object value2 = ((Processor) registration2).getFrom(valueContainerB).orElse(null);
+            if (!Objects.equals(value1, value2)) {
+                return false;
+            }
+        }
+
+        // Match additional containers
+        if (additional) {
+            final Map<Class<?>, ValueContainer<?>> mapA =
+                    ((IAdditionalCompositeValueStore) valueContainerA).getAdditionalContainers().getMap();
+            final Map<Class<?>, ValueContainer<?>> mapB =
+                    ((IAdditionalCompositeValueStore) valueContainerB).getAdditionalContainers().getMap();
+            if (mapA.size() != mapB.size() || !mapA.keySet().containsAll(mapB.keySet())) {
+                return false;
+            }
+            for (Map.Entry<Class<?>, ValueContainer<?>> entry : mapA.entrySet()) {
+                final ValueContainer<?> containerA = entry.getValue();
+                final ValueContainer<?> containerB = mapB.get(entry.getKey());
+                if (!Objects.equals(containerA, containerB)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 
     @Override
     default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {

@@ -28,82 +28,70 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Streams;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.AdditionalContainerHolder;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IImmutableDataHolder;
 import org.lanternpowered.server.data.IValueContainer;
-import org.lanternpowered.server.data.KeyRegistration;
+import org.lanternpowered.server.data.MutableToImmutableManipulatorCollection;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.item.LanternItemType;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDataHolder<ItemStackSnapshot>,
+public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDataHolder<ItemStackSnapshot>,
         AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
-    private final ValueCollection valueCollection;
-    private final AdditionalContainerCollection<ImmutableDataManipulator<?,?>> dataManipulators;
-    private final ItemType itemType;
-    // TODO: Hmm, inconsistency the the name with itemstack?
-    private final int quantity;
+    final LanternItemStack itemStack;
+    private final AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
 
-    public LanternItemStackSnapshot(ItemType itemType, int quantity) {
-        this(itemType, quantity, ValueCollection.create(), AdditionalContainerCollection.create());
-        ((LanternItemType) itemType).getKeysProvider().accept(getValueCollection());
-    }
-
-    LanternItemStackSnapshot(ItemType itemType, int quantity, ValueCollection valueCollection,
-            AdditionalContainerCollection<ImmutableDataManipulator<?,?>> dataManipulators) {
-        this.valueCollection = valueCollection;
-        this.dataManipulators = dataManipulators;
-        this.itemType = itemType;
-        this.quantity = quantity;
+    LanternItemStackSnapshot(LanternItemStack itemStack) {
+        this.additionalContainers = new MutableToImmutableManipulatorCollection(itemStack.getAdditionalContainers());
+        this.itemStack = itemStack;
     }
 
     @Override
     public ValueCollection getValueCollection() {
-        return this.valueCollection;
+        return this.itemStack.getValueCollection();
     }
 
     @Override
     public AdditionalContainerCollection<ImmutableDataManipulator<?,?>> getAdditionalContainers() {
-        return this.dataManipulators;
+        return this.additionalContainers;
     }
 
     @Override
     public ItemType getType() {
-        return this.itemType;
+        return this.itemStack.getItem();
     }
 
     @Override
     public int getCount() {
-        return this.quantity;
+        return this.itemStack.getQuantity();
     }
 
     @Override
     public boolean isEmpty() {
-        return this.itemType == ItemTypes.NONE || this.quantity <= 0;
+        return this.itemStack.isEmpty();
     }
 
     @Override
     public ItemStack createStack() {
-        return new LanternItemStack(this.itemType, this.quantity, getValueCollection().copy(),
-                this.dataManipulators.mapAndAsConcurrent(ImmutableDataManipulator::asMutable));
+        return this.itemStack.copy();
     }
 
     @Override
@@ -120,62 +108,72 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDa
 
     @Override
     public <E> Optional<ItemStackSnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        return null;
+        final LanternItemStack copy = this.itemStack.copy();
+        if (copy.transformFast(key, function)) {
+            return Optional.of(new LanternItemStackSnapshot(copy));
+        }
+        return Optional.empty();
     }
 
     @Override
     public <E> Optional<ItemStackSnapshot> with(Key<? extends BaseValue<E>> key, E value) {
-        return null;
+        final LanternItemStack copy = this.itemStack.copy();
+        if (copy.offerFast(key, value)) {
+            return Optional.of(new LanternItemStackSnapshot(copy));
+        }
+        return Optional.empty();
     }
 
     @Override
     public Optional<ItemStackSnapshot> with(ImmutableDataManipulator<?, ?> valueContainer) {
-        return null;
-    }
-
-    @Override public Optional<ItemStackSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
-        return null;
+        final LanternItemStack copy = this.itemStack.copy();
+        if (copy.offerFast(valueContainer.asMutable())) {
+            return Optional.of(new LanternItemStackSnapshot(copy));
+        }
+        return Optional.empty();
     }
 
     @Override
+    public Optional<ItemStackSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
+        final LanternItemStack copy = this.itemStack.copy();
+        if (copy.offerFast(Streams.stream(valueContainers)
+                .map(ImmutableDataManipulator::asMutable)
+                .collect(Collectors.toList()))) {
+            return Optional.of(new LanternItemStackSnapshot(copy));
+        }
+        return Optional.empty();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public Optional<ItemStackSnapshot> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        return null;
+        final LanternItemStack copy = this.itemStack.copy();
+        final DataRegistration registration = Lantern.getGame().getDataManager().get(containerClass)
+                .orElseThrow(() -> new IllegalStateException("The container class " + containerClass.getName() + " isn't registered."));
+        if (copy.removeFast(registration.getManipulatorClass())) {
+            return Optional.of(new LanternItemStackSnapshot(copy));
+        }
+        return Optional.empty();
     }
 
     @Override
     public ItemStackSnapshot merge(ItemStackSnapshot that, MergeFunction function) {
-        return null;
+        final LanternItemStack copy = this.itemStack.copy();
+        copy.copyFrom(((LanternItemStackSnapshot) that).itemStack, function);
+        return new LanternItemStackSnapshot(copy);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("type", this.itemType.getId())
-                .add("quantity", this.quantity)
+                .add("type", getType().getId())
+                .add("quantity", getCount())
                 .add("data", LanternItemStack.valuesToString(getValues()))
                 .toString();
     }
 
     public boolean isSimilar(ItemStackSnapshot that) {
         checkNotNull(that, "that");
-        return this.itemType == that.getType() && compareRawDataMaps(this, (IValueContainer) that);
-    }
-
-    @SuppressWarnings("unchecked")
-    static boolean compareRawDataMaps(IValueContainer container1, IValueContainer container2) {
-        final ValueCollection valueCollection1 = container1.getValueCollection();
-        final ValueCollection valueCollection2 = container2.getValueCollection();
-        for (KeyRegistration<?,?> registration1 : valueCollection1.getAll()) {
-            if (!valueCollection2.has(registration1.getKey())) {
-                return false;
-            }
-            final KeyRegistration registration2 = (KeyRegistration) valueCollection2.get((Key) registration1.getKey()).get();
-            final Object value1 = ((Processor) registration1).getFrom(container1);
-            final Object value2 = ((Processor) registration2).getFrom(container2);
-            if (!Objects.equals(value1, value2)) {
-                return false;
-            }
-        }
-        return true;
+        return getType() == that.getType() && IValueContainer.matchContents(this, (IValueContainer) that);
     }
 }

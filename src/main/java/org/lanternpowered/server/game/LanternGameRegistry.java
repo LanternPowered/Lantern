@@ -189,6 +189,7 @@ import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistry
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
+import org.lanternpowered.server.inventory.LanternItemStackBuilder;
 import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
@@ -326,6 +327,7 @@ import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShape;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
@@ -473,6 +475,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(WorldBorder.Builder.class, LanternWorldBorderBuilder::new)
                 .registerBuilderSupplier(FluidStack.Builder.class, LanternFluidStackBuilder::new)
                 .registerBuilderSupplier(FluidStackSnapshot.Builder.class, LanternFluidStackSnapshotBuilder::new)
+                .registerBuilderSupplier(ItemStack.Builder.class, LanternItemStackBuilder::new)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???

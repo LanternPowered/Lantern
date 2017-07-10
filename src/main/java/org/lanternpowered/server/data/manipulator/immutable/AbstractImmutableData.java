@@ -27,7 +27,6 @@ package org.lanternpowered.server.data.manipulator.immutable;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.DataHelper;
-import org.lanternpowered.server.data.IImmutableValueHolder;
 import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
@@ -36,18 +35,12 @@ import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.BaseValue;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
@@ -58,14 +51,14 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
     private final Class<M> manipulatorType;
     private final Class<I> immutableManipulatorType;
 
-    public AbstractImmutableData(Class<I> immutableManipulatorType, Class<M> manipulatorType) {
+    protected AbstractImmutableData(Class<I> immutableManipulatorType, Class<M> manipulatorType) {
         this.valueCollection = ValueCollection.create(ValueCollection.Mode.NON_REMOVABLE);
         this.immutableManipulatorType = immutableManipulatorType;
         this.manipulatorType = manipulatorType;
         registerKeys();
     }
 
-    public AbstractImmutableData(M manipulator) {
+    protected AbstractImmutableData(M manipulator) {
         final IDataManipulator<M, I> iDataManipulator = (IDataManipulator<M, I>) manipulator;
         this.immutableManipulatorType = iDataManipulator.getImmutableType();
         this.manipulatorType = iDataManipulator.getMutableType();
@@ -104,6 +97,15 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other == null || !this.immutableManipulatorType.isInstance(other)) {
+            return false;
+        }
+        final IValueContainer<I> manipulator = (IValueContainer<I>) other;
+        return IValueContainer.matchContents(this, manipulator);
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("type", getMutableType().getName())
@@ -118,7 +120,6 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
             super(requiredClass, supportedVersion);
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         protected Optional<I> buildContent(DataView container) throws InvalidDataException {
             return (Optional) DataHelper.buildContent(container, () ->  (IValueContainer) create());

@@ -379,21 +379,21 @@ public final class ValueCollection implements Copyable<ValueCollection> {
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
             E defaultValue, Key<? extends BaseValue<E>> minimum, Key<? extends BaseValue<E>> maximum) {
         return registerSupplied(key, defaultValue,
-                container -> (E) container.get(minimum).get(),
-                container -> (E) container.get(maximum).get());
+                container -> container.get(minimum).get(),
+                container -> container.get(maximum).get());
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
             E defaultValue, E minimum, Key<? extends BaseValue<E>> maximum) {
         return registerSupplied(key, defaultValue,
                 container -> minimum,
-                container -> (E) container.get(maximum).get());
+                container -> container.get(maximum).get());
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
             E defaultValue, Key<? extends BaseValue<E>> minimum, E maximum) {
         return registerSupplied(key, defaultValue,
-                container -> (E) container.get(minimum).get(),
+                container -> container.get(minimum).get(),
                 container -> maximum);
     }
 }

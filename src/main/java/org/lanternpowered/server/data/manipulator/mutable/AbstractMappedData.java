@@ -38,34 +38,31 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractMappedData<K, V, M extends MappedData<K, V, M, I>, I extends ImmutableMappedData<K, V, I, M>>
         extends AbstractData<M, I> implements MappedData<K, V, M, I> {
 
     private final Key<MapValue<K, V>> mapKey;
 
-    public AbstractMappedData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<MapValue<K, V>> mapKey, Map<K, V> defaultMap) {
+    protected AbstractMappedData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<MapValue<K, V>> mapKey, Map<K, V> defaultMap) {
         super(manipulatorType, immutableManipulatorType);
         getValueCollection().register(mapKey, defaultMap);
         this.mapKey = mapKey;
     }
 
-    public AbstractMappedData(I manipulator) {
-        //noinspection unchecked
+    protected AbstractMappedData(I manipulator) {
         this((IDataManipulatorBase<M, I>) manipulator);
     }
 
-    public AbstractMappedData(M manipulator) {
-        //noinspection unchecked
+    protected AbstractMappedData(M manipulator) {
         this((IDataManipulatorBase<M, I>) manipulator);
     }
 
     protected AbstractMappedData(IDataManipulatorBase<M, I> manipulator) {
         super(manipulator);
         if (manipulator instanceof IMappedData) {
-            //noinspection unchecked
             this.mapKey = ((IMappedData) manipulator).getMapKey();
         } else {
-            //noinspection unchecked
             this.mapKey = ((IImmutableMappedData) manipulator).getMapKey();
         }
     }
@@ -93,7 +90,6 @@ public abstract class AbstractMappedData<K, V, M extends MappedData<K, V, M, I>,
             theMap.put(key, value);
         }
         set(this.mapKey, theMap);
-        //noinspection unchecked
         return (M) this;
     }
 
@@ -106,7 +102,6 @@ public abstract class AbstractMappedData<K, V, M extends MappedData<K, V, M, I>,
             theMap.putAll(map);
         }
         set(this.mapKey, theMap);
-        //noinspection unchecked
         return (M) this;
     }
 
@@ -121,7 +116,6 @@ public abstract class AbstractMappedData<K, V, M extends MappedData<K, V, M, I>,
             theMap.remove(key);
         }
         set(this.mapKey, theMap);
-        //noinspection unchecked
         return (M) this;
     }
 }

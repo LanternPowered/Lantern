@@ -186,6 +186,15 @@ public abstract class AbstractData<M extends DataManipulator<M, I>, I extends Im
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other == null || !this.manipulatorType.isInstance(other)) {
+            return false;
+        }
+        final IValueContainer<M> manipulator = (IValueContainer<M>) other;
+        return IValueContainer.matchContents(this, manipulator);
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("type", getMutableType().getName())

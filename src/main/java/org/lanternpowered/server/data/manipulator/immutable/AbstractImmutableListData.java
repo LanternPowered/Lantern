@@ -41,17 +41,17 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
 
     private final Key<? extends ListValue<E>> listKey;
 
-    public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey) {
+    protected AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey) {
         this(immutableManipulatorType, manipulatorType, listKey, ImmutableList.of());
     }
 
-    public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey, List<E> list) {
+    protected AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey, List<E> list) {
         super(immutableManipulatorType, manipulatorType);
         getValueCollection().register(listKey, ImmutableList.copyOf(list));
         this.listKey = listKey;
     }
 
-    public AbstractImmutableListData(M manipulator) {
+    protected AbstractImmutableListData(M manipulator) {
         super(manipulator);
         //noinspection unchecked
         this.listKey = ((IListData<E, M, I>) manipulator).getListKey();

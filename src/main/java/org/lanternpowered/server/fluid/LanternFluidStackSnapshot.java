@@ -29,6 +29,7 @@ import com.google.common.collect.Streams;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.AdditionalContainerHolder;
 import org.lanternpowered.server.data.IImmutableDataHolder;
+import org.lanternpowered.server.data.MutableToImmutableManipulatorCollection;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.game.Lantern;
@@ -48,11 +49,11 @@ import java.util.stream.Collectors;
 public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutableDataHolder<FluidStackSnapshot>,
         AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
-    private final AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers =
-            AdditionalContainerCollection.create();
+    private final AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
     private final LanternFluidStack fluidStack;
 
     LanternFluidStackSnapshot(LanternFluidStack fluidStack) {
+        this.additionalContainers = new MutableToImmutableManipulatorCollection(fluidStack.getAdditionalContainers());
         this.fluidStack = fluidStack;
     }
 

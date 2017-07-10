@@ -28,6 +28,8 @@ package org.lanternpowered.server.block.provider.property;
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
 import org.lanternpowered.server.block.property.InstrumentProperty;
+import org.lanternpowered.server.block.property.PushBehavior;
+import org.lanternpowered.server.block.property.PushBehaviorProperty;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.data.Property;
@@ -48,6 +50,7 @@ import org.spongepowered.api.data.type.InstrumentType;
 import java.util.EnumMap;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public final class PropertyProviders {
 
     private static final Map<MatterProperty.Matter, MatterProperty> MATTER_PROPERTIES = new EnumMap<>(MatterProperty.Matter.class);
@@ -86,7 +89,6 @@ public final class PropertyProviders {
     }
 
     public static PropertyProviderCollection constant(Property<?,?> property) {
-        //noinspection unchecked
         return PropertyProviderCollection.builder()
                 .add(property.getClass(), new ConstantPropertyProvider(property))
                 .build();
@@ -299,6 +301,26 @@ public final class PropertyProviders {
     public static PropertyProviderCollection instrument(InstrumentType instrument) {
         return PropertyProviderCollection.builder()
                 .add(InstrumentProperty.class, new ConstantPropertyProvider<>(new InstrumentProperty(instrument)))
+                .build();
+    }
+
+    public static PropertyProviderCollection instrument(ObjectProvider<InstrumentType> provider) {
+        return PropertyProviderCollection.builder()
+                .add(InstrumentProperty.class, (blockState, location, face) ->
+                        new InstrumentProperty(provider.get(blockState, location, face)))
+                .build();
+    }
+
+    public static PropertyProviderCollection pushBehavior(PushBehavior pushBehavior) {
+        return PropertyProviderCollection.builder()
+                .add(PushBehaviorProperty.class, new ConstantPropertyProvider<>(new PushBehaviorProperty(pushBehavior)))
+                .build();
+    }
+
+    public static PropertyProviderCollection pushBehavior(ObjectProvider<PushBehavior> provider) {
+        return PropertyProviderCollection.builder()
+                .add(PushBehaviorProperty.class, (blockState, location, face) ->
+                        new PushBehaviorProperty(provider.get(blockState, location, face)))
                 .build();
     }
 }

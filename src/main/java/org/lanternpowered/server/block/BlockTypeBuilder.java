@@ -58,6 +58,10 @@ public interface BlockTypeBuilder {
 
     BlockTypeBuilder properties(PropertyProviderCollection collection);
 
+    default BlockTypeBuilder properties(PropertyProviderCollection.Builder collection) {
+        return properties(collection.build());
+    }
+
     BlockTypeBuilder properties(Consumer<PropertyProviderCollection.Builder> consumer);
 
     BlockTypeBuilder tileEntityType(Supplier<TileEntityType> tileEntityType);

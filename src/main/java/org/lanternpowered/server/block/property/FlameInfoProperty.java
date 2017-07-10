@@ -28,6 +28,7 @@ package org.lanternpowered.server.block.property;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.AbstractProperty;
 
+@SuppressWarnings("ConstantConditions")
 public final class FlameInfoProperty extends AbstractProperty<String, FlameInfo> {
 
     public FlameInfoProperty(FlameInfo value) {
@@ -40,7 +41,6 @@ public final class FlameInfoProperty extends AbstractProperty<String, FlameInfo>
 
     @Override
     public int compareTo(Property<?, ?> o) {
-        //noinspection ConstantConditions
-        return o == null ?  0 : this.getValue().compareTo((FlameInfo) o.getValue());
+        return o == null ?  0 : getValue().compareTo((FlameInfo) o.getValue());
     }
 }

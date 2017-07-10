@@ -23,45 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data;
+package org.lanternpowered.server.fluid;
 
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.ImmutableDataHolder;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.extra.fluid.FluidStack;
 
-import java.util.List;
-import java.util.Optional;
+public final class LanternFluidStackBuilder extends AbstractFluidStackBuilder<FluidStack, FluidStack.Builder> implements FluidStack.Builder {
 
-@SuppressWarnings("unchecked")
-public interface IImmutableDataHolder<H extends ImmutableDataHolder<H>> extends
-        IImmutableValueStore<H, ImmutableDataManipulator<?, ?>>, IImmutableDataHolderBase<H> {
-
-    @Override
-    default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        return IImmutableDataHolderBase.super.getValue(key);
+    public LanternFluidStackBuilder() {
+        super(FluidStack.class);
     }
 
     @Override
-    default List<ImmutableDataManipulator<?, ?>> getContainers() {
-        return IImmutableDataHolderBase.super.getContainers();
-    }
-
-    @Override
-    default H copy() {
-        return (H) this;
-    }
-
-    @Override
-    default int getContentVersion() {
-        return 1;
-    }
-
-    @Override
-    default DataContainer toContainer() {
-        final DataContainer dataContainer = DataContainer.createNew();
-        DataHelper.serializeRawData(dataContainer, this);
-        return dataContainer;
+    public LanternFluidStack build() {
+        return buildStack();
     }
 }

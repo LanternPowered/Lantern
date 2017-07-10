@@ -60,7 +60,6 @@ public final class LanternPropertyRegistry implements PropertyRegistry {
 
     @SuppressWarnings({"unchecked", "Convert2streamapi", "SuspiciousMethodCalls"})
     public void registerBlockPropertyStores(PropertyProviderCollection collection) {
-        //noinspection Convert2streamapi
         for (Class<? extends Property> entry : collection.keys()) {
             if (!this.propertyStoreMap.containsKey(entry)) {
                 register(entry, new BlockPropertyStore(entry));

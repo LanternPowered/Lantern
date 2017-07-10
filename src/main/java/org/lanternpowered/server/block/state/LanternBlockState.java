@@ -132,11 +132,6 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     }
 
     @Override
-    public int getContentVersion() {
-        return 1;
-    }
-
-    @Override
     public DataContainer toContainer() {
         final DataContainer dataContainer = DataContainer.createNew();
         dataContainer.set(DataQuery.of("BlockType"), this.baseState.getBlockType().getId());
@@ -279,11 +274,6 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     @Override
     public boolean supports(Key<?> key) {
         return this.keyToBlockTrait.containsKey(checkNotNull(key, "key"));
-    }
-
-    @Override
-    public BlockState copy() {
-        return this;
     }
 
     @Override

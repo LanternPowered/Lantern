@@ -143,11 +143,6 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDa
     }
 
     @Override
-    public ItemStackSnapshot merge(ItemStackSnapshot that) {
-        return null;
-    }
-
-    @Override
     public ItemStackSnapshot merge(ItemStackSnapshot that, MergeFunction function) {
         return null;
     }

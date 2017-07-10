@@ -84,6 +84,8 @@ import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.extra.accessory.Accessory;
+import org.lanternpowered.server.fluid.LanternFluidStackBuilder;
+import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
@@ -149,6 +151,7 @@ import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModu
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.extra.AccessoryRegistryModule;
+import org.lanternpowered.server.game.registry.type.fluid.FluidTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
@@ -315,6 +318,9 @@ import org.spongepowered.api.event.cause.entity.teleport.EntityTeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.PortalTeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
+import org.spongepowered.api.extra.fluid.FluidStack;
+import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
+import org.spongepowered.api.extra.fluid.FluidType;
 import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShape;
@@ -465,6 +471,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(StatisticBuilder.class, StatisticBuilder::create)
                 .registerBuilderSupplier(DataRegistration.Builder.class, LanternDataRegistrationBuilder::new)
                 .registerBuilderSupplier(WorldBorder.Builder.class, LanternWorldBorderBuilder::new)
+                .registerBuilderSupplier(FluidStack.Builder.class, LanternFluidStackBuilder::new)
+                .registerBuilderSupplier(FluidStackSnapshot.Builder.class, LanternFluidStackSnapshotBuilder::new)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
@@ -587,6 +595,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(new AdvancementTreeRegistryModule())
                 .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
+                .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

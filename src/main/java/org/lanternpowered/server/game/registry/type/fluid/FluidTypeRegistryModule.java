@@ -23,45 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data;
+package org.lanternpowered.server.game.registry.type.fluid;
 
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.ImmutableDataHolder;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.BaseValue;
+import org.lanternpowered.server.fluid.LanternFluidType;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.extra.fluid.FluidType;
+import org.spongepowered.api.extra.fluid.FluidTypes;
 
-import java.util.List;
-import java.util.Optional;
+public class FluidTypeRegistryModule extends InternalPluginCatalogRegistryModule<FluidType> {
 
-@SuppressWarnings("unchecked")
-public interface IImmutableDataHolder<H extends ImmutableDataHolder<H>> extends
-        IImmutableValueStore<H, ImmutableDataManipulator<?, ?>>, IImmutableDataHolderBase<H> {
+    private static final FluidTypeRegistryModule INSTANCE = new FluidTypeRegistryModule();
 
-    @Override
-    default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        return IImmutableDataHolderBase.super.getValue(key);
+    public static FluidTypeRegistryModule get() {
+        return INSTANCE;
+    }
+
+    private FluidTypeRegistryModule() {
+        super(FluidTypes.class);
     }
 
     @Override
-    default List<ImmutableDataManipulator<?, ?>> getContainers() {
-        return IImmutableDataHolderBase.super.getContainers();
-    }
-
-    @Override
-    default H copy() {
-        return (H) this;
-    }
-
-    @Override
-    default int getContentVersion() {
-        return 1;
-    }
-
-    @Override
-    default DataContainer toContainer() {
-        final DataContainer dataContainer = DataContainer.createNew();
-        DataHelper.serializeRawData(dataContainer, this);
-        return dataContainer;
+    public void registerDefaults() {
+        register(new LanternFluidType("minecraft", "Water", 0, () -> BlockTypes.WATER));
+        register(new LanternFluidType("minecraft", "Lava", 1, () -> BlockTypes.LAVA));
     }
 }

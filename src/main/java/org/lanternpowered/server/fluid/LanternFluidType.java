@@ -23,45 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data;
+package org.lanternpowered.server.fluid;
 
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.ImmutableDataHolder;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.BaseValue;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.extra.fluid.FluidType;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
-@SuppressWarnings("unchecked")
-public interface IImmutableDataHolder<H extends ImmutableDataHolder<H>> extends
-        IImmutableValueStore<H, ImmutableDataManipulator<?, ?>>, IImmutableDataHolderBase<H> {
+import javax.annotation.Nullable;
 
-    @Override
-    default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        return IImmutableDataHolderBase.super.getValue(key);
+public final class LanternFluidType extends PluginCatalogType.Base.Internal implements FluidType, AbstractPropertyHolder {
+
+    @Nullable private final Supplier<BlockType> blockTypeSupplier;
+
+    public LanternFluidType(String pluginId, String name, int internalId) {
+        this(pluginId, name, internalId, null);
+    }
+
+    public LanternFluidType(String pluginId, String name, int internalId,
+            @Nullable Supplier<BlockType> blockTypeSupplier) {
+        super(pluginId, name, internalId);
+        this.blockTypeSupplier = blockTypeSupplier;
     }
 
     @Override
-    default List<ImmutableDataManipulator<?, ?>> getContainers() {
-        return IImmutableDataHolderBase.super.getContainers();
-    }
-
-    @Override
-    default H copy() {
-        return (H) this;
-    }
-
-    @Override
-    default int getContentVersion() {
-        return 1;
-    }
-
-    @Override
-    default DataContainer toContainer() {
-        final DataContainer dataContainer = DataContainer.createNew();
-        DataHelper.serializeRawData(dataContainer, this);
-        return dataContainer;
+    public Optional<BlockType> getBlockTypeBase() {
+        return this.blockTypeSupplier == null ? Optional.empty() :
+                Optional.of(this.blockTypeSupplier.get());
     }
 }

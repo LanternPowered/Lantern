@@ -100,6 +100,8 @@ public final class DataQueries {
 
     public static final DataQuery ITEM_TYPE = DataQuery.of("ItemType");
     public static final DataQuery QUANTITY = DataQuery.of("Quantity");
+    public static final DataQuery FLUID_TYPE = DataQuery.of("FluidType");
+    public static final DataQuery VOLUME = DataQuery.of("Volume");
 
     public static final DataQuery POSITION = DataQuery.of("Position");
     public static final DataQuery ROTATION = DataQuery.of("Rotation");

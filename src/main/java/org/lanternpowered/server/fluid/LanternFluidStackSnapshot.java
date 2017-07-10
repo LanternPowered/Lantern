@@ -25,11 +25,14 @@
  */
 package org.lanternpowered.server.fluid;
 
+import com.google.common.collect.Streams;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.AdditionalContainerHolder;
 import org.lanternpowered.server.data.IImmutableDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -40,67 +43,99 @@ import org.spongepowered.api.extra.fluid.FluidType;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutableDataHolder<FluidStackSnapshot>,
         AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
+    private final AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers =
+            AdditionalContainerCollection.create();
+    private final LanternFluidStack fluidStack;
+
+    LanternFluidStackSnapshot(LanternFluidStack fluidStack) {
+        this.fluidStack = fluidStack;
+    }
+
     @Override
     public AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> getAdditionalContainers() {
-        return null;
-    }
-
-    @Override
-    public FluidType getFluid() {
-        return null;
-    }
-
-    @Override
-    public int getVolume() {
-        return 0;
-    }
-
-    @Override
-    public FluidStack createStack() {
-        return null;
-    }
-
-    @Override
-    public <E> Optional<FluidStackSnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        return null;
-    }
-
-    @Override
-    public <E> Optional<FluidStackSnapshot> with(Key<? extends BaseValue<E>> key, E value) {
-        return null;
-    }
-
-    @Override
-    public Optional<FluidStackSnapshot> with(ImmutableDataManipulator<?, ?> valueContainer) {
-        return null;
-    }
-
-    @Override
-    public Optional<FluidStackSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
-        return null;
-    }
-
-    @Override
-    public Optional<FluidStackSnapshot> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        return null;
-    }
-
-    @Override
-    public FluidStackSnapshot merge(FluidStackSnapshot that) {
-        return null;
-    }
-
-    @Override
-    public FluidStackSnapshot merge(FluidStackSnapshot that, MergeFunction function) {
-        return null;
+        return this.additionalContainers;
     }
 
     @Override
     public ValueCollection getValueCollection() {
-        return null;
+        // Just use the value collection of the fluid stack
+        return this.fluidStack.getValueCollection();
+    }
+
+    @Override
+    public FluidType getFluid() {
+        return this.fluidStack.getFluid();
+    }
+
+    @Override
+    public int getVolume() {
+        return this.fluidStack.getVolume();
+    }
+
+    @Override
+    public FluidStack createStack() {
+        return this.fluidStack.copy();
+    }
+
+    @Override
+    public <E> Optional<FluidStackSnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+        final LanternFluidStack copy = this.fluidStack.copy();
+        if (copy.transformFast(key, function)) {
+            return Optional.of(new LanternFluidStackSnapshot(copy));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public <E> Optional<FluidStackSnapshot> with(Key<? extends BaseValue<E>> key, E value) {
+        final LanternFluidStack copy = this.fluidStack.copy();
+        if (copy.offerFast(key, value)) {
+            return Optional.of(new LanternFluidStackSnapshot(copy));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<FluidStackSnapshot> with(ImmutableDataManipulator<?, ?> valueContainer) {
+        final LanternFluidStack copy = this.fluidStack.copy();
+        if (copy.offerFast(valueContainer.asMutable())) {
+            return Optional.of(new LanternFluidStackSnapshot(copy));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<FluidStackSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
+        final LanternFluidStack copy = this.fluidStack.copy();
+        if (copy.offerFast(Streams.stream(valueContainers)
+                .map(ImmutableDataManipulator::asMutable)
+                .collect(Collectors.toList()))) {
+            return Optional.of(new LanternFluidStackSnapshot(copy));
+        }
+        return Optional.empty();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Optional<FluidStackSnapshot> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
+        final LanternFluidStack copy = this.fluidStack.copy();
+        final DataRegistration registration = Lantern.getGame().getDataManager().get(containerClass)
+                .orElseThrow(() -> new IllegalStateException("The container class " + containerClass.getName() + " isn't registered."));
+        if (copy.removeFast(registration.getManipulatorClass())) {
+            return Optional.of(new LanternFluidStackSnapshot(copy));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public FluidStackSnapshot merge(FluidStackSnapshot that, MergeFunction function) {
+        final LanternFluidStack copy = this.fluidStack.copy();
+        copy.copyFrom(((LanternFluidStackSnapshot) that).fluidStack, function);
+        return new LanternFluidStackSnapshot(copy);
     }
 }

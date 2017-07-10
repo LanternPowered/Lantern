@@ -50,7 +50,7 @@ import org.lanternpowered.server.data.manipulator.mutable.fluid.LanternFluidTank
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternInventoryItemData;
 import org.lanternpowered.server.data.manipulator.mutable.tileentity.LanternBeaconData;
 import org.lanternpowered.server.entity.LanternEntitySnapshot;
-import org.lanternpowered.server.fluid.LanternFluidStackSnapshot;
+import org.lanternpowered.server.fluid.LanternFluidStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -421,6 +421,7 @@ import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.extra.fluid.FluidTypes;
 import org.spongepowered.api.extra.fluid.data.manipulator.immutable.ImmutableFluidItemData;
 import org.spongepowered.api.extra.fluid.data.manipulator.immutable.ImmutableFluidTankData;
 import org.spongepowered.api.extra.fluid.data.manipulator.mutable.FluidItemData;
@@ -812,7 +813,7 @@ public class DataManipulatorRegistry {
 
         /// normal containers
         register(FluidItemData.class, ImmutableFluidItemData.class,
-                c -> c.register(Keys.FLUID_ITEM_STACK, new LanternFluidStackSnapshot())); // TODO
+                c -> c.register(Keys.FLUID_ITEM_STACK, new LanternFluidStack(FluidTypes.WATER, 0).createSnapshot()));
 
         /// variant containers
 

@@ -31,6 +31,7 @@ import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.spongepowered.api.data.ImmutableDataHolder;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
+import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 
 import java.util.HashMap;
@@ -39,6 +40,16 @@ import java.util.Optional;
 
 @SuppressWarnings({"unchecked", "ConstantConditions"})
 public interface IImmutableDataHolderBase<H extends ImmutableDataHolder<H>> extends ImmutableDataHolder<H>, IImmutableValueHolder {
+
+    @Override
+    default int getContentVersion() {
+        return 1;
+    }
+
+    @Override
+    default H copy() {
+        return (H) this;
+    }
 
     @Override
     default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
@@ -126,5 +137,10 @@ public interface IImmutableDataHolderBase<H extends ImmutableDataHolder<H>> exte
     @Override
     default Optional<H> with(BaseValue<?> value) {
         return with((Key) value.getKey(), value.get());
+    }
+
+    @Override
+    default H merge(H that) {
+        return merge(that, MergeFunction.IGNORE_ALL);
     }
 }

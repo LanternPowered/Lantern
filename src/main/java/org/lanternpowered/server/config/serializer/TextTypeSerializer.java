@@ -27,29 +27,50 @@ package org.lanternpowered.server.config.serializer;
 
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.gson.GsonConfigurationLoader;
+import ninja.leaping.configurate.loader.HeaderMode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextParseException;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-public final class TextTypeSerializer implements TypeSerializer<Text> {
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+
+public class TextTypeSerializer implements TypeSerializer<Text> {
 
     @Override
     public Text deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        final String value0 = value.getString();
+        final StringWriter writer = new StringWriter();
+        final GsonConfigurationLoader gsonLoader = GsonConfigurationLoader.builder()
+                .setIndent(0)
+                .setSink(() -> new BufferedWriter(writer))
+                .setHeaderMode(HeaderMode.NONE)
+                .build();
+
         try {
-            // Try to deserialize as json
-            return TextSerializers.JSON.deserialize(value0);
-        } catch (TextParseException e) {
-            // No format is possible, use plain
-            return Text.of(value0);
+            gsonLoader.save(value);
+        } catch (IOException e) {
+            throw new ObjectMappingException(e);
         }
+
+        return TextSerializers.JSON.deserialize(writer.toString());
     }
 
     @Override
     public void serialize(TypeToken<?> type, Text obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(TextSerializers.JSON.serialize(obj));
-    }
+        final String json = TextSerializers.JSON.serialize(obj);
+        final GsonConfigurationLoader gsonLoader = GsonConfigurationLoader.builder()
+                .setSource(() -> new BufferedReader(new StringReader(json)))
+                .build();
 
+        try {
+            value.setValue(gsonLoader.load());
+        } catch (IOException e) {
+            throw new ObjectMappingException(e);
+        }
+    }
 }

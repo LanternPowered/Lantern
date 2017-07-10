@@ -30,10 +30,13 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.title.Title;
 
 @Plugin(id = "test_command", authors = "Meronat", version = "1.0.0")
 public class TestCommandPlugin {
@@ -47,7 +50,12 @@ public class TestCommandPlugin {
 
         Sponge.getCommandManager().register(this, CommandSpec.builder()
                 .executor((src, args) -> {
-                    src.sendMessage(Text.of("Test"));
+                    final Text message = Text.of(TextColors.WHITE, "Test");
+                    if (src instanceof Player) {
+                        ((Player) src).sendTitle(Title.builder().subtitle(message).build());
+                    } else {
+                        src.sendMessage(message);
+                    }
                     return CommandResult.success();
                 })
                 .build(), "test-command", "tc");

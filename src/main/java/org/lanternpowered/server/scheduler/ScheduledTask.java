@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.scheduler;
 
+import co.aikar.timings.LanternTimings;
+import co.aikar.timings.Timing;
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -32,6 +34,8 @@ import org.spongepowered.api.scheduler.Task;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import javax.annotation.Nullable;
 
 /**
  * An internal representation of a {@link Task} created by a plugin.
@@ -50,6 +54,7 @@ public class ScheduledTask implements Task {
     private final String name;
     final TaskSynchronicity syncType;
     private final String stringRepresentation;
+    @Nullable private Timing taskTimer;
 
     // Internal Task state. Not for user-service use.
     public enum ScheduledTaskState {
@@ -188,6 +193,13 @@ public class ScheduledTask implements Task {
     @Override
     public String toString() {
         return this.stringRepresentation;
+    }
+
+    public Timing getTimingsHandler() {
+        if (this.taskTimer == null) {
+            this.taskTimer = LanternTimings.getPluginSchedulerTimings(this.owner);
+        }
+        return this.taskTimer;
     }
 
     public enum TaskSynchronicity {

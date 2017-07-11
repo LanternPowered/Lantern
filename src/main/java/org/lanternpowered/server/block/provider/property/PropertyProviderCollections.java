@@ -280,6 +280,7 @@ public final class PropertyProviderCollections {
     /**
      * The {@link PropertyProviderCollection} for glass blocks.
      */
+    // TODO: Breakable in adventure
     public static final PropertyProviderCollection GLASS = DEFAULT.toBuilder()
             .add(instrument(InstrumentTypes.HIGH_HAT))
             .build();
@@ -317,6 +318,14 @@ public final class PropertyProviderCollections {
      */
     public static final PropertyProviderCollection CLAY = DEFAULT.toBuilder()
             .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:flute").get()))
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for packed ice blocks.
+     */
+    // TODO: Breakable in adventure
+    public static final PropertyProviderCollection PACKED_ICE = DEFAULT.toBuilder()
+            .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:chime").get()))
             .build();
 
     /**

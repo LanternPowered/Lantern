@@ -265,7 +265,7 @@ public class PlayerContainerSession {
             }
             if (this.itemStack == null || this.itemStack.getQuantity() == 0 || this.itemStack.getItem() == ItemTypes.NONE) {
                 this.itemStack = (LanternItemStack) itemStack.copy();
-            } else if (this.itemStack.isSimilar(itemStack)) {
+            } else if (this.itemStack.similarTo(itemStack)) {
                 this.itemStack.setQuantity(this.itemStack.getQuantity() + itemStack.getQuantity());
             } else {
                 return false;
@@ -278,7 +278,7 @@ public class PlayerContainerSession {
             if (this.itemStack == null || this.itemStack.getItem() == ItemTypes.NONE) {
                 return null;
             }
-            if (matcher != null && !this.itemStack.isSimilar(matcher)) {
+            if (matcher != null && !this.itemStack.similarTo(matcher)) {
                 return null;
             }
             final int newQuantity = this.itemStack.getQuantity() - quantity;
@@ -567,7 +567,7 @@ public class PlayerContainerSession {
                         if (optSlot.isPresent()) {
                             final LanternSlot slot = optSlot.get();
                             if (!(slot instanceof OutputSlot) && slot.isValidItem(this.cursorItem) && (slot.getRawItemStack() == null ||
-                                    ((LanternItemStack) this.cursorItem).isSimilar(slot.getRawItemStack())) && !this.dragSlots.contains(slot)) {
+                                    ((LanternItemStack) this.cursorItem).similarTo(slot.getRawItemStack())) && !this.dragSlots.contains(slot)) {
                                 this.dragSlots.add(slot);
                             }
                         }
@@ -766,7 +766,7 @@ public class PlayerContainerSession {
                         // Try first to get enough unfinished stacks
                         PeekPollTransactionsResult peekResult = inventory.peekPollTransactions(maxQuantity - quantity, stack ->
                                 stack.getQuantity() < stack.getMaxStackQuantity() &&
-                                        ((LanternItemStack) cursorItem).isSimilar(stack)).orElse(null);
+                                        ((LanternItemStack) cursorItem).similarTo(stack)).orElse(null);
                         if (peekResult != null) {
                             quantity += peekResult.getPeekedItem().getQuantity();
                             transactions.addAll(peekResult.getTransactions());
@@ -775,7 +775,7 @@ public class PlayerContainerSession {
                         if (quantity <= maxQuantity) {
                             peekResult = this.openContainer.peekPollTransactions(maxQuantity - quantity, stack ->
                                     stack.getQuantity() >= stack.getMaxStackQuantity() &&
-                                            ((LanternItemStack) cursorItem).isSimilar(stack)).orElse(null);
+                                            ((LanternItemStack) cursorItem).similarTo(stack)).orElse(null);
                             if (peekResult != null) {
                                 quantity += peekResult.getPeekedItem().getQuantity();
                                 transactions.addAll(peekResult.getTransactions());

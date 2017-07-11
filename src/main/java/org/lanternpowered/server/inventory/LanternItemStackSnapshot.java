@@ -53,14 +53,15 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDataHolder<ItemStackSnapshot>,
         AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
     final LanternItemStack itemStack;
-    private final AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
+    @Nullable private AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
 
     LanternItemStackSnapshot(LanternItemStack itemStack) {
-        this.additionalContainers = new MutableToImmutableManipulatorCollection(itemStack.getAdditionalContainers());
         this.itemStack = itemStack;
     }
 
@@ -71,6 +72,9 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
 
     @Override
     public AdditionalContainerCollection<ImmutableDataManipulator<?,?>> getAdditionalContainers() {
+        if (this.additionalContainers == null) {
+            this.additionalContainers = new MutableToImmutableManipulatorCollection(this.itemStack.getAdditionalContainers());
+        }
         return this.additionalContainers;
     }
 
@@ -164,16 +168,47 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof LanternItemStackSnapshot)) {
+            return false;
+        }
+        final LanternItemStackSnapshot o = (LanternItemStackSnapshot) other;
+        return o.itemStack.equalTo(this.itemStack);
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("type", getType().getId())
                 .add("quantity", getCount())
-                .add("data", LanternItemStack.valuesToString(getValues()))
+                .add("data", IValueContainer.valuesToString(this.itemStack))
                 .toString();
     }
 
-    public boolean isSimilar(ItemStackSnapshot that) {
+    /**
+     * Gets whether the specified {@link ItemStackSnapshot} is similar
+     * to this {@link ItemStackSnapshot}. The {@link ItemType} and all
+     * the applied data must match.
+     *
+     * @param that The other snapshot
+     * @return Is similar
+     */
+    public boolean similarTo(ItemStackSnapshot that) {
         checkNotNull(that, "that");
-        return getType() == that.getType() && IValueContainer.matchContents(this, (IValueContainer) that);
+        return similarTo(((LanternItemStackSnapshot) that).itemStack);
+    }
+
+    /**
+     *
+     * Gets whether the specified {@link ItemStack} is similar
+     * to this {@link ItemStackSnapshot}. The {@link ItemType} and all
+     * the applied data must match.
+     *
+     * @param that The other snapshot
+     * @return Is similar
+     */
+    public boolean similarTo(ItemStack that) {
+        checkNotNull(that, "that");
+        return getType() == that.getItem() && IValueContainer.matchContents(this.itemStack, (IValueContainer) that);
     }
 }

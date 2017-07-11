@@ -27,6 +27,7 @@ package org.lanternpowered.server.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
 import org.lanternpowered.server.data.processor.Processor;
@@ -37,14 +38,43 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 @SuppressWarnings("unchecked")
 public interface IValueContainer<C extends ValueContainer<C>> extends ValueContainer<C>, IValueHolder {
+
+    /**
+     * Converts the {@link BaseValue}s of the {@link ValueContainer} into a nicely
+     * formatted {@code String}.
+     *
+     * @param valueContainer The value container
+     * @return The string
+     */
+    static String valuesToString(ValueContainer<?> valueContainer) {
+        return valuesToString(valueContainer.getValues());
+    }
+
+    /**
+     * Converts the {@link BaseValue}s into a nicely
+     * formatted {@code String}.
+     *
+     * @param values The values
+     * @return The string
+     */
+    static String valuesToString(Iterable<? extends BaseValue<?>> values) {
+        return Arrays.toString(StreamSupport.stream(values.spliterator(), false)
+                .map(e -> MoreObjects.toStringHelper("")
+                        .add("key", e.getKey().getId())
+                        .add("value", e.get())
+                        .toString())
+                .toArray());
+    }
 
     /**
      * Matches the contents of the two {@link ValueContainer}s.

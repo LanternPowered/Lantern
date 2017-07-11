@@ -30,8 +30,6 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.ints.IntSets;
@@ -69,9 +67,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-
-import java.util.Collections;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -231,7 +226,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                 final EquipmentType equipmentType = Holder.EQUIPMENT_TYPES[i];
                 final ItemStack itemStack = inventory.query(equipmentType).first().peek().orElse(null);
                 final ItemStack oldItemStack = this.lastEquipment.get(i);
-                if (!LanternItemStack.isSimilar(itemStack, oldItemStack)) {
+                if (!LanternItemStack.similarTo(itemStack, oldItemStack)) {
                     this.lastEquipment.put(i, itemStack);
                     final int slotIndex = i;
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));

@@ -41,12 +41,12 @@ import java.util.function.Function;
 public class MutableToImmutableManipulatorCollection implements AdditionalContainerCollection<ImmutableDataManipulator<?,?>> {
 
     private final AdditionalContainerCollection<DataManipulator<?,?>> collection;
-    private final Map<Class<? extends ImmutableDataManipulator<?,?>>, Optional<ImmutableDataManipulator<?,?>>> cached;
-    private final Map<Class<? extends ImmutableDataManipulator<?,?>>, Optional<ImmutableDataManipulator<?,?>>> unmodifiableCached;
+    private final Map<Class<? extends ImmutableDataManipulator<?,?>>, Optional<ImmutableDataManipulator<?,?>>> cache;
+    private final Map<Class<? extends ImmutableDataManipulator<?,?>>, Optional<ImmutableDataManipulator<?,?>>> unmodifiableCache;
 
     public MutableToImmutableManipulatorCollection(AdditionalContainerCollection<DataManipulator<?, ?>> collection) {
-        this.cached = new ConcurrentHashMap<>();
-        this.unmodifiableCached = Collections.unmodifiableMap(this.cached);
+        this.cache = new ConcurrentHashMap<>();
+        this.unmodifiableCache = Collections.unmodifiableMap(this.cache);
         this.collection = collection;
     }
 
@@ -64,7 +64,7 @@ public class MutableToImmutableManipulatorCollection implements AdditionalContai
 
     @Override
     public <T extends ImmutableDataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
-        return (Optional) this.cached.computeIfAbsent(containerClass,
+        return (Optional) this.cache.computeIfAbsent(containerClass,
                 c -> this.collection.get(getMutableClass(c)).map(DataManipulator::asImmutable));
     }
 
@@ -72,9 +72,9 @@ public class MutableToImmutableManipulatorCollection implements AdditionalContai
     public Map<Class<? extends ImmutableDataManipulator<?, ?>>, ? extends ImmutableDataManipulator<?, ?>> getMap() {
         this.collection.getAll().forEach(manipulator -> {
             final Class<? extends ImmutableDataManipulator<?, ?>> immutableClass = getImmutableClass(manipulator.getClass());
-            this.cached.computeIfAbsent(immutableClass, c -> Optional.of(manipulator.asImmutable()));
+            this.cache.computeIfAbsent(immutableClass, c -> Optional.of(manipulator.asImmutable()));
         });
-        return (Map) this.unmodifiableCached;
+        return (Map) this.unmodifiableCache;
     }
 
     @Override

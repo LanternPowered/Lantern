@@ -42,17 +42,15 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -66,18 +64,44 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     private int quantity;
     private int tempMaxQuantity;
 
+    /**
+     * Constructs a new {@link LanternItemStack} for the specified {@link BlockType},
+     * a {@link IllegalArgumentException} will be thrown if {@link BlockType#getItem()}
+     * returns an empty {@link Optional}.
+     *
+     * @param blockType The block type
+     */
     public LanternItemStack(BlockType blockType) {
         this(blockType, 1);
     }
 
+    /**
+     * Constructs a new {@link LanternItemStack} for the specified {@link BlockType},
+     * a {@link IllegalArgumentException} will be thrown if {@link BlockType#getItem()}
+     * returns an empty {@link Optional}.
+     *
+     * @param blockType The block type
+     * @param quantity The quantity
+     */
     public LanternItemStack(BlockType blockType, int quantity) {
         this(blockType.getItem().orElseThrow(() -> new IllegalArgumentException("That BlockType doesn't have a ItemType.")), quantity);
     }
 
+    /**
+     * Constructs a new {@link LanternItemStack} for the specified {@link ItemType}.
+     *
+     * @param itemType The item type
+     */
     public LanternItemStack(ItemType itemType) {
         this(itemType, 1);
     }
 
+    /**
+     * Constructs a new {@link LanternItemStack} for the specified {@link ItemType}.
+     *
+     * @param itemType The item type
+     * @param quantity The quantity
+     */
     public LanternItemStack(ItemType itemType, int quantity) {
         this(itemType, quantity, ValueCollection.create(), AdditionalContainerCollection.createConcurrent());
         registerKeys();
@@ -172,7 +196,18 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
 
     @Override
     public boolean equalTo(ItemStack that) {
-        return false;
+        return similarTo(that) && getQuantity() == that.getQuantity();
+    }
+
+    /**
+     * Similar to {@link #equalTo(ItemStack)}, but matches this
+     * {@link ItemStack} with a {@link ItemStackSnapshot}.
+     *
+     * @param that The other snapshot
+     * @return Is equal
+     */
+    public boolean equalTo(ItemStackSnapshot that) {
+        return similarTo(that) && getQuantity() == that.getCount();
     }
 
     @Override
@@ -189,34 +224,35 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     }
 
     /**
-     * Gets whether this item stack is equal to the other item stack
-     * except for the stack size, making it possible to merge the
-     * items.
+     * Gets whether the specified {@link ItemStackSnapshot} is similar
+     * to this {@link ItemStack}. The {@link ItemType} and all
+     * the applied data must match.
      *
-     * Shouldn't be confused with {@link #equalTo(ItemStack)}, which I
-     * think has a poor name for what it actually does.
-     *
-     * @param that The other item stack
-     * @return Whether the item stacks are equal
+     * @param that The other snapshot
+     * @return Is similar
      */
-    public boolean isSimilar(ItemStack that) {
+    public boolean similarTo(ItemStackSnapshot that) {
         checkNotNull(that, "that");
-        return this.itemType == that.getItem() && IValueContainer.matchContents(this, (IValueContainer) that);
+        return similarTo(((LanternItemStackSnapshot) that).itemStack);
+    }
+    /**
+     *
+     * Gets whether the specified {@link ItemStack} is similar
+     * to this {@link ItemStack}. The {@link ItemType} and all
+     * the applied data must match.
+     *
+     * @param that The other snapshot
+     * @return Is similar
+     */
+    public boolean similarTo(ItemStack that) {
+        checkNotNull(that, "that");
+        return getItem() == that.getItem() && IValueContainer.matchContents(this, (IValueContainer) that);
     }
 
-    public static boolean isSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
+    public static boolean similarTo(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
         //noinspection SimplifiableConditionalExpression
         return itemStackA == itemStackB ? true : itemStackA == null || itemStackB == null ? false :
-                ((LanternItemStack) itemStackA).isSimilar(itemStackB);
-    }
-
-    static String valuesToString(Set<ImmutableValue<?>> values) {
-        return Arrays.toString(values.stream()
-                .map(e -> MoreObjects.toStringHelper("")
-                        .add("key", e.getKey().getId())
-                        .add("value", e.get())
-                        .toString())
-                .toArray());
+                ((LanternItemStack) itemStackA).similarTo(itemStackB);
     }
 
     @Override
@@ -224,30 +260,21 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
         return MoreObjects.toStringHelper(this)
                 .add("type", this.itemType.getId())
                 .add("quantity", this.quantity)
-                .add("data", valuesToString(getValues()))
+                .add("data", IValueContainer.valuesToString(this))
                 .toString();
     }
 
     @Nullable
     public static LanternItemStack toNullable(@Nullable ItemStackSnapshot itemStackSnapshot) {
-        if (itemStackSnapshot == null || itemStackSnapshot.getType() == ItemTypes.NONE ||
-                itemStackSnapshot.getCount() <= 0) {
-            return null;
-        }
-        return (LanternItemStack) itemStackSnapshot.createStack();
+        return itemStackSnapshot == null || itemStackSnapshot.isEmpty() ? null :  (LanternItemStack) itemStackSnapshot.createStack();
     }
 
     @Nullable
     public static LanternItemStack toNullable(@Nullable ItemStack itemStack) {
-        if (itemStack == null || itemStack.getItem() == ItemTypes.NONE ||
-                itemStack.getQuantity() <= 0) {
-            return null;
-        }
-        return (LanternItemStack) itemStack;
+        return itemStack == null || itemStack.isEmpty() ? null : (LanternItemStack) itemStack;
     }
 
     public static ItemStackSnapshot toSnapshot(@Nullable ItemStack itemStack) {
-        itemStack = toNullable(itemStack);
-        return itemStack == null ? ItemStackSnapshot.NONE : itemStack.createSnapshot();
+        return itemStack == null || itemStack.isEmpty() ? ItemStackSnapshot.NONE : itemStack.createSnapshot();
     }
 }

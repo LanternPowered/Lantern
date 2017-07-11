@@ -253,7 +253,7 @@ public class LanternItem extends LanternEntity implements Item {
                 if (itemStackSnapshot2.getCount() < itemStackSnapshot1.getCount()) {
                     continue;
                 }
-                if (((LanternItemStackSnapshot) itemStackSnapshot1).isSimilar(itemStackSnapshot2)) {
+                if (((LanternItemStackSnapshot) itemStackSnapshot1).similarTo(itemStackSnapshot2)) {
                     final int max = itemStackSnapshot1.getType().getMaxStackQuantity();
                     int quantity = itemStackSnapshot1.getCount() + itemStackSnapshot2.getCount();
                     if (quantity > max) {

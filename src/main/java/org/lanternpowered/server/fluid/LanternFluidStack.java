@@ -28,9 +28,11 @@ package org.lanternpowered.server.fluid;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
+import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.spongepowered.api.data.DataContainer;
@@ -117,5 +119,14 @@ public class LanternFluidStack implements FluidStack, AbstractPropertyHolder, IA
         return IAdditionalDataHolder.super.toContainer()
                 .set(DataQueries.FLUID_TYPE, getFluid())
                 .set(DataQueries.VOLUME, getVolume());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("fluid", getFluid().getId())
+                .add("volume", getVolume())
+                .add("data", IValueContainer.valuesToString(this))
+                .toString();
     }
 }

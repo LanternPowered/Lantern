@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.fluid;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Streams;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.AdditionalContainerHolder;
 import org.lanternpowered.server.data.IImmutableDataHolder;
+import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.MutableToImmutableManipulatorCollection;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
@@ -46,19 +48,23 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutableDataHolder<FluidStackSnapshot>,
         AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
-    private final AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
+    @Nullable private AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
     private final LanternFluidStack fluidStack;
 
     LanternFluidStackSnapshot(LanternFluidStack fluidStack) {
-        this.additionalContainers = new MutableToImmutableManipulatorCollection(fluidStack.getAdditionalContainers());
         this.fluidStack = fluidStack;
     }
 
     @Override
     public AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> getAdditionalContainers() {
+        if (this.additionalContainers == null) {
+            this.additionalContainers = new MutableToImmutableManipulatorCollection(this.fluidStack.getAdditionalContainers());
+        }
         return this.additionalContainers;
     }
 
@@ -138,5 +144,14 @@ public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutable
         final LanternFluidStack copy = this.fluidStack.copy();
         copy.copyFrom(((LanternFluidStackSnapshot) that).fluidStack, function);
         return new LanternFluidStackSnapshot(copy);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("fluid", getFluid().getId())
+                .add("volume", getVolume())
+                .add("data", IValueContainer.valuesToString(this.fluidStack))
+                .toString();
     }
 }

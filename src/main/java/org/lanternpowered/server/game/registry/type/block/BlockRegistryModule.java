@@ -33,6 +33,7 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.flammableInfo;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.hardness;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.instrument;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightAbsorption;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightEmission;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
@@ -1279,6 +1280,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////
         register(171, dyedBuilder("tile.carpet.%s.name")
                         .properties(PropertyProviderCollections.CARPET.toBuilder()
+                                .add(lightAbsorption(0))
                                 .add(hardness(0.1))
                                 .add(blastResistance(0.5)))
                         .boundingBox(BoundingBoxes.carpet())

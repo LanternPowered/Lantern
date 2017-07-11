@@ -31,11 +31,13 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.gravityAffected;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.hardness;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.instrument;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightAbsorption;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightEmission;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.matter;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.passable;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.pushBehavior;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.replaceable;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.slipperiness;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidCube;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidSide;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.statisticsTracked;
@@ -73,6 +75,8 @@ public final class PropertyProviderCollections {
             .add(replaceable(false))
             .add(surrogateBlock(false))
             .add(statisticsTracked(true))
+            .add(slipperiness(0.6))
+            .add(lightAbsorption(15))
             .add(instrument(InstrumentTypes.HARP))
             .add(pushBehavior(PushBehavior.PUSH))
             .build();
@@ -120,6 +124,7 @@ public final class PropertyProviderCollections {
             .add(matter(MatterProperty.Matter.GAS))
             .add(replaceable(true))
             .add(pushBehavior(PushBehavior.REPLACE))
+            .add(lightAbsorption(0)) // Gases don't block light by default
             .add(PASSABLE)
             .build();
 
@@ -194,6 +199,7 @@ public final class PropertyProviderCollections {
      * The {@link PropertyProviderCollection} for water blocks.
      */
     public static final PropertyProviderCollection WATER = DEFAULT_LIQUID.toBuilder()
+            .add(lightAbsorption(3))
             .build();
 
     /**
@@ -310,6 +316,7 @@ public final class PropertyProviderCollections {
      */
     public static final PropertyProviderCollection WEB = DEFAULT.toBuilder()
             .add(pushBehavior(PushBehavior.REPLACE))
+            .add(lightAbsorption(1))
             .add(PASSABLE)
             .build();
 
@@ -321,10 +328,19 @@ public final class PropertyProviderCollections {
             .build();
 
     /**
+     * The {@link PropertyProviderCollection} for ice blocks.
+     */
+    // TODO: Breakable in adventure
+    public static final PropertyProviderCollection ICE = DEFAULT.toBuilder()
+            .add(lightAbsorption(3))
+            .add(slipperiness(0.98))
+            .build();
+
+    /**
      * The {@link PropertyProviderCollection} for packed ice blocks.
      */
     // TODO: Breakable in adventure
-    public static final PropertyProviderCollection PACKED_ICE = DEFAULT.toBuilder()
+    public static final PropertyProviderCollection PACKED_ICE = ICE.toBuilder()
             .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:chime").get()))
             .build();
 

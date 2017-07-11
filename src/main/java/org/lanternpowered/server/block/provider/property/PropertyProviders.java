@@ -28,8 +28,10 @@ package org.lanternpowered.server.block.provider.property;
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
 import org.lanternpowered.server.block.property.InstrumentProperty;
+import org.lanternpowered.server.block.property.LightAbsorptionProperty;
 import org.lanternpowered.server.block.property.PushBehavior;
 import org.lanternpowered.server.block.property.PushBehaviorProperty;
+import org.lanternpowered.server.block.property.SlipperinessProperty;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.data.Property;
@@ -349,6 +351,33 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(FluidTemperatureProperty.class, (blockState, location, face) ->
                         new FluidTemperatureProperty(provider.get(blockState, location, face)))
+                .build();
+    }
+
+    public static PropertyProviderCollection slipperiness(double constant) {
+        final SlipperinessProperty property = new SlipperinessProperty(constant);
+        return PropertyProviderCollection.builder()
+                .add(SlipperinessProperty.class, new ConstantPropertyProvider<>(property))
+                .build();
+    }
+
+    public static PropertyProviderCollection slipperiness(ObjectProvider<Double> provider) {
+        return PropertyProviderCollection.builder()
+                .add(SlipperinessProperty.class, (blockState, location, face) ->
+                        new SlipperinessProperty(provider.get(blockState, location, face)))
+                .build();
+    }
+
+    public static PropertyProviderCollection lightAbsorption(int absorbedLight) {
+        return PropertyProviderCollection.builder()
+                .add(LightAbsorptionProperty.class, new ConstantPropertyProvider<>(new LightAbsorptionProperty(absorbedLight)))
+                .build();
+    }
+
+    public static PropertyProviderCollection lightAbsorption(ObjectProvider<Integer> provider) {
+        return PropertyProviderCollection.builder()
+                .add(LightAbsorptionProperty.class, (blockState, location, face) ->
+                        new LightAbsorptionProperty(provider.get(blockState, location, face)))
                 .build();
     }
 }

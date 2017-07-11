@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
+import org.lanternpowered.server.block.property.AdventureModeExemptProperty;
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
 import org.lanternpowered.server.block.property.InstrumentProperty;
@@ -85,6 +86,9 @@ public final class PropertyProviders {
 
     private static final SurrogateBlockProperty SURROGATE_BLOCK_PROPERTY_TRUE = new SurrogateBlockProperty(true);
     private static final SurrogateBlockProperty SURROGATE_BLOCK_PROPERTY_FALSE = new SurrogateBlockProperty(false);
+
+    private static final AdventureModeExemptProperty ADVENTURE_MODE_EXEMPT_PROPERTY_TRUE = new AdventureModeExemptProperty(true);
+    private static final AdventureModeExemptProperty ADVENTURE_MODE_EXEMPT_PROPERTY_FALSE = new AdventureModeExemptProperty(false);
 
     static {
         for (MatterProperty.Matter matter : MatterProperty.Matter.values()) {
@@ -378,6 +382,20 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(LightAbsorptionProperty.class, (blockState, location, face) ->
                         new LightAbsorptionProperty(provider.get(blockState, location, face)))
+                .build();
+    }
+
+    public static PropertyProviderCollection adventureModeExempt(boolean constant) {
+        final AdventureModeExemptProperty property = constant ? ADVENTURE_MODE_EXEMPT_PROPERTY_TRUE : ADVENTURE_MODE_EXEMPT_PROPERTY_FALSE;
+        return PropertyProviderCollection.builder()
+                .add(AdventureModeExemptProperty.class, new ConstantPropertyProvider<>(property))
+                .build();
+    }
+
+    public static PropertyProviderCollection adventureModeExempt(ObjectProvider<Boolean> provider) {
+        return PropertyProviderCollection.builder()
+                .add(AdventureModeExemptProperty.class, (blockState, location, face) ->
+                        provider.get(blockState, location, face) ? ADVENTURE_MODE_EXEMPT_PROPERTY_TRUE : ADVENTURE_MODE_EXEMPT_PROPERTY_FALSE)
                 .build();
     }
 }

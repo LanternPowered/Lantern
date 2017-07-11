@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.adventureModeExempt;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.blastResistance;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.flammable;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.flammableInfo;
@@ -63,6 +64,7 @@ public final class PropertyProviderCollections {
      */
     public static final PropertyProviderCollection DEFAULT = PropertyProviderCollection.builder()
             .add(matter(MatterProperty.Matter.SOLID))
+            .add(adventureModeExempt(false))
             .add(flammable(false))
             .add(hardness(1.0))
             .add(blastResistance(5.0))
@@ -90,6 +92,7 @@ public final class PropertyProviderCollections {
             .add(passable(true))
             .add(solidCube(false))
             .add(solidSide(false))
+            .add(lightAbsorption(0))
             .build();
 
     /**
@@ -213,6 +216,7 @@ public final class PropertyProviderCollections {
      */
     public static final PropertyProviderCollection LEAVES = DEFAULT.toBuilder()
             .add(flammableInfo(30, 60)) // The default flammable settings
+            .add(lightAbsorption(1))
             .build();
 
     /**
@@ -280,15 +284,16 @@ public final class PropertyProviderCollections {
      */
     public static final PropertyProviderCollection NON_SOLID = DEFAULT.toBuilder()
             .add(pushBehavior(PushBehavior.REPLACE))
+            .add(lightAbsorption(0))
             .add(PASSABLE)
             .build();
 
     /**
      * The {@link PropertyProviderCollection} for glass blocks.
      */
-    // TODO: Breakable in adventure
     public static final PropertyProviderCollection GLASS = DEFAULT.toBuilder()
             .add(instrument(InstrumentTypes.HIGH_HAT))
+            .add(adventureModeExempt(true))
             .build();
 
     /**
@@ -330,8 +335,8 @@ public final class PropertyProviderCollections {
     /**
      * The {@link PropertyProviderCollection} for ice blocks.
      */
-    // TODO: Breakable in adventure
     public static final PropertyProviderCollection ICE = DEFAULT.toBuilder()
+            .add(adventureModeExempt(true))
             .add(lightAbsorption(3))
             .add(slipperiness(0.98))
             .build();
@@ -339,9 +344,10 @@ public final class PropertyProviderCollections {
     /**
      * The {@link PropertyProviderCollection} for packed ice blocks.
      */
-    // TODO: Breakable in adventure
-    public static final PropertyProviderCollection PACKED_ICE = ICE.toBuilder()
+    public static final PropertyProviderCollection PACKED_ICE = DEFAULT.toBuilder()
             .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:chime").get()))
+            .add(adventureModeExempt(true))
+            .add(slipperiness(0.98))
             .build();
 
     /**

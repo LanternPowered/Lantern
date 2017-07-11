@@ -46,6 +46,8 @@ import org.spongepowered.api.data.property.block.StatisticsTrackedProperty;
 import org.spongepowered.api.data.property.block.SurrogateBlockProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
 import org.spongepowered.api.data.type.InstrumentType;
+import org.spongepowered.api.extra.fluid.data.property.FluidTemperatureProperty;
+import org.spongepowered.api.extra.fluid.data.property.FluidViscosityProperty;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -321,6 +323,32 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(PushBehaviorProperty.class, (blockState, location, face) ->
                         new PushBehaviorProperty(provider.get(blockState, location, face)))
+                .build();
+    }
+
+    public static PropertyProviderCollection fluidViscosity(int viscosity) {
+        return PropertyProviderCollection.builder()
+                .add(FluidViscosityProperty.class, new ConstantPropertyProvider<>(new FluidViscosityProperty(viscosity)))
+                .build();
+    }
+
+    public static PropertyProviderCollection fluidViscosity(ObjectProvider<Integer> provider) {
+        return PropertyProviderCollection.builder()
+                .add(FluidViscosityProperty.class, (blockState, location, face) ->
+                        new FluidViscosityProperty(provider.get(blockState, location, face)))
+                .build();
+    }
+
+    public static PropertyProviderCollection fluidTemperature(int temperature) {
+        return PropertyProviderCollection.builder()
+                .add(FluidTemperatureProperty.class, new ConstantPropertyProvider<>(new FluidTemperatureProperty(temperature)))
+                .build();
+    }
+
+    public static PropertyProviderCollection fluidTemperature(ObjectProvider<Integer> provider) {
+        return PropertyProviderCollection.builder()
+                .add(FluidTemperatureProperty.class, (blockState, location, face) ->
+                        new FluidTemperatureProperty(provider.get(blockState, location, face)))
                 .build();
     }
 }

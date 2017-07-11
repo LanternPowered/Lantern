@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.block.provider.property.PropertyProviderCollections.INSTANT_BROKEN;
-import static org.lanternpowered.server.block.provider.property.PropertyProviderCollections.PASSABLE;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.blastResistance;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.flammableInfo;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.hardness;
@@ -68,6 +67,7 @@ import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlace
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
+import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
@@ -316,7 +316,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .register(Keys.DIRT_TYPE, LanternDirtType.DIRT)
                                 )
                         )
-                        .properties(PropertyProviderCollections.DIRT.toBuilder()
+                        .properties(PropertyProviderCollections.GROUND.toBuilder()
                                 .add(hardness(0.5))
                                 .add(blastResistance(2.5)))
                         .translation(TranslationProvider.of(LanternEnumTraits.DIRT_TYPE))
@@ -495,7 +495,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         register(22, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.MINERAL.toBuilder()
                                 .add(hardness(3.0))
                                 .add(blastResistance(15.0)))
                         .translation("tile.blockLapis.name")
@@ -509,7 +509,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.FACING, Direction.NORTH).get()
                                 .withTrait(LanternBooleanTraits.TRIGGERED, false).get())
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(3.5))
                                 .add(blastResistance(17.5)))
                         // .tileEntityType(() -> TileEntityTypes.DISPENSER)
@@ -535,7 +535,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .register(Keys.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT)
                                 )
                         )
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(0.8))
                                 .add(blastResistance(4.0)))
                         .translation(TranslationProvider.of(LanternEnumTraits.SANDSTONE_TYPE))
@@ -546,7 +546,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         register(25, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.WOOD.toBuilder()
                                 .add(hardness(0.8))
                                 .add(blastResistance(4.0)))
                         .translation("tile.musicBlock.name")
@@ -563,7 +563,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
                                 .withTrait(LanternEnumTraits.BED_PART, LanternBedPart.FOOT).get()
                                 .withTrait(LanternBooleanTraits.OCCUPIED, false).get())
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.CLOTH.toBuilder()
                                 .add(hardness(0.2))
                                 .add(blastResistance(1.0)))
                         .translation("tile.bed.name")
@@ -591,8 +591,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternBooleanTraits.POWERED, false).get())
                         .itemType()
                         .boundingBox(BoundingBoxes::rail)
-                        .properties(builder -> builder
-                                .add(PASSABLE)
+                        .properties(PropertyProviderCollections.NON_SOLID.toBuilder()
                                 .add(hardness(0.7))
                                 .add(blastResistance(3.5)))
                         .translation("tile.goldenRail.name")
@@ -614,8 +613,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternBooleanTraits.POWERED, false).get())
                         .itemType()
                         .boundingBox(BoundingBoxes::rail)
-                        .properties(builder -> builder
-                                .add(PASSABLE)
+                        .properties(PropertyProviderCollections.NON_SOLID.toBuilder()
                                 .add(hardness(0.7))
                                 .add(blastResistance(3.5)))
                         .translation("tile.detectorRail.name")
@@ -633,8 +631,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////
         register(30, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
-                                .add(PASSABLE)
+                        .properties(PropertyProviderCollections.WEB.toBuilder()
                                 .add(hardness(4.0))
                                 .add(blastResistance(20.0)))
                         .translation("tile.web.name")
@@ -650,10 +647,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .keysProvider(collection -> collection
                                         .register(Keys.SHRUB_TYPE, LanternShrubType.DEAD_BUSH)))
                         .boundingBox(BoundingBoxes.bush())
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE)
-                                .add(replaceable(true)))
+                        .properties(PropertyProviderCollections.INSTANT_BROKEN_REPLACEABLE_PLANT)
                         .translation("tile.tallgrass.name")
                         .build("minecraft", "tallgrass"),
                 blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.SHRUB_TYPE).get().getInternalId());
@@ -661,10 +655,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Dead Bush   ///
         /////////////////////
         register(32, simpleBuilder()
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE)
-                                .add(replaceable(true)))
+                        .properties(PropertyProviderCollections.INSTANT_BROKEN_REPLACEABLE_PLANT)
                         .boundingBox(BoundingBoxes.bush())
                         .itemType()
                         .translation("tile.deadbush.name")
@@ -675,7 +666,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///     Wool    ///
         ///////////////////
         register(35, dyedBuilder("tile.wool.%s.name")
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.CLOTH.toBuilder()
                                 .add(hardness(0.8))
                                 .add(blastResistance(4.0)))
                         .build("minecraft", "wool"),
@@ -692,9 +683,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .keysProvider(collection -> collection
                                         .register(Keys.PLANT_TYPE, LanternPlantType.DANDELION)))
                         .boundingBox(BoundingBoxes.bush())
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE))
+                        .properties(PropertyProviderCollections.INSTANT_BROKEN_PLANT)
                         .translation(TranslationProvider.of(LanternEnumTraits.YELLOW_FLOWER_TYPE))
                         .build("minecraft", "yellow_flower"),
                 blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.YELLOW_FLOWER_TYPE).get().getInternalId());
@@ -709,9 +698,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .keysProvider(collection -> collection
                                         .register(Keys.PLANT_TYPE, LanternPlantType.POPPY)))
                         .boundingBox(BoundingBoxes.bush())
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE))
+                        .properties(PropertyProviderCollections.INSTANT_BROKEN_PLANT)
                         .translation(TranslationProvider.of(LanternEnumTraits.RED_FLOWER_TYPE))
                         .build("minecraft", "red_flower"),
                 blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.RED_FLOWER_TYPE).get().getInternalId());
@@ -720,9 +707,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////////
         register(39, simpleBuilder()
                         .boundingBox(BoundingBoxes.bush())
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE)
+                        .properties(PropertyProviderCollections.INSTANT_BROKEN_PLANT.toBuilder()
                                 .add(lightEmission(1)))
                         .translation("tile.mushroom.name")
                         .build("minecraft", "brown_mushroom"));
@@ -731,9 +716,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////////
         register(40, simpleBuilder()
                         .boundingBox(BoundingBoxes.bush())
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE))
+                        .properties(PropertyProviderCollections.INSTANT_BROKEN_PLANT)
                         .translation("tile.mushroom.name")
                         .build("minecraft", "red_mushroom"));
         //////////////////////
@@ -741,7 +724,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////
         register(41, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.MINERAL.toBuilder()
                                 .add(hardness(3.0))
                                 .add(blastResistance(10.0)))
                         .translation("tile.blockGold.name")
@@ -751,7 +734,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////
         register(42, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.MINERAL.toBuilder()
                                 .add(hardness(5.0))
                                 .add(blastResistance(10.0)))
                         .translation("tile.blockIron.name")
@@ -778,7 +761,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////////
         register(45, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(2.0))
                                 .add(blastResistance(10.0)))
                         .translation("tile.brick.name")
@@ -791,7 +774,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .defaultState(state -> state
                                 .withTrait(LanternBooleanTraits.EXPLODE, false).get())
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.TNT.toBuilder()
                                 .add(INSTANT_BROKEN))
                         .translation("tile.tnt.name")
                         .build("minecraft", "tnt"),
@@ -801,7 +784,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////
         register(47, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.WOOD.toBuilder()
                                 .add(hardness(1.5))
                                 .add(blastResistance(7.5)))
                         .translation("tile.bookshelf.name")
@@ -811,7 +794,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////////////
         register(48, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(2.0))
                                 .add(blastResistance(10.0)))
                         .translation("tile.stoneMoss.name")
@@ -821,7 +804,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         register(49, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(50.0))
                                 .add(blastResistance(2000.0)))
                         .translation("tile.obsidian.name")
@@ -834,7 +817,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                             .defaultState(state -> state
                                     .withTrait(LanternEnumTraits.TORCH_FACING, Direction.UP).get())
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.NON_SOLID.toBuilder()
                                 .add(INSTANT_BROKEN))
                         .translation("tile.torch.name")
                         .boundingBox(BoundingBoxes::torch)
@@ -864,9 +847,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///  Fire  ///
         //////////////
         register(51, simpleBuilder()
-                        .properties(builder -> builder
-                                .add(PropertyProviderCollections.PASSABLE)
-                                .add(PropertyProviderCollections.INSTANT_BROKEN)
+                        .properties(PropertyProviderCollections.FIRE.toBuilder()
                                 .add(lightEmission(15)))
                         .boundingBox(BoundingBoxes.NULL)
                         .translation("tile.fire.name")
@@ -875,7 +856,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///  Mob Spawner  ///
         /////////////////////
         register(52, simpleBuilder()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(5.0))
                                 .add(blastResistance(25.0)))
                         .translation("tile.mobSpawner.name")
@@ -896,6 +877,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .boundingBox(BoundingBoxes.NULL)
                         .defaultState(state -> state
                                 .withTrait(LanternIntegerTraits.POWER, 0).get())
+                        .properties(PropertyProviderCollections.NON_SOLID.toBuilder()
+                                .add(INSTANT_BROKEN))
                         .translation("tile.redstoneDust.name")
                         .build("minecraft", "redstone_wire"),
                 state -> state.get(Keys.POWER).get().byteValue());
@@ -904,7 +887,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////////
         register(56, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.MINERAL.toBuilder()
                                 .add(hardness(3.0))
                                 .add(blastResistance(5.0)))
                         .translation("tile.oreDiamond.name")
@@ -914,7 +897,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////////
         register(57, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.MINERAL.toBuilder()
                                 .add(hardness(5.0))
                                 .add(blastResistance(10.0)))
                         .translation("tile.blockDiamond.name")
@@ -924,7 +907,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////////
         register(58, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.WOOD.toBuilder()
                                 .add(hardness(2.5))
                                 .add(blastResistance(12.5)))
                         .translation("tile.workbench.name")
@@ -938,7 +921,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(60, simpleBuilder()
                         .boundingBox(BoundingBoxes.farmland())
                         .trait(LanternIntegerTraits.MOISTURE)
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.GROUND.toBuilder()
                                 .add(hardness(0.6))
                                 .add(blastResistance(3.0)))
                         .defaultState(state ->
@@ -966,14 +949,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////////////
         /// Stone Pressure Plate ///
         ////////////////////////////
-        register(70, pressurePlateBuilder()
+        register(70, pressurePlateBuilder(PropertyProviderCollections.STONE)
                         .translation("tile.pressurePlateStone.name")
                         .build("minecraft", "stone_pressure_plate"),
                 this::pressurePlateData);
         /////////////////////////////
         /// Wooden Pressure Plate ///
         /////////////////////////////
-        register(72, pressurePlateBuilder()
+        register(72, pressurePlateBuilder(PropertyProviderCollections.WOOD)
                         .translation("tile.pressurePlateWood.name")
                         .build("minecraft", "wooden_pressure_plate"),
                 this::pressurePlateData);
@@ -985,7 +968,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .traits(LanternBooleanTraits.HAS_RECORD)
                         .defaultState(state -> state
                                 .withTrait(LanternBooleanTraits.HAS_RECORD, false).get())
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.WOOD.toBuilder()
                                 .add(hardness(2.0))
                                 .add(blastResistance(10.0)))
                         .tileEntityType(() -> TileEntityTypes.JUKEBOX)
@@ -1009,7 +992,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         //////////////////////
         register(87, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(0.4))
                                 .add(blastResistance(2.0)))
                         .translation("tile.hellrock.name")
@@ -1027,7 +1010,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /// Stained Glass ///
         /////////////////////
         register(95, dyedBuilder("tile.stainedGlass.%s.name")
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.GLASS.toBuilder()
                                 .add(hardness(0.3))
                                 .add(blastResistance(1.5)))
                         .build("minecraft", "stained_glass"),
@@ -1038,7 +1021,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(101, simpleBuilder()
                         // TODO
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.IRON.toBuilder()
                                 .add(hardness(5.0))
                                 .add(blastResistance(10.0)))
                         .translation("tile.fenceIron.name")
@@ -1048,7 +1031,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////
         register(121, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(3.0))
                                 .add(blastResistance(15.0)))
                         .translation("tile.whiteStone.name")
@@ -1067,7 +1050,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .register(Keys.TREE_TYPE, LanternTreeType.OAK)
                                 )
                         )
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.WOOD.toBuilder()
                                 .add(hardness(2.0))
                                 .add(blastResistance(5.0)))
                         .build("minecraft", "double_wooden_slab"),
@@ -1092,7 +1075,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 )
                         )
                         .boundingBox(BoundingBoxes::slab)
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.WOOD.toBuilder()
                                 .add(hardness(2.0))
                                 .add(blastResistance(5.0)))
                         .build("minecraft", "wooden_slab"),
@@ -1109,7 +1092,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .defaultState(state -> state.withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
                         .itemType()
                         .tileEntityType(() -> TileEntityTypes.ENDER_CHEST)
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(22.5))
                                 .add(blastResistance(3000.0))
                                 .add(lightEmission(7)))
@@ -1130,14 +1113,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////////////////////////
         /// Weighted Pressure Plate (Light) ///
         ///////////////////////////////////////
-        register(147, weightedPressurePlateBuilder()
+        register(147, weightedPressurePlateBuilder(PropertyProviderCollections.IRON)
                         .translation("tile.weightedPlate_light.name")
                         .build("minecraft", "light_weighted_pressure_plate"),
                 this::weightedPressurePlateData);
         ///////////////////////////////////////
         /// Weighted Pressure Plate (Heavy) ///
         ///////////////////////////////////////
-        register(148, weightedPressurePlateBuilder()
+        register(148, weightedPressurePlateBuilder(PropertyProviderCollections.IRON)
                         .translation("tile.weightedPlate_heavy.name")
                         .build("minecraft", "heavy_weighted_pressure_plate"),
                 this::weightedPressurePlateData);
@@ -1146,7 +1129,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////////
         register(152, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.MINERAL.toBuilder()
                                 .add(hardness(5.0))
                                 .add(blastResistance(30.0)))
                         .translation("tile.blockRedstone.name")
@@ -1156,7 +1139,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////
         register(153, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(3.0))
                                 .add(blastResistance(15.0)))
                         .translation("tile.netherquartz.name")
@@ -1170,7 +1153,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.HOPPER_FACING, Direction.DOWN).get()
                                 .withTrait(LanternBooleanTraits.ENABLED, false).get())
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.IRON.toBuilder()
                                 .add(hardness(3.0))
                                 .add(blastResistance(8.0)))
                         .translation("tile.hopper.name")
@@ -1196,7 +1179,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .register(Keys.QUARTZ_TYPE, LanternQuartzType.DEFAULT)
                                 )
                         )
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(0.8))
                                 .add(blastResistance(2.4)))
                         .translation(TranslationProvider.of(LanternEnumTraits.QUARTZ_TYPE))
@@ -1213,7 +1196,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.FACING, Direction.NORTH).get()
                                 .withTrait(LanternBooleanTraits.TRIGGERED, false).get())
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.IRON.toBuilder()
                                 .add(hardness(3.5))
                                 .add(blastResistance(17.5)))
                         // .tileEntityType(() -> TileEntityTypes.DROPPER)
@@ -1232,7 +1215,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /// Stained Hardended Clay ///
         //////////////////////////////
         register(159, dyedBuilder("tile.clayHardenedStained.%s.name")
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(1.25))
                                 .add(blastResistance(7.0)))
                         .build("minecraft", "stained_hardened_clay"),
@@ -1241,7 +1224,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /// Stained Glass Pane ///
         //////////////////////////
         register(160, dyedBuilder("tile.thinStainedGlass.%s.name")
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.GLASS.toBuilder()
                                 .add(hardness(0.3))
                                 .add(blastResistance(1.5)))
                         .build("minecraft", "stained_glass_pane"),
@@ -1271,7 +1254,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///     Carpet    ///
         /////////////////////
         register(171, dyedBuilder("tile.carpet.%s.name")
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.CARPET.toBuilder()
                                 .add(hardness(0.1))
                                 .add(blastResistance(0.5)))
                         .boundingBox(BoundingBoxes.carpet())
@@ -1288,7 +1271,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .register(Keys.SANDSTONE_TYPE, LanternSandstoneType.DEFAULT)
                                 )
                         )
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.STONE.toBuilder()
                                 .add(hardness(0.8))
                                 .add(blastResistance(4.0)))
                         .translation(TranslationProvider.of(LanternEnumTraits.SANDSTONE_TYPE))
@@ -1317,7 +1300,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         register(198, simpleBuilder()
                         .itemType()
-                        .properties(builder -> builder
+                        .properties(PropertyProviderCollections.NON_SOLID.toBuilder()
                                 .add(hardness(0.0))
                                 .add(blastResistance(0.0))
                                 .add(lightEmission(14)))
@@ -1486,14 +1469,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         }
     }
 
-    private BlockTypeBuilder pressurePlateBuilder() {
+    private BlockTypeBuilder pressurePlateBuilder(PropertyProviderCollection baseProperties) {
         return simpleBuilder()
                 .itemType()
                 .traits(LanternBooleanTraits.POWERED)
                 .boundingBox(BoundingBoxes::pressurePlate)
                 .defaultState(state -> state
                         .withTrait(LanternBooleanTraits.POWERED, false).get())
-                .properties(builder -> builder
+                .properties(baseProperties.toBuilder()
                         .add(hardness(0.5))
                         .add(blastResistance(2.5)));
     }
@@ -1502,14 +1485,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         return (byte) (blockState.getTraitValue(LanternBooleanTraits.POWERED).get() ? 1 : 0);
     }
 
-    private BlockTypeBuilder weightedPressurePlateBuilder() {
+    private BlockTypeBuilder weightedPressurePlateBuilder(PropertyProviderCollection baseProperties) {
         return simpleBuilder()
                 .itemType()
                 .traits(LanternIntegerTraits.POWER)
                 .boundingBox(BoundingBoxes::pressurePlate)
                 .defaultState(state -> state
                         .withTrait(LanternIntegerTraits.POWER, 0).get())
-                .properties(builder -> builder
+                .properties(baseProperties.toBuilder()
                         .add(hardness(0.5))
                         .add(blastResistance(2.5)));
     }
@@ -1529,10 +1512,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder furnaceBuilder() {
         return horizontalFacingBuilder()
+                .properties(PropertyProviderCollections.STONE.toBuilder()
                 .tileEntityType(() -> TileEntityTypes.FURNACE)
                 .behaviors(pipeline -> pipeline
                         .add(new OpenableContainerInteractionBehavior()))
-                .properties(builder -> builder
                         .add(hardness(3.5))
                         .add(blastResistance(17.5)));
     }
@@ -1540,7 +1523,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     private BlockTypeBuilder pumpkinBuilder() {
         return horizontalFacingBuilder()
                 .itemType()
-                .properties(builder -> builder
+                .properties(PropertyProviderCollections.GOURD.toBuilder()
                         .add(hardness(1.0))
                         .add(blastResistance(5.0)));
     }
@@ -1652,7 +1635,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .itemType()
                 .tileEntityType(() -> TileEntityTypes.CHEST)
                 .boundingBox(BoundingBoxes::doubleChest)
-                .properties(builder -> builder
+                .properties(PropertyProviderCollections.WOOD.toBuilder()
                         .add(hardness(2.5))
                         .add(blastResistance(12.5)))
                 .behaviors(pipeline -> pipeline
@@ -1674,7 +1657,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .maxStackQuantity(1)
                 )
                 .tileEntityType(() -> TileEntityTypes.SHULKER_BOX)
-                .properties(builder -> builder
+                .properties(PropertyProviderCollections.STONE.toBuilder()
                         .add(hardness(2.0))
                         .add(blastResistance(10.0)))
                 .behaviors(pipeline -> pipeline
@@ -1706,7 +1689,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .register(Keys.SLAB_TYPE, defaultValue)
                         )
                 )
-                .properties(builder -> builder
+                .properties(PropertyProviderCollections.STONE.toBuilder()
                         .add(hardness(2.0))
                         .add(blastResistance(10.0)));
     }
@@ -1728,7 +1711,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .register(Keys.SLAB_TYPE, defaultValue)
                         )
                 )
-                .properties(builder -> builder
+                .properties(PropertyProviderCollections.STONE.toBuilder()
                         .add(hardness(2.0))
                         .add(blastResistance(10.0)));
     }

@@ -149,9 +149,9 @@ public final class PropertyProviderCollections {
             .build();
 
     /**
-     * The {@link PropertyProviderCollection} for dirt blocks.
+     * The {@link PropertyProviderCollection} for ground/dirt blocks.
      */
-    public static final PropertyProviderCollection DIRT = DEFAULT.toBuilder()
+    public static final PropertyProviderCollection GROUND = DEFAULT.toBuilder()
             .build();
 
     /**
@@ -170,16 +170,21 @@ public final class PropertyProviderCollections {
             .build();
 
     /**
-     * The {@link PropertyProviderCollection} for mineral/iron blocks.
+     * The {@link PropertyProviderCollection} for mineral blocks.
      */
     // TODO: Requires tool
     public static final PropertyProviderCollection MINERAL = DEFAULT.toBuilder()
             .build();
 
     /**
+     * The {@link PropertyProviderCollection} for iron blocks.
+     */
+    public static final PropertyProviderCollection IRON = MINERAL;
+
+    /**
      * The {@link PropertyProviderCollection} for anvil blocks.
      */
-    public static final PropertyProviderCollection ANVIL = MINERAL.toBuilder()
+    public static final PropertyProviderCollection ANVIL = IRON.toBuilder()
             .add(pushBehavior(PushBehavior.BLOCK))
             .build();
 
@@ -212,10 +217,24 @@ public final class PropertyProviderCollections {
             .build();
 
     /**
+     * The {@link PropertyProviderCollection} for instant broken plant blocks.
+     */
+    public static final PropertyProviderCollection INSTANT_BROKEN_PLANT = PLANT.toBuilder()
+            .add(INSTANT_BROKEN)
+            .build();
+
+    /**
      * The {@link PropertyProviderCollection} for replaceable plant blocks.
      */
     public static final PropertyProviderCollection REPLACEABLE_PLANT = PLANT.toBuilder()
             .add(replaceable(true))
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for instant broken replaceable plant blocks.
+     */
+    public static final PropertyProviderCollection INSTANT_BROKEN_REPLACEABLE_PLANT = REPLACEABLE_PLANT.toBuilder()
+            .add(INSTANT_BROKEN)
             .build();
 
     /**
@@ -248,11 +267,52 @@ public final class PropertyProviderCollections {
 
     /**
      * The {@link PropertyProviderCollection} for non solid blocks.
+     *
+     * TODO: This name doesn't feel right
      */
     public static final PropertyProviderCollection NON_SOLID = DEFAULT.toBuilder()
             .add(pushBehavior(PushBehavior.REPLACE))
             .add(PASSABLE)
             .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for glass blocks.
+     */
+    public static final PropertyProviderCollection GLASS = DEFAULT.toBuilder()
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for carpet blocks.
+     */
+    public static final PropertyProviderCollection CARPET = CLOTH.toBuilder()
+            .add(PASSABLE)
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for TNT blocks.
+     */
+    public static final PropertyProviderCollection TNT = DEFAULT.toBuilder()
+            .add(flammableInfo(15, 100))
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for gourd blocks.
+     */
+    public static final PropertyProviderCollection GOURD = DEFAULT.toBuilder()
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for web blocks.
+     */
+    public static final PropertyProviderCollection WEB = DEFAULT.toBuilder()
+            .add(pushBehavior(PushBehavior.REPLACE))
+            .add(PASSABLE)
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for barrier blocks.
+     */
+    public static final PropertyProviderCollection BARRIER = UNBREAKABLE;
 
     private PropertyProviderCollections() {
     }

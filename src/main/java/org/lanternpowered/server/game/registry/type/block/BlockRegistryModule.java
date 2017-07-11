@@ -32,8 +32,8 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.blastResistance;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.flammableInfo;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.hardness;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.instrument;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightEmission;
-import static org.lanternpowered.server.block.provider.property.PropertyProviders.replaceable;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
@@ -667,6 +667,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////
         register(35, dyedBuilder("tile.wool.%s.name")
                         .properties(PropertyProviderCollections.CLOTH.toBuilder()
+                                .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:guitar").get()))
                                 .add(hardness(0.8))
                                 .add(blastResistance(4.0)))
                         .build("minecraft", "wool"),
@@ -725,6 +726,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(41, simpleBuilder()
                         .itemType()
                         .properties(PropertyProviderCollections.MINERAL.toBuilder()
+                                .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:bell").get()))
                                 .add(hardness(3.0))
                                 .add(blastResistance(10.0)))
                         .translation("tile.blockGold.name")
@@ -960,6 +962,16 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.pressurePlateWood.name")
                         .build("minecraft", "wooden_pressure_plate"),
                 this::pressurePlateData);
+        //////////////////////
+        ///   Clay Block   ///
+        //////////////////////
+        register(82, simpleBuilder()
+                        .itemType()
+                        .properties(PropertyProviderCollections.CLAY.toBuilder()
+                                .add(hardness(0.6))
+                                .add(blastResistance(3.0)))
+                        .translation("tile.clay.name")
+                        .build("minecraft", "clay"));
         ////////////////////
         ///    Jukebox   ///
         ////////////////////
@@ -1250,6 +1262,18 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(PropertyProviderCollections.UNBREAKABLE))
                         .translation("tile.barrier.name")
                         .build("minecraft", "barrier"));
+        ///////////////////////
+        ///   Sea Lantern   ///
+        ///////////////////////
+        register(169, simpleBuilder() // <3
+                        .itemType()
+                        .properties(PropertyProviderCollections.GLASS.toBuilder()
+                                .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:pling").get())) // Super duper secret
+                                .add(hardness(0.3))
+                                .add(blastResistance(1.5))
+                                .add(lightEmission(15)))
+                        .translation("tile.seaLantern.name")
+                        .build("minecraft", "sea_lantern"));
         /////////////////////
         ///     Carpet    ///
         /////////////////////

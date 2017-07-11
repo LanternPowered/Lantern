@@ -551,7 +551,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(HandPreference.class, new HandPreferenceRegistryModule())
                 .registerModule(HorseColor.class, new HorseColorRegistryModule())
                 .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
-                .registerModule(InstrumentType.class, new InstrumentTypeRegistryModule())
+                .registerModule(InstrumentType.class, InstrumentTypeRegistryModule.get())
                 .registerModule(Hinge.class,
                         new EnumValueRegistryModule<Hinge>(LanternHinge.class, Hinges.class) {})
                 .registerModule(Key.class, KeyRegistryModule.get())

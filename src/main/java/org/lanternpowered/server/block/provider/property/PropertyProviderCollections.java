@@ -43,6 +43,7 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.unbreakable;
 
 import org.lanternpowered.server.block.property.PushBehavior;
+import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.type.InstrumentTypes;
 
@@ -167,6 +168,7 @@ public final class PropertyProviderCollections {
      */
     // TODO: Requires tool
     public static final PropertyProviderCollection STONE = DEFAULT.toBuilder()
+            .add(instrument(InstrumentTypes.BASS_DRUM))
             .build();
 
     /**
@@ -279,6 +281,7 @@ public final class PropertyProviderCollections {
      * The {@link PropertyProviderCollection} for glass blocks.
      */
     public static final PropertyProviderCollection GLASS = DEFAULT.toBuilder()
+            .add(instrument(InstrumentTypes.HIGH_HAT))
             .build();
 
     /**
@@ -307,6 +310,13 @@ public final class PropertyProviderCollections {
     public static final PropertyProviderCollection WEB = DEFAULT.toBuilder()
             .add(pushBehavior(PushBehavior.REPLACE))
             .add(PASSABLE)
+            .build();
+
+    /**
+     * The {@link PropertyProviderCollection} for clay blocks.
+     */
+    public static final PropertyProviderCollection CLAY = DEFAULT.toBuilder()
+            .add(instrument(InstrumentTypeRegistryModule.get().getById("minecraft:flute").get()))
             .build();
 
     /**

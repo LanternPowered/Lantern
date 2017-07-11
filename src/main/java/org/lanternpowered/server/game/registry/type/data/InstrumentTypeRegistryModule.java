@@ -28,6 +28,7 @@ package org.lanternpowered.server.game.registry.type.data;
 import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.fluid.FluidTypeRegistryModule;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -36,7 +37,13 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 @RegistrationDependency(SoundTypeRegistryModule.class)
 public class InstrumentTypeRegistryModule extends PluginCatalogRegistryModule<InstrumentType> {
 
-    public InstrumentTypeRegistryModule() {
+    private static final InstrumentTypeRegistryModule INSTANCE = new InstrumentTypeRegistryModule();
+
+    public static InstrumentTypeRegistryModule get() {
+        return INSTANCE;
+    }
+
+    private InstrumentTypeRegistryModule() {
         super(InstrumentTypes.class);
     }
 

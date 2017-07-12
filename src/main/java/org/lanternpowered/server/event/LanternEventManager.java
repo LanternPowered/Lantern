@@ -274,10 +274,8 @@ public class LanternEventManager implements EventManager {
             while (it.hasNext()) {
                 final RegisteredListener<?> listener = it.next();
                 if (unregister.test(listener)) {
-                    if (listener.getHandle() instanceof AnnotatedEventListener) {
-                        synchronized (this.registeredListeners) {
-                            this.registeredListeners.remove(((AnnotatedEventListener) listener.getHandle()).getHandle());
-                        }
+                    synchronized (this.registeredListeners) {
+                        this.registeredListeners.remove(listener.getHandle());
                     }
                     types.addAll(TypeToken.of(listener.getEventClass()).getTypes().rawTypes());
                     it.remove();

@@ -36,14 +36,14 @@ final class LanternAsset implements Asset {
 
     private final PluginContainer plugin;
     private final String id;
-    final Path path;
     private final URL url;
+    final Path path;
 
-    LanternAsset(PluginContainer plugin, String id, Path path, URL url) {
+    LanternAsset(PluginContainer plugin, String id, URL url, Path path) {
         this.plugin = plugin;
-        this.path = path;
         this.url = url;
         this.id = id;
+        this.path = path;
     }
 
     @Override

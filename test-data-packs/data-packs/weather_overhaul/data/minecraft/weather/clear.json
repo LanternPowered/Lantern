@@ -1,0 +1,10 @@
+{
+    "name": "Clear",
+    "aliases": [
+        "clear",
+        "sunny",
+        "sun"
+    ],
+    "weight": 500,
+    "duration": "@ 300 + $random.nextInt(600)"
+}

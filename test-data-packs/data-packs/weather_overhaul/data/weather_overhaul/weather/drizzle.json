@@ -1,0 +1,11 @@
+{
+    "name": "Drizzle",
+    "aliases": [
+        "driz"
+    ],
+    "options": {
+        "rain_strength": 0.2
+    },
+    "weight": 320,
+    "duration": "@ 150 + $random.nextInt(100)"
+}

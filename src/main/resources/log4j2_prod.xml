@@ -20,11 +20,11 @@
     </Appenders>
     <Loggers>
         <!-- Log server messages without prefix. -->
-        <Logger name="Lantern" level="all" additivity="false">
+        <Logger name="lantern" level="all" additivity="false">
             <AppenderRef ref="DefaultConsole" level="info"/>
             <AppenderRef ref="File"/>
         </Logger>
-        <Logger name="Minecraft" level="all" additivity="false">
+        <Logger name="minecraft" level="all" additivity="false">
             <AppenderRef ref="DefaultConsole" level="info"/>
             <AppenderRef ref="File"/>
         </Logger>

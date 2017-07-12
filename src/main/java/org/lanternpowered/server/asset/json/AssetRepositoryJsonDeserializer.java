@@ -33,24 +33,30 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.asset.ClassLoaderAssetRepository;
 import org.lanternpowered.server.asset.DirectoryAssetRepository;
 import org.lanternpowered.server.asset.MultiAssetRepository;
-import org.spongepowered.api.plugin.PluginManager;
+import org.lanternpowered.server.asset.PacksAssetRepository;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.plugin.LanternPluginManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class AssetRepositoryJsonDeserializer implements JsonDeserializer<AssetRepository> {
 
-    private final PluginManager pluginManager;
+    private final LanternPluginManager pluginManager;
 
-    public AssetRepositoryJsonDeserializer(PluginManager pluginManager) {
+    public AssetRepositoryJsonDeserializer(LanternPluginManager pluginManager) {
         checkNotNull(pluginManager, "pluginManager");
         this.pluginManager = pluginManager;
     }
@@ -61,27 +67,48 @@ public class AssetRepositoryJsonDeserializer implements JsonDeserializer<AssetRe
         // The class loader asset repository will always be present,
         // this cannot be overridden, but the assets themselves can
         // be overridden like the minecraft resource pack system
-        repository.add(new ClassLoaderAssetRepository(this.pluginManager));
+        final ClassLoaderAssetRepository classLoaderAssetRepository = new ClassLoaderAssetRepository(this.pluginManager);
+        repository.add(classLoaderAssetRepository);
+        final LanternClassLoader classLoader = LanternClassLoader.get();
+        final Consumer<URL> consumer = url -> {
+            Path path = new File(url.getFile()).toPath();
+            if (Files.isDirectory(path) && Files.exists(path.resolve("data-packs.info"))) {
+                Lantern.getLogger().debug("Registered a data pack asset repository: " + path);
+                repository.add(new PacksAssetRepository(this.pluginManager, path));
+            } else {
+                classLoaderAssetRepository.addRepository(path);
+            }
+        };
+        classLoader.getBaseURLs().forEach(consumer);
+        classLoader.addBaseURLTracker(consumer);
         final JsonArray array = json.getAsJsonArray();
         for (int i = 0; i < array.size(); i++) {
             final JsonObject obj = array.get(i).getAsJsonObject();
             final String type = obj.get("type").getAsString().toLowerCase(Locale.ENGLISH);
+            Path path;
             switch (type) {
                 // Currently only directory asset repositories
+                case "dir":
                 case "directory":
-                    final Path path = Paths.get(obj.get("path").getAsString());
-                    final DirectoryAssetRepository repo = new DirectoryAssetRepository(this.pluginManager, path);
-                    if (!Files.exists(path)) {
-                        try {
-                            Files.createDirectories(path);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    repository.add(repo);
+                    path = Paths.get(obj.get("path").getAsString());
+                    Lantern.getLogger().debug("Registered a directory asset repository: " + path);
+                    repository.add(new DirectoryAssetRepository(this.pluginManager, path));
+                    break;
+                // Also support a directory with data/asset packs
+                case "packs":
+                    path = Paths.get(obj.get("path").getAsString());
+                    Lantern.getLogger().debug("Registered a data pack asset repository: " + path);
+                    repository.add(new PacksAssetRepository(this.pluginManager, path));
                     break;
                 default:
                     throw new JsonParseException("Unknown repository type: " + type);
+            }
+            if (!Files.exists(path)) {
+                try {
+                    Files.createDirectories(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return repository;

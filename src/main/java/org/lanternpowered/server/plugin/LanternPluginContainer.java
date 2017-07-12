@@ -25,52 +25,28 @@
  */
 package org.lanternpowered.server.plugin;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
 import org.lanternpowered.server.inject.plugin.PluginModule;
+import org.spongepowered.plugin.meta.PluginMetadata;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class LanternPluginContainer extends AbstractPluginContainer {
+public final class LanternPluginContainer extends InfoPluginContainer {
 
-    private final ImmutableList<String> authors;
     private final Injector injector;
     private final Object instance;
 
-    @Nullable private final String description;
-    @Nullable private final String url;
-
     @Nullable private final Path source;
 
-    LanternPluginContainer(Injector injector, String id, Class<?> pluginClass, @Nullable String name, @Nullable String version,
-            @Nullable String description, @Nullable String url, List<String> authors, @Nullable Path source) {
-        super(id, name, version);
-        this.authors = ImmutableList.copyOf(authors);
-        this.description = description;
+    LanternPluginContainer(String id, Injector injector, Class<?> pluginClass, PluginMetadata pluginMetadata, @Nullable Path source) {
+        super(id, pluginMetadata);
         this.source = source;
-        this.url = url;
 
         this.injector = injector.createChildInjector(new PluginModule(this, pluginClass));
         this.instance = this.injector.getInstance(pluginClass);
-    }
-
-    @Override
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(this.description);
-    }
-
-    @Override
-    public Optional<String> getUrl() {
-        return Optional.ofNullable(this.url);
-    }
-
-    @Override
-    public List<String> getAuthors() {
-        return this.authors;
     }
 
     @Override

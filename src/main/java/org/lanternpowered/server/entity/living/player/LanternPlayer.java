@@ -427,7 +427,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.networkEntityId,
                         this.session.getServer().getMaxPlayers(), reducedDebug, false, lowHorizon));
                 // Send the server brand
-                this.session.send(new MessagePlayInOutBrand(InternalPluginsInfo.Implementation.NAME));
+                this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
                 // Send the player list
                 final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
                 final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);

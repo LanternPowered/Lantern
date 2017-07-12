@@ -1,0 +1,5 @@
+{
+    "name": "Lantern",
+    "description": "Lantern is the implementation of a minecraft server with support for the SpongeAPI.",
+    "url": "https://www.lanternpowered.org"
+}

@@ -1,0 +1,26 @@
+{
+    "name": "Thunder Storm",
+    "aliases": [
+        "storm",
+        "thunder_storm",
+        "thunderStorm"
+    ],
+    "options": {
+        "rain_strength": 1.0,
+        "sky_darkness": 1.0
+    },
+    "weight": 200,
+    "duration": "@ 200 + $random.nextInt(300)",
+    "action": {
+        "condition": [
+            "@ $context.get(Parameters.WORLD).get().weatherUniverse.get().darkness > 0.8"
+        ],
+        "action": {
+            "type": "lantern:lightning_weather_spawner",
+            "data": {
+                "attempts-per-chunk": 2,
+                "chance": 0.000004
+            }
+        }
+    }
+}

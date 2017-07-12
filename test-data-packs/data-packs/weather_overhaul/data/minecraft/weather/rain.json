@@ -1,0 +1,12 @@
+{
+    "name": "Rain",
+    "aliases": [
+        "rain",
+        "rainy"
+    ],
+    "options": {
+        "rain_strength": 1.0
+    },
+    "weight": 300,
+    "duration": "@ 250 + $random.nextInt(500)"
+}

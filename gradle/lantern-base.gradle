@@ -1,0 +1,20 @@
+apply plugin: 'java-base'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+// Basic information
+group = 'org.lanternpowered'
+
+// Setup the default tasks
+defaultTasks 'build'
+
+// IntelliJ IDEA resource fix
+idea.module.inheritOutputDirs = true
+
+// Environment variables for the build set by the build server
+ext {
+    buildNumber = System.env.BUILD_NUMBER ?: System.env.TRAVIS_BUILD_NUMBER ?: '0'
+    ciSystem = System.env.CI_SYSTEM ?: (System.env.TRAVIS ? 'travis' : null)
+    commit = System.env.GIT_COMMIT ?: System.env.TRAVIS_COMMIT
+    branch = System.env.GIT_BRANCH ?: System.env.TRAVIS_BRANCH
+}

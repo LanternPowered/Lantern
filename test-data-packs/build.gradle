@@ -1,0 +1,53 @@
+apply from: rootProject.file('gradle/lantern-base.gradle')
+
+// Basic project information
+archivesBaseName = 'lantern-test-data-packs'
+// No version, every test data pack has it's own version
+version = '' // 'cero.sero.zero'
+
+sourceSets {
+    main.java.srcDirs = []
+    main.resources.srcDirs = [ file('data-packs') ]
+}
+
+// Create a zip file from the 'data-packs' directory
+task packsZip(type: Zip) {
+    from sourceSets.main.allSource
+    from rootProject.file('LICENSE.txt')
+    destinationDir distsDir
+    archiveName "${archivesBaseName}.zip"
+}
+rootProject.assemble.dependsOn packsZip
+
+// Create zip files from all the directory data packs
+// in the 'data-packs' directory and put them in a zip
+ext.zippedFilesDirTemp = file("${rootProject.buildDir}/temp-zipped-files")
+ext.zippedFiles = []
+
+task zippedPacksZip(type: Zip) {
+    afterEvaluate {
+        zippedFiles.each { File file ->
+            from file
+        }
+    }
+    from rootProject.file('LICENSE.txt')
+    destinationDir distsDir
+    archiveName "${archivesBaseName}-zipped-packs.zip"
+}
+rootProject.assemble.dependsOn zippedPacksZip
+
+sourceSets.main.allSource.srcDirs.each { File dir ->
+    dir.listFiles().each { File file ->
+        if (file.isDirectory()) {
+            Zip zip = tasks.create("zippedPack${file.name}", Zip) {
+                from file
+                archiveName "${file.name}.zip"
+                destinationDir zippedFilesDirTemp
+            }
+            zippedPacksZip.dependsOn zip
+            zippedFiles.add zip.archivePath
+        } else {
+            zippedFiles.add file
+        }
+    }
+}

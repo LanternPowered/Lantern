@@ -54,7 +54,7 @@ public final class LanternServerLaunch {
         classLoader.addTransformer(new FastValueContainerClassTransformer());
 
         // Get the default logger
-        final Logger logger = LoggerFactory.getLogger(InternalPluginsInfo.Implementation.NAME);
+        final Logger logger = LoggerFactory.getLogger(InternalPluginsInfo.Implementation.IDENTIFIER);
         try {
             // Create the shared option parser
             final OptionParser optionParser = new OptionParser();

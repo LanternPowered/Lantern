@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inject;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -101,7 +103,6 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.service.ServiceManager;
-import org.spongepowered.api.service.SimpleServiceManager;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -117,6 +118,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -344,12 +346,19 @@ public class LanternModule extends PrivateModule {
     @Exposed
     @Provides
     @Singleton
-    private LanternAssetManager provideAssetManager(@Named(DirectoryKeys.ROOT) Path rootDir, PluginManager pluginManager) {
+    private LanternAssetManager provideAssetManager(@Option({ "asset-repository-config", "asset-repo-config" })
+            @Nullable Path repoConfig, LanternPluginManager pluginManager) {
         final Gson gson = new GsonBuilder().registerTypeAdapter(AssetRepository.class,
                 new AssetRepositoryJsonDeserializer(pluginManager)).create();
         try {
-            final InputStream is = extractAndGet(rootDir, "assets-repo.json", "config");
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            URL url;
+            if (repoConfig != null) {
+                url = repoConfig.toUri().toURL();
+            } else {
+                url = getClass().getClassLoader().getResource("assets_repo.json");
+                checkNotNull(url);
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
                 return new LanternAssetManager(gson.fromJson(reader, AssetRepository.class));
             }
         } catch (IOException e) {

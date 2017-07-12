@@ -68,12 +68,15 @@ configurations {
     }
 }
 
+ext.testDataPacks = project(':test-data-packs')
 ext.testPlugins = project(':test-plugins')
 ext.fastutilVersion = '7.1.0'
 // Project dependencies
 dependencies {
     // Add the test plugins to the class path
     compile testPlugins
+    // Add the test data packs to the class path
+    compile testDataPacks
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
@@ -248,6 +251,7 @@ task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
     Set<String> entries = []
     // Don't include the api again
     entries.add "$api.group:$api.name"
+    entries.add "$testDataPacks.group:$testDataPacks.name"
     entries.add "$testPlugins.group:$testPlugins.name"
     // We already include 'asm-all'
     entries.add 'org.ow2.asm:asm'

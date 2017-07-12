@@ -64,6 +64,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
@@ -240,6 +241,7 @@ public final class LanternClassLoader extends URLClassLoader {
     private final LibraryClassLoader libraryClassLoader;
     private final Set<URL> libraryUrls = new HashSet<>();
     private final Set<URL> urls = new HashSet<>();
+    private final List<Consumer<URL>> urlTrackers = new ArrayList<>();
 
     // Class transformer stuff
     private final List<ClassTransformer> transformers = new CopyOnWriteArrayList<>();
@@ -338,15 +340,37 @@ public final class LanternClassLoader extends URLClassLoader {
         }
     }
 
-    @Override
-    public void addURL(URL url) {
+    /**
+     * Adds a base game {@link URL}. All the base game classes
+     * will be processed by {@link ClassTransformer}s and tracked
+     * by {@link #addBaseURLTracker(Consumer)}.
+     *
+     * @param url The url
+     */
+    public void addBaseURL(URL url) {
         requireNonNull(url, "url");
         // Make sure that there can't be duplicate jars
         if (this.urls.add(url)) {
             super.addURL(url);
             // New classes are available, let the class loader try again
             this.invalidClasses.clear();
+            this.urlTrackers.forEach(consumer -> consumer.accept(url));
         }
+    }
+
+    public List<URL> getBaseURLs() {
+        return Arrays.asList(super.getURLs());
+    }
+
+    /**
+     * Adds a {@link Consumer} that will track when {@link URL} gets added
+     * to the {@link ClassLoader}.
+     *
+     * @param consumer The consumer
+     */
+    public void addBaseURLTracker(Consumer<URL> consumer) {
+        requireNonNull(consumer, "consumer");
+        this.urlTrackers.add(consumer);
     }
 
     /**

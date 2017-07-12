@@ -39,7 +39,6 @@ public final class InternalPluginsInfo {
 
     public static final class Api {
 
-        public static final String NAME = "SpongeAPI";
         public static final String IDENTIFIER = Platform.API_ID;
         @Nullable public static final String VERSION = Platform.class.getPackage().getSpecificationVersion();
 
@@ -49,7 +48,6 @@ public final class InternalPluginsInfo {
 
     public static final class SpongePlatform {
 
-        public static final String NAME = "Sponge";
         public static final String IDENTIFIER = "sponge";
         @Nullable public static final String VERSION = Api.VERSION;
 
@@ -59,7 +57,6 @@ public final class InternalPluginsInfo {
 
     public static final class Implementation {
 
-        public static final String NAME = "Lantern";
         public static final String IDENTIFIER = "lantern";
         @Nullable public static final String VERSION = Platform.class.getPackage().getImplementationVersion();
 
@@ -69,7 +66,6 @@ public final class InternalPluginsInfo {
 
     public static final class Minecraft {
 
-        public static final String NAME = "Minecraft";
         public static final String IDENTIFIER = "minecraft";
         public static final String VERSION = "1.12";
 

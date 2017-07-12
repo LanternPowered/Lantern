@@ -25,19 +25,40 @@
  */
 package org.lanternpowered.server.plugin;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.lanternpowered.launch.LanternClassLoader;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
+import org.spongepowered.plugin.meta.PluginMetadata;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public abstract class InternalPluginContainer extends AbstractPluginContainer {
+public abstract class InternalPluginContainer extends InfoPluginContainer {
 
-    InternalPluginContainer(String id, @Nullable String name, @Nullable String version) {
-        super(id, name, version);
+    private static PluginMetadata readPluginInfo(String id, @Nullable String version) {
+        try {
+            final URL url = LanternClassLoader.get().getResource("data/" + id + "/plugin.info");
+            checkNotNull(url, "Missing plugin.info file for internal plugin %s", id);
+            final PluginMetadata metadata = InfoPluginContainer.readPluginInfo(id, url);
+            // Allow the version to be overwritten
+            if (version != null) {
+                metadata.setVersion(version);
+            }
+            return metadata;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read plugin.info files for the internal plugins.");
+        }
+    }
+
+    private InternalPluginContainer(String id, @Nullable String version) {
+        super(id, readPluginInfo(id, version));
     }
 
     @Inject
@@ -51,9 +72,7 @@ public abstract class InternalPluginContainer extends AbstractPluginContainer {
         @Inject private Game game;
 
         public Api() {
-            super(InternalPluginsInfo.Api.IDENTIFIER,
-                    InternalPluginsInfo.Api.NAME,
-                    InternalPluginsInfo.Api.VERSION);
+            super(InternalPluginsInfo.Api.IDENTIFIER, InternalPluginsInfo.Api.VERSION);
         }
 
         @Override
@@ -68,9 +87,7 @@ public abstract class InternalPluginContainer extends AbstractPluginContainer {
         @Inject private Game game;
 
         public SpongePlatform() {
-            super(InternalPluginsInfo.SpongePlatform.IDENTIFIER,
-                    InternalPluginsInfo.SpongePlatform.NAME,
-                    InternalPluginsInfo.SpongePlatform.VERSION);
+            super(InternalPluginsInfo.SpongePlatform.IDENTIFIER, InternalPluginsInfo.SpongePlatform.VERSION);
         }
 
         @Override
@@ -85,9 +102,7 @@ public abstract class InternalPluginContainer extends AbstractPluginContainer {
         @Inject private Server server;
 
         public Minecraft() {
-            super(InternalPluginsInfo.Minecraft.IDENTIFIER,
-                    InternalPluginsInfo.Minecraft.NAME,
-                    InternalPluginsInfo.Minecraft.VERSION);
+            super(InternalPluginsInfo.Minecraft.IDENTIFIER, InternalPluginsInfo.Minecraft.VERSION);
         }
 
         @Override
@@ -102,9 +117,7 @@ public abstract class InternalPluginContainer extends AbstractPluginContainer {
         @Inject private Server server;
 
         public Implementation() {
-            super(InternalPluginsInfo.Implementation.IDENTIFIER,
-                    InternalPluginsInfo.Implementation.NAME,
-                    InternalPluginsInfo.Implementation.VERSION);
+            super(InternalPluginsInfo.Implementation.IDENTIFIER, InternalPluginsInfo.Implementation.VERSION);
         }
 
         @Override

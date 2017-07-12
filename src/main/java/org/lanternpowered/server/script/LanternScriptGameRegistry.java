@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -62,6 +63,7 @@ import org.spongepowered.api.asset.Asset;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -141,7 +143,30 @@ public class LanternScriptGameRegistry implements ScriptGameRegistry {
         final AssetRepository assetRepository = Lantern.getAssetRepository();
         final Asset theAsset = assetRepository.get(plugin, asset).orElseThrow(
                 () -> new IllegalArgumentException("There is no asset with the specified id: " + asset));
-        return this.construct(theAsset, id, objectType);
+        return construct(theAsset, id, objectType);
+    }
+
+    public <T extends CatalogType> Collection<T> constructAll(String assetDirectory, Class<T> objectType) {
+        final AssetRepository assetRepository = Lantern.getAssetRepository();
+        return assetRepository.getAssets(assetDirectory, false).stream()
+                .map(asset -> {
+                    final String assetId = asset.getId();
+                    int index = assetId.lastIndexOf('/');
+                    if (index == -1) {
+                        index = assetId.indexOf(':');
+                    }
+                    String id = assetId.substring(index + 1);
+                    index = id.lastIndexOf('.');
+                    if (index != -1) {
+                        id = id.substring(0, index);
+                    }
+                    try {
+                        return construct(asset, id, objectType);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to construct a " + objectType.getName() + " from the asset: " + assetId, e);
+                    }
+                })
+                .collect(ImmutableList.toImmutableList());
     }
 
     public <T extends CatalogType> T construct(Asset asset, String id, Class<T> objectType) {

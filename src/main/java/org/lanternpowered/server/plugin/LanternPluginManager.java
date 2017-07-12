@@ -78,7 +78,7 @@ public final class LanternPluginManager implements PluginManager {
         this.logger = logger;
     }
 
-    void registerPlugin(PluginContainer plugin) {
+    public void registerPlugin(PluginContainer plugin) {
         checkNotNull(plugin, "plugin");
         this.plugins.put(plugin.getId(), plugin);
     }
@@ -185,7 +185,7 @@ public final class LanternPluginManager implements PluginManager {
 
         if (candidate.getSource().isPresent()) {
             try {
-                classLoader.addURL(candidate.getSource().get().toUri().toURL());
+                classLoader.addBaseURL(candidate.getSource().get().toUri().toURL());
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Failed to add plugin '" + id + "' from " + candidate.getDisplaySource() + " to classpath", e);
             }
@@ -198,8 +198,8 @@ public final class LanternPluginManager implements PluginManager {
 
         try {
             final Class<?> pluginClass = Class.forName(candidate.getPluginClass());
-            final PluginContainer container = new LanternPluginContainer(this.injector, id, pluginClass, metadata.getName(), metadata.getVersion(),
-                    metadata.getDescription(), metadata.getUrl(), metadata.getAuthors(), candidate.getSource().orElse(null));
+            final PluginContainer container = new LanternPluginContainer(id,
+                    this.injector, pluginClass, metadata, candidate.getSource().orElse(null));
             registerPlugin(container);
             registerPluginInstance(container);
             this.eventManager.registerListeners(container, container.getInstance().get());

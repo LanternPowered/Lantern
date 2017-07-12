@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
@@ -53,9 +54,13 @@ public final class WeatherTypeRegistryModule extends AdditionalPluginCatalogRegi
     @Override
     public void registerDefaults() {
         WeatherOptions.init();
-        final LanternScriptGameRegistry scriptGameRegistry = LanternScriptGameRegistry.get();
-        register(scriptGameRegistry.construct("minecraft", "weather/clear.json", "clear", Weather.class));
-        register(scriptGameRegistry.construct("minecraft", "weather/rain.json", "rain", Weather.class));
-        register(scriptGameRegistry.construct("minecraft", "weather/thunder_storm.json", "thunder_storm", Weather.class));
+        // Construct all the weathers and register them,
+        // they can't be reloaded after runtime, TODO?
+        LanternScriptGameRegistry.get()
+                .constructAll("*:weather", Weather.class)
+                .forEach(weather -> {
+                    Lantern.getLogger().debug("Registered a Weather: " + weather.getId());
+                    register(weather);
+                });
     }
 }

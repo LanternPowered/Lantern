@@ -1,16 +1,15 @@
 {
-    "name": "Thunder Storm",
+    "name": "Hell of Thunder",
     "aliases": [
-        "storm",
-        "thunder_storm",
-        "thunderStorm"
+        "thunder_hell",
+        "thunderhell"
     ],
     "options": {
-        "rain_strength": 1.0,
-        "sky_darkness": 1.0
+        "rain_strength": 1.5,
+        "sky_darkness": 1.3
     },
-    "weight": 200,
-    "duration": "@ 200 + $random.nextInt(300)",
+    "weight": 5,
+    "duration": "@ 70 + $random.nextInt(100)",
     "action": {
         "condition": [
             "@ $context.get(Parameters.WORLD).get().weatherUniverse.get().darkness > 0.8"
@@ -19,7 +18,7 @@
             "type": "lantern:lightning_weather_spawner",
             "data": {
                 "attempts-per-chunk": 2,
-                "chance": 0.000004
+                "chance": 0.001
             }
         }
     }

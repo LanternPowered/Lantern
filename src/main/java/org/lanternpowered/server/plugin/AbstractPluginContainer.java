@@ -47,7 +47,7 @@ public abstract class AbstractPluginContainer implements PluginContainer {
     @Nullable private final String name;
     @Nullable private final String version;
 
-    public AbstractPluginContainer(String id, @Nullable String name, @Nullable String version) {
+    protected AbstractPluginContainer(String id, @Nullable String name, @Nullable String version) {
         this.id = checkNotNull(id, "id");
         this.logger = LoggerFactory.getLogger(id);
         this.version = version;
@@ -95,7 +95,9 @@ public abstract class AbstractPluginContainer implements PluginContainer {
     }
 
     @Override
-    public abstract Optional<?> getInstance();
+    public Optional<?> getInstance() {
+        return Optional.empty();
+    }
 
     @Override
     public String toString() {

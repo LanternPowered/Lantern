@@ -68,7 +68,7 @@ public final class MinecraftTranslationManager implements TranslationManager, Re
 
     @Override
     public void onReload() {
-        final Asset asset = Lantern.getAssetRepository().get("minecraft", "lang/en_US.properties").orElseThrow(
+        final Asset asset = Lantern.getAssetRepository().get("minecraft", "lang/en_us.properties").orElseThrow(
                 () -> new IllegalStateException("The minecraft language file is missing!"));
         try {
             this.resourceBundle = new PropertyResourceBundle(asset.getUrl().openStream());

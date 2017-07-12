@@ -235,6 +235,23 @@ public class LanternGame implements Game {
                     LanternMinecraftVersion.CURRENT + " != " + versionCacheEntry);
         }
 
+        // Load the libraries
+        final LibraryManager libraryManager = this.injector.getInstance(LibraryManager.class);
+        libraryManager.load();
+
+        // Load the plugin instances
+        try {
+            // By default, use the '--scanClasspath <true|false>' option, if it can't
+            // be found, fall back to a environment based decision
+            Boolean scanClasspath = this.scanClasspath;
+            if (scanClasspath == null) {
+                scanClasspath = Environment.get() == Environment.DEVELOPMENT;
+            }
+            this.pluginManager.loadPlugins(scanClasspath);
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while loading the plugins.", e);
+        }
+
         this.gameRegistry.registerDefaults();
         this.gameRegistry.earlyRegistry();
 
@@ -261,23 +278,6 @@ public class LanternGame implements Game {
         final Cause gameCause = Cause.source(this).build();
         // Call the construction events
         postGameStateChange(SpongeEventFactory.createGameConstructionEvent(gameCause));
-
-        // Load the libraries
-        final LibraryManager libraryManager = this.injector.getInstance(LibraryManager.class);
-        libraryManager.load();
-
-        // Load the plugin instances
-        try {
-            // By default, use the '--scanClasspath <true|false>' option, if it can't
-            // be found, fall back to a environment based decision
-            Boolean scanClasspath = this.scanClasspath;
-            if (scanClasspath == null) {
-                scanClasspath = Environment.get() == Environment.DEVELOPMENT;
-            }
-            this.pluginManager.loadPlugins(scanClasspath);
-        } catch (IOException e) {
-            throw new RuntimeException("An error occurred while loading the plugins.", e);
-        }
 
         // Call pre init phase for registry
         this.gameRegistry.preInit();

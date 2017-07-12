@@ -41,7 +41,7 @@ public interface Asset extends org.spongepowered.api.asset.Asset {
      *
      * <p>In the vanilla resource system this would
      * return 'plugin:path/to/resource.json'.
-     * For example: 'minecraft:lang/en_US.properties'
+     * For example: 'minecraft:lang/en_us.properties'
      * <p/>
      *
      * @return The resource key

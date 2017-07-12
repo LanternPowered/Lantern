@@ -27,17 +27,12 @@ package org.lanternpowered.server.asset;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
-import org.lanternpowered.api.asset.Asset;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class MultiAssetRepository implements AssetRepository {
+public class MultiAssetRepository extends AbstractMultiAssetRepository {
 
-    private final List<ReloadListener> reloadListeners = new CopyOnWriteArrayList<>();
     private final List<AssetRepository> repositories = new CopyOnWriteArrayList<>();
 
     /**
@@ -64,49 +59,7 @@ public class MultiAssetRepository implements AssetRepository {
     }
 
     @Override
-    public Optional<Asset> get(Object plugin, String name) {
-        for (AssetRepository repository : this.repositories) {
-            final Optional<Asset> asset = repository.get(plugin, name);
-            if (asset.isPresent()) {
-                return asset;
-            }
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Asset> get(String name) {
-        for (AssetRepository repository : this.repositories) {
-            final Optional<Asset> asset = repository.get(name);
-            if (asset.isPresent()) {
-                return asset;
-            }
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Collection<Asset> getLoadedAssets() {
-        final ImmutableList.Builder<Asset> builder = ImmutableList.builder();
-        for (AssetRepository repository : this.repositories) {
-            builder.addAll(repository.getLoadedAssets());
-        }
-        return builder.build();
-    }
-
-    @Override
-    public void reload() {
-        this.repositories.forEach(AssetRepository::reload);
-        this.reloadListeners.forEach(ReloadListener::onReload);
-    }
-
-    @Override
-    public void addReloadListener(ReloadListener reloadListener) {
-        this.reloadListeners.add(checkNotNull(reloadListener, "reloadListener"));
-    }
-
-    @Override
-    public void removeReloadListener(ReloadListener reloadListener) {
-        this.reloadListeners.remove(checkNotNull(reloadListener, "reloadListener"));
+    protected Collection<AssetRepository> getRepositories() {
+        return this.repositories;
     }
 }

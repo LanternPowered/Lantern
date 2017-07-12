@@ -155,7 +155,7 @@ public class WeatherBuilder implements ResettableBuilder<LanternWeather, Weather
 
     @Override
     public Weather create(String pluginId, String id) {
-        return this.create(pluginId, id, this.name == null ? id : this.name);
+        return create(pluginId, id, this.name == null ? id : this.name);
     }
 
     @Override

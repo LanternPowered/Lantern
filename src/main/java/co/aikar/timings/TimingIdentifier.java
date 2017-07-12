@@ -41,12 +41,11 @@ import javax.annotation.Nullable;
  */
 final class TimingIdentifier {
 
-    private static final TimingGroup DEFAULT_GROUP = getGroup("Lantern");
-
     /**
      * Holds all groups. Autoloads on request for a group by name.
      */
     static final Map<String, TimingGroup> GROUP_MAP = MRUMapCache.of(LoadingMap.newIdentityHashMap(TimingGroup::new, 64));
+    static final TimingGroup DEFAULT_GROUP = getGroup("Lantern");
 
     final String group;
     final String name;

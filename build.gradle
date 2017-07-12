@@ -290,7 +290,7 @@ assemble.dependsOn fatJar
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0'
+    gradleVersion = '4.0.1'
 }
 
 // A custom update wrapper task, using a custom task prevents

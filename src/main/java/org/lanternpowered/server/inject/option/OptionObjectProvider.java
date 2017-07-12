@@ -25,12 +25,16 @@
  */
 package org.lanternpowered.server.inject.option;
 
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
+import joptsimple.ValueConverter;
+import joptsimple.internal.Reflection;
+import joptsimple.util.PathConverter;
 import org.lanternpowered.server.inject.Flag;
 import org.lanternpowered.server.inject.InjectionPoint;
 import org.lanternpowered.server.inject.Option;
@@ -46,73 +50,9 @@ import javax.inject.Named;
 @SuppressWarnings("unchecked")
 abstract class OptionObjectProvider<T> implements Provider<T> {
 
-    static class IntegerImpl extends OptionObjectProvider<Integer> {
-        @Inject
-        public IntegerImpl() {
-            super(Integer.class);
-        }
-    }
-
-    static class DoubleImpl extends OptionObjectProvider<Double> {
-        @Inject
-        public DoubleImpl() {
-            super(Double.class);
-        }
-    }
-
-    static class FloatImpl extends OptionObjectProvider<Float> {
-        @Inject
-        public FloatImpl() {
-            super(Float.class);
-        }
-    }
-
-    static class LongImpl extends OptionObjectProvider<Long> {
-        @Inject
-        public LongImpl() {
-            super(Long.class);
-        }
-    }
-
-    static class ShortImpl extends OptionObjectProvider<Short> {
-        @Inject
-        public ShortImpl() {
-            super(Short.class);
-        }
-    }
-
-    static class BooleanImpl extends OptionObjectProvider<Boolean> {
-        @Inject
-        public BooleanImpl() {
-            super(Boolean.class);
-        }
-    }
-
-    static class StringImpl extends OptionObjectProvider<String> {
-        @Inject
-        public StringImpl() {
-            super(String.class);
-        }
-    }
-
-    static class ByteImpl extends OptionObjectProvider<Byte> {
-        @Inject
-        public ByteImpl() {
-            super(Byte.class);
-        }
-    }
-
-    static class FileImpl extends OptionObjectProvider<File> {
-        @Inject
-        public FileImpl() {
-            super(File.class);
-        }
-    }
-
     static class PathImpl extends OptionObjectProvider<Path> {
         @Inject
         public PathImpl() {
-            super(File.class);
         }
 
         @Override
@@ -120,17 +60,27 @@ abstract class OptionObjectProvider<T> implements Provider<T> {
             final File file = (File) get0();
             return file == null ? null : file.toPath();
         }
+
+        @Override
+        protected ValueConverter<Path> typeConverter() {
+            return new PathConverter();
+        }
     }
 
+    static class BooleanImpl extends OptionObjectProvider<Boolean> {}
+    static class ByteImpl extends OptionObjectProvider<Byte> {}
+    static class DoubleImpl extends OptionObjectProvider<Double> {}
+    static class FileImpl extends OptionObjectProvider<File> {}
+    static class FloatImpl extends OptionObjectProvider<Float> {}
+    static class IntegerImpl extends OptionObjectProvider<Integer> {}
+    static class LongImpl extends OptionObjectProvider<Long> {}
+    static class ShortImpl extends OptionObjectProvider<Short> {}
+    static class StringImpl extends OptionObjectProvider<String> {}
+
+    protected final TypeToken<T> type = new TypeToken<T>(this.getClass()) {};
     @Inject @Named(OptionModule.ARGUMENTS) private String[] arguments;
     @Inject private InjectionPoint injectionPoint;
     @Inject private OptionParser optionParser;
-
-    private final Class<?> valueType;
-
-    private OptionObjectProvider(Class<?> valueType) {
-        this.valueType = valueType;
-    }
 
     @Nullable
     @Override
@@ -145,7 +95,7 @@ abstract class OptionObjectProvider<T> implements Provider<T> {
             throw new IllegalStateException("Missing @Option annotation.");
         }
         final Flag flag = this.injectionPoint.getAnnotation(Flag.class);
-        if (flag != null && !this.valueType.equals(Boolean.class)) {
+        if (flag != null && !this.type.isSupertypeOf(Boolean.class)) {
             throw new IllegalStateException("The @Flag annotation can only be used for boolean options.");
         }
 
@@ -155,7 +105,7 @@ abstract class OptionObjectProvider<T> implements Provider<T> {
         if (flag != null) {
             optionSpec = builder;
         } else {
-            optionSpec = builder.withRequiredArg().ofType(this.valueType);
+            optionSpec = builder.withRequiredArg().withValuesConvertedBy(this.typeConverter());
         }
         final OptionSet optionSet = this.optionParser.parse(this.arguments);
         if (flag != null) {
@@ -168,5 +118,9 @@ abstract class OptionObjectProvider<T> implements Provider<T> {
                 return object;
             }
         }
+    }
+
+    protected ValueConverter<T> typeConverter() {
+        return Reflection.findConverter((Class<T>) this.type.getRawType());
     }
 }

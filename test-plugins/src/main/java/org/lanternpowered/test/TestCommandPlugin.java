@@ -36,6 +36,7 @@ import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 
 @Plugin(id = "test_command", authors = "Meronat", version = "1.0.0")
@@ -50,7 +51,7 @@ public class TestCommandPlugin {
 
         Sponge.getCommandManager().register(this, CommandSpec.builder()
                 .executor((src, args) -> {
-                    final Text message = Text.of(TextColors.WHITE, "Test");
+                    final Text message = Text.of(TextColors.GREEN, TextStyles.UNDERLINE, "Test", TextStyles.RESET, " 1234");
                     if (src instanceof Player) {
                         ((Player) src).sendTitle(Title.builder().subtitle(message).build());
                     } else {

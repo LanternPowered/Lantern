@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.network.buffer.objects;
 
-import static org.lanternpowered.server.text.LanternTexts.fixJson;
-
 import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.gson.Gson;
@@ -147,6 +145,21 @@ public final class Types {
             }
         }
     });
+
+    // We need to fix the json format yay, the minecraft client
+    // can't handle primitives or arrays as root, just expect
+    // things to break, so fix it...
+    private static String fixJson(String json) {
+        final char start = json.charAt(0);
+        if (start == '{') {
+            return json;
+        } else {
+            if (start != '[') {
+                json = '[' + json + ']';
+            }
+            return "{\"text\":\"\",\"extra\":" + json + "}";
+        }
+    }
 
     /**
      * A serializer for {@link ItemStack} objects,

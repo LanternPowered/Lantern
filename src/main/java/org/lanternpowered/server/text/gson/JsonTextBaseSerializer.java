@@ -106,11 +106,7 @@ abstract class JsonTextBaseSerializer {
                 if (jsonEventAction != null && jsonEventValue != null) {
                     final String action = jsonEventAction.getAsString();
                     final String value = jsonEventValue.getAsString();
-
-                    final HoverAction<?> hoverAction = LanternTextHelper.parseHoverAction(action, value);
-                    if (hoverAction != null) {
-                        builder.onHover(hoverAction);
-                    }
+                    builder.onHover(LanternTextHelper.parseHoverAction(action, value));
                 }
             }
         }

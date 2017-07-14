@@ -76,12 +76,8 @@ final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements 
                 // Try to make the serialized text object less complex,
                 // like text objects nested in a lot of other
                 // text objects, this seems to happen a lot
-            } else if (removeComplexity && content.isEmpty()) {
-                if (children.size() == 1) {
-                    return context.serialize(children.get(0));
-                } else {
-                    return context.serialize(children);
-                }
+            } else if (removeComplexity && content.isEmpty() && children.size() == 1) {
+                return context.serialize(children.get(0));
             }
         }
 

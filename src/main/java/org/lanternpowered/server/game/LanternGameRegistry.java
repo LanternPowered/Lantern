@@ -91,6 +91,7 @@ import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
+import org.lanternpowered.server.game.registry.factory.TimingsFactoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
@@ -613,6 +614,7 @@ public class LanternGameRegistry implements GameRegistry {
     private void registerFactories() {
         final List<FactoryRegistry<?, ?>> factoryRegistries = new ArrayList<>();
         factoryRegistries.add(new ResourcePackFactoryModule());
+        factoryRegistries.add(new TimingsFactoryRegistryModule());
 
         try {
             for (FactoryRegistry<?, ?> registry : factoryRegistries) {

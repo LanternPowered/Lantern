@@ -181,4 +181,7 @@ public abstract class ConfigBase {
         this.loader.save(this.root);
     }
 
+    public ConfigurationNode getRoot() {
+        return this.root;
+    }
 }

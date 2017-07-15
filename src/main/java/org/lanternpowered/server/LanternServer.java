@@ -29,6 +29,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import co.aikar.timings.TimingsManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -352,6 +353,7 @@ public final class LanternServer implements Server {
      * Pulses (ticks) the game.
      */
     private void pulse() {
+        TimingsManager.FULL_SERVER_TICK.startTiming();
         this.runningTimeTicks.incrementAndGet();
         // Pulse the network sessions
         this.networkManager.pulseSessions();
@@ -360,6 +362,7 @@ public final class LanternServer implements Server {
         // Pulse the world threads
         this.worldManager.pulse();
         AdvancementTrees.INSTANCE.pulse();
+        TimingsManager.FULL_SERVER_TICK.stopTiming();
     }
 
     /**

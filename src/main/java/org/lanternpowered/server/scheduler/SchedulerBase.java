@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.scheduler;
 
+import co.aikar.timings.TimingsManager;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.game.Lantern;
@@ -103,12 +104,14 @@ abstract class SchedulerBase {
      */
     protected final void runTick() {
         preTick();
+        TimingsManager.PLUGIN_SCHEDULER_HANDLER.startTimingIfSync();
         try {
             this.taskMap.values().forEach(this::processTask);
             postTick();
         } finally {
             finallyPostTick();
         }
+        TimingsManager.PLUGIN_SCHEDULER_HANDLER.stopTimingIfSync();
     }
 
     /**
@@ -176,12 +179,14 @@ abstract class SchedulerBase {
     protected void startTask(final ScheduledTask task) {
         executeTaskRunnable(() -> {
             task.setState(ScheduledTask.ScheduledTaskState.RUNNING);
+            task.getTimingsHandler().startTimingIfSync();
             try {
                 task.getConsumer().accept(task);
             } catch (Throwable t) {
                 Lantern.getLogger().error("The Scheduler tried to run the task {} owned by {}, but an error occurred.",
                         task.getName(), task.getOwner(), t);
             }
+            task.getTimingsHandler().stopTimingIfSync();
         });
     }
 

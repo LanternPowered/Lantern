@@ -311,6 +311,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         c.register(Keys.SATURATION, 40.0, 0.0, LanternKeys.MAX_SATURATION);
         c.register(Keys.LAST_DATE_PLAYED, null);
         c.register(Keys.FIRST_DATE_PLAYED, null);
+        c.registerNonRemovable(Keys.WALKING_SPEED, 0.1);
+        c.registerNonRemovable(LanternKeys.FIELD_OF_VIEW_MODIFIER, 1.0);
         c.registerNonRemovable(Keys.IS_FLYING, false);
         c.registerNonRemovable(Keys.IS_SNEAKING, false);
         c.registerNonRemovable(Keys.IS_SPRINTING, false);

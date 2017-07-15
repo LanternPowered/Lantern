@@ -136,6 +136,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("ArePlaying"), "lantern:are_playing");
     public static final Key<Value<Boolean>> HAS_RECORD =
             makeValueKey(Boolean.class, DataQuery.of("HasRecord"), "lantern:has_record");
+    public static final Key<Value<Double>> FIELD_OF_VIEW_MODIFIER =
+            makeValueKey(Double.class, DataQuery.of("FieldOfViewModifier"), "lantern:field_of_view_modifier");
 
     private LanternKeys() {
     }

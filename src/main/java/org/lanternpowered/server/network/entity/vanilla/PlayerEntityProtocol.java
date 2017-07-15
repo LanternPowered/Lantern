@@ -28,13 +28,11 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
-import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.extra.accessory.TopHat;
@@ -81,6 +79,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     private boolean lastCanFly;
     private float lastFlySpeed;
+    private float lastFieldOfView;
 
     private int[] passengerStack = new int[13];
     @Nullable private TopHat lastTopHat;
@@ -256,7 +255,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
         context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
         context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, getFlySpeed(), 0.01f));
+                this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, getFlySpeed(), getFovModifier()));
 
         final TopHat topHat = getTopHat();
         if (topHat != null && !getEntity().get(Keys.INVISIBLE).get()) {
@@ -276,18 +275,21 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
         final boolean canFly = canFly();
         final float flySpeed = getFlySpeed();
+        final float fieldOfView = getFovModifier();
         if (gameMode != this.lastGameMode) {
             context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, 0.01f));
+                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, fieldOfView));
             this.lastGameMode = gameMode;
             this.lastCanFly = canFly;
             this.lastFlySpeed = flySpeed;
-        } else if (canFly != this.lastCanFly || flySpeed != this.lastFlySpeed) {
+            this.lastFieldOfView = fieldOfView;
+        } else if (canFly != this.lastCanFly || flySpeed != this.lastFlySpeed || fieldOfView != this.lastFieldOfView) {
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, 0.01f));
+                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, fieldOfView));
             this.lastCanFly = canFly;
             this.lastFlySpeed = flySpeed;
+            this.lastFieldOfView = fieldOfView;
         }
         super.update(context);
         final TopHat topHat = getTopHat();
@@ -362,11 +364,20 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         } else if (event instanceof RefreshAbilitiesPlayerEvent) {
             final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
             final float flySpeed = getFlySpeed();
+            final float fov = getFovModifier();
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, flySpeed, 0.01f));
+                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, flySpeed, fov));
         } else {
             super.handleEvent(context, event);
         }
+    }
+
+    private float getFovModifier() {
+        // client = (walkSpeed / fovModifier + 1) / 2
+        // fovModifier = walkSpeed / (client * 2 - 1)
+        final float walkSpeed = this.entity.get(Keys.WALKING_SPEED).orElse(0.1).floatValue();
+        final float client = this.entity.get(LanternKeys.FIELD_OF_VIEW_MODIFIER).orElse(1.0).floatValue();
+        return walkSpeed / (client * 2f - 1f);
     }
 
     private float getFlySpeed() {

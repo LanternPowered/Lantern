@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("ConstantConditions")
 public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
 
     private static final JsonTranslator INSTANCE = new JsonTranslator();
@@ -78,7 +79,6 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
 
     @Override
     public DataContainer translate(JsonObject obj) throws InvalidDataException {
-        //noinspection ConstantConditions
         return (DataContainer) fromJson(obj);
     }
 
@@ -99,7 +99,6 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
                 if (element.isJsonObject()) {
                     fromJson(container.createView(DataQuery.of(key)), element);
                 } else {
-                    //noinspection ConstantConditions
                     container.set(DataQuery.of(key), fromJson(element));
                 }
             }
@@ -107,33 +106,10 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
         } else if (json.isJsonArray()) {
             final JsonArray array = json.getAsJsonArray();
             final List<Object> objects = Lists.newArrayListWithCapacity(array.size());
-            int ints = 0;
-            int bytes = 0;
             for (int i = 0; i < array.size(); i++) {
-                final Object object = fromJson(array.get(i));
-                objects.add(object);
-                if (object instanceof Integer) {
-                    ints++;
-                }
-                if (object instanceof Byte) {
-                    bytes++;
-                }
+                objects.add(fromJson(array.get(i)));
             }
-            if (bytes == objects.size()) {
-                final Byte[] array0 = new Byte[bytes];
-                for (int i = 0; i < bytes; i++) {
-                    array0[i] = (Byte) objects.get(i);
-                }
-                return array0;
-            } else if (ints == objects.size()) {
-                final Integer[] array0 = new Integer[ints];
-                for (int i = 0; i < bytes; i++) {
-                    array0[i] = (Integer) objects.get(i);
-                }
-                return array0;
-            } else {
-                return objects;
-            }
+            return objects;
         } else if (json.isJsonPrimitive()) {
             final String value = json.getAsString();
             if (DOUBLE.matcher(value).matches()) {

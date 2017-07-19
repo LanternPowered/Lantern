@@ -198,6 +198,11 @@ public class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public boolean hasArray() {
+        return this.buf.hasArray();
+    }
+
+    @Override
     public byte[] array() {
         return this.buf.array();
     }
@@ -295,7 +300,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public byte[] readByteArray() {
-        return this.readLimitedByteArray(Integer.MAX_VALUE);
+        return readLimitedByteArray(Integer.MAX_VALUE);
     }
 
     @Override
@@ -588,15 +593,14 @@ public class LanternByteBuffer implements ByteBuffer {
     @Override
     public String readUTF() {
         final int length = readShort();
-        return new String(this.buf.readBytes(length).array(), StandardCharsets.UTF_8);
+        return new String(readBytes(length), StandardCharsets.UTF_8);
     }
 
     @Override
     public String getUTF(int index) {
         final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        final int length = readShort();
-        final String data = new String(this.buf.readBytes(length).array(), StandardCharsets.UTF_8);
+        final String data = readUTF();
         this.buf.readerIndex(oldIndex);
         return data;
     }

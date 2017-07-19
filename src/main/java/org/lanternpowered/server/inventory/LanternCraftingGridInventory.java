@@ -25,50 +25,29 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
-import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
-import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.World;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternCraftingInventory extends LanternGridInventory implements CraftingInventory {
+public class LanternCraftingGridInventory extends LanternGridInventory implements CraftingGridInventory {
 
-    private CraftingGridInventory gridInventory;
-    private CraftingOutput craftingOutput;
-
-    public LanternCraftingInventory(@Nullable Inventory parent) {
-        super(parent, null);
-    }
-
-    public LanternCraftingInventory(@Nullable Inventory parent, @Nullable Translation name) {
+    public LanternCraftingGridInventory(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
     }
 
-    @Override
-    protected void finalizeContent() {
-        super.finalizeContent();
-
-        try {
-            this.gridInventory = query(CraftingGridInventory.class).first();
-        } catch (ClassCastException e) {
-            throw new IllegalStateException("Unable to find the GridInventory");
-        }
-        try {
-            this.craftingOutput = query(CraftingOutput.class).first();
-        } catch (ClassCastException e) {
-            throw new IllegalStateException("Unable to find the CraftingOutput");
-        }
+    public LanternCraftingGridInventory(@Nullable Inventory parent) {
+        super(parent);
     }
 
     @Override
-    public CraftingGridInventory getCraftingGrid() {
-        return this.gridInventory;
-    }
-
-    @Override
-    public CraftingOutput getResult() {
-        return this.craftingOutput;
+    public Optional<CraftingRecipe> getRecipe(World world) {
+        return Lantern.getRegistry().getCraftingRecipeRegistry().findMatchingRecipe(this, world);
     }
 }

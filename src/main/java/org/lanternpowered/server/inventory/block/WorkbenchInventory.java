@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.inventory.block;
 
+import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
-import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -40,7 +40,7 @@ public class WorkbenchInventory extends LanternCraftingInventory {
         super(parent, name);
 
         this.registerSlot(new LanternCraftingOutput(this));
-        this.registerChild(new LanternGridInventory(this) {
+        this.registerChild(new LanternCraftingGridInventory(this) {
             {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 3; x++) {

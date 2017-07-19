@@ -30,9 +30,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.AbstractMutableInventory;
+import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
-import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
@@ -71,7 +71,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
         registerChild(new LanternCraftingInventory(this) {
             {
                 registerSlot(new LanternCraftingOutput(this));
-                registerChild(new LanternGridInventory(this) {
+                registerChild(new LanternCraftingGridInventory(this) {
                     {
                         for (int y = 0; y < 2; y++) {
                             for (int x = 0; x < 2; x++) {

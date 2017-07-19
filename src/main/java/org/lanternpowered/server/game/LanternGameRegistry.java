@@ -163,8 +163,8 @@ import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.ObjectiveDisplayModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.VisibilityRegistryModule;
-import org.lanternpowered.server.game.registry.type.statistic.StatisticTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
+import org.lanternpowered.server.game.registry.type.statistic.StatisticTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
@@ -331,7 +331,8 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
-import org.spongepowered.api.item.recipe.RecipeRegistry;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
+import org.spongepowered.api.item.recipe.smelting.SmeltingRecipeRegistry;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
@@ -1028,8 +1029,12 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public RecipeRegistry getRecipeRegistry() {
-        // TODO Auto-generated method stub
+    public CraftingRecipeRegistry getCraftingRecipeRegistry() {
+        return null;
+    }
+
+    @Override
+    public SmeltingRecipeRegistry getSmeltingRecipeRegistry() {
         return null;
     }
 

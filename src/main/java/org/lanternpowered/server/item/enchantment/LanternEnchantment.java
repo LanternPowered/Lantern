@@ -87,4 +87,9 @@ public class LanternEnchantment extends PluginCatalogType.Base.Translatable.Inte
     public boolean isCompatibleWith(Enchantment ench) {
         return false;
     }
+
+    @Override
+    public boolean isTreasure() {
+        return false;
+    }
 }

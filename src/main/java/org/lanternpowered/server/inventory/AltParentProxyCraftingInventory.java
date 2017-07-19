@@ -26,11 +26,12 @@
 package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.inventory.type.OrderedInventory;
-import org.spongepowered.api.item.recipe.Recipe;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
+import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class AltParentProxyCraftingInventory extends AltParentProxyGridInventory
     }
 
     @Override
-    public GridInventory getCraftingGrid() {
+    public CraftingGridInventory getCraftingGrid() {
         return ((CraftingInventory) this.delegate).getCraftingGrid();
     }
 
@@ -54,7 +55,7 @@ public class AltParentProxyCraftingInventory extends AltParentProxyGridInventory
     }
 
     @Override
-    public Optional<Recipe> getRecipe() {
-        return ((CraftingInventory) this.delegate).getRecipe();
+    public Optional<CraftingRecipe> getRecipe(World world) {
+        return ((CraftingInventory) this.delegate).getRecipe(world);
     }
 }

@@ -29,6 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
@@ -60,7 +61,7 @@ import javax.annotation.Nullable;
 
 public final class CommandSetData extends CommandProvider {
 
-    private static final Gson GSON = new Gson();
+    private static final Gson gson = new GsonBuilder().setLenient().create();
 
     public CommandSetData() {
         super(3, "set-data");
@@ -100,7 +101,7 @@ public final class CommandSetData extends CommandProvider {
                                 }
                                 final JsonElement element;
                                 try {
-                                    element = GSON.fromJson(content, JsonElement.class);
+                                    element = gson.fromJson(content, JsonElement.class);
                                 } catch (JsonParseException e) {
                                     throw args.createError(t("Invalid json data: %s\nError: %s", content, e.getMessage()));
                                 }

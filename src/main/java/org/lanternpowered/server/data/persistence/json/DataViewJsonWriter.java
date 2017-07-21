@@ -95,7 +95,7 @@ final class DataViewJsonWriter extends JsonWriter {
 
     @Override
     public JsonWriter beginArray() {
-        List<Object> list = new ArrayList<>();
+        final List<Object> list = new ArrayList<>();
         put(list);
         this.stack.add(list);
         return this;
@@ -114,7 +114,7 @@ final class DataViewJsonWriter extends JsonWriter {
             return this;
         }
 
-        Object parent = peek();
+        final Object parent = peek();
         if (parent instanceof DataView) {
             checkState(this.pendingKey != null);
             ((DataView) parent).createView(this.pendingKey);
@@ -185,5 +185,4 @@ final class DataViewJsonWriter extends JsonWriter {
             throw new IOException("Incomplete document");
         }
     }
-
 }

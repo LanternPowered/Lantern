@@ -306,6 +306,8 @@ public class LanternGame implements Game {
                     .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION, Tristate.FALSE);
             service.getGroupForOpLevel(Permissions.Login.BYPASS_WHITELIST_LEVEL).getSubjectData()
                     .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Login.BYPASS_WHITELIST_PERMISSION, Tristate.TRUE);
+            service.getGroupForOpLevel(Permissions.Chat.FORMAT_URLS_LEVEL).getSubjectData()
+                    .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Chat.FORMAT_URLS, Tristate.TRUE);
         }
 
         // Load the default commands

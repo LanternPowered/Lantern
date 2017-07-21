@@ -40,6 +40,7 @@ import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
+import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
@@ -110,7 +111,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             final Text rawMessageText = Text.of(message0);
             final GlobalConfig.Chat.Urls urls = Lantern.getGame().getGlobalConfig().getChat().getUrls();
             final Text messageText;
-            if (urls.isEnabled()) {
+            if (urls.isEnabled() && player.hasPermission(Permissions.Chat.FORMAT_URLS)) {
                 messageText = newTextWithLinks(message0, urls.getTemplate(), false);
             } else {
                 messageText = rawMessageText;

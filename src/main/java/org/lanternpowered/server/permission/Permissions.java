@@ -49,6 +49,16 @@ public final class Permissions {
         }
     }
 
+    public static final class Chat {
+
+        public static final String FORMAT_URLS = "lantern.chat.format-urls";
+
+        public static final int FORMAT_URLS_LEVEL = 0;
+
+        private Chat() {
+        }
+    }
+
     private Permissions() {
     }
 }

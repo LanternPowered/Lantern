@@ -26,10 +26,9 @@
 package org.lanternpowered.server.text;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.lanternpowered.server.data.io.store.ObjectSerializer;
-import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
-import org.lanternpowered.server.data.translator.JsonTranslator;
+import com.google.gson.JsonParseException;
+import org.lanternpowered.server.data.io.store.item.ItemStackStore;
+import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
@@ -48,6 +47,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Coerce;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -114,21 +114,26 @@ public final class LanternTextHelper {
         return null;
     }
 
-    private static final ObjectSerializer<LanternItemStack> itemStackSerializer =
-            ObjectSerializerRegistry.get().get(LanternItemStack.class).get();
-
     @SuppressWarnings("deprecation")
-    public static HoverAction<?> parseHoverAction(String action, String value) {
+    public static HoverAction<?> parseHoverAction(String action, String value) throws JsonParseException {
         final DataView dataView;
         switch (action) {
             case "show_text":
                 return TextActions.showText(TextSerializers.LEGACY_FORMATTING_CODE.deserializeUnchecked(value));
             case "show_item":
-                dataView = JsonTranslator.instance().translate(GSON.fromJson(value, JsonObject.class));
-                final ItemStack itemStack = itemStackSerializer.deserialize(dataView);
+                try {
+                    dataView = JsonDataFormat.readContainer(value, false);
+                } catch (IOException e) {
+                    throw new JsonParseException("Failed to parse the item data container", e);
+                }
+                final ItemStack itemStack = ItemStackStore.INSTANCE.deserialize(dataView);
                 return TextActions.showItem(itemStack.createSnapshot());
             case "show_entity":
-                dataView = JsonTranslator.instance().translate(GSON.fromJson(value, JsonObject.class));
+                try {
+                    dataView = JsonDataFormat.readContainer(value, false);
+                } catch (IOException e) {
+                    throw new JsonParseException("Failed to parse the entity data container", e);
+                }
 
                 final UUID uuid = UUID.fromString(dataView.getString(SHOW_ENTITY_ID).get());
                 final String name = dataView.getString(SHOW_ENTITY_NAME).get();
@@ -180,12 +185,20 @@ public final class LanternTextHelper {
                     .set(SHOW_ENTITY_NAME, ref.getName());
             ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, type.getId()));
 
-            return new RawAction("show_entity", GSON.toJson(JsonTranslator.instance().translate(dataContainer)));
+            try {
+                return new RawAction("show_entity", JsonDataFormat.writeAsString(dataContainer));
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
         } else if (hoverAction instanceof HoverAction.ShowItem) {
             final ItemStackSnapshot itemStackSnapshot = ((HoverAction.ShowItem) hoverAction).getResult();
             final LanternItemStack itemStack = (LanternItemStack) itemStackSnapshot.createStack();
-            final DataView dataView = itemStackSerializer.serialize(itemStack);
-            return new RawAction("show_item", GSON.toJson(JsonTranslator.instance().translate(dataView)));
+            final DataView dataView = ItemStackStore.INSTANCE.serialize(itemStack);
+            try {
+                return new RawAction("show_item", JsonDataFormat.writeAsString(dataView));
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
         } else {
             throw new IllegalArgumentException("Unknown hover action type: " + hoverAction.getClass().getName());
         }

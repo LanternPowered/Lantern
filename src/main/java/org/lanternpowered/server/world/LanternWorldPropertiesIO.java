@@ -27,13 +27,12 @@ package org.lanternpowered.server.world;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.data.io.IOHelper;
-import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.data.io.IOHelper;
+import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
+import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.world.MoonPhase;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
@@ -42,7 +41,6 @@ import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModu
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
-import org.lanternpowered.server.world.gen.flat.FlatOverworldGeneratorType;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.weather.LanternWeather;
@@ -405,12 +403,10 @@ final class LanternWorldPropertiesIO {
                     }
                     if (!options.isEmpty()) {
                         try {
-                            final JsonObject json = GSON.fromJson(options, JsonObject.class);
-                            generatorSettings = JsonTranslator.instance().translate(json).copy();
+                            generatorSettings = JsonDataFormat.readContainer(options, false);
                         } catch (Exception e) {
                             Lantern.getLogger().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",
-                                    options, genName);
-                            e.printStackTrace();
+                                    options, genName, e);
                         }
                     }
                     if (generatorSettings == null) {
@@ -497,8 +493,12 @@ final class LanternWorldPropertiesIO {
         // The flat world generator has a different settings format
         if (generatorId.equalsIgnoreCase("flat")) {
             dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings().getString(AbstractFlatGeneratorType.SETTINGS).get());
-            dataView.set(GENERATOR_OPTIONS_EXTRA, GSON.toJson(JsonTranslator.instance().translate(
-                    properties.getGeneratorSettings().copy().remove(AbstractFlatGeneratorType.SETTINGS))));
+            try {
+                dataView.set(GENERATOR_OPTIONS_EXTRA, JsonDataFormat.writeAsString(
+                        properties.getGeneratorSettings().copy().remove(AbstractFlatGeneratorType.SETTINGS)));
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
         } else {
             dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings());
         }

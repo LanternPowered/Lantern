@@ -28,13 +28,9 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
-import org.lanternpowered.server.data.translator.JsonTranslator;
+import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
@@ -52,6 +48,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,9 +56,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public final class CommandSetData extends CommandProvider {
-
-    private static final Gson gson = new GsonBuilder().setLenient().create();
 
     public CommandSetData() {
         super(3, "set-data");
@@ -99,13 +95,12 @@ public final class CommandSetData extends CommandProvider {
                                 while (args.hasNext()) {
                                     args.next();
                                 }
-                                final JsonElement element;
+                                final Object data;
                                 try {
-                                    element = gson.fromJson(content, JsonElement.class);
-                                } catch (JsonParseException e) {
+                                    data = JsonDataFormat.read(content, true).orElse(null); // Don't be too strict
+                                } catch (IOException e) {
                                     throw args.createError(t("Invalid json data: %s\nError: %s", content, e.getMessage()));
                                 }
-                                final Object data = element == null ? null : JsonTranslator.fromJson(element);
                                 final Key key = currentKey.get();
                                 final TypeToken<?> typeToken = key.getElementToken();
                                 if (content.isEmpty()) {
@@ -120,7 +115,6 @@ public final class CommandSetData extends CommandProvider {
                                     final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
                                     try {
                                         // Put it in a holder object, the command element separates iterable objects
-                                        //noinspection unchecked
                                         return new ValueHolder(dataTypeSerializer.deserialize(typeToken, context, data));
                                     } catch (InvalidDataException e) {
                                         throw args.createError(t("Invalid data: %s", e.getMessage()));
@@ -138,7 +132,6 @@ public final class CommandSetData extends CommandProvider {
                     final Player target = args.<Player>getOne("player").get();
                     final Key key = args.<Key>getOne("key").get();
                     final Object data = args.<ValueHolder>getOne("data").get().data;
-                    //noinspection unchecked
                     target.offer(key, data);
                     src.sendMessage(t("Successfully offered the data for the key %s to the player %s", key.getId(), target.getName()));
                     return CommandResult.success();

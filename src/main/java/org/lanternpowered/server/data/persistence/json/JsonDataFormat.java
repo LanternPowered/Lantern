@@ -302,12 +302,12 @@ public class JsonDataFormat extends AbstractStringDataFormat {
             writer.value((Boolean) value);
         } else if (value instanceof Number) {
             if (value instanceof Double) {
-                final String value1 = value + "";
-                if (value1.indexOf('.') == -1) {
-                    writer.value((Double) value);
-                } else {
-                    writer.value(value + DOUBLE_SUFFIX_UNTYPED);
+                String dbl = Double.toString((Double) value);
+                if (dbl.indexOf('.') == -1) {
+                    dbl += DOUBLE_SUFFIX_UNTYPED;
                 }
+                // Writes a raw json value, without quotes
+                writer.jsonValue(dbl);
             } else if (value instanceof Float) {
                 writer.value(value + FLOAT_SUFFIX);
             } else if (value instanceof Long) {

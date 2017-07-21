@@ -84,13 +84,13 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         return createContainer(reader);
     }
 
-    private DataContainer createContainer(JsonReader reader) throws IOException {
+    private static DataContainer createContainer(JsonReader reader) throws IOException {
         final DataContainer container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         readView(reader, container);
         return container;
     }
 
-    private void readView(JsonReader reader, DataView view) throws IOException {
+    private static void readView(JsonReader reader, DataView view) throws IOException {
         reader.beginObject();
         while (reader.hasNext()) {
             DataQuery key = DataQuery.of(reader.nextName());
@@ -106,7 +106,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
     }
 
     @Nullable
-    private Object read(JsonReader reader) throws IOException {
+    private static Object read(JsonReader reader) throws IOException {
         final JsonToken token = reader.peek();
         switch (token) {
             case BEGIN_OBJECT:
@@ -144,7 +144,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         return nextDouble;
     }
 
-    private List<?> readArray(JsonReader reader) throws IOException {
+    private static List<?> readArray(JsonReader reader) throws IOException {
         reader.beginArray();
         final List<Object> result = new ArrayList<>();
         while (reader.hasNext()) {
@@ -177,7 +177,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         return writer.toString();
     }
 
-    private void writeView(JsonWriter writer, DataView view) throws IOException {
+    private static void writeView(JsonWriter writer, DataView view) throws IOException {
         writer.beginObject();
         for (Map.Entry<DataQuery, Object> entry : view.getValues(false).entrySet()) {
             writer.name(entry.getKey().asString('.'));
@@ -186,7 +186,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         writer.endObject();
     }
 
-    private void write(JsonWriter writer, @Nullable Object value) throws IOException {
+    private static void write(JsonWriter writer, @Nullable Object value) throws IOException {
         if (value == null) {
             writer.nullValue();
         } else if (value instanceof Boolean) {
@@ -208,7 +208,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         }
     }
 
-    private void writeArray(JsonWriter writer, Iterable<?> iterable) throws IOException {
+    private static void writeArray(JsonWriter writer, Iterable<?> iterable) throws IOException {
         writer.beginArray();
         for (Object value : iterable) {
             write(writer, value);
@@ -216,7 +216,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         writer.endArray();
     }
 
-    private void writeMap(JsonWriter writer, Map<?, ?> map) throws IOException {
+    private static void writeMap(JsonWriter writer, Map<?, ?> map) throws IOException {
         writer.beginObject();
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             Object key = entry.getKey();

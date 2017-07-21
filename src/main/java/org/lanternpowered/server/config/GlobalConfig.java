@@ -26,6 +26,7 @@
 package org.lanternpowered.server.config;
 
 import static org.lanternpowered.server.config.ConfigConstants.ENABLED;
+import static org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage.URL_ARGUMENT;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -43,6 +44,9 @@ import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.util.IpSet;
 import org.lanternpowered.server.util.functions.Predicates;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -78,6 +82,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     @Setting(value = "query", comment = "Configuration for the query server.")
     private Query query = new Query();
+
+    @Setting(value = "chat", comment = "Configuration for the chat.")
+    private Chat chat = new Chat();
 
     @ConfigSerializable
     private static class Commands {
@@ -192,6 +199,50 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     }
 
     @ConfigSerializable
+    public static final class Chat {
+
+        @Setting(value = "urls", comment = "Configuration for the urls formatting in chat.")
+        private Urls urls;
+
+        @ConfigSerializable
+        public static final class Urls {
+
+            @Setting(value = "enabled", comment = "Whether the url replacement is enabled.")
+            private boolean enabled = true;
+
+            @Setting(value = "template", comment = "The template of the url replacement. The {url} argument will be replaced by the URL.")
+            private TextTemplate template = TextTemplate.of(TextColors.BLUE, TextStyles.UNDERLINE, TextTemplate.arg(URL_ARGUMENT));
+
+            /**
+             * Gets whether the url formatting is enabled.
+             *
+             * @return Is enabled
+             */
+            public boolean isEnabled() {
+                return this.enabled;
+            }
+
+            /**
+             * Gets the {@link TextTemplate}.
+             *
+             * @return The template
+             */
+            public TextTemplate getTemplate() {
+                return this.template;
+            }
+        }
+
+        /**
+         * Gets the {@link Urls} component.
+         *
+         * @return The urls
+         */
+        public Urls getUrls() {
+            return this.urls;
+        }
+    }
+
+    @ConfigSerializable
     private static final class Proxy {
 
         @Setting(value = "type", comment = "The type of the proxy, or none if disabled.")
@@ -213,6 +264,21 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    @Override
+    public void load() throws IOException {
+        // An ugly fix, but good enough for now,
+        // colors are loaded after injection, this avoids
+        // the creation of text objects until needed
+        if (this.chat.urls == null) {
+            this.chat.urls = new Chat.Urls();
+        }
+        super.load();
+    }
+
+    public Chat getChat() {
+        return this.chat;
     }
 
     public String getProxySecurityKey() {

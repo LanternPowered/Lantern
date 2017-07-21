@@ -28,15 +28,17 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import static org.spongepowered.api.command.CommandMessageFormatting.error;
 
+import com.google.common.collect.ImmutableMap;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
+import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
@@ -49,11 +51,10 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -67,6 +68,7 @@ import java.util.regex.Pattern;
 
 public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChatMessage> {
 
+    public static final String URL_ARGUMENT = "url";
     private final static AttributeKey<ChatData> CHAT_DATA = AttributeKey.valueOf("chat-data");
 
     private static class ChatData {
@@ -106,7 +108,13 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         } else {
             final Text nameText = player.get(Keys.DISPLAY_NAME).get();
             final Text rawMessageText = Text.of(message0);
-            final Text messageText = newTextWithLinks(message0, true);
+            final GlobalConfig.Chat.Urls urls = Lantern.getGame().getGlobalConfig().getChat().getUrls();
+            final Text messageText;
+            if (urls.isEnabled()) {
+                messageText = newTextWithLinks(message0, urls.getTemplate(), false);
+            } else {
+                messageText = rawMessageText;
+            }
             final MessageChannel channel = player.getMessageChannel();
             final MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(Cause.of(NamedCause.source(player)),
                     channel, Optional.of(channel), new MessageEvent.MessageFormatter(nameText, messageText), rawMessageText, false);
@@ -141,7 +149,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             "((?:[a-z0-9]{2,}://)?(?:(?:[0-9]{1,3}\\.){3}[0-9]{1,3}|(?:[-\\w_]+\\.[a-z]{2,}?))(?::[0-9]{1,5})?.*?(?=[!\"\u00A7 \n]|$))",
             Pattern.CASE_INSENSITIVE);
 
-    private static Text newTextWithLinks(String message, boolean allowMissingHeader) {
+    private static Text newTextWithLinks(String message, TextTemplate template, boolean allowMissingHeader) {
         Text.Builder builder = null;
         StringBuilder lastMessage = null;
 
@@ -193,10 +201,9 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
                     builder.append(Text.of(lastMessage.toString()));
                     lastMessage = null;
                 }
-                builder.append(Text.builder(url)
+
+                builder.append(template.apply(ImmutableMap.of(URL_ARGUMENT, url))
                         .onClick(TextActions.openUrl(urlInstance))
-                        .color(TextColors.BLUE)
-                        .style(TextStyles.UNDERLINE)
                         .build());
             }
         }

@@ -55,6 +55,8 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.serializer.TextTemplateConfigSerializer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -71,6 +73,7 @@ public abstract class ConfigBase {
         final TypeSerializerCollection typeSerializers = TypeSerializers.getDefaultSerializers();
         final DataViewTypeSerializer dataViewTypeSerializer = new DataViewTypeSerializer();
         typeSerializers.registerType(TypeToken.of(Text.class), new TextTypeSerializer())
+                .registerType(TypeToken.of(TextTemplate.class), new TextTemplateConfigSerializer())
                 .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
                 .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
                 .registerType(TypeToken.of(GameProfile.class), (TypeSerializer) typeSerializers.get(

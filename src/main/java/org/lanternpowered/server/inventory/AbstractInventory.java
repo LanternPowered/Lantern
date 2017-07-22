@@ -114,7 +114,7 @@ public abstract class AbstractInventory implements IInventory {
     @Override
     public Optional<ItemStack> poll(ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        return poll(stack -> stack.getItem().equals(itemType));
+        return poll(stack -> stack.getType().equals(itemType));
     }
 
     @Override
@@ -125,7 +125,7 @@ public abstract class AbstractInventory implements IInventory {
     @Override
     public Optional<ItemStack> poll(int limit, ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        return poll(limit, stack -> stack.getItem().equals(itemType));
+        return poll(limit, stack -> stack.getType().equals(itemType));
     }
 
     @Override
@@ -136,7 +136,7 @@ public abstract class AbstractInventory implements IInventory {
     @Override
     public Optional<ItemStack> peek(ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        return peek(stack -> stack.getItem().equals(itemType));
+        return peek(stack -> stack.getType().equals(itemType));
     }
 
     @Override
@@ -147,7 +147,7 @@ public abstract class AbstractInventory implements IInventory {
     @Override
     public Optional<ItemStack> peek(int limit, ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        return peek(limit, stack -> stack.getItem().equals(itemType));
+        return peek(limit, stack -> stack.getType().equals(itemType));
     }
 
     protected abstract Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher);

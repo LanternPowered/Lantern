@@ -260,10 +260,10 @@ public class PlayerContainerSession {
         }
 
         public boolean offer(ItemStack itemStack) {
-            if (itemStack.getQuantity() == 0 || itemStack.getItem() == ItemTypes.NONE) {
+            if (itemStack.getQuantity() == 0 || itemStack.getType() == ItemTypes.NONE) {
                 return false;
             }
-            if (this.itemStack == null || this.itemStack.getQuantity() == 0 || this.itemStack.getItem() == ItemTypes.NONE) {
+            if (this.itemStack == null || this.itemStack.getQuantity() == 0 || this.itemStack.getType() == ItemTypes.NONE) {
                 this.itemStack = (LanternItemStack) itemStack.copy();
             } else if (this.itemStack.similarTo(itemStack)) {
                 this.itemStack.setQuantity(this.itemStack.getQuantity() + itemStack.getQuantity());
@@ -275,7 +275,7 @@ public class PlayerContainerSession {
 
         @Nullable
         public LanternItemStack poll(@Nullable ItemStack matcher, int quantity) {
-            if (this.itemStack == null || this.itemStack.getItem() == ItemTypes.NONE) {
+            if (this.itemStack == null || this.itemStack.getType() == ItemTypes.NONE) {
                 return null;
             }
             if (matcher != null && !this.itemStack.similarTo(matcher)) {
@@ -704,7 +704,7 @@ public class PlayerContainerSession {
                     final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, mainInventory, itemStack.copy(), offhand);
 
                     // Force updates if the max stack size on the client and server don't match
-                    final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getItem());
+                    final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
                     if (itemStack.getMaxStackQuantity() != originalMaxStackSize) {
                         final LanternItemStack tempStack = (LanternItemStack) itemStack.copy();
                         tempStack.setTempMaxQuantity(originalMaxStackSize);
@@ -887,7 +887,7 @@ public class PlayerContainerSession {
                         final List<SlotTransaction> transactions = result.get().getTransactions();
                         slotTransactions.addAll(transactions);
                         final ItemStack itemStack = transactions.get(0).getOriginal().createStack();
-                        itemStack.setQuantity(itemStack.getQuantity() - transactions.get(0).getFinal().getCount());
+                        itemStack.setQuantity(itemStack.getQuantity() - transactions.get(0).getFinal().getQuantity());
                         entities.add(createDroppedItem(itemStack.createSnapshot()));
                     }
                     if (button == 0) {

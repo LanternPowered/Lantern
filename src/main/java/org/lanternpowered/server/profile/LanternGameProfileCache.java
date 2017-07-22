@@ -31,7 +31,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multiset;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.ConfigBase;
@@ -48,7 +47,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -160,22 +158,16 @@ public final class LanternGameProfileCache implements GameProfileCache {
         }
     }
 
-    /**
-     * TODO: SpongeAPI should use Instant?
-     */
     @Override
-    public boolean add(GameProfile profile, boolean overwrite, @Nullable Date expiry) {
+    public boolean add(GameProfile profile, boolean overwrite, @Nullable Instant expiry) {
         final UUID uuid = checkNotNull(profile, "profile").getUniqueId();
         if (!overwrite && this.byUUID.containsKey(uuid)) {
             return false;
         }
-        final Instant expirationDate;
-        if (expiry != null) {
-            expirationDate = expiry.toInstant();
-        } else {
-            expirationDate = calculateDefaultExpirationDate();
+        if (expiry == null) {
+            expiry = calculateDefaultExpirationDate();
         }
-        final ProfileCacheEntry entry = new ProfileCacheEntry(profile, expirationDate);
+        final ProfileCacheEntry entry = new ProfileCacheEntry(profile, expiry);
         this.byUUID.put(uuid, entry);
         profile.getName().ifPresent(name -> this.byName.put(name, entry));
         return true;
@@ -238,7 +230,7 @@ public final class LanternGameProfileCache implements GameProfileCache {
     public Optional<GameProfile> lookupById(UUID uniqueId) {
         try {
             final GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(uniqueId, true);
-            add(gameProfile, true, null);
+            add(gameProfile, true, (Instant) null);
             return Optional.of(gameProfile);
         } catch (IOException e) {
             Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);

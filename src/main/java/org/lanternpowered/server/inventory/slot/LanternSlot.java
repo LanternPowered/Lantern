@@ -328,7 +328,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     }
 
     protected boolean doesAcceptItemType(ItemStack stack) {
-        return doesAcceptItemType(stack.getItem());
+        return doesAcceptItemType(stack.getType());
     }
 
     protected boolean doesAcceptItemType(ItemType itemType) {
@@ -510,7 +510,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     @Override
     public boolean contains(ItemType type) {
         checkNotNull(type, "type");
-        return this.itemStack != null && this.itemStack.getItem().equals(type);
+        return this.itemStack != null && this.itemStack.getType().equals(type);
     }
 
     @Override

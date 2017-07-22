@@ -78,7 +78,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 import org.lanternpowered.server.permission.AbstractSubject;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.statistic.StatisticMap;
@@ -1115,7 +1114,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     public void handleStartElytraFlying() {
         // Check for the elytra item
         if (getInventory().getEquipment().getSlot(EquipmentTypes.CHESTPLATE)
-                .get().peek().map(ItemStack::getItem).orElse(null) != ItemTypes.ELYTRA) {
+                .get().peek().map(ItemStack::getType).orElse(null) != ItemTypes.ELYTRA) {
             return;
         }
         offer(LanternKeys.IS_ELYTRA_FLYING, true);

@@ -38,6 +38,8 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.profile.GameProfileCache;
 
+import java.time.Instant;
+
 public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
 
     @Override
@@ -58,7 +60,7 @@ public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
         gameProfileCache.getById(gameProfile.getUniqueId()).ifPresent(
                 profile -> context.getChannel().attr(NetworkSession.PREVIOUS_GAME_PROFILE).set(profile));
         // Cache the new profile
-        gameProfileCache.add(gameProfile, true, null);
+        gameProfileCache.add(gameProfile, true, (Instant) null);
         session.sendWithFuture(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
                 .addListener(future -> {
                     session.setGameProfile(gameProfile);

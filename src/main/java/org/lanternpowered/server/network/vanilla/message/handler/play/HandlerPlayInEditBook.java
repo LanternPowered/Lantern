@@ -45,7 +45,7 @@ public class HandlerPlayInEditBook implements Handler<MessagePlayInEditBook> {
         final LanternSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
         final ItemStack itemStack = slot.peek().orElse(null);
-        if (itemStack != null && itemStack.getItem() == ItemTypes.WRITABLE_BOOK) {
+        if (itemStack != null && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
             itemStack.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));
             slot.set(itemStack);
         }

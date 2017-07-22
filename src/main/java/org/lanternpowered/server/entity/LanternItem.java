@@ -236,7 +236,7 @@ public class LanternItem extends LanternEntity implements Item {
             remove();
             return null;
         }
-        if (itemStackSnapshot1.getCount() >= itemStackSnapshot1.getType().getMaxStackQuantity()) {
+        if (itemStackSnapshot1.getQuantity() >= itemStackSnapshot1.getType().getMaxStackQuantity()) {
             return null;
         }
         checkNotNull(getWorld());
@@ -250,12 +250,12 @@ public class LanternItem extends LanternEntity implements Item {
                     continue;
                 }
                 final ItemStackSnapshot itemStackSnapshot2 = entity.get(Keys.REPRESENTED_ITEM).get();
-                if (itemStackSnapshot2.getCount() < itemStackSnapshot1.getCount()) {
+                if (itemStackSnapshot2.getQuantity() < itemStackSnapshot1.getQuantity()) {
                     continue;
                 }
                 if (((LanternItemStackSnapshot) itemStackSnapshot1).similarTo(itemStackSnapshot2)) {
                     final int max = itemStackSnapshot1.getType().getMaxStackQuantity();
-                    int quantity = itemStackSnapshot1.getCount() + itemStackSnapshot2.getCount();
+                    int quantity = itemStackSnapshot1.getQuantity() + itemStackSnapshot2.getQuantity();
                     if (quantity > max) {
                         final ItemStack itemStack2 = itemStackSnapshot2.createStack();
                         itemStack2.setQuantity(quantity - max);

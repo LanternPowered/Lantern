@@ -152,7 +152,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     @Override
     public DataContainer toContainer() {
         return IAdditionalDataHolder.super.toContainer()
-                .set(DataQueries.ITEM_TYPE, getItem())
+                .set(DataQueries.ITEM_TYPE, getType())
                 .set(DataQueries.QUANTITY, getQuantity());
     }
 
@@ -162,7 +162,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     }
 
     @Override
-    public ItemType getItem() {
+    public ItemType getType() {
         return this.itemType;
     }
 
@@ -207,7 +207,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
      * @return Is equal
      */
     public boolean equalTo(ItemStackSnapshot that) {
-        return similarTo(that) && getQuantity() == that.getCount();
+        return similarTo(that) && getQuantity() == that.getQuantity();
     }
 
     @Override
@@ -246,7 +246,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
      */
     public boolean similarTo(ItemStack that) {
         checkNotNull(that, "that");
-        return getItem() == that.getItem() && IValueContainer.matchContents(this, (IValueContainer) that);
+        return getType() == that.getType() && IValueContainer.matchContents(this, (IValueContainer) that);
     }
 
     public static boolean similarTo(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {

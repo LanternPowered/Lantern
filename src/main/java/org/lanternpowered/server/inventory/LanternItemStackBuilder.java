@@ -59,7 +59,7 @@ public class LanternItemStackBuilder extends AbstractDataBuilder<ItemStack> impl
         if (itemType != null) {
             if (this.itemStack == null) {
                 this.itemStack = new LanternItemStack(itemType);
-            } else if (this.itemStack.getItem() != itemType) {
+            } else if (this.itemStack.getType() != itemType) {
                 final LanternItemStack old = this.itemStack;
                 this.itemStack = new LanternItemStack(itemType);
                 this.itemStack.setQuantity(old.getQuantity());
@@ -80,7 +80,7 @@ public class LanternItemStackBuilder extends AbstractDataBuilder<ItemStack> impl
 
     @Override
     public ItemType getCurrentItem() {
-        return this.itemTypeSet ? itemStack(null).getItem() : ItemTypes.NONE;
+        return this.itemTypeSet ? itemStack(null).getType() : ItemTypes.NONE;
     }
 
     @Override

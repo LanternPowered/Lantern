@@ -77,7 +77,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
                 return getFor(type.get().getDefaultState(), null, direction);
             }
         } else if (propertyHolder instanceof ItemStack) {
-            Optional<BlockType> type = ((ItemStack) propertyHolder).getItem().getBlock();
+            Optional<BlockType> type = ((ItemStack) propertyHolder).getType().getBlock();
             if (type.isPresent()) {
                 return getFor(((LanternBlockType) type.get()).getStateFromItemStack((ItemStack) propertyHolder), null, direction);
             }

@@ -260,7 +260,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
     @Override
     public DataView serialize(LanternItemStack object) {
         final DataContainer dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-        dataContainer.set(IDENTIFIER, object.getItem().getId());
+        dataContainer.set(IDENTIFIER, object.getType().getId());
         serialize(object, dataContainer);
         return dataContainer;
     }
@@ -288,7 +288,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
 
     @Override
     public void serializeValues(LanternItemStack object, SimpleValueContainer valueContainer, DataView dataView) {
-        final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getItem());
+        final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getType());
         if (serializer != null) {
             serializer.serializeValues(object, valueContainer, dataView);
         }
@@ -331,7 +331,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
 
     @Override
     public void deserializeValues(LanternItemStack object, SimpleValueContainer valueContainer, DataView dataView) {
-        final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getItem());
+        final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getType());
         if (serializer != null) {
             serializer.deserializeValues(object, valueContainer, dataView);
         }

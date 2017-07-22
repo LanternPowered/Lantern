@@ -55,7 +55,7 @@ public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
         final BlockSnapshot.Builder builder = BlockSnapshotBuilder.createPositionless();
         final Optional<ItemStack> optItem = context.get(Parameters.USED_ITEM_STACK);
         if (optItem.isPresent()) {
-            builder.blockState(optItem.get().getItem().getBlock().get().getDefaultState());
+            builder.blockState(optItem.get().getType().getBlock().get().getDefaultState());
             //noinspection unchecked
             optItem.get().getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
         } else {

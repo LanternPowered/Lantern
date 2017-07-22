@@ -46,7 +46,7 @@ public class HandlerPlayInSignBook implements Handler<MessagePlayInSignBook> {
         final LanternSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
         ItemStack itemStack = slot.peek().orElse(null);
-        if (itemStack != null && itemStack.getItem() == ItemTypes.WRITABLE_BOOK) {
+        if (itemStack != null && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
             final ItemStack itemStack1 = new LanternItemStack(ItemTypes.WRITTEN_BOOK);
             itemStack.getValues().forEach(itemStack1::offer);
             itemStack1.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));

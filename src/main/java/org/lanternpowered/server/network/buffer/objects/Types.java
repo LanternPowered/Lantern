@@ -176,7 +176,7 @@ public final class Types {
             } else {
                 final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
                 this.store.serialize((LanternItemStack) object, dataView);
-                buf.write(Types.RAW_ITEM_STACK, new RawItemStack(ItemRegistryModule.get().getInternalId(object.getItem()),
+                buf.write(Types.RAW_ITEM_STACK, new RawItemStack(ItemRegistryModule.get().getInternalId(object.getType()),
                         dataView.getShort(ItemStackStore.DATA).orElse((short) 0), object.getQuantity(),
                         dataView.getView(ItemStackStore.TAG).orElse(null)));
             }

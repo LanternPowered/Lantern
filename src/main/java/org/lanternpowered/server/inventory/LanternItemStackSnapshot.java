@@ -80,11 +80,11 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
 
     @Override
     public ItemType getType() {
-        return this.itemStack.getItem();
+        return this.itemStack.getType();
     }
 
     @Override
-    public int getCount() {
+    public int getQuantity() {
         return this.itemStack.getQuantity();
     }
 
@@ -107,7 +107,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     public DataContainer toContainer() {
         return IImmutableDataHolder.super.toContainer()
                 .set(DataQueries.ITEM_TYPE, getType())
-                .set(DataQueries.QUANTITY, getCount());
+                .set(DataQueries.QUANTITY, getQuantity());
     }
 
     @Override
@@ -180,7 +180,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("type", getType().getId())
-                .add("quantity", getCount())
+                .add("quantity", getQuantity())
                 .add("data", IValueContainer.valuesToString(this.itemStack))
                 .toString();
     }
@@ -209,6 +209,6 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
      */
     public boolean similarTo(ItemStack that) {
         checkNotNull(that, "that");
-        return getType() == that.getItem() && IValueContainer.matchContents(this.itemStack, (IValueContainer) that);
+        return getType() == that.getType() && IValueContainer.matchContents(this.itemStack, (IValueContainer) that);
     }
 }

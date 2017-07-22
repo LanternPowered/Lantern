@@ -416,7 +416,7 @@ public final class PlayerInteractionHandler {
 
         final Optional<ItemStack> handItem = slot.peek();
         if (handItem.isPresent()) {
-            final LanternItemType itemType = (LanternItemType) handItem.get().getItem();
+            final LanternItemType itemType = (LanternItemType) handItem.get().getType();
             context.set(Parameters.USED_ITEM_STACK, handItem.get());
             context.set(Parameters.USED_SLOT, slot);
             context.set(Parameters.INTERACTION_HAND, handType);
@@ -478,7 +478,7 @@ public final class PlayerInteractionHandler {
                     this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.OFF_HAND));
                     /*
                     final CooldownTracker cooldownTracker = this.player.getCooldownTracker();
-                    cooldownTracker.set(handItem.get().getItem(), 15);
+                    cooldownTracker.set(handItem.get().getType(), 15);
                     */
                 }
             }
@@ -510,7 +510,7 @@ public final class PlayerInteractionHandler {
         }
         final Optional<ItemStack> handItem = slot.peek();
         if (handItem.isPresent()) {
-            final LanternItemType itemType = (LanternItemType) handItem.get().getItem();
+            final LanternItemType itemType = (LanternItemType) handItem.get().getType();
             context.set(Parameters.USED_ITEM_STACK, handItem.get());
             context.set(Parameters.USED_SLOT, slot);
             context.set(Parameters.INTERACTION_HAND, handType);

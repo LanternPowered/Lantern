@@ -183,7 +183,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         final DataContainer view = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         store.serialize((LanternItemStack) itemStack, view);
         final int data = view.getInt(ItemStackStore.DATA).get();
-        final int internalId = ItemRegistryModule.get().getInternalId(itemStack.getItem());
+        final int internalId = ItemRegistryModule.get().getInternalId(itemStack.getType());
         return new int[] { internalId, data };
     }
 

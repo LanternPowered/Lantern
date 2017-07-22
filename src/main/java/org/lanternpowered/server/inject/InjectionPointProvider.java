@@ -47,6 +47,10 @@ import javax.annotation.Nullable;
 
 /**
  * Allows injecting the {@link InjectionPoint} in {@link Provider}s.
+ *
+ * TODO: The {@link ProvisionInvocation#getDependencyChain()} is deprecated in
+ * TODO:   and will be removed in the Guice version 4.4. A proper replacement
+ * TODO:   should be found at that point.
  */
 public final class InjectionPointProvider extends AbstractMatcher<Binding<?>> implements Module, ProvisionListener, Provider<InjectionPoint> {
 

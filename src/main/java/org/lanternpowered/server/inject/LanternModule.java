@@ -161,7 +161,7 @@ public class LanternModule extends PrivateModule {
         requestStaticInjection(Sponge.class);
 
         // Injection Points
-        install(new InjectionPointProvider());
+        install(new InjectionPointProviderNew());
 
         // The logger
         bind(Logger.class)
@@ -439,30 +439,5 @@ public class LanternModule extends PrivateModule {
     @Singleton
     private File provideRootWorldDirectoryAsFile(@Named(DirectoryKeys.ROOT_WORLD) Path rootWorldDir) {
         return rootWorldDir.toFile();
-    }
-
-    //////////////////////
-    /// Helper Methods ///
-    //////////////////////
-
-    // TODO: Move this?
-    private static InputStream extractAndGet(Path rootDir, String path, String targetDir) throws IOException {
-        final Path dir = rootDir.resolve(targetDir);
-        if (!Files.exists(dir)) {
-            Files.createDirectories(dir);
-        }
-        final Path file = dir.resolve(path);
-        if (!Files.exists(file)) {
-            final InputStream is = LanternGame.class.getResourceAsStream('/' + path);
-            if (is == null) {
-                throw new IllegalArgumentException("The resource \"" + path + "\" doesn't exist.");
-            }
-            try {
-                Files.copy(is, file);
-            } finally {
-                is.close();
-            }
-        }
-        return Files.newInputStream(file);
     }
 }

@@ -52,6 +52,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("SuspiciousMethodCalls")
 public class AbstractChildrenInventory extends AbstractMutableInventory {
 
     private final Object2IntMap<AbstractInventory> childrenIndexes = new Object2IntOpenHashMap<>();
@@ -111,7 +112,22 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         return childInventory;
     }
 
-    Iterable<LanternSlot> getSlotInventories() {
+    /**
+     * Gets the {@link Slot}s of this inventory.
+     *
+     * @return The slots
+     */
+    public List<LanternSlot> getSlots() {
+        return Collections.unmodifiableList(getSlotInventories());
+    }
+
+    /**
+     * Constructs a {@link List} with all the {@link LanternSlot}s
+     * that are present in this {@link Inventory}.
+     *
+     * @return The slot inventories
+     */
+    protected List<LanternSlot> getSlotInventories() {
         final ImmutableList.Builder<LanternSlot> slots = ImmutableList.builder();
         for (AbstractInventory child : this.children) {
             if (child instanceof AbstractChildrenInventory) {
@@ -120,7 +136,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
                 slots.add((LanternSlot) child);
             }
         }
-        return Collections.emptyList();
+        return slots.build();
     }
 
     /**
@@ -323,6 +339,36 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
 
     @Override
     public void setMaxStackSize(int size) {
+    }
+
+    @Override
+    public Inventory intersect(Inventory inventory) {
+        checkNotNull(inventory, "inventory");
+        if (!(inventory instanceof AbstractChildrenInventory)) {
+            return empty();
+        }
+        final List<LanternSlot> intersectedSlots = new ArrayList<>(getSlotInventories());
+        intersectedSlots.retainAll(((AbstractChildrenInventory) inventory).getSlotInventories());
+        if (intersectedSlots.isEmpty()) {
+            return empty();
+        }
+        return new LanternOrderedInventory(this, null) {
+            {
+                intersectedSlots.forEach(this::registerSlot);
+                finalizeContent();
+            }
+        };
+    }
+
+    @Override
+    public boolean containsInventory(Inventory inventory) {
+        checkNotNull(inventory, "inventory");
+        for (Inventory child : this.children) {
+            if (child == inventory || child.containsInventory(inventory)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SuppressWarnings("unchecked")

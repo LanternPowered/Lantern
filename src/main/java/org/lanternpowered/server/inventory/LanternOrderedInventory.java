@@ -41,7 +41,6 @@ import org.spongepowered.api.item.inventory.type.OrderedInventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,15 +67,6 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
 
     public LanternOrderedInventory(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
-    }
-
-    /**
-     * Gets the {@link Slot}s of this inventory.
-     *
-     * @return The slots
-     */
-    public List<LanternSlot> getSlots() {
-        return Collections.unmodifiableList(this.slots);
     }
 
     /**
@@ -141,7 +131,6 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (property == SlotIndex.class && child instanceof Slot) {
-            //noinspection SuspiciousMethodCalls
             final int index = this.indexBySlot.getInt(child);
             return index == INVALID_INDEX ? Optional.empty() : Optional.of(property.cast(SlotIndex.of(index)));
         }
@@ -152,7 +141,6 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
         final List<T> properties = super.tryGetProperties(child, property);
         if (property == SlotIndex.class && child instanceof Slot) {
-            //noinspection SuspiciousMethodCalls
             final int index = this.indexBySlot.getInt(child);
             if (index != INVALID_INDEX) {
                 properties.add(property.cast(SlotIndex.of(index)));
@@ -162,7 +150,7 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
     }
 
     @Override
-    protected Iterable<LanternSlot> getSlotInventories() {
+    protected List<LanternSlot> getSlotInventories() {
         return this.leafSlots;
     }
 

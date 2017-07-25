@@ -32,6 +32,7 @@ import org.lanternpowered.server.inventory.AbstractMutableInventory;
 import org.lanternpowered.server.inventory.FastOfferResult;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.PeekPollTransactionsResult;
 import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
@@ -522,6 +523,16 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     public void setMaxStackSize(int size) {
         checkArgument(size > 0, "Size must be greater then 0");
         this.maxStackSize = size;
+    }
+
+    @Override
+    public Inventory intersect(Inventory inventory) {
+        return empty();
+    }
+
+    @Override
+    public boolean containsInventory(Inventory inventory) {
+        return inventory == this;
     }
 
     @SuppressWarnings("unchecked")

@@ -44,6 +44,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class AltParentProxyInventory extends AbstractInventory {
 
     private final LanternEmptyInventory emptyInventory = new LanternEmptyInventory(this);
@@ -257,49 +258,41 @@ public class AltParentProxyInventory extends AbstractInventory {
 
     @Override
     public <T extends Inventory> T query(Class<?>... types) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(types));
     }
 
     @Override
     public <T extends Inventory> T query(ItemType... types) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(types));
     }
 
     @Override
     public <T extends Inventory> T query(ItemStack... types) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(types));
     }
 
     @Override
     public <T extends Inventory> T queryAny(ItemStack... types) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.queryAny(types));
     }
 
     @Override
     public <T extends Inventory> T query(InventoryProperty<?, ?>... props) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(props));
     }
 
     @Override
     public <T extends Inventory> T query(Translation... names) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(names));
     }
 
     @Override
     public <T extends Inventory> T query(String... names) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(names));
     }
 
     @Override
     public <T extends Inventory> T query(Object... args) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(args));
     }
 
@@ -311,6 +304,21 @@ public class AltParentProxyInventory extends AbstractInventory {
     @Override
     public InventoryArchetype getArchetype() {
         return this.delegate.getArchetype();
+    }
+
+    @Override
+    public Inventory intersect(Inventory inventory) {
+        return this.delegate.intersect(inventory);
+    }
+
+    @Override
+    public Inventory union(Inventory inventory) {
+        return this.delegate.union(inventory);
+    }
+
+    @Override
+    public boolean containsInventory(Inventory inventory) {
+        return this.delegate.containsInventory(inventory) || inventory == this;
     }
 
     @Override

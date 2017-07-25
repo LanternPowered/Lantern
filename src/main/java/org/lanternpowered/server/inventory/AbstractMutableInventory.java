@@ -63,6 +63,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractMutableInventory extends AbstractInventory {
 
     static class NameHolder {
@@ -186,7 +187,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Override
     <T extends InventoryProperty<?, ?>> ImmutableList.Builder<T> getPropertiesBuilder(Class<T> property) {
         final ImmutableList.Builder<T> builder = super.getPropertiesBuilder(property);
-        //noinspection unchecked
         builder.addAll((Collection<? extends T>) this.inventoryPropertiesByClass.get(property));
         return builder;
     }
@@ -195,7 +195,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     <T extends InventoryProperty<?, ?>> ImmutableList.Builder<T> getPropertiesBuilder(Inventory child, Class<T> property) {
         final ImmutableList.Builder<T> builder = super.getPropertiesBuilder(child, property);
         if (child instanceof AbstractMutableInventory) {
-            //noinspection unchecked
             builder.addAll((Collection<? extends T>) ((AbstractMutableInventory) child).inventoryPropertiesByClass.get(property));
         }
         return builder;
@@ -228,10 +227,8 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
 
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
         if (property == InventoryTitle.class) {
-            //noinspection unchecked
             return Optional.of((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
-            //noinspection unchecked
             return Optional.of((T) new InventoryCapacity(capacity()));
         }
         return Optional.empty();
@@ -240,10 +237,8 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
         final List<T> properties = new ArrayList<>();
         if (property == InventoryTitle.class) {
-            //noinspection unchecked
             properties.add((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
-            //noinspection unchecked
             properties.add((T) new InventoryCapacity(capacity()));
         }
         return properties;

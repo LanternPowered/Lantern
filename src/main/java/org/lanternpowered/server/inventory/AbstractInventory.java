@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
@@ -51,6 +52,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractInventory implements IInventory {
 
     protected abstract LanternEmptyInventory empty();
@@ -164,13 +166,29 @@ public abstract class AbstractInventory implements IInventory {
     protected abstract PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack itemStack);
 
     @Override
+    public Inventory union(Inventory inventory) {
+        checkNotNull(inventory, "inventory");
+        return new LanternOrderedInventory(this, null) {
+            {
+                // Add all the slots from this inventory
+                AbstractInventory.this.<LanternSlot>slots().forEach(this::registerSlot);
+                // Add all the slots from the other inventory, if not already added by the previous inventory
+                inventory.<LanternSlot>slots().forEach(slot -> {
+                    if (!this.slots.contains(slot)) {
+                        registerSlot(slot);
+                    }
+                });
+                finalizeContent();
+            }
+        };
+    }
+
+    @Override
     public boolean hasProperty(Class<? extends InventoryProperty<?, ?>> property) {
         checkNotNull(property, "property");
         final AbstractInventory parent = parent();
-        //noinspection unchecked
         Optional<InventoryProperty<?, ?>> optProperty = tryGetProperty((Class) property, null);
         if (parent != this && !optProperty.isPresent()) {
-            //noinspection unchecked
             optProperty = parent.tryGetProperty(
                     this, (Class) property, null);
         }
@@ -181,10 +199,8 @@ public abstract class AbstractInventory implements IInventory {
     public boolean hasProperty(InventoryProperty<?, ?> property) {
         checkNotNull(property, "property");
         final AbstractInventory parent = parent();
-        //noinspection unchecked
         Optional<InventoryProperty<?, ?>> optProperty = tryGetProperty((Class) property.getClass(), property.getKey());
         if (parent != this && !optProperty.isPresent()) {
-            //noinspection unchecked
             optProperty = parent.tryGetProperty(
                     this, (Class) property.getClass(), property.getKey());
         }
@@ -194,11 +210,9 @@ public abstract class AbstractInventory implements IInventory {
     @Override
     public boolean hasProperty(Inventory child, InventoryProperty<?,?> property) {
         checkNotNull(property, "property");
-        //noinspection unchecked
         Optional<InventoryProperty<?, ?>> optProperty = tryGetProperty(
                 child, (Class) property.getClass(), property.getKey());
         if (!optProperty.isPresent()) {
-            //noinspection unchecked
             optProperty = ((AbstractInventory) child).tryGetProperty((Class) property.getClass(), property.getKey());
         }
         return optProperty.isPresent() && optProperty.get().equals(property);
@@ -213,7 +227,6 @@ public abstract class AbstractInventory implements IInventory {
         checkNotNull(property, "property");
         final AbstractInventory parent = parent();
         final ImmutableList.Builder<T> properties = ImmutableList.builder();
-        //noinspection unchecked
         properties.addAll(tryGetProperties(property));
         if (parent != this) {
             properties.addAll(parent.tryGetProperties(this, property));
@@ -230,7 +243,6 @@ public abstract class AbstractInventory implements IInventory {
         checkNotNull(child, "child");
         checkNotNull(property, "property");
         final ImmutableList.Builder<T> properties = ImmutableList.builder();
-        //noinspection unchecked
         properties.addAll(tryGetProperties(child, property));
         properties.addAll(((AbstractInventory) child).tryGetProperties(property));
         return properties;
@@ -255,7 +267,6 @@ public abstract class AbstractInventory implements IInventory {
         checkNotNull(property, "property");
         Optional<T> optProperty = tryGetProperty(child, property, key);
         if (!optProperty.isPresent()) {
-            //noinspection unchecked
             optProperty = ((AbstractInventory) child).tryGetProperty(property, key);
         }
         return optProperty;
@@ -263,10 +274,8 @@ public abstract class AbstractInventory implements IInventory {
 
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
         if (property == InventoryTitle.class) {
-            //noinspection unchecked
             return Optional.of((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
-            //noinspection unchecked
             return Optional.of((T) new InventoryCapacity(capacity()));
         }
         return Optional.empty();
@@ -275,10 +284,8 @@ public abstract class AbstractInventory implements IInventory {
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
         final List<T> properties = new ArrayList<>();
         if (property == InventoryTitle.class) {
-            //noinspection unchecked
             properties.add((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
-            //noinspection unchecked
             properties.add((T) new InventoryCapacity(capacity()));
         }
         return properties;

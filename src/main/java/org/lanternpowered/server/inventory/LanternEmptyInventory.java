@@ -238,6 +238,21 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     }
 
     @Override
+    public Inventory intersect(Inventory inventory) {
+        return this;
+    }
+
+    @Override
+    public Inventory union(Inventory inventory) {
+        return inventory;
+    }
+
+    @Override
+    public boolean containsInventory(Inventory inventory) {
+        return inventory == this;
+    }
+
+    @Override
     public Iterator<Inventory> iterator() {
         return EmptyIterator.get();
     }

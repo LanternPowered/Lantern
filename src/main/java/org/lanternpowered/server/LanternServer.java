@@ -261,6 +261,13 @@ public final class LanternServer implements Server {
             } catch (IOException e) {
                 this.logger.error("Failed to load the favicon", e);
             }
+        } else {
+            try {
+                this.favicon = LanternFavicon.load(getGame().getAssetManager().getAsset(
+                        InternalPluginsInfo.Implementation.IDENTIFIER, "icon/favicon.png").get().getUrl());
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to load the default favicon.");
+            }
         }
 
         final String resourcePackPath = config.getDefaultResourcePack();

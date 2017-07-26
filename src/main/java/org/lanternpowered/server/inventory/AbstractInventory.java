@@ -37,6 +37,7 @@ import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
@@ -249,6 +250,11 @@ public abstract class AbstractInventory implements IInventory {
     }
 
     @Override
+    public <T extends InventoryProperty<?, ?>> Optional<T> getInventoryProperty(Class<T> property) {
+        return getProperty(property, AbstractInventoryProperty.getDefaultKey(property));
+    }
+
+    @Override
     public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key) {
         checkNotNull(property, "property");
         final AbstractInventory parent = parent();
@@ -259,6 +265,11 @@ public abstract class AbstractInventory implements IInventory {
             }
         }
         return tryGetProperty(property, key);
+    }
+
+    @Override
+    public <T extends InventoryProperty<?, ?>> Optional<T> getInventoryProperty(Inventory child, Class<T> property) {
+        return getProperty(child, property, AbstractInventoryProperty.getDefaultKey(property));
     }
 
     @Override

@@ -78,7 +78,6 @@ public class AltParentProxyInventory extends AbstractInventory {
 
     @Override
     public Iterator<Inventory> iterator() {
-        //noinspection unchecked
         return new Iterator<Inventory>() {
             private final Iterator<Inventory> it = delegate.iterator();
 
@@ -101,7 +100,6 @@ public class AltParentProxyInventory extends AbstractInventory {
 
     @Override
     public <T extends Inventory> Iterable<T> slots() {
-        //noinspection unchecked
         return () -> new Iterator<T>() {
             private final Iterator<T> it = (Iterator<T>) delegate.slots().iterator();
 
@@ -115,7 +113,6 @@ public class AltParentProxyInventory extends AbstractInventory {
                 final T next = this.it.next();
                 Inventory inventory = next.parent();
                 if (next == inventory || inventory == delegate) {
-                    //noinspection unchecked
                     return (T) AltParentProxyInventories.get(AltParentProxyInventory.this, next);
                 }
                 final List<Inventory> stack = new ArrayList<>();
@@ -132,7 +129,6 @@ public class AltParentProxyInventory extends AbstractInventory {
                 for (int i = 0; i < stack.size() - 1; i++) {
                     stack.set(i, AltParentProxyInventories.get(stack.get(i + 1), stack.get(i)));
                 }
-                //noinspection unchecked
                 return (T) stack.get(stack.size() - 1);
             }
 
@@ -145,13 +141,11 @@ public class AltParentProxyInventory extends AbstractInventory {
 
     @Override
     public <T extends Inventory> T first() {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.first());
     }
 
     @Override
     public <T extends Inventory> T next() {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.next());
     }
 
@@ -177,7 +171,6 @@ public class AltParentProxyInventory extends AbstractInventory {
 
     @Override
     public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(matcher, nested));
     }
 

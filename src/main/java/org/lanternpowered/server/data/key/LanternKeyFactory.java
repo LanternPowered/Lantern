@@ -64,7 +64,7 @@ public final class LanternKeyFactory {
 
     public static <E> Key<Value<E>> makeValueKey(Class<E> elementType,
             DataQuery query, String id, String name) {
-        return makeValueKey(elementType, query, id, name);
+        return makeValueKey(TypeToken.of(elementType), query, id, name);
     }
 
     public static <E> Key<Value<E>> makeValueKey(Class<E> elementType,
@@ -86,7 +86,7 @@ public final class LanternKeyFactory {
 
     public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(Class<E> elementType,
             DataQuery query, String id, String name) {
-        return makeMutableBoundedValueKey(elementType, query, id, name);
+        return makeMutableBoundedValueKey(TypeToken.of(elementType), query, id, name);
     }
 
     public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(Class<E> elementType,
@@ -108,7 +108,7 @@ public final class LanternKeyFactory {
 
     public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(Class<E> elementType,
             DataQuery query, String id, String name) {
-        return makeImmutableBoundedValueKey(elementType, query, id, name);
+        return makeImmutableBoundedValueKey(TypeToken.of(elementType), query, id, name);
     }
 
     public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(Class<E> elementType,
@@ -245,7 +245,7 @@ public final class LanternKeyFactory {
 
     public static <K, V> Key<MapValue<K, V>> makeMapKey(TypeToken<Map<K, V>> elementToken, TypeToken<MapValue<K, V>> valueToken,
             DataQuery query, String id) {
-        return KeyFactory.makeMapKey(elementToken, valueToken, query, id, query.last().toString());
+        return makeMapKey(elementToken, valueToken, query, id, query.last().toString());
     }
 
     public static <K, V> Key<MapValue<K, V>> makeMapKeyWithKeyAndValue(TypeToken<K> keyToken, TypeToken<V> valueToken,

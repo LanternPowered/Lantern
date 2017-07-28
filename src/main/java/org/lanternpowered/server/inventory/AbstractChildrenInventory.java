@@ -186,7 +186,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     public FastOfferResult offerFast(ItemStack stack) {
         checkNotNull(stack, "stack");
         final List<Inventory> processed = new ArrayList<>();
-        final Inventory inventory = query(stack);
+        final Inventory inventory = queryAny(stack);
         if (inventory instanceof AbstractChildrenInventory) {
             final FastOfferResult offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
             if (offerResult.getRest() == null) {
@@ -228,7 +228,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         checkNotNull(stack, "stack");
         final PeekOfferTransactionsResult peekResult;
         final List<Inventory> processed = new ArrayList<>();
-        final Inventory inventory = query(stack);
+        final Inventory inventory = queryAny(stack);
         if (inventory instanceof AbstractChildrenInventory) {
             peekResult = ((AbstractChildrenInventory) inventory).peekOfferFastTransactions(stack, processed, true);
             if (peekResult.getOfferResult().getRest() == null) {

@@ -255,7 +255,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
             if (stack.getQuantity() <= 0) {
                 stack = null;
             } else {
-                fail = !this.isValidItem(stack);
+                fail = !isValidItem(stack);
             }
         }
         final List<SlotTransaction> transactions = new ArrayList<>();
@@ -395,7 +395,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         }
         final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
         if (this.itemStack != null && (!((LanternItemStack) this.itemStack).similarTo(stack)
-                || this.itemStack.getQuantity() >= maxStackSize) || !this.isValidItem(stack)) {
+                || this.itemStack.getQuantity() >= maxStackSize) || !isValidItem(stack)) {
             return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
         }
         // Get the amount of space we have left

@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
+import org.lanternpowered.server.block.tile.ITileEntityInventory;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.element.ElementListener;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
@@ -48,7 +50,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.Furnace;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
@@ -66,11 +67,13 @@ import javax.annotation.Nullable;
 
 public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior {
 
-    private class FurnaceInventory extends LanternOrderedInventory implements TileEntityInventory<TileEntityCarrier>, IFurnaceInventory {
+    private class FurnaceInventory extends LanternOrderedInventory implements ITileEntityInventory, IFurnaceInventory {
 
         private final LanternInputSlot inputSlot;
         private final LanternFuelSlot fuelSlot;
         private final LanternOutputSlot outputSlot;
+
+        @Nullable private SmeltingProgressProperty cachedProperty;
 
         FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
             super(parent, name);
@@ -84,29 +87,19 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
         @SuppressWarnings("unchecked")
         @Override
-        protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
-            if (property == SmeltingProgressProperty.class) {
-                return Optional.of((T) new SmeltingProgressProperty(new SmeltingProgress(
-                        get(Keys.MAX_BURN_TIME).get(),
-                        get(Keys.PASSED_BURN_TIME).get(),
-                        get(Keys.MAX_COOK_TIME).get(),
-                        get(Keys.PASSED_COOK_TIME).get())));
+        protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> propertyType, @Nullable Object key) {
+            if (propertyType == SmeltingProgressProperty.class) {
+                SmeltingProgressProperty property = this.cachedProperty;
+                if (property == null) {
+                    property = this.cachedProperty = new SmeltingProgressProperty(new SmeltingProgress(
+                            get(Keys.MAX_BURN_TIME).get(),
+                            get(Keys.PASSED_BURN_TIME).get(),
+                            get(Keys.MAX_COOK_TIME).get(),
+                            get(Keys.PASSED_COOK_TIME).get()));
+                }
+                return Optional.of((T) property);
             }
-            return super.tryGetProperty(property, key);
-        }
-
-        @Override
-        public void markDirty() {
-        }
-
-        @Override
-        public boolean canInteractWith(Player player) {
-            return true;
-        }
-
-        @Override
-        public Optional<TileEntityCarrier> getCarrier() {
-            return Optional.of(LanternFurnace.this);
+            return super.tryGetProperty(propertyType, key);
         }
 
         @Override
@@ -126,10 +119,11 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         super.registerKeys();
 
         final ValueCollection c = getValueCollection();
-        c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE);
-        c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME);
-        c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE);
-        c.register(Keys.PASSED_COOK_TIME, 0, 0, Keys.MAX_COOK_TIME);
+        final ElementListener<Integer> clearProperty = (oldElement, newElement) -> this.inventory.cachedProperty = null;
+        c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
+        c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME).addListener(clearProperty);
+        c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
+        c.register(Keys.PASSED_COOK_TIME, 0, 0, Keys.MAX_COOK_TIME).addListener(clearProperty);
     }
 
     @Override

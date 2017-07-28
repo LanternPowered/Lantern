@@ -97,7 +97,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         this.containers.remove(container);
     }
 
-    private void queueUpdate() {
+    protected void queueUpdate() {
         for (SlotChangeListener listener : this.changeListeners) {
             listener.accept(this);
         }

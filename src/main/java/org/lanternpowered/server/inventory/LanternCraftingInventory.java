@@ -43,7 +43,7 @@ import javax.annotation.Nullable;
 
 public class LanternCraftingInventory extends LanternGridInventory implements CraftingInventory {
 
-    private CraftingGridInventory gridInventory;
+    private CraftingGridInventory craftingGrid;
     private CraftingOutput craftingOutput;
 
     public LanternCraftingInventory(@Nullable Inventory parent) {
@@ -60,7 +60,7 @@ public class LanternCraftingInventory extends LanternGridInventory implements Cr
         super.finalizeContent();
 
         try {
-            this.gridInventory = query(CraftingGridInventory.class).first();
+            this.craftingGrid = query(CraftingGridInventory.class).first();
         } catch (ClassCastException e) {
             throw new IllegalStateException("Unable to find the CraftingGridInventory");
         }
@@ -82,7 +82,7 @@ public class LanternCraftingInventory extends LanternGridInventory implements Cr
 
     @Override
     public CraftingGridInventory getCraftingGrid() {
-        return this.gridInventory;
+        return this.craftingGrid;
     }
 
     @Override

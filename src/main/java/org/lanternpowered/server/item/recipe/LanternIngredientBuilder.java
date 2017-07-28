@@ -143,7 +143,7 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         checkNotNull(items, "items");
         for (ItemStack item : items) {
             checkNotNull(item, "item");
-            this.matchers.add(itemStack -> LanternItemStack.isSimilar(itemStack, item));
+            this.matchers.add(itemStack -> LanternItemStack.similarTo(itemStack, item));
         }
         return withDisplay(items);
     }

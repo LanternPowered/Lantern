@@ -77,9 +77,9 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
 
     @Override
     public void registerDefaults() {
-        this.register(LanternTileEntityType.of("minecraft", "furnace", LanternFurnace::new));
         register(LanternTileEntityType.of("minecraft", "chest", LanternChest::new));
         register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
+        register(LanternTileEntityType.of("minecraft", "furnace", LanternFurnace::new));
         register(LanternTileEntityType.of("minecraft", "jukebox", LanternJukebox::new));
         register(LanternTileEntityType.of("minecraft", "noteblock", LanternNote::new));
         register(LanternTileEntityType.of("minecraft", "shulker_box", LanternShulkerBox::new));

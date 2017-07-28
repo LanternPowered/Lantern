@@ -640,11 +640,11 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
                 .registerModule(new AdvancementTreeRegistryModule())
                 .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
+                .registerModule(RecordType.class, RecordTypeRegistryModule.get())
+                .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 // Recipes
                 .registerModule(CraftingRecipe.class, this.craftingRecipeRegistry.getRegistryModule())
                 .registerModule(ISmeltingRecipe.class, this.smeltingRecipeRegistry.getRegistryModule())
-                .registerModule(RecordType.class, RecordTypeRegistryModule.get())
-                .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 .registerModule(IFuel.class, this.fuelRegistryModule)
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())

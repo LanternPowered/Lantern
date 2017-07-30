@@ -63,7 +63,6 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
 
     private final ValueCollection valueCollection;
     private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers;
-
     private final ItemType itemType;
 
     private int quantity;

@@ -32,7 +32,6 @@ import org.lanternpowered.server.inventory.AbstractMutableInventory;
 import org.lanternpowered.server.inventory.FastOfferResult;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.PeekPollTransactionsResult;
 import org.lanternpowered.server.inventory.PeekSetTransactionsResult;

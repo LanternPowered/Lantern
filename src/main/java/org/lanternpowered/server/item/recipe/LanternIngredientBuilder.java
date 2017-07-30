@@ -125,7 +125,7 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
     public IIngredient.Builder with(GameDictionary.Entry entry) {
         checkNotNull(entry, "entry");
         this.matchers.add(entry::matches);
-        return this;
+        return withDisplay(entry.getTemplate());
     }
 
     @Override
@@ -133,7 +133,8 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         checkNotNull(items, "items");
         for (ItemStackSnapshot item : items) {
             checkNotNull(item, "item");
-            with(item.createStack());
+            final ItemStack item1 = item.createStack();
+            this.matchers.add(itemStack -> LanternItemStack.similarTo(itemStack, item1));
         }
         return withDisplay(items);
     }
@@ -143,7 +144,8 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         checkNotNull(items, "items");
         for (ItemStack item : items) {
             checkNotNull(item, "item");
-            this.matchers.add(itemStack -> LanternItemStack.similarTo(itemStack, item));
+            final ItemStack item1 = item.copy(); // Create a copy to be safe
+            this.matchers.add(itemStack -> LanternItemStack.similarTo(itemStack, item1));
         }
         return withDisplay(items);
     }
@@ -191,10 +193,12 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
     @Override
     public IIngredient build() {
         checkState(!this.matchers.isEmpty(), "At least one matcher must be added");
+        checkState(!this.displayItems.isEmpty(), "At least one displayItem must be added");
         IIngredientQuantityProvider quantityProvider = this.quantityProvider;
         if (quantityProvider == null) {
             quantityProvider = DEFAULT_QUANTITY_PROVIDER;
         }
-        return new LanternIngredient(Predicates.or(this.matchers), quantityProvider, this.displayItems, this.remainingItemProvider);
+        return new LanternIngredient(Predicates.or(this.matchers), quantityProvider,
+                new ArrayList<>(this.displayItems), this.remainingItemProvider);
     }
 }

@@ -107,20 +107,20 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
      * and y coordinates within the {@link CraftingMatrix}.
      *
      * @param craftingMatrix The crafting matrix
-     * @param x The initial x coordinate
-     * @param y The initial y coordinate
+     * @param startX The initial x coordinate
+     * @param startY The initial y coordinate
      * @return Whether the recipe matches
      */
     @Nullable
-    private Result matchAt(CraftingMatrix craftingMatrix, int x, int y, int flags) {
+    private Result matchAt(CraftingMatrix craftingMatrix, int startX, int startY, int flags) {
         final int cw = craftingMatrix.width();
         final int ch = craftingMatrix.height();
 
         final int rw = getWidth();
         final int rh = getHeight();
 
-        final int ew = x + rw;
-        final int eh = y + rh;
+        final int ew = startX + rw;
+        final int eh = startY + rh;
 
         // The recipe no longer fits within the grid when starting from the coordinates
         if (ew > cw || eh > ch) {
@@ -133,18 +133,19 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         final Multimap<Ingredient, ItemStack> ingredientItems = resultItem &&
                 !(this.resultProvider instanceof ConstantCraftingResultProvider) ? HashMultimap.create() : null;
 
-        for (int j = 0; j < rh; j++) {
-            for (int i = 0; i < rw; i++) {
-                final ItemStack itemStack = craftingMatrix.get(x + i, y + j);
-                final IIngredient ingredient = this.ingredients[i][j];
+        for (int y = 0; y < ch; y++) {
+            for (int x = 0; x < cw; x++) {
+                final ItemStack itemStack = craftingMatrix.get(x, y);
+                final int i = x - startX;
+                final int j = y - startY;
+                final IIngredient ingredient = i < 0 || i >= rw || j < 0 || j >= rh ? null : this.ingredients[i][j];
                 if (ingredient == null) {
                     if (itemStack.isEmpty()) {
                         continue;
                     }
                     return null;
                 }
-                if (ingredient.test(LanternItemStack.orEmpty(itemStack)) &&
-                        itemStack.getQuantity() >= ingredient.getQuantity(itemStack)) {
+                if (!ingredient.test(itemStack) || itemStack.getQuantity() < ingredient.getQuantity(itemStack)) {
                     return null;
                 }
                 if (ingredientItems != null) {
@@ -176,7 +177,7 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
                     if (ingredient != null) {
                         final Optional<ItemStack> remainingItem = ingredient.getRemainingItem(craftingMatrix.get(i, j));
                         if (remainingItem.isPresent()) {
-                            builder.set((j + y) * cw + (i + x), LanternItemStack.toSnapshot(remainingItem.get()));
+                            builder.set((j + startY) * cw + (i + startX), LanternItemStack.toSnapshot(remainingItem.get()));
                         }
                     }
                 }

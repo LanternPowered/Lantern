@@ -50,7 +50,7 @@ public class LanternSmeltingRecipeRegistryModule extends LanternRecipeRegistryMo
     @DelayedRegistration(RegistrationPhase.POST_INIT)
     @Override
     public void registerDefaults() {
-        PluginContainer plugin = Lantern.getMinecraftPlugin();
+        final PluginContainer plugin = Lantern.getMinecraftPlugin();
         register(ISmeltingRecipe.builder()
                 .ingredient(ItemTypes.COBBLESTONE)
                 .result(ItemStack.of(ItemTypes.STONE, 1))

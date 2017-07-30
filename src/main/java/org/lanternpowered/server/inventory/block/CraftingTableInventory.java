@@ -34,21 +34,22 @@ import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
-public class WorkbenchInventory extends LanternCraftingInventory {
+public class CraftingTableInventory extends LanternCraftingInventory implements ICraftingTableInventory {
 
-    public WorkbenchInventory(@Nullable Inventory parent, @Nullable Translation name) {
+    public CraftingTableInventory(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
 
-        this.registerSlot(new LanternCraftingOutput(this));
-        this.registerChild(new LanternCraftingGridInventory(this) {
+        registerSlot(new LanternCraftingOutput(this));
+        registerChild(new LanternCraftingGridInventory(this) {
             {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 3; x++) {
-                        this.registerSlotAt(x, y, new LanternCraftingInput(this));
+                        registerSlotAt(x, y, new LanternCraftingInput(this));
                     }
                 }
-                this.finalizeContent();
+                finalizeContent();
             }
         });
+        finalizeContent();
     }
 }

@@ -48,7 +48,7 @@ public class FurnaceInventoryContainer extends LanternContainer {
     @Nullable private SmeltingProgress lastProgress;
 
     public FurnaceInventoryContainer(LanternPlayerInventory humanInventory, IFurnaceInventory openInventory) {
-        super(openInventory.getName(), humanInventory, openInventory);
+        super(humanInventory, openInventory);
     }
 
     @Override

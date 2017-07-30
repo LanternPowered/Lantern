@@ -55,6 +55,7 @@ import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.CraftingTableInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
@@ -930,6 +931,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(hardness(2.5))
                                 .add(blastResistance(12.5)))
                         .translation("tile.workbench.name")
+                        .behaviors(pipeline -> pipeline
+                                .add(new CraftingTableInteractionBehavior()))
                         .build("minecraft", "crafting_table"));
         // TODO: Wheat
         ////////////////////

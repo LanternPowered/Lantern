@@ -59,8 +59,10 @@ import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.block.EnderChestInventory;
 import org.lanternpowered.server.inventory.block.IChestInventory;
+import org.lanternpowered.server.inventory.block.ICraftingTableInventory;
 import org.lanternpowered.server.inventory.block.IFurnaceInventory;
 import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
+import org.lanternpowered.server.inventory.container.CraftingTableInventoryContainer;
 import org.lanternpowered.server.inventory.container.FurnaceInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.item.CooldownTracker;
@@ -908,6 +910,8 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
             container = new ChestInventoryContainer(this.inventory, (IChestInventory) inventory);
         } else if (inventory instanceof IFurnaceInventory) {
             container = new FurnaceInventoryContainer(this.inventory, (IFurnaceInventory) inventory);
+        } else if (inventory instanceof ICraftingTableInventory) {
+            container = new CraftingTableInventoryContainer(this.inventory, (ICraftingTableInventory) inventory);
         } else if (inventory instanceof PlayerInventory) {
             return Optional.empty();
         } else {

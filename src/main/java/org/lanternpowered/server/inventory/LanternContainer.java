@@ -74,6 +74,18 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
      * used as the bottom inventory and also as top inventory if {@code null} is provided
      * for the inventory that should be opened.
      *
+     * @param playerInventory The player inventory
+     * @param openInventory The inventory to open
+     */
+    public LanternContainer(LanternPlayerInventory playerInventory, @Nullable OrderedInventory openInventory) {
+        this(openInventory != null ? openInventory.getName() : null, playerInventory, openInventory);
+    }
+
+    /**
+     * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
+     * used as the bottom inventory and also as top inventory if {@code null} is provided
+     * for the inventory that should be opened.
+     *
      * @param name The name of the container
      * @param playerInventory The player inventory
      * @param openInventory The inventory to open

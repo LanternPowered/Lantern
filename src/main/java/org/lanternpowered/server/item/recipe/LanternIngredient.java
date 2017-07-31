@@ -35,7 +35,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-final class LanternIngredient implements IIngredient {
+public final class LanternIngredient implements IIngredient {
 
     final Predicate<ItemStack> matcher;
     final IIngredientQuantityProvider quantityProvider;
@@ -74,5 +74,9 @@ final class LanternIngredient implements IIngredient {
     @Override
     public List<ItemStackSnapshot> displayedItems() {
         return this.displayedItems;
+    }
+
+    public IIngredientQuantityProvider getQuantityProvider() {
+        return this.quantityProvider;
     }
 }

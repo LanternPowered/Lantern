@@ -31,6 +31,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.item.recipe.ConstantIngredientQuantityProvider;
+import org.lanternpowered.server.item.recipe.LanternIngredient;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -75,6 +77,9 @@ public class LanternShapelessCraftingRecipeBuilder implements IShapelessCrafting
     @Override
     public IShapelessCraftingRecipe.Builder.ResultStep addIngredient(Ingredient ingredient) {
         checkNotNull(ingredient, "ingredient");
+        if (ingredient != null && !(((LanternIngredient) ingredient).getQuantityProvider() instanceof ConstantIngredientQuantityProvider)) {
+            throw new IllegalArgumentException("Crafting recipes don't support multiple input items on one slot.");
+        }
         this.ingredients.add(ingredient);
         return this;
     }
@@ -83,7 +88,7 @@ public class LanternShapelessCraftingRecipeBuilder implements IShapelessCrafting
     public IShapelessCraftingRecipe.Builder.ResultStep addIngredients(Ingredient ingredient, int times) {
         checkNotNull(ingredient, "ingredient");
         for (int i = 0; i < times; i++) {
-            this.ingredients.add(ingredient);
+            addIngredient(ingredient);
         }
         return this;
     }

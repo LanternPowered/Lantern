@@ -145,7 +145,7 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
                     }
                     return null;
                 }
-                if (!ingredient.test(itemStack) || itemStack.getQuantity() < ingredient.getQuantity(itemStack)) {
+                if (!ingredient.test(itemStack)) {
                     return null;
                 }
                 if (ingredientItems != null) {

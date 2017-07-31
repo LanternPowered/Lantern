@@ -31,7 +31,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.World;
@@ -88,11 +87,6 @@ public class LanternCraftingInventory extends LanternGridInventory implements Cr
     @Override
     public CraftingOutput getResult() {
         return this.craftingOutput;
-    }
-
-    @Override
-    public Optional<CraftingRecipe> getRecipe(World world) {
-        return this.craftingGrid.getRecipe(world);
     }
 
     /**

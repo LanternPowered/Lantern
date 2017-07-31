@@ -226,7 +226,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                 final EquipmentType equipmentType = Holder.EQUIPMENT_TYPES[i];
                 final ItemStack itemStack = inventory.query(equipmentType).first().peek().orElse(null);
                 final ItemStack oldItemStack = this.lastEquipment.get(i);
-                if (!LanternItemStack.similarTo(itemStack, oldItemStack)) {
+                if (!LanternItemStack.areSimilar(itemStack, oldItemStack)) {
                     this.lastEquipment.put(i, itemStack);
                     final int slotIndex = i;
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));

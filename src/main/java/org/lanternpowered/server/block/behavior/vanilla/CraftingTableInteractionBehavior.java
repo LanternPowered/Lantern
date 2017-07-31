@@ -34,6 +34,7 @@ import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.inventory.block.CraftingTableInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.item.inventory.Container;
 
 import java.util.Optional;
 
@@ -43,8 +44,11 @@ public class CraftingTableInteractionBehavior implements InteractWithBlockBehavi
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
         if (optPlayer.isPresent()) {
-            optPlayer.get().openInventory(new CraftingTableInventory(null, null), Cause.source(optPlayer.get()).build());
-            return BehaviorResult.SUCCESS;
+            final Optional<Container> optContainer = optPlayer.get().openInventory(
+                    new CraftingTableInventory(optPlayer.get().getInventory(), null), Cause.source(optPlayer.get()).build());
+            if (optContainer.isPresent()) {
+                return BehaviorResult.SUCCESS;
+            }
         }
         return BehaviorResult.PASS;
     }

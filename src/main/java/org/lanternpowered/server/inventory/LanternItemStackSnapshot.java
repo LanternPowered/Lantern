@@ -211,10 +211,4 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
         checkNotNull(that, "that");
         return getType() == that.getType() && IValueContainer.matchContents(this.itemStack, (IValueContainer) that);
     }
-
-    public static boolean similarTo(@Nullable ItemStackSnapshot itemStackA, @Nullable ItemStackSnapshot itemStackB) {
-        //noinspection SimplifiableConditionalExpression
-        return itemStackA == itemStackB ? true : itemStackA == null || itemStackB == null ? false :
-                ((LanternItemStackSnapshot) itemStackA).similarTo(itemStackB);
-    }
 }

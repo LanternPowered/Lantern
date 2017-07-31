@@ -253,10 +253,28 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
         return getType() == that.getType() && IValueContainer.matchContents(this, (IValueContainer) that);
     }
 
-    public static boolean similarTo(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
+    public static boolean areSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
         //noinspection SimplifiableConditionalExpression
         return itemStackA == itemStackB ? true : itemStackA == null || itemStackB == null ? false :
                 ((LanternItemStack) itemStackA).similarTo(itemStackB);
+    }
+
+    public static boolean areSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStackSnapshot itemStackB) {
+        //noinspection SimplifiableConditionalExpression
+        return itemStackA == ((LanternItemStackSnapshot) itemStackB).itemStack ? true : itemStackA == null || itemStackB == null ? false :
+                ((LanternItemStack) itemStackA).similarTo(itemStackB);
+    }
+
+    public static boolean areSimilar(@Nullable ItemStackSnapshot itemStackA, @Nullable ItemStack itemStackB) {
+        //noinspection SimplifiableConditionalExpression
+        return itemStackB == ((LanternItemStackSnapshot) itemStackA).itemStack ? true : itemStackA == null || itemStackB == null ? false :
+                ((LanternItemStack) itemStackB).similarTo(itemStackA);
+    }
+
+    public static boolean areSimilar(@Nullable ItemStackSnapshot itemStackA, @Nullable ItemStackSnapshot itemStackB) {
+        //noinspection SimplifiableConditionalExpression
+        return ((LanternItemStackSnapshot) itemStackA).itemStack == ((LanternItemStackSnapshot) itemStackA).itemStack ? true :
+                itemStackA == null || itemStackB == null ? false : ((LanternItemStackSnapshot) itemStackB).itemStack.similarTo(itemStackA);
     }
 
     @Override

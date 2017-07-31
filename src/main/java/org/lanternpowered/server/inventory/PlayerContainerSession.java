@@ -464,7 +464,7 @@ public class PlayerContainerSession {
                             int quantity = -1;
                             if (this.cursorItem == null) {
                                 quantity = resultItem.getQuantity();
-                            } else if (LanternItemStack.similarTo(resultItem.createStack(), this.cursorItem)) {
+                            } else if (LanternItemStack.areSimilar(resultItem.createStack(), this.cursorItem)) {
                                 final int quantity1 = resultItem.getQuantity() + this.cursorItem.getQuantity();
                                 if (quantity1 < this.cursorItem.getMaxStackQuantity()) {
                                     quantity = quantity1;

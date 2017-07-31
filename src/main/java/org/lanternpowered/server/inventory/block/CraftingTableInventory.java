@@ -25,12 +25,19 @@
  */
 package org.lanternpowered.server.inventory.block;
 
+import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.World;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -51,5 +58,19 @@ public class CraftingTableInventory extends LanternCraftingInventory implements 
             }
         });
         finalizeContent();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    @Override
+    protected World getWorld() {
+        final AbstractInventory parent = parent();
+        if (parent instanceof CarriedInventory) {
+            final Optional<Carrier> optCarrier = ((CarriedInventory<Carrier>) parent).getCarrier();
+            if (optCarrier.isPresent() && optCarrier.get() instanceof Locatable) {
+                return ((Locatable) optCarrier.get()).getWorld();
+            }
+        }
+        return super.getWorld();
     }
 }

@@ -134,7 +134,7 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         for (ItemStackSnapshot item : items) {
             checkNotNull(item, "item");
             final ItemStack item1 = item.createStack();
-            this.matchers.add(itemStack -> LanternItemStack.similarTo(itemStack, item1));
+            this.matchers.add(itemStack -> LanternItemStack.areSimilar(itemStack, item1));
         }
         return withDisplay(items);
     }
@@ -145,7 +145,7 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         for (ItemStack item : items) {
             checkNotNull(item, "item");
             final ItemStack item1 = item.copy(); // Create a copy to be safe
-            this.matchers.add(itemStack -> LanternItemStack.similarTo(itemStack, item1));
+            this.matchers.add(itemStack -> LanternItemStack.areSimilar(itemStack, item1));
         }
         return withDisplay(items);
     }

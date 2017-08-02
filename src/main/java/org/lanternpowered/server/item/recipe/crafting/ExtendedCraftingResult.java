@@ -77,7 +77,7 @@ public final class ExtendedCraftingResult {
         itemStack.setQuantity(itemStack.getQuantity() * times);
         return itemStack;
     }
-    
+
     /**
      * Gets the {@link MatrixResult}.
      *
@@ -96,13 +96,14 @@ public final class ExtendedCraftingResult {
                     itemStack.setQuantity(itemStack.getQuantity() -
                             (this.itemQuantities == null ? 1 : this.itemQuantities[x][y]) * times);
                 }
-                final ItemStackSnapshot itemStackSnapshot = remaining.get(y + w * x);
+                final ItemStackSnapshot itemStackSnapshot = remaining.get(y * w + x);
                 if (!itemStackSnapshot.isEmpty()) {
                     int quantity;
                     final boolean flag = LanternItemStack.areSimilar(itemStack, itemStackSnapshot);
                     if (itemStack.isEmpty() || flag) {
                         if (!flag) {
                             itemStack = itemStackSnapshot.createStack();
+                            matrix.set(x, y, itemStack);
                         }
                         final int max = itemStack.getMaxStackQuantity();
                         quantity = itemStack.getQuantity() * times;

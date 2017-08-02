@@ -353,8 +353,8 @@ public class PlayerContainerSession {
             for (int y = 0; y < matrix.height(); y++) {
                 final ItemStack itemStack = matrix.get(x, y);
                 final Slot slot = grid.getSlot(x, y).get();
-                transactions.add(new SlotTransaction(slot, slot.peek().map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE),
-                        itemStack.createSnapshot()));
+                transactions.add(new SlotTransaction(slot, slot.peek().map(LanternItemStackSnapshot::wrap)
+                        .orElse(LanternItemStackSnapshot.none()), LanternItemStackSnapshot.wrap(itemStack)));
             }
         }
 

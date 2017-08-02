@@ -59,6 +59,15 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
         AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
     /**
+     * Gets the {@link ItemStackSnapshot#NONE} as a {@link LanternItemStackSnapshot}.
+     *
+     * @return The none item stack snapshot
+     */
+    public static LanternItemStackSnapshot none() {
+        return (LanternItemStackSnapshot) ItemStackSnapshot.NONE;
+    }
+
+    /**
      * Creates {@link LanternItemStackSnapshot} by wrapping the {@link ItemStack},
      * this DOES NOT COPY the {@link ItemStack}. Use {@link ItemStack#createSnapshot()}
      * in that case. This method may only be used with extra care, only when the

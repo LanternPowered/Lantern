@@ -60,4 +60,9 @@ final class SimpleCraftingMatrix implements CraftingMatrix {
     public int height() {
         return this.grid.getRows();
     }
+
+    @Override
+    public CraftingMatrix copy() {
+        return new SimpleCraftingMatrix(this.grid);
+    }
 }

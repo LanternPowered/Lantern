@@ -47,4 +47,6 @@ abstract class LanternCraftingRecipe extends LanternRecipe implements ISimpleCra
     public Optional<String> getGroup() {
         return Optional.ofNullable(this.group);
     }
+
+
 }

@@ -27,16 +27,16 @@ package org.lanternpowered.server.item.recipe.crafting;
 
 import org.lanternpowered.server.item.recipe.LanternRecipeRegistry;
 import org.lanternpowered.server.item.recipe.LanternRecipeRegistryModule;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
-import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
 public class LanternCraftingRecipeRegistry extends LanternRecipeRegistry<CraftingRecipe, CraftingRecipe>
-        implements CraftingRecipeRegistry {
+        implements ICraftingRecipeRegistry {
 
     public LanternCraftingRecipeRegistry(LanternRecipeRegistryModule<CraftingRecipe> registryModule) {
         super(registryModule);
@@ -63,14 +63,49 @@ public class LanternCraftingRecipeRegistry extends LanternRecipeRegistry<Craftin
     public Optional<CraftingResult> getResult(CraftingGridInventory grid, World world) {
         final CraftingMatrix craftingMatrix = CraftingMatrix.of(grid);
         for (CraftingRecipe recipe : getRecipes()) {
-            final Optional<CraftingResult> result;
+            final Optional<CraftingResult> optResult;
             if (recipe instanceof ICraftingRecipe) {
-                result = ((ICraftingRecipe) recipe).getResult(craftingMatrix, world);
+                optResult = ((ICraftingRecipe) recipe).getResult(craftingMatrix, world);
             } else {
-                result = recipe.getResult(grid, world);
+                optResult = recipe.getResult(grid, world);
             }
-            if (result.isPresent()) {
-                return result;
+            if (optResult.isPresent()) {
+                return optResult;
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ExtendedCraftingResult> getExtendedResult(CraftingGridInventory grid, World world, int timesLimit) {
+        final CraftingMatrix craftingMatrix = CraftingMatrix.of(grid);
+        for (CraftingRecipe recipe : getRecipes()) {
+            final Optional<ExtendedCraftingResult> optResult;
+            if (recipe instanceof ICraftingRecipe) {
+                optResult = ((ICraftingRecipe) recipe).getExtendedResult(craftingMatrix, world, timesLimit);
+            } else {
+                optResult = recipe.getResult(grid, world).map(result -> {
+                    // Just assume that normal recipes only decrease one item per slot
+                    int maxTimes = -1;
+                    for (int x = 0; x < craftingMatrix.width(); x++) {
+                        for (int y = 0; y < craftingMatrix.height(); y++) {
+                            final ItemStack itemStack = craftingMatrix.get(x, y);
+                            if (!itemStack.isEmpty()) {
+                                final int times1 = itemStack.getQuantity();
+                                if (maxTimes == -1 || times1 < maxTimes) {
+                                    maxTimes = times1;
+                                }
+                            }
+                        }
+                    }
+                    if (maxTimes > timesLimit) {
+                        maxTimes = timesLimit;
+                    }
+                    return new ExtendedCraftingResult(result, craftingMatrix, maxTimes);
+                });
+            }
+            if (optResult.isPresent()) {
+                return optResult;
             }
         }
         return Optional.empty();

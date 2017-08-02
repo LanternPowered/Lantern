@@ -36,10 +36,12 @@ import org.spongepowered.api.world.World;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 /**
  * A extension of {@link CraftingRecipe} that avoids making multiple
  * copies of {@link ItemStack}s that can be reused. All the {@link ItemStack}s
- * in the grid arrays may NOT BE MODIFIED, otherwise next operations
+ * in the {@link CraftingMatrix} may NOT BE MODIFIED, otherwise next operations
  * may end up in trouble, always make a copy of these stacks if you want
  * to use them.
  */
@@ -84,7 +86,31 @@ public interface ICraftingRecipe extends CraftingRecipe {
      * @param world The world
      * @return The crafting result if successful, otherwise {@link Optional#empty()}
      */
-    Optional<CraftingResult> getResult(CraftingMatrix craftingMatrix, World world);
+    default Optional<ExtendedCraftingResult> getExtendedResult(CraftingMatrix craftingMatrix, @Nullable World world) {
+        return getExtendedResult(craftingMatrix, world, 1);
+    }
+
+    /**
+     * Attempts to get a {@link CraftingResult} for the given
+     * {@link CraftingMatrix} and {@link World}.
+     *
+     * @param craftingMatrix The crafting matrix
+     * @param world The world
+     * @return The crafting result if successful, otherwise {@link Optional#empty()}
+     */
+    Optional<ExtendedCraftingResult> getExtendedResult(CraftingMatrix craftingMatrix, @Nullable World world, int timesLimit);
+
+    /**
+     * Attempts to get a {@link CraftingResult} for the given
+     * {@link CraftingMatrix} and {@link World}.
+     *
+     * @param craftingMatrix The crafting matrix
+     * @param world The world
+     * @return The crafting result if successful, otherwise {@link Optional#empty()}
+     */
+    default Optional<CraftingResult> getResult(CraftingMatrix craftingMatrix, World world) {
+        return getExtendedResult(craftingMatrix, world).map(ExtendedCraftingResult::getResult);
+    }
 
     @Override
     default boolean isValid(CraftingGridInventory grid, World world) {

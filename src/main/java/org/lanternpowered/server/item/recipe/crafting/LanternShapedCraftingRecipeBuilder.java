@@ -31,9 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
-import org.lanternpowered.server.item.recipe.ConstantIngredientQuantityProvider;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.lanternpowered.server.item.recipe.LanternIngredient;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -72,9 +70,6 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
 
     @Override
     public AisleStep.ResultStep where(char symbol, @Nullable Ingredient ingredient) throws IllegalArgumentException {
-        if (ingredient != null && !(((LanternIngredient) ingredient).getQuantityProvider() instanceof ConstantIngredientQuantityProvider)) {
-            throw new IllegalArgumentException("Crafting recipes don't support multiple input items on one slot.");
-        }
         if (this.aisle.stream().noneMatch(row -> row.indexOf(symbol) >= 0)) {
             throw new IllegalArgumentException("The symbol '" + symbol + "' is not defined in the aisle pattern.");
         }

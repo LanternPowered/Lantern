@@ -70,4 +70,11 @@ public interface CraftingMatrix {
      * @return The height
      */
     int height();
+
+    /**
+     * Creates a copy of this {@link CraftingMatrix}.
+     *
+     * @return The copy
+     */
+    CraftingMatrix copy();
 }

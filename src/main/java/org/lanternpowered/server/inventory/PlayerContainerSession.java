@@ -26,6 +26,7 @@
 package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
@@ -33,6 +34,7 @@ import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.item.recipe.crafting.ExtendedCraftingResult;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
@@ -634,7 +636,48 @@ public class PlayerContainerSession {
                 if (slot instanceof CraftingOutput) {
                     final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
                     cursorTransaction = new Transaction<>(cursorItem, cursorItem);
-                    // TODO
+
+                    final AbstractInventory parent = slot.parent();
+                    if (parent instanceof CraftingInventory) {
+                        final CraftingInventory inventory = (CraftingInventory) parent;
+                        final Optional<ExtendedCraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
+                                .getExtendedResult(inventory.getCraftingGrid(), this.player.getWorld());
+                        if (optResult.isPresent()) {
+                            final ExtendedCraftingResult result = optResult.get();
+                            final ItemStackSnapshot resultItem = result.getResult().getResult();
+
+                            int times = result.getMaxTimes();
+                            final ItemStack itemStack1 = resultItem.createStack();
+                            itemStack1.setQuantity(times * itemStack1.getQuantity());
+
+                            final AbstractMutableInventory targetInventory = this.openContainer.playerInventory
+                                    .getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
+                            PeekOfferTransactionsResult peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
+
+                            if (peekResult.getOfferResult().isSuccess()) {
+                                transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
+
+                                final ItemStack restItem = peekResult.getOfferResult().getRest();
+                                if (restItem != null) {
+                                    final int added = itemStack1.getQuantity() - restItem.getQuantity();
+                                    times = added / resultItem.getQuantity();
+                                    final int diff = added % resultItem.getQuantity();
+                                    if (diff != 0) {
+                                        itemStack1.setQuantity(resultItem.getQuantity() * times);
+                                        peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
+                                        checkState(peekResult.getOfferResult().isSuccess());
+                                    }
+                                }
+                                transactions.addAll(peekResult.getTransactions());
+                            }
+                        } else {
+                            // No actual transaction, there shouldn't have been a item in the crafting result slot
+                            transactions.add(new SlotTransaction(slot, ItemStackSnapshot.NONE, ItemStackSnapshot.NONE));
+                        }
+                    } else {
+                        Lantern.getLogger().warn("Found a CraftingOutput slot without a CraftingInventory as parent.");
+                        return;
+                    }
                 } else {
                     final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
                     cursorTransaction = new Transaction<>(cursorItem, cursorItem);
@@ -644,14 +687,14 @@ public class PlayerContainerSession {
                         final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
                         final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, mainInventory, itemStack.copy(), offhand);
 
-                    // Force updates if the max stack size on the client and server don't match
-                    final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
-                    if (itemStack.getMaxStackQuantity() != originalMaxStackSize) {
-                        final LanternItemStack tempStack = (LanternItemStack) itemStack.copy();
-                        tempStack.setTempMaxQuantity(originalMaxStackSize);
-                        final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(windowId, slot, mainInventory, tempStack, offhand);
-                        result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
-                    }
+                        // Force updates if the max stack size on the client and server don't match
+                        final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+                        if (itemStack.getMaxStackQuantity() != originalMaxStackSize) {
+                            final LanternItemStack tempStack = (LanternItemStack) itemStack.copy();
+                            tempStack.setTempMaxQuantity(originalMaxStackSize);
+                            final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(windowId, slot, mainInventory, tempStack, offhand);
+                            result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
+                        }
 
                         if (result.getOfferResult().isSuccess()) {
                             transactions.addAll(result.getTransactions());

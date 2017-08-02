@@ -196,6 +196,7 @@ import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.LanternIngredientBuilder;
 import org.lanternpowered.server.item.recipe.LanternRecipeRegistryModule;
+import org.lanternpowered.server.item.recipe.crafting.ICraftingRecipeRegistry;
 import org.lanternpowered.server.item.recipe.crafting.IShapedCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.IShapelessCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistry;
@@ -1090,7 +1091,7 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public CraftingRecipeRegistry getCraftingRecipeRegistry() {
+    public ICraftingRecipeRegistry getCraftingRecipeRegistry() {
         return this.craftingRecipeRegistry;
     }
 

@@ -28,7 +28,7 @@ package org.lanternpowered.server.item.recipe;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-public final class ConstantIngredientQuantityProvider implements IIngredientQuantityProvider {
+final class ConstantIngredientQuantityProvider implements IIngredientQuantityProvider {
 
     private final int quantity;
 

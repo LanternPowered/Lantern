@@ -39,13 +39,14 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implements IShapedCraftingRecipe {
+final class LanternShapedCraftingRecipe extends LanternCraftingRecipe implements IShapedCraftingRecipe {
 
     final ICraftingResultProvider resultProvider;
     private final IIngredient[][] ingredients;
@@ -90,9 +91,10 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         rw = w - rw + 1;
         rh = h - rh + 1;
 
+        int[][] itemQuantities = (flags & Flags.REMAINING_ITEMS) != 0 ? new int[w][h] : null;
         for (int i = 0; i < rw; i++) {
             for (int j = 0; j < rh; j++) {
-                final Result result = matchAt(craftingMatrix, i, j, flags);
+                final Result result = matchAt(craftingMatrix, i, j, flags, itemQuantities);
                 if (result != null) {
                     return Optional.of(result);
                 }
@@ -100,6 +102,12 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         }
 
         return Optional.empty();
+    }
+
+    private static void fill(int[][] matrix, int value) {
+        for (int[] array : matrix) {
+            Arrays.fill(array, value);
+        }
     }
 
     /**
@@ -112,7 +120,10 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
      * @return Whether the recipe matches
      */
     @Nullable
-    private Result matchAt(CraftingMatrix craftingMatrix, int startX, int startY, int flags) {
+    private Result matchAt(CraftingMatrix craftingMatrix, int startX, int startY, int flags, int[][] itemQuantities) {
+        // Clear the quantities
+        fill(itemQuantities, 0);
+
         final int cw = craftingMatrix.width();
         final int ch = craftingMatrix.height();
 
@@ -133,6 +144,8 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
         final Multimap<Ingredient, ItemStack> ingredientItems = resultItem &&
                 !(this.resultProvider instanceof ConstantCraftingResultProvider) ? HashMultimap.create() : null;
 
+        int times = -1;
+
         for (int y = 0; y < ch; y++) {
             for (int x = 0; x < cw; x++) {
                 final ItemStack itemStack = craftingMatrix.get(x, y);
@@ -145,8 +158,14 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
                     }
                     return null;
                 }
-                if (!ingredient.test(itemStack)) {
+                final int quantity = ingredient.getQuantity(itemStack);
+                if (!ingredient.test(itemStack) || itemStack.getQuantity() < quantity) {
                     return null;
+                }
+                itemQuantities[x][y] = quantity;
+                final int times1 = itemStack.getQuantity() / quantity;
+                if (times == -1 || times1 < times) {
+                    times = times1;
                 }
                 if (ingredientItems != null) {
                     ingredientItems.put(ingredient, itemStack);
@@ -185,6 +204,6 @@ public class LanternShapedCraftingRecipe extends LanternCraftingRecipe implement
             remainingItemsList = ImmutableList.copyOf(builder);
         }
 
-        return new Result(resultItemStack, remainingItemsList);
+        return new Result(resultItemStack, remainingItemsList, itemQuantities, times);
     }
 }

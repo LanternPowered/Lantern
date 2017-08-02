@@ -45,4 +45,9 @@ final class EmptyCraftingMatrix implements CraftingMatrix {
     public int height() {
         return 1;
     }
+
+    @Override
+    public CraftingMatrix copy() {
+        return this;
+    }
 }

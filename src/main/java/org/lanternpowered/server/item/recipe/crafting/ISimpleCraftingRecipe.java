@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.item.recipe.crafting;
 
-import org.lanternpowered.server.item.recipe.crafting.CraftingMatrix;
-import org.lanternpowered.server.item.recipe.crafting.ICraftingRecipe;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.world.World;
@@ -63,11 +61,14 @@ public interface ISimpleCraftingRecipe extends ICraftingRecipe {
     }
 
     @Override
-    default Optional<CraftingResult> getResult(CraftingMatrix craftingMatrix, @Nullable World world) {
+    default Optional<ExtendedCraftingResult> getExtendedResult(CraftingMatrix craftingMatrix, @Nullable World world, int timesLimit) {
         return match(craftingMatrix, world, Flags.RESULT_ITEM | Flags.REMAINING_ITEMS)
-                .map(result -> new CraftingResult(
+                .map(result -> new ExtendedCraftingResult(new CraftingResult(
                         result.getResultItem().get(),
-                        result.getRemainingItems().get()));
+                        result.getRemainingItems().get()),
+                        craftingMatrix,
+                        result.getMaxTimes(),
+                        result.getItemQuantities()));
     }
 
     /**
@@ -106,16 +107,31 @@ public interface ISimpleCraftingRecipe extends ICraftingRecipe {
 
         @Nullable private final ItemStackSnapshot resultItem;
         @Nullable private final List<ItemStackSnapshot> remainingItems;
+        @Nullable private final int[][] itemQuantities;
+        private final int maxTimes;
 
         /**
          * Constructs a new {@link Result}.
-         *
-         * @param resultItem The result item
+         * @param resultItem The result item, not affected by the times
          * @param remainingItems The remaining items
+         * @param maxTimes The maximum amout of times the recipe can be applied
          */
-        public Result(@Nullable ItemStackSnapshot resultItem, @Nullable List<ItemStackSnapshot> remainingItems) {
-            this.resultItem = resultItem;
+        public Result(
+                @Nullable ItemStackSnapshot resultItem,
+                @Nullable List<ItemStackSnapshot> remainingItems,
+                int maxTimes) {
+            this(resultItem, remainingItems, null, maxTimes);
+        }
+
+        Result(
+                @Nullable ItemStackSnapshot resultItem,
+                @Nullable List<ItemStackSnapshot> remainingItems,
+                @Nullable int[][] itemQuantities,
+                int maxTimes) {
+            this.itemQuantities = itemQuantities;
             this.remainingItems = remainingItems;
+            this.resultItem = resultItem;
+            this.maxTimes = maxTimes;
         }
 
         /**
@@ -134,6 +150,15 @@ public interface ISimpleCraftingRecipe extends ICraftingRecipe {
          */
         public Optional<List<ItemStackSnapshot>> getRemainingItems() {
             return Optional.ofNullable(this.remainingItems);
+        }
+
+        public int getMaxTimes() {
+            return this.maxTimes;
+        }
+
+        @Nullable
+        int[][] getItemQuantities() {
+            return this.itemQuantities;
         }
     }
 }

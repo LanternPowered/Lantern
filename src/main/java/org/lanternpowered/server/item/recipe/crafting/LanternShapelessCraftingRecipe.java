@@ -81,6 +81,9 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
                 !(this.resultProvider instanceof ConstantCraftingResultProvider) ? HashMultimap.create() : null;
         final ImmutableList.Builder<ItemStackSnapshot> remainingItemsBuilder = remainingItems ? ImmutableList.builder() : null;
 
+        int times = -1;
+        int[][] itemQuantities = remainingItems ? new int[w][h] : null;
+
         for (int j = 0; j < h; j++) {
             for (int i = 0; i < w; i++) {
                 final ItemStack itemStack = craftingMatrix.get(i, j);
@@ -93,18 +96,28 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
                 Optional<ItemStack> remainingItem = Optional.empty();
                 boolean success = false;
                 while (it.hasNext()) {
-                    final Ingredient ingredient = it.next();
-                    if (ingredient.test(itemStack)) {
-                        if (ingredientItems != null) {
-                            ingredientItems.put(ingredient, itemStack);
-                        }
-                        if (remainingItemsBuilder != null) {
-                            remainingItem = ((IIngredient) ingredient).getRemainingItem(itemStack);
-                        }
-                        it.remove();
-                        success = true;
-                        break;
+                    final IIngredient ingredient = (IIngredient) it.next();
+                    if (!ingredient.test(itemStack)) {
+                        continue;
                     }
+                    final int quantity = ingredient.getQuantity(itemStack);
+                    if (quantity < itemStack.getQuantity()) {
+                        continue;
+                    }
+                    itemQuantities[i][j] = quantity;
+                    final int times1 = itemStack.getQuantity() / quantity;
+                    if (times == -1 || times1 < times) {
+                        times = times1;
+                    }
+                    if (ingredientItems != null) {
+                        ingredientItems.put(ingredient, itemStack);
+                    }
+                    if (remainingItemsBuilder != null) {
+                        remainingItem = ingredient.getRemainingItem(itemStack);
+                    }
+                    it.remove();
+                    success = true;
+                    break;
                 }
                 // A faulty input ingredient was found
                 if (!success) {
@@ -129,6 +142,6 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
             checkNotNull(resultItemStack, "Something funky happened.");
         }
 
-        return Optional.of(new Result(resultItemStack, remainingItemsBuilder == null ? null : remainingItemsBuilder.build()));
+        return Optional.of(new Result(resultItemStack, remainingItemsBuilder == null ? null : remainingItemsBuilder.build(), itemQuantities, times));
     }
 }

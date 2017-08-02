@@ -363,7 +363,7 @@ public class PlayerContainerSession {
                 .named(NamedCause.SOURCE, this.player)
                 .build();
         final List<Entity> entities = matrixResult.getRest().stream()
-                .map(itemStack -> createDroppedItem(itemStack.createSnapshot()))
+                .map(itemStack -> createDroppedItem(LanternItemStackSnapshot.wrap(itemStack)))
                 .collect(Collectors.toList());
         final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
         Sponge.getEventManager().post(event);

@@ -58,6 +58,19 @@ import javax.annotation.Nullable;
 public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDataHolder<ItemStackSnapshot>,
         AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
+    /**
+     * Creates {@link LanternItemStackSnapshot} by wrapping the {@link ItemStack},
+     * this DOES NOT COPY the {@link ItemStack}. Use {@link ItemStack#createSnapshot()}
+     * in that case. This method may only be used with extra care, only when the
+     * {@link ItemStack} you are working with won't change anymore, is "final".
+     *
+     * @param itemStack The item stack
+     * @return The item stack snapshot
+     */
+    public static LanternItemStackSnapshot wrap(ItemStack itemStack) {
+        return new LanternItemStackSnapshot((LanternItemStack) checkNotNull(itemStack, "itemStack"));
+    }
+
     final LanternItemStack itemStack;
     @Nullable private AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
 

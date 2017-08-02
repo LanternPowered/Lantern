@@ -50,8 +50,8 @@ public final class MinecraftVersionCache {
     }
 
     public void load() {
-        load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-versions.json"), false);
-        load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-legacy-versions.json"), true);
+        load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc_versions.json"), false);
+        load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc_legacy_versions.json"), true);
     }
 
     private void load(InputStream inputStream, boolean legacy) {

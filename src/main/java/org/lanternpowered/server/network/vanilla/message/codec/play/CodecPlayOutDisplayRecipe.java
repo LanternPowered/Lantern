@@ -23,25 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
 
-public interface Protocol {
+public final class CodecPlayOutDisplayRecipe implements Codec<MessagePlayOutDisplayRecipe> {
 
-    int CURRENT_VERSION = 337;
-
-    /**
-     * Gets the inbound {@link MessageRegistry}.
-     * 
-     * @return The registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound {@link MessageRegistry}.
-     * 
-     * @return The registry
-     */
-    MessageRegistry outbound();
+    @Override
+    public ByteBuffer encode(CodecContext context, MessagePlayOutDisplayRecipe message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeByte((byte) message.getWindowId());
+        buf.writeVarInt(message.getRecipeId());
+        return buf;
+    }
 }

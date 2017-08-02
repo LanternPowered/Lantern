@@ -49,7 +49,7 @@ final class DefaultStackSizes {
     static {
         final Gson gson = new Gson();
 
-        final InputStream is = DefaultStackSizes.class.getResourceAsStream("/internal/max-stack-sizes.json");
+        final InputStream is = DefaultStackSizes.class.getResourceAsStream("/internal/max_stack_sizes.json");
         final JsonObject json = gson.fromJson(new BufferedReader(new InputStreamReader(is)), JsonObject.class);
 
         for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
@@ -66,7 +66,7 @@ final class DefaultStackSizes {
             jsonObject.addProperty(itemType.getId(), itemType.getMaxStackQuantity());
         }
 
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get("max-stack-sizes.json"))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get("max_stack_sizes.json"))) {
             gson.toJson(jsonObject, writer);
             writer.flush();
             writer.close();

@@ -25,37 +25,19 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.google.common.collect.ImmutableList;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPrepareCraftingGrid;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
 
-import java.util.List;
-
-public final class CodecPlayInPrepareCraftingGrid implements Codec<MessagePlayInPrepareCraftingGrid> {
+public class CodecPlayInClickRecipe implements Codec<MessagePlayInClickRecipe> {
 
     @Override
-    public MessagePlayInPrepareCraftingGrid decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final int windowId = buf.readByte();
-        final int transactionId = buf.readShort();
-        final List<MessagePlayInPrepareCraftingGrid.SlotUpdate> returnedItems = readUpdates(buf);
-        final List<MessagePlayInPrepareCraftingGrid.SlotUpdate> preparedItems = readUpdates(buf);
-        return new MessagePlayInPrepareCraftingGrid(windowId, transactionId, preparedItems, returnedItems);
-    }
-
-    private static List<MessagePlayInPrepareCraftingGrid.SlotUpdate> readUpdates(ByteBuffer buf) {
-        final ImmutableList.Builder<MessagePlayInPrepareCraftingGrid.SlotUpdate> builder = ImmutableList.builder();
-        final int count = buf.readShort();
-        for (int i = 0; i < count; i++) {
-            final ItemStack itemStack = buf.read(Types.ITEM_STACK);
-            final int craftingSlot = buf.readByte();
-            final int playerSlot = buf.readByte();
-            builder.add(new MessagePlayInPrepareCraftingGrid.SlotUpdate(itemStack, craftingSlot, playerSlot));
-        }
-        return builder.build();
+    public MessagePlayInClickRecipe decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        final int windowId = buf.readByte() & 0xff;
+        final int recipe = buf.readVarInt();
+        final boolean shift = buf.readBoolean();
+        return new MessagePlayInClickRecipe(windowId, recipe, shift);
     }
 }

@@ -45,7 +45,7 @@ public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegist
     public void registerDefaults() {
         final Gson gson = new Gson();
         final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
-                .getResourceAsStream("/internal/sound-events.json"))), JsonArray.class);
+                .getResourceAsStream("/internal/sound_events.json"))), JsonArray.class);
         for (int i = 0; i < array.size(); i++) {
             final String name = array.get(i).getAsString();
             final String id = name.replaceAll("\\.", "_");

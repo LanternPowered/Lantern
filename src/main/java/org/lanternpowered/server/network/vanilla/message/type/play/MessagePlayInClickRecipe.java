@@ -23,25 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.message.Message;
 
-public interface Protocol {
+public final class MessagePlayInClickRecipe implements Message {
 
-    int CURRENT_VERSION = 337;
+    private final int windowId;
+    private final int recipeId;
+    private final boolean shift;
 
-    /**
-     * Gets the inbound {@link MessageRegistry}.
-     * 
-     * @return The registry
-     */
-    MessageRegistry inbound();
+    public MessagePlayInClickRecipe(int windowId, int recipeId, boolean shift) {
+        this.windowId = windowId;
+        this.recipeId = recipeId;
+        this.shift = shift;
+    }
 
-    /**
-     * Gets the outbound {@link MessageRegistry}.
-     * 
-     * @return The registry
-     */
-    MessageRegistry outbound();
+    public int getWindowId() {
+        return this.windowId;
+    }
+
+    public int getRecipeId() {
+        return this.recipeId;
+    }
+
+    public boolean hasShift() {
+        return this.shift;
+    }
 }

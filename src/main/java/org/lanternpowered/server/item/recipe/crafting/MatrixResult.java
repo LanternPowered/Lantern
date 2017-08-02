@@ -25,36 +25,37 @@
  */
 package org.lanternpowered.server.item.recipe.crafting;
 
-import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
-import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.Optional;
+import java.util.List;
 
-public interface ICraftingRecipeRegistry extends CraftingRecipeRegistry {
+public final class MatrixResult {
 
-    /**
-     * Finds the matching recipe and creates the {@link ExtendedCraftingResult},
-     * which is then returned.
-     *
-     * @param grid The crafting grid
-     * @param world The world the player is in
-     * @return The {@link ExtendedCraftingResult} if a recipe was found, or
-     *         {@link Optional#empty()} if not
-     */
-    default Optional<ExtendedCraftingResult> getExtendedResult(CraftingGridInventory grid, World world) {
-        return getExtendedResult(grid, world, 1);
+    private final CraftingMatrix craftingMatrix;
+    private final List<ItemStack> restItems;
+
+    public MatrixResult(CraftingMatrix craftingMatrix, List<ItemStack> restItems) {
+        this.craftingMatrix = craftingMatrix;
+        this.restItems = restItems;
     }
 
     /**
-     * Finds the matching recipe and creates the {@link ExtendedCraftingResult},
-     * which is then returned.
+     * Gets the {@link CraftingMatrix} with all the
+     * updated {@link ItemStack}s.
      *
-     * @param grid The crafting grid
-     * @param world The world the player is in
-     * @param timesLimit The limit in amount of times that a recipe should be applied
-     * @return The {@link ExtendedCraftingResult} if a recipe was found, or
-     *         {@link Optional#empty()} if not
+     * @return The crafting matrix
      */
-    Optional<ExtendedCraftingResult> getExtendedResult(CraftingGridInventory grid, World world, int timesLimit);
+    public CraftingMatrix getCraftingMatrix() {
+        return this.craftingMatrix;
+    }
+
+    /**
+     * Gets a {@link List} with all the rest {@link ItemStack}s, these rest items are
+     * "remainingItems" that couldn't be put back into into the crafting matrix.
+     *
+     * @return The rest item stacks
+     */
+    public List<ItemStack> getRest() {
+        return this.restItems;
+    }
 }

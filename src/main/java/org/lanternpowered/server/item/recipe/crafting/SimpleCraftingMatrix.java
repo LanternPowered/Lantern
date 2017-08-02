@@ -30,13 +30,21 @@ import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 
 import javax.annotation.Nullable;
 
-final class SimpleCraftingMatrix implements CraftingMatrix {
+final class SimpleCraftingMatrix implements ICraftingMatrix {
 
     @Nullable private ItemStack[][] matrix;
     private final CraftingGridInventory grid;
 
     SimpleCraftingMatrix(CraftingGridInventory grid) {
         this.grid = grid;
+    }
+
+    @Override
+    public void set(int x, int y, ItemStack itemStack) {
+        if (this.matrix == null) {
+            this.matrix = new ItemStack[this.grid.getColumns()][this.grid.getRows()];
+        }
+        this.matrix[x][y] = itemStack;
     }
 
     @Override

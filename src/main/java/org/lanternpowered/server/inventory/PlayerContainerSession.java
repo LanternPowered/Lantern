@@ -34,7 +34,9 @@ import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.item.recipe.crafting.CraftingMatrix;
 import org.lanternpowered.server.item.recipe.crafting.ExtendedCraftingResult;
+import org.lanternpowered.server.item.recipe.crafting.MatrixResult;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
@@ -75,6 +77,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -307,8 +310,8 @@ public class PlayerContainerSession {
         final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
         if (itemStack.isPresent()) {
-            final Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
-                    .type(SpawnTypes.DROPPED_ITEM).build())
+            final Cause cause = Cause.builder()
+                    .named("SpawnCause", SpawnCause.builder().type(SpawnTypes.DROPPED_ITEM).build())
                     .named(NamedCause.SOURCE, this.player)
                     .named("Slot", slot)
                     .build();
@@ -340,6 +343,31 @@ public class PlayerContainerSession {
         if (this.openContainer == null) {
             setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
         }
+    }
+
+    private void updateCraftingGrid(CraftingInventory craftingInventory, MatrixResult matrixResult,
+            List<SlotTransaction> transactions) {
+        final CraftingMatrix matrix = matrixResult.getCraftingMatrix();
+        final CraftingGridInventory grid = craftingInventory.getCraftingGrid();
+        for (int x = 0; x < matrix.width(); x++) {
+            for (int y = 0; y < matrix.height(); y++) {
+                final ItemStack itemStack = matrix.get(x, y);
+                final Slot slot = grid.getSlot(x, y).get();
+                transactions.add(new SlotTransaction(slot, slot.peek().map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE),
+                        itemStack.createSnapshot()));
+            }
+        }
+
+        final Cause cause = Cause.builder()
+                .named("SpawnCause", SpawnCause.builder().type(SpawnTypes.DROPPED_ITEM).build())
+                .named(NamedCause.SOURCE, this.player)
+                .build();
+        final List<Entity> entities = matrixResult.getRest().stream()
+                .map(itemStack -> createDroppedItem(itemStack.createSnapshot()))
+                .collect(Collectors.toList());
+        final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
+        Sponge.getEventManager().post(event);
+        finishSpawnEntityEvent(event);
     }
 
     public void handleWindowClick(MessagePlayInClickWindow message) {
@@ -456,11 +484,11 @@ public class PlayerContainerSession {
                         ClickInventoryEvent event;
 
                         final CraftingInventory inventory = (CraftingInventory) parent;
-                        final Optional<CraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
-                                .getResult(inventory.getCraftingGrid(), this.player.getWorld());
+                        final Optional<ExtendedCraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
+                                .getExtendedResult(inventory.getCraftingGrid(), this.player.getWorld());
                         final ItemStackSnapshot originalCursorItem = LanternItemStack.toSnapshot(this.cursorItem);
                         if (optResult.isPresent()) {
-                            final CraftingResult result = optResult.get();
+                            final CraftingResult result = optResult.get().getResult();
                             final ItemStackSnapshot resultItem = result.getResult();
 
                             int quantity = -1;
@@ -480,31 +508,7 @@ public class PlayerContainerSession {
                                 itemStack.setQuantity(quantity);
                                 cursorTransaction = new Transaction<>(originalCursorItem, itemStack.createSnapshot());
                                 transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
-                                final List<ItemStackSnapshot> remainingItems = result.getRemainingItems();
-                                final CraftingGridInventory grid = inventory.getCraftingGrid();
-                                int i = 0;
-                                for (int y = 0; y < grid.getRows(); y++) {
-                                    for (int x = 0; x < grid.getColumns(); x++) {
-                                        final LanternSlot gridSlot = (LanternSlot) grid.getSlot(x, y).get();
-                                        final ItemStack oldItem = gridSlot.peek().orElse(null);
-                                        final ItemStackSnapshot oldItemSnapshot = LanternItemStack.toSnapshot(oldItem);
-                                        ItemStackSnapshot newItemSnapshot = null;
-                                        if (i < remainingItems.size()) {
-                                            final ItemStackSnapshot remainingItem = remainingItems.get(i);
-                                            if (!remainingItem.isEmpty()) {
-                                                newItemSnapshot = remainingItem;
-                                            }
-                                        }
-                                        if (newItemSnapshot == null && oldItem != null && !oldItem.isEmpty()) {
-                                            oldItem.setQuantity(oldItem.getQuantity() - 1);
-                                            newItemSnapshot = LanternItemStack.toSnapshot(oldItem);
-                                        }
-                                        if (newItemSnapshot != null) {
-                                            transactions.add(new SlotTransaction(gridSlot, oldItemSnapshot, newItemSnapshot));
-                                        }
-                                        i++;
-                                    }
-                                }
+                                updateCraftingGrid(inventory, optResult.get().getMatrixResult(1), transactions);
                             }
                         } else {
                             cursorTransaction = new Transaction<>(originalCursorItem, originalCursorItem);
@@ -668,7 +672,9 @@ public class PlayerContainerSession {
                                         checkState(peekResult.getOfferResult().isSuccess());
                                     }
                                 }
+
                                 transactions.addAll(peekResult.getTransactions());
+                                updateCraftingGrid(inventory, result.getMatrixResult(times), transactions);
                             }
                         } else {
                             // No actual transaction, there shouldn't have been a item in the crafting result slot

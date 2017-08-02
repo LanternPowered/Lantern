@@ -27,7 +27,7 @@ package org.lanternpowered.server.item.recipe.crafting;
 
 import org.spongepowered.api.item.inventory.ItemStack;
 
-final class EmptyCraftingMatrix implements CraftingMatrix {
+final class EmptyCraftingMatrix implements ICraftingMatrix {
 
     static final EmptyCraftingMatrix INSTANCE = new EmptyCraftingMatrix();
 
@@ -49,5 +49,9 @@ final class EmptyCraftingMatrix implements CraftingMatrix {
     @Override
     public CraftingMatrix copy() {
         return this;
+    }
+
+    @Override
+    public void set(int x, int y, ItemStack itemStack) {
     }
 }

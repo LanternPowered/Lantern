@@ -968,8 +968,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     private static boolean canBypassPlayerLimit(GameProfile gameProfile) {
         final PermissionService permissionService = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
         return permissionService.getUserSubjects()
-                .get(gameProfile.getUniqueId().toString())
-                .hasPermission(Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION);
+                .getSubject(gameProfile.getUniqueId().toString())
+                        .map(subject -> subject.hasPermission(Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION))
+                .orElse(false);
     }
 
     private static boolean isWhitelisted(GameProfile gameProfile) {
@@ -982,8 +983,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         final PermissionService permissionService = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
         return permissionService.getUserSubjects()
-                .get(gameProfile.getUniqueId().toString())
-                .hasPermission(Permissions.Login.BYPASS_WHITELIST_PERMISSION);
+                .getSubject(gameProfile.getUniqueId().toString())
+                .map(subject -> subject.hasPermission(Permissions.Login.BYPASS_WHITELIST_PERMISSION))
+                .orElse(false);
     }
 
     @Override

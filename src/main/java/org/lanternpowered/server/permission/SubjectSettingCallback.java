@@ -25,22 +25,23 @@
  */
 package org.lanternpowered.server.permission;
 
+import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.permission.UserCollection;
+import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 
 import java.lang.ref.WeakReference;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-class SubjectSettingCallback implements Predicate<PermissionService> {
+final class SubjectSettingCallback implements Predicate<PermissionService> {
 
-    private final WeakReference<AbstractSubject> ref;
+    private final WeakReference<ProxySubject> ref;
 
-    SubjectSettingCallback(AbstractSubject ref) {
+    SubjectSettingCallback(ProxySubject ref) {
         this.ref = new WeakReference<>(ref);
     }
 
@@ -49,25 +50,38 @@ class SubjectSettingCallback implements Predicate<PermissionService> {
         return apply(this.ref.get(), input);
     }
 
-    public static boolean apply(@Nullable AbstractSubject ref, @Nullable PermissionService input) {
+    static boolean apply(@Nullable ProxySubject ref, @Nullable PermissionService input) {
         if (ref == null) {
+            // returning false from this predicate means this setting callback will be removed
+            // as a listener, and will not be tested again.
             return false;
         }
+        // if PS has just been unregistered, ignore the change.
         if (input == null) {
             return true;
         }
-        final SubjectCollection userSubjects = input.getSubjects(ref.getSubjectCollectionIdentifier());
-        //noinspection ConstantConditions
-        if (userSubjects != null) {
-            final Subject subject;
-            if (ref instanceof User && userSubjects instanceof UserCollection) {
+
+        final SubjectReference subject;
+
+        // check if we're using the native Lantern impl
+        // we can skip some unnecessary instance creation this way.
+        if (input instanceof LanternPermissionService) {
+            final LanternPermissionService service = (LanternPermissionService) input;
+            final LanternSubjectCollection collection = service.get(ref.getSubjectCollectionIdentifier());
+
+            if (ref instanceof User && collection instanceof UserCollection) {
                 // GameProfile is already resolved, use it directly
-                subject = ((UserCollection) userSubjects).get(((User) ref).getProfile());
+                subject = collection.get(((User) ref).getProfile().getUniqueId().toString()).asSubjectReference();
             } else {
-                subject = userSubjects.get(ref.getIdentifier());
+                subject = collection.get(ref.getIdentifier()).asSubjectReference();
             }
-            ref.setInternalSubject(subject);
+        } else {
+            // build a new subject reference using the permission service
+            // this doesn't actually load the subject, so it will be lazily init'd when needed.
+            subject = input.newSubjectReference(ref.getSubjectCollectionIdentifier(), ref.getIdentifier());
         }
+
+        ref.setInternalSubject(subject);
         return true;
     }
 

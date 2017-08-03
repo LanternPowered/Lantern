@@ -47,15 +47,20 @@ import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.rcon.RconService;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
@@ -64,7 +69,7 @@ import javax.annotation.Nullable;
  *
  * <p>Really doesn't do much else. Don't use this guys.
  */
-public class LanternPermissionService implements PermissionService {
+public final class LanternPermissionService implements PermissionService {
 
     private static final String SUBJECTS_DEFAULT = "default";
     private static final Function<String, CommandSource> NO_COMMAND_SOURCE = s -> null;
@@ -72,36 +77,39 @@ public class LanternPermissionService implements PermissionService {
     private final Game game;
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<>();
     @Nullable private Collection<PermissionDescription> descriptions;
-    private final ConcurrentMap<String, SubjectCollection> subjects = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, LanternSubjectCollection> subjects = new ConcurrentHashMap<>();
     private final LanternSubjectCollection defaultCollection;
     private final LanternSubject defaultData;
 
     @Inject
-    public LanternPermissionService(Game game) {
+    private LanternPermissionService(Game game) {
         this.game = game;
-        this.subjects.put(SUBJECTS_DEFAULT, (this.defaultCollection = this.newCollection(SUBJECTS_DEFAULT)));
+        this.subjects.put(SUBJECTS_DEFAULT, this.defaultCollection = newCollection(SUBJECTS_DEFAULT));
         this.subjects.put(SUBJECTS_USER, new UserCollection(this));
         this.subjects.put(SUBJECTS_GROUP, new OpLevelCollection(this));
 
         this.subjects.put(SUBJECTS_COMMAND_BLOCK, new DataFactoryCollection(SUBJECTS_COMMAND_BLOCK, this,
-                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, getGroupForOpLevel(2)), NO_COMMAND_SOURCE));
+                s -> new FixedParentMemorySubjectData(this, getGroupForOpLevel(2).asSubjectReference()), NO_COMMAND_SOURCE));
 
         this.subjects.put(SUBJECTS_SYSTEM, new DataFactoryCollection(SUBJECTS_SYSTEM, this,
-                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, getGroupForOpLevel(4)),
+                s -> new FixedParentMemorySubjectData(this, getGroupForOpLevel(4).asSubjectReference()),
                 s -> {
                     if (s.equals(LanternConsoleSource.NAME)) {
                         return Sponge.getServer().getConsole();
-                    } else if (s.startsWith(RconSource.NAME_PREFIX)) {
-                        String hostName = s.substring(RconSource.NAME_FULL_PREFIX.length(), s.length() - RconSource.NAME_POSTFIX.length());
-                        RconService rconService = Sponge.getServiceManager().provideUnchecked(RconService.class);
-                        if (rconService instanceof RconServer) {
-                            return ((RconServer) rconService).getByHostName(hostName).orElse(null);
+                    } else {
+                        final Matcher matcher = RconSource.NAME_PATTERN.matcher(s);
+                        if (matcher.matches()) {
+                            final String hostName = matcher.group(1);
+                            final RconService rconService = Sponge.getServiceManager().provideUnchecked(RconService.class);
+                            if (rconService instanceof RconServer) {
+                                return ((RconServer) rconService).getByHostName(hostName).orElse(null);
+                            }
                         }
                     }
                     return null;
                 }));
 
-        this.defaultData = this.getDefaultCollection().get(SUBJECTS_DEFAULT);
+        this.defaultData = getDefaultCollection().get(SUBJECTS_DEFAULT);
     }
 
     public Subject getGroupForOpLevel(int level) {
@@ -109,13 +117,23 @@ public class LanternPermissionService implements PermissionService {
     }
 
     @Override
-    public SubjectCollection getUserSubjects() {
-        return getSubjects(PermissionService.SUBJECTS_USER);
+    public LanternSubjectCollection getUserSubjects() {
+        return get(PermissionService.SUBJECTS_USER);
     }
 
     @Override
-    public SubjectCollection getGroupSubjects() {
-        return getSubjects(PermissionService.SUBJECTS_GROUP);
+    public LanternSubjectCollection getGroupSubjects() {
+        return get(PermissionService.SUBJECTS_GROUP);
+    }
+
+    private LanternSubjectCollection newCollection(String identifier) {
+        checkNotNull(identifier, "identifier");
+        return new DataFactoryCollection(identifier, this, s -> new GlobalMemorySubjectData(LanternPermissionService.this), NO_COMMAND_SOURCE);
+    }
+
+    public LanternSubjectCollection get(String identifier) {
+        checkNotNull(identifier, "identifier");
+        return this.subjects.computeIfAbsent(identifier, this::newCollection);
     }
 
     @Override
@@ -124,41 +142,57 @@ public class LanternPermissionService implements PermissionService {
     }
 
     @Override
-    public void registerContextCalculator(ContextCalculator calculator) {
+    public Predicate<String> getIdentifierValidityPredicate() {
+        return s -> true;
     }
 
     @Override
-    public SubjectCollection getSubjects(String identifier) {
-        SubjectCollection ret = this.subjects.get(identifier);
-        if (ret == null) {
-            SubjectCollection existingRet = this.subjects.putIfAbsent(identifier, (ret = newCollection(identifier)));
-            if (existingRet != null) {
-                ret = existingRet;
-            }
-        }
-        return ret;
-    }
-
-    private LanternSubjectCollection newCollection(String identifier) {
-        return new DataFactoryCollection(identifier, this, s -> new GlobalMemorySubjectData(LanternPermissionService.this), NO_COMMAND_SOURCE);
+    public SubjectReference newSubjectReference(String collectionIdentifier, String subjectIdentifier) {
+        checkNotNull(collectionIdentifier, "collectionIdentifier");
+        checkNotNull(subjectIdentifier, "subjectIdentifier");
+        return new LanternSubjectReference(this, collectionIdentifier, subjectIdentifier);
     }
 
     @Override
-    public Map<String, SubjectCollection> getKnownSubjects() {
+    public CompletableFuture<SubjectCollection> loadCollection(String identifier) {
+        return CompletableFuture.completedFuture(get(identifier));
+    }
+
+    @Override
+    public Optional<SubjectCollection> getCollection(String identifier) {
+        return Optional.of(get(identifier));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasCollection(String identifier) {
+        return CompletableFuture.completedFuture(this.subjects.containsKey(identifier));
+    }
+
+    @Override
+    public Map<String, SubjectCollection> getLoadedCollections() {
         return ImmutableMap.copyOf(this.subjects);
     }
 
     @Override
-    public Optional<Builder> newDescriptionBuilder(Object instance) {
-        Optional<PluginContainer> container = this.game.getPluginManager().fromInstance(checkNotNull(instance, "instance"));
+    public CompletableFuture<Set<String>> getAllIdentifiers() {
+        return CompletableFuture.completedFuture(getLoadedCollections().keySet());
+    }
+
+    @Override
+    public void registerContextCalculator(ContextCalculator<Subject> calculator) {
+    }
+
+    @Override
+    public Builder newDescriptionBuilder(Object instance) {
+        final Optional<PluginContainer> container = this.game.getPluginManager().fromInstance(checkNotNull(instance, "instance"));
         if (!container.isPresent()) {
             throw new IllegalArgumentException("The provided plugin object does not have an associated plugin container "
                     + "(in other words, is 'plugin' actually your plugin object?)");
         }
-        return Optional.<Builder>of(new LanternPermissionDescription.Builder(this, container.get()));
+        return new LanternPermissionDescription.Builder(this, container.get());
     }
 
-    public void addDescription(PermissionDescription permissionDescription) {
+    void addDescription(PermissionDescription permissionDescription) {
         checkNotNull(permissionDescription, "permissionDescription");
         checkNotNull(permissionDescription.getId(), "permissionId");
         this.descriptionMap.put(permissionDescription.getId().toLowerCase(), permissionDescription);

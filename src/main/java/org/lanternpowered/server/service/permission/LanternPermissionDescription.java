@@ -25,43 +25,48 @@
  */
 package org.lanternpowered.server.service.permission;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Basic implementation of {@link PermissionDescription}. Can only be used in
  * conjunction with {@link LanternPermissionService}.
  */
-class LanternPermissionDescription implements PermissionDescription {
+final class LanternPermissionDescription implements PermissionDescription {
 
-    private final PermissionService permissionService;
-    private final String id;
-    private final Text description;
+    private final LanternPermissionService permissionService;
     private final PluginContainer owner;
+    private final String id;
+    @Nullable private final Text description;
 
-    LanternPermissionDescription(PermissionService permissionService, String id, Text description, PluginContainer owner) {
+    private LanternPermissionDescription(LanternPermissionService permissionService, String id, PluginContainer owner, @Nullable Text description) {
         super();
-        this.permissionService = checkNotNull(permissionService, "permissionService");
-        this.id = checkNotNull(id, "id");
-        this.description = checkNotNull(description, "description");
-        this.owner = checkNotNull(owner, "owner");
+        this.permissionService = permissionService;
+        this.description = description;
+        this.owner = owner;
+        this.id = id;
     }
 
     @Override
@@ -70,19 +75,25 @@ class LanternPermissionDescription implements PermissionDescription {
     }
 
     @Override
-    public Text getDescription() {
-        return this.description;
+    public Optional<Text> getDescription() {
+        return Optional.ofNullable(this.description);
     }
 
     @Override
     public Map<Subject, Boolean> getAssignedSubjects(String identifier) {
-        SubjectCollection subjects = this.permissionService.getSubjects(identifier);
+        final SubjectCollection subjects = this.permissionService.get(identifier);
+        return subjects.getLoadedWithPermission(this.id);
+    }
+
+    @Override
+    public CompletableFuture<Map<SubjectReference, Boolean>> findAssignedSubjects(String type) {
+        final SubjectCollection subjects = this.permissionService.get(type);
         return subjects.getAllWithPermission(this.id);
     }
 
     @Override
-    public PluginContainer getOwner() {
-        return this.owner;
+    public Optional<PluginContainer> getOwner() {
+        return Optional.of(this.owner);
     }
 
     @Override
@@ -91,15 +102,18 @@ class LanternPermissionDescription implements PermissionDescription {
     }
 
     @Override
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null || this.getClass() != obj.getClass()) {
+        if (obj == null) {
             return false;
         }
-        LanternPermissionDescription other = (LanternPermissionDescription) obj;
-        return this.id.equals(other.id) && this.owner.equals(other.owner) && this.description.equals(other.description);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LanternPermissionDescription other = (LanternPermissionDescription) obj;
+        return this.id.equals(other.id) && this.owner.equals(other.owner) && Objects.equal(this.description, other.description);
     }
 
     @Override
@@ -112,16 +126,16 @@ class LanternPermissionDescription implements PermissionDescription {
 
     static class Builder implements PermissionDescription.Builder {
 
+        private final Map<String, Tristate> roleAssignments = new LinkedHashMap<>();
         private final LanternPermissionService permissionService;
         private final PluginContainer owner;
-        @Nullable private String id;
         @Nullable private Text description;
-        private final Map<String, Tristate> roleAssignments = new LinkedHashMap<>();
+        @Nullable private String id;
 
         Builder(LanternPermissionService permissionService, PluginContainer owner) {
             super();
-            this.permissionService = checkNotNull(permissionService, "permissionService");
-            this.owner = checkNotNull(owner, "owner");
+            this.permissionService = permissionService;
+            this.owner = owner;
         }
 
         @Override
@@ -131,8 +145,8 @@ class LanternPermissionDescription implements PermissionDescription {
         }
 
         @Override
-        public Builder description(Text description) {
-            this.description = checkNotNull(description, "description");
+        public Builder description(@Nullable Text description) {
+            this.description = description;
             return this;
         }
 
@@ -146,15 +160,14 @@ class LanternPermissionDescription implements PermissionDescription {
         @Override
         public LanternPermissionDescription register() throws IllegalStateException {
             checkState(this.id != null, "No id set");
-            checkState(this.description != null, "No description set");
-            LanternPermissionDescription description =
-                    new LanternPermissionDescription(this.permissionService, this.id, this.description, this.owner);
+            final LanternPermissionDescription description = new LanternPermissionDescription(
+                    this.permissionService, this.id, this.owner, this.description);
             this.permissionService.addDescription(description);
 
             // Set role-templates
-            SubjectCollection subjects = this.permissionService.getSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
+            final LanternSubjectCollection subjects = this.permissionService.get(PermissionService.SUBJECTS_ROLE_TEMPLATE);
             for (Entry<String, Tristate> assignment : this.roleAssignments.entrySet()) {
-                Subject subject = subjects.get(assignment.getKey());
+                final Subject subject = subjects.get(assignment.getKey());
                 subject.getTransientSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, this.id, assignment.getValue());
             }
             return description;
@@ -162,3 +175,4 @@ class LanternPermissionDescription implements PermissionDescription {
     }
 
 }
+

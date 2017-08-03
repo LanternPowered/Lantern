@@ -25,62 +25,66 @@
  */
 package org.lanternpowered.server.service.permission;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-public class DataFactoryCollection extends LanternSubjectCollection {
+import static com.google.common.base.Preconditions.checkNotNull;
 
+final class DataFactoryCollection extends LanternSubjectCollection {
+
+    private final LanternPermissionService service;
     private final ConcurrentMap<String, LanternSubject> subjects = new ConcurrentHashMap<>();
     private final Function<String, MemorySubjectData> dataFactory;
     private final Function<String, CommandSource> commandSourceFunction;
 
-    protected DataFactoryCollection(String identifier, LanternPermissionService service, Function<String, MemorySubjectData> dataFactory,
+    DataFactoryCollection(String identifier, LanternPermissionService service,
+            Function<String, MemorySubjectData> dataFactory,
             Function<String, CommandSource> commandSourceFunction) {
         super(identifier, service);
-        this.dataFactory = dataFactory;
         this.commandSourceFunction = commandSourceFunction;
+        this.dataFactory = dataFactory;
+        this.service = service;
     }
 
     @Override
     public LanternSubject get(String identifier) {
         checkNotNull(identifier, "identifier");
-        if (!this.subjects.containsKey(identifier)) {
-            this.subjects.putIfAbsent(identifier, new DataFactorySubject(identifier, this.dataFactory.apply(identifier)));
-        }
-        return this.subjects.get(identifier);
+        return this.subjects.computeIfAbsent(identifier, id -> new DataFactorySubject(id, this.dataFactory.apply(id)));
     }
 
     @Override
-    public boolean hasRegistered(String identifier) {
+    public boolean isRegistered(String identifier) {
+        checkNotNull(identifier, "identifier");
         return this.subjects.containsKey(identifier);
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterable<Subject> getAllSubjects() {
-        return (Iterable) this.subjects.values();
+    @SuppressWarnings("unchecked")
+    public Collection<Subject> getLoadedSubjects() {
+        return (Collection) this.subjects.values();
     }
 
-    private class DataFactorySubject extends LanternSubject {
+    private final class DataFactorySubject extends LanternSubject {
 
         private final String identifier;
         private final MemorySubjectData data;
 
-        protected DataFactorySubject(String identifier, MemorySubjectData data) {
+        DataFactorySubject(String identifier, MemorySubjectData data) {
             this.identifier = identifier;
             this.data = data;
         }
@@ -91,6 +95,11 @@ public class DataFactoryCollection extends LanternSubjectCollection {
         }
 
         @Override
+        public Optional<String> getFriendlyIdentifier() {
+            return getCommandSource().map(CommandSource::getName);
+        }
+
+        @Override
         public Optional<CommandSource> getCommandSource() {
             return Optional.ofNullable(DataFactoryCollection.this.commandSourceFunction.apply(getIdentifier()));
         }
@@ -98,6 +107,16 @@ public class DataFactoryCollection extends LanternSubjectCollection {
         @Override
         public SubjectCollection getContainingCollection() {
             return DataFactoryCollection.this;
+        }
+
+        @Override
+        public PermissionService getService() {
+            return DataFactoryCollection.this.service;
+        }
+
+        @Override
+        public SubjectReference asSubjectReference() {
+            return DataFactoryCollection.this.service.newSubjectReference(DataFactoryCollection.this.getIdentifier(), getIdentifier());
         }
 
         @Override
@@ -112,7 +131,7 @@ public class DataFactoryCollection extends LanternSubjectCollection {
                 ret = getDataPermissionValue(DataFactoryCollection.this.getDefaults().getTransientSubjectData(), permission);
             }
             if (ret == Tristate.UNDEFINED) {
-                ret = this.getDataPermissionValue(DataFactoryCollection.this.service.getDefaults().getTransientSubjectData(), permission);
+                ret = getDataPermissionValue(DataFactoryCollection.this.service.getDefaults().getTransientSubjectData(), permission);
             }
             return ret;
         }
@@ -121,13 +140,12 @@ public class DataFactoryCollection extends LanternSubjectCollection {
         public Optional<String> getOption(Set<Context> contexts, String option) {
             Optional<String> ret = super.getOption(contexts, option);
             if (!ret.isPresent()) {
-                ret = this.getDataOptionValue(DataFactoryCollection.this.getDefaults().getSubjectData(), option);
+                ret = getDataOptionValue(DataFactoryCollection.this.getDefaults().getSubjectData(), option);
             }
             if (!ret.isPresent()) {
-                ret = this.getDataOptionValue(DataFactoryCollection.this.service.getDefaults().getSubjectData(), option);
+                ret = getDataOptionValue(DataFactoryCollection.this.service.getDefaults().getSubjectData(), option);
             }
             return ret;
         }
     }
-
 }

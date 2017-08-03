@@ -27,7 +27,7 @@ package org.lanternpowered.server.console;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.permission.AbstractSubjectBase;
+import org.lanternpowered.server.permission.AbstractProxySubject;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -41,7 +41,7 @@ import org.spongepowered.api.util.Tristate;
 import java.util.Map;
 import java.util.Optional;
 
-public final class LanternConsoleSource extends AbstractSubjectBase implements ConsoleSource {
+public final class LanternConsoleSource extends AbstractProxySubject implements ConsoleSource {
 
     public static final String NAME = "Server";
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
@@ -52,7 +52,7 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements C
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     private LanternConsoleSource() {
-        initSubject();
+        initializeSubject();
     }
 
     @Override

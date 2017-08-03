@@ -25,66 +25,64 @@
  */
 package org.lanternpowered.server.service.permission;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.SingleParentMemorySubjectData;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 /**
  * An implementation of vanilla minecraft's 4 op groups.
  */
-public class UserSubject extends LanternSubject {
+final class UserSubject extends LanternSubject {
 
     private final GameProfile player;
     private final MemorySubjectData data;
     private final UserCollection collection;
 
-    public UserSubject(final GameProfile player, final UserCollection users) {
-        this.player = checkNotNull(player, "player");
-        this.data = new SingleParentMemorySubjectData(checkNotNull(users, "userCollection").getService()) {
+    UserSubject(GameProfile player, UserCollection users) {
+        this.player = player;
+        this.collection = users;
+        this.data = new SingleParentMemorySubjectData(users.getService()) {
 
             @Override
-            public Subject getParent() {
+            public SubjectReference getParent() {
                 int opLevel = getOpLevel();
-                return opLevel == 0 ? null : users.getService().getGroupForOpLevel(opLevel);
+                return opLevel == 0 ? null : users.getService().getGroupForOpLevel(opLevel).asSubjectReference();
             }
 
             @Override
-            public boolean setParent(@Nullable Subject parent) {
+            public void setParent(SubjectReference parent) {
                 int opLevel;
                 if (parent == null) {
                     opLevel = 0;
                 } else {
-                    if (!(parent instanceof OpLevelCollection.OpLevelSubject)) {
-                        return false;
+                    final Subject subject = parent.resolve().join();
+                    if (!(subject instanceof OpLevelCollection.OpLevelSubject)) {
+                        return;
                     }
-                    opLevel = ((OpLevelCollection.OpLevelSubject) parent).getOpLevel();
+                    opLevel = ((OpLevelCollection.OpLevelSubject) subject).getOpLevel();
                 }
                 if (opLevel > 0) {
                     Lantern.getGame().getOpsConfig().addEntry(new OpsEntry(((LanternGameProfile) player).withoutProperties(), opLevel));
                 } else {
                     Lantern.getGame().getOpsConfig().removeEntry(player.getUniqueId());
                 }
-                return true;
             }
-
         };
-        this.collection = users;
     }
 
     @Override
@@ -92,13 +90,21 @@ public class UserSubject extends LanternSubject {
         return this.player.getUniqueId().toString();
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public Optional<CommandSource> getCommandSource() {
-        return (Optional) Lantern.getGame().getServer().getPlayer(this.player.getUniqueId());
+    public Optional<String> getFriendlyIdentifier() {
+        return this.player.getName();
     }
 
-    int getOpLevel() {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Optional<CommandSource> getCommandSource() {
+        if (Sponge.isServerAvailable()) {
+            return (Optional) Lantern.getServer().getPlayer(this.player.getUniqueId());
+        }
+        return Optional.empty();
+    }
+
+    public int getOpLevel() {
         return Lantern.getGame().getOpsConfig().getEntryByUUID(this.player.getUniqueId()).map(OpsEntry::getOpLevel).orElse(0);
     }
 
@@ -113,15 +119,20 @@ public class UserSubject extends LanternSubject {
     }
 
     @Override
+    public PermissionService getService() {
+        return this.collection.getService();
+    }
+
+    @Override
     public Tristate getPermissionValue(Set<Context> contexts, String permission) {
         Tristate ret = super.getPermissionValue(contexts, permission);
         if (ret == Tristate.UNDEFINED) {
-            ret = this.getDataPermissionValue(this.collection.getDefaults().getSubjectData(), permission);
+            ret = getDataPermissionValue(this.collection.getDefaults().getSubjectData(), permission);
         }
         if (ret == Tristate.UNDEFINED) {
-            ret = this.getDataPermissionValue(this.collection.getService().getDefaults().getSubjectData(), permission);
+            ret = getDataPermissionValue(this.collection.getService().getDefaults().getSubjectData(), permission);
         }
-        if (ret == Tristate.UNDEFINED && this.getOpLevel() >= Lantern.getGame().getGlobalConfig().getDefaultOpPermissionLevel()) {
+        if (ret == Tristate.UNDEFINED && getOpLevel() >= Lantern.getGame().getGlobalConfig().getDefaultOpPermissionLevel()) {
             ret = Tristate.TRUE;
         }
         return ret;
@@ -131,12 +142,11 @@ public class UserSubject extends LanternSubject {
     public Optional<String> getOption(Set<Context> contexts, String option) {
         Optional<String> ret = super.getOption(contexts, option);
         if (!ret.isPresent()) {
-            ret = this.getDataOptionValue(this.collection.getDefaults().getSubjectData(), option);
+            ret = getDataOptionValue(this.collection.getDefaults().getSubjectData(), option);
         }
         if (!ret.isPresent()) {
-            ret = this.getDataOptionValue(this.collection.getService().getDefaults().getSubjectData(), option);
+            ret = getDataOptionValue(this.collection.getService().getDefaults().getSubjectData(), option);
         }
         return ret;
     }
-
 }

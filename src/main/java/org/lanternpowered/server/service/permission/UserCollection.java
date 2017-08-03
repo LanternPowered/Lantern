@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.service.permission;
 
-import com.google.common.base.Throwables;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
@@ -34,8 +35,8 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 
+import java.util.Collection;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
@@ -44,39 +45,12 @@ import javax.annotation.Nullable;
  */
 public class UserCollection extends LanternSubjectCollection {
 
-    public UserCollection(LanternPermissionService service) {
+    UserCollection(LanternPermissionService service) {
         super(PermissionService.SUBJECTS_USER, service);
     }
 
-    @Override
-    public LanternSubject get(String identifier) {
-        UUID uid = identifierToUUID(identifier);
-        if (uid == null) {
-            throw new IllegalArgumentException("Provided identifier must be a uuid, was " + identifier);
-        }
-        return get(uuidToGameProfile(uid));
-    }
-
-    public LanternSubject get(GameProfile profile) {
-        return new UserSubject(profile, this);
-    }
-
-    private GameProfile uuidToGameProfile(UUID uuid) {
-        try {
-            return Lantern.getGame().getGameProfileManager().get(uuid, true).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public boolean hasRegistered(String identifier) {
-        final UUID uuid = identifierToUUID(identifier);
-        return uuid != null && Lantern.getGame().getOpsConfig().getEntryByUUID(uuid).isPresent();
-    }
-
     @Nullable
-    private UUID identifierToUUID(String identifier) {
+    private UUID parseUUID(String identifier) {
         try {
             return UUID.fromString(identifier);
         } catch (IllegalArgumentException e) {
@@ -85,19 +59,31 @@ public class UserCollection extends LanternSubjectCollection {
     }
 
     @Override
+    public LanternSubject get(String identifier) {
+        final UUID uuid = parseUUID(identifier);
+        checkArgument(uuid != null, "Provided identifier must be a uuid, was %s", identifier);
+        final GameProfile profile;
+        try {
+            profile = Sponge.getServer().getGameProfileManager().get(uuid, true).get();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to lookup game profile for " + uuid, e);
+        }
+        return new UserSubject(profile, this);
+    }
+
+    @Override
+    public boolean isRegistered(String identifier) {
+        final UUID uuid = parseUUID(identifier);
+        return uuid != null && Lantern.getGame().getOpsConfig().getEntryByUUID(uuid).isPresent();
+    }
+
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterable<Subject> getAllSubjects() {
-        return (Iterable) Sponge.getServer().getOnlinePlayers();
-        /*return ImmutableSet.copyOf(Iterables.concat(
-                Iterables.<Object, Subject>transform(SpongePermissionService.getOps().getValues().values(),
-                        new Function<Object, Subject>() {
-                        @Nullable
-                        @Override
-                        public Subject apply(Object input) {
-                            GameProfile profile = ((GameProfile) ((UserListOpsEntry) input).value);
-                            return get(profile);
-                        }
-                        // WARNING: This gives dupes
-                    }), Sponge.getGame().getServer().getOnlinePlayers()));*/
+    public Collection<Subject> getLoadedSubjects() {
+        return (Collection) Sponge.getServer().getOnlinePlayers();
+    }
+
+    public LanternPermissionService getService() {
+        return this.service;
     }
 }

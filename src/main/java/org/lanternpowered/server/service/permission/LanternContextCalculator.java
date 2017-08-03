@@ -62,10 +62,9 @@ public class LanternContextCalculator implements ContextCalculator<Subject> {
             .weakKeys()
             .build(key -> {
                 final ImmutableSet.Builder<Context> builder = ImmutableSet.builder();
-                final InetAddress addr = checkNotNull(function.apply(key), "addr");
-                builder.add(new Context(contextKey, addr.getHostAddress()));
-                //noinspection Guava,ConstantConditions
-                for (String set : Maps.filterValues(Lantern.getGame().getGlobalConfig().getIpSets(), input -> input.test(addr)).keySet()) {
+                final InetAddress address = checkNotNull(function.apply(key), "address");
+                builder.add(new Context(contextKey, address.getHostAddress()));
+                for (String set : Maps.filterValues(Lantern.getGame().getGlobalConfig().getIpSets(), input -> input.test(address)).keySet()) {
                     builder.add(new Context(contextKey, set));
                 }
                 return builder.build();

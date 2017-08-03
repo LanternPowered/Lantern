@@ -77,7 +77,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
-import org.lanternpowered.server.permission.AbstractSubject;
+import org.lanternpowered.server.permission.ProxySubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.statistic.StatisticMap;
@@ -122,7 +122,7 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
@@ -153,7 +153,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class LanternPlayer extends LanternHumanoid implements AbstractSubject, Player, AbstractViewer, NetworkIdHolder {
+public class LanternPlayer extends LanternHumanoid implements ProxySubject, Player, AbstractViewer, NetworkIdHolder {
 
     private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -0.3), new Vector3d(0.3, 1.8, 0.3));
 
@@ -737,13 +737,13 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     }
 
     @Override
-    public void setInternalSubject(@Nullable Subject subject) {
+    public void setInternalSubject(@Nullable SubjectReference subject) {
         // We don't have to set the internal subject in the player instance
         // because it's already set in the user
     }
 
     @Override
-    public Subject getInternalSubject() {
+    public SubjectReference getInternalSubject() {
         return this.user.getInternalSubject();
     }
 
@@ -779,7 +779,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public String getIdentifier() {
-        return this.getUniqueId().toString();
+        return getUniqueId().toString();
     }
 
     @Override

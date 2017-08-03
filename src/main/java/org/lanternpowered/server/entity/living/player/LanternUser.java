@@ -27,7 +27,7 @@ package org.lanternpowered.server.entity.living.player;
 
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.entity.AbstractArmorEquipable;
-import org.lanternpowered.server.permission.AbstractSubjectBase;
+import org.lanternpowered.server.permission.AbstractProxySubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
@@ -50,7 +50,6 @@ import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -60,14 +59,14 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-public class LanternUser extends AbstractSubjectBase implements AbstractPropertyHolder, AbstractArmorEquipable, User {
+public class LanternUser extends AbstractProxySubject implements AbstractPropertyHolder, AbstractArmorEquipable, User {
 
     private final LanternGameProfile gameProfile;
     @Nullable private WeakReference<Player> player;
 
     public LanternUser(LanternGameProfile gameProfile) {
         this.gameProfile = gameProfile;
-        this.initSubject();
+        initializeSubject();
     }
 
     @Override
@@ -241,7 +240,7 @@ public class LanternUser extends AbstractSubjectBase implements AbstractProperty
 
     @Override
     public Optional<CommandSource> getCommandSource() {
-        return (Optional) this.getPlayer();
+        return (Optional) getPlayer();
     }
 
     @Override

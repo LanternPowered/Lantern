@@ -23,28 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.permission;
+package org.lanternpowered.server.service.permission;
 
+import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
+
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
-public abstract class AbstractSubjectBase implements AbstractSubject {
+final class LanternSubjectReference implements SubjectReference {
 
-    @Nullable private volatile Subject subject;
+    private final LanternPermissionService service;
+    private final String collectionId;
+    private final String subjectId;
+    @Nullable private LanternSubject cache = null;
 
-    @Override
-    public void setInternalSubject(@Nullable Subject subj) {
-        this.subject = subj;
+    LanternSubjectReference(LanternPermissionService service, String collectionId, String subjectId) {
+        this.service = service;
+        this.collectionId = collectionId;
+        this.subjectId = subjectId;
     }
 
-    @Nullable
     @Override
-    public Subject getInternalSubject() {
-        if (this.subject == null) {
-            findPermissionSubject();
+    public String getCollectionIdentifier() {
+        return this.collectionId;
+    }
+
+    @Override
+    public String getSubjectIdentifier() {
+        return this.subjectId;
+    }
+
+    @Override
+    public synchronized CompletableFuture<Subject> resolve() {
+        // lazily load
+        if (this.cache == null) {
+            this.cache = this.service.get(this.collectionId).get(this.subjectId);
         }
-        return this.subject;
+        return CompletableFuture.completedFuture(this.cache);
     }
 
 }

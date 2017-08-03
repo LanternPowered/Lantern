@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.rcon;
 
-import org.lanternpowered.server.permission.AbstractSubjectBase;
+import org.lanternpowered.server.permission.AbstractProxySubject;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -34,27 +34,29 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
-public final class RconSource extends AbstractSubjectBase implements org.spongepowered.api.command.source.RconSource {
+public final class RconSource extends AbstractProxySubject implements org.spongepowered.api.command.source.RconSource {
 
-    public static final String NAME_PREFIX = "Rcon";
-    public static final String NAME_FULL_PREFIX = NAME_PREFIX + "{";
-    public static final String NAME_POSTFIX = "}";
+    public static final String NAME_FORMAT = "Rcon{%s}";
+    public static final Pattern NAME_PATTERN = Pattern.compile('^' + String.format(NAME_FORMAT, "(.+)") + '$');
 
     private final StringBuffer buffer = new StringBuffer();
     private final RconConnection connection;
+    private final String name;
 
     // Whether the rcon source is logged in
     private volatile boolean loggedIn;
 
     RconSource(RconConnection connection) {
+        this.name = String.format(NAME_FORMAT, connection.getAddress().getHostName());
         this.connection = connection;
-        initSubject();
+        initializeSubject();
     }
 
     @Override
     public String getName() {
-        return NAME_FULL_PREFIX + this.connection.getAddress().getHostName() + NAME_POSTFIX;
+        return this.name;
     }
 
     @Override
@@ -73,7 +75,7 @@ public final class RconSource extends AbstractSubjectBase implements org.spongep
 
     @Override
     public String getIdentifier() {
-        return this.getName();
+        return getName();
     }
 
     @Override

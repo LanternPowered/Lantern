@@ -23,5 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
 package org.lanternpowered.server.permission;
+
+import org.spongepowered.api.service.permission.SubjectReference;
+
+import javax.annotation.Nullable;
+
+public abstract class AbstractProxySubject implements ProxySubject {
+
+    @Nullable private SubjectReference reference;
+
+    @Override
+    public void setInternalSubject(@Nullable SubjectReference reference) {
+        this.reference = reference;
+    }
+
+    @Nullable
+    @Override
+    public SubjectReference getInternalSubject() {
+        return this.reference;
+    }
+}

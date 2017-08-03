@@ -25,13 +25,16 @@
  */
 package org.lanternpowered.server.permission;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.LanternServiceListeners;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Collections;
@@ -41,51 +44,106 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public interface AbstractSubject extends Subject {
+public interface ProxySubject extends Subject {
 
-    void setInternalSubject(@Nullable Subject subj);
+    /**
+     * Sets the internal {@link SubjectReference}.
+     *
+     * @param reference The subject reference
+     */
+    void setInternalSubject(@Nullable SubjectReference reference);
 
+    /**
+     * Gets the internal {@link SubjectReference}.
+     *
+     * @return The internal subject reference
+     */
     @Nullable
-    Subject getInternalSubject();
+    SubjectReference getInternalSubject();
 
+    /**
+     * Gets the identifier of the subject collection.
+     *
+     * @return The subject collection identifier
+     */
     String getSubjectCollectionIdentifier();
 
+    /**
+     * Gets the default {@link Tristate} result
+     * for the given permission.
+     *
+     * @param permission The permission
+     * @return The result
+     */
     Tristate getPermissionDefault(String permission);
 
-    default void initSubject() {
+    /**
+     * Initializes the {@link ProxySubject}.
+     */
+    default void initializeSubject() {
         LanternServiceListeners.getInstance().registerExpirableServiceCallback(PermissionService.class, new SubjectSettingCallback(this));
     }
 
-    default void findPermissionSubject() {
-        Sponge.getServiceManager().provide(PermissionService.class).ifPresent(service -> SubjectSettingCallback.apply(this, service));
+    @Nullable
+    default Subject resolveNullableSubject() {
+        SubjectReference reference = getInternalSubject();
+        if (reference == null) {
+            final Optional<PermissionService> optService = Lantern.getGame().getServiceManager().provide(PermissionService.class);
+            if (optService.isPresent()) {
+                // Try to update the internal subject
+                SubjectSettingCallback.apply(this, optService.get());
+                // Get the new subject reference, can be null if failed
+                reference = getInternalSubject();
+            }
+        }
+        return reference == null ? null : reference.resolve().join();
     }
 
-    default Subject tryGetSubject0() {
-        final Subject subject = getInternalSubject();
+    default Subject resolveSubject() {
+        final Subject subject = resolveNullableSubject();
         if (subject == null) {
             throw new IllegalStateException("No subject present for " + getIdentifier());
         }
         return subject;
     }
 
+    // Delegated methods
+
+    @Override
+    default SubjectReference asSubjectReference() {
+        return checkNotNull(getInternalSubject(), "No internal subject reference is set");
+    }
+
     @Override
     default SubjectCollection getContainingCollection() {
-        return tryGetSubject0().getContainingCollection();
+        return resolveSubject().getContainingCollection();
     }
 
     @Override
     default SubjectData getSubjectData() {
-        return tryGetSubject0().getSubjectData();
+        return resolveSubject().getSubjectData();
     }
 
     @Override
     default SubjectData getTransientSubjectData() {
-        return tryGetSubject0().getTransientSubjectData();
+        return resolveSubject().getTransientSubjectData();
+    }
+
+    @Override
+    default boolean isSubjectDataPersisted() {
+        final Subject subject = resolveNullableSubject();
+        return subject != null && subject.isSubjectDataPersisted();
+    }
+
+    @Override
+    default Optional<String> getFriendlyIdentifier() {
+        final Subject subject = resolveNullableSubject();
+        return subject == null ? Optional.empty() : subject.getFriendlyIdentifier();
     }
 
     @Override
     default boolean hasPermission(Set<Context> contexts, String permission) {
-        final Subject subject = getInternalSubject();
+        final Subject subject = resolveNullableSubject();
         if (subject == null) {
             return getPermissionDefault(permission).asBoolean();
         } else {
@@ -101,49 +159,49 @@ public interface AbstractSubject extends Subject {
 
     @Override
     default Tristate getPermissionValue(Set<Context> contexts, String permission) {
-        final Subject subject = getInternalSubject();
+        final Subject subject = resolveNullableSubject();
         return subject == null ? getPermissionDefault(permission) : subject.getPermissionValue(contexts, permission);
     }
 
     @Override
-    default boolean isChildOf(Subject parent) {
-        final Subject subject = getInternalSubject();
+    default boolean isChildOf(SubjectReference parent) {
+        final Subject subject = resolveNullableSubject();
         return subject != null && subject.isChildOf(parent);
     }
 
     @Override
-    default boolean isChildOf(Set<Context> contexts, Subject parent) {
-        final Subject subject = getInternalSubject();
+    default boolean isChildOf(Set<Context> contexts, SubjectReference parent) {
+        final Subject subject = resolveNullableSubject();
         return subject != null && subject.isChildOf(contexts, parent);
     }
 
     @Override
-    default List<Subject> getParents() {
-        final Subject subject = getInternalSubject();
+    default List<SubjectReference> getParents() {
+        final Subject subject = resolveNullableSubject();
         return subject == null ? Collections.emptyList() : subject.getParents();
     }
 
     @Override
-    default List<Subject> getParents(Set<Context> contexts) {
-        final Subject subject = getInternalSubject();
+    default List<SubjectReference> getParents(Set<Context> contexts) {
+        final Subject subject = resolveNullableSubject();
         return subject == null ? Collections.emptyList() : subject.getParents(contexts);
     }
 
     @Override
     default Set<Context> getActiveContexts() {
-        final Subject subject = getInternalSubject();
+        final Subject subject = resolveNullableSubject();
         return subject == null ? Collections.emptySet() : subject.getActiveContexts();
     }
 
     @Override
     default Optional<String> getOption(String key) {
-        final Subject subject = getInternalSubject();
+        final Subject subject = resolveNullableSubject();
         return subject == null ? Optional.empty() : subject.getOption(key);
     }
 
     @Override
     default Optional<String> getOption(Set<Context> contexts, String key) {
-        final Subject subject = getInternalSubject();
+        final Subject subject = resolveNullableSubject();
         return subject == null ? Optional.empty() : subject.getOption(contexts, key);
     }
 }

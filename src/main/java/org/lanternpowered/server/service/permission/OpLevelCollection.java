@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.service.permission;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
@@ -36,6 +38,7 @@ import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,71 +47,77 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class OpLevelCollection extends LanternSubjectCollection {
+public final class OpLevelCollection extends LanternSubjectCollection {
 
     private final Map<String, OpLevelSubject> levels;
 
-    public OpLevelCollection(LanternPermissionService service) {
+    OpLevelCollection(LanternPermissionService service) {
         super(PermissionService.SUBJECTS_GROUP, service);
-        ImmutableMap.Builder<String, OpLevelSubject> build = ImmutableMap.builder();
+        final ImmutableMap.Builder<String, OpLevelSubject> build = ImmutableMap.builder();
         for (int i = 0; i <= 4; ++i) {
-            build.put("op_" + i, new OpLevelSubject(service, i)); // TODO: Add subject data
+            build.put("op_" + i, new OpLevelSubject(service, i));
         }
         this.levels = build.build();
     }
 
     @Override
     public LanternSubject get(String identifier) {
-        if (this.levels.containsKey(identifier)) {
-            return this.levels.get(identifier);
-        } else {
-            throw new IllegalArgumentException(identifier + " is not a valid op level group name (op_{0,4})");
-        }
+        final LanternSubject subject = this.levels.get(identifier);
+        checkArgument(subject != null, "%s is not a valid op level group name (op_{0,4})", identifier);
+        return subject;
     }
 
     @Override
-    public boolean hasRegistered(String identifier) {
+    public boolean isRegistered(String identifier) {
         return this.levels.containsKey(identifier);
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterable<Subject> getAllSubjects() {
+    @SuppressWarnings("unchecked")
+    public Collection<Subject> getLoadedSubjects() {
         return (Collection) this.levels.values();
     }
 
-    public static class OpLevelSubject extends LanternSubject {
+    static final class OpLevelSubject extends LanternSubject {
 
         private final LanternPermissionService service;
-        private final int level;
         private final MemorySubjectData data;
+        private final int level;
 
-        public OpLevelSubject(final LanternPermissionService service, final int level) {
+        OpLevelSubject(LanternPermissionService service, int level) {
             this.service = service;
             this.level = level;
             this.data = new GlobalMemorySubjectData(service) {
 
                 @Override
-                public List<Subject> getParents(Set<Context> contexts) {
-                    if (!GLOBAL_CONTEXT.equals(contexts)) {
+                public List<SubjectReference> getParents(Set<Context> contexts) {
+                    if (!contexts.isEmpty()) {
                         return Collections.emptyList();
                     }
                     if (level == 0) {
                         return super.getParents(contexts);
                     } else {
-                        return ImmutableList.<Subject>builder().add(service.getGroupForOpLevel(level - 1)).addAll(super.getParents(contexts)).build();
+                        return ImmutableList.<SubjectReference>builder()
+                                .add(service.getGroupForOpLevel(level - 1).asSubjectReference())
+                                .addAll(super.getParents(contexts))
+                                .build();
                     }
                 }
             };
         }
 
-        public int getOpLevel() {
+        int getOpLevel() {
             return this.level;
         }
 
         @Override
         public String getIdentifier() {
             return "op_" + this.level;
+        }
+
+        @Override
+        public Optional<String> getFriendlyIdentifier() {
+            return Optional.empty();
         }
 
         @Override
@@ -122,14 +131,18 @@ public class OpLevelCollection extends LanternSubjectCollection {
         }
 
         @Override
-        public MemorySubjectData getSubjectData() {
-            return this.data;
+        public PermissionService getService() {
+            return service;
         }
 
         @Override
-        public Optional<String> getOption(Set<Context> contexts, String key) {
-            return Optional.empty();
+        public SubjectReference asSubjectReference() {
+            return this.service.newSubjectReference(getContainingCollection().getIdentifier(), getIdentifier());
+        }
+
+        @Override
+        public MemorySubjectData getSubjectData() {
+            return this.data;
         }
     }
-
 }

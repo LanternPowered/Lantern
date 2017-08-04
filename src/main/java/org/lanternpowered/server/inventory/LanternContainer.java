@@ -217,7 +217,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
                 index = ((LanternOrderedInventory) this.playerInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY)).getSlotIndex(slot);
             }
             if (index == -1) {
-                index = this.openInventory.getSlotIndex(slot);
+                index = getSlotIndex(slot);
             } else {
                 windowId = -2;
             }
@@ -233,7 +233,6 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     }
 
     protected void collectPropertyChanges(List<Message> messages) {
-
     }
 
     @Override

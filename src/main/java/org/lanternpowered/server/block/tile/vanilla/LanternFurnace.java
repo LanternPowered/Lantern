@@ -67,6 +67,30 @@ import javax.annotation.Nullable;
 
 public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior {
 
+    private static final class FuelSlot extends LanternFuelSlot {
+
+        FuelSlot(@Nullable Inventory parent) {
+            super(parent);
+        }
+
+        @Override
+        public boolean doesAllowShiftClickOffer() {
+            return false;
+        }
+    }
+
+    private static final class InputSlot extends LanternInputSlot {
+
+        InputSlot(@Nullable Inventory parent) {
+            super(parent);
+        }
+
+        @Override
+        public boolean doesAllowShiftClickOffer() {
+            return false;
+        }
+    }
+
     private class FurnaceInventory extends LanternOrderedInventory implements ITileEntityInventory, IFurnaceInventory {
 
         private final LanternInputSlot inputSlot;
@@ -78,8 +102,8 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
             super(parent, name);
 
-            registerSlot(this.inputSlot = new LanternInputSlot(this));
-            registerSlot(this.fuelSlot = new LanternFuelSlot(this));
+            registerSlot(this.inputSlot = new InputSlot(this));
+            registerSlot(this.fuelSlot = new FuelSlot(this));
             registerSlot(this.outputSlot = new LanternOutputSlot(this));
 
             finalizeContent();

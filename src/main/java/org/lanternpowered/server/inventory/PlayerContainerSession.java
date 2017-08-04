@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.container.FurnaceInventoryContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
@@ -69,6 +70,8 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+import org.spongepowered.api.item.inventory.slot.FuelSlot;
+import org.spongepowered.api.item.inventory.slot.InputSlot;
 import org.spongepowered.api.item.inventory.slot.OutputSlot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
@@ -701,6 +704,13 @@ public class PlayerContainerSession {
                             tempStack.setTempMaxQuantity(originalMaxStackSize);
                             final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(windowId, slot, tempStack, offhand);
                             result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
+                        }
+                        // Fix client glitches
+                        // TODO: Remove when refactoring shift clicking
+                        if (this.openContainer instanceof FurnaceInventoryContainer) {
+                            final LanternOrderedInventory inventory = this.openContainer.openInventory;
+                            this.openContainer.queueSlotChange(inventory.query(InputSlot.class).<InputSlot>first());
+                            this.openContainer.queueSlotChange(inventory.query(FuelSlot.class).<FuelSlot>first());
                         }
 
                         if (result.getOfferResult().isSuccess()) {

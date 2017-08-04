@@ -190,9 +190,11 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
         check();
 
         // Attempt to generate a id for the smelting recipe
-        final String ingredient = this.exemplaryIngredient.getType().getId();
+        String ingredient = this.exemplaryIngredient.getType().getId();
+        ingredient = ingredient.substring(ingredient.indexOf(':') + 1);
         final ItemStackSnapshot exemplaryResult = getResultProvider().get(this.exemplaryIngredient).getResult();
-        final String result = exemplaryResult.getType().getId();
+        String result = exemplaryResult.getType().getId();
+        result = result.substring(result.indexOf(':') + 1);
 
         final String id = ingredient + "_to_" + result;
         final int count = idCounters.computeIfAbsent(id, s -> 0) + 1;

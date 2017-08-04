@@ -41,7 +41,6 @@ import org.spongepowered.api.data.property.PropertyStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,18 +60,14 @@ public final class LanternPropertyRegistry implements PropertyRegistry {
     @SuppressWarnings({"unchecked", "Convert2streamapi", "SuspiciousMethodCalls"})
     public void registerBlockPropertyStores(PropertyProviderCollection collection) {
         for (Class<? extends Property> entry : collection.keys()) {
-            if (!this.propertyStoreMap.containsKey(entry)) {
-                register(entry, new BlockPropertyStore(entry));
-            }
+            register(entry, new BlockPropertyStore(entry));
         }
     }
 
     @SuppressWarnings({"unchecked", "Convert2streamapi", "SuspiciousMethodCalls"})
     public void registerItemPropertyStores(org.lanternpowered.server.item.PropertyProviderCollection collection) {
         for (Class<? extends Property> entry : collection.keys()) {
-            if (!this.propertyStoreMap.containsKey(entry)) {
-                register(entry, new ItemPropertyStore(entry));
-            }
+            register(entry, new ItemPropertyStore(entry));
         }
     }
 
@@ -81,7 +76,7 @@ public final class LanternPropertyRegistry implements PropertyRegistry {
         this.allowRegistrations = false;
         for (Map.Entry<Class<? extends Property<?, ?>>, List<PropertyStore<?>>> entry : this.propertyStoreMap.entrySet()) {
             final ImmutableList.Builder<PropertyStore<?>> propertyStoreBuilder = ImmutableList.builder();
-            Collections.sort(entry.getValue(), (o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()));
+            entry.getValue().sort((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()));
             propertyStoreBuilder.addAll(entry.getValue());
             this.delegateMap.put(entry.getKey(), new PropertyStoreDelegate(propertyStoreBuilder.build()));
         }
@@ -112,9 +107,7 @@ public final class LanternPropertyRegistry implements PropertyRegistry {
         final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
         for (Map.Entry<Class<? extends Property<?, ?>>, PropertyStoreDelegate<?>> entry : this.delegateMap.entrySet()) {
             final Optional<? extends Property<?, ?>> optional = entry.getValue().getFor(holder);
-            if (optional.isPresent()) {
-                builder.add(optional.get());
-            }
+            optional.ifPresent(builder::add);
         }
         return builder.build();
     }

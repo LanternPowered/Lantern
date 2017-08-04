@@ -25,17 +25,24 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.World;
+
+import java.util.Iterator;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 public class LanternCraftingInventory extends LanternGridInventory implements CraftingInventory {
 
-    private CraftingGridInventory gridInventory;
+    private CraftingGridInventory craftingGrid;
     private CraftingOutput craftingOutput;
 
     public LanternCraftingInventory(@Nullable Inventory parent) {
@@ -46,29 +53,52 @@ public class LanternCraftingInventory extends LanternGridInventory implements Cr
         super(parent, name);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void finalizeContent() {
         super.finalizeContent();
 
         try {
-            this.gridInventory = query(CraftingGridInventory.class).first();
+            this.craftingGrid = query(CraftingGridInventory.class).first();
         } catch (ClassCastException e) {
-            throw new IllegalStateException("Unable to find the GridInventory");
+            throw new IllegalStateException("Unable to find the CraftingGridInventory");
         }
         try {
             this.craftingOutput = query(CraftingOutput.class).first();
         } catch (ClassCastException e) {
             throw new IllegalStateException("Unable to find the CraftingOutput");
         }
+
+        ((IInventory) this.craftingGrid).addChangeListener(slot -> {
+            final Optional<CraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
+                    .getResult(this.craftingGrid, getWorld());
+            this.craftingOutput.set(optResult
+                    .map(CraftingResult::getResult)
+                    .map(ItemStackSnapshot::createStack)
+                    .orElse(null));
+        });
     }
 
     @Override
     public CraftingGridInventory getCraftingGrid() {
-        return this.gridInventory;
+        return this.craftingGrid;
     }
 
     @Override
     public CraftingOutput getResult() {
         return this.craftingOutput;
+    }
+
+    /**
+     * Attempts to get a {@link World} instance that is passed through in the
+     * crafting system. By default, lets just use the first {@link World} that
+     * we can find.
+     *
+     * @return The world
+     */
+    @Nullable
+    protected World getWorld() {
+        final Iterator<World> it = Lantern.getWorldManager().getWorlds().iterator();
+        return it.hasNext() ? it.next() : null;
     }
 }

@@ -23,19 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.item.recipe.crafting;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.recipe.crafting.Ingredient;
 
-public final class HandlerPlayInCloseWindow implements Handler<MessagePlayInOutCloseWindow> {
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+
+final class EmptyIngredientList implements IngredientList {
+
+    static final EmptyIngredientList INSTANCE = new EmptyIngredientList();
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInOutCloseWindow message) {
-        final LanternPlayer player = context.getSession().getPlayer();
-        player.getContainerSession().setRawOpenContainer(null, Cause.source(player).build());
+    public Optional<ItemStack> getOne(Ingredient ingredient) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Collection<ItemStack> getAll(Ingredient ingredient) {
+        return Collections.emptyList();
     }
 }

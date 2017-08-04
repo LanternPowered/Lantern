@@ -33,6 +33,7 @@ import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
@@ -428,6 +429,11 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     }
 
     @Override
+    public void addChangeListener(SlotChangeListener listener) {
+        this.children.forEach(inv -> inv.addChangeListener(listener));
+    }
+
+    @Override
     public Optional<ItemStack> poll(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         // Loop through the children inventories
@@ -649,5 +655,11 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     protected void removeViewer(Viewer viewer, LanternContainer container) {
         super.removeViewer(viewer, container);
         this.children.forEach(child -> child.removeViewer(viewer, container));
+    }
+
+    @Override
+    void close() {
+        super.close();
+        this.children.forEach(AbstractInventory::close);
     }
 }

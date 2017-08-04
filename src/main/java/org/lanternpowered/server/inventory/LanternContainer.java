@@ -74,6 +74,18 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
      * used as the bottom inventory and also as top inventory if {@code null} is provided
      * for the inventory that should be opened.
      *
+     * @param playerInventory The player inventory
+     * @param openInventory The inventory to open
+     */
+    public LanternContainer(LanternPlayerInventory playerInventory, @Nullable OrderedInventory openInventory) {
+        this(openInventory != null ? openInventory.getName() : null, playerInventory, openInventory);
+    }
+
+    /**
+     * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
+     * used as the bottom inventory and also as top inventory if {@code null} is provided
+     * for the inventory that should be opened.
+     *
      * @param name The name of the container
      * @param playerInventory The player inventory
      * @param openInventory The inventory to open
@@ -149,7 +161,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     protected abstract void openInventoryFor(LanternPlayer viewer);
 
     public void openInventoryForAndInitialize(Player viewer) {
-        this.openInventoryFor((LanternPlayer) viewer);
+        openInventoryFor((LanternPlayer) viewer);
 
         final List<ItemStack> items = this.slots.stream()
                 .map(slot -> slot.peek().orElse(null)).collect(Collectors.toList());
@@ -164,7 +176,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
      * @param slot The slot
      */
     public void queueSlotChange(Slot slot) {
-        this.queueSlotChange(slot, false);
+        queueSlotChange(slot, false);
     }
 
     /**
@@ -175,7 +187,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
      * @param slot The slot
      */
     public void queueSilentSlotChange(Slot slot) {
-        this.queueSlotChange(slot, true);
+        queueSlotChange(slot, true);
     }
 
     void queueSlotChange(Slot slot, boolean silent) {
@@ -205,7 +217,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
                 index = ((LanternOrderedInventory) this.playerInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY)).getSlotIndex(slot);
             }
             if (index == -1) {
-                index = this.openInventory.getSlotIndex(slot);
+                index = getSlotIndex(slot);
             } else {
                 windowId = -2;
             }
@@ -214,9 +226,13 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             }
         }
         this.dirtySlots.clear();
+        collectPropertyChanges(messages);
         if (!messages.isEmpty()) {
             getRawViewers().forEach(player -> ((LanternPlayer) player).getConnection().send(messages));
         }
+    }
+
+    protected void collectPropertyChanges(List<Message> messages) {
     }
 
     @Override

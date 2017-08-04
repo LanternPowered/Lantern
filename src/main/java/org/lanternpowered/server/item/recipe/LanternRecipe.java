@@ -23,32 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.item.recipe;
 
-import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
-import org.lanternpowered.server.inventory.LanternCraftingInventory;
-import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
-import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.recipe.Recipe;
 
-import javax.annotation.Nullable;
+public abstract class LanternRecipe extends PluginCatalogType.Base implements Recipe {
 
-public class WorkbenchInventory extends LanternCraftingInventory {
+    private final ItemStackSnapshot exemplaryResult;
 
-    public WorkbenchInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+    public LanternRecipe(String pluginId, String name, ItemStackSnapshot exemplaryResult) {
+        super(pluginId, name);
+        this.exemplaryResult = exemplaryResult;
+    }
 
-        this.registerSlot(new LanternCraftingOutput(this));
-        this.registerChild(new LanternCraftingGridInventory(this) {
-            {
-                for (int y = 0; y < 3; y++) {
-                    for (int x = 0; x < 3; x++) {
-                        this.registerSlotAt(x, y, new LanternCraftingInput(this));
-                    }
-                }
-                this.finalizeContent();
-            }
-        });
+    public LanternRecipe(String pluginId, String id, String name, ItemStackSnapshot exemplaryResult) {
+        super(pluginId, id, name);
+        this.exemplaryResult = exemplaryResult;
+    }
+
+    @Override
+    public ItemStackSnapshot getExemplaryResult() {
+        return this.exemplaryResult;
     }
 }

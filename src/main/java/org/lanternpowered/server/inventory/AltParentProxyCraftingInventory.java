@@ -29,7 +29,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.inventory.type.OrderedInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.world.World;
 
@@ -40,7 +39,7 @@ import javax.annotation.Nullable;
 public class AltParentProxyCraftingInventory extends AltParentProxyGridInventory implements CraftingInventory {
 
     protected AltParentProxyCraftingInventory(@Nullable Inventory parent,
-            OrderedInventory delegate) {
+            CraftingInventory delegate) {
         super(parent, delegate);
     }
 

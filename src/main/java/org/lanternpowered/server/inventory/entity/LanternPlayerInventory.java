@@ -42,6 +42,8 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.World;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -82,6 +84,12 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                     }
                 });
                 finalizeContent();
+            }
+
+            @Override
+            protected World getWorld() {
+                // Use the world of the player
+                return getCarrier().map(Locatable::getWorld).orElseGet(() -> super.getWorld());
             }
         });
         this.equipmentInventory = registerChild(new LanternEquipmentInventory(this, player) {

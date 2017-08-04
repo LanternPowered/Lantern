@@ -63,6 +63,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
@@ -102,6 +103,7 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
@@ -995,6 +997,21 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         checkNotNull(category, "category");
         this.broadcast(() -> ((LanternSoundType) sound).createMessage(position,
                 category, (float) Math.max(minVolume, volume), (float) pitch));
+    }
+
+    @Override
+    public void playRecord(Vector3i position, RecordType recordType) {
+        playOrStopRecord(position, checkNotNull(recordType, "recordType"));
+    }
+
+    @Override
+    public void stopRecord(Vector3i position) {
+        playOrStopRecord(position, null);
+    }
+
+    private void playOrStopRecord(Vector3i position, @Nullable RecordType recordType) {
+        checkNotNull(position, "position");
+        broadcast(() -> new MessagePlayOutRecord(position, recordType));
     }
 
     private void spawnParticles(Iterator<LanternPlayer> players, ParticleEffect particleEffect, Vector3d position) {

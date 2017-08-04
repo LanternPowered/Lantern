@@ -32,17 +32,15 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.block.tile.ITileEntityInventory;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
-import org.lanternpowered.server.data.type.record.RecordType;
 import org.lanternpowered.server.inventory.slot.HasPropertyItemFilter;
 import org.lanternpowered.server.inventory.slot.LanternFilteringSlot;
-import org.lanternpowered.server.item.property.RecordProperty;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
-import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.item.RecordProperty;
+import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.event.cause.Cause;
@@ -93,8 +91,7 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
         final RecordProperty property = recordItem.getProperty(RecordProperty.class).orElse(null);
         final RecordType recordType = property == null ? null : property.getValue();
         if (recordType != null) {
-            ((LanternWorld) location.getExtent()).broadcast(
-                    () -> new MessagePlayOutRecord(location.getBlockPosition(), recordType));
+            location.getExtent().playRecord(location.getBlockPosition(), recordType);
         }
     }
 
@@ -105,8 +102,7 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
         }
         this.playing = false;
         final Location<World> location = getLocation();
-        ((LanternWorld) location.getExtent()).broadcast(
-                () -> new MessagePlayOutRecord(location.getBlockPosition(), null));
+        location.getExtent().stopRecord(location.getBlockPosition());
     }
 
     @Override

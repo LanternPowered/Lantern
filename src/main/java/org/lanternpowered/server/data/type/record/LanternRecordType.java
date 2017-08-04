@@ -26,10 +26,20 @@
 package org.lanternpowered.server.data.type.record;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.effect.sound.record.RecordType;
 
 public class LanternRecordType extends PluginCatalogType.Base.Translatable.Internal implements RecordType {
 
-    public LanternRecordType(String pluginId, String name, String translation, int internalId) {
+    private final SoundType soundType;
+
+    public LanternRecordType(String pluginId, String name, String translation, int internalId, SoundType soundType) {
         super(pluginId, name, translation, internalId);
+        this.soundType = soundType;
+    }
+
+    @Override
+    public SoundType getSound() {
+        return this.soundType;
     }
 }

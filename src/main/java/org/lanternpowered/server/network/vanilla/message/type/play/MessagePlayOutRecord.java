@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.data.type.record.RecordType;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.effect.sound.record.RecordType;
 
 import java.util.Optional;
 

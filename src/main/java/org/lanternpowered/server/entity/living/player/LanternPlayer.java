@@ -77,6 +77,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
@@ -108,6 +109,7 @@ import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -832,6 +834,21 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         checkNotNull(category, "category");
         this.session.send(((LanternSoundType) sound).createMessage(position,
                 category, (float) Math.max(minVolume, volume), (float) pitch));
+    }
+
+    @Override
+    public void playRecord(Vector3i position, RecordType recordType) {
+        playOrStopRecord(position, checkNotNull(recordType, "recordType"));
+    }
+
+    @Override
+    public void stopRecord(Vector3i position) {
+        playOrStopRecord(position, null);
+    }
+
+    private void playOrStopRecord(Vector3i position, @Nullable RecordType recordType) {
+        checkNotNull(position, "position");
+        getConnection().send(new MessagePlayOutRecord(position, recordType));
     }
 
     @Override

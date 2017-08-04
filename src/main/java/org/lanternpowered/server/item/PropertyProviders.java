@@ -28,24 +28,24 @@ package org.lanternpowered.server.item;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.data.type.record.RecordType;
 import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
 import org.lanternpowered.server.item.property.CooldownProperty;
 import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
-import org.lanternpowered.server.item.property.RecordProperty;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
 import org.spongepowered.api.data.property.item.FoodRestorationProperty;
+import org.spongepowered.api.data.property.item.RecordProperty;
 import org.spongepowered.api.data.property.item.SaturationProperty;
 import org.spongepowered.api.data.property.item.ToolTypeProperty;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 
 import java.util.Collection;

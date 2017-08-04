@@ -92,6 +92,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     private final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey = new HashMap<>();
 
     private final Set<ContainerViewListener> viewerListeners = new HashSet<>();
+    final Set<InventoryCloseListener> closeListeners = new HashSet<>();
 
     public AbstractMutableInventory(@Nullable Inventory parent, @Nullable Translation name) {
         this.parent = parent;
@@ -441,5 +442,17 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     protected void removeViewer(Viewer viewer, LanternContainer container) {
         this.viewerListeners.removeIf(listener ->
                 listener.onViewerRemoved(viewer, container) == ContainerViewListener.Result.REMOVE_LISTENER);
+    }
+
+    @Override
+    public void addCloseListener(InventoryCloseListener closeListener) {
+        this.closeListeners.add(checkNotNull(closeListener, "closeListener"));
+    }
+
+    @Override
+    void close() {
+        for (InventoryCloseListener listener : this.closeListeners) {
+            listener.onClose(this);
+        }
     }
 }

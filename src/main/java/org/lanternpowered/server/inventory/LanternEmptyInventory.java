@@ -145,6 +145,10 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     }
 
     @Override
+    public void addCloseListener(InventoryCloseListener listener) {
+    }
+
+    @Override
     public void clear() {
     }
 

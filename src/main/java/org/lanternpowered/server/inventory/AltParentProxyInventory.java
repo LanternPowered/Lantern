@@ -83,6 +83,11 @@ public class AltParentProxyInventory extends AbstractInventory {
     }
 
     @Override
+    public void addCloseListener(InventoryCloseListener listener) {
+        this.delegate.addCloseListener(listener);
+    }
+
+    @Override
     public Iterator<Inventory> iterator() {
         return new Iterator<Inventory>() {
             private final Iterator<Inventory> it = delegate.iterator();
@@ -348,5 +353,10 @@ public class AltParentProxyInventory extends AbstractInventory {
     @Override
     public Translation getName() {
         return this.delegate.getName();
+    }
+
+    @Override
+    void close() {
+        this.delegate.close();
     }
 }

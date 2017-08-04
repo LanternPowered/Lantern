@@ -54,6 +54,13 @@ public interface IInventory extends Inventory {
      */
     void addViewListener(ContainerViewListener listener);
 
+    /**
+     * Adds a {@link InventoryCloseListener} to this {@link Inventory}.
+     *
+     * @param listener The listener
+     */
+    void addCloseListener(InventoryCloseListener listener);
+
     Optional<ItemStack> poll(ItemType itemType);
 
     Optional<ItemStack> poll(Predicate<ItemStack> matcher);

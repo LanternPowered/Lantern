@@ -315,4 +315,7 @@ public abstract class AbstractInventory implements IInventory {
 
     void removeViewer(Viewer viewer, LanternContainer container) {
     }
+
+    void close() {
+    }
 }

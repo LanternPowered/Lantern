@@ -25,22 +25,27 @@
  */
 package org.lanternpowered.server.inventory.block;
 
+import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class CraftingTableInventory extends LanternCraftingInventory implements ICraftingTableInventory {
 
     public CraftingTableInventory(@Nullable Inventory parent, @Nullable Translation name) {
@@ -57,10 +62,23 @@ public class CraftingTableInventory extends LanternCraftingInventory implements 
                 finalizeContent();
             }
         });
+        addCloseListener(inventory -> {
+            if (parent instanceof CarriedInventory) {
+                ((CarriedInventory<Carrier>) parent).getCarrier().ifPresent(carrier -> {
+                    if (carrier instanceof Locatable) {
+                        final Cause cause = Cause.source(this).named(NamedCause.owner(carrier)).build();
+                        final Location<World> location = ((Locatable) carrier).getLocation();
+                        LanternEventHelper.fireDropItemEventDispense(cause, entities -> getCraftingGrid().slots().forEach(
+                                slot -> slot.poll().filter(stack -> !stack.isEmpty()).ifPresent(
+                                        stack -> entities.add(LanternEventHelper.createDroppedItem(location, stack.createSnapshot())))));
+                    }
+                });
+            }
+        });
+
         finalizeContent();
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     protected World getWorld() {

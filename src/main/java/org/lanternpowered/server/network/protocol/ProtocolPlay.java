@@ -133,7 +133,6 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClientSettings;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCloseWindow;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInContainerSessionForwarding;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
@@ -323,7 +322,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInClickWindow.class, MessagePlayInClickWindow.class)
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowClick));
         inbound.bind(CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class)
-                .bindHandler(new HandlerPlayInCloseWindow());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowClose));
         inbound.bind(CodecPlayInOutCustomPayload.class);
         inbound.bind(CodecPlayInUseEntity.class);
         inbound.bind(CodecInOutPing.class, MessageInOutKeepAlive.class);

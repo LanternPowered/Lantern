@@ -656,4 +656,10 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         super.removeViewer(viewer, container);
         this.children.forEach(child -> child.removeViewer(viewer, container));
     }
+
+    @Override
+    void close() {
+        super.close();
+        this.children.forEach(AbstractInventory::close);
+    }
 }

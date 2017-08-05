@@ -33,17 +33,23 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.element.ElementListener;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
-import org.lanternpowered.server.inventory.block.IFurnaceInventory;
-import org.lanternpowered.server.inventory.property.SmeltingProgress;
-import org.lanternpowered.server.inventory.property.SmeltingProgressProperty;
+import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.ContainerProperties;
+import org.lanternpowered.server.inventory.client.FurnaceClientContainer;
+import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
 import org.lanternpowered.server.inventory.slot.LanternInputSlot;
 import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.fuel.IFuel;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -52,14 +58,17 @@ import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.slot.InputSlot;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -67,68 +76,85 @@ import javax.annotation.Nullable;
 
 public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior {
 
-    private static final class FuelSlot extends LanternFuelSlot {
-
-        FuelSlot(@Nullable Inventory parent) {
-            super(parent);
-        }
-
-        @Override
-        public boolean doesAllowShiftClickOffer() {
-            return false;
-        }
-    }
-
-    private static final class InputSlot extends LanternInputSlot {
-
-        InputSlot(@Nullable Inventory parent) {
-            super(parent);
-        }
-
-        @Override
-        public boolean doesAllowShiftClickOffer() {
-            return false;
-        }
-    }
-
-    private class FurnaceInventory extends LanternOrderedInventory implements ITileEntityInventory, IFurnaceInventory {
+    private class FurnaceInventory extends LanternOrderedInventory implements ITileEntityInventory, VanillaOpenableInventory {
 
         private final LanternInputSlot inputSlot;
         private final LanternFuelSlot fuelSlot;
         private final LanternOutputSlot outputSlot;
 
-        @Nullable private SmeltingProgressProperty cachedProperty;
+        private double smeltProgress;
+        private double fuelProgress;
 
         FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
             super(parent, name);
 
-            registerSlot(this.inputSlot = new InputSlot(this));
-            registerSlot(this.fuelSlot = new FuelSlot(this));
+            registerSlot(this.inputSlot = new LanternInputSlot(this));
+            registerSlot(this.fuelSlot = new LanternFuelSlot(this, stack ->
+                    Lantern.getRegistry().getFuelRegistry().findMatching(stack.createSnapshot()).isPresent()));
             registerSlot(this.outputSlot = new LanternOutputSlot(this));
 
             finalizeContent();
         }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> propertyType, @Nullable Object key) {
-            if (propertyType == SmeltingProgressProperty.class) {
-                SmeltingProgressProperty property = this.cachedProperty;
-                if (property == null) {
-                    property = this.cachedProperty = new SmeltingProgressProperty(new SmeltingProgress(
-                            get(Keys.MAX_BURN_TIME).get(),
-                            get(Keys.PASSED_BURN_TIME).get(),
-                            get(Keys.MAX_COOK_TIME).get(),
-                            get(Keys.PASSED_COOK_TIME).get()));
-                }
-                return Optional.of((T) property);
-            }
-            return super.tryGetProperty(propertyType, key);
-        }
-
         @Override
         public Optional<TileEntityCarrier> getTileEntity() {
             return Optional.of(LanternFurnace.this);
+        }
+
+        @Override
+        public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
+            // Use the default behavior in case the slot is located in this inventory
+            if (isChild(slot)) {
+                if (slot instanceof InputSlot) {
+                    // The input slots uses a different insertion order to the default
+                    return container.getPlayerInventory().getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
+                }
+                return VanillaOpenableInventory.super.getShiftClickTarget(container, slot);
+            }
+            // The item stack should be present
+            final ItemStackSnapshot snapshot = LanternItemStackSnapshot.wrap(slot.peek().get()); // Wrap, peek creates a copy
+            // Check if the item can be used as a ingredient
+            final Optional<SmeltingRecipe> optSmeltingRecipe = Lantern.getRegistry()
+                    .getSmeltingRecipeRegistry().findMatchingRecipe(snapshot);
+            final List<IInventory> inventories = new ArrayList<>();
+            if (optSmeltingRecipe.isPresent()) {
+                inventories.add(this.inputSlot);
+            }
+            // Check if the item can be used as a fuel
+            final Optional<IFuel> optFuel = Lantern.getRegistry()
+                    .getFuelRegistry().findMatching(snapshot);
+            if (optFuel.isPresent()) {
+                inventories.add(this.fuelSlot);
+            }
+            return inventories.isEmpty() ? VanillaOpenableInventory.super.getShiftClickTarget(container, slot) :
+                    inventories.size() == 1 ? inventories.get(0) : inventories.get(0).union(inventories.get(1));
+        }
+
+        @Override
+        public boolean disableShiftClickWhenFull() {
+            return false;
+        }
+
+        @Override
+        public ClientContainer constructClientContainer0(LanternContainer container) {
+            final FurnaceClientContainer clientContainer = new FurnaceClientContainer(TextTranslation.toText(getName()));
+            // Provide the smelting progress
+            clientContainer.bindPropertySupplier(ContainerProperties.SMELT_PROGRESS, () -> {
+                double smeltProgress = this.smeltProgress;
+                if (smeltProgress < 0) {
+                    smeltProgress = this.smeltProgress = get(Keys.PASSED_COOK_TIME).get().doubleValue() / get(Keys.MAX_COOK_TIME).get().doubleValue();
+                }
+                return smeltProgress;
+            });
+            // Provide the fuel progress
+            clientContainer.bindPropertySupplier(ContainerProperties.FUEL_PROGRESS, () -> {
+                double fuelProgress = this.fuelProgress;
+                if (fuelProgress < 0) {
+                    fuelProgress = this.fuelProgress = 1.0 - get(Keys.PASSED_BURN_TIME).get().doubleValue() / get(Keys.MAX_BURN_TIME).get().doubleValue();
+                }
+                return fuelProgress;
+            });
+            return clientContainer;
         }
     }
 
@@ -143,7 +169,10 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         super.registerKeys();
 
         final ValueCollection c = getValueCollection();
-        final ElementListener<Integer> clearProperty = (oldElement, newElement) -> this.inventory.cachedProperty = null;
+        final ElementListener<Integer> clearProperty = (oldElement, newElement) -> {
+            this.inventory.smeltProgress = -1;
+            this.inventory.fuelProgress = -1;
+        };
         c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
         c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME).addListener(clearProperty);
         c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
@@ -196,7 +225,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                         .findMatchingRecipe(inputSlotItemSnapshot);
                 if (smeltingRecipe.isPresent()) {
                     final int quantity = ((ISmeltingRecipe) smeltingRecipe.get()).getIngredient().getQuantity(inputSlotItemSnapshot);
-                    if (inputSlotItemSnapshot.getCount() >= quantity) {
+                    if (inputSlotItemSnapshot.getQuantity() >= quantity) {
                         smeltingResult = smeltingRecipe.get().getResult(inputSlotItemSnapshot);
                         // Check if the item can be smelted
                         if (smeltingResult.isPresent()) {

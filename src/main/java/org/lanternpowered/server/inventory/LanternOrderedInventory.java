@@ -98,6 +98,10 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
         return childInventory;
     }
 
+    public Object2IntMap<LanternSlot> getIndexBySlots() {
+        return this.indexBySlot;
+    }
+
     int nextFreeSlotIndex() {
         for (int i = 0; i < this.slots.size(); i++) {
             if (this.slots.get(i) == null) {

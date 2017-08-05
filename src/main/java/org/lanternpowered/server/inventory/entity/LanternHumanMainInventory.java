@@ -26,13 +26,9 @@
 package org.lanternpowered.server.inventory.entity;
 
 import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
-import org.spongepowered.api.item.inventory.type.GridInventory;
-import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 

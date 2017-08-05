@@ -35,11 +35,15 @@ import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;
+import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.property.GuiIds;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
 import java.util.List;
 
+@RegistrationDependency(ClientContainerRegistryModule.class)
 public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModule<InventoryArchetype> {
 
     public InventoryArchetypeRegistryModule() {
@@ -90,6 +94,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(menuRowArchetype)
                 .with(menuRowArchetype)
                 .property(new InventoryDimension(9, 3))
+                .property(new GuiIdProperty(GuiIds.CHEST))
                 .build("sponge:menu_grid", "Menu Grid");
         register(menuGridArchetype);
 
@@ -103,6 +108,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(chestArchetype)
                 .with(chestArchetype)
                 .property(new InventoryDimension(9, 6))
+                .property(new GuiIdProperty(GuiIds.CHEST))
                 .property(InventoryTitle.of(t("container.chestDouble")))
                 .build("minecraft:double_chest", "Double Chest");
         register(doubleChestArchetype);
@@ -121,6 +127,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                         .build("minecraft:furnace_output", "Furnace Output"))
                 .property(new InventoryTitle(t("container.furnace")))
                 .property(new InventoryDimension(3, 1))
+                .property(new GuiIdProperty(GuiIds.FURNACE))
                 .build("minecraft:furnace", "Furnace");
         register(furnaceArchetype);
 
@@ -128,6 +135,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(menuGridArchetype)
                 .property(new InventoryDimension(3, 3))
                 .property(InventoryTitle.of(t("container.dispenser")))
+                .property(new GuiIdProperty(GuiIds.DISPENSER))
                 .build("minecraft:dispenser", "Dispenser");
         register(dispenserArchetype);
 
@@ -138,6 +146,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                         .build("minecraft:workbench_grid", "Workbench Grid"))
                 .with(slotArchetype)
                 .property(InventoryTitle.of(t("container.crafting")))
+                .property(new GuiIdProperty(GuiIds.CRAFTING_TABLE))
                 .build("minecraft:workbench", "Workbench");
         register(workbenchArchetype);
 
@@ -145,6 +154,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(menuRowArchetype)
                 .property(new InventoryDimension(5, 1))
                 .property(InventoryTitle.of(t("container.brewing")))
+                .property(new GuiIdProperty(GuiIds.BREWING_STAND))
                 .build("minecraft:brewing_stand", "Brewing Stand");
         register(brewingStandArchetype);
 
@@ -152,6 +162,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(menuRowArchetype)
                 .property(new InventoryDimension(5, 1))
                 .property(InventoryTitle.of(t("container.hopper")))
+                .property(new GuiIdProperty(GuiIds.HOPPER))
                 .build("minecraft:hopper", "Hopper");
         register(hopperArchetype);
 
@@ -159,6 +170,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(slotArchetype)
                 .property(new InventoryDimension(1, 1))
                 .property(InventoryTitle.of(t("container.beacon")))
+                .property(new GuiIdProperty(GuiIds.BEACON))
                 .build("minecraft:beacon", "Beacon");
         register(beaconArchetype);
 
@@ -167,6 +179,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(slotArchetype)
                 .property(new InventoryDimension(2, 1))
                 .property(InventoryTitle.of(t("container.enchant")))
+                .property(new GuiIdProperty(GuiIds.ENCHANTING_TABLE))
                 .build("minecraft:enchanting_table", "Enchanting Table");
         register(enchantingTableArchetype);
 
@@ -176,6 +189,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(slotArchetype)
                 .property(new InventoryDimension(3, 1))
                 .property(InventoryTitle.of(t("container.repair")))
+                .property(new GuiIdProperty(GuiIds.ANVIL))
                 .build("minecraft:anvil", "Anvil");
         register(anvilArchetype);
 
@@ -184,6 +198,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(slotArchetype)
                 .with(slotArchetype)
                 .property(new InventoryDimension(3, 1))
+                .property(new GuiIdProperty(GuiIds.VILLAGER))
                 .build("minecraft:villager", "Villager");
         register(villagerArchetype);
 
@@ -191,6 +206,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(slotArchetype)
                 .with(slotArchetype)
                 .property(new InventoryDimension(2, 1))
+                .property(new GuiIdProperty(GuiIds.HORSE))
                 .build("minecraft:horse", "Horse");
         register(horseArchetype);
 
@@ -200,6 +216,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                         .from(menuGridArchetype)
                         .property(new InventoryDimension(5, 3))
                         .build("horse_grid", "Horse Grid"))
+                .property(new GuiIdProperty(GuiIds.HORSE))
                 .build("minecraft:horse_with_chest", "Horse with Chest");
         register(horseWithChestArchetype);
 

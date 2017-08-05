@@ -28,11 +28,29 @@ package org.lanternpowered.server.inventory.slot;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.function.Predicate;
+
+@FunctionalInterface
 public interface ItemFilter {
 
-    default boolean isValidItem(ItemStack stack) {
-        return isValidItem(stack.getType());
+    boolean isValidItem(ItemStack stack);
+
+    default boolean isValidItem(ItemType type) {
+        return isValidItem(ItemStack.of(type, 1));
     }
 
-    boolean isValidItem(ItemType type);
+    static ItemFilter of(Predicate<ItemType> predicate) {
+        return new ItemFilter() {
+
+            @Override
+            public boolean isValidItem(ItemStack stack) {
+                return predicate.test(stack.getType());
+            }
+
+            @Override
+            public boolean isValidItem(ItemType type) {
+                return predicate.test(type);
+            }
+        };
+    }
 }

@@ -30,19 +30,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.AbstractMutableInventory;
+import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
+import org.lanternpowered.server.inventory.OpenableInventory;
+import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
+import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.inventory.slot.LanternEquipmentSlot;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
@@ -57,7 +64,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternPlayerInventory extends LanternOrderedInventory implements PlayerInventory {
+public class LanternPlayerInventory extends LanternOrderedInventory implements PlayerInventory, OpenableInventory {
 
     @Nullable private final WeakReference<Player> player;
 
@@ -103,6 +110,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 finalizeContent();
             }
         });
+        this.offHandSlot = registerChild(new OffHandSlot(this, null));
         this.mainInventory = registerChild(new LanternHumanMainInventory(this) {
             {
                 final LanternHumanMainInventory main = this;
@@ -130,7 +138,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 prioritizeChild(this.hotbar);
             }
         });
-        this.offHandSlot = registerChild(new OffHandSlot(this, null));
+        finalizeContent();
 
         // Generate inventory views
         this.inventoryViews.put(HumanInventoryView.MAIN,
@@ -242,5 +250,36 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     @Override
     public Optional<Player> getCarrier() {
         return this.player == null ? Optional.empty() : Optional.ofNullable(this.player.get());
+    }
+
+    @Override
+    public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
+        if (slot == this.offHandSlot) {
+            // The off hand slot uses a different insertion order to the default
+            return container.getPlayerInventory().getInventoryView(HumanInventoryView.MAIN);
+        } else if (this.equipmentInventory.isChild(slot) || (slot instanceof LanternCraftingInput && isChild(slot))) {
+            return container.getPlayerInventory().getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
+        } else if (this.mainInventory.isChild(slot)) {
+            // Just try to offer to the equipment
+            return this.equipmentInventory;
+        }
+        return OpenableInventory.super.getShiftClickTarget(container, slot);
+    }
+
+    @Override
+    public boolean disableShiftClickWhenFull() {
+        return false;
+    }
+
+    @Override
+    public PlayerClientContainer constructClientContainer(LanternContainer container) {
+        final PlayerClientContainer clientContainer = new PlayerClientContainer(Text.of(getName()));
+        clientContainer.bindCursor(container.getCursorSlot());
+        clientContainer.bindHotbarBehavior(getHotbar().getHotbarBehavior());
+        clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(container));
+        clientContainer.bindBottom();
+        getIndexBySlots().object2IntEntrySet().forEach(entry ->
+                clientContainer.bindSlot(entry.getIntValue(), entry.getKey()));
+        return clientContainer;
     }
 }

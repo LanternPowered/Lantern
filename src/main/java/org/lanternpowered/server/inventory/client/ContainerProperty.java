@@ -23,22 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.property;
+package org.lanternpowered.server.inventory.client;
 
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.annotation.Nullable;
+import com.google.common.reflect.TypeToken;
 
-public final class SmeltingProgressProperty extends AbstractInventoryProperty<String, SmeltingProgress> {
+public final class ContainerProperty<T> {
 
-    public SmeltingProgressProperty(SmeltingProgress value) {
-        super(value);
+    private final TypeToken<T> valueType;
+
+    /**
+     * Constructs a new {@link ContainerProperty} with
+     * the given value type.
+     *
+     * @param valueType The value type
+     */
+    public ContainerProperty(TypeToken<T> valueType) {
+        this.valueType = checkNotNull(valueType, "valueType");
     }
 
-    @Override
-    public int compareTo(@Nullable Property<?, ?> o) {
-        // Probably not used, no point in implementing
-        return 0;
+    /**
+     * Gets the value type of this {@link ContainerProperty}.
+     *
+     * @return The value type
+     */
+    public TypeToken<T> getValueType() {
+        return this.valueType;
     }
 }

@@ -25,16 +25,26 @@
  */
 package org.lanternpowered.server.inventory.block;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.AbstractInventory;
+import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
+import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.CraftingTableClientContainer;
+import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.Locatable;
@@ -46,10 +56,10 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public class CraftingTableInventory extends LanternCraftingInventory implements ICraftingTableInventory {
+public class CraftingTableInventory extends LanternCraftingInventory implements VanillaOpenableInventory {
 
     public CraftingTableInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+        super(parent, name == null ? tr("container.crafting") : name);
 
         registerSlot(new LanternCraftingOutput(this));
         registerChild(new LanternCraftingGridInventory(this) {
@@ -90,5 +100,20 @@ public class CraftingTableInventory extends LanternCraftingInventory implements 
             }
         }
         return super.getWorld();
+    }
+
+    @Override
+    public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
+        if (slot instanceof LanternCraftingInput && isChild(slot)) {
+            // The crafting input inventories use reverse insertion order to the default
+            return container.getPlayerInventory().getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
+        }
+        // Use the default behavior, you can't shift click to the crafting grid
+        return VanillaOpenableInventory.super.getShiftClickTarget(container, slot);
+    }
+
+    @Override
+    public ClientContainer constructClientContainer0(LanternContainer container) {
+        return new CraftingTableClientContainer(TextTranslation.toText(getName()));
     }
 }

@@ -23,25 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile.vanilla;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 
-public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
+import java.util.Map;
+import java.util.Optional;
 
-    protected final I inventory;
+public interface InventoryPropertyHolder {
 
-    protected LanternContainer() {
-        this.inventory = createInventory();
-        ((AbstractInventory) this.inventory).addViewListener(this);
-    }
+    Map<String, InventoryProperty<String, ?>> getProperties();
 
-    protected abstract I createInventory();
+    Optional<InventoryProperty<String, ?>> getProperty(String key);
 
-    @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return this.inventory;
-    }
+    <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property, String key);
+
+    <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property);
 }

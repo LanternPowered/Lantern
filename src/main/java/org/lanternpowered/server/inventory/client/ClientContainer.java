@@ -25,18 +25,22 @@
  */
 package org.lanternpowered.server.inventory.client;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class ClientContainer {
 
     protected static final int[] MAIN_INVENTORY_FLAGS = new int[36];
@@ -64,25 +68,55 @@ public abstract class ClientContainer {
     protected static final int FLAG_MAIN_INVENTORY = 0x8;
 
     /**
+     * A flag that defines that the slot is present in the hotbar. The flag
+     * uses 4 bits and this is the raw slot index. Counting from 1 to 9.
+     */
+    protected static final int FLAG_HOTBAR = 0xf0;
+
+    /**
      * A counter for container ids.
      */
     private static int containerIdCounter = 1;
 
     static {
-        Arrays.fill(MAIN_INVENTORY_FLAGS, FLAG_MAIN_INVENTORY);
+        Arrays.fill(MAIN_INVENTORY_FLAGS, 0, 27, FLAG_MAIN_INVENTORY);
+        for (int i = 0; i < 9; i++) {
+            // Apply the hotbar flags
+            MAIN_INVENTORY_FLAGS[27 + i] = FLAG_MAIN_INVENTORY | ((i + 1) << 4);
+        }
     }
 
-    private static final class EmptyClientSlot implements ClientSlot.Empty {
+    private static abstract class BaseClientSlot implements ClientSlot {
 
-        static final EmptyClientSlot INSTANCE = new EmptyClientSlot();
+        /**
+         * Whether the state is dirty.
+         */
+        public final static int IS_DIRTY = 0x1;
+
+        /**
+         * Whether the slot should be updated silently.
+         */
+        public final static int SILENT_UPDATE = 0x2;
+
+        private int dirtyState = 0;
+
+        protected abstract ItemStack getRaw();
+    }
+
+    private static final class EmptyClientSlot extends BaseClientSlot implements ClientSlot.Empty {
 
         @Override
         public ItemStack get() {
             return ItemStack.empty();
         }
+
+        @Override
+        protected ItemStack getRaw() {
+            return ItemStack.empty();
+        }
     }
 
-    private static final class SlotClientSlot implements ClientSlot.Slot {
+    private static final class SlotClientSlot extends BaseClientSlot implements ClientSlot.Slot {
 
         private final LanternSlot slot;
 
@@ -99,9 +133,14 @@ public abstract class ClientContainer {
         public LanternSlot getSlot() {
             return this.slot;
         }
+
+        @Override
+        protected ItemStack getRaw() {
+            return this.slot.getRawItemStack();
+        }
     }
 
-    private static final class IconClientSlot implements ClientSlot.Icon {
+    private static final class IconClientSlot extends BaseClientSlot implements ClientSlot.Button {
 
         private ItemStack itemStack = ItemStack.empty();
 
@@ -111,8 +150,13 @@ public abstract class ClientContainer {
         }
 
         @Override
-        public void set(ItemStack itemStack) {
+        public void setIcon(ItemStack itemStack) {
             this.itemStack = checkNotNull(itemStack, "itemStack").copy();
+        }
+
+        @Override
+        protected ItemStack getRaw() {
+            return this.itemStack;
         }
     }
 
@@ -131,15 +175,17 @@ public abstract class ClientContainer {
     }
 
     private final Text title;
-    private final ClientSlot[] slots;
+    private final BaseClientSlot[] slots;
     private final int containerId;
 
     public ClientContainer(Text title) {
         this.title = title;
         final int[] flags = getSlotFlags();
         // Create a array to bind slots
-        this.slots = new ClientSlot[flags.length];
-        Arrays.fill(this.slots, EmptyClientSlot.INSTANCE);
+        this.slots = new BaseClientSlot[flags.length];
+        for (int i = 0; i < this.slots.length; i++) {
+            this.slots[i] = new EmptyClientSlot();
+        }
         // Generate a new container id
         this.containerId = generateContainerId();
     }
@@ -175,6 +221,14 @@ public abstract class ClientContainer {
         return containerId;
     }
 
+    /**
+     * Creates a init {@link Message} that can be used to
+     * open the container on the client. A {@code null} may
+     * be returned if the container can't be opened by
+     * the server.
+     *
+     * @return The init message
+     */
     @Nullable
     protected abstract Message createInitMessage();
 
@@ -186,7 +240,6 @@ public abstract class ClientContainer {
      * @return The bound client slot
      */
     public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
-        checkArgument(this.slots[index] == null, "Slot index %s is already bound", index);
         final SlotClientSlot clientSlot = new SlotClientSlot(slot);
         this.slots[index] = clientSlot;
         return clientSlot;
@@ -199,11 +252,79 @@ public abstract class ClientContainer {
      * @param index The slot index
      * @return The bound client slot
      */
-    public ClientSlot.Icon bindIcon(int index) {
-        checkArgument(this.slots[index] == null, "Slot index %s is already bound", index);
+    public ClientSlot.Button bindButton(int index) {
         final IconClientSlot clientSlot = new IconClientSlot();
         this.slots[index] = clientSlot;
         return clientSlot;
+    }
+
+    /**
+     * Binds a {@link InventoryProperty} type to
+     * the given {@link Supplier}.
+     *
+     * @param propertyType The property type
+     * @param supplier The supplier
+     * @param <T> The property type
+     */
+    public <T extends InventoryProperty<?,?>> void bindProperty(Class<T> propertyType, Supplier<T> supplier) {
+        checkNotNull(propertyType, "propertyType");
+        checkNotNull(supplier, "supplier");
+    }
+
+    /**
+     * Binds a {@link InventoryProperty} type to
+     * the given constant value.
+     *
+     * @param property The property
+     * @param <T> The property type
+     */
+    public <T extends InventoryProperty<?,?>> void bindProperty(T property) {
+        bindProperty((Class<T>) property.getClass(), () -> property);
+    }
+
+    public void queueSlotChange(ClientSlot clientSlot) {
+        ((BaseClientSlot) clientSlot).dirtyState = BaseClientSlot.IS_DIRTY;
+    }
+
+    public void queueSlotChange(int index) {
+        this.slots[index].dirtyState = BaseClientSlot.IS_DIRTY;
+    }
+
+    public void queueSilentSlotChange(ClientSlot clientSlot) {
+        ((BaseClientSlot) clientSlot).dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
+    }
+
+    public void queueSilentSlotChange(int index) {
+        this.slots[index].dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
+    }
+
+    protected void collectChanges(List<Message> messages) {
+        final int[] flags = getSlotFlags();
+        for (int i = 0; i < this.slots.length; i++) {
+            final BaseClientSlot slot = this.slots[i];
+            if ((slot.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
+                int containerId = getContainerId();
+                final int index;
+                final int hotbarSlot;
+                // Check if we can do a silent update
+                if ((slot.dirtyState & BaseClientSlot.SILENT_UPDATE) != 0 &&
+                        (hotbarSlot = flags[i] & FLAG_HOTBAR) != 0) {
+                    index = hotbarSlot - 1;
+                    containerId = -2;
+                } else {
+                    index = i;
+                }
+                // Reset the dirty state
+                slot.dirtyState = 0;
+                // Add a update message
+                messages.add(new MessagePlayOutSetWindowSlot(containerId, index, slot.get()));
+            }
+        }
+        // Collect the property changes
+        collectPropertyChanges(messages);
+    }
+
+    protected void collectPropertyChanges(List<Message> messages) {
     }
 
     /**

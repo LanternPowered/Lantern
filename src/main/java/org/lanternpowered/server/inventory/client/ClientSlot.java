@@ -25,8 +25,11 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.ItemStack;
+
+import java.util.function.Consumer;
 
 /**
  * Represents a bound slot on a {@link ClientContainer}.
@@ -46,14 +49,14 @@ public interface ClientSlot {
      * an icon. The slot cannot be modified through inventory
      * operations.
      */
-    interface Icon extends ClientSlot {
+    interface Button extends ClientSlot {
 
         /**
          * Sets the icon {@link ItemStack}.
          *
          * @param itemStack The item stack
          */
-        void set(ItemStack itemStack);
+        void setIcon(ItemStack itemStack);
     }
 
     /**

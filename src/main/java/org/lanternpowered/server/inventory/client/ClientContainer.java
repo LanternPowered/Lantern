@@ -29,7 +29,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Text;
 
 import java.util.Arrays;
 
@@ -60,6 +62,11 @@ public abstract class ClientContainer {
      * A flag that defines that the slot is present in the main inventory.
      */
     protected static final int FLAG_MAIN_INVENTORY = 0x8;
+
+    /**
+     * A counter for container ids.
+     */
+    private static int containerIdCounter = 1;
 
     static {
         Arrays.fill(MAIN_INVENTORY_FLAGS, FLAG_MAIN_INVENTORY);
@@ -123,14 +130,53 @@ public abstract class ClientContainer {
         return allFlags;
     }
 
+    private final Text title;
     private final ClientSlot[] slots;
+    private final int containerId;
 
-    public ClientContainer() {
+    public ClientContainer(Text title) {
+        this.title = title;
         final int[] flags = getSlotFlags();
         // Create a array to bind slots
         this.slots = new ClientSlot[flags.length];
         Arrays.fill(this.slots, EmptyClientSlot.INSTANCE);
+        // Generate a new container id
+        this.containerId = generateContainerId();
     }
+
+    /**
+     * Gets the title.
+     *
+     * @return The title
+     */
+    public Text getTitle() {
+        return this.title;
+    }
+
+    /**
+     * Gets the container id.
+     *
+     * @return The container id
+     */
+    public int getContainerId() {
+        return this.containerId;
+    }
+
+    /**
+     * Generates a container id.
+     *
+     * @return The container id
+     */
+    protected int generateContainerId() {
+        final int containerId = containerIdCounter++;
+        if (containerIdCounter >= 100) {
+            containerIdCounter = 1;
+        }
+        return containerId;
+    }
+
+    @Nullable
+    protected abstract Message createInitMessage();
 
     /**
      * Binds a {@link LanternSlot} to the

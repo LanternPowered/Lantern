@@ -27,16 +27,20 @@ package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
+
 import java.util.Arrays;
 
 public class ChestClientContainer extends ClientContainer {
 
-    private static final int[][] SLOT_FLAGS = new int[6][];
-    private static final int[][] ALL_SLOT_FLAGS = new int[6][];
+    private static final int[][] SLOT_FLAGS = new int[7][];
+    private static final int[][] ALL_SLOT_FLAGS = new int[7][];
 
     static {
         for (int i = 0; i < SLOT_FLAGS.length; i++) {
-            final int[] flags = new int[(i + 1) * 9];
+            final int[] flags = new int[i * 9];
             Arrays.fill(flags, FLAG_REVERSE_SHIFT_INSERTION);
             SLOT_FLAGS[i] = flags;
             ALL_SLOT_FLAGS[i] = compileAllSlotFlags(flags);
@@ -45,9 +49,16 @@ public class ChestClientContainer extends ClientContainer {
 
     private final int rowIndex;
 
-    public ChestClientContainer(int rows) {
-        checkArgument(rows > 0 && rows <= 6);
-        this.rowIndex = rows - 1;
+    public ChestClientContainer(Text title, int rows) {
+        super(title);
+        checkArgument(rows >= 0 && rows <= 6);
+        this.rowIndex = rows;
+    }
+
+    @Override
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.CONTAINER,
+                getTitle(), this.rowIndex * 9, 0);
     }
 
     @Override

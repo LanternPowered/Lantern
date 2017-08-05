@@ -25,12 +25,26 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
+
 public class BeaconClientContainer extends ClientContainer {
 
     private static final int[] SLOT_FLAGS = new int[] {
             FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Payment slot
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+
+    public BeaconClientContainer(Text title) {
+        super(title);
+    }
+
+    @Override
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.BEACON,
+                getTitle(), SLOT_FLAGS.length, 0);
+    }
 
     @Override
     protected int[] getSlotFlags() {

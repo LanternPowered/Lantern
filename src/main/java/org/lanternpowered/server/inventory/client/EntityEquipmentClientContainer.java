@@ -27,6 +27,10 @@ package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
+
 import java.util.Arrays;
 
 // Llama
@@ -50,10 +54,19 @@ public class EntityEquipmentClientContainer extends ClientContainer {
     }
 
     private final int rowIndex;
+    private final int entityId;
 
-    public EntityEquipmentClientContainer(int chestRows) {
+    public EntityEquipmentClientContainer(Text title, int chestRows, int entityId) {
+        super(title);
         checkArgument(chestRows >= 0 && chestRows <= 5);
         this.rowIndex = chestRows;
+        this.entityId = entityId;
+    }
+
+    @Override
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.HORSE,
+                getTitle(), SLOT_FLAGS.length, this.entityId);
     }
 
     @Override

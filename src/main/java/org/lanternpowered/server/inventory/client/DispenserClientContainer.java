@@ -25,9 +25,18 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
+
 public class DispenserClientContainer extends ChestClientContainer {
 
-    public DispenserClientContainer() {
-        super(1);
+    public DispenserClientContainer(Text title) {
+        super(title, 1);
+    }
+
+    @Override
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.DISPENSER, getTitle(), getSlotFlags().length, 0);
     }
 }

@@ -25,6 +25,10 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
+
 public class HopperClientContainer extends ClientContainer {
 
     private static final int[] SLOT_FLAGS = new int[] {
@@ -35,6 +39,16 @@ public class HopperClientContainer extends ClientContainer {
             FLAG_REVERSE_SHIFT_INSERTION, // Slot 5
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+
+    public HopperClientContainer(Text title) {
+        super(title);
+    }
+
+    @Override
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.HOPPER,
+                getTitle(), SLOT_FLAGS.length, 0);
+    }
 
     @Override
     protected int[] getSlotFlags() {

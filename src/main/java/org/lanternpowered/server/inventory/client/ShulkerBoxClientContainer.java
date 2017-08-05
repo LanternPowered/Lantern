@@ -25,9 +25,19 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
+
 public class ShulkerBoxClientContainer extends ChestClientContainer {
 
-    public ShulkerBoxClientContainer() {
-        super(3);
+    public ShulkerBoxClientContainer(Text title) {
+        super(title, 3);
+    }
+
+    @Override
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.SHULKER_BOX,
+                getTitle(), getSlotFlags().length, 0);
     }
 }

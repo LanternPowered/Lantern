@@ -941,8 +941,8 @@ public class PlayerContainerSession {
     private PeekOfferTransactionsResult getShiftPeekOfferResult(LanternSlot slot, ItemStack itemStack) {
         checkNotNull(this.openContainer);
         final LanternPlayerInventory playerInventory = this.openContainer.playerInventory;
-        IInventory targetInventory = ((OpenableInventory) this.openContainer.getOpenInventory())
-                .getShiftClickTarget(this.openContainer, slot);
+        final OpenableInventory openableInventory = (OpenableInventory) this.openContainer.getOpenInventory();
+        IInventory targetInventory = openableInventory.getShiftClickTarget(this.openContainer, slot);
         final boolean mainSlot = playerInventory.getMain().isChild(slot);
         if (targetInventory == null && !mainSlot) {
             targetInventory = playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
@@ -952,7 +952,7 @@ public class PlayerContainerSession {
         if (targetInventory != null) {
             result = ((AbstractInventory) targetInventory).peekOfferFastTransactions(itemStack1);
             itemStack1 = result.getOfferResult().getRest();
-            if (mainSlot && itemStack1 != null) {
+            if (mainSlot && itemStack1 != null && !openableInventory.disableShiftClickWhenFull()) {
                 targetInventory = null;
             }
         }

@@ -59,6 +59,16 @@ public interface OpenableInventory extends IInventory {
     }
 
     /**
+     * Gets whether shift clicking from the player inventory
+     * should be disabled when the top inventory is full.
+     *
+     * @return Disable shift click
+     */
+    default boolean disableShiftClickWhenFull() {
+        return true;
+    }
+
+    /**
      * Constructs a {@link LanternContainer} for this {@link OpenableInventory}
      * and the {@link LanternPlayerInventory}.
      *

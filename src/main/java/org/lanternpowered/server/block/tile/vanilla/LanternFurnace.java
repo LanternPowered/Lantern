@@ -35,6 +35,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.block.IFurnaceInventory;
@@ -125,7 +126,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                 return IFurnaceInventory.super.getShiftClickTarget(container, slot);
             }
             // The item stack should be present
-            final ItemStackSnapshot snapshot = slot.peek().get().createSnapshot();
+            final ItemStackSnapshot snapshot = LanternItemStackSnapshot.wrap(slot.peek().get()); // Wrap, peek creates a copy
             // Check if the item can be used as a ingredient
             final Optional<SmeltingRecipe> optSmeltingRecipe = Lantern.getRegistry()
                     .getSmeltingRecipeRegistry().findMatchingRecipe(snapshot);
@@ -141,6 +142,11 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             }
             return inventories.isEmpty() ? IFurnaceInventory.super.getShiftClickTarget(container, slot) :
                     inventories.size() == 1 ? inventories.get(0) : inventories.get(0).union(inventories.get(1));
+        }
+
+        @Override
+        public boolean disableShiftClickWhenFull() {
+            return false;
         }
     }
 

@@ -267,4 +267,9 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     public LanternContainer createContainer(LanternPlayerInventory playerInventory) {
         return new PlayerInventoryContainer(null, this);
     }
+
+    @Override
+    public boolean disableShiftClickWhenFull() {
+        return true;
+    }
 }

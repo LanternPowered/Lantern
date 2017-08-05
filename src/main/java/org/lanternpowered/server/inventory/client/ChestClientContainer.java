@@ -23,43 +23,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.client;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.text.translation.Translation;
+import java.util.Arrays;
 
-import javax.annotation.Nullable;
+public class ChestClientContainer extends ClientContainer {
 
-public class ChestInventory extends LanternGridInventory implements IChestInventory {
+    private static final int[][] SLOT_FLAGS = new int[6][];
+    private static final int[][] ALL_SLOT_FLAGS = new int[6][];
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
-    }
-
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? tr("container.chest") : name);
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                registerSlotAt(x, y);
-            }
+    static {
+        for (int i = 0; i < SLOT_FLAGS.length; i++) {
+            final int[] flags = new int[(i + 1) * 9];
+            Arrays.fill(flags, FLAG_REVERSE_SHIFT_INSERTION);
+            SLOT_FLAGS[i] = flags;
+            ALL_SLOT_FLAGS[i] = compileAllSlotFlags(flags);
         }
-        finalizeContent();
+    }
+
+    private final int rowIndex;
+
+    public ChestClientContainer(int rows) {
+        checkArgument(rows > 0 && rows <= 6);
+        this.rowIndex = rows - 1;
     }
 
     @Override
-    public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
-        return isChild(slot) ? IChestInventory.super.getShiftClickTarget(container, slot) : this;
+    protected int[] getSlotFlags() {
+        return SLOT_FLAGS[this.rowIndex];
     }
 
     @Override
-    public boolean disableShiftClickWhenFull() {
-        return false;
+    protected int[] getAllSlotFlags() {
+        return ALL_SLOT_FLAGS[this.rowIndex];
     }
 }

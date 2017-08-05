@@ -23,43 +23,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.client;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.text.translation.Translation;
+/**
+ * Represents a bound slot on a {@link ClientContainer}.
+ */
+public interface ClientSlot {
 
-import javax.annotation.Nullable;
+    /**
+     * Gets the {@link ItemStack} that is visible in
+     * this {@link ClientSlot}.
+     *
+     * @return The item stack
+     */
+    ItemStack get();
 
-public class ChestInventory extends LanternGridInventory implements IChestInventory {
+    /**
+     * Represents a {@link ClientSlot} that just represents
+     * an icon. The slot cannot be modified through inventory
+     * operations.
+     */
+    interface Icon extends ClientSlot {
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
+        /**
+         * Sets the icon {@link ItemStack}.
+         *
+         * @param itemStack The item stack
+         */
+        void set(ItemStack itemStack);
     }
 
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? tr("container.chest") : name);
+    /**
+     * Represents a {@link ClientSlot} that is bound to
+     * a {@link LanternSlot}.
+     */
+    interface Slot extends ClientSlot {
 
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                registerSlotAt(x, y);
-            }
-        }
-        finalizeContent();
+        /**
+         * Gets the {@link LanternSlot}.
+         *
+         * @return The slot
+         */
+        LanternSlot getSlot();
     }
 
-    @Override
-    public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
-        return isChild(slot) ? IChestInventory.super.getShiftClickTarget(container, slot) : this;
-    }
+    /**
+     * Nothing is bound, {@link #get()} will always return
+     * a empty {@link ItemStack}.
+     */
+    interface Empty extends ClientSlot {
 
-    @Override
-    public boolean disableShiftClickWhenFull() {
-        return false;
     }
 }

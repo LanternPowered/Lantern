@@ -23,43 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.client;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+public class BeaconClientContainer extends ClientContainer {
 
-import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.text.translation.Translation;
+    private static final int[] SLOT_FLAGS = new int[] {
+            FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Payment slot
+    };
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
 
-import javax.annotation.Nullable;
-
-public class ChestInventory extends LanternGridInventory implements IChestInventory {
-
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
-    }
-
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? tr("container.chest") : name);
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                registerSlotAt(x, y);
-            }
-        }
-        finalizeContent();
+    @Override
+    protected int[] getSlotFlags() {
+        return SLOT_FLAGS;
     }
 
     @Override
-    public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
-        return isChild(slot) ? IChestInventory.super.getShiftClickTarget(container, slot) : this;
+    protected int[] getAllSlotFlags() {
+        return ALL_SLOT_FLAGS;
     }
 
     @Override
-    public boolean disableShiftClickWhenFull() {
+    protected boolean disableShiftClickWhenFull() {
         return false;
     }
 }

@@ -55,6 +55,7 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBui
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.block.EnderChestInventory;
@@ -923,14 +924,10 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         checkNotNull(cause, "cause");
         // TODO: Make this better
         LanternContainer container;
-        if (inventory instanceof IChestInventory) {
-            container = new ChestInventoryContainer(this.inventory, (IChestInventory) inventory);
-        } else if (inventory instanceof IFurnaceInventory) {
-            container = new FurnaceInventoryContainer(this.inventory, (IFurnaceInventory) inventory);
-        } else if (inventory instanceof ICraftingTableInventory) {
-            container = new CraftingTableInventoryContainer(this.inventory, (ICraftingTableInventory) inventory);
-        } else if (inventory instanceof PlayerInventory) {
+        if (inventory instanceof PlayerInventory) {
             return Optional.empty();
+        } else if (inventory instanceof OpenableInventory) {
+            container = ((OpenableInventory) inventory).createContainer(this.inventory);
         } else {
             throw new UnsupportedOperationException("Unsupported inventory type: " + inventory);
         }

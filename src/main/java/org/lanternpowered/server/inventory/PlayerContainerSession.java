@@ -695,15 +695,14 @@ public class PlayerContainerSession {
                     cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
                     if (itemStack != null) {
-                        final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
-                        final PeekOfferTransactionsResult result = getShiftPeekOfferResult(windowId, slot, itemStack.copy(), offhand);
+                        final PeekOfferTransactionsResult result = getShiftPeekOfferResult(slot, itemStack.copy());
 
                         // Force updates if the max stack size on the client and server don't match
                         final int originalMaxStackSize = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
                         if (itemStack.getMaxStackQuantity() != originalMaxStackSize) {
                             final LanternItemStack tempStack = (LanternItemStack) itemStack.copy();
                             tempStack.setTempMaxQuantity(originalMaxStackSize);
-                            final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(windowId, slot, tempStack, offhand);
+                            final PeekOfferTransactionsResult result1 = getShiftPeekOfferResult(slot, tempStack);
                             result1.getTransactions().forEach(transaction -> this.openContainer.queueSlotChange(transaction.getSlot()));
                         }
                         if (result.getOfferResult().isSuccess()) {
@@ -717,8 +716,8 @@ public class PlayerContainerSession {
                                         stack -> true).get().getTransactions());
                             }
                         }
-                        // Fix client glitches
-                        // TODO: Remove when refactoring shift clicking
+                        // Fix client glitches, just force update the slots
+                        // TODO: Remove when splitting up the containers up in two layers, client and server
                         if (this.openContainer instanceof FurnaceInventoryContainer) {
                             final LanternOrderedInventory inventory = this.openContainer.openInventory;
                             this.openContainer.queueSlotChange(inventory.query(InputSlot.class).<InputSlot>first());
@@ -939,37 +938,38 @@ public class PlayerContainerSession {
         }
     }
 
-    private PeekOfferTransactionsResult getShiftPeekOfferResult(int windowId, LanternSlot slot,
-            ItemStack itemStack, boolean offhand) {
-        final LanternPlayerInventory playerInventory = this.openContainer.playerInventory;
-        final LanternHumanMainInventory mainInventory = playerInventory.getMain();
-        AbstractInventory inventory;
-        PeekOfferTransactionsResult result;
+    private PeekOfferTransactionsResult getShiftPeekOfferResult(LanternSlot slot, ItemStack itemStack) {
         checkNotNull(this.openContainer);
-        if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
-                (windowId == 0 && !mainInventory.isChild(slot) && !offhand)) {
-            if (slot.isReverseShiftClickOfferOrder()) {
-                inventory = playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
-            } else {
-                inventory = playerInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
+        final LanternPlayerInventory playerInventory = this.openContainer.playerInventory;
+        IInventory targetInventory = ((OpenableInventory) this.openContainer.getOpenInventory())
+                .getShiftClickTarget(this.openContainer, slot);
+        final boolean mainSlot = playerInventory.getMain().isChild(slot);
+        if (targetInventory == null && !mainSlot) {
+            targetInventory = playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
+        }
+        PeekOfferTransactionsResult result = null;
+        ItemStack itemStack1 = itemStack;
+        if (targetInventory != null) {
+            result = ((AbstractInventory) targetInventory).peekOfferFastTransactions(itemStack1);
+            itemStack1 = result.getOfferResult().getRest();
+            if (mainSlot && itemStack1 != null) {
+                targetInventory = null;
             }
-            result = inventory.peekOfferFastTransactions(itemStack);
-        } else {
-            // In case the we can't shift click to the top inventory, the inventory will be used in the else statement
-            inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
-                    ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
-            result = inventory.peekOfferFastTransactions(itemStack);
-            if (result.getOfferResult().getRest() != null) {
-                if (slot.parent() instanceof LanternHotbar || offhand) {
-                    inventory = playerInventory.getInventoryView(HumanInventoryView.MAIN);
-                } else {
-                    inventory = playerInventory.getHotbar();
-                }
-                PeekOfferTransactionsResult result1 = inventory.peekOfferFastTransactions(result.getOfferResult().getRest());
+        }
+        if (targetInventory == null) {
+            if (slot.parent() instanceof LanternHotbar) {
+                targetInventory = playerInventory.getInventoryView(HumanInventoryView.MAIN);
+            } else {
+                targetInventory = playerInventory.getHotbar();
+            }
+            PeekOfferTransactionsResult result1 = ((AbstractInventory) targetInventory).peekOfferFastTransactions(itemStack1);
+            if (result != null) {
                 if (result1.getOfferResult().isSuccess()) {
                     result1.getTransactions().addAll(result.getTransactions());
                     result = result1;
                 }
+            } else {
+                result = result1;
             }
         }
         return result;

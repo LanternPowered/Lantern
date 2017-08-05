@@ -33,7 +33,7 @@ import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-public abstract class LanternContainerBase extends LanternTileEntity implements ContainerViewListener {
+public abstract class LanternContainerTileBase extends LanternTileEntity implements ContainerViewListener {
 
     private int playersCount = 0;
 

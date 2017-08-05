@@ -40,7 +40,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.Random;
 
-public class LanternChest extends LanternContainer<TileChestInventory> implements Chest {
+public class LanternChest extends LanternContainerTile<TileChestInventory> implements Chest {
 
     private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 

@@ -25,9 +25,16 @@
  */
 package org.lanternpowered.server.inventory.block;
 
-import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.OpenableInventory;
+import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.spongepowered.api.item.inventory.type.OrderedInventory;
 
-public interface IChestInventory extends OrderedInventory, IInventory {
+public interface IChestInventory extends OrderedInventory, OpenableInventory {
 
+    @Override
+    default LanternContainer createContainer(LanternPlayerInventory playerInventory) {
+        return new ChestInventoryContainer(playerInventory, this);
+    }
 }

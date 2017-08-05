@@ -23,38 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
-
-import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.LanternGridInventory;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.item.inventory.slot.OutputSlot;
 
 import javax.annotation.Nullable;
 
-public class ChestInventory extends LanternGridInventory implements IChestInventory {
+/**
+ * Represents a {@link IInventory} that can be opened by
+ * a {@link Player}.
+ */
+public interface OpenableInventory extends IInventory {
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
+    /**
+     * Gets the target {@link Inventory} where the contents of the
+     * {@link Slot} should be moved to. If {@code null} is returned
+     * will the behavior default to moving items between the hotbar
+     * and main inventory.
+     * <p>
+     * All {@link OutputSlot}s in the {@link IInventory} will also
+     * be ignored, if no valid slot can be found in the
+     * {@link IInventory} will the behavior also use the default.
+     *
+     * @param container The container in which the shift click occurred
+     * @param slot The slot
+     * @return The target inventory
+     */
+    @Nullable
+    default IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
+        return null;
     }
 
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? tr("container.chest") : name);
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                registerSlotAt(x, y);
-            }
-        }
-        finalizeContent();
-    }
-
-    @Override
-    public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
-        return isChild(slot) ? IChestInventory.super.getShiftClickTarget(container, slot) : this;
-    }
+    /**
+     * Constructs a {@link LanternContainer} for this {@link OpenableInventory}
+     * and the {@link LanternPlayerInventory}.
+     *
+     * @return The constructed container
+     */
+    LanternContainer createContainer(LanternPlayerInventory playerInventory);
 }

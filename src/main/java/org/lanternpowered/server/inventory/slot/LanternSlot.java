@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.AbstractMutableInventory;
 import org.lanternpowered.server.inventory.FastOfferResult;
+import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
@@ -535,7 +536,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     }
 
     @Override
-    public Inventory intersect(Inventory inventory) {
+    public IInventory intersect(Inventory inventory) {
         return empty();
     }
 
@@ -548,22 +549,5 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     @Override
     public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
         return (T) empty();
-    }
-
-    /**
-     * Gets whether the content of this slot should be offered
-     * in the reverse offer to the main inventory when retrieving
-     * the items through shift click.
-     *
-     * TODO: A cleaner way to implement this?
-     *
-     * @return Is reverse offer order
-     */
-    public boolean isReverseShiftClickOfferOrder() {
-        return true;
-    }
-
-    public boolean doesAllowShiftClickOffer() {
-        return true;
     }
 }

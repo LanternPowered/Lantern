@@ -131,6 +131,10 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
         return this.openInventory;
     }
 
+    public LanternPlayerInventory getPlayerInventory() {
+        return this.playerInventory;
+    }
+
     @Override
     public Set<Player> getViewers() {
         return ImmutableSet.copyOf(this.viewers);

@@ -167,7 +167,7 @@ public abstract class AbstractInventory implements IInventory {
     protected abstract PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack itemStack);
 
     @Override
-    public Inventory union(Inventory inventory) {
+    public IInventory union(Inventory inventory) {
         checkNotNull(inventory, "inventory");
         return new LanternOrderedInventory(this, null) {
             {

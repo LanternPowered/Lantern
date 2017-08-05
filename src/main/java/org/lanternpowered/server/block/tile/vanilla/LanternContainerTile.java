@@ -29,11 +29,11 @@ import org.lanternpowered.server.inventory.AbstractInventory;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 
-public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
+public abstract class LanternContainerTile<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerTileBase implements TileEntityCarrier {
 
     protected final I inventory;
 
-    protected LanternContainer() {
+    protected LanternContainerTile() {
         this.inventory = createInventory();
         ((AbstractInventory) this.inventory).addViewListener(this);
     }

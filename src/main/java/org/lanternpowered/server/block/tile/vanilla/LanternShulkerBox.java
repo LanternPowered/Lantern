@@ -40,7 +40,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.Random;
 
-public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory> {
+public class LanternShulkerBox extends LanternContainerTile<TileShulkerBoxInventory> {
 
     private final Random random = new Random();
 

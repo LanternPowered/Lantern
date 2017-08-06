@@ -57,7 +57,7 @@ public class FurnaceClientContainer extends ClientContainer {
     }
 
     @Override
-    protected <T extends InventoryProperty<?,?>> void bindProperty(Class<T> propertyType, Supplier<T> supplier) {
+    public <T extends InventoryProperty<?,?>> void bindProperty(Class<T> propertyType, Supplier<T> supplier) {
         super.bindProperty(propertyType, supplier);
         if (propertyType == SmeltingProgressProperty.class) {
             this.smeltingProgressPropertySupplier = (Supplier<SmeltingProgressProperty>) supplier;

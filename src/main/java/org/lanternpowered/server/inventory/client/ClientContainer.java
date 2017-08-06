@@ -42,7 +42,9 @@ import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -189,6 +191,7 @@ public abstract class ClientContainer {
 
     private final Text title;
     private final BaseClientSlot[] slots;
+    private final Map<LanternSlot, SlotClientSlot> slotMap = new HashMap<>();
     private final int containerId;
 
     public ClientContainer(Text title) {
@@ -254,7 +257,12 @@ public abstract class ClientContainer {
      */
     public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
         final SlotClientSlot clientSlot = new SlotClientSlot(slot);
+        final BaseClientSlot oldClientSlot = this.slots[index];
+        if (oldClientSlot instanceof SlotClientSlot) {
+            this.slotMap.remove(((SlotClientSlot) oldClientSlot).slot);
+        }
         this.slots[index] = clientSlot;
+        this.slotMap.put(slot, clientSlot);
         return clientSlot;
     }
 
@@ -296,6 +304,19 @@ public abstract class ClientContainer {
     }
 
     /**
+     * Queues a silent slot change for the specified {@link LanternSlot}.
+     *
+     * @param slot The slot
+     */
+    public void queueSlotChange(LanternSlot slot) {
+        checkNotNull(slot, "slot");
+        final SlotClientSlot clientSlot = this.slotMap.get(slot);
+        if (clientSlot != null) {
+            queueSlotChange(clientSlot);
+        }
+    }
+
+    /**
      * Queues a slot change for the specified {@link ClientSlot}.
      *
      * @param clientSlot The client slot
@@ -324,12 +345,25 @@ public abstract class ClientContainer {
     }
 
     /**
+     * Queues a silent slot change for the specified {@link LanternSlot}.
+     *
+     * @param slot The slot
+     */
+    public void queueSilentSlotChange(LanternSlot slot) {
+        checkNotNull(slot, "slot");
+        final SlotClientSlot clientSlot = this.slotMap.get(slot);
+        if (clientSlot != null) {
+            queueSilentSlotChange(clientSlot);
+        }
+    }
+
+    /**
      * Queues a silent slot change for the specified {@link ClientSlot}.
      *
      * @param clientSlot The client slot
      */
     public void queueSilentSlotChange(ClientSlot clientSlot) {
-        ((BaseClientSlot) clientSlot).dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
+        queueSilentSlotChange((BaseClientSlot) clientSlot);
     }
 
     /**
@@ -338,7 +372,11 @@ public abstract class ClientContainer {
      * @param index The slot index
      */
     public void queueSilentSlotChange(int index) {
-        this.slots[index].dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
+        queueSilentSlotChange(this.slots[index]);
+    }
+
+    private void queueSilentSlotChange(BaseClientSlot clientSlot) {
+        clientSlot.dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
     }
 
     private void queueSilentSlotChangeSafely(BaseClientSlot clientSlot) {

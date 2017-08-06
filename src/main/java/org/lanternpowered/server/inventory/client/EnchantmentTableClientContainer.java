@@ -32,7 +32,7 @@ import org.spongepowered.api.text.Text;
 public class EnchantmentTableClientContainer extends ClientContainer {
 
     private static final int[] SLOT_FLAGS = new int[] {
-            FLAG_REVERSE_SHIFT_INSERTION | FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Input slot
+            FLAG_REVERSE_SHIFT_INSERTION | FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION | FLAG_ONE_ITEM, // Input slot
             FLAG_REVERSE_SHIFT_INSERTION | FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Lapis lazuli slot
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);

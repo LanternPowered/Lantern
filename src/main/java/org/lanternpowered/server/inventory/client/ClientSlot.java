@@ -25,11 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.ItemStack;
-
-import java.util.function.Consumer;
 
 /**
  * Represents a bound slot on a {@link ClientContainer}.

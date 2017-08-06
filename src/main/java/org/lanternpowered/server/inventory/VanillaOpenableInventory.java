@@ -23,18 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.OpenableInventory;
-import org.lanternpowered.server.inventory.container.FurnaceInventoryContainer;
+import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.spongepowered.api.item.inventory.type.OrderedInventory;
 
-public interface IFurnaceInventory extends OrderedInventory, OpenableInventory {
+public interface VanillaOpenableInventory extends OpenableInventory, OrderedInventory {
+
+    /**
+     * Constructs a {@link ClientContainer} for this {@link OpenableInventory}.
+     *
+     * @return The constructed client container
+     */
+    ClientContainer constructClientContainer();
 
     @Override
-    default LanternContainer createContainer(LanternPlayerInventory playerInventory) {
-        return new FurnaceInventoryContainer(playerInventory, this);
+    default ClientContainer constructClientContainer(LanternContainer container) {
+        final ClientContainer clientContainer = constructClientContainer();
+        final LanternPlayerInventory playerInventory = container.getPlayerInventory();
+        final int bottomStart = clientContainer.getTopSlotsCount();
+        // Register the top inventory slots
+        ((LanternOrderedInventory) this).getIndexBySlots().object2IntEntrySet().forEach(entry -> {
+            if (playerInventory.getMain().isChild(entry.getKey())) {
+                clientContainer.bindSlot(entry.getIntValue(), entry.getKey());
+            }
+        });
+        // Register the main inventory slots
+        playerInventory.getMain().getIndexBySlots().object2IntEntrySet().forEach(entry ->
+                clientContainer.bindSlot(bottomStart + entry.getIntValue(), entry.getKey()));
+        return clientContainer;
     }
 }

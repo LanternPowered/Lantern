@@ -42,15 +42,8 @@ public class PlayerClientContainer extends ClientContainer {
             FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Equipment slot 4
             FLAG_DISABLE_SHIFT_INSERTION, // Offhand slot
     };
-    private static final int[] ALL_SLOT_FLAGS;
-
-    static {
-        ALL_SLOT_FLAGS = new int[SLOT_FLAGS.length + MAIN_INVENTORY_FLAGS.length];
-        System.arraycopy(SLOT_FLAGS, 0, ALL_SLOT_FLAGS, 0, SLOT_FLAGS.length - 1);
-        System.arraycopy(MAIN_INVENTORY_FLAGS, 0, ALL_SLOT_FLAGS, SLOT_FLAGS.length - 1, MAIN_INVENTORY_FLAGS.length);
-        // The offhand slot uses the last index
-        ALL_SLOT_FLAGS[ALL_SLOT_FLAGS.length - 1] = SLOT_FLAGS[SLOT_FLAGS.length - 1];
-    }
+    private static final int OFFHAND_SLOT_INDEX = SLOT_FLAGS.length - 1;
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
 
     public PlayerClientContainer(Text title) {
         super(title);
@@ -75,5 +68,18 @@ public class PlayerClientContainer extends ClientContainer {
     @Override
     protected Message createInitMessage() {
         return null;
+    }
+
+    // Originally is the offhand slot the last index, after the main inventory,
+    // but we modify this to move the slot before the main inventory
+
+    @Override
+    protected int clientSlotIndexToServer(int index) {
+        return index < OFFHAND_SLOT_INDEX ? index : index == ALL_SLOT_FLAGS.length - 1 ? OFFHAND_SLOT_INDEX : index + 1;
+    }
+
+    @Override
+    protected int serverSlotIndexToClient(int index) {
+        return index < OFFHAND_SLOT_INDEX ? index : index == OFFHAND_SLOT_INDEX ? ALL_SLOT_FLAGS.length - 1 : index - 1;
     }
 }

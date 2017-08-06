@@ -23,18 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.slot;
 
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.OpenableInventory;
-import org.lanternpowered.server.inventory.container.CraftingTableInventoryContainer;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.spongepowered.api.item.inventory.type.OrderedInventory;
+public interface SlotChangeTracker {
 
-public interface ICraftingTableInventory extends OrderedInventory, OpenableInventory {
-
-    @Override
-    default LanternContainer createContainer(LanternPlayerInventory playerInventory) {
-        return new CraftingTableInventoryContainer(playerInventory, this);
-    }
+    void queueSlotChange(LanternSlot slot);
 }

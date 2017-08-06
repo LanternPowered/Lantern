@@ -31,6 +31,9 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
+import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.CraftingTableClientContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
@@ -40,6 +43,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
@@ -50,7 +54,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public class CraftingTableInventory extends LanternCraftingInventory implements ICraftingTableInventory {
+public class CraftingTableInventory extends LanternCraftingInventory implements VanillaOpenableInventory {
 
     public CraftingTableInventory(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
@@ -103,6 +107,11 @@ public class CraftingTableInventory extends LanternCraftingInventory implements 
             return container.getPlayerInventory().getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
         }
         // Use the default behavior, you can't shift click to the crafting grid
-        return ICraftingTableInventory.super.getShiftClickTarget(container, slot);
+        return VanillaOpenableInventory.super.getShiftClickTarget(container, slot);
+    }
+
+    @Override
+    public ClientContainer constructClientContainer() {
+        return new CraftingTableClientContainer(Text.of(getName()));
     }
 }

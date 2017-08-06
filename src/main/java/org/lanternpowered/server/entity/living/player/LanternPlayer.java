@@ -59,12 +59,6 @@ import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.block.EnderChestInventory;
-import org.lanternpowered.server.inventory.block.IChestInventory;
-import org.lanternpowered.server.inventory.block.ICraftingTableInventory;
-import org.lanternpowered.server.inventory.block.IFurnaceInventory;
-import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
-import org.lanternpowered.server.inventory.container.CraftingTableInventoryContainer;
-import org.lanternpowered.server.inventory.container.FurnaceInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.item.CooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
@@ -267,7 +261,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
         this.inventory = new LanternPlayerInventory(null, null, this);
-        this.inventoryContainer = new PlayerInventoryContainer(null, this.inventory);
+        this.inventoryContainer = new PlayerInventoryContainer(this.inventory);
         this.enderChestInventory = new EnderChestInventory(null);
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
@@ -479,7 +473,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
             this.session.send(new MessagePlayOutSelectAdvancementTree(
                     get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
             setScoreboard(world.getScoreboard());
-            this.inventoryContainer.openInventoryForAndInitialize(this);
+            this.inventoryContainer.init();
             this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
             // Add the player to the world
             world.addPlayer(this);
@@ -635,7 +629,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
 
         // Stream the inventory updates
         final LanternContainer container = this.containerSession.getOpenContainer();
-        (container == null ? this.inventoryContainer : container).streamSlotChanges();
+        (container == null ? this.inventoryContainer : container).tryGetClientContainer(this).update();
 
         this.resourcePackSendQueue.pulse();
 
@@ -922,12 +916,11 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     public Optional<Container> openInventory(Inventory inventory, Cause cause) {
         checkNotNull(inventory, "inventory");
         checkNotNull(cause, "cause");
-        // TODO: Make this better
         LanternContainer container;
         if (inventory instanceof PlayerInventory) {
             return Optional.empty();
         } else if (inventory instanceof OpenableInventory) {
-            container = ((OpenableInventory) inventory).createContainer(this.inventory);
+            container = new LanternContainer(this.inventory, (OpenableInventory) inventory);
         } else {
             throw new UnsupportedOperationException("Unsupported inventory type: " + inventory);
         }

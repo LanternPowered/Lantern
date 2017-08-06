@@ -25,49 +25,57 @@
  */
 package org.lanternpowered.server.inventory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
 public class PlayerInventoryContainer extends LanternContainer {
 
-    public PlayerInventoryContainer(@Nullable Translation name, LanternPlayerInventory playerInventory) {
-        super(name, playerInventory, null);
-        super.addSlotTrackers();
+    private ClientContainer clientContainer;
+
+    public PlayerInventoryContainer(LanternPlayerInventory playerInventory) {
+        super((Translation) null, playerInventory, null);
+        // Construct the client container and attach the player
+        this.clientContainer = playerInventory.constructClientContainer(this);
+        this.clientContainer.bind(playerInventory.getCarrier().get());
     }
 
     @Override
-    void addSlotTrackers() {
+    public Optional<ClientContainer> getClientContainer(Player viewer) {
+        checkNotNull(viewer, "viewer");
+        // The client container of player who owns the inventory will
+        // always be present
+        final Player player = getPlayerInventory().getCarrier().orElse(null);
+        if (player == viewer) {
+            return Optional.of(this.clientContainer);
+        }
+        return super.getClientContainer(viewer);
     }
 
     @Override
-    void removeSlotTrackers() {
-    }
-
-    @Override
-    protected void openInventoryFor(LanternPlayer viewer) {
-    }
-
-    @Override
-    void queueSlotChange(Slot slot, boolean silent) {
-        queueSlotChange0(slot, silent);
-    }
-
-    @Override
-    Set<Player> getRawViewers() {
+    Collection<Player> getRawViewers() {
         final Player player = this.playerInventory.getCarrier().orElse(null);
         if (player != null) {
-            final Set<Player> viewers = new HashSet<>(this.viewers);
+            final Set<Player> viewers = new HashSet<>(super.getRawViewers());
             viewers.add(player);
             return viewers;
         }
-        return this.viewers;
+        return super.getRawViewers();
+    }
+
+    public void init() {
+        this.clientContainer.init();
     }
 }

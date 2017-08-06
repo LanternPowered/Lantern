@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings("unchecked")
 public class FurnaceClientContainer extends ClientContainer {
 
@@ -50,7 +52,7 @@ public class FurnaceClientContainer extends ClientContainer {
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
 
     private Supplier<SmeltingProgressProperty> smeltingProgressPropertySupplier = () -> null;
-    private SmeltingProgress lastProgress;
+    @Nullable private SmeltingProgress lastProgress;
 
     public FurnaceClientContainer(Text title) {
         super(title);

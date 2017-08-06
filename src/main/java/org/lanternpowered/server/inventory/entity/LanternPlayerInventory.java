@@ -38,7 +38,8 @@ import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.OpenableInventory;
-import org.lanternpowered.server.inventory.PlayerInventoryContainer;
+import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.inventory.slot.LanternEquipmentSlot;
@@ -48,6 +49,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
@@ -135,7 +137,6 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 prioritizeChild(this.hotbar);
             }
         });
-        this.offHandSlot = registerChild(new OffHandSlot(this, null));
 
         // Generate inventory views
         this.inventoryViews.put(HumanInventoryView.MAIN,
@@ -264,12 +265,12 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     }
 
     @Override
-    public LanternContainer createContainer(LanternPlayerInventory playerInventory) {
-        return new PlayerInventoryContainer(null, this);
+    public boolean disableShiftClickWhenFull() {
+        return true;
     }
 
     @Override
-    public boolean disableShiftClickWhenFull() {
-        return true;
+    public ClientContainer constructClientContainer(LanternContainer container) {
+        return new PlayerClientContainer(Text.of(getName()));
     }
 }

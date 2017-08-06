@@ -44,7 +44,7 @@ public class EntityEquipmentClientContainer extends ClientContainer {
 
     static {
         for (int i = 0; i < SLOT_FLAGS.length; i++) {
-            final int[] flags = new int[2 + (i * 9)];
+            final int[] flags = new int[2 + (i * 3)];
             Arrays.fill(flags, FLAG_REVERSE_SHIFT_INSERTION);
             flags[0] |= FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION;
             flags[1] |= FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION;

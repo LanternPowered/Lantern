@@ -30,13 +30,18 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternGridInventory;
+import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.client.ChestClientContainer;
+import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.CraftingTableClientContainer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
-public class ChestInventory extends LanternGridInventory implements IChestInventory {
+public class ChestInventory extends LanternGridInventory implements VanillaOpenableInventory {
 
     public ChestInventory(@Nullable Inventory parent, int rows) {
         this(parent, null, rows);
@@ -55,11 +60,16 @@ public class ChestInventory extends LanternGridInventory implements IChestInvent
 
     @Override
     public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
-        return isChild(slot) ? IChestInventory.super.getShiftClickTarget(container, slot) : this;
+        return isChild(slot) ? VanillaOpenableInventory.super.getShiftClickTarget(container, slot) : this;
     }
 
     @Override
     public boolean disableShiftClickWhenFull() {
         return false;
+    }
+
+    @Override
+    public ClientContainer constructClientContainer() {
+        return new ChestClientContainer(Text.of(getName()), 3);
     }
 }

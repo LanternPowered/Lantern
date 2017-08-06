@@ -32,7 +32,6 @@ import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.block.IChestInventory;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -41,6 +40,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.type.OrderedInventory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ContainerTileEntityStore<T extends LanternContainerTile> extends Ti
         final List<DataView> itemViews = dataView.getViewList(ITEMS).orElse(null);
         if (itemViews != null) {
             dataView.remove(ITEMS);
-            final IChestInventory inventory = (IChestInventory) object.getInventory();
+            final OrderedInventory inventory = (OrderedInventory) object.getInventory();
             final ObjectSerializer<LanternItemStack> itemStackSerializer = ObjectSerializerRegistry.get().get(LanternItemStack.class).get();
             for (DataView itemView : itemViews) {
                 final int slot = itemView.getByte(SLOT).get() & 0xff;

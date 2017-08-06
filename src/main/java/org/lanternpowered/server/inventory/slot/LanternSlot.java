@@ -78,7 +78,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     /**
      * All the {@link LanternContainer}s this slot is attached to.
      */
-    private final Set<LanternContainer> containers = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Set<SlotChangeTracker> trackers = Collections.newSetFromMap(new WeakHashMap<>());
     private final List<SlotChangeListener> changeListeners = new ArrayList<>();
 
     public LanternSlot(@Nullable Inventory parent) {
@@ -89,20 +89,30 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         super(parent, name);
     }
 
-    public void addContainer(LanternContainer container) {
-        this.containers.add(container);
+    /**
+     * Adds a {@link SlotChangeTracker}.
+     *
+     * @param tracker The slot change tracker
+     */
+    public void addTracker(SlotChangeTracker tracker) {
+        this.trackers.add(tracker);
     }
 
-    public void removeContainer(LanternContainer container) {
-        this.containers.remove(container);
+    /**
+     * Removes a {@link SlotChangeTracker}.
+     *
+     * @param tracker The slot change tracker
+     */
+    public void removeTracker(SlotChangeTracker tracker) {
+        this.trackers.remove(tracker);
     }
 
     protected void queueUpdate() {
         for (SlotChangeListener listener : this.changeListeners) {
             listener.accept(this);
         }
-        for (LanternContainer container : this.containers) {
-            container.queueSlotChange(this);
+        for (SlotChangeTracker tracker : this.trackers) {
+            tracker.queueSlotChange(this);
         }
     }
 

@@ -38,7 +38,9 @@ import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
-import org.lanternpowered.server.inventory.block.IFurnaceInventory;
+import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.FurnaceClientContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.property.SmeltingProgress;
 import org.lanternpowered.server.inventory.property.SmeltingProgressProperty;
@@ -64,6 +66,7 @@ import org.spongepowered.api.item.inventory.slot.InputSlot;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
@@ -75,7 +78,7 @@ import javax.annotation.Nullable;
 
 public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior {
 
-    private class FurnaceInventory extends LanternOrderedInventory implements ITileEntityInventory, IFurnaceInventory {
+    private class FurnaceInventory extends LanternOrderedInventory implements ITileEntityInventory, VanillaOpenableInventory {
 
         private final LanternInputSlot inputSlot;
         private final LanternFuelSlot fuelSlot;
@@ -123,7 +126,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                     // The input slots uses a different insertion order to the default
                     return container.getPlayerInventory().getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
                 }
-                return IFurnaceInventory.super.getShiftClickTarget(container, slot);
+                return VanillaOpenableInventory.super.getShiftClickTarget(container, slot);
             }
             // The item stack should be present
             final ItemStackSnapshot snapshot = LanternItemStackSnapshot.wrap(slot.peek().get()); // Wrap, peek creates a copy
@@ -140,13 +143,18 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             if (optFuel.isPresent()) {
                 inventories.add(this.fuelSlot);
             }
-            return inventories.isEmpty() ? IFurnaceInventory.super.getShiftClickTarget(container, slot) :
+            return inventories.isEmpty() ? VanillaOpenableInventory.super.getShiftClickTarget(container, slot) :
                     inventories.size() == 1 ? inventories.get(0) : inventories.get(0).union(inventories.get(1));
         }
 
         @Override
         public boolean disableShiftClickWhenFull() {
             return false;
+        }
+
+        @Override
+        public ClientContainer constructClientContainer() {
+            return new FurnaceClientContainer(Text.of(getName()));
         }
     }
 

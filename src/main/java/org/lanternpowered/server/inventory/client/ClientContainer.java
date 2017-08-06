@@ -26,15 +26,21 @@
 package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.DefaultStackSizes;
+import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.slot.SlotChangeTracker;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -42,15 +48,21 @@ import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+/**
+ * A container that guesses what will change on a client container when a specific
+ * operation is executed. For example shift clicking on an item, etc.
+ * Additionally can every slot be bound to a specific client slot, and not every slot
+ * has to be bound. This allows that you can reorder the complete client inventory
+ * without having to modify your original {@link IInventory}. Just bind each slot
+ * to the proper index and the client container will handle the rest.
+ */
 @SuppressWarnings("unchecked")
-public abstract class ClientContainer {
+public abstract class ClientContainer implements SlotChangeTracker {
 
     protected static final int[] MAIN_INVENTORY_FLAGS = new int[36];
 
@@ -94,10 +106,10 @@ public abstract class ClientContainer {
     private static int containerIdCounter = 1;
 
     static {
-        Arrays.fill(MAIN_INVENTORY_FLAGS, 0, 27, FLAG_MAIN_INVENTORY);
+        Arrays.fill(MAIN_INVENTORY_FLAGS, 0, MAIN_INVENTORY_FLAGS.length, FLAG_MAIN_INVENTORY);
         for (int i = 0; i < 9; i++) {
             // Apply the hotbar flags
-            MAIN_INVENTORY_FLAGS[27 + i] = FLAG_MAIN_INVENTORY | ((i + 1) << 4);
+            MAIN_INVENTORY_FLAGS[27 + i] |= ((i + 1) << 4);
         }
     }
 
@@ -118,7 +130,7 @@ public abstract class ClientContainer {
         protected abstract ItemStack getRaw();
     }
 
-    private static final class EmptyClientSlot extends BaseClientSlot implements ClientSlot.Empty {
+    private final class EmptyClientSlot extends BaseClientSlot implements ClientSlot.Empty {
 
         @Override
         public ItemStack get() {
@@ -131,7 +143,7 @@ public abstract class ClientContainer {
         }
     }
 
-    private static final class SlotClientSlot extends BaseClientSlot implements ClientSlot.Slot {
+    private final class SlotClientSlot extends BaseClientSlot implements ClientSlot.Slot {
 
         private final LanternSlot slot;
 
@@ -151,11 +163,12 @@ public abstract class ClientContainer {
 
         @Override
         protected ItemStack getRaw() {
-            return this.slot.getRawItemStack();
+            final ItemStack itemStack = this.slot.getRawItemStack();
+            return itemStack == null ? ItemStack.empty() : itemStack;
         }
     }
 
-    private static final class IconClientSlot extends BaseClientSlot implements ClientSlot.Button {
+    private final class IconClientSlot extends BaseClientSlot implements ClientSlot.Button {
 
         private ItemStack itemStack = ItemStack.empty();
 
@@ -167,6 +180,7 @@ public abstract class ClientContainer {
         @Override
         public void setIcon(ItemStack itemStack) {
             this.itemStack = checkNotNull(itemStack, "itemStack").copy();
+            queueSilentSlotChange(this);
         }
 
         @Override
@@ -191,8 +205,9 @@ public abstract class ClientContainer {
 
     private final Text title;
     private final BaseClientSlot[] slots;
-    private final Map<LanternSlot, SlotClientSlot> slotMap = new HashMap<>();
+    private final Multimap<LanternSlot, SlotClientSlot> slotMap = HashMultimap.create();
     private final int containerId;
+    @Nullable private LanternPlayer player;
 
     public ClientContainer(Text title) {
         this.title = title;
@@ -257,12 +272,13 @@ public abstract class ClientContainer {
      */
     public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
         final SlotClientSlot clientSlot = new SlotClientSlot(slot);
-        final BaseClientSlot oldClientSlot = this.slots[index];
-        if (oldClientSlot instanceof SlotClientSlot) {
-            this.slotMap.remove(((SlotClientSlot) oldClientSlot).slot);
-        }
+        removeSlot(index);
         this.slots[index] = clientSlot;
         this.slotMap.put(slot, clientSlot);
+        if (this.player != null) {
+            slot.addTracker(this);
+        }
+        queueSilentSlotChange(clientSlot);
         return clientSlot;
     }
 
@@ -275,8 +291,22 @@ public abstract class ClientContainer {
      */
     public ClientSlot.Button bindButton(int index) {
         final IconClientSlot clientSlot = new IconClientSlot();
+        removeSlot(index);
         this.slots[index] = clientSlot;
         return clientSlot;
+    }
+
+    private void removeSlot(int index) {
+        // Cleanup the old client slot
+        final BaseClientSlot oldClientSlot = this.slots[index];
+        if (oldClientSlot instanceof SlotClientSlot) {
+            final LanternSlot slot = ((SlotClientSlot) oldClientSlot).slot;
+            // Remove the tracker from this slot
+            if (this.slotMap.remove(slot, oldClientSlot) &&
+                    this.player != null && this.slotMap.get(slot).isEmpty()) {
+                slot.removeTracker(this);
+            }
+        }
     }
 
     /**
@@ -308,12 +338,9 @@ public abstract class ClientContainer {
      *
      * @param slot The slot
      */
+    @Override
     public void queueSlotChange(LanternSlot slot) {
-        checkNotNull(slot, "slot");
-        final SlotClientSlot clientSlot = this.slotMap.get(slot);
-        if (clientSlot != null) {
-            queueSlotChange(clientSlot);
-        }
+        this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
     }
 
     /**
@@ -335,10 +362,16 @@ public abstract class ClientContainer {
     }
 
     private void queueSlotChange(BaseClientSlot clientSlot) {
+        if (this.player == null) {
+            return;
+        }
         clientSlot.dirtyState = BaseClientSlot.IS_DIRTY;
     }
 
     private void queueSlotChangeSafely(BaseClientSlot clientSlot) {
+        if (this.player == null) {
+            return;
+        }
         if ((clientSlot.dirtyState & BaseClientSlot.IS_DIRTY) == 0) {
             clientSlot.dirtyState = BaseClientSlot.IS_DIRTY;
         }
@@ -350,11 +383,7 @@ public abstract class ClientContainer {
      * @param slot The slot
      */
     public void queueSilentSlotChange(LanternSlot slot) {
-        checkNotNull(slot, "slot");
-        final SlotClientSlot clientSlot = this.slotMap.get(slot);
-        if (clientSlot != null) {
-            queueSilentSlotChange(clientSlot);
-        }
+        this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
     }
 
     /**
@@ -376,38 +405,69 @@ public abstract class ClientContainer {
     }
 
     private void queueSilentSlotChange(BaseClientSlot clientSlot) {
+        if (this.player == null) {
+            return;
+        }
         clientSlot.dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
     }
 
     private void queueSilentSlotChangeSafely(BaseClientSlot clientSlot) {
+        if (this.player == null) {
+            return;
+        }
         if ((clientSlot.dirtyState & BaseClientSlot.IS_DIRTY) == 0) {
             clientSlot.dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
         }
     }
 
-    public boolean openAndInitializeFor(Player player) {
-        final Message message = createInitMessage();
-        if (message == null) {
-            return false;
+    /**
+     * Binds this {@link ClientContainer} to the
+     * given {@link LanternPlayer}.
+     *
+     * @param player The player
+     */
+    public void bind(Player player) {
+        checkNotNull(player, "player");
+        checkState(this.player == null, "There is already a player bound");
+        this.player = (LanternPlayer) player;
+        // Add the tracker to each slot
+        for (LanternSlot slot : this.slotMap.keySet()) {
+            slot.addTracker(this);
         }
+    }
+
+    /**
+     * Initializes the container for the bounded {@link Player}.
+     */
+    public void init() {
+        checkState(this.player != null);
         final List<Message> messages = new ArrayList<>();
-        messages.add(message);
+        final Message message = createInitMessage();
+        if (message != null) {
+            messages.add(message);
+        }
+        final ItemStack[] items = new ItemStack[getSlotFlags().length];
+        for (int i = 0; i < items.length; i++) {
+            items[serverSlotIndexToClient(i)] = this.slots[i].get();
+        }
+        // Send the inventory content
+        messages.add(new MessagePlayOutWindowItems(this.containerId, items));
         // Collect additional messages
         collectInitMessages(messages);
         // Stream the messages to the player
-        ((LanternPlayer) player).getConnection().send(messages);
-        return true;
+        this.player.getConnection().send(messages);
     }
 
     protected void collectInitMessages(List<Message> messages) {
     }
 
-    public void updateFor(Player player) {
+    public void update() {
+        checkState(this.player != null);
         final List<Message> messages = new ArrayList<>();
         // Collect all the changes
         collectChangeMessages(messages);
         // Stream the messages to the player
-        ((LanternPlayer) player).getConnection().send(messages);
+        this.player.getConnection().send(messages);
     }
 
     protected void collectChangeMessages(List<Message> messages) {
@@ -440,6 +500,21 @@ public abstract class ClientContainer {
     }
 
     /**
+     * Releases all the {@link LanternSlot} and
+     * removes the {@link LanternPlayer}.
+     */
+    public void release() {
+        if (this.player == null) {
+            return;
+        }
+        this.player = null;
+        // Remove the tracker from each slot
+        for (LanternSlot slot : this.slotMap.keySet()) {
+            slot.removeTracker(this);
+        }
+    }
+
+    /**
      * Gets a {@link ClientSlot} for the given slot index.
      *
      * @param index The slot index
@@ -448,6 +523,10 @@ public abstract class ClientContainer {
     @Nullable
     public ClientSlot getSlot(int index) {
         return index < 0 || index >= this.slots.length ? null : this.slots[index];
+    }
+
+    public int getTopSlotsCount() {
+        return getSlotFlags().length;
     }
 
     /**
@@ -480,6 +559,14 @@ public abstract class ClientContainer {
         return true;
     }
 
+    protected int clientSlotIndexToServer(int index) {
+        return index;
+    }
+
+    protected int serverSlotIndexToClient(int index) {
+        return index;
+    }
+
     /**
      * Handles a shift click on the specified slot index, this will queue
      * all the slot updates that are required to force the client to revert
@@ -488,6 +575,7 @@ public abstract class ClientContainer {
      * @param slotIndex The slot index
      */
     public void handleShiftClick(int slotIndex) {
+        slotIndex = clientSlotIndexToServer(slotIndex);
         final int[] flags = getSlotFlags();
         // Check if the slot is in the main inventory
         final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;

@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.container.FurnaceInventoryContainer;
+import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
@@ -52,6 +52,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -128,6 +129,11 @@ public class PlayerContainerSession {
         this.player = player;
     }
 
+    private int getContainerId() {
+        checkNotNull(this.openContainer);
+        return this.openContainer.getClientContainer(this.player).get().getContainerId();
+    }
+
     /**
      * Gets the open container.
      *
@@ -152,11 +158,11 @@ public class PlayerContainerSession {
     }
 
     public void handleWindowClose(MessagePlayInOutCloseWindow message) {
-        if (this.openContainer == null || message.getWindow() != this.openContainer.windowId) {
+        if (this.openContainer == null || message.getWindow() != getContainerId()) {
             return;
         }
         final Cause cause = Cause.source(this.player).build();
-        player.getContainerSession().setRawOpenContainer(null, cause, false, true);
+        setRawOpenContainer(null, cause, false, true);
     }
 
     /**
@@ -175,8 +181,12 @@ public class PlayerContainerSession {
                     // Stop the client from closing the container, resend the open message
                     if (client) {
                         // This can't be done to the player inventory, player inventory uses index 0
-                        if (this.openContainer.windowId != 0) {
-                            this.openContainer.openInventoryForAndInitialize(this.player);
+                        // The optional should always return something at this point, otherwise
+                        // something is broken
+                        final ClientContainer clientContainer = this.openContainer.getClientContainer(this.player).get();
+                        if (clientContainer.getContainerId() != 0) {
+                            // Reinitialize the client container
+                            clientContainer.init();
                             return false;
                         }
                     } else {
@@ -212,27 +222,17 @@ public class PlayerContainerSession {
                     cursorItemSnapshot = transaction.getFinal();
                     this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
                 }
-                // The container is being used for the first time
-                if (container.getRawViewers().isEmpty()) {
-                    container.addSlotTrackers();
-                }
                 sendClose = false;
-                container.addViewer(this.player, container);
-                container.viewers.add(this.player);
-                container.openInventoryForAndInitialize(this.player);
+                container.addViewer(this.player);
                 updateCursorItem();
             } else {
                 this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
             }
-            if (sendClose && this.openContainer.windowId != -1) {
-                this.player.getConnection().send(new MessagePlayInOutCloseWindow(this.openContainer.windowId));
+            if (sendClose && getContainerId() != 0) {
+                this.player.getConnection().send(new MessagePlayInOutCloseWindow(getContainerId()));
             }
             if (this.openContainer != null) {
-                this.openContainer.viewers.remove(this.player);
-                this.openContainer.removeViewer(this.player, this.openContainer);
-                if (this.openContainer.getRawViewers().isEmpty()) {
-                    this.openContainer.removeSlotTrackers();
-                }
+                this.openContainer.removeViewer(this.player);
             }
         }
         this.openContainer = container;
@@ -267,7 +267,7 @@ public class PlayerContainerSession {
             } else {
                 return;
             }
-        } else if (windowId != this.openContainer.windowId) {
+        } else if (windowId != getContainerId()) {
             return;
         }
         // Just display the recipe for now, all the other behavior will be implemented later,
@@ -384,7 +384,7 @@ public class PlayerContainerSession {
             } else {
                 return;
             }
-        } else if (windowId != this.openContainer.windowId) {
+        } else if (windowId != getContainerId()) {
             return;
         }
         final int button = message.getButton();
@@ -715,13 +715,6 @@ public class PlayerContainerSession {
                                 transactions.addAll(slot.peekPollTransactions(
                                         stack -> true).get().getTransactions());
                             }
-                        }
-                        // Fix client glitches, just force update the slots
-                        // TODO: Remove when splitting up the containers up in two layers, client and server
-                        if (this.openContainer instanceof FurnaceInventoryContainer) {
-                            final LanternOrderedInventory inventory = this.openContainer.openInventory;
-                            this.openContainer.queueSlotChange(inventory.query(InputSlot.class).<InputSlot>first());
-                            this.openContainer.queueSlotChange(inventory.query(FuelSlot.class).<FuelSlot>first());
                         }
                     }
                 }

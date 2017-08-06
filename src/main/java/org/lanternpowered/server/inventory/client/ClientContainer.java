@@ -27,13 +27,20 @@ package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.DefaultStackSizes;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -72,6 +79,12 @@ public abstract class ClientContainer {
      * uses 4 bits and this is the raw slot index. Counting from 1 to 9.
      */
     protected static final int FLAG_HOTBAR = 0xf0;
+
+    /**
+     * A flag that defines that only one item (item stack with quantity one)
+     * can be present in the target slot.
+     */
+    protected static final int FLAG_ONE_ITEM = 0x100;
 
     /**
      * A counter for container ids.
@@ -282,23 +295,84 @@ public abstract class ClientContainer {
         bindProperty((Class<T>) property.getClass(), () -> property);
     }
 
+    /**
+     * Queues a slot change for the specified {@link ClientSlot}.
+     *
+     * @param clientSlot The client slot
+     */
     public void queueSlotChange(ClientSlot clientSlot) {
-        ((BaseClientSlot) clientSlot).dirtyState = BaseClientSlot.IS_DIRTY;
+        queueSlotChange((BaseClientSlot) clientSlot);
     }
 
+    /**
+     * Queues a slot change for the specified slot index.
+     *
+     * @param index The slot index
+     */
     public void queueSlotChange(int index) {
-        this.slots[index].dirtyState = BaseClientSlot.IS_DIRTY;
+        queueSlotChange(this.slots[index]);
     }
 
+    private void queueSlotChange(BaseClientSlot clientSlot) {
+        clientSlot.dirtyState = BaseClientSlot.IS_DIRTY;
+    }
+
+    private void queueSlotChangeSafely(BaseClientSlot clientSlot) {
+        if ((clientSlot.dirtyState & BaseClientSlot.IS_DIRTY) == 0) {
+            clientSlot.dirtyState = BaseClientSlot.IS_DIRTY;
+        }
+    }
+
+    /**
+     * Queues a silent slot change for the specified {@link ClientSlot}.
+     *
+     * @param clientSlot The client slot
+     */
     public void queueSilentSlotChange(ClientSlot clientSlot) {
         ((BaseClientSlot) clientSlot).dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
     }
 
+    /**
+     * Queues a silent slot change for the specified slot index.
+     *
+     * @param index The slot index
+     */
     public void queueSilentSlotChange(int index) {
         this.slots[index].dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
     }
 
-    protected void collectChanges(List<Message> messages) {
+    private void queueSilentSlotChangeSafely(BaseClientSlot clientSlot) {
+        if ((clientSlot.dirtyState & BaseClientSlot.IS_DIRTY) == 0) {
+            clientSlot.dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
+        }
+    }
+
+    public boolean openAndInitializeFor(Player player) {
+        final Message message = createInitMessage();
+        if (message == null) {
+            return false;
+        }
+        final List<Message> messages = new ArrayList<>();
+        messages.add(message);
+        // Collect additional messages
+        collectInitMessages(messages);
+        // Stream the messages to the player
+        ((LanternPlayer) player).getConnection().send(messages);
+        return true;
+    }
+
+    protected void collectInitMessages(List<Message> messages) {
+    }
+
+    public void updateFor(Player player) {
+        final List<Message> messages = new ArrayList<>();
+        // Collect all the changes
+        collectChangeMessages(messages);
+        // Stream the messages to the player
+        ((LanternPlayer) player).getConnection().send(messages);
+    }
+
+    protected void collectChangeMessages(List<Message> messages) {
         final int[] flags = getSlotFlags();
         for (int i = 0; i < this.slots.length; i++) {
             final BaseClientSlot slot = this.slots[i];
@@ -366,5 +440,116 @@ public abstract class ClientContainer {
      */
     protected boolean disableShiftClickWhenFull() {
         return true;
+    }
+
+    /**
+     * Handles a shift click on the specified slot index, this will queue
+     * all the slot updates that are required to force the client to revert
+     * the changes.
+     *
+     * @param slotIndex The slot index
+     */
+    public void handleShiftClick(int slotIndex) {
+        final int[] flags = getSlotFlags();
+        // Check if the slot is in the main inventory
+        final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;
+        final boolean hotbar = (flags[slotIndex] & FLAG_HOTBAR) != 0;
+        // Get the client slot
+        final BaseClientSlot slot = this.slots[slotIndex];
+        ItemStack itemStack = slot.get();
+        // Shift clicking on a empty slot doesn't have any effect
+        if (itemStack.isEmpty()) {
+            return;
+        }
+        // Loop reverse through the slots if the insertion is reversed
+        final boolean reverse = (flags[slotIndex] & FLAG_REVERSE_SHIFT_INSERTION) != 0;
+        final int start = reverse ? flags.length - 1 : 0;
+        final int end = reverse ? 0 : flags.length - 1;
+        // Get the max stack size for the shifted item
+        final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+        final IntSet mainSlots = new IntOpenHashSet();
+        for (int i = start; i <= end; i++) {
+            // Don't shift to itself
+            if (i == slotIndex) {
+                continue;
+            }
+            // You can never shift insert to this slot
+            if ((flags[i] & FLAG_DISABLE_SHIFT_INSERTION) != 0) {
+                continue;
+            }
+            final boolean main1 = (flags[i] & FLAG_MAIN_INVENTORY) != 0;
+            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
+            if (main && hotbar != hotbar1) {
+                mainSlots.add(i);
+            }
+            // Only attempt to move from bottom to top or from top to bottom inventory
+            if (main == main1) {
+                continue;
+            }
+            final BaseClientSlot slot1 = this.slots[i];
+            final ItemStack itemStack1 = slot1.getRaw();
+            // Get the amount of items that can be put in the stack
+            final int limit = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
+            // If the items aren't equal, they won't be able to stack anyway,
+            // or if the slot is full
+            if (!itemStack1.isEmpty() && (itemStack1.getQuantity() >= limit ||
+                    !LanternItemStack.areSimilar(itemStack, itemStack1))) {
+                continue;
+            }
+            // Just force the slot to update and skip it, we don't know for
+            // sure that there will be an item put in it.
+            if ((flags[i] & FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION) != 0) {
+                // Do it silently if possible, avoid any animations
+                queueSilentSlotChangeSafely(slot1);
+                continue;
+            }
+            // Now, we take some items away from the shifted stack and continue
+            // the process for the rest of the slots
+            final int removed = limit - itemStack1.getQuantity();
+            if (removed > 0) {
+                itemStack.setQuantity(itemStack.getQuantity() - removed);
+                // Do it silently if possible, avoid any animations
+                queueSilentSlotChangeSafely(slot1);
+            }
+            // We are at the end, the stack is empty
+            if (itemStack.isEmpty()) {
+                return;
+            }
+        }
+        // Shift between main and hotbar for the rest of the stack
+        if (disableShiftClickWhenFull()) {
+            return;
+        }
+        for (int i : mainSlots.toIntArray()) {
+            // No need to check if shifting is disabled, it will always work
+            // for the main inventory
+            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
+            // Only move between hotbar and main
+            if (hotbar == hotbar1) {
+                continue;
+            }
+            final BaseClientSlot slot1 = this.slots[i];
+            final ItemStack itemStack1 = slot1.getRaw();
+            // Get the amount of items that can be put in the stack
+            final int limit = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
+            // If the items aren't equal, they won't be able to stack anyway,
+            // or if the slot is full
+            if (!itemStack1.isEmpty() && (itemStack1.getQuantity() >= limit ||
+                    !LanternItemStack.areSimilar(itemStack, itemStack1))) {
+                continue;
+            }
+            // Now, we take some items away from the shifted stack and continue
+            // the process for the rest of the slots
+            final int removed = limit - itemStack1.getQuantity();
+            if (removed > 0) {
+                itemStack.setQuantity(itemStack.getQuantity() - removed);
+                // Do it silently if possible, avoid any animations
+                queueSilentSlotChangeSafely(slot1);
+            }
+            // We are at the end, the stack is empty
+            if (itemStack.isEmpty()) {
+                return;
+            }
+        }
     }
 }

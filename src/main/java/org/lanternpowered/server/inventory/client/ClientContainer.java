@@ -465,10 +465,11 @@ public abstract class ClientContainer {
         final boolean reverse = (flags[slotIndex] & FLAG_REVERSE_SHIFT_INSERTION) != 0;
         final int start = reverse ? flags.length - 1 : 0;
         final int end = reverse ? 0 : flags.length - 1;
+        final int step = reverse ? -1 : 1;
         // Get the max stack size for the shifted item
         final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
         final IntSet mainSlots = new IntOpenHashSet();
-        for (int i = start; i <= end; i++) {
+        for (int i = start; i <= end; i += step) {
             // Don't shift to itself
             if (i == slotIndex) {
                 continue;

@@ -25,26 +25,28 @@
  */
 package org.lanternpowered.server.inventory.block;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
-public class DispensorInventory extends LanternGridInventory {
+public class DispenserInventory extends LanternGridInventory {
 
-    public DispensorInventory(@Nullable Inventory parent) {
+    public DispenserInventory(@Nullable Inventory parent) {
         this(parent, null);
     }
 
-    public DispensorInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+    public DispenserInventory(@Nullable Inventory parent, @Nullable Translation name) {
+        super(parent, name == null ? tr("container.dispenser") : name);
 
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                this.registerSlotAt(x, y);
+                registerSlotAt(x, y);
             }
         }
-        this.finalizeContent();
+        finalizeContent();
     }
 }

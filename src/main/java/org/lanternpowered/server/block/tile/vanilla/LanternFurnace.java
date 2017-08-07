@@ -50,6 +50,7 @@ import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.fuel.IFuel;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -66,7 +67,6 @@ import org.spongepowered.api.item.inventory.slot.InputSlot;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
@@ -154,7 +154,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
         @Override
         public ClientContainer constructClientContainer() {
-            return new FurnaceClientContainer(Text.of(getName()));
+            return new FurnaceClientContainer(TextTranslation.toText(getName()));
         }
     }
 

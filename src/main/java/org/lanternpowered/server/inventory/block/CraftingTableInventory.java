@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.block;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.IInventory;
@@ -37,13 +39,13 @@ import org.lanternpowered.server.inventory.client.CraftingTableClientContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
@@ -57,7 +59,7 @@ import javax.annotation.Nullable;
 public class CraftingTableInventory extends LanternCraftingInventory implements VanillaOpenableInventory {
 
     public CraftingTableInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+        super(parent, name == null ? tr("container.crafting") : name);
 
         registerSlot(new LanternCraftingOutput(this));
         registerChild(new LanternCraftingGridInventory(this) {
@@ -112,6 +114,6 @@ public class CraftingTableInventory extends LanternCraftingInventory implements 
 
     @Override
     public ClientContainer constructClientContainer() {
-        return new CraftingTableClientContainer(Text.of(getName()));
+        return new CraftingTableClientContainer(TextTranslation.toText(getName()));
     }
 }

@@ -32,6 +32,7 @@ import org.lanternpowered.server.inventory.VanillaOpenableInventory;
 import org.lanternpowered.server.inventory.block.ChestInventory;
 import org.lanternpowered.server.inventory.client.ChestClientContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
@@ -50,6 +51,6 @@ public class TileDoubleChestInventory extends LanternOrderedInventory implements
 
     @Override
     public ClientContainer constructClientContainer() {
-        return new ChestClientContainer(Text.of(getName()), 6);
+        return new ChestClientContainer(TextTranslation.toText(getName()), 6);
     }
 }

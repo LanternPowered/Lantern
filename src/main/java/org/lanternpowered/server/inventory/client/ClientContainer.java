@@ -621,11 +621,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
         return true;
     }
 
-    protected int clientSlotIndexToServer(int index) {
+    public int clientSlotIndexToServer(int index) {
         return index;
     }
 
-    protected int serverSlotIndexToClient(int index) {
+    public int serverSlotIndexToClient(int index) {
         return index;
     }
 
@@ -662,7 +662,6 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // Get the client slot
         final BaseClientSlot slot = this.slots[slotIndex];
         ItemStack itemStack = slot.get();
-        System.out.println("Shift click: " + itemStack);
         // Shift clicking on a empty slot doesn't have any effect
         if (itemStack.isEmpty()) {
             return;

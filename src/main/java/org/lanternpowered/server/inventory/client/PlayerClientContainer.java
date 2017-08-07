@@ -74,12 +74,12 @@ public class PlayerClientContainer extends ClientContainer {
     // but we modify this to move the slot before the main inventory
 
     @Override
-    protected int clientSlotIndexToServer(int index) {
-        return index < OFFHAND_SLOT_INDEX ? index : index == ALL_SLOT_FLAGS.length - 1 ? OFFHAND_SLOT_INDEX : index + 1;
+    public int clientSlotIndexToServer(int index) {
+        return index == ALL_SLOT_FLAGS.length - 1 ? OFFHAND_SLOT_INDEX : index < OFFHAND_SLOT_INDEX ? index : index + 1;
     }
 
     @Override
-    protected int serverSlotIndexToClient(int index) {
-        return index < OFFHAND_SLOT_INDEX ? index : index == OFFHAND_SLOT_INDEX ? ALL_SLOT_FLAGS.length - 1 : index - 1;
+    public int serverSlotIndexToClient(int index) {
+        return index == OFFHAND_SLOT_INDEX ? ALL_SLOT_FLAGS.length - 1 : index < OFFHAND_SLOT_INDEX ? index : index - 1;
     }
 }

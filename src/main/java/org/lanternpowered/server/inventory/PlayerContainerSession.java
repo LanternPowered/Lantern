@@ -292,7 +292,9 @@ public class PlayerContainerSession {
                         entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.createSnapshot())));
             }
         } else {
-            final Optional<LanternSlot> optSlot = this.player.getInventoryContainer().getClientContainer(this.player).get().getSlot(slotIndex);
+            final ClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer(this.player).get();
+            slotIndex = clientContainer.clientSlotIndexToServer(slotIndex);
+            final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
                 final LanternSlot slot = optSlot.get();
@@ -394,7 +396,7 @@ public class PlayerContainerSession {
 
         final int button = message.getButton();
         final int mode = message.getMode();
-        final int slotIndex = message.getSlot();
+        final int slotIndex = message.getSlot() > 0 ? clientContainer.clientSlotIndexToServer(message.getSlot()) : message.getSlot();
 
         // Drag mode
         if (mode == 5) {

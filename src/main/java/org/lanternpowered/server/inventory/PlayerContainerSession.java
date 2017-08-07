@@ -292,7 +292,7 @@ public class PlayerContainerSession {
                         entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.createSnapshot())));
             }
         } else {
-            final Optional<LanternSlot> optSlot = this.openContainer.playerInventory.getSlotAt(slotIndex);
+            final Optional<LanternSlot> optSlot = this.player.getInventoryContainer().getClientContainer(this.player).get().getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
                 final LanternSlot slot = optSlot.get();
@@ -459,7 +459,7 @@ public class PlayerContainerSession {
                         }
                     } else {
                         // Add slot
-                        final Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
+                        final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
                         if (optSlot.isPresent()) {
                             final LanternSlot slot = optSlot.get();
                             if (!(slot instanceof OutputSlot) && slot.isValidItem(this.cursorItem) && (slot.getRawItemStack() == null ||
@@ -481,7 +481,7 @@ public class PlayerContainerSession {
         // Left/right click inside the inventory
         } else if (mode == 0 && (button == 0 || button == 1) && slotIndex != -999) {
             clientContainer.handleLeftRightClick(slotIndex, button == 1);
-            final Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
+            final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
@@ -641,7 +641,7 @@ public class PlayerContainerSession {
         // Shift + left/right click
         } else if (mode == 1 && (button == 0 || button == 1)) {
             clientContainer.handleShiftClick(slotIndex);
-            Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
+            Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();
                 final ItemStack itemStack = slot.peek().orElse(null);
@@ -741,7 +741,7 @@ public class PlayerContainerSession {
             }
         // Double click
         } else if (mode == 6 && button == 0) {
-            final Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
+            final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
                 final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(this.cursorItem);
@@ -797,7 +797,7 @@ public class PlayerContainerSession {
             }
         // Number keys
         } else if (mode == 2) {
-            final Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
+            final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();
 
@@ -879,7 +879,7 @@ public class PlayerContainerSession {
             } else {
                 final ItemStackSnapshot item = LanternItemStack.toSnapshot(this.cursorItem);
                 cursorTransaction = new Transaction<>(item, item);
-                final Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
+                final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
                 if (optSlot.isPresent()) {
                     final LanternSlot slot = optSlot.get();
                     final Optional<PeekPollTransactionsResult> result = button == 0 ?
@@ -914,7 +914,7 @@ public class PlayerContainerSession {
             final Optional<GameMode> gameMode = this.player.get(Keys.GAME_MODE);
             if (gameMode.isPresent() && gameMode.get().equals(GameModes.CREATIVE)
                     && this.cursorItem == null) {
-                final Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
+                final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
                 if (optSlot.isPresent()) {
                     final LanternSlot slot = optSlot.get();
                     final ItemStack stack = slot.peek().orElse(null);

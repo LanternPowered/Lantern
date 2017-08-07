@@ -522,7 +522,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 final int hotbarSlot;
                 // Check if we can do a silent update
                 if ((slot.dirtyState & BaseClientSlot.SILENT_UPDATE) != 0 &&
-                        (hotbarSlot = flags[i] & FLAG_HOTBAR) != 0) {
+                        (hotbarSlot = (flags[i] & FLAG_HOTBAR) >> 4) != 0) {
                     index = hotbarSlot - 1;
                     containerId = -2;
                 } else {

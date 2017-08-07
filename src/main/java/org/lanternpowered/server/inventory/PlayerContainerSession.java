@@ -130,8 +130,11 @@ public class PlayerContainerSession {
     }
 
     private int getContainerId() {
-        checkNotNull(this.openContainer);
-        return this.openContainer.getClientContainer(this.player).get().getContainerId();
+        return getClientContainer().getContainerId();
+    }
+
+    private ClientContainer getClientContainer() {
+        return checkNotNull(this.openContainer).tryGetClientContainer(this.player);
     }
 
     /**
@@ -387,6 +390,8 @@ public class PlayerContainerSession {
         } else if (windowId != getContainerId()) {
             return;
         }
+        final ClientContainer clientContainer = getClientContainer();
+
         final int button = message.getButton();
         final int mode = message.getMode();
         final int slotIndex = message.getSlot();
@@ -475,6 +480,7 @@ public class PlayerContainerSession {
             resetDrag();
         // Left/right click inside the inventory
         } else if (mode == 0 && (button == 0 || button == 1) && slotIndex != -999) {
+            clientContainer.handleLeftRightClick(slotIndex, button == 1);
             final Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();
@@ -634,6 +640,7 @@ public class PlayerContainerSession {
             }
         // Shift + left/right click
         } else if (mode == 1 && (button == 0 || button == 1)) {
+            clientContainer.handleShiftClick(slotIndex);
             Optional<LanternSlot> optSlot = this.openContainer.getSlotAt(slotIndex);
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();

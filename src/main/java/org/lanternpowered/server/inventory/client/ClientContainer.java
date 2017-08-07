@@ -30,8 +30,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.DefaultStackSizes;
 import org.lanternpowered.server.inventory.IInventory;
@@ -49,6 +50,7 @@ import org.spongepowered.api.text.Text;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -63,6 +65,11 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("unchecked")
 public abstract class ClientContainer implements SlotChangeTracker {
+
+    /**
+     * The slot index that should be used to bind the cursor slot.
+     */
+    public static final int CURSOR_SLOT_INDEX = -1;
 
     protected static final int[] MAIN_INVENTORY_FLAGS = new int[36];
 
@@ -125,7 +132,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
          */
         public final static int SILENT_UPDATE = 0x2;
 
-        private int dirtyState = 0;
+        int dirtyState = 0;
 
         protected abstract ItemStack getRaw();
     }
@@ -204,21 +211,34 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     private final Text title;
-    private final BaseClientSlot[] slots;
     private final Multimap<LanternSlot, SlotClientSlot> slotMap = HashMultimap.create();
+    private BaseClientSlot cursor = new EmptyClientSlot(); // Not really a slot, but the implementation does the trick
     private final int containerId;
+    @SuppressWarnings("NullableProblems") private BaseClientSlot[] slots;
     @Nullable private LanternPlayer player;
 
     public ClientContainer(Text title) {
+        // Generate a new container id
+        this.containerId = generateContainerId();
         this.title = title;
+    }
+
+    /**
+     * Populates this {@link ClientContainer}
+     * with initial content.
+     */
+    @SuppressWarnings("ConstantConditions")
+    private void populate() {
+        // Is already populated
+        if (this.slots != null) {
+            return;
+        }
         final int[] flags = getSlotFlags();
         // Create a array to bind slots
         this.slots = new BaseClientSlot[flags.length];
         for (int i = 0; i < this.slots.length; i++) {
             this.slots[i] = new EmptyClientSlot();
         }
-        // Generate a new container id
-        this.containerId = generateContainerId();
     }
 
     /**
@@ -271,9 +291,14 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * @return The bound client slot
      */
     public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+        populate();
         final SlotClientSlot clientSlot = new SlotClientSlot(slot);
         removeSlot(index);
-        this.slots[index] = clientSlot;
+        if (index == -1) {
+            this.cursor = clientSlot;
+        } else {
+            this.slots[index] = clientSlot;
+        }
         this.slotMap.put(slot, clientSlot);
         if (this.player != null) {
             slot.addTracker(this);
@@ -290,6 +315,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * @return The bound client slot
      */
     public ClientSlot.Button bindButton(int index) {
+        populate();
         final IconClientSlot clientSlot = new IconClientSlot();
         removeSlot(index);
         this.slots[index] = clientSlot;
@@ -298,7 +324,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
 
     private void removeSlot(int index) {
         // Cleanup the old client slot
-        final BaseClientSlot oldClientSlot = this.slots[index];
+        final BaseClientSlot oldClientSlot = index == -1 ? this.cursor : this.slots[index];
         if (oldClientSlot instanceof SlotClientSlot) {
             final LanternSlot slot = ((SlotClientSlot) oldClientSlot).slot;
             // Remove the tracker from this slot
@@ -362,6 +388,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     private void queueSlotChange(BaseClientSlot clientSlot) {
+        populate();
         if (this.player == null) {
             return;
         }
@@ -369,6 +396,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     private void queueSlotChangeSafely(BaseClientSlot clientSlot) {
+        populate();
         if (this.player == null) {
             return;
         }
@@ -405,6 +433,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     private void queueSilentSlotChange(BaseClientSlot clientSlot) {
+        populate();
         if (this.player == null) {
             return;
         }
@@ -412,6 +441,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     private void queueSilentSlotChangeSafely(BaseClientSlot clientSlot) {
+        populate();
         if (this.player == null) {
             return;
         }
@@ -429,6 +459,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     public void bind(Player player) {
         checkNotNull(player, "player");
         checkState(this.player == null, "There is already a player bound");
+        populate();
         this.player = (LanternPlayer) player;
         // Add the tracker to each slot
         for (LanternSlot slot : this.slotMap.keySet()) {
@@ -441,6 +472,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      */
     public void init() {
         checkState(this.player != null);
+        populate();
         final List<Message> messages = new ArrayList<>();
         final Message message = createInitMessage();
         if (message != null) {
@@ -448,10 +480,17 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
         final ItemStack[] items = new ItemStack[getSlotFlags().length];
         for (int i = 0; i < items.length; i++) {
+            if (this.slots[i] instanceof ClientSlot.Empty) {
+                System.out.println("DEBUG A: " + i);
+            }
             items[serverSlotIndexToClient(i)] = this.slots[i].get();
         }
         // Send the inventory content
         messages.add(new MessagePlayOutWindowItems(this.containerId, items));
+        // Send the cursor item if present
+        if (!this.cursor.getRaw().isEmpty()) {
+            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.get()));
+        }
         // Collect additional messages
         collectInitMessages(messages);
         // Stream the messages to the player
@@ -463,11 +502,14 @@ public abstract class ClientContainer implements SlotChangeTracker {
 
     public void update() {
         checkState(this.player != null);
+        populate();
         final List<Message> messages = new ArrayList<>();
         // Collect all the changes
         collectChangeMessages(messages);
-        // Stream the messages to the player
-        this.player.getConnection().send(messages);
+        if (!messages.isEmpty()) {
+            // Stream the messages to the player
+            this.player.getConnection().send(messages);
+        }
     }
 
     protected void collectChangeMessages(List<Message> messages) {
@@ -489,8 +531,12 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 // Reset the dirty state
                 slot.dirtyState = 0;
                 // Add a update message
-                messages.add(new MessagePlayOutSetWindowSlot(containerId, index, slot.get()));
+                messages.add(new MessagePlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.get()));
             }
+        }
+        // Update the cursor item if needed
+        if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
+            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.get()));
         }
         // Collect the property changes
         collectPropertyChanges(messages);
@@ -504,6 +550,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * removes the {@link LanternPlayer}.
      */
     public void release() {
+        populate();
         if (this.player == null) {
             return;
         }
@@ -518,15 +565,30 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * Gets a {@link ClientSlot} for the given slot index.
      *
      * @param index The slot index
-     * @return The client slot if present, otherwise {@code null}
+     * @return The client slot if present, otherwise {@link Optional#empty()}
      */
-    @Nullable
-    public ClientSlot getSlot(int index) {
-        return index < 0 || index >= this.slots.length ? null : this.slots[index];
+    public Optional<ClientSlot> getClientSlot(int index) {
+        populate();
+        return index == -1 ? Optional.of(this.cursor) : index < 0 || index >= this.slots.length ? Optional.empty() : Optional.of(this.slots[index]);
+    }
+
+    /**
+     * Attempts to get the bound {@link LanternSlot} for the given index.
+     *
+     * @param index The slot index
+     * @return The bound slot if present, otherwise {@link Optional#empty()}
+     */
+    public Optional<LanternSlot> getSlot(int index) {
+        populate();
+        if (index < -1 || index >= this.slots.length) {
+            return Optional.empty();
+        }
+        final BaseClientSlot clientSlot = index == -1 ? this.cursor : this.slots[index];
+        return clientSlot instanceof SlotClientSlot ? Optional.of(((SlotClientSlot) clientSlot).slot) : Optional.empty();
     }
 
     public int getTopSlotsCount() {
-        return getSlotFlags().length;
+        return getTopSlotFlags().length;
     }
 
     /**
@@ -537,7 +599,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      *
      * @return The slot flags
      */
-    protected abstract int[] getSlotFlags();
+    protected abstract int[] getTopSlotFlags();
 
     /**
      * Gets a array that contains all the flags
@@ -545,8 +607,8 @@ public abstract class ClientContainer implements SlotChangeTracker {
      *
      * @return The slot flags
      */
-    protected int[] getAllSlotFlags() {
-        return compileAllSlotFlags(getSlotFlags());
+    protected int[] getSlotFlags() {
+        return compileAllSlotFlags(getTopSlotFlags());
     }
 
     /**
@@ -568,6 +630,22 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     /**
+     * Handles a left or right click interaction.
+     *
+     * @param slotIndex The slot index
+     * @param right Whether it's a right click action
+     */
+    public void handleLeftRightClick(int slotIndex, boolean right) {
+        final BaseClientSlot slot = this.slots[slotIndex];
+        // Only changes can occur if the cursor slot and the target slot are empty
+        if (!slot.getRaw().isEmpty() && !this.cursor.getRaw().isEmpty()) {
+            // Update the slot and cursor
+            queueSilentSlotChangeSafely(slot);
+            queueSlotChange(this.cursor);
+        }
+    }
+
+    /**
      * Handles a shift click on the specified slot index, this will queue
      * all the slot updates that are required to force the client to revert
      * the changes.
@@ -575,6 +653,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * @param slotIndex The slot index
      */
     public void handleShiftClick(int slotIndex) {
+        populate();
         slotIndex = clientSlotIndexToServer(slotIndex);
         final int[] flags = getSlotFlags();
         // Check if the slot is in the main inventory
@@ -583,6 +662,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // Get the client slot
         final BaseClientSlot slot = this.slots[slotIndex];
         ItemStack itemStack = slot.get();
+        System.out.println("Shift click: " + itemStack);
         // Shift clicking on a empty slot doesn't have any effect
         if (itemStack.isEmpty()) {
             return;
@@ -594,8 +674,8 @@ public abstract class ClientContainer implements SlotChangeTracker {
         final int step = reverse ? -1 : 1;
         // Get the max stack size for the shifted item
         final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
-        final IntSet mainSlots = new IntOpenHashSet();
-        for (int i = start; i <= end; i += step) {
+        final IntList mainSlots = new IntArrayList();
+        for (int i = start; i != end; i += step) {
             // Don't shift to itself
             if (i == slotIndex) {
                 continue;
@@ -634,7 +714,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
             // the process for the rest of the slots
             final int removed = limit - itemStack1.getQuantity();
             if (removed > 0) {
-                itemStack.setQuantity(itemStack.getQuantity() - removed);
+                itemStack.setQuantity(Math.max(0, itemStack.getQuantity() - removed));
                 // Do it silently if possible, avoid any animations
                 queueSilentSlotChangeSafely(slot1);
             }
@@ -647,7 +727,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
         if (disableShiftClickWhenFull()) {
             return;
         }
-        for (int i : mainSlots.toIntArray()) {
+        final int[] mainSlotsArray = mainSlots.toIntArray();
+        if (reverse) {
+            ArrayUtils.reverse(mainSlotsArray);
+        }
+        for (int i : mainSlotsArray) {
             // No need to check if shifting is disabled, it will always work
             // for the main inventory
             final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
@@ -661,15 +745,15 @@ public abstract class ClientContainer implements SlotChangeTracker {
             final int limit = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
             // If the items aren't equal, they won't be able to stack anyway,
             // or if the slot is full
-            if (!itemStack1.isEmpty() && (itemStack1.getQuantity() >= limit ||
-                    !LanternItemStack.areSimilar(itemStack, itemStack1))) {
+            if (!itemStack1.isEmpty() && (!LanternItemStack.areSimilar(itemStack, itemStack1) ||
+                    itemStack1.getQuantity() >= limit)) {
                 continue;
             }
             // Now, we take some items away from the shifted stack and continue
             // the process for the rest of the slots
-            final int removed = limit - itemStack1.getQuantity();
+            final int removed = Math.min(limit, itemStack1.getQuantity());
             if (removed > 0) {
-                itemStack.setQuantity(itemStack.getQuantity() - removed);
+                itemStack.setQuantity(Math.max(0, itemStack.getQuantity() - removed));
                 // Do it silently if possible, avoid any animations
                 queueSilentSlotChangeSafely(slot1);
             }

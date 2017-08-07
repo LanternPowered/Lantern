@@ -44,12 +44,12 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public class FurnaceClientContainer extends ClientContainer {
 
-    private static final int[] SLOT_FLAGS = new int[] {
+    private static final int[] TOP_SLOT_FLAGS = new int[] {
             FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Input slot
             FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Fuel slot
             FLAG_DISABLE_SHIFT_INSERTION, // Output slot
     };
-    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
     private Supplier<SmeltingProgressProperty> smeltingProgressPropertySupplier = () -> null;
     @Nullable private SmeltingProgress lastProgress;
@@ -94,16 +94,16 @@ public class FurnaceClientContainer extends ClientContainer {
     @Override
     protected Message createInitMessage() {
         return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.FURNACE,
-                getTitle(), SLOT_FLAGS.length, 0);
+                getTitle(), TOP_SLOT_FLAGS.length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS;
     }
 
     @Override
     protected int[] getSlotFlags() {
-        return SLOT_FLAGS;
-    }
-
-    @Override
-    protected int[] getAllSlotFlags() {
         return ALL_SLOT_FLAGS;
     }
 

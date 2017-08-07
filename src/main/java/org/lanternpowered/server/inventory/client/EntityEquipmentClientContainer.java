@@ -39,16 +39,16 @@ import java.util.Arrays;
 // Mule
 public class EntityEquipmentClientContainer extends ClientContainer {
 
-    private static final int[][] SLOT_FLAGS = new int[6][];
+    private static final int[][] TOP_SLOT_FLAGS = new int[6][];
     private static final int[][] ALL_SLOT_FLAGS = new int[6][];
 
     static {
-        for (int i = 0; i < SLOT_FLAGS.length; i++) {
+        for (int i = 0; i < TOP_SLOT_FLAGS.length; i++) {
             final int[] flags = new int[2 + (i * 3)];
             Arrays.fill(flags, FLAG_REVERSE_SHIFT_INSERTION);
             flags[0] |= FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION;
             flags[1] |= FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION;
-            SLOT_FLAGS[i] = flags;
+            TOP_SLOT_FLAGS[i] = flags;
             ALL_SLOT_FLAGS[i] = compileAllSlotFlags(flags);
         }
     }
@@ -66,16 +66,16 @@ public class EntityEquipmentClientContainer extends ClientContainer {
     @Override
     protected Message createInitMessage() {
         return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.HORSE,
-                getTitle(), SLOT_FLAGS.length, this.entityId);
+                getTitle(), TOP_SLOT_FLAGS.length, this.entityId);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS[this.rowIndex];
     }
 
     @Override
     protected int[] getSlotFlags() {
-        return SLOT_FLAGS[this.rowIndex];
-    }
-
-    @Override
-    protected int[] getAllSlotFlags() {
         return ALL_SLOT_FLAGS[this.rowIndex];
     }
 }

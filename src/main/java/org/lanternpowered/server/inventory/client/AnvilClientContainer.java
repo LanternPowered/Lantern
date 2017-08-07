@@ -31,12 +31,12 @@ import org.spongepowered.api.text.Text;
 
 public class AnvilClientContainer extends ClientContainer {
 
-    private static final int[] SLOT_FLAGS = new int[] {
+    private static final int[] TOP_SLOT_FLAGS = new int[] {
             0, // First input slot
             0, // Second input slot
             FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Result slot
     };
-    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
     public AnvilClientContainer(Text title) {
         super(title);
@@ -45,16 +45,16 @@ public class AnvilClientContainer extends ClientContainer {
     @Override
     protected Message createInitMessage() {
         return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.ANVIL,
-                getTitle(), SLOT_FLAGS.length, 0);
+                getTitle(), TOP_SLOT_FLAGS.length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS;
     }
 
     @Override
     protected int[] getSlotFlags() {
-        return SLOT_FLAGS;
-    }
-
-    @Override
-    protected int[] getAllSlotFlags() {
         return ALL_SLOT_FLAGS;
     }
 }

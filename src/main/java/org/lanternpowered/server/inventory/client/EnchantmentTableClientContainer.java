@@ -31,11 +31,11 @@ import org.spongepowered.api.text.Text;
 
 public class EnchantmentTableClientContainer extends ClientContainer {
 
-    private static final int[] SLOT_FLAGS = new int[] {
+    private static final int[] TOP_SLOT_FLAGS = new int[] {
             FLAG_REVERSE_SHIFT_INSERTION | FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION | FLAG_ONE_ITEM, // Input slot
             FLAG_REVERSE_SHIFT_INSERTION | FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Lapis lazuli slot
     };
-    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
     public EnchantmentTableClientContainer(Text title) {
         super(title);
@@ -44,16 +44,16 @@ public class EnchantmentTableClientContainer extends ClientContainer {
     @Override
     protected Message createInitMessage() {
         return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.ENCHANTING_TABLE,
-                getTitle(), SLOT_FLAGS.length, 0);
+                getTitle(), TOP_SLOT_FLAGS.length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS;
     }
 
     @Override
     protected int[] getSlotFlags() {
-        return SLOT_FLAGS;
-    }
-
-    @Override
-    protected int[] getAllSlotFlags() {
         return ALL_SLOT_FLAGS;
     }
 }

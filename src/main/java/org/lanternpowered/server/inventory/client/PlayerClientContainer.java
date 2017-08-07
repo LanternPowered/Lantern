@@ -30,7 +30,7 @@ import org.spongepowered.api.text.Text;
 
 public class PlayerClientContainer extends ClientContainer {
 
-    private static final int[] SLOT_FLAGS = new int[] {
+    private static final int[] TOP_SLOT_FLAGS = new int[] {
             FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Crafting output slot
             FLAG_DISABLE_SHIFT_INSERTION, // Crafting input slot 1
             FLAG_DISABLE_SHIFT_INSERTION, // Crafting input slot 2
@@ -42,20 +42,20 @@ public class PlayerClientContainer extends ClientContainer {
             FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Equipment slot 4
             FLAG_DISABLE_SHIFT_INSERTION, // Offhand slot
     };
-    private static final int OFFHAND_SLOT_INDEX = SLOT_FLAGS.length - 1;
-    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+    private static final int OFFHAND_SLOT_INDEX = TOP_SLOT_FLAGS.length - 1;
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
     public PlayerClientContainer(Text title) {
         super(title);
     }
 
     @Override
-    protected int[] getSlotFlags() {
-        return SLOT_FLAGS;
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS;
     }
 
     @Override
-    protected int[] getAllSlotFlags() {
+    protected int[] getSlotFlags() {
         return ALL_SLOT_FLAGS;
     }
 

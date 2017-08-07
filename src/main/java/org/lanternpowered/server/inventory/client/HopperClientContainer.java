@@ -31,14 +31,14 @@ import org.spongepowered.api.text.Text;
 
 public class HopperClientContainer extends ClientContainer {
 
-    private static final int[] SLOT_FLAGS = new int[] {
+    private static final int[] TOP_SLOT_FLAGS = new int[] {
             FLAG_REVERSE_SHIFT_INSERTION, // Slot 1
             FLAG_REVERSE_SHIFT_INSERTION, // Slot 2
             FLAG_REVERSE_SHIFT_INSERTION, // Slot 3
             FLAG_REVERSE_SHIFT_INSERTION, // Slot 4
             FLAG_REVERSE_SHIFT_INSERTION, // Slot 5
     };
-    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
     public HopperClientContainer(Text title) {
         super(title);
@@ -47,16 +47,16 @@ public class HopperClientContainer extends ClientContainer {
     @Override
     protected Message createInitMessage() {
         return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.HOPPER,
-                getTitle(), SLOT_FLAGS.length, 0);
+                getTitle(), TOP_SLOT_FLAGS.length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS;
     }
 
     @Override
     protected int[] getSlotFlags() {
-        return SLOT_FLAGS;
-    }
-
-    @Override
-    protected int[] getAllSlotFlags() {
         return ALL_SLOT_FLAGS;
     }
 }

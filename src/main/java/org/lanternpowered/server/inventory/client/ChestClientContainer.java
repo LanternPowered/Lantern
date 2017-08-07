@@ -35,14 +35,14 @@ import java.util.Arrays;
 
 public class ChestClientContainer extends ClientContainer {
 
-    private static final int[][] SLOT_FLAGS = new int[7][];
+    private static final int[][] TOP_SLOT_FLAGS = new int[7][];
     private static final int[][] ALL_SLOT_FLAGS = new int[7][];
 
     static {
-        for (int i = 0; i < SLOT_FLAGS.length; i++) {
+        for (int i = 0; i < TOP_SLOT_FLAGS.length; i++) {
             final int[] flags = new int[i * 9];
             Arrays.fill(flags, FLAG_REVERSE_SHIFT_INSERTION);
-            SLOT_FLAGS[i] = flags;
+            TOP_SLOT_FLAGS[i] = flags;
             ALL_SLOT_FLAGS[i] = compileAllSlotFlags(flags);
         }
     }
@@ -58,16 +58,16 @@ public class ChestClientContainer extends ClientContainer {
     @Override
     protected Message createInitMessage() {
         return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.CONTAINER,
-                getTitle(), this.rowIndex * 9, 0);
+                getTitle(), getTopSlotFlags().length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS[this.rowIndex];
     }
 
     @Override
     protected int[] getSlotFlags() {
-        return SLOT_FLAGS[this.rowIndex];
-    }
-
-    @Override
-    protected int[] getAllSlotFlags() {
         return ALL_SLOT_FLAGS[this.rowIndex];
     }
 }

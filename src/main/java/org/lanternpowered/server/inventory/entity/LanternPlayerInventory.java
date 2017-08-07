@@ -38,6 +38,7 @@ import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.OpenableInventory;
+import org.lanternpowered.server.inventory.VanillaOpenableInventory;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
@@ -64,7 +65,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternPlayerInventory extends LanternOrderedInventory implements PlayerInventory, OpenableInventory {
+public class LanternPlayerInventory extends LanternOrderedInventory implements PlayerInventory, VanillaOpenableInventory {
 
     @Nullable private final WeakReference<Player> player;
 
@@ -261,7 +262,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
             // Just try to offer to the equipment
             return this.equipmentInventory;
         }
-        return OpenableInventory.super.getShiftClickTarget(container, slot);
+        return VanillaOpenableInventory.super.getShiftClickTarget(container, slot);
     }
 
     @Override
@@ -270,7 +271,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     }
 
     @Override
-    public ClientContainer constructClientContainer(LanternContainer container) {
+    public ClientContainer constructClientContainer() {
         return new PlayerClientContainer(Text.of(getName()));
     }
 }

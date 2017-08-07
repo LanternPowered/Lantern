@@ -33,7 +33,6 @@ import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.VanillaOpenableInventory;
 import org.lanternpowered.server.inventory.client.ChestClientContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
-import org.lanternpowered.server.inventory.client.CraftingTableClientContainer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.Text;

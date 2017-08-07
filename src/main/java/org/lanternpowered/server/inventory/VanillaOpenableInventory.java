@@ -45,7 +45,7 @@ public interface VanillaOpenableInventory extends OpenableInventory, OrderedInve
         final int bottomStart = clientContainer.getTopSlotsCount();
         // Register the top inventory slots
         ((LanternOrderedInventory) this).getIndexBySlots().object2IntEntrySet().forEach(entry -> {
-            if (playerInventory.getMain().isChild(entry.getKey())) {
+            if (!playerInventory.getMain().isChild(entry.getKey())) {
                 clientContainer.bindSlot(entry.getIntValue(), entry.getKey());
             }
         });

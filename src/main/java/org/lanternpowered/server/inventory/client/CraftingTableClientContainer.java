@@ -31,7 +31,7 @@ import org.spongepowered.api.text.Text;
 
 public class CraftingTableClientContainer extends ClientContainer {
 
-    private static final int[] SLOT_FLAGS = new int[] {
+    private static final int[] TOP_SLOT_FLAGS = new int[] {
             FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Output slot
             FLAG_DISABLE_SHIFT_INSERTION, // Input slot 1
             FLAG_DISABLE_SHIFT_INSERTION, // Input slot 2
@@ -43,7 +43,7 @@ public class CraftingTableClientContainer extends ClientContainer {
             FLAG_DISABLE_SHIFT_INSERTION, // Input slot 8
             FLAG_DISABLE_SHIFT_INSERTION, // Input slot 9
     };
-    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(SLOT_FLAGS);
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
     public CraftingTableClientContainer(Text title) {
         super(title);
@@ -51,16 +51,16 @@ public class CraftingTableClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.CONTAINER, getTitle(), SLOT_FLAGS.length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.CRAFTING_TABLE, getTitle(), TOP_SLOT_FLAGS.length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS;
     }
 
     @Override
     protected int[] getSlotFlags() {
-        return SLOT_FLAGS;
-    }
-
-    @Override
-    protected int[] getAllSlotFlags() {
         return ALL_SLOT_FLAGS;
     }
 

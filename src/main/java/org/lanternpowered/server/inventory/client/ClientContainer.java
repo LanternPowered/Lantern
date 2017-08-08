@@ -689,7 +689,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         } else if (mode == 4 && (button == 0 || button == 1)) {
             if (slotIndex == -999) {
                 // Left/right click outside the inventory
-                handleLeftRightClickOutsideContainer(button);
+                handleLeftRightClick(-999, button);
             } else {
                 // (Control) drop key
                 handleDropKey(slotIndex, button == 1);
@@ -833,37 +833,28 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     /**
-     * Handles a left or right click interaction
-     * outside the container.
-     *
-     * @param button The button that was pressed (0: left; 1: right)
-     */
-    private void handleLeftRightClickOutsideContainer(int button) {
-        if (!this.cursor.getRaw().isEmpty()) {
-            queueSlotChange(this.cursor);
-        }
-    }
-
-    /**
-     * Handles a left or right click interaction.
+     * Handles a left or right click interaction. {@code slotIndex} with value -999
+     * may be passed in when the click interaction occurs outside the container.
      *
      * @param slotIndex The slot index that was clicked
      * @param button The button that was pressed (0: left; 1: right)
      */
     private void handleLeftRightClick(int slotIndex, int button) {
-        final BaseClientSlot slot = this.slots[slotIndex];
-        // Reset the double click item
-        this.doubleClickItem = null;
-        if (!slot.getRaw().isEmpty()) {
-            // Only changes can occur if the cursor slot and the target slot are empty
-            if (!this.cursor.getRaw().isEmpty()) {
-                // Update the slot and cursor
-                queueSilentSlotChangeSafely(slot);
-                queueSlotChange(this.cursor);
-            } else {
-                // Store the clicked item, it's possible that a double click occurs
-                this.doubleClickItem = slot.get();
+        if (slotIndex != -999) {
+            final BaseClientSlot slot = this.slots[slotIndex];
+            if (!slot.getRaw().isEmpty()) {
+                // Only changes can occur if the cursor slot and the target slot are empty
+                if (!this.cursor.getRaw().isEmpty()) {
+                    // Update the slot and cursor
+                    queueSilentSlotChangeSafely(slot);
+                    queueSlotChange(this.cursor);
+                } else {
+                    // Store the clicked item, it's possible that a double click occurs
+                    this.doubleClickItem = slot.get();
+                }
             }
+        } else if (!this.cursor.getRaw().isEmpty()) {
+            queueSlotChange(this.cursor);
         }
     }
 
@@ -877,8 +868,6 @@ public abstract class ClientContainer implements SlotChangeTracker {
      */
     private void handleShiftClick(int slotIndex, int button) {
         populate();
-        // Reset the double click item
-        this.doubleClickItem = null;
         slotIndex = clientSlotIndexToServer(slotIndex);
         final int[] flags = getSlotFlags();
         // Check if the slot is in the main inventory

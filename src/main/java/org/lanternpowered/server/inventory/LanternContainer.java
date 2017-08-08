@@ -58,6 +58,11 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
     final LanternPlayerInventory playerInventory;
 
     /**
+     * The slot for the cursor item.
+     */
+    private final LanternSlot cursor = new LanternSlot(this);
+
+    /**
      * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
      * used as the bottom inventory and also as top inventory if {@code null} is provided
      * for the inventory that should be opened.
@@ -94,6 +99,15 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
             registerChild(playerInventory);
             this.openInventory = playerInventory;
         }
+    }
+
+    /**
+     * Gets the cursor {@link LanternSlot}.
+     *
+     * @return The cursor slot
+     */
+    public LanternSlot getCursorSlot() {
+        return this.cursor;
     }
 
     /**

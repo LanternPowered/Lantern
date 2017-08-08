@@ -32,7 +32,7 @@ import org.spongepowered.api.text.Text;
 public class CraftingTableClientContainer extends ClientContainer {
 
     private static final int[] TOP_SLOT_FLAGS = new int[] {
-            FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Output slot
+            FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION | FLAG_IGNORE_DOUBLE_CLICK, // Output slot
             FLAG_DISABLE_SHIFT_INSERTION, // Input slot 1
             FLAG_DISABLE_SHIFT_INSERTION, // Input slot 2
             FLAG_DISABLE_SHIFT_INSERTION, // Input slot 3

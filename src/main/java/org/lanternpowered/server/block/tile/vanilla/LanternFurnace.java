@@ -154,7 +154,10 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
         @Override
         public ClientContainer constructClientContainer() {
-            return new FurnaceClientContainer(TextTranslation.toText(getName()));
+            final FurnaceClientContainer clientContainer = new FurnaceClientContainer(TextTranslation.toText(getName()));
+            // Provide the smelting progress
+            clientContainer.bindProperty(SmeltingProgressProperty.class, this);
+            return clientContainer;
         }
     }
 

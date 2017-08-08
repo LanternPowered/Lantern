@@ -43,6 +43,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -106,6 +107,12 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * can be present in the target slot.
      */
     protected static final int FLAG_ONE_ITEM = 0x100;
+
+    /**
+     * A flag that defines that the slot is an output slot. Double click can't
+     * retrieve items from that slot.
+     */
+    protected static final int FLAG_IGNORE_DOUBLE_CLICK = 0x200;
 
     /**
      * A counter for container ids.
@@ -216,6 +223,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     private final int containerId;
     @SuppressWarnings("NullableProblems") private BaseClientSlot[] slots;
     @Nullable private LanternPlayer player;
+    @Nullable private ItemStack doubleClickItem;
 
     public ClientContainer(Text title) {
         // Generate a new container id
@@ -360,6 +368,18 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     /**
+     * Binds a {@link InventoryProperty} type which will
+     * be retrieved from the target {@link Inventory}.
+     *
+     * @param propertyType The property type
+     * @param inventory The inventory
+     * @param <T> The property type
+     */
+    public <T extends InventoryProperty<?,?>> void bindProperty(Class<T> propertyType, Inventory inventory) {
+        bindProperty(propertyType, () -> inventory.getInventoryProperty(propertyType).orElse(null));
+    }
+
+    /**
      * Queues a silent slot change for the specified {@link LanternSlot}.
      *
      * @param slot The slot
@@ -480,9 +500,6 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
         final ItemStack[] items = new ItemStack[getSlotFlags().length];
         for (int i = 0; i < items.length; i++) {
-            if (this.slots[i] instanceof ClientSlot.Empty) {
-                System.out.println("DEBUG A: " + i);
-            }
             items[serverSlotIndexToClient(i)] = this.slots[i].get();
         }
         // Send the inventory content
@@ -629,19 +646,77 @@ public abstract class ClientContainer implements SlotChangeTracker {
         return index;
     }
 
+    public void handleClick(int slotIndex, int mode, int button, @Nullable ItemStack clickedItem) {
+        System.out.println("ITEM: " + clickedItem);
+        populate();
+        // Convert the slot index
+        slotIndex = clientSlotIndexToServer(slotIndex);
+
+        if (mode == 0 && (button == 0 || button == 1) && slotIndex != -999) {
+            // Left/right click inside the inventory
+            handleLeftRightClick(slotIndex);
+        } else if (mode == 1 && (button == 0 || button == 1)) {
+            // Shift + left/right click
+            handleShiftClick(slotIndex);
+        } else if (mode == 6 && button == 0) {
+            // Double click
+            handleDoubleClick(slotIndex);
+        }
+    }
+
+    /**
+     * Handles a double click interaction.
+     *
+     * @param slotIndex The slot index
+     */
+    private void handleDoubleClick(int slotIndex) {
+        if (this.doubleClickItem != null) {
+            final ItemStack itemStack = this.doubleClickItem;
+            final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+            final int[] flags = getSlotFlags();
+            for (int i = 0; i < flags.length; i++) {
+                // The stack is full, stop
+                if (itemStack.getQuantity() >= maxStack) {
+                    break;
+                }
+                if (i == slotIndex || (flags[i] & FLAG_IGNORE_DOUBLE_CLICK) != 0) {
+                    continue;
+                }
+                final BaseClientSlot slot1 = this.slots[i];
+                final ItemStack itemStack1 = slot1.getRaw();
+                if (itemStack1.isEmpty() || !LanternItemStack.areSimilar(itemStack, itemStack1)) {
+                    continue;
+                }
+                // Increase quantity
+                itemStack.setQuantity(Math.min(maxStack, itemStack.getQuantity() + itemStack1.getQuantity()));
+                // Queue a slot change
+                queueSilentSlotChange(slot1);
+            }
+            // Update the cursor
+            queueSlotChange(this.cursor);
+        }
+        this.doubleClickItem = null;
+    }
+
     /**
      * Handles a left or right click interaction.
      *
      * @param slotIndex The slot index
-     * @param right Whether it's a right click action
      */
-    public void handleLeftRightClick(int slotIndex, boolean right) {
+    private void handleLeftRightClick(int slotIndex) {
         final BaseClientSlot slot = this.slots[slotIndex];
-        // Only changes can occur if the cursor slot and the target slot are empty
-        if (!slot.getRaw().isEmpty() && !this.cursor.getRaw().isEmpty()) {
-            // Update the slot and cursor
-            queueSilentSlotChangeSafely(slot);
-            queueSlotChange(this.cursor);
+        // Reset the double click item
+        this.doubleClickItem = null;
+        if (!slot.getRaw().isEmpty()) {
+            // Only changes can occur if the cursor slot and the target slot are empty
+            if (!this.cursor.getRaw().isEmpty()) {
+                // Update the slot and cursor
+                queueSilentSlotChangeSafely(slot);
+                queueSlotChange(this.cursor);
+            } else {
+                // Store the clicked item, it's possible that a double click occurs
+                this.doubleClickItem = slot.get();
+            }
         }
     }
 
@@ -652,8 +727,10 @@ public abstract class ClientContainer implements SlotChangeTracker {
      *
      * @param slotIndex The slot index
      */
-    public void handleShiftClick(int slotIndex) {
+    private void handleShiftClick(int slotIndex) {
         populate();
+        // Reset the double click item
+        this.doubleClickItem = null;
         slotIndex = clientSlotIndexToServer(slotIndex);
         final int[] flags = getSlotFlags();
         // Check if the slot is in the main inventory

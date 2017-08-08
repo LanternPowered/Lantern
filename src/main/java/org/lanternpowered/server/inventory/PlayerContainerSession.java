@@ -47,12 +47,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -70,8 +68,6 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.inventory.slot.FuelSlot;
-import org.spongepowered.api.item.inventory.slot.InputSlot;
 import org.spongepowered.api.item.inventory.slot.OutputSlot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
@@ -105,11 +101,6 @@ public class PlayerContainerSession {
      * The container that is currently open.
      */
     @Nullable private LanternContainer openContainer;
-
-    /**
-     * The item stack currently on the cursor
-     */
-    @Nullable private ItemStack cursorItem;
 
     /**
      * All the slots currently in a drag session.
@@ -175,8 +166,10 @@ public class PlayerContainerSession {
      */
     private boolean setRawOpenContainer(@Nullable LanternContainer container, Cause cause, boolean sendClose, boolean client) {
         if (this.openContainer != container) {
-            ItemStackSnapshot cursorItemSnapshot = LanternItemStack.toSnapshot(this.cursorItem);
+            ItemStackSnapshot cursorItem = ItemStackSnapshot.NONE;
             if (this.openContainer != null) {
+                final ItemStackSnapshot cursorItemSnapshot = this.openContainer.getCursorSlot().peek()
+                        .map(LanternItemStackSnapshot::wrap).orElse(LanternItemStackSnapshot.none());
                 final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
                         cause, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
                 Sponge.getEventManager().post(event);
@@ -199,12 +192,12 @@ public class PlayerContainerSession {
                 }
                 final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
                 if (transaction.isValid()) {
-                    cursorItemSnapshot = transaction.getFinal();
-                }
-                if (!cursorItemSnapshot.isEmpty()) {
-                    final ItemStackSnapshot cursorItemSnapshot0 = cursorItemSnapshot;
-                    LanternEventHelper.fireDropItemEventDispense(cause, entities -> entities.add(
-                            LanternEventHelper.createDroppedItem(this.player.getLocation(), cursorItemSnapshot0)));
+                    if (transaction.getFinal().isEmpty()) {
+                        LanternEventHelper.fireDropItemEventDispense(cause, entities -> entities.add(
+                                LanternEventHelper.createDroppedItem(this.player.getLocation(), transaction.getOriginal())));
+                    } else {
+                        cursorItem = transaction.getFinal();
+                    }
                 }
                 // Close the inventory
                 this.openContainer.close();
@@ -212,24 +205,27 @@ public class PlayerContainerSession {
                 sendClose = false;
             }
             if (container != null) {
+                final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, cursorItem);
                 final InteractInventoryEvent.Open event = SpongeEventFactory.createInteractInventoryEventOpen(
-                        cause, new Transaction<>(cursorItemSnapshot, cursorItemSnapshot), container);
+                        cause, cursorTransaction, container);
                 Sponge.getEventManager().post(event);
                 if (event.isCancelled()) {
-                    this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
+                    if (cursorTransaction.isValid()) {
+                        final ItemStackSnapshot cursorItem1 = cursorTransaction.getFinal();
+                        if (!cursorItem1.isEmpty()) {
+                            LanternEventHelper.fireDropItemEventDispense(cause, entities -> entities.add(
+                                    LanternEventHelper.createDroppedItem(this.player.getLocation(), cursorItem1)));
+                        }
+                    }
                     container.removeViewer(this.player, container);
                     return false;
                 }
-                final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
-                if (transaction.isValid()) {
-                    cursorItemSnapshot = transaction.getFinal();
-                    this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
+                if (cursorTransaction.isValid()) {
+                    final ItemStackSnapshot cursorItem1 = cursorTransaction.getFinal();
+                    container.getCursorSlot().setRawItemStack(cursorItem1.createStack());
                 }
                 sendClose = false;
                 container.addViewer(this.player);
-                updateCursorItem();
-            } else {
-                this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
             }
             if (sendClose && getContainerId() != 0) {
                 this.player.getConnection().send(new MessagePlayInOutCloseWindow(getContainerId()));
@@ -242,24 +238,28 @@ public class PlayerContainerSession {
         return true;
     }
 
+    @SuppressWarnings("ConstantConditions")
+    private LanternContainer getContainer() {
+        return this.openContainer;
+    }
+
     /**
      * Sets the cursor item.
      *
      * @param cursorItem The cursor item
      */
     public void setCursorItem(@Nullable ItemStack cursorItem) {
-        this.cursorItem = LanternItemStack.toNullable(cursorItem);
-        updateCursorItem();
+        getContainer().getCursorSlot().setRawItemStack(cursorItem);
     }
 
-    private void updateCursorItem() {
-        this.player.getConnection().send(
-                new MessagePlayOutSetWindowSlot(-1, -1, this.cursorItem));
-    }
-
+    /**
+     * Gets the {@link ItemStack} in the cursor.
+     *
+     * @return The cursor item
+     */
     @Nullable
     public ItemStack getCursorItem() {
-        return this.cursorItem;
+        return getContainer().getCursorSlot().getRawItemStack();
     }
 
     public void handleRecipeClick(MessagePlayInClickRecipe message) {
@@ -393,6 +393,7 @@ public class PlayerContainerSession {
             return;
         }
         final ClientContainer clientContainer = getClientContainer();
+        clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton(), message.getClickedItem());
 
         final int button = message.getButton();
         final int mode = message.getMode();
@@ -400,7 +401,7 @@ public class PlayerContainerSession {
 
         // Drag mode
         if (mode == 5) {
-            if (this.cursorItem == null) {
+            if (getCursorItem() == null) {
                 resetDrag();
             } else if (this.dragState != -1) {
                 if ((this.dragState == 0 && (button == 1 || button == 2)) ||
@@ -408,25 +409,25 @@ public class PlayerContainerSession {
                     if (button == 2 || button == 6) {
                         final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
                         if (button == 2) {
-                            int quantity = this.cursorItem.getQuantity();
+                            int quantity = getCursorItem().getQuantity();
                             int slots = this.dragSlots.size();
                             int itemsPerSlot = quantity / slots;
                             int rest = quantity - itemsPerSlot * slots;
 
                             final List<SlotTransaction> transactions = new ArrayList<>();
                             for (LanternSlot slot : this.dragSlots) {
-                                final ItemStack itemStack = this.cursorItem.copy();
+                                final ItemStack itemStack = getCursorItem().copy();
                                 itemStack.setQuantity(itemsPerSlot);
                                 transactions.addAll(slot.peekOfferFastTransactions(itemStack).getTransactions());
                             }
 
                             ItemStackSnapshot newCursorItem = ItemStackSnapshot.NONE;
                             if (rest > 0) {
-                                ItemStack itemStack = this.cursorItem.copy();
+                                ItemStack itemStack = getCursorItem().copy();
                                 itemStack.setQuantity(rest);
                                 newCursorItem = itemStack.createSnapshot();
                             }
-                            final ItemStackSnapshot oldCursorItem = this.cursorItem.createSnapshot();
+                            final ItemStackSnapshot oldCursorItem = getCursorItem().createSnapshot();
                             final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(oldCursorItem, newCursorItem);
 
                             final ClickInventoryEvent.Drag.Primary event = SpongeEventFactory.createClickInventoryEventDragPrimary(
@@ -434,12 +435,12 @@ public class PlayerContainerSession {
                             finishInventoryEvent(event);
                             resetDrag();
                         } else {
-                            int quantity = this.cursorItem.getQuantity();
+                            int quantity = getCursorItem().getQuantity();
                             int size = Math.min(this.dragSlots.size(), quantity);
 
                             final List<SlotTransaction> transactions = new ArrayList<>();
                             for (LanternSlot slot : this.dragSlots) {
-                                final ItemStack itemStack = this.cursorItem.copy();
+                                final ItemStack itemStack = getCursorItem().copy();
                                 itemStack.setQuantity(1);
                                 transactions.addAll(slot.peekOfferFastTransactions(itemStack).getTransactions());
                             }
@@ -447,11 +448,11 @@ public class PlayerContainerSession {
 
                             ItemStackSnapshot newCursorItem = ItemStackSnapshot.NONE;
                             if (quantity > 0) {
-                                ItemStack itemStack = this.cursorItem.copy();
+                                ItemStack itemStack = getCursorItem().copy();
                                 itemStack.setQuantity(quantity);
                                 newCursorItem = itemStack.createSnapshot();
                             }
-                            final ItemStackSnapshot oldCursorItem = this.cursorItem.createSnapshot();
+                            final ItemStackSnapshot oldCursorItem = getCursorItem().createSnapshot();
                             final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(oldCursorItem, newCursorItem);
 
                             final ClickInventoryEvent.Drag.Secondary event = SpongeEventFactory.createClickInventoryEventDragSecondary(
@@ -464,8 +465,8 @@ public class PlayerContainerSession {
                         final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
                         if (optSlot.isPresent()) {
                             final LanternSlot slot = optSlot.get();
-                            if (!(slot instanceof OutputSlot) && slot.isValidItem(this.cursorItem) && (slot.getRawItemStack() == null ||
-                                    ((LanternItemStack) this.cursorItem).similarTo(slot.getRawItemStack())) && !this.dragSlots.contains(slot)) {
+                            if (!(slot instanceof OutputSlot) && slot.isValidItem(getCursorItem()) && (slot.getRawItemStack() == null ||
+                                    ((LanternItemStack) getCursorItem()).similarTo(slot.getRawItemStack())) && !this.dragSlots.contains(slot)) {
                                 this.dragSlots.add(slot);
                             }
                         }
@@ -482,7 +483,6 @@ public class PlayerContainerSession {
             resetDrag();
         // Left/right click inside the inventory
         } else if (mode == 0 && (button == 0 || button == 1) && slotIndex != -999) {
-            clientContainer.handleLeftRightClick(slotIndex, button == 1);
             final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();
@@ -500,17 +500,17 @@ public class PlayerContainerSession {
                         final CraftingInventory inventory = (CraftingInventory) parent;
                         final Optional<ExtendedCraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
                                 .getExtendedResult(inventory.getCraftingGrid(), this.player.getWorld());
-                        final ItemStackSnapshot originalCursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                        final ItemStackSnapshot originalCursorItem = LanternItemStack.toSnapshot(getCursorItem());
                         if (optResult.isPresent()) {
                             final CraftingResult result = optResult.get().getResult();
                             final ItemStackSnapshot resultItem = result.getResult();
 
                             int quantity = -1;
-                            if (this.cursorItem == null) {
+                            if (getCursorItem() == null) {
                                 quantity = resultItem.getQuantity();
-                            } else if (LanternItemStack.areSimilar(resultItem.createStack(), this.cursorItem)) {
-                                final int quantity1 = resultItem.getQuantity() + this.cursorItem.getQuantity();
-                                if (quantity1 < this.cursorItem.getMaxStackQuantity()) {
+                            } else if (LanternItemStack.areSimilar(resultItem.createStack(), getCursorItem())) {
+                                final int quantity1 = resultItem.getQuantity() + getCursorItem().getQuantity();
+                                if (quantity1 < getCursorItem().getMaxStackQuantity()) {
                                     quantity = quantity1;
                                 }
                             }
@@ -550,27 +550,27 @@ public class PlayerContainerSession {
                     final List<SlotTransaction> transactions = new ArrayList<>();
                     Transaction<ItemStackSnapshot> cursorTransaction = null;
 
-                    if (this.cursorItem != null && !(slot instanceof OutputSlot)) {
-                        final PeekOfferTransactionsResult result = slot.peekOfferFastTransactions(this.cursorItem);
+                    if (getCursorItem() != null && !(slot instanceof OutputSlot)) {
+                        final PeekOfferTransactionsResult result = slot.peekOfferFastTransactions(getCursorItem());
                         if (result.getOfferResult().isSuccess()) {
                             transactions.addAll(result.getTransactions());
-                            cursorTransaction = new Transaction<>(this.cursorItem.createSnapshot(),
+                            cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
                                     LanternItemStack.toSnapshot(result.getOfferResult().getRest()));
                         } else {
-                            final PeekSetTransactionsResult result1 = slot.peekSetTransactions(this.cursorItem);
+                            final PeekSetTransactionsResult result1 = slot.peekSetTransactions(getCursorItem());
                             if (result1.getTransactionResult().getType().equals(InventoryTransactionResult.Type.SUCCESS)) {
                                 final Collection<ItemStackSnapshot> replaceItems = result1.getTransactionResult().getReplacedItems();
                                 if (!replaceItems.isEmpty()) {
-                                    cursorTransaction = new Transaction<>(this.cursorItem.createSnapshot(),
+                                    cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
                                             replaceItems.iterator().next());
                                 } else {
-                                    cursorTransaction = new Transaction<>(this.cursorItem.createSnapshot(),
+                                    cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
                                             ItemStackSnapshot.NONE);
                                 }
                                 transactions.addAll(result1.getTransactions());
                             }
                         }
-                    } else if (this.cursorItem == null) {
+                    } else if (getCursorItem() == null) {
                         final PeekPollTransactionsResult result = slot.peekPollTransactions(stack -> true).orElse(null);
                         if (result != null) {
                             cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, LanternItemStack.toSnapshot(result.getPeekedItem()));
@@ -580,7 +580,7 @@ public class PlayerContainerSession {
                         }
                     }
                     if (cursorTransaction == null) {
-                        final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                        final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(getCursorItem());
                         cursorTransaction = new Transaction<>(cursorItem, cursorItem);
                     }
                     event = SpongeEventFactory.createClickInventoryEventPrimary(cause, cursorTransaction, this.openContainer, transactions);
@@ -589,7 +589,7 @@ public class PlayerContainerSession {
                     final List<SlotTransaction> transactions = new ArrayList<>();
                     Transaction<ItemStackSnapshot> cursorTransaction = null;
 
-                    if (this.cursorItem == null) {
+                    if (getCursorItem() == null) {
                         int stackSize = slot.getStackSize();
                         if (stackSize != 0) {
                             stackSize = stackSize - (stackSize / 2);
@@ -598,32 +598,32 @@ public class PlayerContainerSession {
                             cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, result.getPeekedItem().createSnapshot());
                         }
                     } else {
-                        final ItemStack itemStack = this.cursorItem.copy();
+                        final ItemStack itemStack = getCursorItem().copy();
                         itemStack.setQuantity(1);
 
                         final PeekOfferTransactionsResult result = slot.peekOfferFastTransactions(itemStack);
                         if (result.getOfferResult().isSuccess()) {
-                            final ItemStackSnapshot oldCursor = this.cursorItem.createSnapshot();
-                            int quantity = this.cursorItem.getQuantity() - 1;
+                            final ItemStackSnapshot oldCursor = getCursorItem().createSnapshot();
+                            int quantity = getCursorItem().getQuantity() - 1;
                             if (quantity <= 0) {
                                 cursorTransaction = new Transaction<>(oldCursor, ItemStackSnapshot.NONE);
                             } else {
-                                final ItemStack newCursorItem = this.cursorItem.copy();
+                                final ItemStack newCursorItem = getCursorItem().copy();
                                 newCursorItem.setQuantity(quantity);
                                 cursorTransaction = new Transaction<>(oldCursor, newCursorItem.createSnapshot());
                             }
                             transactions.addAll(result.getTransactions());
                         } else {
-                            final PeekSetTransactionsResult result1 = slot.peekSetTransactions(this.cursorItem);
+                            final PeekSetTransactionsResult result1 = slot.peekSetTransactions(getCursorItem());
                             if (result1.getTransactionResult().getType().equals(InventoryTransactionResult.Type.SUCCESS) &&
                                     result1.getTransactionResult().getRejectedItems().isEmpty()) {
                                 final Collection<ItemStackSnapshot> replaceItems = result1.getTransactionResult().getReplacedItems();
                                 if (!replaceItems.isEmpty()) {
                                     setCursorItem(replaceItems.iterator().next().createStack());
-                                    cursorTransaction = new Transaction<>(this.cursorItem.createSnapshot(),
+                                    cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
                                             replaceItems.iterator().next());
                                 } else {
-                                    cursorTransaction = new Transaction<>(this.cursorItem.createSnapshot(),
+                                    cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
                                             ItemStackSnapshot.NONE);
                                 }
                                 transactions.addAll(result1.getTransactions());
@@ -631,7 +631,7 @@ public class PlayerContainerSession {
                         }
                     }
                     if (cursorTransaction == null) {
-                        final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                        final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(getCursorItem());
                         cursorTransaction = new Transaction<>(cursorItem, cursorItem);
                     }
                     event = SpongeEventFactory.createClickInventoryEventSecondary(cause, cursorTransaction, this.openContainer, transactions);
@@ -642,7 +642,6 @@ public class PlayerContainerSession {
             }
         // Shift + left/right click
         } else if (mode == 1 && (button == 0 || button == 1)) {
-            clientContainer.handleShiftClick(slotIndex);
             Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();
@@ -653,7 +652,7 @@ public class PlayerContainerSession {
                 final List<SlotTransaction> transactions = new ArrayList<>();
 
                 if (slot instanceof CraftingOutput) {
-                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(getCursorItem());
                     cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
                     final AbstractInventory parent = slot.parent();
@@ -700,7 +699,7 @@ public class PlayerContainerSession {
                         return;
                     }
                 } else {
-                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(this.cursorItem);
+                    final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(getCursorItem());
                     cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
                     if (itemStack != null) {
@@ -746,13 +745,13 @@ public class PlayerContainerSession {
             final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
             if (optSlot.isPresent()) {
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
-                final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(this.cursorItem);
+                final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(getCursorItem());
                 ItemStackSnapshot newItem = oldItem;
 
                 final List<SlotTransaction> transactions = new ArrayList<>();
 
-                if (this.cursorItem != null && !(optSlot.get() instanceof OutputSlot)) {
-                    final ItemStack cursorItem = this.cursorItem.copy();
+                if (getCursorItem() != null && !(optSlot.get() instanceof OutputSlot)) {
+                    final ItemStack cursorItem = getCursorItem().copy();
                     int quantity = cursorItem.getQuantity();
                     final int maxQuantity = cursorItem.getMaxStackQuantity();
                     if (quantity < maxQuantity) {
@@ -813,7 +812,7 @@ public class PlayerContainerSession {
 
                     final Transaction<ItemStackSnapshot> cursorTransaction;
 
-                    if (this.cursorItem == null) {
+                    if (getCursorItem() == null) {
                         cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, ItemStackSnapshot.NONE);
 
                         ItemStack otherItemStack = slot.getRawItemStack();
@@ -830,7 +829,7 @@ public class PlayerContainerSession {
                             transactions.add(new SlotTransaction(hotbarSlot, hotbarItem, otherItem));
                         }
                     } else {
-                        final ItemStackSnapshot cursorItem = this.cursorItem.createSnapshot();
+                        final ItemStackSnapshot cursorItem = getCursorItem().createSnapshot();
                         cursorTransaction = new Transaction<>(cursorItem, cursorItem);
                     }
 
@@ -858,10 +857,10 @@ public class PlayerContainerSession {
             if (slotIndex == -999) {
                 ItemStackSnapshot oldItem = ItemStackSnapshot.NONE;
                 ItemStackSnapshot newItem = ItemStackSnapshot.NONE;
-                if (this.cursorItem != null) {
-                    oldItem = this.cursorItem.createSnapshot();
+                if (getCursorItem() != null) {
+                    oldItem = getCursorItem().createSnapshot();
                     if (button != 0) {
-                        final ItemStack stack = this.cursorItem.copy();
+                        final ItemStack stack = getCursorItem().copy();
                         stack.setQuantity(stack.getQuantity() - 1);
                         newItem = LanternItemStack.toSnapshot(stack);
                         stack.setQuantity(1);
@@ -879,7 +878,7 @@ public class PlayerContainerSession {
                             this.openContainer, slotTransactions);
                 }
             } else {
-                final ItemStackSnapshot item = LanternItemStack.toSnapshot(this.cursorItem);
+                final ItemStackSnapshot item = LanternItemStack.toSnapshot(getCursorItem());
                 cursorTransaction = new Transaction<>(item, item);
                 final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
                 if (optSlot.isPresent()) {
@@ -910,12 +909,12 @@ public class PlayerContainerSession {
         // Middle lock a slot
         } else if (mode == 3) {
             final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
-            final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(this.cursorItem);
+            final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(getCursorItem());
             Transaction<ItemStackSnapshot> cursorTransaction = null;
 
             final Optional<GameMode> gameMode = this.player.get(Keys.GAME_MODE);
             if (gameMode.isPresent() && gameMode.get().equals(GameModes.CREATIVE)
-                    && this.cursorItem == null) {
+                    && getCursorItem() == null) {
                 final Optional<LanternSlot> optSlot = clientContainer.getSlot(slotIndex);
                 if (optSlot.isPresent()) {
                     final LanternSlot slot = optSlot.get();
@@ -983,28 +982,14 @@ public class PlayerContainerSession {
         if (!event.isCancelled()) {
             if (!(event instanceof ClickInventoryEvent.Creative) && event instanceof ClickInventoryEvent) {
                 final Transaction<ItemStackSnapshot> cursorTransaction = ((ClickInventoryEvent) event).getCursorTransaction();
-                if (!cursorTransaction.isValid()) {
-                    updateCursorItem();
-                } else {
+                if (cursorTransaction.isValid()) {
                     setCursorItem(cursorTransaction.getFinal().createStack());
                 }
             }
-            for (SlotTransaction slotTransaction : slotTransactions) {
-                if (slotTransaction.isValid()) {
-                    slotTransaction.getSlot().set(slotTransaction.getFinal().createStack());
-                } else {
-                    // Force the slot to update
-                    this.openContainer.queueSlotChange(slotTransaction.getSlot());
-                }
-            }
+            slotTransactions.stream().filter(Transaction::isValid).forEach(
+                    transaction -> transaction.getSlot().set(transaction.getFinal().createStack()));
             if (event instanceof SpawnEntityEvent) {
                 LanternEventHelper.finishSpawnEntityEvent((SpawnEntityEvent) event);
-            }
-        } else {
-            updateCursorItem();
-            for (SlotTransaction slotTransaction : slotTransactions) {
-                // Force the slot to update
-                this.openContainer.queueSlotChange(slotTransaction.getSlot());
             }
         }
     }

@@ -34,7 +34,7 @@ public class AnvilClientContainer extends ClientContainer {
     private static final int[] TOP_SLOT_FLAGS = new int[] {
             0, // First input slot
             0, // Second input slot
-            FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Result slot
+            FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION | FLAG_IGNORE_DOUBLE_CLICK, // Result slot
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 

@@ -128,7 +128,8 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     }
 
     public void setRawItemStack(@Nullable ItemStack itemStack) {
-        this.itemStack = itemStack;
+        this.itemStack = itemStack != null && itemStack.isEmpty() ? null : itemStack;
+        queueUpdate();
     }
 
     /**

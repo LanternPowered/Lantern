@@ -393,7 +393,7 @@ public class PlayerContainerSession {
             return;
         }
         final ClientContainer clientContainer = getClientContainer();
-        clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton(), message.getClickedItem());
+        clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
 
         final int button = message.getButton();
         final int mode = message.getMode();

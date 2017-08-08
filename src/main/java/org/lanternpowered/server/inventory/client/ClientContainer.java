@@ -646,8 +646,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         return index;
     }
 
-    public void handleClick(int slotIndex, int mode, int button, @Nullable ItemStack clickedItem) {
-        System.out.println("ITEM: " + clickedItem);
+    public void handleClick(int slotIndex, int mode, int button) {
         populate();
         // Convert the slot index
         slotIndex = clientSlotIndexToServer(slotIndex);
@@ -661,6 +660,27 @@ public abstract class ClientContainer implements SlotChangeTracker {
         } else if (mode == 6 && button == 0) {
             // Double click
             handleDoubleClick(slotIndex);
+        } else if (mode == 2) {
+            // Number keys
+            handleNumberKey(slotIndex, button);
+        }
+    }
+
+    /**
+     * Handles a number key interaction.
+     *
+     * @param slotIndex The slot index that was selected while pressing the button
+     * @param number The number that was pressed, 0 - 8 (0 is number 1, etc.)
+     */
+    private void handleNumberKey(int slotIndex, int number) {
+        // Calculate the hotbar slot index
+        final int hotbarSlotIndex = getSlotFlags().length - (9 - number);
+        // Clicking to the same slot won't do anything and
+        // if the both slots are empty also nothing will change
+        if (slotIndex != hotbarSlotIndex && (!this.slots[slotIndex].getRaw().isEmpty() ||
+                !this.slots[hotbarSlotIndex].getRaw().isEmpty())) {
+            queueSilentSlotChange(this.slots[slotIndex]);
+            queueSilentSlotChange(this.slots[hotbarSlotIndex]);
         }
     }
 

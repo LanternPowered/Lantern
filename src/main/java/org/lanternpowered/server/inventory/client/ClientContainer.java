@@ -758,7 +758,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // Middle click is only used in creative,
         // you can only do it if the cursor is empty
         // and the target slot isn't empty.
-        if (this.cursor.getRaw().isEmpty() &&
+        if (slotIndex != -999 && this.cursor.getRaw().isEmpty() &&
                 !this.slots[slotIndex].getRaw().isEmpty() &&
                 (this.player != null && this.player.get(Keys.GAME_MODE).get() == GameModes.CREATIVE)) {
             queueSlotChange(this.cursor);

@@ -32,8 +32,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.DefaultStackSizes;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -42,7 +45,9 @@ import org.lanternpowered.server.inventory.slot.SlotChangeTracker;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -223,7 +228,13 @@ public abstract class ClientContainer implements SlotChangeTracker {
     private final int containerId;
     @SuppressWarnings("NullableProblems") private BaseClientSlot[] slots;
     @Nullable private LanternPlayer player;
+
+    // Double click data
     @Nullable private ItemStack doubleClickItem;
+
+    // Drag mode data
+    private final IntSet dragSlots = new IntOpenHashSet();
+    private int dragMode = -1;
 
     public ClientContainer(Text title) {
         // Generate a new container id
@@ -651,18 +662,106 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // Convert the slot index
         slotIndex = clientSlotIndexToServer(slotIndex);
 
+        // Handle and/or reset the drag
+        final boolean drag = mode == 5;
+        if (!drag || !handleDrag(slotIndex, button)) {
+            resetDrag();
+        }
+
+        // Reset the double click
+        final boolean doubleClick = mode == 6 && button == 0;
+        if (!doubleClick) {
+            this.doubleClickItem = null;
+        }
+
         if (mode == 0 && (button == 0 || button == 1) && slotIndex != -999) {
             // Left/right click inside the inventory
-            handleLeftRightClick(slotIndex);
+            handleLeftRightClick(slotIndex, button);
         } else if (mode == 1 && (button == 0 || button == 1)) {
             // Shift + left/right click
-            handleShiftClick(slotIndex);
-        } else if (mode == 6 && button == 0) {
+            handleShiftClick(slotIndex, button);
+        } else if (doubleClick) {
             // Double click
             handleDoubleClick(slotIndex);
         } else if (mode == 2) {
             // Number keys
             handleNumberKey(slotIndex, button);
+        } else if (mode == 4 && (button == 0 || button == 1)) {
+            if (slotIndex == -999) {
+                // Left/right click outside the inventory
+                handleLeftRightClickOutsideContainer(button);
+            } else {
+                // (Control) drop key
+                handleDropKey(slotIndex, button == 1);
+            }
+        } else if (mode == 3 && button == 2) {
+            // Middle click
+            handleMiddleClick(slotIndex);
+        } else if (!drag) {
+            // Warn about unhandled actions
+            Lantern.getLogger().warn("Unknown client container click action: slotIndex: {}, mode: {}, button: {}",
+                    slotIndex, mode, button);
+        }
+    }
+
+    /**
+     * Resets the current drag process.
+     */
+    private void resetDrag() {
+        this.dragMode = -1;
+        // Force each slot to update
+        for (int i : this.dragSlots.toIntArray()) {
+            queueSlotChange(this.slots[i]);
+        }
+        this.dragSlots.clear();
+    }
+
+    private boolean handleDrag(int slotIndex, int button) {
+        // Extract the drag mode and state from the button
+        final int mode = button >> 2;
+        final int state = button & 0x3;
+        // Check if the drag mode matches the current one, or if a new drag started
+        if (mode != this.dragMode) {
+            // Drag mode mismatch and state isn't "start"
+            if (state != 0) {
+                // Force to update the send slot if it's an add action
+                if (state == 1) {
+                    this.dragSlots.add(slotIndex);
+                }
+                return false;
+            }
+            this.dragMode = state;
+        }
+        if (state == 0) {
+            // Start state
+            // Another start action? Just restart the drag.
+            resetDrag();
+            this.dragMode = state;
+        } else if (state == 1) {
+            // Add slot state
+            // Collect the slots
+            this.dragSlots.add(slotIndex);
+        } else if (state == 2) {
+            // Finish state
+            // Just reset the drag
+            resetDrag();
+        }
+        return true;
+    }
+
+    /**
+     * Handles a number key interaction.
+     *
+     * @param slotIndex The slot index that was clicked
+     */
+    private void handleMiddleClick(int slotIndex) {
+        // Middle click is only used in creative,
+        // you can only do it if the cursor is empty
+        // and the target slot isn't empty.
+        if (this.cursor.getRaw().isEmpty() &&
+                !this.slots[slotIndex].getRaw().isEmpty() &&
+                (this.player != null && this.player.get(Keys.GAME_MODE).get() == GameModes.CREATIVE)) {
+            queueSlotChange(this.cursor);
         }
     }
 
@@ -687,7 +786,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     /**
      * Handles a double click interaction.
      *
-     * @param slotIndex The slot index
+     * @param slotIndex The slot index that was pressed
      */
     private void handleDoubleClick(int slotIndex) {
         if (this.doubleClickItem != null) {
@@ -719,11 +818,39 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     /**
+     * Handles a drop key interaction.
+     *
+     * @param slotIndex The slot index that was selected while pressing the button
+     * @param ctrl Whether the control button was pressed
+     */
+    private void handleDropKey(int slotIndex, boolean ctrl) {
+        // The cursor has to be empty and the target slot
+        // cannot be empty or nothing will happen
+        if (this.cursor.getRaw().isEmpty() &&
+                !this.slots[slotIndex].getRaw().isEmpty()) {
+            queueSlotChange(this.slots[slotIndex]);
+        }
+    }
+
+    /**
+     * Handles a left or right click interaction
+     * outside the container.
+     *
+     * @param button The button that was pressed (0: left; 1: right)
+     */
+    private void handleLeftRightClickOutsideContainer(int button) {
+        if (!this.cursor.getRaw().isEmpty()) {
+            queueSlotChange(this.cursor);
+        }
+    }
+
+    /**
      * Handles a left or right click interaction.
      *
-     * @param slotIndex The slot index
+     * @param slotIndex The slot index that was clicked
+     * @param button The button that was pressed (0: left; 1: right)
      */
-    private void handleLeftRightClick(int slotIndex) {
+    private void handleLeftRightClick(int slotIndex, int button) {
         final BaseClientSlot slot = this.slots[slotIndex];
         // Reset the double click item
         this.doubleClickItem = null;
@@ -745,9 +872,10 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * all the slot updates that are required to force the client to revert
      * the changes.
      *
-     * @param slotIndex The slot index
+     * @param slotIndex The slot index that was clicked
+     * @param button The button that was pressed (0: left; 1: right)
      */
-    private void handleShiftClick(int slotIndex) {
+    private void handleShiftClick(int slotIndex, int button) {
         populate();
         // Reset the double click item
         this.doubleClickItem = null;

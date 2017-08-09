@@ -769,6 +769,8 @@ public abstract class ClientContainer implements SlotChangeTracker {
         for (int i : this.dragSlots.toIntArray()) {
             queueSlotChange(this.slots[i]);
         }
+        // Also update the cursor
+        queueSlotChangeSafely(this.cursor);
         this.dragSlots.clear();
     }
 
@@ -786,13 +788,13 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 }
                 return false;
             }
-            this.dragMode = state;
+            this.dragMode = mode;
         }
         if (state == 0) {
             // Start state
             // Another start action? Just restart the drag.
             resetDrag();
-            this.dragMode = state;
+            this.dragMode = mode;
         } else if (state == 1) {
             // Add slot state
             // Collect the slots

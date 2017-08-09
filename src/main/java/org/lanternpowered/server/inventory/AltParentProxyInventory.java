@@ -341,7 +341,7 @@ public class AltParentProxyInventory extends AbstractInventory {
     }
 
     @Override
-    protected Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher) {
+    public Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher) {
         return this.delegate.peekPollTransactions(limit, matcher);
     }
 

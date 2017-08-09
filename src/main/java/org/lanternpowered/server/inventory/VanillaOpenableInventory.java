@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.spongepowered.api.item.inventory.type.OrderedInventory;
@@ -45,6 +46,7 @@ public interface VanillaOpenableInventory extends OpenableInventory, OrderedInve
         final int bottomStart = clientContainer.getTopSlotsCount();
         // Bind the cursor item slot
         clientContainer.bindSlot(ClientContainer.CURSOR_SLOT_INDEX, container.getCursorSlot());
+        clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(container));
         // Register the top inventory slots
         ((LanternOrderedInventory) this).getIndexBySlots().object2IntEntrySet().forEach(entry -> {
             if (!playerInventory.getMain().isChild(entry.getKey())) {

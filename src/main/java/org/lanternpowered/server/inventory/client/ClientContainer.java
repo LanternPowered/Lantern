@@ -41,7 +41,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.DefaultStackSizes;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.behavior.InventoryInteractionBehavior;
+import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.inventory.slot.SlotChangeTracker;
@@ -62,7 +62,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -233,7 +232,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     private final int containerId;
     @SuppressWarnings("NullableProblems") private BaseClientSlot[] slots;
     @Nullable private LanternPlayer player;
-    @Nullable private InventoryInteractionBehavior interactionBehavior;
+    @Nullable private ContainerInteractionBehavior interactionBehavior;
 
     // Double click data
     @Nullable private ItemStack doubleClickItem;
@@ -309,11 +308,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
     protected abstract Message createInitMessage();
 
     /**
-     * Binds the {@link InventoryInteractionBehavior} to this container.
+     * Binds the {@link ContainerInteractionBehavior} to this container.
      *
      * @param interactionBehavior The interaction behavior
      */
-    public void bindInteractionBehavior(InventoryInteractionBehavior interactionBehavior) {
+    public void bindInteractionBehavior(ContainerInteractionBehavior interactionBehavior) {
         checkNotNull(interactionBehavior, "interactionBehavior");
         this.interactionBehavior = interactionBehavior;
     }
@@ -497,6 +496,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
     }
 
+    public LanternPlayer getPlayer() {
+        checkState(this.player != null, "No player is bound");
+        return this.player;
+    }
+
     /**
      * Binds this {@link ClientContainer} to the
      * given {@link LanternPlayer}.
@@ -606,6 +610,17 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     /**
+     * Converts the hotbar slot index (0 - 8) to
+     * a slot index within this container.
+     *
+     * @param hotbarSlot The hotbar slot
+     * @return The slot index
+     */
+    public int getHotbarSlotIndex(int hotbarSlot) {
+        return getSlotFlags().length - (9 - hotbarSlot);
+    }
+
+    /**
      * Gets a {@link ClientSlot} for the given slot index.
      *
      * @param index The slot index
@@ -665,12 +680,26 @@ public abstract class ClientContainer implements SlotChangeTracker {
         return true;
     }
 
-    public int clientSlotIndexToServer(int index) {
+    protected int clientSlotIndexToServer(int index) {
         return index;
     }
 
-    public int serverSlotIndexToClient(int index) {
+    protected int serverSlotIndexToClient(int index) {
         return index;
+    }
+
+    public void handleCreativeClick(int slotIndex, @Nullable ItemStack itemStack) {
+        populate();
+        // Convert the slot index
+        slotIndex = clientSlotIndexToServer(slotIndex);
+
+        // Update the target slot and cursor
+        queueSilentSlotChange(this.slots[slotIndex]);
+        queueSlotChange(this.cursor);
+
+        final int slotIndex1 = slotIndex;
+        tryProcessBehavior(behavior -> behavior.handleCreativeClick(this,
+                slotIndex1 == -999 ? null : this.slots[slotIndex1], itemStack));
     }
 
     public void handleClick(int slotIndex, int mode, int button) {
@@ -720,7 +749,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
     }
 
-    private void tryProcessBehavior(Consumer<InventoryInteractionBehavior> behavior) {
+    private void tryProcessBehavior(Consumer<ContainerInteractionBehavior> behavior) {
         if (this.interactionBehavior != null) {
             try {
                 behavior.accept(this.interactionBehavior);
@@ -770,12 +799,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
         } else if (state == 2) {
             // Finish state
             if (!this.dragSlots.isEmpty()) {
-                Arrays.stream(this.dragSlots.toIntArray()).mapToObj(i -> this.slots[i]).collect(Collectors.toList());
                 tryProcessBehavior(behavior -> {
                     final List<ClientSlot> clientSlots = Arrays.stream(this.dragSlots.toIntArray())
                             .mapToObj(i -> this.slots[i])
                             .collect(ImmutableList.toImmutableList());
-                    behavior.handleDrag(clientSlots, mode == 0 ? MouseButton.LEFT : mode == 1 ? MouseButton.RIGHT : MouseButton.MIDDLE);
+                    behavior.handleDrag(this, clientSlots, mode == 0 ? MouseButton.LEFT : mode == 1 ? MouseButton.RIGHT : MouseButton.MIDDLE);
                 });
             }
             // Just reset the drag
@@ -798,10 +826,8 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 (this.player != null && this.player.get(Keys.GAME_MODE).get() == GameModes.CREATIVE)) {
             queueSlotChange(this.cursor);
         }
-        tryProcessBehavior(behavior -> {
-            final Optional<ClientSlot> clientSlot = slotIndex == -999 ? Optional.empty() : Optional.of(this.slots[slotIndex]);
-            behavior.handleClick(clientSlot, MouseButton.MIDDLE);
-        });
+        tryProcessBehavior(behavior -> behavior.handleClick(this,
+                slotIndex == -999 ? null : this.slots[slotIndex], MouseButton.MIDDLE));
     }
 
     /**
@@ -812,7 +838,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      */
     private void handleNumberKey(int slotIndex, int number) {
         // Calculate the hotbar slot index
-        final int hotbarSlotIndex = getSlotFlags().length - (9 - number);
+        final int hotbarSlotIndex = getHotbarSlotIndex(number);
         // Clicking to the same slot won't do anything and
         // if the both slots are empty also nothing will change
         if (slotIndex != hotbarSlotIndex && (!this.slots[slotIndex].getRaw().isEmpty() ||
@@ -820,7 +846,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
             queueSilentSlotChange(this.slots[slotIndex]);
             queueSilentSlotChange(this.slots[hotbarSlotIndex]);
         }
-        tryProcessBehavior(behavior -> behavior.handleNumberKey(this.slots[slotIndex], number));
+        tryProcessBehavior(behavior -> behavior.handleNumberKey(this, this.slots[slotIndex], number + 1));
     }
 
     /**
@@ -855,7 +881,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
             queueSlotChange(this.cursor);
         }
         this.doubleClickItem = null;
-        tryProcessBehavior(behavior -> behavior.handleDoubleClick(this.slots[slotIndex]));
+        tryProcessBehavior(behavior -> behavior.handleDoubleClick(this, this.slots[slotIndex]));
     }
 
     /**
@@ -871,7 +897,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 !this.slots[slotIndex].getRaw().isEmpty()) {
             queueSlotChange(this.slots[slotIndex]);
         }
-        tryProcessBehavior(behavior -> behavior.handleDropKey(this.slots[slotIndex], ctrl));
+        tryProcessBehavior(behavior -> behavior.handleDropKey(this, this.slots[slotIndex], ctrl));
     }
 
     /**
@@ -898,10 +924,8 @@ public abstract class ClientContainer implements SlotChangeTracker {
         } else if (!this.cursor.getRaw().isEmpty()) {
             queueSlotChange(this.cursor);
         }
-        tryProcessBehavior(behavior -> {
-            final Optional<ClientSlot> clientSlot = slotIndex == -999 ? Optional.empty() : Optional.of(this.slots[slotIndex]);
-            behavior.handleClick(clientSlot, button == 1 ? MouseButton.RIGHT : MouseButton.LEFT);
-        });
+        tryProcessBehavior(behavior -> behavior.handleClick(this,
+                slotIndex == -999 ? null : this.slots[slotIndex], button == 1 ? MouseButton.RIGHT : MouseButton.LEFT));
     }
 
     /**
@@ -913,7 +937,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
      * @param button The button that was pressed (0: left; 1: right)
      */
     private void handleShiftClick(int slotIndex, int button) {
-        tryProcessBehavior(behavior -> behavior.handleShiftClick(this.slots[slotIndex], button == 1 ? MouseButton.RIGHT : MouseButton.LEFT));
+        handleShiftClick0(slotIndex);
+        tryProcessBehavior(behavior -> behavior.handleShiftClick(this, this.slots[slotIndex], button == 1 ? MouseButton.RIGHT : MouseButton.LEFT));
+    }
+
+    private void handleShiftClick0(int slotIndex) {
         final int[] flags = getSlotFlags();
         // Check if the slot is in the main inventory
         final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;

@@ -29,16 +29,18 @@ import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.List;
-import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 /**
  * Represents the behavior when a {@link Player} interacts with
  * a {@link ClientContainer} and {@link LanternContainer}.
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType") // Ignore, only we should call this class
-public interface InventoryInteractionBehavior {
+public interface ContainerInteractionBehavior {
 
     /**
      * Handles a shift-click operation with a specific {@link MouseButton}
@@ -50,24 +52,24 @@ public interface InventoryInteractionBehavior {
      * @param clientSlot The client slot that was clicked
      * @param mouseButton The mouse button that was used in the shift click
      */
-    void handleShiftClick(ClientSlot clientSlot, MouseButton mouseButton);
+    void handleShiftClick(ClientContainer clientContainer, ClientSlot clientSlot, MouseButton mouseButton);
 
     /**
      * Handles a double-click operation for the target {@link ClientSlot}.
      *
      * @param clientSlot The client slot that was double clicked
      */
-    void handleDoubleClick(ClientSlot clientSlot);
+    void handleDoubleClick(ClientContainer clientContainer, ClientSlot clientSlot);
 
     /**
      * Handles a regular click operation for the target {@link ClientSlot}
-     * ({@link Optional#empty()} can occur when clicking outside the container),
+     * ({@code null} can occur when clicking outside the container),
      * only a specific {@link MouseButton} is used (no other keys/buttons).
      *
      * @param clientSlot The client slot that was clicked
      * @param mouseButton The mouse button that was used in the regular click
      */
-    void handleClick(Optional<ClientSlot> clientSlot, MouseButton mouseButton);
+    void handleClick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot, MouseButton mouseButton);
 
     /**
      * Handles a drop key operation for the target {@link ClientSlot}. {@code ctrl}
@@ -76,7 +78,7 @@ public interface InventoryInteractionBehavior {
      * @param clientSlot The client slot that was selected when pressing the key
      * @param ctrl Is the control key pressed
      */
-    void handleDropKey(ClientSlot clientSlot, boolean ctrl);
+    void handleDropKey(ClientContainer clientContainer, ClientSlot clientSlot, boolean ctrl);
 
     /**
      * Handles a number key operation for the target {@link ClientSlot}. {@code number}
@@ -85,7 +87,7 @@ public interface InventoryInteractionBehavior {
      * @param clientSlot The client slot that was selected when pressing the key
      * @param number The pressed number key, counting from 1 to 9
      */
-    void handleNumberKey(ClientSlot clientSlot, int number);
+    void handleNumberKey(ClientContainer clientContainer, ClientSlot clientSlot, int number);
 
     /**
      * Handles a drag operation for the target {@link ClientSlot}s. While dragging
@@ -95,5 +97,16 @@ public interface InventoryInteractionBehavior {
      * @param clientSlots The client slots
      * @param mouseButton The mouse button
      */
-    void handleDrag(List<ClientSlot> clientSlots, MouseButton mouseButton);
+    void handleDrag(ClientContainer clientContainer, List<ClientSlot> clientSlots, MouseButton mouseButton);
+
+    /**
+     * Handles a creative click operation for the target {@link ClientSlot}
+     * ({@code null} can occur when clicking outside the container).
+     * On vanilla minecraft will the provided {@link ItemStack} be put in
+     * the target {@link ClientSlot}.
+     *
+     * @param clientSlot The client slot
+     * @param itemStack The item stack
+     */
+    void handleCreativeClick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot, @Nullable ItemStack itemStack);
 }

@@ -155,7 +155,7 @@ public abstract class AbstractInventory implements IInventory {
 
     protected abstract Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher);
 
-    protected abstract Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher);
+    public abstract Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher);
 
     /**
      * Peeks for the result {@link SlotTransaction}s and {@link InventoryTransactionResult}

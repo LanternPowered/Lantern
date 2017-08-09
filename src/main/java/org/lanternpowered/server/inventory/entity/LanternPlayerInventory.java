@@ -266,7 +266,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
 
     @Override
     public boolean disableShiftClickWhenFull() {
-        return true;
+        return false;
     }
 
     @Override

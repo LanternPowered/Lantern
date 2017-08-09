@@ -186,8 +186,8 @@ public final class VanillaContainerInteractionBehavior implements ContainerInter
                     transactions.addAll(result.getTransactions());
                     final ItemStack rest = result.getOfferResult().getRest();
                     if (rest != null) {
-                        transactions.addAll(slot.peekPollTransactions(
-                                itemStack.getQuantity() - rest.getQuantity(), stack -> true).get().getTransactions());
+                        transactions.addAll(slot.peekPollTransactions(itemStack.getQuantity() - rest.getQuantity(),
+                                stack -> true).get().getTransactions());
                     } else {
                         transactions.addAll(slot.peekPollTransactions(
                                 stack -> true).get().getTransactions());
@@ -221,7 +221,6 @@ public final class VanillaContainerInteractionBehavior implements ContainerInter
         ItemStackSnapshot newItem = oldItem;
 
         final List<SlotTransaction> transactions = new ArrayList<>();
-
         if (getCursorItem() != null && !(slot instanceof OutputSlot)) {
             final ItemStack cursorItem = getCursorItem().copy();
             int quantity = cursorItem.getQuantity();
@@ -692,6 +691,7 @@ public final class VanillaContainerInteractionBehavior implements ContainerInter
         Sponge.getEventManager().post(event);
         LanternEventHelper.finishSpawnEntityEvent(event);
     }
+
     private PeekOfferTransactionsResult getShiftPeekOfferResult(LanternSlot slot, ItemStack itemStack) {
         final LanternPlayerInventory playerInventory = this.container.getPlayerInventory();
         final OpenableInventory openableInventory = (OpenableInventory) this.container.getOpenInventory();

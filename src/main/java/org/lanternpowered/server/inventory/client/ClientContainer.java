@@ -585,6 +585,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // Update the cursor item if needed
         if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
             messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.get()));
+            this.cursor.dirtyState = 0;
         }
         // Collect the property changes
         collectPropertyChanges(messages);
@@ -695,7 +696,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
 
         // Update the target slot and cursor
         queueSilentSlotChange(this.slots[slotIndex]);
-        queueSlotChange(this.cursor);
+        // queueSlotChange(this.cursor);
 
         final int slotIndex1 = slotIndex;
         tryProcessBehavior(behavior -> behavior.handleCreativeClick(this,
@@ -843,8 +844,8 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // if the both slots are empty also nothing will change
         if (slotIndex != hotbarSlotIndex && (!this.slots[slotIndex].getRaw().isEmpty() ||
                 !this.slots[hotbarSlotIndex].getRaw().isEmpty())) {
-            queueSilentSlotChange(this.slots[slotIndex]);
-            queueSilentSlotChange(this.slots[hotbarSlotIndex]);
+            queueSilentSlotChangeSafely(this.slots[slotIndex]);
+            queueSilentSlotChangeSafely(this.slots[hotbarSlotIndex]);
         }
         tryProcessBehavior(behavior -> behavior.handleNumberKey(this, this.slots[slotIndex], number + 1));
     }
@@ -875,10 +876,10 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 // Increase quantity
                 itemStack.setQuantity(Math.min(maxStack, itemStack.getQuantity() + itemStack1.getQuantity()));
                 // Queue a slot change
-                queueSilentSlotChange(slot1);
+                queueSilentSlotChangeSafely(slot1);
             }
             // Update the cursor
-            queueSlotChange(this.cursor);
+            queueSlotChangeSafely(this.cursor);
         }
         this.doubleClickItem = null;
         tryProcessBehavior(behavior -> behavior.handleDoubleClick(this, this.slots[slotIndex]));
@@ -895,7 +896,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // cannot be empty or nothing will happen
         if (this.cursor.getRaw().isEmpty() &&
                 !this.slots[slotIndex].getRaw().isEmpty()) {
-            queueSlotChange(this.slots[slotIndex]);
+            queueSlotChangeSafely(this.slots[slotIndex]);
         }
         tryProcessBehavior(behavior -> behavior.handleDropKey(this, this.slots[slotIndex], ctrl));
     }
@@ -915,7 +916,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 if (!this.cursor.getRaw().isEmpty()) {
                     // Update the slot and cursor
                     queueSilentSlotChangeSafely(slot);
-                    queueSlotChange(this.cursor);
+                    queueSlotChangeSafely(this.cursor);
                 } else {
                     // Store the clicked item, it's possible that a double click occurs
                     this.doubleClickItem = slot.get();
@@ -953,6 +954,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         if (itemStack.isEmpty()) {
             return;
         }
+        queueSilentSlotChangeSafely(slot);
         // Loop reverse through the slots if the insertion is reversed
         final boolean reverse = (flags[slotIndex] & FLAG_REVERSE_SHIFT_INSERTION) != 0;
         final int start = reverse ? flags.length - 1 : 0;

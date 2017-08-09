@@ -82,4 +82,9 @@ public class PlayerClientContainer extends ClientContainer {
     protected int serverSlotIndexToClient(int index) {
         return index == OFFHAND_SLOT_INDEX ? ALL_SLOT_FLAGS.length - 1 : index < OFFHAND_SLOT_INDEX ? index : index - 1;
     }
+
+    @Override
+    protected boolean disableShiftClickWhenFull() {
+        return false;
+    }
 }

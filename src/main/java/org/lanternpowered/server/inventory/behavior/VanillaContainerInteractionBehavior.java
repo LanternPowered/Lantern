@@ -41,6 +41,7 @@ import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.PeekPollTransactionsResult;
 import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
+import org.lanternpowered.server.inventory.behavior.event.ContainerEvent;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
@@ -88,7 +89,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public final class VanillaContainerInteractionBehavior implements ContainerInteractionBehavior {
+public class VanillaContainerInteractionBehavior extends AbstractContainerInteractionBehavior {
 
     private final LanternContainer container;
 

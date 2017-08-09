@@ -169,6 +169,7 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
@@ -318,7 +319,8 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInClientSettings.class, MessagePlayInClientSettings.class)
                 .bindHandler(new HandlerPlayInClientSettings());
         inbound.bind(CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class); // TODO: Handler
-        inbound.bind(CodecPlayInEnchantItem.class, MessagePlayInEnchantItem.class); // TODO: Handler
+        inbound.bind(CodecPlayInEnchantItem.class, MessagePlayInEnchantItem.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleEnchantItem));
         inbound.bind(CodecPlayInClickWindow.class, MessagePlayInClickWindow.class)
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowClick));
         inbound.bind(CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class)
@@ -364,8 +366,10 @@ final class ProtocolPlay extends ProtocolBase {
 
         // Provided by CodecPlayInOutCustomPayload
         inbound.bindMessage(MessagePlayInOutBrand.class); // TODO: Handler
-        inbound.bindMessage(MessagePlayInChangeItemName.class); // TODO: Handler
-        inbound.bindMessage(MessagePlayInChangeOffer.class); // TODO: Handler
+        inbound.bindMessage(MessagePlayInChangeItemName.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleItemRename));
+        inbound.bindMessage(MessagePlayInChangeOffer.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleOfferChange));
         inbound.bindMessage(MessagePlayInEditCommandBlock.Block.class); // TODO: Handler
         inbound.bindMessage(MessagePlayInEditCommandBlock.AdvancedBlock.class); // TODO: Handler
         inbound.bindMessage(MessagePlayInEditCommandBlock.Entity.class); // TODO: Handler
@@ -381,6 +385,8 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInRegisterChannels());
         inbound.bindMessage(MessagePlayInOutUnregisterChannels.class)
                 .bindHandler(new HandlerPlayInUnregisterChannels());
+        inbound.bindMessage(MessagePlayInAcceptBeaconEffects.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleAcceptBeaconEffects));
         // Provided by CodecPlayInUseEntity
         inbound.bindMessage(MessagePlayInUseEntity.Attack.class)
                 .bindHandler(new HandlerPlayInUseEntityAttack());

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import org.lanternpowered.server.inventory.behavior.event.EnchantButtonEvent;
+import org.lanternpowered.server.inventory.behavior.event.SelectTradingOfferEvent;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.text.Text;
@@ -55,5 +57,9 @@ public class EnchantmentTableClientContainer extends ClientContainer {
     @Override
     protected int[] getSlotFlags() {
         return ALL_SLOT_FLAGS;
+    }
+
+    public void handleButton(int index) {
+        tryProcessBehavior(behavior -> behavior.handleEvent(this, new EnchantButtonEvent(index)));
     }
 }

@@ -23,20 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.inventory.behavior.event;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
+/**
+ * Represents a special event that may occur in a container.
+ */
+public interface ContainerEvent {
 
-public final class CodecPlayInEnchantItem implements Codec<MessagePlayInEnchantItem> {
-
-    @Override
-    public MessagePlayInEnchantItem decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final int windowId = buf.readByte();
-        final int slot = buf.readByte();
-        return new MessagePlayInEnchantItem(windowId, slot);
-    }
 }

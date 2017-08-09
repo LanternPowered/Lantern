@@ -32,12 +32,14 @@ import static org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeOb
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
+import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
@@ -50,6 +52,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSound;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.effect.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -82,7 +85,9 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
         } else if ("MC|Brand".equals(channel)) {
             return new MessagePlayInOutBrand(content.readString());
         } else if ("MC|Beacon".equals(channel)) {
-            // TODO
+            final PotionEffectType primary = PotionEffectTypeRegistryModule.get().getByInternalId(content.readInteger()).orElse(null);
+            final PotionEffectType secondary = PotionEffectTypeRegistryModule.get().getByInternalId(content.readInteger()).orElse(null);
+            return new MessagePlayInAcceptBeaconEffects(primary, secondary);
         } else if ("MC|AdvCdm".equals(channel)) {
             final byte type = content.readByte();
 

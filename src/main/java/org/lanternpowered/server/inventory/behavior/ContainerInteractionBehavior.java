@@ -26,6 +26,7 @@
 package org.lanternpowered.server.inventory.behavior;
 
 import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.behavior.event.ContainerEvent;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.spongepowered.api.entity.living.player.Player;
@@ -49,6 +50,7 @@ public interface ContainerInteractionBehavior {
      * Shift-clicking in combination with {@link MouseButton#MIDDLE} is
      * currently not supported by the client.
      *
+     * @param clientContainer The client container
      * @param clientSlot The client slot that was clicked
      * @param mouseButton The mouse button that was used in the shift click
      */
@@ -57,6 +59,7 @@ public interface ContainerInteractionBehavior {
     /**
      * Handles a double-click operation for the target {@link ClientSlot}.
      *
+     * @param clientContainer The client container
      * @param clientSlot The client slot that was double clicked
      */
     void handleDoubleClick(ClientContainer clientContainer, ClientSlot clientSlot);
@@ -66,6 +69,7 @@ public interface ContainerInteractionBehavior {
      * ({@code null} can occur when clicking outside the container),
      * only a specific {@link MouseButton} is used (no other keys/buttons).
      *
+     * @param clientContainer The client container
      * @param clientSlot The client slot that was clicked
      * @param mouseButton The mouse button that was used in the regular click
      */
@@ -75,6 +79,7 @@ public interface ContainerInteractionBehavior {
      * Handles a drop key operation for the target {@link ClientSlot}. {@code ctrl}
      * defines that the control key was pressed when pressing the drop key.
      *
+     * @param clientContainer The client container
      * @param clientSlot The client slot that was selected when pressing the key
      * @param ctrl Is the control key pressed
      */
@@ -84,6 +89,7 @@ public interface ContainerInteractionBehavior {
      * Handles a number key operation for the target {@link ClientSlot}. {@code number}
      * defines which number key was pressed.
      *
+     * @param clientContainer The client container
      * @param clientSlot The client slot that was selected when pressing the key
      * @param number The pressed number key, counting from 1 to 9
      */
@@ -94,6 +100,7 @@ public interface ContainerInteractionBehavior {
      * was a specific {@link MouseButton} used. The {@link ClientSlot} are provided
      * in the order that they were dragged, the list will never be empty.
      *
+     * @param clientContainer The client container
      * @param clientSlots The client slots
      * @param mouseButton The mouse button
      */
@@ -105,8 +112,17 @@ public interface ContainerInteractionBehavior {
      * On vanilla minecraft will the provided {@link ItemStack} be put in
      * the target {@link ClientSlot}.
      *
+     * @param clientContainer The client container
      * @param clientSlot The client slot
      * @param itemStack The item stack
      */
     void handleCreativeClick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot, @Nullable ItemStack itemStack);
+
+    /**
+     * Handles the target {@link ContainerEvent}.
+     *
+     * @param clientContainer The client container
+     * @param event The event to process
+     */
+    void handleEvent(ClientContainer clientContainer, ContainerEvent event);
 }

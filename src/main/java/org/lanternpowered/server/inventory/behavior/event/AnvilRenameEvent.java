@@ -23,20 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.inventory.behavior.event;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class CodecPlayInEnchantItem implements Codec<MessagePlayInEnchantItem> {
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.inventory.client.AnvilClientContainer;
+
+/**
+ * Will be thrown when a name is being inputted in
+ * the {@link AnvilClientContainer}.
+ */
+public final class AnvilRenameEvent implements ContainerEvent {
+
+    private final String name;
+
+    public AnvilRenameEvent(String name) {
+        this.name = checkNotNull(name, "name");
+    }
+
+    /**
+     * Gets the received name.
+     *
+     * @return The name
+     */
+    public String getName() {
+        return this.name;
+    }
 
     @Override
-    public MessagePlayInEnchantItem decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final int windowId = buf.readByte();
-        final int slot = buf.readByte();
-        return new MessagePlayInEnchantItem(windowId, slot);
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("name", this.name)
+                .toString();
     }
 }

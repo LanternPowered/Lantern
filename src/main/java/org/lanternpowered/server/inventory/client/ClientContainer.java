@@ -136,7 +136,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
     }
 
-    private static abstract class BaseClientSlot implements ClientSlot {
+    protected static abstract class BaseClientSlot implements ClientSlot {
 
         /**
          * Whether the state is dirty.
@@ -230,7 +230,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
     private final Multimap<LanternSlot, SlotClientSlot> slotMap = HashMultimap.create();
     private BaseClientSlot cursor = new EmptyClientSlot(); // Not really a slot, but the implementation does the trick
     private final int containerId;
-    @SuppressWarnings("NullableProblems") private BaseClientSlot[] slots;
+    @SuppressWarnings("NullableProblems") protected BaseClientSlot[] slots;
     @Nullable private LanternPlayer player;
     @Nullable private ContainerInteractionBehavior interactionBehavior;
 
@@ -433,7 +433,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         queueSlotChange(this.slots[index]);
     }
 
-    private void queueSlotChange(BaseClientSlot clientSlot) {
+    protected void queueSlotChange(BaseClientSlot clientSlot) {
         populate();
         if (this.player == null) {
             return;
@@ -441,7 +441,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         clientSlot.dirtyState = BaseClientSlot.IS_DIRTY;
     }
 
-    private void queueSlotChangeSafely(BaseClientSlot clientSlot) {
+    protected void queueSlotChangeSafely(BaseClientSlot clientSlot) {
         populate();
         if (this.player == null) {
             return;
@@ -478,7 +478,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         queueSilentSlotChange(this.slots[index]);
     }
 
-    private void queueSilentSlotChange(BaseClientSlot clientSlot) {
+    protected void queueSilentSlotChange(BaseClientSlot clientSlot) {
         populate();
         if (this.player == null) {
             return;
@@ -486,7 +486,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         clientSlot.dirtyState = BaseClientSlot.IS_DIRTY | BaseClientSlot.SILENT_UPDATE;
     }
 
-    private void queueSilentSlotChangeSafely(BaseClientSlot clientSlot) {
+    protected void queueSilentSlotChangeSafely(BaseClientSlot clientSlot) {
         populate();
         if (this.player == null) {
             return;
@@ -750,7 +750,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
     }
 
-    private void tryProcessBehavior(Consumer<ContainerInteractionBehavior> behavior) {
+    protected void tryProcessBehavior(Consumer<ContainerInteractionBehavior> behavior) {
         if (this.interactionBehavior != null) {
             try {
                 behavior.accept(this.interactionBehavior);

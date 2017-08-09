@@ -23,20 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.inventory.behavior.event;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
 
-public final class CodecPlayInEnchantItem implements Codec<MessagePlayInEnchantItem> {
+/**
+ * Will be thrown when one of the buttons in the
+ * {@link EnchantmentTableClientContainer} is pressed.
+ */
+public final class EnchantButtonEvent implements ContainerEvent {
+
+    private final int button;
+
+    public EnchantButtonEvent(int button) {
+        this.button = button;
+    }
+
+    /**
+     * Gets the pressed button. Can be 0, 1 or 2.
+     *
+     * @return The button
+     */
+    public int getButton() {
+        return this.button;
+    }
 
     @Override
-    public MessagePlayInEnchantItem decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final int windowId = buf.readByte();
-        final int slot = buf.readByte();
-        return new MessagePlayInEnchantItem(windowId, slot);
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("button", this.button)
+                .toString();
     }
 }

@@ -29,17 +29,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventHelper;
+import org.lanternpowered.server.inventory.client.AnvilClientContainer;
+import org.lanternpowered.server.inventory.client.BeaconClientContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
+import org.lanternpowered.server.inventory.client.TradingClientContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
 import org.spongepowered.api.Sponge;
@@ -296,5 +304,37 @@ public class PlayerContainerSession {
         }
         final ClientContainer clientContainer = getClientContainer();
         clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
+    }
+
+    public void handleAcceptBeaconEffects(MessagePlayInAcceptBeaconEffects message) {
+        final ClientContainer clientContainer = getClientContainer();
+        if (clientContainer instanceof BeaconClientContainer) {
+            ((BeaconClientContainer) clientContainer).handleEffects(
+                    message.getPrimaryEffect().orElse(null), message.getSecondaryEffect().orElse(null));
+        }
+    }
+
+    public void handleItemRename(MessagePlayInChangeItemName message) {
+        final ClientContainer clientContainer = getClientContainer();
+        if (clientContainer instanceof AnvilClientContainer) {
+            ((AnvilClientContainer) clientContainer).handleRename(message.getName());
+        }
+    }
+
+    public void handleOfferChange(MessagePlayInChangeOffer message) {
+        final ClientContainer clientContainer = getClientContainer();
+        if (clientContainer instanceof TradingClientContainer) {
+            ((TradingClientContainer) clientContainer).handleSelectOffer(message.getIndex());
+        }
+    }
+
+    public void handleEnchantItem(MessagePlayInEnchantItem message) {
+        if (message.getWindowId() != getContainerId()) {
+            return;
+        }
+        final ClientContainer clientContainer = getClientContainer();
+        if (clientContainer instanceof EnchantmentTableClientContainer) {
+            ((EnchantmentTableClientContainer) clientContainer).handleButton(message.getEnchantmentSlot());
+        }
     }
 }

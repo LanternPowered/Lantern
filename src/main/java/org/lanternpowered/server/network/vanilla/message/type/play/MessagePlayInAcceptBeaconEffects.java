@@ -23,51 +23,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.client;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.inventory.behavior.event.BeaconEffectsEvent;
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.effect.potion.PotionEffectType;
-import org.spongepowered.api.text.Text;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class BeaconClientContainer extends ClientContainer {
+public final class MessagePlayInAcceptBeaconEffects implements Message {
 
-    private static final int[] TOP_SLOT_FLAGS = new int[] {
-            FLAG_REVERSE_SHIFT_INSERTION | FLAG_DISABLE_SHIFT_INSERTION, // Payment slot
-    };
-    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
+    @Nullable private final PotionEffectType primaryEffect;
+    @Nullable private final PotionEffectType secondaryEffect;
 
-    public BeaconClientContainer(Text title) {
-        super(title);
+    public MessagePlayInAcceptBeaconEffects(@Nullable PotionEffectType primaryEffect, @Nullable PotionEffectType secondaryEffect) {
+        this.secondaryEffect = secondaryEffect;
+        this.primaryEffect = primaryEffect;
+    }
+
+    /**
+     * Gets the primary {@link PotionEffectType}. This effect
+     * may be {@link Optional#empty()}.
+     *
+     * @return The primary potion effect type
+     */
+    public Optional<PotionEffectType> getPrimaryEffect() {
+        return Optional.ofNullable(this.primaryEffect);
+    }
+
+    /**
+     * Gets the secondary {@link PotionEffectType}. This effect
+     * may be {@link Optional#empty()}.
+     *
+     * @return The secondary potion effect type
+     */
+    public Optional<PotionEffectType> getSecondaryEffect() {
+        return Optional.ofNullable(this.secondaryEffect);
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.BEACON,
-                getTitle(), TOP_SLOT_FLAGS.length, 0);
-    }
-
-    @Override
-    protected int[] getTopSlotFlags() {
-        return TOP_SLOT_FLAGS;
-    }
-
-    @Override
-    protected int[] getSlotFlags() {
-        return ALL_SLOT_FLAGS;
-    }
-
-    @Override
-    protected boolean disableShiftClickWhenFull() {
-        return false;
-    }
-
-    public void handleEffects(@Nullable PotionEffectType primaryEffect, @Nullable PotionEffectType secondaryEffect) {
-        // Force the input item to update
-        queueSilentSlotChange(this.slots[0]);
-        tryProcessBehavior(behavior -> behavior.handleEvent(this, new BeaconEffectsEvent(primaryEffect, secondaryEffect)));
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("primaryEffect", this.primaryEffect)
+                .add("secondaryEffect", this.secondaryEffect)
+                .toString();
     }
 }

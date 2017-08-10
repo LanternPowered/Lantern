@@ -153,7 +153,7 @@ public class PlayerContainerSession {
                         // This can't be done to the player inventory, player inventory uses index 0
                         // The optional should always return something at this point, otherwise
                         // something is broken
-                        final ClientContainer clientContainer = this.openContainer.getClientContainer(this.player).get();
+                        final ClientContainer clientContainer = getClientContainer();
                         if (clientContainer.getContainerId() != 0) {
                             // Reinitialize the client container
                             clientContainer.init();
@@ -215,25 +215,6 @@ public class PlayerContainerSession {
     @SuppressWarnings("ConstantConditions")
     private LanternContainer getContainer() {
         return this.openContainer;
-    }
-
-    /**
-     * Sets the cursor item.
-     *
-     * @param cursorItem The cursor item
-     */
-    public void setCursorItem(@Nullable ItemStack cursorItem) {
-        getContainer().getCursorSlot().setRawItemStack(cursorItem);
-    }
-
-    /**
-     * Gets the {@link ItemStack} in the cursor.
-     *
-     * @return The cursor item
-     */
-    @Nullable
-    public ItemStack getCursorItem() {
-        return getContainer().getCursorSlot().getRawItemStack();
     }
 
     public void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {

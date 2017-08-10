@@ -119,6 +119,17 @@ public interface ContainerInteractionBehavior {
     void handleCreativeClick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot, @Nullable ItemStack itemStack);
 
     /**
+     * Handles a item pick operation. The client sends a {@link ClientSlot} to swap
+     * the contents with the hotbar slot, this occurs when a player middle clicks a
+     * block. The block item stack must exactly match the contents in the target slot
+     * before a operation will be executed.
+     *
+     * @param clientContainer The client container
+     * @param clientSlot The client slot
+     */
+    void handlePick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot);
+
+    /**
      * Handles the target {@link ContainerEvent}.
      *
      * @param clientContainer The client container

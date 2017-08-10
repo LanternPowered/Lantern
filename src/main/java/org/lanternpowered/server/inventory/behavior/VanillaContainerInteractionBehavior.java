@@ -41,6 +41,7 @@ import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.PeekPollTransactionsResult;
 import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
+import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
@@ -664,6 +665,40 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     cause, cursorTransaction, this.container, result.getTransactions());
             finishInventoryEvent(event);
         }
+    }
+
+    @Override
+    public void handlePick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot) {
+        final LanternPlayer player = clientContainer.getPlayer();
+        if (player != this.container.getPlayerInventory().getCarrier().orElse(null) ||
+                !(clientSlot instanceof ClientSlot.Slot)) {
+            return;
+        }
+        final PlayerInventoryContainer inventoryContainer = player.getInventoryContainer();
+        final ClientSlot hotbarClientSlot = inventoryContainer.getClientContainer().getSelectedHotbarSlot();
+        if (!(hotbarClientSlot instanceof ClientSlot.Slot)) {
+            return;
+        }
+        final LanternHotbar hotbar = player.getInventory().getHotbar();
+        final LanternSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
+
+        // The slot we will swap items with
+        LanternSlot hotbarSlot = hotbar.getSelectedSlot();
+        if (hotbarSlot.peek().isPresent()) {
+            final Optional<LanternSlot> optSlot = hotbar.getSlots().stream()
+                    .filter(slot1 -> !slot1.peek().isPresent())
+                    .findFirst();
+            if (optSlot.isPresent()) {
+                hotbarSlot = optSlot.get();
+            }
+        }
+
+        final ItemStack slotItem = slot.peek().orElse(null);
+        final ItemStack hotbarItem = hotbarSlot.peek().orElse(null);
+
+        hotbarSlot.set(slotItem);
+        hotbar.setSelectedSlotIndex(hotbar.getSlotIndex(hotbarSlot));
+        slot.set(hotbarItem);
     }
 
     private void updateCraftingGrid(Player player, CraftingInventory craftingInventory,

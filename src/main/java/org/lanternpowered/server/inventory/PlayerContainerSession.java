@@ -212,11 +212,6 @@ public class PlayerContainerSession {
         return true;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    private LanternContainer getContainer() {
-        return this.openContainer;
-    }
-
     public void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
         final ClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer(this.player).get();
         if (clientContainer instanceof PlayerClientContainer) {

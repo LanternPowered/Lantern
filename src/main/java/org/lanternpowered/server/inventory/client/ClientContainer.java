@@ -719,12 +719,18 @@ public abstract class ClientContainer implements SlotChangeTracker {
         return index;
     }
 
+    @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
     public void handlePick(int slotIndex) {
         populate();
         // Convert the slot index
         slotIndex = clientSlotIndexToServer(slotIndex);
 
-        queueSilentSlotChange(this.slots[slotIndex]);
+        queueSilentSlotChangeSafely(this.slots[slotIndex]);
+        final int hotbarSlotIndex = ((PlayerClientContainer) this.player.getInventoryContainer()
+                .getClientContainer(this.player).get()).getSelectedHotbarSlotIndex();
+        queueSilentSlotChangeSafely(this.slots[getHotbarSlotIndex(hotbarSlotIndex)]);
+        final int slotIndex1 = slotIndex;
+        tryProcessBehavior(behavior -> behavior.handlePick(this, this.slots[slotIndex1]));
     }
 
     public void handleCreativeClick(int slotIndex, @Nullable ItemStack itemStack) {

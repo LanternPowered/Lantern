@@ -28,61 +28,38 @@ package org.lanternpowered.server.inventory.client;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-/**
- * Represents a bound slot on a {@link ClientContainer}.
- */
-public interface ClientSlot {
+public interface ContainerPart extends ContainerBase {
 
     /**
-     * Gets the index of the slot within
-     * the {@link ClientContainer}.
+     * Gets the root {@link ClientContainer}.
      *
-     * @return The index
+     * @return The root client container
      */
-    int getIndex();
+    ClientContainer getRoot();
 
     /**
-     * Gets the {@link ItemStack} that is visible in
-     * this {@link ClientSlot}.
+     * Unbinds/releases the slot of the given index
+     * within this {@link ContainerPart}.
      *
-     * @return The item stack
+     * @param index The index within this container part
      */
-    ItemStack getItem();
+    void unbind(int index);
 
     /**
-     * Represents a {@link ClientSlot} that just represents
-     * an icon. The slot cannot be modified through inventory
-     * operations.
+     * Binds a {@link LanternSlot} to the given slot index
+     * within this {@link ContainerPart}.
+     *
+     * @param index The slot index within this container part
+     * @return The bound client slot
      */
-    interface Button extends ClientSlot {
-
-        /**
-         * Sets the icon {@link ItemStack}.
-         *
-         * @param itemStack The item stack
-         */
-        void setItem(ItemStack itemStack);
-    }
+    ClientSlot.Slot bindSlot(int index, LanternSlot slot);
 
     /**
-     * Represents a {@link ClientSlot} that is bound to
-     * a {@link LanternSlot}.
+     * Binds a {@link ItemStack} as a icon to the
+     * given slot index within this {@link ContainerPart}.
+     *
+     * @param index The slot index within this container part
+     * @return The bound client slot
      */
-    interface Slot extends ClientSlot {
-
-        /**
-         * Gets the {@link LanternSlot}.
-         *
-         * @return The slot
-         */
-        LanternSlot getSlot();
-    }
-
-    /**
-     * Nothing is bound, {@link #getItem()} will always return
-     * a empty {@link ItemStack}.
-     */
-    interface Empty extends ClientSlot {
-
-    }
+    ClientSlot.Button bindButton(int index);
 }

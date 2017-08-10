@@ -30,8 +30,10 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.client.BottomContainerPart;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
+import org.lanternpowered.server.inventory.client.TopContainerPart;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.entity.living.player.Player;
@@ -223,6 +225,11 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
         checkNotNull(viewer, "viewer");
         checkState(!this.viewers.containsKey(viewer));
         final ClientContainer clientContainer = ((OpenableInventory) this.openInventory).constructClientContainer(this);
+        // Bind the default bottom container part if the custom one is missing
+        if (!clientContainer.getBottom().isPresent()) {
+            final LanternPlayer player = (LanternPlayer) getPlayerInventory().getCarrier().get();
+            clientContainer.bindBottom(player.getInventoryContainer().getClientContainer().getBottom().get());
+        }
         this.viewers.put(viewer, clientContainer);
         clientContainer.bind(viewer);
         clientContainer.init();

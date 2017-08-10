@@ -44,7 +44,6 @@ import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.inventory.slot.SlotChangeTracker;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
@@ -74,7 +73,7 @@ import javax.annotation.Nullable;
  * to the proper index and the client container will handle the rest.
  */
 @SuppressWarnings("unchecked")
-public abstract class ClientContainer implements SlotChangeTracker {
+public abstract class ClientContainer implements ContainerBase {
 
     /**
      * The slot index that should be used to bind the cursor slot.
@@ -156,6 +155,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
 
         protected abstract ItemStack getRaw();
+
+        @Override
+        public int getIndex() {
+            return this.index;
+        }
     }
 
     private final class EmptyClientSlot extends BaseClientSlot implements ClientSlot.Empty {
@@ -165,7 +169,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
 
         @Override
-        public ItemStack get() {
+        public ItemStack getItem() {
             return ItemStack.empty();
         }
 
@@ -185,7 +189,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
 
         @Override
-        public ItemStack get() {
+        public ItemStack getItem() {
             return this.slot.peek().orElse(ItemStack.empty());
         }
 
@@ -210,12 +214,12 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
 
         @Override
-        public ItemStack get() {
+        public ItemStack getItem() {
             return this.itemStack.copy();
         }
 
         @Override
-        public void setIcon(ItemStack itemStack) {
+        public void setItem(ItemStack itemStack) {
             this.itemStack = checkNotNull(itemStack, "itemStack").copy();
             queueSilentSlotChange(this);
         }
@@ -248,6 +252,103 @@ public abstract class ClientContainer implements SlotChangeTracker {
     @Nullable private LanternPlayer player;
     @Nullable private ContainerInteractionBehavior interactionBehavior;
 
+    private static abstract class AbstractContainerPart implements ContainerPart {
+
+        protected final ClientContainer clientContainer;
+
+        protected AbstractContainerPart(ClientContainer clientContainer) {
+            this.clientContainer = clientContainer;
+        }
+
+        @Override
+        public ClientContainer getRoot() {
+            return this.clientContainer;
+        }
+
+        @Override
+        public void queueSlotChange(LanternSlot slot) {
+            this.clientContainer.queueSlotChange(slot);
+        }
+
+        @Override
+        public void queueSlotChange(ClientSlot clientSlot) {
+            this.clientContainer.queueSlotChange(clientSlot);
+        }
+
+        @Override
+        public void queueSlotChange(int index) {
+            this.clientContainer.queueSlotChange(index);
+        }
+
+        @Override
+        public void queueSilentSlotChange(LanternSlot slot) {
+            this.clientContainer.queueSilentSlotChange(slot);
+        }
+
+        @Override
+        public void queueSilentSlotChange(ClientSlot clientSlot) {
+            this.clientContainer.queueSilentSlotChange(clientSlot);
+        }
+
+        @Override
+        public void queueSilentSlotChange(int index) {
+            this.clientContainer.queueSilentSlotChange(index);
+        }
+
+        @Override
+        public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+            return this.clientContainer.bindSlot(index, slot);
+        }
+
+        @Override
+        public ClientSlot.Button bindButton(int index) {
+            return this.clientContainer.bindButton(index);
+        }
+
+        @Override
+        public Optional<LanternSlot> getSlot(int index) {
+            return this.clientContainer.getSlot(index);
+        }
+
+        @Override
+        public Optional<ClientSlot> getClientSlot(int index) {
+            return this.clientContainer.getClientSlot(localToGlobalIndex(index));
+        }
+
+        @Override
+        public void unbind(int index) {
+            this.clientContainer.unbind(localToGlobalIndex(index));
+        }
+
+        protected abstract int localToGlobalIndex(int index);
+    }
+    private final class TopContainerPartImpl extends AbstractContainerPart implements TopContainerPart {
+
+        private TopContainerPartImpl(ClientContainer clientContainer) {
+            super(clientContainer);
+        }
+
+        @Override
+        protected int localToGlobalIndex(int index) {
+            checkState(index >= 0 && index < getTopSlotsCount());
+            return 0;
+        }
+    }
+    private final class BottomContainerPartImpl extends AbstractContainerPart implements BottomContainerPart {
+
+        private BottomContainerPartImpl(ClientContainer clientContainer) {
+            super(clientContainer);
+        }
+
+        @Override
+        protected int localToGlobalIndex(int index) {
+            checkState(index >= 0 && index < MAIN_INVENTORY_FLAGS.length);
+            return index - MAIN_INVENTORY_FLAGS.length;
+        }
+    }
+
+    private final TopContainerPart topContainerPart = new TopContainerPartImpl(this);
+    @Nullable private BottomContainerPart bottomContainerPart;
     // Double click data
     @Nullable private ItemStack doubleClickItem;
 
@@ -259,6 +360,73 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // Generate a new container id
         this.containerId = generateContainerId();
         this.title = title;
+    }
+
+    /**
+     * Gets the {@link TopContainerPart} of this {@link ClientContainer}. This
+     * is the top inventory.
+     *
+     * @return The top container part
+     */
+    public TopContainerPart getTop() {
+        populate();
+        return this.topContainerPart;
+    }
+
+    /**
+     * Gets the bound {@link BottomContainerPart} of this {@link ClientContainer}. This
+     * is the bottom inventory.
+     *
+     * @return The bottom container part
+     */
+    public Optional<BottomContainerPart> getBottom() {
+        populate();
+        return Optional.ofNullable(this.bottomContainerPart);
+    }
+
+    /**
+     * Binds the {@link BottomContainerPart} of this {@link ClientContainer}. This
+     * is the bottom inventory. Calling this method overrides the player bottom
+     * inventory, by default will that inventory used.
+     *
+     * @return The bottom container part
+     */
+    public BottomContainerPart bindBottom() {
+        populate();
+        if (this.bottomContainerPart == null) {
+            this.bottomContainerPart = new BottomContainerPartImpl(this);
+        } else {
+            final int s = getTopSlotsCount();
+            for (int i = 0; i < MAIN_INVENTORY_FLAGS.length; i++) {
+                this.slots[s + i] = new EmptyClientSlot(s + i);
+            }
+        }
+        return this.bottomContainerPart;
+    }
+
+    public BottomContainerPart bindBottom(BottomContainerPart bottomContainerPart) {
+        populate();
+        if (this.bottomContainerPart == null) {
+            this.bottomContainerPart = new BottomContainerPartImpl(this);
+        }
+        final ClientContainer clientContainer = ((BottomContainerPartImpl) bottomContainerPart).clientContainer;
+        final int s1 = getTopSlotsCount();
+        final int s2 = clientContainer.getTopSlotsCount();
+        for (int i = 0; i < MAIN_INVENTORY_FLAGS.length; i++) {
+            final int index = s1 + i;
+            BaseClientSlot clientSlot = clientContainer.slots[s2 + i];
+            if (clientSlot instanceof SlotClientSlot) {
+                clientSlot = new SlotClientSlot(index, ((SlotClientSlot) clientSlot).slot);
+            } else if (clientSlot instanceof IconClientSlot) {
+                final ItemStack itemStack = clientSlot.getItem();
+                clientSlot = new IconClientSlot(index);
+                ((IconClientSlot) clientSlot).setItem(itemStack);
+            } else {
+                clientSlot = new EmptyClientSlot(index);
+            }
+            this.slots[index] = clientSlot;
+        }
+        return this.bottomContainerPart;
     }
 
     /**
@@ -331,12 +499,11 @@ public abstract class ClientContainer implements SlotChangeTracker {
         this.interactionBehavior = interactionBehavior;
     }
 
-    /**
-     * Unbinds/releases the slot of the given index.
-     *
-     * @param index The index
-     */
-    public void unbind(int index) {
+    public void bindCursor(LanternSlot slot) {
+        bindSlot(CURSOR_SLOT_INDEX, slot);
+    }
+
+    private void unbind(int index) {
         populate();
         if (this.slots[index] instanceof ClientSlot.Empty) {
             return;
@@ -347,14 +514,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         queueSilentSlotChangeSafely(clientSlot);
     }
 
-    /**
-     * Binds a {@link LanternSlot} to the
-     * given slot index.
-     *
-     * @param index The slot index
-     * @return The bound client slot
-     */
-    public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+    private ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
         populate();
         final SlotClientSlot clientSlot = new SlotClientSlot(index, slot);
         removeSlot(index);
@@ -371,14 +531,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         return clientSlot;
     }
 
-    /**
-     * Binds a {@link ItemStack} as a icon to the
-     * given slot index.
-     *
-     * @param index The slot index
-     * @return The bound client slot
-     */
-    public ClientSlot.Button bindButton(int index) {
+    private ClientSlot.Button bindButton(int index) {
         populate();
         final IconClientSlot clientSlot = new IconClientSlot(index);
         removeSlot(index);
@@ -435,30 +588,17 @@ public abstract class ClientContainer implements SlotChangeTracker {
         bindProperty(propertyType, () -> inventory.getInventoryProperty(propertyType).orElse(null));
     }
 
-    /**
-     * Queues a silent slot change for the specified {@link LanternSlot}.
-     *
-     * @param slot The slot
-     */
     @Override
     public void queueSlotChange(LanternSlot slot) {
         this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
     }
 
-    /**
-     * Queues a slot change for the specified {@link ClientSlot}.
-     *
-     * @param clientSlot The client slot
-     */
+    @Override
     public void queueSlotChange(ClientSlot clientSlot) {
         queueSlotChange((BaseClientSlot) clientSlot);
     }
 
-    /**
-     * Queues a slot change for the specified slot index.
-     *
-     * @param index The slot index
-     */
+    @Override
     public void queueSlotChange(int index) {
         queueSlotChange(this.slots[index]);
     }
@@ -481,29 +621,17 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
     }
 
-    /**
-     * Queues a silent slot change for the specified {@link LanternSlot}.
-     *
-     * @param slot The slot
-     */
+    @Override
     public void queueSilentSlotChange(LanternSlot slot) {
         this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
     }
 
-    /**
-     * Queues a silent slot change for the specified {@link ClientSlot}.
-     *
-     * @param clientSlot The client slot
-     */
+    @Override
     public void queueSilentSlotChange(ClientSlot clientSlot) {
         queueSilentSlotChange((BaseClientSlot) clientSlot);
     }
 
-    /**
-     * Queues a silent slot change for the specified slot index.
-     *
-     * @param index The slot index
-     */
+    @Override
     public void queueSilentSlotChange(int index) {
         queueSilentSlotChange(this.slots[index]);
     }
@@ -561,13 +689,13 @@ public abstract class ClientContainer implements SlotChangeTracker {
         }
         final ItemStack[] items = new ItemStack[getSlotFlags().length];
         for (int i = 0; i < items.length; i++) {
-            items[serverSlotIndexToClient(i)] = this.slots[i].get();
+            items[serverSlotIndexToClient(i)] = this.slots[i].getItem();
         }
         // Send the inventory content
         messages.add(new MessagePlayOutWindowItems(this.containerId, items));
         // Send the cursor item if present
         if (!this.cursor.getRaw().isEmpty()) {
-            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.get()));
+            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
         }
         // Collect additional messages
         collectInitMessages(messages);
@@ -609,12 +737,12 @@ public abstract class ClientContainer implements SlotChangeTracker {
                 // Reset the dirty state
                 slot.dirtyState = 0;
                 // Add a update message
-                messages.add(new MessagePlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.get()));
+                messages.add(new MessagePlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.getItem()));
             }
         }
         // Update the cursor item if needed
         if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
-            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.get()));
+            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
             this.cursor.dirtyState = 0;
         }
         // Collect the property changes
@@ -651,23 +779,13 @@ public abstract class ClientContainer implements SlotChangeTracker {
         return getSlotFlags().length - (9 - hotbarSlot);
     }
 
-    /**
-     * Gets a {@link ClientSlot} for the given slot index.
-     *
-     * @param index The slot index
-     * @return The client slot if present, otherwise {@link Optional#empty()}
-     */
+    @Override
     public Optional<ClientSlot> getClientSlot(int index) {
         populate();
         return index == -1 ? Optional.of(this.cursor) : index < 0 || index >= this.slots.length ? Optional.empty() : Optional.of(this.slots[index]);
     }
 
-    /**
-     * Attempts to get the bound {@link LanternSlot} for the given index.
-     *
-     * @param index The slot index
-     * @return The bound slot if present, otherwise {@link Optional#empty()}
-     */
+    @Override
     public Optional<LanternSlot> getSlot(int index) {
         populate();
         if (index < -1 || index >= this.slots.length) {
@@ -965,7 +1083,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
                     queueSlotChangeSafely(this.cursor);
                 } else {
                     // Store the clicked item, it's possible that a double click occurs
-                    this.doubleClickItem = slot.get();
+                    this.doubleClickItem = slot.getItem();
                 }
             }
         } else if (!this.cursor.getRaw().isEmpty()) {
@@ -995,7 +1113,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         final boolean hotbar = (flags[slotIndex] & FLAG_HOTBAR) != 0;
         // Get the client slot
         final BaseClientSlot slot = this.slots[slotIndex];
-        ItemStack itemStack = slot.get();
+        ItemStack itemStack = slot.getItem();
         // Shift clicking on a empty slot doesn't have any effect
         if (itemStack.isEmpty()) {
             return;

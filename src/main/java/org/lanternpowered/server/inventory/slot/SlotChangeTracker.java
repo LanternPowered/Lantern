@@ -25,7 +25,49 @@
  */
 package org.lanternpowered.server.inventory.slot;
 
+import org.lanternpowered.server.inventory.client.ClientSlot;
+
 public interface SlotChangeTracker {
 
+    /**
+     * Queues a silent slot change for the specified {@link LanternSlot}.
+     *
+     * @param slot The slot
+     */
     void queueSlotChange(LanternSlot slot);
+
+    /**
+     * Queues a slot change for the specified {@link ClientSlot}.
+     *
+     * @param clientSlot The client slot
+     */
+    void queueSlotChange(ClientSlot clientSlot);
+
+    /**
+     * Queues a slot change for the specified slot index.
+     *
+     * @param index The slot index
+     */
+    void queueSlotChange(int index);
+
+    /**
+     * Queues a silent slot change for the specified {@link LanternSlot}.
+     *
+     * @param slot The slot
+     */
+    void queueSilentSlotChange(LanternSlot slot);
+
+    /**
+     * Queues a silent slot change for the specified {@link ClientSlot}.
+     *
+     * @param clientSlot The client slot
+     */
+    void queueSilentSlotChange(ClientSlot clientSlot);
+
+    /**
+     * Queues a silent slot change for the specified slot index.
+     *
+     * @param index The slot index
+     */
+    void queueSilentSlotChange(int index);
 }

@@ -26,63 +26,28 @@
 package org.lanternpowered.server.inventory.client;
 
 import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.lanternpowered.server.inventory.slot.SlotChangeTracker;
 
-/**
- * Represents a bound slot on a {@link ClientContainer}.
- */
-public interface ClientSlot {
+import java.util.Optional;
+
+public interface ContainerBase extends SlotChangeTracker {
 
     /**
-     * Gets the index of the slot within
-     * the {@link ClientContainer}.
+     * Gets a {@link ClientSlot} for the given slot index
+     * within this {@link ContainerPart}.
      *
-     * @return The index
+     * @param index The slot index
+     * @return The client slot if present, otherwise {@link Optional#empty()}
      */
-    int getIndex();
+    Optional<ClientSlot> getClientSlot(int index);
 
     /**
-     * Gets the {@link ItemStack} that is visible in
-     * this {@link ClientSlot}.
+     * Attempts to get the bound {@link LanternSlot} for the given
+     * index within this {@link ContainerPart}.
      *
-     * @return The item stack
+     * @param index The slot index within this container part
+     * @return The bound slot if present, otherwise {@link Optional#empty()}
      */
-    ItemStack getItem();
+    Optional<LanternSlot> getSlot(int index);
 
-    /**
-     * Represents a {@link ClientSlot} that just represents
-     * an icon. The slot cannot be modified through inventory
-     * operations.
-     */
-    interface Button extends ClientSlot {
-
-        /**
-         * Sets the icon {@link ItemStack}.
-         *
-         * @param itemStack The item stack
-         */
-        void setItem(ItemStack itemStack);
-    }
-
-    /**
-     * Represents a {@link ClientSlot} that is bound to
-     * a {@link LanternSlot}.
-     */
-    interface Slot extends ClientSlot {
-
-        /**
-         * Gets the {@link LanternSlot}.
-         *
-         * @return The slot
-         */
-        LanternSlot getSlot();
-    }
-
-    /**
-     * Nothing is bound, {@link #getItem()} will always return
-     * a empty {@link ItemStack}.
-     */
-    interface Empty extends ClientSlot {
-
-    }
 }

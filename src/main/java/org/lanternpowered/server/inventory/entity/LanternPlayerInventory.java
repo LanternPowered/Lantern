@@ -38,6 +38,7 @@ import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.client.BottomContainerPart;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
@@ -272,6 +273,8 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     public PlayerClientContainer constructClientContainer() {
         final PlayerClientContainer clientContainer = new PlayerClientContainer(Text.of(getName()));
         clientContainer.bindHotbarBehavior(this.hotbar.getHotbarBehavior());
+        final BottomContainerPart part = clientContainer.bindBottom();
+        getIndexBySlots().object2IntEntrySet().forEach(entry -> part.bindSlot(entry.getIntValue(), entry.getKey()));
         return clientContainer;
     }
 }

@@ -62,9 +62,9 @@ final class ProtocolForgeHandshake extends ProtocolBase {
         final MessageRegistry inbound = inbound();
         final MessageRegistry outbound = outbound();
 
-        inbound.bind(0x0c, CodecInOutPing.class, MessageInOutKeepAlive.class);
+        inbound.bind(0x0b, CodecInOutPing.class, MessageInOutKeepAlive.class);
         final CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayInCustomPayloadRegistration =
-                inbound.bind(0x0a, CodecPlayInOutCustomPayload.class);
+                inbound.bind(0x09, CodecPlayInOutCustomPayload.class);
         codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class)
                 .bindHandler(new HandlerPlayInChannelPayload());
         codecPlayInCustomPayloadRegistration.bind(MessageForgeHandshakeInOutAck.class)
@@ -80,9 +80,9 @@ final class ProtocolForgeHandshake extends ProtocolBase {
         codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutUnregisterChannels.class)
                 .bindHandler(new HandlerPlayInUnregisterChannels());
 
-        outbound.bind(0x20, CodecInOutPing.class, MessageInOutKeepAlive.class);
+        outbound.bind(0x1f, CodecInOutPing.class, MessageInOutKeepAlive.class);
         final CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayOutCustomPayloadRegistration =
-                outbound.bind(0x19, CodecPlayInOutCustomPayload.class);
+                outbound.bind(0x18, CodecPlayInOutCustomPayload.class);
         codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class);
         codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeInOutAck.class);
         codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeInOutHello.class);
@@ -90,7 +90,7 @@ final class ProtocolForgeHandshake extends ProtocolBase {
         codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeOutReset.class);
         codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutRegisterChannels.class);
         codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutUnregisterChannels.class);
-        outbound.bind(0x1b, CodecOutDisconnect.class, MessageOutDisconnect.class);
+        outbound.bind(0x1a, CodecOutDisconnect.class, MessageOutDisconnect.class);
         outbound.bindProcessor(MessageForgeHandshakeOutRegistryData.class, new ProcessorForgeHandshakeOutRegistryData());
     }
 }

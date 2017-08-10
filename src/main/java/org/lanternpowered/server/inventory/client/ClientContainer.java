@@ -148,12 +148,21 @@ public abstract class ClientContainer implements SlotChangeTracker {
          */
         public final static int SILENT_UPDATE = 0x2;
 
-        int dirtyState = 0;
+        protected final int index;
+        protected int dirtyState = 0;
+
+        protected BaseClientSlot(int index) {
+            this.index = index;
+        }
 
         protected abstract ItemStack getRaw();
     }
 
     private final class EmptyClientSlot extends BaseClientSlot implements ClientSlot.Empty {
+
+        private EmptyClientSlot(int index) {
+            super(index);
+        }
 
         @Override
         public ItemStack get() {
@@ -170,7 +179,8 @@ public abstract class ClientContainer implements SlotChangeTracker {
 
         private final LanternSlot slot;
 
-        private SlotClientSlot(LanternSlot slot) {
+        private SlotClientSlot(int index, LanternSlot slot) {
+            super(index);
             this.slot = slot;
         }
 
@@ -194,6 +204,10 @@ public abstract class ClientContainer implements SlotChangeTracker {
     private final class IconClientSlot extends BaseClientSlot implements ClientSlot.Button {
 
         private ItemStack itemStack = ItemStack.empty();
+
+        private IconClientSlot(int index) {
+            super(index);
+        }
 
         @Override
         public ItemStack get() {
@@ -228,7 +242,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
 
     private final Text title;
     private final Multimap<LanternSlot, SlotClientSlot> slotMap = HashMultimap.create();
-    private BaseClientSlot cursor = new EmptyClientSlot(); // Not really a slot, but the implementation does the trick
+    private BaseClientSlot cursor = new EmptyClientSlot(CURSOR_SLOT_INDEX); // Not really a slot, but the implementation does the trick
     private final int containerId;
     @SuppressWarnings("NullableProblems") protected BaseClientSlot[] slots;
     @Nullable private LanternPlayer player;
@@ -261,7 +275,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
         // Create a array to bind slots
         this.slots = new BaseClientSlot[flags.length];
         for (int i = 0; i < this.slots.length; i++) {
-            this.slots[i] = new EmptyClientSlot();
+            this.slots[i] = new EmptyClientSlot(i);
         }
     }
 
@@ -318,6 +332,22 @@ public abstract class ClientContainer implements SlotChangeTracker {
     }
 
     /**
+     * Unbinds/releases the slot of the given index.
+     *
+     * @param index The index
+     */
+    public void unbind(int index) {
+        populate();
+        if (this.slots[index] instanceof ClientSlot.Empty) {
+            return;
+        }
+        removeSlot(index);
+        final EmptyClientSlot clientSlot = new EmptyClientSlot(index);
+        this.slots[index] = clientSlot;
+        queueSilentSlotChangeSafely(clientSlot);
+    }
+
+    /**
      * Binds a {@link LanternSlot} to the
      * given slot index.
      *
@@ -326,7 +356,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      */
     public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
         populate();
-        final SlotClientSlot clientSlot = new SlotClientSlot(slot);
+        final SlotClientSlot clientSlot = new SlotClientSlot(index, slot);
         removeSlot(index);
         if (index == -1) {
             this.cursor = clientSlot;
@@ -350,7 +380,7 @@ public abstract class ClientContainer implements SlotChangeTracker {
      */
     public ClientSlot.Button bindButton(int index) {
         populate();
-        final IconClientSlot clientSlot = new IconClientSlot();
+        final IconClientSlot clientSlot = new IconClientSlot(index);
         removeSlot(index);
         this.slots[index] = clientSlot;
         return clientSlot;
@@ -687,6 +717,14 @@ public abstract class ClientContainer implements SlotChangeTracker {
 
     protected int serverSlotIndexToClient(int index) {
         return index;
+    }
+
+    public void handlePick(int slotIndex) {
+        populate();
+        // Convert the slot index
+        slotIndex = clientSlotIndexToServer(slotIndex);
+
+        queueSilentSlotChange(this.slots[slotIndex]);
     }
 
     public void handleCreativeClick(int slotIndex, @Nullable ItemStack itemStack) {

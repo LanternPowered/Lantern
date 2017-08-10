@@ -25,12 +25,10 @@
  */
 package org.lanternpowered.server.inventory.entity;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternInventoryRow;
+import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
+import org.lanternpowered.server.inventory.behavior.VanillaHotbarBehavior;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
@@ -45,43 +43,25 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public class LanternHotbar extends LanternInventoryRow implements Hotbar {
 
-    private int selectedSlotIndex;
+    private final HotbarBehavior hotbarBehavior = new VanillaHotbarBehavior();
 
     LanternHotbar(@Nullable Inventory parent) {
         super(parent);
     }
 
     public LanternSlot getSelectedSlot() {
-        return getSlotAt(this.selectedSlotIndex).orElseThrow(() -> new IllegalStateException("No slot at index: " + this.selectedSlotIndex));
+        final int slotIndex = this.hotbarBehavior.getSelectedSlotIndex();
+        return getSlotAt(slotIndex).orElseThrow(() -> new IllegalStateException("No slot at index: " + slotIndex));
     }
 
     @Override
     public int getSelectedSlotIndex() {
-        return this.selectedSlotIndex;
-    }
-
-    public void setRawSelectedSlotIndex(int index) {
-        this.selectedSlotIndex = index;
+        return this.hotbarBehavior.getSelectedSlotIndex();
     }
 
     @Override
     public void setSelectedSlotIndex(int index) {
-        checkArgument(index >= 0 && index < this.slots.size(), "The index %s may not be smaller then 0 or greater then %s",
-                index, this.slots.size() - 1);
-        Inventory inventory = this;
-        while (!(inventory instanceof LanternPlayerInventory)) {
-            final Inventory inventory1 = inventory.parent();
-            if (inventory == inventory1) {
-                inventory = null;
-                break;
-            }
-            inventory = inventory1;
-        }
-        if (inventory != null) {
-            ((LanternPlayerInventory) inventory).getCarrier().ifPresent(
-                    player -> ((LanternPlayer) player).getConnection().send(new MessagePlayInOutHeldItemChange(index)));
-        }
-        setRawSelectedSlotIndex(index);
+        this.hotbarBehavior.setSelectedSlotIndex(index);
     }
 
     @Override
@@ -99,5 +79,9 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
             properties.add((T) new EquipmentSlotType(EquipmentTypes.MAIN_HAND));
         }
         return properties;
+    }
+
+    public HotbarBehavior getHotbarBehavior() {
+        return this.hotbarBehavior;
     }
 }

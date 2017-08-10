@@ -25,8 +25,16 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
+import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.text.Text;
+
+import java.util.List;
 
 public class PlayerClientContainer extends ClientContainer {
 
@@ -44,6 +52,9 @@ public class PlayerClientContainer extends ClientContainer {
     };
     private static final int OFFHAND_SLOT_INDEX = TOP_SLOT_FLAGS.length - 1;
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
+
+    private HotbarBehavior hotbarBehavior = new SimpleHotbarBehavior();
+    private int previousSelectedHotbarSlot;
 
     public PlayerClientContainer(Text title) {
         super(title);
@@ -86,5 +97,87 @@ public class PlayerClientContainer extends ClientContainer {
     @Override
     protected boolean disableShiftClickWhenFull() {
         return false;
+    }
+
+    @Override
+    protected void collectInitMessages(List<Message> messages) {
+        super.collectInitMessages(messages);
+        this.previousSelectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
+        messages.add(new MessagePlayInOutHeldItemChange(this.previousSelectedHotbarSlot));
+    }
+
+    @Override
+    protected void collectChangeMessages(List<Message> messages) {
+        super.collectChangeMessages(messages);
+        final int selectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
+        // Update the selected hotbar slot
+        if (selectedHotbarSlot != this.previousSelectedHotbarSlot) {
+            this.previousSelectedHotbarSlot = selectedHotbarSlot;
+            messages.add(new MessagePlayInOutHeldItemChange(selectedHotbarSlot));
+        }
+    }
+
+    public void handleHeldItemChange(int hotbarSlotIndex) {
+        // We don't need to send an update if the client switches the held item
+        this.previousSelectedHotbarSlot = hotbarSlotIndex;
+        this.hotbarBehavior.handleSelectedSlotChange(this, hotbarSlotIndex);
+    }
+
+    /**
+     * Binds the {@link HotbarBehavior}.
+     *
+     * @param hotbarBehavior The hotbar behavior
+     */
+    public void bindHotbarBehavior(HotbarBehavior hotbarBehavior) {
+        checkNotNull(hotbarBehavior, "hotbarBehavior");
+        this.hotbarBehavior = hotbarBehavior;
+    }
+
+    /**
+     * Sets the selected hotbar by using the {@link ClientSlot}. The
+     * {@link ClientSlot} must be located in the hotbar.
+     *
+     * @param hotbarSlot The hotbar client slot
+     */
+    public void setSelectedHotbarSlot(ClientSlot hotbarSlot) {
+        checkNotNull(hotbarSlot, "hotbarSlot");
+        final int index = ((BaseClientSlot) hotbarSlot).index;
+        final int hotbarSlotIndex = (index & FLAG_HOTBAR) >> 4;
+        checkArgument(hotbarSlotIndex != 0, "The client slot isn't located in the hotbar.");
+        setSelectedHotbarSlotIndex(hotbarSlotIndex - 1);
+    }
+
+    /**
+     * Gets the currently selected hotbar {@link ClientSlot}.
+     *
+     * @return The hotbar client slot
+     */
+    public ClientSlot getSelectedHotbarSlot() {
+        return this.slots[getHotbarSlotIndex(getSelectedHotbarSlotIndex())];
+    }
+
+    /**
+     * Sets the selected hotbar slot index. To get the hotbar slot index
+     * within a {@link ClientContainer}, use {@link #getHotbarSlotIndex(int)}.
+     * This value varies between 0 and 8.
+     *
+     * @param hotbarSlotIndex The hotbar slot index
+     */
+    public void setSelectedHotbarSlotIndex(int hotbarSlotIndex) {
+        checkArgument(hotbarSlotIndex >= 0 && hotbarSlotIndex <= 8);
+        this.hotbarBehavior.setSelectedSlotIndex(hotbarSlotIndex);
+    }
+
+    /**
+     * Gets the selected hotbar slot index. To get the hotbar slot index
+     * within a {@link ClientContainer}, use {@link #getHotbarSlotIndex(int)}.
+     * This value varies between 0 and 8.
+     *
+     * @return The hotbar slot index
+     */
+    public int getSelectedHotbarSlotIndex() {
+        final int hotbarSlotIndex = this.hotbarBehavior.getSelectedSlotIndex();
+        checkArgument(hotbarSlotIndex >= 0 && hotbarSlotIndex <= 8);
+        return hotbarSlotIndex;
     }
 }

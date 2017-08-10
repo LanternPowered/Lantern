@@ -137,7 +137,6 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInFinishUsingItem;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerBlockPlacement;
@@ -351,7 +350,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInResourcePackStatus());
         inbound.bind(CodecPlayInAdvancementTree.class);
         inbound.bind(CodecPlayInOutHeldItemChange.class, MessagePlayInOutHeldItemChange.class)
-                .bindHandler(new HandlerPlayInHeldItemChange());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleHeldItemChange));
         inbound.bind(CodecPlayInCreativeWindowAction.class, MessagePlayInCreativeWindowAction.class)
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowCreativeClick));
         inbound.bind(CodecPlayInChangeSign.class, MessagePlayInChangeSign.class)

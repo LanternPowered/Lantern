@@ -33,6 +33,7 @@ import org.lanternpowered.server.inventory.client.AnvilClientContainer;
 import org.lanternpowered.server.inventory.client.BeaconClientContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
+import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
@@ -49,6 +50,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -233,6 +236,13 @@ public class PlayerContainerSession {
         return getContainer().getCursorSlot().getRawItemStack();
     }
 
+    public void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
+        final ClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer(this.player).get();
+        if (clientContainer instanceof PlayerClientContainer) {
+            ((PlayerClientContainer) clientContainer).handleHeldItemChange(message.getSlot());
+        }
+    }
+
     public void handleRecipeClick(MessagePlayInClickRecipe message) {
         final int windowId = message.getWindowId();
         if (this.openContainer == null) {
@@ -304,6 +314,11 @@ public class PlayerContainerSession {
         }
         final ClientContainer clientContainer = getClientContainer();
         clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
+    }
+
+    public void handlePickItem(MessagePlayInPickItem message) {
+        final ClientContainer clientContainer = getClientContainer();
+        clientContainer.handlePick(message.getSlot());
     }
 
     public void handleAcceptBeaconEffects(MessagePlayInAcceptBeaconEffects message) {

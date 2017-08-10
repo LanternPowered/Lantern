@@ -469,7 +469,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
             pulseChunkChanges();
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
-            this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
             this.session.send(new MessagePlayOutSelectAdvancementTree(
                     get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
             setScoreboard(world.getScoreboard());

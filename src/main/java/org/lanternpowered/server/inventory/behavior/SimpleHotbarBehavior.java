@@ -23,16 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.inventory.behavior;
 
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
+import static com.google.common.base.Preconditions.checkArgument;
 
-public final class HandlerPlayInHeldItemChange implements Handler<MessagePlayInOutHeldItemChange> {
+import org.lanternpowered.server.inventory.client.ClientContainer;
+
+public class SimpleHotbarBehavior implements HotbarBehavior {
+
+    private int slot;
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInOutHeldItemChange message) {
-        context.getSession().getPlayer().getInventory().getHotbar().setRawSelectedSlotIndex(message.getSlot());
+    public void setSelectedSlotIndex(int hotbarSlot) {
+        checkArgument(hotbarSlot >= 0 && hotbarSlot <= 8);
+        this.slot = hotbarSlot;
+    }
+
+    @Override
+    public int getSelectedSlotIndex() {
+        return this.slot;
+    }
+
+    @Override
+    public void handleSelectedSlotChange(ClientContainer clientContainer, int hotbarSlot) {
+        this.slot = hotbarSlot;
     }
 }

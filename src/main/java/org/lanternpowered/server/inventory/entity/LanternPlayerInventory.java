@@ -271,6 +271,8 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
 
     @Override
     public ClientContainer constructClientContainer() {
-        return new PlayerClientContainer(Text.of(getName()));
+        final PlayerClientContainer clientContainer = new PlayerClientContainer(Text.of(getName()));
+        clientContainer.bindHotbarBehavior(this.hotbar.getHotbarBehavior());
+        return clientContainer;
     }
 }

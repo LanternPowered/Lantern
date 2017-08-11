@@ -36,12 +36,12 @@ import org.lanternpowered.server.plugin.InfoPluginContainer;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.SimplePluginContainer;
+import org.lanternpowered.server.util.PathUtils;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.plugin.meta.PluginMetadata;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -101,11 +101,7 @@ public abstract class AbstractAssetRepository implements AssetRepository {
     }
 
     Asset registerAsset(Object plugin, String id, Path file) {
-        try {
-            return registerAsset(plugin, id, file.toUri().toURL(), file);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return registerAsset(plugin, id, PathUtils.toURL(file), file);
     }
 
     Asset registerAsset(Object plugin, String id, URL url, Path file) {

@@ -41,6 +41,7 @@ import org.lanternpowered.server.asset.MultiAssetRepository;
 import org.lanternpowered.server.asset.PacksAssetRepository;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.LanternPluginManager;
+import org.lanternpowered.server.util.PathUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class AssetRepositoryJsonDeserializer implements JsonDeserializer<AssetRe
         repository.add(classLoaderAssetRepository);
         final LanternClassLoader classLoader = LanternClassLoader.get();
         final Consumer<URL> consumer = url -> {
-            Path path = new File(url.getFile()).toPath();
+            final Path path = PathUtils.toPath(url);
             if (Files.isDirectory(path) && Files.exists(path.resolve("data-packs.info"))) {
                 Lantern.getLogger().debug("Registered a data pack asset repository: " + path);
                 repository.add(new PacksAssetRepository(this.pluginManager, path));

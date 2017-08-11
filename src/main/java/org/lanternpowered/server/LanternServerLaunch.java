@@ -34,6 +34,8 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSpec;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.lanternpowered.launch.Environment;
 import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.launch.transformer.Exclusion;
 import org.lanternpowered.server.inject.LanternModule;
@@ -74,7 +76,7 @@ public final class LanternServerLaunch {
             // Initialize the injector
             final LanternModule module = new LanternModule(logger, args, optionParser);
             final Injector injector = Guice.createInjector(Stage.DEVELOPMENT, module);
-            logger.info("Instantiated the Injector.");
+            logger.info("Instantiated the Injector in {} mode.", Environment.get().name().toLowerCase());
 
             // Create the server instance
             final LanternServer lanternServer = injector.getInstance(LanternServer.class);

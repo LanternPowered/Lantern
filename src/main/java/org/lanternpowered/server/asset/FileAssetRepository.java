@@ -31,6 +31,7 @@ import com.google.common.collect.Multimap;
 import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.LanternPluginManager;
+import org.lanternpowered.server.util.PathUtils;
 
 import java.io.Closeable;
 import java.io.File;
@@ -59,11 +60,7 @@ class FileAssetRepository extends AbstractAssetRepository implements Closeable {
     FileAssetRepository(LanternPluginManager pluginManager, Path file) {
         super(pluginManager);
         this.file = file;
-        try {
-            this.fileUrl = file.toUri().toURL();
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException(e);
-        }
+        this.fileUrl = PathUtils.toURL(file);
     }
 
     public Path getFile() {

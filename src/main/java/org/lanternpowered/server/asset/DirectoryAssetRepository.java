@@ -32,9 +32,9 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.plugin.LanternPluginManager;
+import org.lanternpowered.server.util.PathUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -68,11 +68,7 @@ public class DirectoryAssetRepository extends AbstractAssetRepository {
     @Override
     protected URL getAssetURL(Path path) {
         path = this.directory.resolve(path);
-        try {
-            return Files.exists(path) ? path.toUri().toURL() : null;
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return Files.exists(path) ? PathUtils.toURL(path) : null;
     }
 
     @Override

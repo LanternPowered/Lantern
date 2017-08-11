@@ -76,6 +76,7 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceManager;
+import org.lanternpowered.server.util.PathUtils;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -353,7 +354,7 @@ public class LanternModule extends PrivateModule {
         try {
             URL url;
             if (repoConfig != null) {
-                url = repoConfig.toUri().toURL();
+                url = PathUtils.toURL(repoConfig);
             } else {
                 url = getClass().getClassLoader().getResource("assets_repo.json");
                 checkNotNull(url);

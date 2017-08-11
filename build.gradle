@@ -101,7 +101,7 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-iostreams:2.8.1'
 
     // Console
-    compile 'org.jline:jline-terminal-jna:3.3.1'
+    compile 'org.jline:jline-terminal-jna:3.4.0'
     compile 'net.java.dev.jna:jna:4.4.0'
     compile 'net.minecrell:terminalconsoleappender:1.0.0-SNAPSHOT'
 
@@ -216,6 +216,7 @@ task fastutilJar(type: ShadowJar) {
         filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2ShortOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ByteOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2IntOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectArrayMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectMaps.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectLinkedOpenHashMap.class'

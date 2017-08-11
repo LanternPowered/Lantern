@@ -27,9 +27,9 @@ package org.lanternpowered.server.resourcepack;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Throwables;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
+import org.lanternpowered.server.util.PathUtils;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 
@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,6 +80,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
         String hash = null;
         String id = "{URI:" + path;
         if (!unchecked) {
+            final URL url;
             if (path.startsWith("level://")) {
                 final String path0 = path.replaceFirst("level://", "");
                 final Path file = this.levelPacksFolder.resolve(path0);
@@ -86,9 +88,12 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
                     throw new FileNotFoundException("Cannot find the file: \"" + file.toAbsolutePath() + "\" which" +
                             " is required to generate the hash for \"" + path + "\"");
                 }
+                url = PathUtils.toURL(file);
                 uri = file.toUri();
+            } else {
+                url = PathUtils.toURL(uri);
             }
-            try (InputStream is = uri.toURL().openStream()) {
+            try (InputStream is = url.openStream()) {
                 hash = Hashing.sha1().hashBytes(ByteStreams.toByteArray(is)).toString();
             }
             id += ";Hash:" + hash;

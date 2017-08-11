@@ -110,7 +110,7 @@ public final class LanternClassLoader extends URLClassLoader {
                 throw new RuntimeException("Invalid environment type: " + env);
             }
         } else {
-            environment = location == null || location.getProtocol().equals("file") ?
+            environment = location == null || new File(location.getFile()).isDirectory() ?
                     Environment.DEVELOPMENT : Environment.PRODUCTION;
             System.setProperty(ENVIRONMENT, environment.toString().toLowerCase());
         }

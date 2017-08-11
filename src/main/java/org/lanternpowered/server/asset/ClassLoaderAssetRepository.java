@@ -54,9 +54,9 @@ public class ClassLoaderAssetRepository extends AbstractMultiAssetRepository {
     public void addRepository(Path path) {
         final AssetRepository assetRepository;
         if (Files.isDirectory(path)) {
-            assetRepository = new ClassLoaderDirectoryAssetRepository(pluginManager, path);
+            assetRepository = new ClassLoaderDirectoryAssetRepository(this.pluginManager, path);
         } else {
-            assetRepository = new ClassLoaderFileAssetRepository(pluginManager, path);
+            assetRepository = new ClassLoaderFileAssetRepository(this.pluginManager, path);
         }
         this.repositories.add(assetRepository);
     }

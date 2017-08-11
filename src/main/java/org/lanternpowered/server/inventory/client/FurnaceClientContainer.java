@@ -52,9 +52,9 @@ public class FurnaceClientContainer extends ClientContainer {
     public <T> void bindPropertySupplier(ContainerProperty<T> propertyType, Supplier<T> supplier) {
         super.bindPropertySupplier(propertyType, supplier);
         if (propertyType == ContainerProperties.SMELT_PROGRESS) {
-            bindInternalProperty(2, () -> (int) (((Double) supplier.get()) * (double) MAX_PROGRESS_VALUE));
+            bindInternalProperty(2, () -> MAX_PROGRESS_VALUE - (int) (((Double) supplier.get()) * (double) MAX_PROGRESS_VALUE));
         } else if (propertyType == ContainerProperties.FUEL_PROGRESS) {
-            bindInternalProperty(0, () -> MAX_PROGRESS_VALUE - (int) (((Double) supplier.get()) * (double) MAX_PROGRESS_VALUE));
+            bindInternalProperty(0, () -> (int) (((Double) supplier.get()) * (double) MAX_PROGRESS_VALUE));
         }
     }
 

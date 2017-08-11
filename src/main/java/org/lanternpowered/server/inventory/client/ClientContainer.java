@@ -79,7 +79,7 @@ public abstract class ClientContainer implements ContainerBase {
     /**
      * The slot index that should be used to bind the cursor slot.
      */
-    public static final int CURSOR_SLOT_INDEX = 99999;
+    private static final int CURSOR_SLOT_INDEX = 99999;
 
     protected static final int[] MAIN_INVENTORY_FLAGS = new int[36];
 
@@ -531,12 +531,17 @@ public abstract class ClientContainer implements ContainerBase {
 
     private void unbind(int index) {
         populate();
-        if (this.slots[index] instanceof ClientSlot.Empty) {
+        if (this.slots[index] instanceof ClientSlot.Empty ||
+                (index == CURSOR_SLOT_INDEX && this.cursor instanceof ClientSlot.Empty)) {
             return;
         }
         removeSlot(index);
         final EmptyClientSlot clientSlot = new EmptyClientSlot(index);
-        this.slots[index] = clientSlot;
+        if (index == CURSOR_SLOT_INDEX) {
+            this.cursor = clientSlot;
+        } else {
+            this.slots[index] = clientSlot;
+        }
         queueSilentSlotChangeSafely(clientSlot);
     }
 
@@ -766,6 +771,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
         // Update the cursor item if needed
         if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
+            System.out.println("DEBUG: " + this.cursor.getClass().getName());
             messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
             this.cursor.dirtyState = 0;
         }
@@ -780,7 +786,7 @@ public abstract class ClientContainer implements ContainerBase {
                 final int newValue = entry.intSupplier.getAsInt();
                 if (newValue != entry.previousValue) {
                     entry.previousValue = newValue;
-                    messages.add(new MessagePlayOutWindowProperty(getContainerId(), i, newValue));
+                    messages.add(new MessagePlayOutWindowProperty(this.containerId, i, newValue));
                 }
             }
         }

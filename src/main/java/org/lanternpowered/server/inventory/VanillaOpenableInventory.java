@@ -45,7 +45,7 @@ public interface VanillaOpenableInventory extends OpenableInventory, OrderedInve
         final LanternPlayerInventory playerInventory = container.getPlayerInventory();
         // Bind the cursor item slot
         clientContainer.bindCursor(container.getCursorSlot());
-        ContainerPart part = clientContainer.getTop();
+        final ContainerPart part = clientContainer.getTop();
         // Register the top inventory slots
         ((LanternOrderedInventory) this).getIndexBySlots().object2IntEntrySet().forEach(entry -> {
             if (!playerInventory.getMain().isChild(entry.getKey())) {

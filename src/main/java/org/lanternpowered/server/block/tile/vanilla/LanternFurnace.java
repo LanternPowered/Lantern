@@ -40,10 +40,9 @@ import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.VanillaOpenableInventory;
 import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.client.ContainerProperties;
 import org.lanternpowered.server.inventory.client.FurnaceClientContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
-import org.lanternpowered.server.inventory.property.SmeltingProgress;
-import org.lanternpowered.server.inventory.property.SmeltingProgressProperty;
 import org.lanternpowered.server.inventory.slot.LanternFuelSlot;
 import org.lanternpowered.server.inventory.slot.LanternInputSlot;
 import org.lanternpowered.server.inventory.slot.LanternOutputSlot;
@@ -59,7 +58,6 @@ import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
@@ -84,7 +82,8 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         private final LanternFuelSlot fuelSlot;
         private final LanternOutputSlot outputSlot;
 
-        @Nullable private SmeltingProgressProperty cachedProperty;
+        private double smeltProgress;
+        private double fuelProgress;
 
         FurnaceInventory(@Nullable Inventory parent, @Nullable Translation name) {
             super(parent, name);
@@ -94,23 +93,6 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             registerSlot(this.outputSlot = new LanternOutputSlot(this));
 
             finalizeContent();
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> propertyType, @Nullable Object key) {
-            if (propertyType == SmeltingProgressProperty.class) {
-                SmeltingProgressProperty property = this.cachedProperty;
-                if (property == null) {
-                    property = this.cachedProperty = new SmeltingProgressProperty(new SmeltingProgress(
-                            get(Keys.MAX_BURN_TIME).get(),
-                            get(Keys.PASSED_BURN_TIME).get(),
-                            get(Keys.MAX_COOK_TIME).get(),
-                            get(Keys.PASSED_COOK_TIME).get()));
-                }
-                return Optional.of((T) property);
-            }
-            return super.tryGetProperty(propertyType, key);
         }
 
         @Override
@@ -156,7 +138,21 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         public ClientContainer constructClientContainer0(LanternContainer container) {
             final FurnaceClientContainer clientContainer = new FurnaceClientContainer(TextTranslation.toText(getName()));
             // Provide the smelting progress
-            clientContainer.bindProperty(SmeltingProgressProperty.class, this);
+            clientContainer.bindPropertySupplier(ContainerProperties.SMELT_PROGRESS, () -> {
+                double smeltProgress = this.smeltProgress;
+                if (smeltProgress < 0) {
+                    smeltProgress = this.smeltProgress = get(Keys.PASSED_COOK_TIME).get().doubleValue() / get(Keys.MAX_COOK_TIME).get().doubleValue();
+                }
+                return smeltProgress;
+            });
+            // Provide the fuel progress
+            clientContainer.bindPropertySupplier(ContainerProperties.FUEL_PROGRESS, () -> {
+                double fuelProgress = this.fuelProgress;
+                if (fuelProgress < 0) {
+                    fuelProgress = this.fuelProgress = get(Keys.PASSED_BURN_TIME).get().doubleValue() / get(Keys.MAX_BURN_TIME).get().doubleValue();
+                }
+                return fuelProgress;
+            });
             return clientContainer;
         }
     }
@@ -172,7 +168,10 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         super.registerKeys();
 
         final ValueCollection c = getValueCollection();
-        final ElementListener<Integer> clearProperty = (oldElement, newElement) -> this.inventory.cachedProperty = null;
+        final ElementListener<Integer> clearProperty = (oldElement, newElement) -> {
+            this.inventory.smeltProgress = -1;
+            this.inventory.fuelProgress = -1;
+        };
         c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
         c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME).addListener(clearProperty);
         c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);

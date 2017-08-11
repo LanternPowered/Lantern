@@ -34,6 +34,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 
+@SuppressWarnings("ConstantConditions")
 public final class HandlerPlayInSwapHandItems implements Handler<MessagePlayInSwapHandItems> {
 
     @Override
@@ -48,13 +49,11 @@ public final class HandlerPlayInSwapHandItems implements Handler<MessagePlayInSw
 
         if (hotbarItem != null || offHandItem != null) {
             hotbarSlot.set(offHandItem);
-            //noinspection ConstantConditions
             offHandSlot.set(hotbarItem);
 
-            //noinspection ConstantConditions
             if (hotbarItem != null) {
                 final PlayerInventoryContainer inventoryContainer = context.getSession().getPlayer().getInventoryContainer();
-                inventoryContainer.queueSilentSlotChange(hotbarSlot);
+                inventoryContainer.getClientContainer().queueSilentSlotChange(hotbarSlot);
             }
         }
     }

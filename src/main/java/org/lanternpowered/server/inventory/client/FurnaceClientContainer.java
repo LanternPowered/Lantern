@@ -25,21 +25,13 @@
  */
 package org.lanternpowered.server.inventory.client;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.lanternpowered.server.inventory.property.SmeltingProgress;
-import org.lanternpowered.server.inventory.property.SmeltingProgressProperty;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
 public class FurnaceClientContainer extends ClientContainer {
@@ -50,45 +42,27 @@ public class FurnaceClientContainer extends ClientContainer {
             FLAG_DISABLE_SHIFT_INSERTION, // Output slot
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
-
-    private Supplier<SmeltingProgressProperty> smeltingProgressPropertySupplier = () -> null;
-    @Nullable private SmeltingProgress lastProgress;
+    private static final int MAX_PROGRESS_VALUE = 1000;
 
     public FurnaceClientContainer(Text title) {
         super(title);
     }
 
     @Override
-    public <T extends InventoryProperty<?,?>> void bindProperty(Class<T> propertyType, Supplier<T> supplier) {
-        super.bindProperty(propertyType, supplier);
-        if (propertyType == SmeltingProgressProperty.class) {
-            this.smeltingProgressPropertySupplier = (Supplier<SmeltingProgressProperty>) supplier;
+    public <T> void bindPropertySupplier(ContainerProperty<T> propertyType, Supplier<T> supplier) {
+        super.bindPropertySupplier(propertyType, supplier);
+        if (propertyType == ContainerProperties.SMELT_PROGRESS) {
+            bindInternalProperty(2, () -> (int) (((Double) supplier.get()) * (double) MAX_PROGRESS_VALUE));
+        } else if (propertyType == ContainerProperties.FUEL_PROGRESS) {
+            bindInternalProperty(0, () -> MAX_PROGRESS_VALUE - (int) (((Double) supplier.get()) * (double) MAX_PROGRESS_VALUE));
         }
     }
 
     @Override
-    protected void collectPropertyChanges(List<Message> messages) {
-        final SmeltingProgressProperty property = this.smeltingProgressPropertySupplier.get();
+    protected void collectInitMessages(List<Message> messages) {
         final int containerId = getContainerId();
-        if (!Objects.equals(property == null ? null : property.getValue(), this.lastProgress)) {
-            if (property != null) {
-                this.lastProgress = checkNotNull(property.getValue());
-                messages.add(new MessagePlayOutWindowProperty(containerId, 0,
-                        this.lastProgress.getMaxBurnTime() - this.lastProgress.getElapsedBurnTime()));
-                messages.add(new MessagePlayOutWindowProperty(containerId, 1,
-                        this.lastProgress.getMaxBurnTime()));
-                messages.add(new MessagePlayOutWindowProperty(containerId, 2,
-                        this.lastProgress.getElapsedSmeltTime()));
-                messages.add(new MessagePlayOutWindowProperty(containerId, 3,
-                        this.lastProgress.getMaxSmeltTime()));
-            } else {
-                this.lastProgress = null;
-                messages.add(new MessagePlayOutWindowProperty(containerId, 0, 0));
-                messages.add(new MessagePlayOutWindowProperty(containerId, 1, 1));
-                messages.add(new MessagePlayOutWindowProperty(containerId, 2, 0));
-                messages.add(new MessagePlayOutWindowProperty(containerId, 3, 1));
-            }
-        }
+        messages.add(new MessagePlayOutWindowProperty(containerId, 1, MAX_PROGRESS_VALUE));
+        messages.add(new MessagePlayOutWindowProperty(containerId, 3, MAX_PROGRESS_VALUE));
     }
 
     @Override

@@ -47,10 +47,10 @@ import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -60,6 +60,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -364,7 +365,18 @@ public abstract class ClientContainer implements ContainerBase {
 
     // Drag mode data
     private final IntSet dragSlots = new IntArraySet();
+    private final List<PropertyEntry> propertySuppliers = new ArrayList<>();
     private int dragMode = -1;
+
+    private static final class PropertyEntry {
+
+        private final IntSupplier intSupplier;
+        private int previousValue = Integer.MAX_VALUE; // Force a update
+
+        private PropertyEntry(IntSupplier intSupplier) {
+            this.intSupplier = intSupplier;
+        }
+    }
 
     public ClientContainer(Text title) {
         // Generate a new container id
@@ -567,14 +579,13 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Binds a {@link InventoryProperty} type to
-     * the given {@link Supplier}.
+     * Binds a {@link ContainerProperty} type to the given {@link Supplier}.
      *
      * @param propertyType The property type
      * @param supplier The supplier
      * @param <T> The property type
      */
-    public <T extends InventoryProperty<?,?>> void bindProperty(Class<T> propertyType, Supplier<T> supplier) {
+    public <T> void bindPropertySupplier(ContainerProperty<T> propertyType, Supplier<T> supplier) {
         checkNotNull(propertyType, "propertyType");
         checkNotNull(supplier, "supplier");
     }
@@ -586,20 +597,19 @@ public abstract class ClientContainer implements ContainerBase {
      * @param property The property
      * @param <T> The property type
      */
-    public <T extends InventoryProperty<?,?>> void bindProperty(T property) {
-        bindProperty((Class<T>) property.getClass(), () -> property);
+    public <T> void bindProperty(ContainerProperty<T> propertyType, T property) {
+        bindPropertySupplier(propertyType, () -> property);
     }
 
-    /**
-     * Binds a {@link InventoryProperty} type which will
-     * be retrieved from the target {@link Inventory}.
-     *
-     * @param propertyType The property type
-     * @param inventory The inventory
-     * @param <T> The property type
-     */
-    public <T extends InventoryProperty<?,?>> void bindProperty(Class<T> propertyType, Inventory inventory) {
-        bindProperty(propertyType, () -> inventory.getInventoryProperty(propertyType).orElse(null));
+    protected void bindInternalProperty(int propertyIndex, IntSupplier property) {
+        checkState(propertyIndex >= 0, "propertyIndex");
+        checkNotNull(property, "property");
+        // Fill the property suppliers until the provided index is available
+        while (this.propertySuppliers.size() <= propertyIndex) {
+            this.propertySuppliers.add(null);
+        }
+        // Register the property
+        this.propertySuppliers.set(propertyIndex, new PropertyEntry(property));
     }
 
     @Override
@@ -764,6 +774,16 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     protected void collectPropertyChanges(List<Message> messages) {
+        for (int i = 0; i < this.propertySuppliers.size(); i++) {
+            final PropertyEntry entry = this.propertySuppliers.get(i);
+            if (entry != null) {
+                final int newValue = entry.intSupplier.getAsInt();
+                if (newValue != entry.previousValue) {
+                    entry.previousValue = newValue;
+                    messages.add(new MessagePlayOutWindowProperty(getContainerId(), i, newValue));
+                }
+            }
+        }
     }
 
     /**

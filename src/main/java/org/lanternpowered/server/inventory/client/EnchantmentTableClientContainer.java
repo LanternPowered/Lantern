@@ -26,10 +26,16 @@
 package org.lanternpowered.server.inventory.client;
 
 import org.lanternpowered.server.inventory.behavior.event.EnchantButtonEvent;
+import org.lanternpowered.server.item.enchantment.LanternEnchantment;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.text.Text;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
+@SuppressWarnings("unchecked")
 public class EnchantmentTableClientContainer extends ClientContainer {
 
     private static final int[] TOP_SLOT_FLAGS = new int[] {
@@ -40,6 +46,44 @@ public class EnchantmentTableClientContainer extends ClientContainer {
 
     public EnchantmentTableClientContainer(Text title) {
         super(title);
+    }
+
+    @Override
+    public <T> void bindPropertySupplier(ContainerProperty<T> propertyType, Supplier<T> supplier) {
+        super.bindPropertySupplier(propertyType, supplier);
+        // First try to bind integer properties
+        int index = -1;
+        if (propertyType == ContainerProperties.REQUIRED_EXPERIENCE_LEVEL_1) {
+            index = 0;
+        } else if (propertyType == ContainerProperties.REQUIRED_EXPERIENCE_LEVEL_2) {
+            index = 1;
+        } else if (propertyType == ContainerProperties.REQUIRED_EXPERIENCE_LEVEL_3) {
+            index = 2;
+        } else if (propertyType == ContainerProperties.ENCHANTMENT_SEED) {
+            index = 3;
+        } else if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_LEVEL_1) {
+            index = 7;
+        } else if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_LEVEL_2) {
+            index = 8;
+        } else if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_LEVEL_3) {
+            index = 9;
+        }
+        if (index != -1) {
+            bindInternalProperty(index, ((Supplier<Integer>) supplier)::get);
+        } else {
+            // Enchantment type properties
+            if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_1) {
+                index = 4;
+            } else if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_2) {
+                index = 5;
+            } else if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_3) {
+                index = 6;
+            }
+            if (index != -1) {
+                bindInternalProperty(index, () -> ((Supplier<Optional<Enchantment>>) supplier).get()
+                        .map(enchantment -> ((LanternEnchantment) enchantment).getInternalId()).orElse(-1));
+            }
+        }
     }
 
     @Override

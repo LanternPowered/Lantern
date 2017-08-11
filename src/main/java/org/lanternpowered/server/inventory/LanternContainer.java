@@ -39,8 +39,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -156,26 +154,6 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
         if (session.getOpenContainer() == this) {
             session.setOpenContainer(null, cause);
         }
-    }
-
-    /**
-     * Queues a {@link ItemStack} change of a {@link Slot}.
-     *
-     * @param slot The slot
-     */
-    public void queueSlotChange(Slot slot) {
-        this.viewers.values().forEach(container -> container.queueSlotChange((LanternSlot) slot));
-    }
-
-    /**
-     * Queues a {@link ItemStack} change of a {@link Slot}. This
-     * is done "silently" and this means that there won't be any
-     * animation played (in the hotbar).
-     *
-     * @param slot The slot
-     */
-    public void queueSilentSlotChange(Slot slot) {
-        this.viewers.values().forEach(container -> container.queueSilentSlotChange((LanternSlot) slot));
     }
 
     /**

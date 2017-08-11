@@ -78,7 +78,7 @@ public abstract class ClientContainer implements ContainerBase {
     /**
      * The slot index that should be used to bind the cursor slot.
      */
-    public static final int CURSOR_SLOT_INDEX = -1;
+    public static final int CURSOR_SLOT_INDEX = 99999;
 
     protected static final int[] MAIN_INVENTORY_FLAGS = new int[36];
 
@@ -155,11 +155,6 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         protected abstract ItemStack getRaw();
-
-        @Override
-        public int getIndex() {
-            return this.index;
-        }
     }
 
     private final class EmptyClientSlot extends BaseClientSlot implements ClientSlot.Empty {
@@ -256,7 +251,7 @@ public abstract class ClientContainer implements ContainerBase {
 
         protected final ClientContainer clientContainer;
 
-        protected AbstractContainerPart(ClientContainer clientContainer) {
+        AbstractContainerPart(ClientContainer clientContainer) {
             this.clientContainer = clientContainer;
         }
 
@@ -277,7 +272,7 @@ public abstract class ClientContainer implements ContainerBase {
 
         @Override
         public void queueSlotChange(int index) {
-            this.clientContainer.queueSlotChange(index);
+            this.clientContainer.queueSlotChange(localToGlobalIndex(index));
         }
 
         @Override
@@ -292,22 +287,22 @@ public abstract class ClientContainer implements ContainerBase {
 
         @Override
         public void queueSilentSlotChange(int index) {
-            this.clientContainer.queueSilentSlotChange(index);
+            this.clientContainer.queueSilentSlotChange(localToGlobalIndex(index));
         }
 
         @Override
         public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
-            return this.clientContainer.bindSlot(index, slot);
+            return this.clientContainer.bindSlot(localToGlobalIndex(index), slot);
         }
 
         @Override
         public ClientSlot.Button bindButton(int index) {
-            return this.clientContainer.bindButton(index);
+            return this.clientContainer.bindButton(localToGlobalIndex(index));
         }
 
         @Override
         public Optional<LanternSlot> getSlot(int index) {
-            return this.clientContainer.getSlot(index);
+            return this.clientContainer.getSlot(localToGlobalIndex(index));
         }
 
         @Override
@@ -331,7 +326,14 @@ public abstract class ClientContainer implements ContainerBase {
         @Override
         protected int localToGlobalIndex(int index) {
             checkState(index >= 0 && index < getTopSlotsCount());
-            return 0;
+            return index;
+        }
+
+        @Override
+        public int getSlotIndex(ClientSlot clientSlot) {
+            final int index = ((BaseClientSlot) clientSlot).index;
+            final int size = getTopSlotsCount();
+            return index >= 0 && index < size ? index : -1;
         }
     }
     private final class BottomContainerPartImpl extends AbstractContainerPart implements BottomContainerPart {
@@ -343,7 +345,15 @@ public abstract class ClientContainer implements ContainerBase {
         @Override
         protected int localToGlobalIndex(int index) {
             checkState(index >= 0 && index < MAIN_INVENTORY_FLAGS.length);
-            return index - MAIN_INVENTORY_FLAGS.length;
+            return index + getTopSlotsCount();
+        }
+
+        @Override
+        public int getSlotIndex(ClientSlot clientSlot) {
+            int index = ((BaseClientSlot) clientSlot).index;
+            final int size = getTopSlotsCount();
+            index -= size;
+            return index >= 0 && index < MAIN_INVENTORY_FLAGS.length ? index : -1;
         }
     }
 
@@ -360,6 +370,10 @@ public abstract class ClientContainer implements ContainerBase {
         // Generate a new container id
         this.containerId = generateContainerId();
         this.title = title;
+    }
+
+    public Optional<ContainerInteractionBehavior> getInteractionBehavior() {
+        return Optional.ofNullable(this.interactionBehavior);
     }
 
     /**
@@ -518,7 +532,7 @@ public abstract class ClientContainer implements ContainerBase {
         populate();
         final SlotClientSlot clientSlot = new SlotClientSlot(index, slot);
         removeSlot(index);
-        if (index == -1) {
+        if (index == CURSOR_SLOT_INDEX) {
             this.cursor = clientSlot;
         } else {
             this.slots[index] = clientSlot;
@@ -541,7 +555,7 @@ public abstract class ClientContainer implements ContainerBase {
 
     private void removeSlot(int index) {
         // Cleanup the old client slot
-        final BaseClientSlot oldClientSlot = index == -1 ? this.cursor : this.slots[index];
+        final BaseClientSlot oldClientSlot = index == CURSOR_SLOT_INDEX ? this.cursor : this.slots[index];
         if (oldClientSlot instanceof SlotClientSlot) {
             final LanternSlot slot = ((SlotClientSlot) oldClientSlot).slot;
             // Remove the tracker from this slot
@@ -782,16 +796,16 @@ public abstract class ClientContainer implements ContainerBase {
     @Override
     public Optional<ClientSlot> getClientSlot(int index) {
         populate();
-        return index == -1 ? Optional.of(this.cursor) : index < 0 || index >= this.slots.length ? Optional.empty() : Optional.of(this.slots[index]);
+        return index == CURSOR_SLOT_INDEX ? Optional.of(this.cursor) : index < 0 || index >= this.slots.length ? Optional.empty() : Optional.of(this.slots[index]);
     }
 
     @Override
     public Optional<LanternSlot> getSlot(int index) {
         populate();
-        if (index < -1 || index >= this.slots.length) {
+        if (index != CURSOR_SLOT_INDEX && (index < 0 || index >= this.slots.length)) {
             return Optional.empty();
         }
-        final BaseClientSlot clientSlot = index == -1 ? this.cursor : this.slots[index];
+        final BaseClientSlot clientSlot = index == CURSOR_SLOT_INDEX ? this.cursor : this.slots[index];
         return clientSlot instanceof SlotClientSlot ? Optional.of(((SlotClientSlot) clientSlot).slot) : Optional.empty();
     }
 

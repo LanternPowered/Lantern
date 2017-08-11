@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.client.BottomContainerPart;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
 import org.lanternpowered.server.inventory.client.TopContainerPart;
@@ -229,6 +228,10 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
         if (!clientContainer.getBottom().isPresent()) {
             final LanternPlayer player = (LanternPlayer) getPlayerInventory().getCarrier().get();
             clientContainer.bindBottom(player.getInventoryContainer().getClientContainer().getBottom().get());
+        }
+        if (!clientContainer.getInteractionBehavior().isPresent()) {
+            final LanternPlayer player = (LanternPlayer) getPlayerInventory().getCarrier().get();
+            clientContainer.bindInteractionBehavior(player.getInventoryContainer().getClientContainer().getInteractionBehavior().get());
         }
         this.viewers.put(viewer, clientContainer);
         clientContainer.bind(viewer);

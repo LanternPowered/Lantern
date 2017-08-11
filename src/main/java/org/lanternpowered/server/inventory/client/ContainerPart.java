@@ -62,4 +62,14 @@ public interface ContainerPart extends ContainerBase {
      * @return The bound client slot
      */
     ClientSlot.Button bindButton(int index);
+
+    /**
+     * Gets the index for the {@link ClientSlot} within
+     * this {@link ContainerPart}. The returned index will be
+     * {@code -1} if the slot isn't located in this part.
+     *
+     * @param clientSlot The client slot
+     * @return The slot index within this container part
+     */
+    int getSlotIndex(ClientSlot clientSlot);
 }

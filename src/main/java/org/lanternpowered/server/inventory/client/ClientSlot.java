@@ -34,14 +34,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 public interface ClientSlot {
 
     /**
-     * Gets the index of the slot within
-     * the {@link ClientContainer}.
-     *
-     * @return The index
-     */
-    int getIndex();
-
-    /**
      * Gets the {@link ItemStack} that is visible in
      * this {@link ClientSlot}.
      *

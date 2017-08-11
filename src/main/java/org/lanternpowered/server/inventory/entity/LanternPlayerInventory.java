@@ -38,6 +38,7 @@ import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.BottomContainerPart;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
@@ -137,6 +138,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 prioritizeChild(this.hotbar);
             }
         });
+        finalizeContent();
 
         // Generate inventory views
         this.inventoryViews.put(HumanInventoryView.MAIN,
@@ -270,11 +272,16 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     }
 
     @Override
-    public PlayerClientContainer constructClientContainer() {
+    public PlayerClientContainer constructClientContainer0(LanternContainer container) {
         final PlayerClientContainer clientContainer = new PlayerClientContainer(Text.of(getName()));
         clientContainer.bindHotbarBehavior(this.hotbar.getHotbarBehavior());
+        clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(container));
         final BottomContainerPart part = clientContainer.bindBottom();
-        getIndexBySlots().object2IntEntrySet().forEach(entry -> part.bindSlot(entry.getIntValue(), entry.getKey()));
+        getMain().getIndexBySlots().object2IntEntrySet().forEach(entry -> {
+            if (getMain().isChild(entry.getKey())) {
+                part.bindSlot(entry.getIntValue(), entry.getKey());
+            }
+        });
         return clientContainer;
     }
 }

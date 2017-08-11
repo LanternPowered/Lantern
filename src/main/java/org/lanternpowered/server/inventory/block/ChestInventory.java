@@ -68,7 +68,7 @@ public class ChestInventory extends LanternGridInventory implements VanillaOpena
     }
 
     @Override
-    public ClientContainer constructClientContainer() {
+    public ClientContainer constructClientContainer0(LanternContainer container) {
         return new ChestClientContainer(TextTranslation.toText(getName()), getRows());
     }
 }

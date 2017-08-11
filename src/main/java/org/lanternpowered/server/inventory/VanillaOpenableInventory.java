@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ContainerPart;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
@@ -38,15 +37,14 @@ public interface VanillaOpenableInventory extends OpenableInventory, OrderedInve
      *
      * @return The constructed client container
      */
-    ClientContainer constructClientContainer();
+    ClientContainer constructClientContainer0(LanternContainer container);
 
     @Override
     default ClientContainer constructClientContainer(LanternContainer container) {
-        final ClientContainer clientContainer = constructClientContainer();
+        final ClientContainer clientContainer = constructClientContainer0(container);
         final LanternPlayerInventory playerInventory = container.getPlayerInventory();
         // Bind the cursor item slot
         clientContainer.bindCursor(container.getCursorSlot());
-        clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(container));
         ContainerPart part = clientContainer.getTop();
         // Register the top inventory slots
         ((LanternOrderedInventory) this).getIndexBySlots().object2IntEntrySet().forEach(entry -> {

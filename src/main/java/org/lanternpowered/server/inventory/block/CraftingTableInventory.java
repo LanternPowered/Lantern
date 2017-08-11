@@ -113,7 +113,7 @@ public class CraftingTableInventory extends LanternCraftingInventory implements 
     }
 
     @Override
-    public ClientContainer constructClientContainer() {
+    public ClientContainer constructClientContainer0(LanternContainer container) {
         return new CraftingTableClientContainer(TextTranslation.toText(getName()));
     }
 }

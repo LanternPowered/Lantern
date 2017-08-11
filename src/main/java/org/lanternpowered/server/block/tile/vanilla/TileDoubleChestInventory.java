@@ -27,6 +27,7 @@ package org.lanternpowered.server.block.tile.vanilla;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.VanillaOpenableInventory;
 import org.lanternpowered.server.inventory.block.ChestInventory;
@@ -50,7 +51,7 @@ public class TileDoubleChestInventory extends LanternOrderedInventory implements
     }
 
     @Override
-    public ClientContainer constructClientContainer() {
+    public ClientContainer constructClientContainer0(LanternContainer container) {
         return new ChestClientContainer(TextTranslation.toText(getName()), 6);
     }
 }

@@ -25,14 +25,19 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.inventory.behavior.event.BeaconEffectsEvent;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.text.Text;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class BeaconClientContainer extends ClientContainer {
 
     private static final int[] TOP_SLOT_FLAGS = new int[] {
@@ -63,6 +68,22 @@ public class BeaconClientContainer extends ClientContainer {
     @Override
     protected boolean disableShiftClickWhenFull() {
         return false;
+    }
+
+    @Override
+    public <T> void bindPropertySupplier(ContainerProperty<T> propertyType, Supplier<T> supplier) {
+        super.bindPropertySupplier(propertyType, supplier);
+        int index = -1;
+        if (propertyType == ContainerProperties.PRIMARY_POTION_EFFECT) {
+            index = 0;
+        } else if (propertyType == ContainerProperties.SECONDARY_POTION_EFFECT) {
+            index = 1;
+        }
+        if (index != -1) {
+            final Supplier<Optional<PotionEffectType>> supplier1 = (Supplier<Optional<PotionEffectType>>) supplier;
+            bindInternalProperty(index, () -> supplier1.get()
+                    .map(type -> ((LanternPotionEffectType) type).getInternalId()).orElse(-1));
+        }
     }
 
     public void handleEffects(@Nullable PotionEffectType primaryEffect, @Nullable PotionEffectType secondaryEffect) {

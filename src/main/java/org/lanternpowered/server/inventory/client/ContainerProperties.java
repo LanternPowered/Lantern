@@ -64,8 +64,6 @@ public final class ContainerProperties {
     public static final ContainerProperty<Optional<PotionEffectType>> SECONDARY_POTION_EFFECT =
             new ContainerProperty<>(new TypeToken<Optional<PotionEffectType>>() {});
 
-    public static final ContainerProperty<Integer> LEVELS = new ContainerProperty<>(TypeToken.of(Integer.class));
-
     public static final ContainerProperty<Integer> REPAIR_COST = new ContainerProperty<>(TypeToken.of(Integer.class));
 
     public static final ContainerProperty<Integer> REQUIRED_EXPERIENCE_LEVEL_1 = new ContainerProperty<>(TypeToken.of(Integer.class));

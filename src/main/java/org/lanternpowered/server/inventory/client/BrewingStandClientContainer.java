@@ -31,6 +31,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("unchecked")
 public class BrewingStandClientContainer extends ClientContainer {
 
     private static final int[] TOP_SLOT_FLAGS = new int[] {
@@ -50,9 +51,11 @@ public class BrewingStandClientContainer extends ClientContainer {
     public <T> void bindPropertySupplier(ContainerProperty<T> propertyType, Supplier<T> supplier) {
         super.bindPropertySupplier(propertyType, supplier);
         if (propertyType == ContainerProperties.BREW_PROGRESS) {
-            bindInternalProperty(0, () -> 400 - (int) (((Double) supplier.get()) * 400.0));
+            final Supplier<Double> supplier1 = (Supplier<Double>) supplier;
+            bindInternalProperty(0, () -> 400 - (int) (supplier1.get() * 400.0));
         } else if (propertyType == ContainerProperties.FUEL_PROGRESS) {
-            bindInternalProperty(1, () -> (int) (((Double) supplier.get()) * 20.0));
+            final Supplier<Double> supplier1 = (Supplier<Double>) supplier;
+            bindInternalProperty(1, () -> (int) (supplier1.get() * 20.0));
         }
     }
 

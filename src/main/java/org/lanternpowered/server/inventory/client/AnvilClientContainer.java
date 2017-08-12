@@ -31,7 +31,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
+import java.util.function.Supplier;
 
+@SuppressWarnings("unchecked")
 public class AnvilClientContainer extends ClientContainer {
 
     private static final int[] TOP_SLOT_FLAGS = new int[] {
@@ -69,6 +71,15 @@ public class AnvilClientContainer extends ClientContainer {
             queueSilentSlotChangeSafely(this.slots[2]);
         }
         super.collectChangeMessages(messages);
+    }
+
+    @Override
+    public <T> void bindPropertySupplier(ContainerProperty<T> propertyType, Supplier<T> supplier) {
+        super.bindPropertySupplier(propertyType, supplier);
+        if (propertyType == ContainerProperties.REPAIR_COST) {
+            final Supplier<Integer> supplier1 = (Supplier<Integer>) supplier;
+            bindInternalProperty(0, supplier1::get);
+        }
     }
 
     public void handleRename(String name) {

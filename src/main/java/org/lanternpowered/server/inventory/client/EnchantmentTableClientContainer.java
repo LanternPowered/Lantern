@@ -69,7 +69,8 @@ public class EnchantmentTableClientContainer extends ClientContainer {
             index = 9;
         }
         if (index != -1) {
-            bindInternalProperty(index, ((Supplier<Integer>) supplier)::get);
+            final Supplier<Integer> supplier1 = (Supplier<Integer>) supplier;
+            bindInternalProperty(index, supplier1::get);
         } else {
             // Enchantment type properties
             if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_1) {
@@ -79,8 +80,9 @@ public class EnchantmentTableClientContainer extends ClientContainer {
             } else if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_3) {
                 index = 6;
             }
+            final Supplier<Optional<Enchantment>> supplier1 = (Supplier<Optional<Enchantment>>) supplier;
             if (index != -1) {
-                bindInternalProperty(index, () -> ((Supplier<Optional<Enchantment>>) supplier).get()
+                bindInternalProperty(index, () -> supplier1.get()
                         .map(enchantment -> ((LanternEnchantment) enchantment).getInternalId()).orElse(-1));
             }
         }

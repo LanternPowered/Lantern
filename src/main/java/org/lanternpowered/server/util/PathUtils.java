@@ -28,6 +28,7 @@ package org.lanternpowered.server.util;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -37,26 +38,51 @@ import java.nio.file.Path;
 // Use this class to avoid deprecated methods across the codebase.
 public final class PathUtils {
 
-    public static URL toURL(URL url) {
+    /**
+     * Fixes the {@link URL} by replacing all the
+     * {@code %20} codes back with spaces.
+     *
+     * @param url The url
+     * @return The fixed url
+     */
+    public static URL fixURL(URL url) {
         try {
-            return new URL(url.toString().replace("%20", " "));
-        } catch (MalformedURLException e) {
+            return toURL(new File(url.toURI()));
+        } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
+    /**
+     * Converts the {@link URI} into a {@link URL}.
+     *
+     * @param uri The uri
+     * @return The url
+     */
     public static URL toURL(URI uri) {
         try {
-            return toURL(uri.toURL());
+            return new File(uri).toURL();
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
+    /**
+     * Converts the {@link Path} into a {@link URL}.
+     *
+     * @param path The path
+     * @return The url
+     */
     public static URL toURL(Path path) {
         return toURL(path.toFile());
     }
 
+    /**
+     * Converts the {@link Path} into a {@link URL}.
+     *
+     * @param file The file
+     * @return The url
+     */
     public static URL toURL(File file) {
         try {
             return file.toURL();
@@ -65,20 +91,39 @@ public final class PathUtils {
         }
     }
 
-    public static Path toPath(URL url) {
-        return new File(toURL(url).getFile()).toPath();
-    }
-
-    public static Path toPath(URI uri) {
-        return new File(toURL(uri).getFile()).toPath();
-    }
-
-    public static Path toPath(Path path) {
+    /**
+     * Fixes the {@link Path} by replacing all the
+     * {@code %20} codes back with spaces.
+     *
+     * @param path The path
+     * @return The fixed path
+     */
+    public static Path fixPath(Path path) {
         return toPath(path.toUri());
     }
 
-    public static Path toPath(File file) {
-        return toPath(file.toURI());
+    /**
+     * Converts the {@link URL} into a {@link Path}.
+     *
+     * @param url The url
+     * @return The path
+     */
+    public static Path toPath(URL url) {
+        try {
+            return toPath(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Converts the {@link URI} into a {@link Path}.
+     *
+     * @param uri The uri
+     * @return The path
+     */
+    public static Path toPath(URI uri) {
+        return new File(uri).toPath();
     }
 
     private PathUtils() {

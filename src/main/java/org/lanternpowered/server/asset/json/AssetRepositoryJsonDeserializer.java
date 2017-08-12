@@ -43,7 +43,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.util.PathUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;

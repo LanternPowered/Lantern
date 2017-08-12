@@ -80,8 +80,8 @@ public class EnchantmentTableClientContainer extends ClientContainer {
             } else if (propertyType == ContainerProperties.SHOWN_ENCHANTMENT_3) {
                 index = 6;
             }
-            final Supplier<Optional<Enchantment>> supplier1 = (Supplier<Optional<Enchantment>>) supplier;
             if (index != -1) {
+                final Supplier<Optional<Enchantment>> supplier1 = (Supplier<Optional<Enchantment>>) supplier;
                 bindInternalProperty(index, () -> supplier1.get()
                         .map(enchantment -> ((LanternEnchantment) enchantment).getInternalId()).orElse(-1));
             }

@@ -130,14 +130,14 @@ public class LanternPaginationService implements PaginationService {
                 .arguments(pageArgs)
                 .executor(pageExecutor).build();
 
-        //Fallback to page arguments
+        // Fallback to page arguments
         ChildCommandElementExecutor childDispatcher = new ChildCommandElementExecutor(pageExecutor);
         childDispatcher.register(next, "next", "n");
         childDispatcher.register(prev, "prev", "p", "previous");
         childDispatcher.register(page, "page");
 
-        //We create the child manually in order to force that paginationElement is required for all children + fallback
-        //https://github.com/SpongePowered/SpongeAPI/issues/1272
+        // We create the child manually in order to force that paginationElement is required for all children + fallback
+        // https://github.com/SpongePowered/SpongeAPI/issues/1272
         return CommandSpec.builder().arguments(paginationElement, firstParsing(childDispatcher, pageArgs))
                 .executor(childDispatcher)
                 .description(t("Helper command for paginations occurring"))

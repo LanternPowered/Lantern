@@ -27,7 +27,6 @@ package org.lanternpowered.server.service.pagination;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.PeekingIterator;
@@ -44,12 +43,12 @@ import javax.annotation.Nullable;
 /**
  * Pagination occurring for an iterable -- we don't know its size.
  */
-class IterablePagination extends ActivePagination {
+final class IterablePagination extends ActivePagination {
 
     private final PeekingIterator<Map.Entry<Text, Integer>> countIterator;
     private int lastPage;
 
-    public IterablePagination(MessageReceiver src, PaginationCalculator calc, Iterable<Map.Entry<Text, Integer>> counts, @Nullable Text title,
+    IterablePagination(MessageReceiver src, PaginationCalculator calc, Iterable<Map.Entry<Text, Integer>> counts, @Nullable Text title,
             @Nullable Text header, @Nullable Text footer, Text padding) {
         super(src, calc, title, header, footer, padding);
         this.countIterator = Iterators.peekingIterator(counts.iterator());
@@ -73,17 +72,10 @@ class IterablePagination extends ActivePagination {
         this.lastPage = page;
 
         if (getMaxContentLinesPerPage() <= 0) {
-            return Lists.newArrayList(Iterators.transform(this.countIterator, new Function<Map.Entry<Text, Integer>, Text>() {
-
-                @Nullable
-                @Override
-                public Text apply(Map.Entry<Text, Integer> input) {
-                    return input.getKey();
-                }
-            }));
+            return Lists.newArrayList(Iterators.transform(this.countIterator, Map.Entry::getKey));
         }
 
-        List<Text> ret = new ArrayList<>(getMaxContentLinesPerPage());
+        final List<Text> ret = new ArrayList<>(getMaxContentLinesPerPage());
         int addedLines = 0;
         while (addedLines <= getMaxContentLinesPerPage()) {
             if (!this.countIterator.hasNext()) {
@@ -98,7 +90,7 @@ class IterablePagination extends ActivePagination {
                 padPage(ret, addedLines, true);
                 break;
             }
-            Map.Entry<Text, Integer> ent = this.countIterator.next();
+            final Map.Entry<Text, Integer> ent = this.countIterator.next();
             ret.add(ent.getKey());
             addedLines += ent.getValue();
         }

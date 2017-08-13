@@ -33,9 +33,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.loader.HeaderMode;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.format.TextStyles;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -45,7 +43,7 @@ import java.util.PrimitiveIterator;
 /**
  * Pagination calculator for players.
  */
-public class PaginationCalculator {
+final class PaginationCalculator {
 
     private static final String NON_UNICODE_CHARS;
     private static final int[] NON_UNICODE_CHAR_WIDTHS;
@@ -59,32 +57,28 @@ public class PaginationCalculator {
      *
      * @param linesPerPage The amount of lines per page there should be
      */
-    public PaginationCalculator(int linesPerPage) {
+    PaginationCalculator(int linesPerPage) {
         this.linesPerPage = linesPerPage;
     }
 
     static {
-        ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
+        final ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
                 .setURL(PaginationCalculator.class.getResource("/internal/font_sizes.json"))
                 .setHeaderMode(HeaderMode.PRESET)
                 .build();
         try {
             final ConfigurationNode node = loader.load();
             NON_UNICODE_CHARS = node.getNode("non-unicode").getString();
-            List<? extends ConfigurationNode> charWidths = node.getNode("char-widths").getChildrenList();
-            int[] nonUnicodeCharWidths = new int[charWidths.size()];
-            for (int i = 0; i < nonUnicodeCharWidths.length; ++i) {
-                nonUnicodeCharWidths[i] = charWidths.get(i).getInt();
+            final List<? extends ConfigurationNode> charWidths = node.getNode("char-widths").getChildrenList();
+            NON_UNICODE_CHAR_WIDTHS = new int[charWidths.size()];
+            for (int i = 0; i < NON_UNICODE_CHAR_WIDTHS.length; ++i) {
+                NON_UNICODE_CHAR_WIDTHS[i] = charWidths.get(i).getInt();
             }
-
-            NON_UNICODE_CHAR_WIDTHS = nonUnicodeCharWidths;
-
-            List<? extends ConfigurationNode> glyphWidths = node.getNode("glyph-widths").getChildrenList();
-            byte[] unicodeCharWidths = new byte[glyphWidths.size()];
-            for (int i = 0; i < nonUnicodeCharWidths.length; ++i) {
-                unicodeCharWidths[i] = (byte) glyphWidths.get(i).getInt();
+            final List<? extends ConfigurationNode> glyphWidths = node.getNode("glyph-widths").getChildrenList();
+            UNICODE_CHAR_WIDTHS = new byte[glyphWidths.size()];
+            for (int i = 0; i < UNICODE_CHAR_WIDTHS.length; ++i) {
+                UNICODE_CHAR_WIDTHS[i] = (byte) glyphWidths.get(i).getInt();
             }
-            UNICODE_CHAR_WIDTHS = unicodeCharWidths;
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -118,13 +112,17 @@ public class PaginationCalculator {
      * point, accounting for if its text is bold our not.
      *
      * @param codePoint The code point of the character
-     * @param isBold Whether or not the character is bold or not
+     * @param bold Whether or not the character is bold or not
      * @return The width of the character at the code point
      */
-    private int getWidth(int codePoint, boolean isBold) {
+    private int getWidth(int codePoint, boolean bold) {
         final int nonUnicodeIdx = NON_UNICODE_CHARS.indexOf(codePoint);
         int width;
-        if (codePoint == 32) {
+        if (codePoint == 167) {
+            // Color code character, this has no width
+            width = 0;
+        } else if (codePoint == 32) {
+            // Space
             width = 4;
         } else if (codePoint > 0 && nonUnicodeIdx != -1) {
             width = NON_UNICODE_CHAR_WIDTHS[nonUnicodeIdx];
@@ -133,9 +131,9 @@ public class PaginationCalculator {
             // Split into high and low nibbles.
             // bit digits
             // 87654321 >>> 4 = 00008765
-            int startColumn = temp >>> 4;
+            final int startColumn = temp >>> 4;
             // 87654321 & 00001111 = 00004321
-            int endColumn = temp & 15;
+            final int endColumn = temp & 15;
 
             width = (endColumn + 1) - startColumn;
             // Why does this scaling happen?
@@ -148,10 +146,9 @@ public class PaginationCalculator {
             width = 0;
         }
         // If bold, the width gets 1 added
-        if(isBold && width > 0) {
-            width = width + 1;
+        if (bold && width > 0) {
+            width++;
         }
-
         return width;
     }
 
@@ -162,39 +159,48 @@ public class PaginationCalculator {
      * @return The length of the text
      */
     private int getLength(Text text) {
+        return getLength(text, false);
+    }
+
+    private int getLength(Text text, boolean bold) {
+        final Boolean bold1 = text.getStyle().isBold().orElse(null);
+        if (bold1 != null) {
+            bold = bold1;
+        }
+        String txt;
+        if (text instanceof LiteralText) {
+            txt = ((LiteralText) text).getContent();
+        } else {
+            txt = text.toPlainSingle();
+        }
+        int length = getLength(txt, bold);
+        // Get the length of all the children
+        for (Text child : text.getChildren()) {
+            length += getLength(child, bold);
+        }
+        return length;
+    }
+
+    private int getLength(String text, boolean bold) {
+        final PrimitiveIterator.OfInt ofInt = text.codePoints().iterator();
+
         int total = 0;
-        for (Text child : text.withChildren()) {
-            final String txt;
-
-            if (child instanceof LiteralText) {
-                txt = ((LiteralText) child).getContent();
-            } else if (child instanceof TranslatableText) {
-                txt = child.toPlain();
-            } else {
-                continue;
-            }
-
-            final PrimitiveIterator.OfInt ofInt = txt.codePoints().iterator();
-
-            final boolean bold = child.getStyle().contains(TextStyles.BOLD);
-
-            Integer cp;
-            boolean newLine = false;
-            while (ofInt.hasNext()) {
-                cp = ofInt.next();
-                if (cp == '\n') {
-                    // If the previous character is a '\n'
-                    if (newLine) {
-                        total += LINE_WIDTH;
-                    } else {
-                        total = ((int) Math.ceil((double) total / LINE_WIDTH)) * LINE_WIDTH;
-                        newLine = true;
-                    }
+        int cp;
+        boolean newLine = false;
+        while (ofInt.hasNext()) {
+            cp = ofInt.nextInt();
+            if (cp == '\n') {
+                // If the previous character is a '\n'
+                if (newLine) {
+                    total += LINE_WIDTH;
                 } else {
-                    int width = getWidth(cp, bold);
-                    total += width;
-                    newLine = false;
+                    total = ((int) Math.ceil((double) total / LINE_WIDTH)) * LINE_WIDTH;
+                    newLine = true;
                 }
+            } else {
+                final int width = getWidth(cp, bold);
+                total += width;
+                newLine = false;
             }
         }
 
@@ -215,20 +221,18 @@ public class PaginationCalculator {
      */
     public Text center(Text text, Text padding) {
         int inputLength = getLength(text);
-
         if (inputLength >= LINE_WIDTH) {
             return text;
         }
         final Text textWithSpaces = addSpaces(Text.of(" "), text);
-
-        boolean addSpaces = getLength(textWithSpaces) <= LINE_WIDTH;
+        final boolean addSpaces = getLength(textWithSpaces) <= LINE_WIDTH;
 
         Text styledPadding = withStyle(padding, text);
         int paddingLength = getLength(styledPadding);
         final Text.Builder output = Text.builder();
 
         // Using 0 width unicode symbols as padding throws us into an unending loop, replace them with the default padding
-        if(paddingLength < 1) {
+        if (paddingLength < 1) {
             padding = Text.of("=");
             styledPadding = withColor(withStyle(padding, text), text);
             paddingLength = getLength(styledPadding);
@@ -238,13 +242,12 @@ public class PaginationCalculator {
         if (inputLength == 0) {
             addPadding(padding, output, GenericMath.floor((double) LINE_WIDTH / paddingLength));
         } else {
-            if(addSpaces) {
+            if (addSpaces) {
                 text = textWithSpaces;
                 inputLength = getLength(textWithSpaces);
             }
 
             int paddingNecessary = LINE_WIDTH - inputLength;
-
             int paddingCount = GenericMath.floor(paddingNecessary / paddingLength);
             // Pick a halfway point
             int beforePadding = GenericMath.floor(paddingCount / 2.0);
@@ -308,5 +311,4 @@ public class PaginationCalculator {
             build.append(Collections.nCopies(count, padding));
         }
     }
-
 }

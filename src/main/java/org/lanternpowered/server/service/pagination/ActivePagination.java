@@ -64,7 +64,7 @@ abstract class ActivePagination {
     private final PaginationCalculator calc;
     private final Text padding;
 
-    public ActivePagination(MessageReceiver src, PaginationCalculator calc, @Nullable Text title, @Nullable Text header,
+    ActivePagination(MessageReceiver src, PaginationCalculator calc, @Nullable Text title, @Nullable Text header,
             @Nullable Text footer, Text padding) {
         this.src = new WeakReference<>(src);
         this.calc = calc;
@@ -205,15 +205,14 @@ abstract class ActivePagination {
         return ret.build();
     }
 
-    protected void padPage(final List<Text> currentPage, final int currentPageLines, final boolean addContinuation) {
+    protected void padPage(List<Text> currentPage, int currentPageLines, boolean addContinuation) {
         final int maxContentLinesPerPage = getMaxContentLinesPerPage();
         for (int i = currentPageLines; i < maxContentLinesPerPage; i++) {
             if (addContinuation && i == maxContentLinesPerPage - 1) {
                 currentPage.add(CONTINUATION_TEXT);
             } else {
-                currentPage.add(0, Text.EMPTY);
+                currentPage.add(Text.EMPTY);
             }
         }
     }
-
 }

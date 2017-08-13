@@ -47,7 +47,7 @@ public class LanternPaginationBuilder implements PaginationList.Builder {
     private Text paginationSpacer = Text.of("=");
     private int linesPerPage = 20;
 
-    public LanternPaginationBuilder(LanternPaginationService service) {
+    LanternPaginationBuilder(LanternPaginationService service) {
         this.service = service;
     }
 
@@ -120,7 +120,6 @@ public class LanternPaginationBuilder implements PaginationList.Builder {
         this.header = list.getHeader().orElse(null);
         this.footer = list.getFooter().orElse(null);
         this.paginationSpacer = list.getPadding();
-
         this.paginationList = null;
         return this;
     }

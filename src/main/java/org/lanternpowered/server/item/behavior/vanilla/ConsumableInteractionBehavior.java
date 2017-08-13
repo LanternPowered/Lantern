@@ -129,7 +129,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
             if (saturationProperty != null && saturationProperty.getValue() != 0.0) {
                 final Optional<Double> optSaturation = player.get(Keys.SATURATION);
                 if (optSaturation.isPresent()) {
-                    player.offer(Keys.SATURATION, Math.min(optSaturation.get() + saturationProperty.getValue() * foodLevelForSaturation * 2,
+                    player.offer(Keys.SATURATION, Math.min(optSaturation.get() + saturationProperty.getValue(),
                             player.get(Keys.FOOD_LEVEL).orElse(20)));
                 }
             }

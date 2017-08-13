@@ -80,7 +80,7 @@ public final class CommandHelp extends CommandProvider {
 
     @Override
     public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
-        final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
+        final Comparator<CommandMapping> comparator = Comparator.comparing(CommandMapping::getPrimaryAlias);
         specBuilder
                 .arguments(
                         GenericArguments.optional(new CommandElement(Text.of("command")) {
@@ -143,18 +143,17 @@ public final class CommandHelp extends CommandProvider {
                         commands.addAll(Collections2.filter(Sponge.getCommandManager().getAll().values(),
                                 input -> input.getCallable().testPermission(src)));
 
+
+                        final Text title = Text.builder("Available commands:").color(TextColors.DARK_GREEN).build();
+                        final List<Text> lines = commands.stream().map(c -> getDescription(src, c)).collect(Collectors.toList());
+
                         // Console sources cannot see/use the pagination
-                        boolean paginate = !(src instanceof ConsoleSource);
-
-                        Text title = Text.builder("Available commands:").color(TextColors.DARK_GREEN).build();
-                        Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
-
-                        if (paginate) {
-                            PaginationList.Builder builder = Sponge.getGame().getServiceManager()
-                                    .provide(PaginationService.class).get().builder();
-                            builder.title(title);
-                            builder.contents(lines);
-                            builder.sendTo(src);
+                        if (!(src instanceof ConsoleSource)) {
+                            Sponge.getGame().getServiceManager().provide(PaginationService.class).get().builder()
+                                    .title(title)
+                                    .padding(Text.of(TextColors.DARK_GREEN, "="))
+                                    .contents(lines)
+                                    .sendTo(src);
                         } else {
                             src.sendMessage(title);
                             src.sendMessages(lines);
@@ -171,8 +170,8 @@ public final class CommandHelp extends CommandProvider {
         final Optional<Text> description = mapping.getCallable().getShortDescription(source);
         Text.Builder text = Text.builder("/" + mapping.getPrimaryAlias());
         text.color(TextColors.GREEN);
-        text.style(TextStyles.UNDERLINE);
-        text.onClick(TextActions.suggestCommand("/" + mapping.getPrimaryAlias()));
+        //End with a space, so tab completion works immediately.
+        text.onClick(TextActions.suggestCommand("/" + mapping.getPrimaryAlias() + " "));
         Optional<? extends Text> longDescription = mapping.getCallable().getHelp(source);
         if (longDescription.isPresent()) {
             text.onHover(TextActions.showText(longDescription.get()));

@@ -48,23 +48,24 @@ abstract class ActivePagination {
 
     private static final Text SLASH_TEXT = Text.of("/");
     private static final Text DIVIDER_TEXT = Text.of(" ");
+    private static final Text CONTINUATION_TEXT = t("...");
+
     private final WeakReference<MessageReceiver> src;
     private final UUID id = UUID.randomUUID();
     private final Text nextPageText;
     private final Text prevPageText;
-    @Nullable
-    private final Text title;
-    @Nullable
-    private final Text header;
-    @Nullable
-    private final Text footer;
+
+    @Nullable private final Text title;
+    @Nullable private final Text header;
+    @Nullable private final Text footer;
+
     private int currentPage;
     private final int maxContentLinesPerPage;
-    protected final PaginationCalculator calc;
+    private final PaginationCalculator calc;
     private final Text padding;
 
-    public ActivePagination(MessageReceiver src, PaginationCalculator calc, Text title,
-            Text header, Text footer, Text padding) {
+    ActivePagination(MessageReceiver src, PaginationCalculator calc, @Nullable Text title, @Nullable Text header,
+            @Nullable Text footer, Text padding) {
         this.src = new WeakReference<>(src);
         this.calc = calc;
         this.title = title;
@@ -74,20 +75,26 @@ abstract class ActivePagination {
         this.nextPageText = t("»").toBuilder()
                 .color(TextColors.BLUE)
                 .style(TextStyles.UNDERLINE)
-                .onClick(TextActions.runCommand("/pagination " + this.id.toString() + " next")).build();
+                .onClick(TextActions.runCommand("/pagination " + this.id.toString() + " next"))
+                .onHover(TextActions.showText(Text.of("/page next")))
+                .onShiftClick(TextActions.insertText("/page next"))
+                .build();
         this.prevPageText = t("«").toBuilder()
                 .color(TextColors.BLUE)
                 .style(TextStyles.UNDERLINE)
-                .onClick(TextActions.runCommand("/pagination " + this.id.toString() + " prev")).build();
+                .onClick(TextActions.runCommand("/pagination " + this.id.toString() + " prev"))
+                .onHover(TextActions.showText(Text.of("/page prev")))
+                .onShiftClick(TextActions.insertText("/page prev"))
+                .build();
         int maxContentLinesPerPage = calc.getLinesPerPage(src) - 1;
         if (title != null) {
-            maxContentLinesPerPage -= calc.getLines(src, title);
+            maxContentLinesPerPage -= calc.getLines(title);
         }
         if (header != null) {
-            maxContentLinesPerPage -= calc.getLines(src, header);
+            maxContentLinesPerPage -= calc.getLines(header);
         }
         if (footer != null) {
-            maxContentLinesPerPage -= calc.getLines(src, footer);
+            maxContentLinesPerPage -= calc.getLines(footer);
         }
         this.maxContentLinesPerPage = maxContentLinesPerPage;
 
@@ -146,9 +153,7 @@ abstract class ActivePagination {
         }
 
         Text footer = calculateFooter(page);
-        if (footer != null) {
-            toSend.add(this.calc.center(src, footer, this.padding));
-        }
+        toSend.add(this.calc.center(footer, this.padding));
         if (this.footer != null) {
             toSend.add(this.footer);
         }
@@ -168,7 +173,17 @@ abstract class ActivePagination {
         boolean needsDiv = false;
         int totalPages = getTotalPages();
         if (totalPages > 1) {
-            ret.append(Text.of(currentPage)).append(SLASH_TEXT).append(Text.of(totalPages));
+            ret.append(Text.of(
+                    TextActions.showText(Text.of("/page " + currentPage)),
+                    TextActions.runCommand("/pagination " + this.id + ' ' + currentPage),
+                    TextActions.insertText("/page " + currentPage),
+                    currentPage
+            )).append(SLASH_TEXT).append(Text.of(
+                    TextActions.showText(Text.of("/page " + totalPages)),
+                    TextActions.runCommand("/pagination " + this.id + ' ' + totalPages),
+                    TextActions.insertText("/page " + totalPages),
+                    totalPages
+            ));
             needsDiv = true;
         }
         if (hasNext) {
@@ -182,10 +197,22 @@ abstract class ActivePagination {
             }
             ret.append(Text.of("»"));
         }
+
+        ret.color(this.padding.getColor());
         if (this.title != null) {
-            ret.color(this.title.getColor());
             ret.style(this.title.getStyle());
         }
         return ret.build();
+    }
+
+    protected void padPage(List<Text> currentPage, int currentPageLines, boolean addContinuation) {
+        final int maxContentLinesPerPage = getMaxContentLinesPerPage();
+        for (int i = currentPageLines; i < maxContentLinesPerPage; i++) {
+            if (addContinuation && i == maxContentLinesPerPage - 1) {
+                currentPage.add(CONTINUATION_TEXT);
+            } else {
+                currentPage.add(Text.EMPTY);
+            }
+        }
     }
 }

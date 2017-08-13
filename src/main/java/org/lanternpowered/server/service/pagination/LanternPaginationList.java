@@ -42,7 +42,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class LanternPaginationList implements PaginationList {
+import javax.annotation.Nullable;
+
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+final class LanternPaginationList implements PaginationList {
 
     private final LanternPaginationService service;
     private Iterable<Text> contents;
@@ -52,8 +55,8 @@ public class LanternPaginationList implements PaginationList {
     private Text paginationSpacer;
     private int linesPerPage;
 
-    public LanternPaginationList(LanternPaginationService service, Iterable<Text> contents, Text title, Text header,
-            Text footer, Text paginationSpacer, int linesPerPage) {
+    LanternPaginationList(LanternPaginationService service, Iterable<Text> contents, @Nullable Text title, @Nullable Text header,
+            @Nullable Text footer, Text paginationSpacer, int linesPerPage) {
         this.service = service;
         this.contents = contents;
         this.title = Optional.ofNullable(title);
@@ -95,39 +98,37 @@ public class LanternPaginationList implements PaginationList {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void sendTo(final MessageReceiver receiver) {
-        checkNotNull(this.contents, "contents");
-        checkNotNull(receiver, "source");
+    public void sendTo(final MessageReceiver receiver, int page) {
+        checkNotNull(receiver, "The message receiver cannot be null!");
         this.service.registerCommandOnce();
 
         MessageReceiver realSource = receiver;
         while (realSource instanceof ProxySource) {
-            realSource = ((ProxySource)realSource).getOriginalSource();
+            realSource = ((ProxySource) realSource).getOriginalSource();
         }
-        @SuppressWarnings("unchecked")
-        PaginationCalculator calculator = new PaginationCalculator(this.linesPerPage);
+        final PaginationCalculator calculator = new PaginationCalculator(this.linesPerPage);
         Iterable<Map.Entry<Text, Integer>> counts = StreamSupport.stream(this.contents.spliterator(), false).map(input -> {
-            int lines = calculator.getLines(receiver, input);
+            int lines = calculator.getLines(input);
             return Maps.immutableEntry(input, lines);
         }).collect(Collectors.toList());
 
         Text title = this.title.orElse(null);
         if (title != null) {
-            title = calculator.center(receiver, title, this.paginationSpacer);
+            title = calculator.center(title, this.paginationSpacer);
         }
 
         ActivePagination pagination;
         if (this.contents instanceof List) { // If it started out as a list, it's probably reasonable to copy it to another list
-            pagination = new ListPagination(receiver, calculator, ImmutableList.copyOf(counts), title, this.header.orElse(null),
+            pagination = new ListPagination(realSource, calculator, ImmutableList.copyOf(counts), title, this.header.orElse(null),
                     this.footer.orElse(null), this.paginationSpacer);
         } else {
-            pagination = new IterablePagination(receiver, calculator, counts, title, this.header.orElse(null),
-                    this.footer.orElse(null), this.paginationSpacer);
+            pagination = new IterablePagination(realSource, calculator, counts, title,
+                    this.header.orElse(null), this.footer.orElse(null), this.paginationSpacer);
         }
 
         this.service.getPaginationState(receiver, true).put(pagination);
         try {
-            pagination.nextPage();
+            pagination.specificPage(page);
         } catch (CommandException e) {
             receiver.sendMessage(error(e.getText()));
         }

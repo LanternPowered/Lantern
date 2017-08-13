@@ -27,6 +27,7 @@ package org.lanternpowered.server.service.pagination;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 /**
  * Pagination working with a list of values.
  */
@@ -42,15 +45,20 @@ class ListPagination extends ActivePagination {
 
     private final List<List<Text>> pages;
 
-    public ListPagination(MessageReceiver src, PaginationCalculator calc, List<Map.Entry<Text, Integer>> lines,
-            Text title, Text header, Text footer, Text padding) {
+    ListPagination(MessageReceiver src, PaginationCalculator calc, List<Map.Entry<Text, Integer>> lines,
+            @Nullable Text title, @Nullable Text header, @Nullable Text footer, Text padding) {
         super(src, calc, title, header, footer, padding);
         List<List<Text>> pages = new ArrayList<>();
         List<Text> currentPage = new ArrayList<>();
         int currentPageLines = 0;
 
         for (Map.Entry<Text, Integer> ent : lines) {
-            if (getMaxContentLinesPerPage() > 0 && ent.getValue() + currentPageLines > getMaxContentLinesPerPage() && currentPageLines != 0) {
+            final boolean finiteLinesPerPage  = getMaxContentLinesPerPage() > 0;
+            final boolean willExceedPageLength = ent.getValue() + currentPageLines > getMaxContentLinesPerPage();
+            final boolean currentPageNotEmpty = currentPageLines != 0;
+            final boolean spillToNextPage = finiteLinesPerPage && willExceedPageLength && currentPageNotEmpty;
+            if (spillToNextPage) {
+                padPage(currentPage, currentPageLines, true);
                 currentPageLines = 0;
                 pages.add(currentPage);
                 currentPage = new ArrayList<>();
@@ -58,7 +66,13 @@ class ListPagination extends ActivePagination {
             currentPageLines += ent.getValue();
             currentPage.add(ent.getKey());
         }
-        if (currentPageLines > 0) {
+        //last page is not yet committed
+        final boolean lastPageNotEmpty = currentPageLines > 0;
+        if (lastPageNotEmpty) {
+            if (!pages.isEmpty()) {
+                // Only pad if we have a previous page
+                padPage(currentPage, currentPageLines, false);
+            }
             pages.add(currentPage);
         }
         this.pages = pages;
@@ -66,10 +80,13 @@ class ListPagination extends ActivePagination {
 
     @Override
     protected Iterable<Text> getLines(int page) throws CommandException {
-        if (page < 1) {
+        final int size = this.pages.size();
+        if (size == 0) {
+            return ImmutableList.of();
+        } else if (page < 1) {
             throw new CommandException(t("Page %s does not exist!", page));
-        } else if (page > this.pages.size()) {
-            throw new CommandException(t("Page %s is too high", page));
+        } else if (page > size) {
+            throw new CommandException(t("Page %s is greater than the max of %s!", page, size));
         }
         return this.pages.get(page - 1);
     }

@@ -45,7 +45,7 @@ import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class LanternPaginationList implements PaginationList {
+final class LanternPaginationList implements PaginationList {
 
     private final LanternPaginationService service;
     private Iterable<Text> contents;
@@ -104,7 +104,7 @@ public class LanternPaginationList implements PaginationList {
 
         MessageReceiver realSource = receiver;
         while (realSource instanceof ProxySource) {
-            realSource = ((ProxySource)realSource).getOriginalSource();
+            realSource = ((ProxySource) realSource).getOriginalSource();
         }
         final PaginationCalculator calculator = new PaginationCalculator(this.linesPerPage);
         Iterable<Map.Entry<Text, Integer>> counts = StreamSupport.stream(this.contents.spliterator(), false).map(input -> {
@@ -122,7 +122,8 @@ public class LanternPaginationList implements PaginationList {
             pagination = new ListPagination(realSource, calculator, ImmutableList.copyOf(counts), title, this.header.orElse(null),
                     this.footer.orElse(null), this.paginationSpacer);
         } else {
-            pagination = new IterablePagination(realSource, calculator, counts, title, this.header.orElse(null), this.footer.orElse(null), this.paginationSpacer);
+            pagination = new IterablePagination(realSource, calculator, counts, title,
+                    this.header.orElse(null), this.footer.orElse(null), this.paginationSpacer);
         }
 
         this.service.getPaginationState(receiver, true).put(pagination);

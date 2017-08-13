@@ -49,8 +49,8 @@ class IterablePagination extends ActivePagination {
     private final PeekingIterator<Map.Entry<Text, Integer>> countIterator;
     private int lastPage;
 
-    public IterablePagination(MessageReceiver src, PaginationCalculator calc, Iterable<Map.Entry<Text, Integer>> counts, Text title,
-            Text header, Text footer, Text padding) {
+    public IterablePagination(MessageReceiver src, PaginationCalculator calc, Iterable<Map.Entry<Text, Integer>> counts, @Nullable Text title,
+            @Nullable Text header, @Nullable Text footer, Text padding) {
         super(src, calc, title, header, footer, padding);
         this.countIterator = Iterators.peekingIterator(counts.iterator());
     }
@@ -58,11 +58,15 @@ class IterablePagination extends ActivePagination {
     @Override
     protected Iterable<Text> getLines(int page) throws CommandException {
         if (!this.countIterator.hasNext()) {
-            throw new CommandException(t("Already at end of iterator"));
+            throw new CommandException(t("You're already at the end of the pagination list iterator."));
+        }
+
+        if (page < 1) {
+            throw new CommandException(t("Page %s does not exist!", page));
         }
 
         if (page <= this.lastPage) {
-            throw new CommandException(t("Cannot go backward in an IterablePagination"));
+            throw new CommandException(t("You cannot go to previous pages in an iterable pagination."));
         } else if (page > this.lastPage + 1) {
             getLines(page - 1);
         }
@@ -83,9 +87,15 @@ class IterablePagination extends ActivePagination {
         int addedLines = 0;
         while (addedLines <= getMaxContentLinesPerPage()) {
             if (!this.countIterator.hasNext()) {
+                // Pad the last page, but only if it isn't the first.
+                if (page > 1) {
+                    padPage(ret, addedLines, false);
+                }
                 break;
             }
             if (addedLines + this.countIterator.peek().getValue() > getMaxContentLinesPerPage()) {
+                // Add the continuation marker, pad if required
+                padPage(ret, addedLines, true);
                 break;
             }
             Map.Entry<Text, Integer> ent = this.countIterator.next();
@@ -112,6 +122,6 @@ class IterablePagination extends ActivePagination {
 
     @Override
     public void previousPage() throws CommandException {
-        throw new CommandException(t("Cannot go backwards in a streaming pagination"));
+        throw new CommandException(t("You cannot go to previous pages in an iterable pagination."));
     }
 }

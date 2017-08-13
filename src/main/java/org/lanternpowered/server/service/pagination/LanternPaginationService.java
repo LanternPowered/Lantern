@@ -26,6 +26,7 @@
 package org.lanternpowered.server.service.pagination;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import static org.spongepowered.api.command.args.GenericArguments.firstParsing;
 import static org.spongepowered.api.command.args.GenericArguments.integer;
 
 import com.google.common.collect.ImmutableList;
@@ -36,9 +37,11 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
+import org.spongepowered.api.command.args.ChildCommandElementExecutor;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
@@ -60,10 +63,12 @@ import javax.annotation.Nullable;
 public class LanternPaginationService implements PaginationService {
 
     static class SourcePaginations {
-        private final Map<UUID, ActivePagination> paginations = new ConcurrentHashMap<>();
-        private volatile UUID lastUuid;
 
-        public ActivePagination get(UUID uuid) {
+        private final Map<UUID, ActivePagination> paginations = new ConcurrentHashMap<>();
+
+        @Nullable private volatile UUID lastUuid;
+
+        @Nullable public ActivePagination get(UUID uuid) {
             return this.paginations.get(uuid);
         }
 
@@ -78,40 +83,65 @@ public class LanternPaginationService implements PaginationService {
             return this.paginations.keySet();
         }
 
-        public UUID getLastUuid() {
+        @Nullable
+        UUID getLastUuid() {
             return this.lastUuid;
         }
     }
-    final ConcurrentMap<MessageReceiver, SourcePaginations> activePaginations = new MapMaker().weakKeys().makeMap();
+
+    private final ConcurrentMap<MessageReceiver, SourcePaginations> activePaginations = new MapMaker().weakKeys().makeMap();
     private final AtomicBoolean commandRegistered = new AtomicBoolean();
 
     void registerCommandOnce() {
         if (this.commandRegistered.compareAndSet(false, true)) {
-            Sponge.getGame().getCommandManager().register(Lantern.getMinecraftPlugin(), CommandSpec.builder()
-                    .description(t("Helper command for paginations occurring"))
-                    .arguments(new ActivePaginationCommandElement(t("pagination-id")))
-                    .child(CommandSpec.builder()
-                            .description(t("Go to the next page"))
-                            .executor((src, args) -> {
-                                args.<ActivePagination>getOne("pagination-id").get().nextPage();
-                                return CommandResult.success();
-                            }).build(), "next", "n")
-                    .child(CommandSpec.builder()
-                            .description(t("Go to the previous page"))
-                            .executor((src, args) -> {
-                                args.<ActivePagination>getOne("pagination-id").get().previousPage();
-                                return CommandResult.success();
-                            }).build(), "previous", "prev", "p")
-                    .child(CommandSpec.builder()
-                            .description(t("Go to a specific page"))
-                            .arguments(integer(t("page")))
-                            .executor((src, args) -> {
-                                args.<ActivePagination>getOne("pagination-id").get().specificPage(args.<Integer>getOne("page").get());
-                                return CommandResult.success();
-                            }).build(), "page")
-                    .build(), "pagination", "page");
+            Sponge.getGame().getCommandManager().register(Lantern.getImplementationPlugin(), buildPaginationCommand(), "pagination", "page");
         }
 
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private CommandSpec buildPaginationCommand() {
+        // TODO Completely redo this once command refactor is out and PR changes to Sponge as well
+        final ActivePaginationCommandElement paginationElement = new ActivePaginationCommandElement(t("pagination-id"));
+
+        CommandSpec next = CommandSpec.builder()
+                .description(t("Go to the next page"))
+                .executor((src, args) -> {
+                    args.<ActivePagination>getOne("pagination-id").get().nextPage();
+                    return CommandResult.success();
+                }).build();
+
+        CommandSpec prev = CommandSpec.builder()
+                .description(t("Go to the previous page"))
+                .executor((src, args) -> {
+                    args.<ActivePagination>getOne("pagination-id").get().previousPage();
+                    return CommandResult.success();
+                }).build();
+
+        CommandElement pageArgs = integer(t("page"));
+
+        CommandExecutor pageExecutor = (src, args) -> {
+            args.<ActivePagination>getOne("pagination-id").get().specificPage(args.<Integer>getOne("page").get());
+            return CommandResult.success();
+        };
+
+        CommandSpec page = CommandSpec.builder()
+                .description(t("Go to a specific page"))
+                .arguments(pageArgs)
+                .executor(pageExecutor).build();
+
+        //Fallback to page arguments
+        ChildCommandElementExecutor childDispatcher = new ChildCommandElementExecutor(pageExecutor);
+        childDispatcher.register(next, "next", "n");
+        childDispatcher.register(prev, "prev", "p", "previous");
+        childDispatcher.register(page, "page");
+
+        //We create the child manually in order to force that paginationElement is required for all children + fallback
+        //https://github.com/SpongePowered/SpongeAPI/issues/1272
+        return CommandSpec.builder().arguments(paginationElement, firstParsing(childDispatcher, pageArgs))
+                .executor(childDispatcher)
+                .description(t("Helper command for paginations occurring"))
+                .build();
     }
 
     @Override
@@ -119,6 +149,7 @@ public class LanternPaginationService implements PaginationService {
         return new LanternPaginationBuilder(this);
     }
 
+    @Nullable
     SourcePaginations getPaginationState(MessageReceiver source, boolean create) {
         SourcePaginations ret = this.activePaginations.get(source);
         if (ret == null && create) {
@@ -133,7 +164,7 @@ public class LanternPaginationService implements PaginationService {
 
     private class ActivePaginationCommandElement extends CommandElement {
 
-        protected ActivePaginationCommandElement(@Nullable Text key) {
+        ActivePaginationCommandElement(@Nullable Text key) {
             super(key);
         }
 
@@ -141,23 +172,23 @@ public class LanternPaginationService implements PaginationService {
         @Override
         protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
             UUID id;
-            SourcePaginations paginations = getPaginationState(source, false);
+
+            final SourcePaginations paginations = getPaginationState(source, false);
             if (paginations == null) {
-                throw args.createError(t("Source %s has no paginations!", source));
+                throw args.createError(t("Source %s has no paginations!", source.getName()));
             }
 
             Object state = args.getState();
             try {
                 id = UUID.fromString(args.next());
-            } catch (IllegalArgumentException ex) { // TODO: Just use last valid input?
+            } catch (IllegalArgumentException ex) {
                 if (paginations.getLastUuid() != null) {
                     args.setState(state);
                     return paginations.get(paginations.getLastUuid());
-                } else {
-                    throw args.createError(t("Input was not a valid UUID!"));
                 }
+                throw args.createError(t("Input was not a valid UUID!"));
             }
-            ActivePagination pagination = paginations.get(id);
+            final ActivePagination pagination = paginations.get(id);
             if (pagination == null) {
                 throw args.createError(t("No pagination registered for id %s", id.toString()));
             }
@@ -166,7 +197,7 @@ public class LanternPaginationService implements PaginationService {
 
         @Override
         public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-            SourcePaginations paginations = getPaginationState(src, false);
+            final SourcePaginations paginations = getPaginationState(src, false);
             if (paginations == null) {
                 return ImmutableList.of();
             }
@@ -177,9 +208,15 @@ public class LanternPaginationService implements PaginationService {
                         .map(Object::toString)
                         .filter(new StartsWithPredicate(optNext.get()))
                         .collect(ImmutableList.toImmutableList());
-            } else {
-                return ImmutableList.copyOf(Iterables.transform(paginations.keys(), Object::toString));
             }
+            return ImmutableList.copyOf(Iterables.transform(paginations.keys(), Object::toString));
         }
+
+        @Override
+        public Text getUsage(CommandSource src) {
+            return getKey() == null ? Text.of() : Text.of("[", getKey(), "]");
+        }
+
     }
+
 }

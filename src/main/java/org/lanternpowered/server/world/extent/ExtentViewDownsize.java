@@ -106,6 +106,13 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
+    public int getPrecipitationLevelAt(int x, int z) {
+        checkRange(x, this.blockMin.getY(), z);
+        final int y = this.extent.getPrecipitationLevelAt(x, z);
+        return GenericMath.clamp(y, this.blockMin.getY(), this.blockMax.getY());
+    }
+
+    @Override
     public Location<? extends Extent> getLocation(Vector3i position) {
         checkRange(position.getX(), position.getY(), position.getZ());
         return new Location<>(this, position);

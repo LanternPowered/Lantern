@@ -1098,6 +1098,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
+    public int getPrecipitationLevelAt(int x, int z) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getPrecipitationLevelAt(x, z);
+    }
+
+    @Override
     public Difficulty getDifficulty() {
         return this.properties.getDifficulty();
     }

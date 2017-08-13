@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.TeleportHelper;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
 import java.util.Optional;
 
@@ -36,14 +37,8 @@ import java.util.Optional;
 public class LanternTeleportHelper implements TeleportHelper {
 
     @Override
-    public Optional<Location<World>> getSafeLocation(Location<World> location) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Location<World>> getSafeLocation(Location<World> location, int height, int width) {
-        // TODO Auto-generated method stub
+    public Optional<Location<World>> getSafeLocation(Location<World> location, int height, int width, int floorDistance,
+            TeleportHelperFilter filter, TeleportHelperFilter... additionalFilters) {
         return Optional.empty();
     }
 }

@@ -635,6 +635,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return height;
     }
 
+    @Override
+    public int getPrecipitationLevelAt(int x, int z) {
+        // TODO
+        return getHighestYAt(x, z);
+    }
+
     /**
      * Automatically fill the height map after chunks have been initialized.
      */

@@ -228,6 +228,13 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
+    public int getPrecipitationLevelAt(int x, int z) {
+        checkRange(x, this.blockMin.getY(), z);
+        final int y = this.extent.getPrecipitationLevelAt(x, z);
+        return GenericMath.clamp(y, this.blockMin.getY(), this.blockMax.getY());
+    }
+
+    @Override
     public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag, Cause cause) {
         checkRange(x, y, z);
         return this.extent.setBlock(x, y, z, block, flag, cause);

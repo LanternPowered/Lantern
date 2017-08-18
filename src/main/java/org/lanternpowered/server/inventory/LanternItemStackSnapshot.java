@@ -48,6 +48,7 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -118,6 +119,11 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     @Override
     public ItemStack createStack() {
         return this.itemStack.copy();
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.itemStack.getTranslation();
     }
 
     @Override

@@ -27,11 +27,16 @@ package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface InventoryPropertyHolder {
 
-    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, Object key);
+    Map<String, InventoryProperty<String, ?>> getProperties();
 
-    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property);
+    Optional<InventoryProperty<String, ?>> getProperty(String key);
+
+    <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property, String key);
+
+    <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property);
 }

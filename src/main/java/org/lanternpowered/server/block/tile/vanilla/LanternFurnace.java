@@ -89,7 +89,8 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             super(parent, name);
 
             registerSlot(this.inputSlot = new LanternInputSlot(this));
-            registerSlot(this.fuelSlot = new LanternFuelSlot(this));
+            registerSlot(this.fuelSlot = new LanternFuelSlot(this, stack ->
+                    Lantern.getRegistry().getFuelRegistry().findMatching(stack.createSnapshot()).isPresent()));
             registerSlot(this.outputSlot = new LanternOutputSlot(this));
 
             finalizeContent();
@@ -149,7 +150,8 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             clientContainer.bindPropertySupplier(ContainerProperties.FUEL_PROGRESS, () -> {
                 double fuelProgress = this.fuelProgress;
                 if (fuelProgress < 0) {
-                    fuelProgress = this.fuelProgress = get(Keys.PASSED_BURN_TIME).get().doubleValue() / get(Keys.MAX_BURN_TIME).get().doubleValue();
+                    final int max = get(Keys.MAX_BURN_TIME).get();
+                    fuelProgress = this.fuelProgress = max - get(Keys.PASSED_BURN_TIME).get().doubleValue() / (double) max;
                 }
                 return fuelProgress;
             });

@@ -52,7 +52,7 @@ public class BrewingStandClientContainer extends ClientContainer {
         super.bindPropertySupplier(propertyType, supplier);
         if (propertyType == ContainerProperties.BREW_PROGRESS) {
             final Supplier<Double> supplier1 = (Supplier<Double>) supplier;
-            bindInternalProperty(0, () -> 400 - (int) (supplier1.get() * 400.0));
+            bindInternalProperty(0, () -> (int) (supplier1.get() * 400.0));
         } else if (propertyType == ContainerProperties.FUEL_PROGRESS) {
             final Supplier<Double> supplier1 = (Supplier<Double>) supplier;
             bindInternalProperty(1, () -> (int) (supplier1.get() * 20.0));

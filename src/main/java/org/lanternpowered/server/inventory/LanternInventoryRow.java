@@ -42,6 +42,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class LanternInventoryRow extends LanternInventory2D implements InventoryRow {
 
     public LanternInventoryRow(@Nullable Inventory parent) {
@@ -108,8 +109,7 @@ public class LanternInventoryRow extends LanternInventory2D implements Inventory
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
         if (property == InventoryDimension.class) {
-            //noinspection unchecked
-            return Optional.of((T) new InventoryDimension(this.size(), 1));
+            return Optional.of((T) new InventoryDimension(size(), 1));
         }
         return super.tryGetProperty(property, key);
     }
@@ -118,8 +118,7 @@ public class LanternInventoryRow extends LanternInventory2D implements Inventory
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
         final List<T> properties = super.tryGetProperties(property);
         if (property == InventoryDimension.class) {
-            //noinspection unchecked
-            properties.add((T) new InventoryDimension(this.size(), 1));
+            properties.add((T) new InventoryDimension(size(), 1));
         }
         return properties;
     }

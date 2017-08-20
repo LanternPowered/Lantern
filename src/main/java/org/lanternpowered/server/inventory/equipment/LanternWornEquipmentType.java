@@ -26,19 +26,19 @@
 package org.lanternpowered.server.inventory.equipment;
 
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.equipment.EquipmentTypeWorn;
+import org.spongepowered.api.item.inventory.equipment.WornEquipmentType;
 
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-public class LanternEquipmentTypeWorn extends LanternEquipmentType implements EquipmentTypeWorn {
+public class LanternWornEquipmentType extends LanternEquipmentType implements WornEquipmentType {
 
-    public LanternEquipmentTypeWorn(String pluginId, String name) {
+    public LanternWornEquipmentType(String pluginId, String name) {
         super(pluginId, name);
     }
 
-    public LanternEquipmentTypeWorn(String pluginId, String name, @Nullable Predicate<EquipmentType> childChecker) {
+    public LanternWornEquipmentType(String pluginId, String name, @Nullable Predicate<EquipmentType> childChecker) {
         super(pluginId, name, childChecker);
     }
 }

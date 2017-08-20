@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.inventory.entity;
 
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -37,7 +37,7 @@ public class OffHandSlot extends LanternSlot {
 
     public OffHandSlot(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
-        registerProperty(new EquipmentSlotType(LanternEquipmentTypes.OFF_HAND));
+        registerProperty(new EquipmentSlotType(EquipmentTypes.OFF_HAND));
     }
 
     @Override

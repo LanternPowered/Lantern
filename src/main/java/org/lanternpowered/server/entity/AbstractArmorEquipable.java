@@ -25,11 +25,10 @@
  */
 package org.lanternpowered.server.entity;
 
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
+import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 
 import java.util.Optional;
 
@@ -38,52 +37,12 @@ import javax.annotation.Nullable;
 public interface AbstractArmorEquipable extends AbstractEquipable, ArmorEquipable {
 
     @Override
-    default Optional<ItemStack> getHelmet() {
-        return getEquipped(EquipmentTypes.HEADWEAR);
-    }
-
-    @Override
-    default void setHelmet(@Nullable ItemStack helmet) {
-        equip(EquipmentTypes.HEADWEAR, helmet);
-    }
-
-    @Override
-    default Optional<ItemStack> getChestplate() {
-        return getEquipped(EquipmentTypes.CHESTPLATE);
-    }
-
-    @Override
-    default void setChestplate(@Nullable ItemStack chestplate) {
-        equip(EquipmentTypes.CHESTPLATE, chestplate);
-    }
-
-    @Override
-    default Optional<ItemStack> getLeggings() {
-        return getEquipped(EquipmentTypes.LEGGINGS);
-    }
-
-    @Override
-    default void setLeggings(@Nullable ItemStack leggings) {
-        equip(EquipmentTypes.LEGGINGS, leggings);
-    }
-
-    @Override
-    default Optional<ItemStack> getBoots() {
-        return getEquipped(EquipmentTypes.BOOTS);
-    }
-
-    @Override
-    default void setBoots(@Nullable ItemStack boots) {
-        equip(EquipmentTypes.BOOTS, boots);
-    }
-
-    @Override
     default Optional<ItemStack> getItemInHand(HandType handType) {
-        return getEquipped(LanternEquipmentTypes.forHand(handType));
+        return getEquipped(EquipmentTypeRegistryModule.forHand(handType));
     }
 
     @Override
     default void setItemInHand(HandType handType, @Nullable ItemStack itemInHand) {
-        equip(LanternEquipmentTypes.forHand(handType), itemInHand);
+        equip(EquipmentTypeRegistryModule.forHand(handType), itemInHand);
     }
 }

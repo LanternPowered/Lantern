@@ -40,7 +40,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.entity.HumanMainInventory;
+import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.world.LanternWorld;
@@ -280,7 +280,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     }
 
     private static void deserializePlayerInventory(LanternPlayerInventory inventory, List<DataView> itemViews) {
-        final HumanMainInventory mainInventory = inventory.getMain();
+        final LanternHumanMainInventory mainInventory = inventory.getMain();
         final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
         final OffHandSlot offHandSlot = inventory.getOffhand();
 
@@ -301,7 +301,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static List<DataView> serializePlayerInventory(LanternPlayerInventory inventory) {
         final List<DataView> itemViews = new ArrayList<>();
 
-        final HumanMainInventory mainInventory = inventory.getMain();
+        final LanternHumanMainInventory mainInventory = inventory.getMain();
         final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
         final OffHandSlot offHandSlot = inventory.getOffhand();
 

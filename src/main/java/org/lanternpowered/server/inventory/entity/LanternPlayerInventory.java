@@ -33,10 +33,12 @@ import org.lanternpowered.server.inventory.AbstractMutableInventory;
 import org.lanternpowered.server.inventory.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
+import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.inventory.slot.LanternEquipmentSlot;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
@@ -59,9 +61,8 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
 
     @Nullable private final WeakReference<Player> player;
 
-    private LanternHotbar hotbar;
     private final LanternEquipmentInventory equipmentInventory;
-    private final HumanMainInventory mainInventory;
+    private final LanternHumanMainInventory mainInventory;
     private final OffHandSlot offHandSlot;
 
     private final Map<HumanInventoryView, AbstractMutableInventory> inventoryViews = new EnumMap<>(HumanInventoryView.class);
@@ -102,23 +103,31 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 finalizeContent();
             }
         });
-        this.mainInventory = registerChild(new HumanMainInventory(this, null) {
+        this.mainInventory = registerChild(new LanternHumanMainInventory(this) {
             {
-                for (int y = 0; y < 3; y++) {
-                    for (int x = 0; x < 9; x++) {
-                        registerSlotAt(x, y);
+                final LanternHumanMainInventory main = this;
+                this.grid = new LanternGridInventory(this) {
+                    {
+                        for (int y = 0; y < 3; y++) {
+                            for (int x = 0; x < 9; x++) {
+                                final LanternSlot slot = registerSlotAt(x, y);
+                                main.registerSlotAt(x, y, slot);
+                            }
+                        }
+                        finalizeContent();
                     }
-                }
-                hotbar = registerRow(3, new LanternHotbar(this) {
+                };
+                this.hotbar = new LanternHotbar(this) {
                     {
                         for (int x = 0; x < 9; x++) {
                             registerSlotAt(x);
                         }
                         finalizeContent();
                     }
-                });
+                };
+                registerRow(3, this.hotbar);
                 finalizeContent();
-                prioritizeChild(hotbar);
+                prioritizeChild(this.hotbar);
             }
         });
         this.offHandSlot = registerChild(new OffHandSlot(this, null));
@@ -137,23 +146,26 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
 
         // This is the default views/inventories
         this.inventoryViews.put(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR, this.mainInventory);
-        this.inventoryViews.put(HumanInventoryView.HOTBAR, this.hotbar);
+        this.inventoryViews.put(HumanInventoryView.HOTBAR, getHotbar());
     }
 
-    public LanternOrderedInventory getRawInventoryView() {
-        return (LanternOrderedInventory) this.inventoryViews.get(HumanInventoryView.RAW_INVENTORY);
-    }
-
-    private AbstractMutableInventory generateRawInventoryView(HumanMainInventory mainInventory,
+    private AbstractMutableInventory generateRawInventoryView(LanternHumanMainInventory mainInventory,
             LanternEquipmentInventory equipmentInventory, OffHandSlot offHandSlot) {
         return new LanternOrderedInventory(null, null) {
             {
-                registerChild(new HumanMainInventory(this, null) {
+                registerChild(new LanternHumanMainInventory(this) {
                     {
-                        registerRow(0, hotbar);
-                        for (int i = 0; i < 3; i++) {
-                            registerRow(i + 1, mainInventory.getRow(i).get());
+                        this.hotbar = mainInventory.getHotbar();
+                        this.grid = mainInventory.getGrid();
+                        for (int x = 0; x < 9; x++) {
+                            registerSlotAt(x, 0, this.hotbar.getSlotAt(x).get());
                         }
+                        for (int y = 0; y < 3; y++) {
+                            for (int x = 0; x < 9; x++) {
+                                registerSlotAt(x, y + 1, this.grid.getSlot(x, y).get());
+                            }
+                        }
+                        finalizeContent();
                     }
                 });
                 registerChild(equipmentInventory);
@@ -162,15 +174,15 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
         };
     }
 
-    private AbstractMutableInventory generateMainView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+    private AbstractMutableInventory generateMainView(@Nullable Inventory parent, LanternHumanMainInventory mainInventory) {
         final List<AbstractInventory> children = new ArrayList<>(mainInventory.getChildren());
-        children.removeAll(this.hotbar.getChildren());
+        children.removeAll(getHotbar().getChildren());
         return new AbstractChildrenInventory(parent, null, children);
     }
 
-    private AbstractMutableInventory generateReverseMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+    private AbstractMutableInventory generateReverseMainAndHotbarView(@Nullable Inventory parent, LanternHumanMainInventory mainInventory) {
         final List<AbstractInventory> children = new ArrayList<>(mainInventory.getChildren());
-        final List<AbstractInventory> hotbarSlots = new ArrayList<>(this.hotbar.getChildren());
+        final List<AbstractInventory> hotbarSlots = new ArrayList<>(getHotbar().getChildren());
         children.removeAll(hotbarSlots);
         Collections.reverse(children);
         Collections.reverse(hotbarSlots);
@@ -178,15 +190,15 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
         return new AbstractChildrenInventory(parent, null, children);
     }
 
-    private AbstractMutableInventory generatePriorityMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+    private AbstractMutableInventory generatePriorityMainAndHotbarView(@Nullable Inventory parent, LanternHumanMainInventory mainInventory) {
         final List<AbstractInventory> children = new ArrayList<>(mainInventory.getChildren());
-        final List<AbstractInventory> hotbarSlots =  new ArrayList<>(this.hotbar.getChildren());
+        final List<AbstractInventory> hotbarSlots =  new ArrayList<>(getHotbar().getChildren());
         children.removeAll(hotbarSlots);
         children.addAll(hotbarSlots);
         return new AbstractChildrenInventory(parent, null, children);
     }
 
-    private AbstractMutableInventory generateAllPriorityMainView(HumanMainInventory mainInventory) {
+    private AbstractMutableInventory generateAllPriorityMainView(LanternHumanMainInventory mainInventory) {
         final List<AbstractInventory> children = new ArrayList<>(this.getChildren());
         return new AbstractChildrenInventory(null, null) {
             {
@@ -209,11 +221,11 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
 
     @Override
     public LanternHotbar getHotbar() {
-        return this.hotbar;
+        return this.mainInventory.getHotbar();
     }
 
     @Override
-    public HumanMainInventory getMain() {
+    public LanternHumanMainInventory getMain() {
         return this.mainInventory;
     }
 

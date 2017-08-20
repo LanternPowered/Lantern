@@ -25,24 +25,20 @@
  */
 package org.lanternpowered.server.inventory.equipment;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.spongepowered.api.item.inventory.equipment.HeldEquipmentType;
 
-public final class LanternEquipmentTypes {
+import java.util.function.Predicate;
 
-    public static final EquipmentType MAIN_HAND = DummyObjectProvider.createFor(EquipmentType.class, "MAIN_HAND");
+import javax.annotation.Nullable;
 
-    public static final EquipmentType OFF_HAND = DummyObjectProvider.createFor(EquipmentType.class, "OFF_HAND");
+public class LanternHeldEquipmentType extends LanternEquipmentType implements HeldEquipmentType {
 
-    public static EquipmentType forHand(HandType handType) {
-        checkNotNull(handType, "handType");
-        return handType == HandTypes.MAIN_HAND ? MAIN_HAND : OFF_HAND;
+    public LanternHeldEquipmentType(String pluginId, String name) {
+        super(pluginId, name);
     }
 
-    private LanternEquipmentTypes() {
+    public LanternHeldEquipmentType(String pluginId, String name, @Nullable Predicate<EquipmentType> childChecker) {
+        super(pluginId, name, childChecker);
     }
 }

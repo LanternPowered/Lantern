@@ -29,30 +29,26 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternInventoryRow;
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class LanternHotbar extends LanternInventoryRow implements Hotbar {
 
     private int selectedSlotIndex;
 
-    public LanternHotbar(@Nullable Inventory parent) {
+    LanternHotbar(@Nullable Inventory parent) {
         super(parent);
-    }
-
-    public LanternHotbar(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
     }
 
     public LanternSlot getSelectedSlot() {
@@ -91,8 +87,7 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            //noinspection unchecked
-            return Optional.of((T) new EquipmentSlotType(LanternEquipmentTypes.MAIN_HAND));
+            return Optional.of((T) new EquipmentSlotType(EquipmentTypes.MAIN_HAND));
         }
         return Optional.empty();
     }
@@ -101,8 +96,7 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
         final List<T> properties = super.tryGetProperties(child, property);
         if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            //noinspection unchecked
-            properties.add((T) new EquipmentSlotType(LanternEquipmentTypes.MAIN_HAND));
+            properties.add((T) new EquipmentSlotType(EquipmentTypes.MAIN_HAND));
         }
         return properties;
     }

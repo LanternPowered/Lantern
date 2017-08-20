@@ -25,17 +25,16 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory.equipment;
 
-import com.google.common.collect.ImmutableList;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypeEquipped;
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypeWorn;
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
+import org.lanternpowered.server.inventory.equipment.LanternHeldEquipmentType;
+import org.lanternpowered.server.inventory.equipment.LanternWornEquipmentType;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-
-import java.util.List;
 
 public final class EquipmentTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<EquipmentType> {
 
@@ -45,22 +44,24 @@ public final class EquipmentTypeRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        register(new LanternEquipmentType("minecraft", "all", type -> true));
-        register(new LanternEquipmentTypeEquipped("minecraft", "equipped", type -> type instanceof LanternEquipmentTypeEquipped));
-        register(new LanternEquipmentTypeEquipped("minecraft", "main_hand"));
-        register(new LanternEquipmentTypeEquipped("minecraft", "off_hand"));
-        register(new LanternEquipmentTypeWorn("minecraft", "worn", type -> type instanceof LanternEquipmentTypeWorn));
-        register(new LanternEquipmentTypeWorn("minecraft", "boots"));
-        register(new LanternEquipmentTypeWorn("minecraft", "chestplate"));
-        register(new LanternEquipmentTypeWorn("minecraft", "headwear"));
-        register(new LanternEquipmentTypeWorn("minecraft", "leggings"));
+        register(new LanternEquipmentType("minecraft", "all",
+                type -> true));
+        register(new LanternEquipmentType("minecraft", "equipped",
+                type -> type instanceof LanternHeldEquipmentType || type instanceof LanternWornEquipmentType));
+        register(new LanternHeldEquipmentType("minecraft", "held",
+                type -> type instanceof LanternHeldEquipmentType));
+        register(new LanternHeldEquipmentType("minecraft", "main_hand"));
+        register(new LanternHeldEquipmentType("minecraft", "off_hand"));
+        register(new LanternWornEquipmentType("minecraft", "worn",
+                type -> type instanceof LanternWornEquipmentType));
+        register(new LanternWornEquipmentType("minecraft", "boots"));
+        register(new LanternWornEquipmentType("minecraft", "chestplate"));
+        register(new LanternWornEquipmentType("minecraft", "headwear"));
+        register(new LanternWornEquipmentType("minecraft", "leggings"));
     }
 
-    @Override
-    public List<CatalogMappingData> getCatalogMappings() {
-        return ImmutableList.<CatalogMappingData>builder()
-                .addAll(super.getCatalogMappings())
-                .add(new CatalogMappingData(LanternEquipmentTypes.class, provideCatalogMap()))
-                .build();
+    public static EquipmentType forHand(HandType handType) {
+        checkNotNull(handType, "handType");
+        return handType == HandTypes.MAIN_HAND ? EquipmentTypes.MAIN_HAND : EquipmentTypes.OFF_HAND;
     }
 }

@@ -33,7 +33,7 @@ import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.container.FurnaceInventoryContainer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
-import org.lanternpowered.server.inventory.entity.HumanMainInventory;
+import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
@@ -942,7 +942,7 @@ public class PlayerContainerSession {
     private PeekOfferTransactionsResult getShiftPeekOfferResult(int windowId, LanternSlot slot,
             ItemStack itemStack, boolean offhand) {
         final LanternPlayerInventory playerInventory = this.openContainer.playerInventory;
-        final HumanMainInventory mainInventory = playerInventory.getMain();
+        final LanternHumanMainInventory mainInventory = playerInventory.getMain();
         AbstractInventory inventory;
         PeekOfferTransactionsResult result;
         checkNotNull(this.openContainer);

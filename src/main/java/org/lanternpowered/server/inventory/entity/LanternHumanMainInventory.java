@@ -23,21 +23,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.equipment;
+package org.lanternpowered.server.inventory.entity;
 
-import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-
-import java.util.function.Predicate;
+import org.lanternpowered.server.inventory.LanternGridInventory;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.entity.Hotbar;
+import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
-public class LanternEquipmentTypeEquipped extends LanternEquipmentType {
+public class LanternHumanMainInventory extends LanternGridInventory implements MainPlayerInventory {
 
-    public LanternEquipmentTypeEquipped(String pluginId, String name) {
-        super(pluginId, name);
+    protected LanternHotbar hotbar;
+    protected LanternGridInventory grid;
+
+    LanternHumanMainInventory(@Nullable Inventory parent) {
+        super(parent);
     }
 
-    public LanternEquipmentTypeEquipped(String pluginId, String name, @Nullable Predicate<EquipmentType> childChecker) {
-        super(pluginId, name, childChecker);
+    @Override
+    public LanternHotbar getHotbar() {
+        return this.hotbar;
+    }
+
+    @Override
+    public LanternGridInventory getGrid() {
+        return this.grid;
+    }
+
+    @Override
+    protected <T extends Slot> T registerSlotAt(int x, int y, T slot) {
+        return super.registerSlotAt(x, y, slot);
     }
 }

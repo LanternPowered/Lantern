@@ -39,7 +39,6 @@ import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
@@ -76,8 +75,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
         private final static EquipmentType[] EQUIPMENT_TYPES =
                 {
-                        LanternEquipmentTypes.MAIN_HAND,
-                        LanternEquipmentTypes.OFF_HAND,
+                        EquipmentTypes.MAIN_HAND,
+                        EquipmentTypes.OFF_HAND,
                         EquipmentTypes.BOOTS,
                         EquipmentTypes.LEGGINGS,
                         EquipmentTypes.CHESTPLATE,

@@ -32,7 +32,7 @@ import org.lanternpowered.server.data.property.PropertyKeySetter;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.equipment.EquipmentTypeWorn;
+import org.spongepowered.api.item.inventory.equipment.WornEquipmentType;
 import org.spongepowered.api.item.inventory.property.ArmorSlotType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.slot.EquipmentSlot;
@@ -83,8 +83,8 @@ public class LanternEquipmentSlot extends LanternFilteringSlot implements Equipm
     private void registerContent() {
         if (this.itemFilter instanceof SimpleEquipmentItemFilter) {
             for (EquipmentType equipmentType : ((SimpleEquipmentItemFilter) this.itemFilter).equipmentTypes) {
-                if (equipmentType instanceof EquipmentTypeWorn) {
-                    final ArmorSlotType slotType = new ArmorSlotType((EquipmentTypeWorn) equipmentType);
+                if (equipmentType instanceof WornEquipmentType) {
+                    final ArmorSlotType slotType = new ArmorSlotType((WornEquipmentType) equipmentType);
                     PropertyKeySetter.setKey(slotType, equipmentType.getId());
                     registerProperty(slotType);
                 }

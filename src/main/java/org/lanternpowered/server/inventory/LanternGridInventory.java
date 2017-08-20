@@ -201,7 +201,7 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
             this.rows.add(null);
         }
         this.rows.set(y, (LanternInventoryRow) inventoryRow);
-        ((LanternOrderedInventory) inventoryRow).slots.forEach(slot -> this.registerSlot(slot, true));
+        ((LanternOrderedInventory) inventoryRow).slots.forEach(slot -> registerSlot(slot, true));
         return inventoryRow;
     }
 
@@ -222,7 +222,7 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
             this.columns.add(null);
         }
         this.columns.set(x, (LanternInventoryColumn) inventoryColumn);
-        ((LanternOrderedInventory) inventoryColumn).slots.forEach(slot -> this.registerSlot(slot, true));
+        ((LanternOrderedInventory) inventoryColumn).slots.forEach(slot -> registerSlot(slot, true));
         return inventoryColumn;
     }
 

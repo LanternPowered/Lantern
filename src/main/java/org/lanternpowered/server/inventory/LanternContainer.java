@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
-import org.lanternpowered.server.inventory.entity.HumanMainInventory;
+import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
@@ -94,7 +94,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             LanternPlayerInventory playerInventory, @Nullable OrderedInventory openInventory) {
         super(null, name);
         this.playerInventory = playerInventory;
-        final HumanMainInventory mainInventory = playerInventory.getMain();
+        final LanternHumanMainInventory mainInventory = playerInventory.getMain();
         if (openInventory != null) {
             this.registerChild(openInventory);
             this.registerChild(mainInventory);

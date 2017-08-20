@@ -248,81 +248,71 @@ public abstract class ClientContainer implements ContainerBase {
     @Nullable private LanternPlayer player;
     @Nullable private ContainerInteractionBehavior interactionBehavior;
 
-    private static abstract class AbstractContainerPart implements ContainerPart {
-
-        protected final ClientContainer clientContainer;
-
-        AbstractContainerPart(ClientContainer clientContainer) {
-            this.clientContainer = clientContainer;
-        }
+    private abstract class AbstractContainerPart implements ContainerPart {
 
         @Override
         public ClientContainer getRoot() {
-            return this.clientContainer;
+            return ClientContainer.this;
         }
 
         @Override
         public void queueSlotChange(LanternSlot slot) {
-            this.clientContainer.queueSlotChange(slot);
+            getRoot().queueSlotChange(slot);
         }
 
         @Override
         public void queueSlotChange(ClientSlot clientSlot) {
-            this.clientContainer.queueSlotChange(clientSlot);
+            getRoot().queueSlotChange(clientSlot);
         }
 
         @Override
         public void queueSlotChange(int index) {
-            this.clientContainer.queueSlotChange(localToGlobalIndex(index));
+            getRoot().queueSlotChange(localToGlobalIndex(index));
         }
 
         @Override
         public void queueSilentSlotChange(LanternSlot slot) {
-            this.clientContainer.queueSilentSlotChange(slot);
+            getRoot().queueSilentSlotChange(slot);
         }
 
         @Override
         public void queueSilentSlotChange(ClientSlot clientSlot) {
-            this.clientContainer.queueSilentSlotChange(clientSlot);
+            getRoot().queueSilentSlotChange(clientSlot);
         }
 
         @Override
         public void queueSilentSlotChange(int index) {
-            this.clientContainer.queueSilentSlotChange(localToGlobalIndex(index));
+            getRoot().queueSilentSlotChange(localToGlobalIndex(index));
         }
 
         @Override
         public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
-            return this.clientContainer.bindSlot(localToGlobalIndex(index), slot);
+            return getRoot().bindSlot(localToGlobalIndex(index), slot);
         }
 
         @Override
         public ClientSlot.Button bindButton(int index) {
-            return this.clientContainer.bindButton(localToGlobalIndex(index));
+            return getRoot().bindButton(localToGlobalIndex(index));
         }
 
         @Override
         public Optional<LanternSlot> getSlot(int index) {
-            return this.clientContainer.getSlot(localToGlobalIndex(index));
+            return getRoot().getSlot(localToGlobalIndex(index));
         }
 
         @Override
         public Optional<ClientSlot> getClientSlot(int index) {
-            return this.clientContainer.getClientSlot(localToGlobalIndex(index));
+            return getRoot().getClientSlot(localToGlobalIndex(index));
         }
 
         @Override
         public void unbind(int index) {
-            this.clientContainer.unbind(localToGlobalIndex(index));
+            getRoot().unbind(localToGlobalIndex(index));
         }
 
         protected abstract int localToGlobalIndex(int index);
     }
     private final class TopContainerPartImpl extends AbstractContainerPart implements TopContainerPart {
-
-        private TopContainerPartImpl(ClientContainer clientContainer) {
-            super(clientContainer);
-        }
 
         @Override
         protected int localToGlobalIndex(int index) {
@@ -339,10 +329,6 @@ public abstract class ClientContainer implements ContainerBase {
     }
     private final class BottomContainerPartImpl extends AbstractContainerPart implements BottomContainerPart {
 
-        private BottomContainerPartImpl(ClientContainer clientContainer) {
-            super(clientContainer);
-        }
-
         @Override
         protected int localToGlobalIndex(int index) {
             checkState(index >= 0 && index < MAIN_INVENTORY_FLAGS.length);
@@ -358,7 +344,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
     }
 
-    private final TopContainerPart topContainerPart = new TopContainerPartImpl(this);
+    private final TopContainerPart topContainerPart = new TopContainerPartImpl();
     @Nullable private BottomContainerPart bottomContainerPart;
     // Double click data
     @Nullable private ItemStack doubleClickItem;
@@ -420,7 +406,7 @@ public abstract class ClientContainer implements ContainerBase {
     public BottomContainerPart bindBottom() {
         populate();
         if (this.bottomContainerPart == null) {
-            this.bottomContainerPart = new BottomContainerPartImpl(this);
+            this.bottomContainerPart = new BottomContainerPartImpl();
         } else {
             final int s = getTopSlotsCount();
             for (int i = 0; i < MAIN_INVENTORY_FLAGS.length; i++) {
@@ -433,9 +419,9 @@ public abstract class ClientContainer implements ContainerBase {
     public BottomContainerPart bindBottom(BottomContainerPart bottomContainerPart) {
         populate();
         if (this.bottomContainerPart == null) {
-            this.bottomContainerPart = new BottomContainerPartImpl(this);
+            this.bottomContainerPart = new BottomContainerPartImpl();
         }
-        final ClientContainer clientContainer = ((BottomContainerPartImpl) bottomContainerPart).clientContainer;
+        final ClientContainer clientContainer = bottomContainerPart.getRoot();
         final int s1 = getTopSlotsCount();
         final int s2 = clientContainer.getTopSlotsCount();
         for (int i = 0; i < MAIN_INVENTORY_FLAGS.length; i++) {
@@ -545,7 +531,7 @@ public abstract class ClientContainer implements ContainerBase {
         queueSilentSlotChangeSafely(clientSlot);
     }
 
-    private ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+    protected ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
         populate();
         final SlotClientSlot clientSlot = new SlotClientSlot(index, slot);
         removeSlot(index);
@@ -771,7 +757,6 @@ public abstract class ClientContainer implements ContainerBase {
         }
         // Update the cursor item if needed
         if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
-            System.out.println("DEBUG: " + this.cursor.getClass().getName());
             messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
             this.cursor.dirtyState = 0;
         }
@@ -870,11 +855,11 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     protected int clientSlotIndexToServer(int index) {
-        return index;
+        return index < 0 ? -1 : index;
     }
 
     protected int serverSlotIndexToClient(int index) {
-        return index;
+        return index < 0 ? -1 : index;
     }
 
     @SuppressWarnings({"ConstantConditions", "OptionalGetWithoutIsPresent"})
@@ -897,12 +882,14 @@ public abstract class ClientContainer implements ContainerBase {
         slotIndex = clientSlotIndexToServer(slotIndex);
 
         // Update the target slot and cursor
-        queueSilentSlotChange(this.slots[slotIndex]);
+        if (slotIndex != -1) {
+            queueSilentSlotChange(this.slots[slotIndex]);
+        }
         // queueSlotChange(this.cursor);
 
         final int slotIndex1 = slotIndex;
         tryProcessBehavior(behavior -> behavior.handleCreativeClick(this,
-                slotIndex1 == -999 ? null : this.slots[slotIndex1], itemStack));
+                slotIndex1 == -1 ? null : this.slots[slotIndex1], itemStack));
     }
 
     public void handleClick(int slotIndex, int mode, int button) {
@@ -922,7 +909,7 @@ public abstract class ClientContainer implements ContainerBase {
             this.doubleClickItem = null;
         }
 
-        if (mode == 0 && (button == 0 || button == 1) && slotIndex != -999) {
+        if (mode == 0 && (button == 0 || button == 1)) {
             // Left/right click inside the inventory
             handleLeftRightClick(slotIndex, button);
         } else if (mode == 1 && (button == 0 || button == 1)) {
@@ -935,9 +922,9 @@ public abstract class ClientContainer implements ContainerBase {
             // Number keys
             handleNumberKey(slotIndex, button);
         } else if (mode == 4 && (button == 0 || button == 1)) {
-            if (slotIndex == -999) {
+            if (slotIndex == -1) {
                 // Left/right click outside the inventory
-                handleLeftRightClick(-999, button);
+                handleLeftRightClick(-1, button);
             } else {
                 // (Control) drop key
                 handleDropKey(slotIndex, button == 1);
@@ -1026,13 +1013,13 @@ public abstract class ClientContainer implements ContainerBase {
         // Middle click is only used in creative,
         // you can only do it if the cursor is empty
         // and the target slot isn't empty.
-        if (slotIndex != -999 && this.cursor.getRaw().isEmpty() &&
+        if (slotIndex != -1 && this.cursor.getRaw().isEmpty() &&
                 !this.slots[slotIndex].getRaw().isEmpty() &&
                 (this.player != null && this.player.get(Keys.GAME_MODE).get() == GameModes.CREATIVE)) {
             queueSlotChange(this.cursor);
         }
         tryProcessBehavior(behavior -> behavior.handleClick(this,
-                slotIndex == -999 ? null : this.slots[slotIndex], MouseButton.MIDDLE));
+                slotIndex == -1 ? null : this.slots[slotIndex], MouseButton.MIDDLE));
     }
 
     /**
@@ -1106,14 +1093,14 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Handles a left or right click interaction. {@code slotIndex} with value -999
+     * Handles a left or right click interaction. {@code slotIndex} with value -1
      * may be passed in when the click interaction occurs outside the container.
      *
      * @param slotIndex The slot index that was clicked
      * @param button The button that was pressed (0: left; 1: right)
      */
     private void handleLeftRightClick(int slotIndex, int button) {
-        if (slotIndex != -999) {
+        if (slotIndex != -1) {
             final BaseClientSlot slot = this.slots[slotIndex];
             if (!slot.getRaw().isEmpty()) {
                 // Only changes can occur if the cursor slot and the target slot are empty
@@ -1130,7 +1117,7 @@ public abstract class ClientContainer implements ContainerBase {
             queueSlotChange(this.cursor);
         }
         tryProcessBehavior(behavior -> behavior.handleClick(this,
-                slotIndex == -999 ? null : this.slots[slotIndex], button == 1 ? MouseButton.RIGHT : MouseButton.LEFT));
+                slotIndex == -1 ? null : this.slots[slotIndex], button == 1 ? MouseButton.RIGHT : MouseButton.LEFT));
     }
 
     /**

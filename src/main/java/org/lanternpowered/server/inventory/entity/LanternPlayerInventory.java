@@ -37,9 +37,8 @@ import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
-import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
-import org.lanternpowered.server.inventory.client.BottomContainerPart;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
@@ -65,7 +64,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternPlayerInventory extends LanternOrderedInventory implements PlayerInventory, VanillaOpenableInventory {
+public class LanternPlayerInventory extends LanternOrderedInventory implements PlayerInventory, OpenableInventory {
 
     @Nullable private final WeakReference<Player> player;
 
@@ -111,6 +110,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 finalizeContent();
             }
         });
+        this.offHandSlot = registerChild(new OffHandSlot(this, null));
         this.mainInventory = registerChild(new LanternHumanMainInventory(this) {
             {
                 final LanternHumanMainInventory main = this;
@@ -263,7 +263,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
             // Just try to offer to the equipment
             return this.equipmentInventory;
         }
-        return VanillaOpenableInventory.super.getShiftClickTarget(container, slot);
+        return OpenableInventory.super.getShiftClickTarget(container, slot);
     }
 
     @Override
@@ -272,16 +272,14 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     }
 
     @Override
-    public PlayerClientContainer constructClientContainer0(LanternContainer container) {
+    public PlayerClientContainer constructClientContainer(LanternContainer container) {
         final PlayerClientContainer clientContainer = new PlayerClientContainer(Text.of(getName()));
-        clientContainer.bindHotbarBehavior(this.hotbar.getHotbarBehavior());
+        clientContainer.bindCursor(container.getCursorSlot());
+        clientContainer.bindHotbarBehavior(getHotbar().getHotbarBehavior());
         clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(container));
-        final BottomContainerPart part = clientContainer.bindBottom();
-        getMain().getIndexBySlots().object2IntEntrySet().forEach(entry -> {
-            if (getMain().isChild(entry.getKey())) {
-                part.bindSlot(entry.getIntValue(), entry.getKey());
-            }
-        });
+        clientContainer.bindBottom();
+        getIndexBySlots().object2IntEntrySet().forEach(entry ->
+                clientContainer.bindSlot(entry.getIntValue(), entry.getKey()));
         return clientContainer;
     }
 }

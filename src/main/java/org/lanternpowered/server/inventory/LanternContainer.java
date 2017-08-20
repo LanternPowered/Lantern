@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
-import org.lanternpowered.server.inventory.client.TopContainerPart;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.entity.living.player.Player;

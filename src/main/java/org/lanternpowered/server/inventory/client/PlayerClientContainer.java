@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.text.Text;
@@ -86,12 +87,12 @@ public class PlayerClientContainer extends ClientContainer {
 
     @Override
     protected int clientSlotIndexToServer(int index) {
-        return index == ALL_SLOT_FLAGS.length - 1 ? OFFHAND_SLOT_INDEX : index < OFFHAND_SLOT_INDEX ? index : index + 1;
+        return index < 0 ? -1 : index == ALL_SLOT_FLAGS.length - 1 ? OFFHAND_SLOT_INDEX : index < OFFHAND_SLOT_INDEX ? index : index + 1;
     }
 
     @Override
     protected int serverSlotIndexToClient(int index) {
-        return index == OFFHAND_SLOT_INDEX ? ALL_SLOT_FLAGS.length - 1 : index < OFFHAND_SLOT_INDEX ? index : index - 1;
+        return index < 0 ? -1 : index == OFFHAND_SLOT_INDEX ? ALL_SLOT_FLAGS.length - 1 : index < OFFHAND_SLOT_INDEX ? index : index - 1;
     }
 
     @Override
@@ -115,6 +116,11 @@ public class PlayerClientContainer extends ClientContainer {
             this.previousSelectedHotbarSlot = selectedHotbarSlot;
             messages.add(new MessagePlayInOutHeldItemChange(selectedHotbarSlot));
         }
+    }
+
+    @Override
+    public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+        return super.bindSlot(index, slot);
     }
 
     public void handleHeldItemChange(int hotbarSlotIndex) {

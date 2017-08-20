@@ -156,6 +156,7 @@ import org.lanternpowered.server.game.registry.type.fluid.FluidTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CollisionRuleRegistryModule;
@@ -203,9 +204,9 @@ import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecip
 import org.lanternpowered.server.item.recipe.crafting.LanternShapelessCraftingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.fuel.IFuel;
 import org.lanternpowered.server.item.recipe.fuel.IFuelRegistry;
+import org.lanternpowered.server.item.recipe.fuel.LanternFuelBuilder;
 import org.lanternpowered.server.item.recipe.fuel.LanternFuelRegistryModule;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
-import org.lanternpowered.server.item.recipe.fuel.LanternFuelBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistryModule;
@@ -349,6 +350,7 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.property.GuiId;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -624,6 +626,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
+                .registerModule(GuiId.class, ClientContainerRegistryModule.get())
                 .registerModule(GoldenApple.class, GoldenAppleRegistryModule.get())
                 .registerModule(CoalType.class, CoalTypeRegistryModule.get())
                 .registerModule(Fish.class, FishRegistryModule.get())

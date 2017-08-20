@@ -23,36 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.entity;
+package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.inventory.InventoryPropertyHolder;
+import org.spongepowered.api.item.inventory.property.GuiId;
 
-import javax.annotation.Nullable;
+public final class ClientContainerType extends PluginCatalogType.Base implements GuiId {
 
-public class LanternHumanMainInventory extends LanternGridInventory implements MainPlayerInventory {
+    private final ClientContainerProvider containerProvider;
 
-    protected LanternHotbar hotbar;
-    protected LanternGridInventory grid;
-
-    LanternHumanMainInventory(@Nullable Inventory parent) {
-        super(parent);
+    public ClientContainerType(String pluginId, String name,
+            ClientContainerProvider containerProvider) {
+        super(pluginId, name);
+        this.containerProvider = containerProvider;
     }
 
-    @Override
-    public LanternHotbar getHotbar() {
-        return this.hotbar;
+    public ClientContainerType(String pluginId, String id, String name,
+            ClientContainerProvider containerProvider) {
+        super(pluginId, id, name);
+        this.containerProvider = containerProvider;
     }
 
-    @Override
-    public LanternGridInventory getGrid() {
-        return this.grid;
-    }
-
-    @Override
-    protected <T extends Slot> T registerSlotAt(int x, int y, T slot) {
-        return super.registerSlotAt(x, y, slot);
+    /**
+     * Creates a new {@link ClientContainer}.
+     *
+     * @return The client container
+     */
+    public ClientContainer createContainer(InventoryPropertyHolder propertyHolder) {
+        return this.containerProvider.apply(propertyHolder);
     }
 }

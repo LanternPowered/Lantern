@@ -23,36 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.entity;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
-public class LanternHumanMainInventory extends LanternGridInventory implements MainPlayerInventory {
+public interface InventoryPropertyHolder {
 
-    protected LanternHotbar hotbar;
-    protected LanternGridInventory grid;
+    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, Object key);
 
-    LanternHumanMainInventory(@Nullable Inventory parent) {
-        super(parent);
-    }
-
-    @Override
-    public LanternHotbar getHotbar() {
-        return this.hotbar;
-    }
-
-    @Override
-    public LanternGridInventory getGrid() {
-        return this.grid;
-    }
-
-    @Override
-    protected <T extends Slot> T registerSlotAt(int x, int y, T slot) {
-        return super.registerSlotAt(x, y, slot);
-    }
+    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property);
 }

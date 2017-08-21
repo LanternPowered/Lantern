@@ -45,7 +45,7 @@ public class PlayerInventoryContainer extends LanternContainer {
     public PlayerInventoryContainer(LanternPlayerInventory playerInventory) {
         super((Translation) null, playerInventory, null);
         // Construct the client container and attach the player
-        this.clientContainer = (PlayerClientContainer) playerInventory.constructClientContainer(this);
+        this.clientContainer = playerInventory.constructClientContainer(this);
         this.clientContainer.bind(playerInventory.getCarrier().get());
     }
 

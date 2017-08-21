@@ -426,9 +426,15 @@ public abstract class ClientContainer implements ContainerBase {
         final int s2 = clientContainer.getTopSlotsCount();
         for (int i = 0; i < MAIN_INVENTORY_FLAGS.length; i++) {
             final int index = s1 + i;
+            removeSlot(index);
             BaseClientSlot clientSlot = clientContainer.slots[s2 + i];
             if (clientSlot instanceof SlotClientSlot) {
-                clientSlot = new SlotClientSlot(index, ((SlotClientSlot) clientSlot).slot);
+                final LanternSlot slot = ((SlotClientSlot) clientSlot).slot;
+                clientSlot = new SlotClientSlot(index, slot);
+                this.slotMap.put(slot, (SlotClientSlot) clientSlot);
+                if (this.player != null) {
+                    slot.addTracker(this);
+                }
             } else if (clientSlot instanceof IconClientSlot) {
                 final ItemStack itemStack = clientSlot.getItem();
                 clientSlot = new IconClientSlot(index);
@@ -705,6 +711,7 @@ public abstract class ClientContainer implements ContainerBase {
         final ItemStack[] items = new ItemStack[getSlotFlags().length];
         for (int i = 0; i < items.length; i++) {
             items[serverSlotIndexToClient(i)] = this.slots[i].getItem();
+            this.slots[i].dirtyState = 0;
         }
         // Send the inventory content
         messages.add(new MessagePlayOutWindowItems(this.containerId, items));
@@ -953,6 +960,9 @@ public abstract class ClientContainer implements ContainerBase {
      * Resets the current drag process.
      */
     private void resetDrag() {
+        if (this.dragMode == -1) {
+            return;
+        }
         this.dragMode = -1;
         // Force each slot to update
         for (int i : this.dragSlots.toIntArray()) {
@@ -1153,6 +1163,7 @@ public abstract class ClientContainer implements ContainerBase {
         final int step = reverse ? -1 : 1;
         // Get the max stack size for the shifted item
         final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+        final IntList retrySlots = new IntArrayList();
         final IntList mainSlots = new IntArrayList();
         for (int i = start; i != end; i += step) {
             // Don't shift to itself
@@ -1178,8 +1189,10 @@ public abstract class ClientContainer implements ContainerBase {
             final int limit = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
             // If the items aren't equal, they won't be able to stack anyway,
             // or if the slot is full
-            if (!itemStack1.isEmpty() && (itemStack1.getQuantity() >= limit ||
-                    !LanternItemStack.areSimilar(itemStack, itemStack1))) {
+            if (itemStack1.isEmpty()) {
+                retrySlots.add(i);
+                continue;
+            } else if (!LanternItemStack.areSimilar(itemStack, itemStack1) || itemStack1.getQuantity() >= limit) {
                 continue;
             }
             // Just force the slot to update and skip it, we don't know for
@@ -1192,6 +1205,28 @@ public abstract class ClientContainer implements ContainerBase {
             // Now, we take some items away from the shifted stack and continue
             // the process for the rest of the slots
             final int removed = limit - itemStack1.getQuantity();
+            if (removed > 0) {
+                itemStack.setQuantity(Math.max(0, itemStack.getQuantity() - removed));
+                // Do it silently if possible, avoid any animations
+                queueSilentSlotChangeSafely(slot1);
+            }
+            // We are at the end, the stack is empty
+            if (itemStack.isEmpty()) {
+                return;
+            }
+        }
+        for (int i : retrySlots) {
+            final BaseClientSlot slot1 = this.slots[i];
+            // Just force the slot to update and skip it, we don't know for
+            // sure that there will be an item put in it.
+            if ((flags[i] & FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION) != 0) {
+                // Do it silently if possible, avoid any animations
+                queueSilentSlotChangeSafely(slot1);
+                continue;
+            }
+            // Now, we take some items away from the shifted stack and continue
+            // the process for the rest of the slots
+            final int removed = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
             if (removed > 0) {
                 itemStack.setQuantity(Math.max(0, itemStack.getQuantity() - removed));
                 // Do it silently if possible, avoid any animations

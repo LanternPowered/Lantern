@@ -150,8 +150,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             clientContainer.bindPropertySupplier(ContainerProperties.FUEL_PROGRESS, () -> {
                 double fuelProgress = this.fuelProgress;
                 if (fuelProgress < 0) {
-                    final int max = get(Keys.MAX_BURN_TIME).get();
-                    fuelProgress = this.fuelProgress = max - get(Keys.PASSED_BURN_TIME).get().doubleValue() / (double) max;
+                    fuelProgress = this.fuelProgress = 1.0 - get(Keys.PASSED_BURN_TIME).get().doubleValue() / get(Keys.MAX_BURN_TIME).get().doubleValue();
                 }
                 return fuelProgress;
             });

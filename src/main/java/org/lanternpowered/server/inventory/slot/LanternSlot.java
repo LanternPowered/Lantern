@@ -51,9 +51,11 @@ import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -128,8 +130,11 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     }
 
     public void setRawItemStack(@Nullable ItemStack itemStack) {
-        this.itemStack = itemStack == null || itemStack.isEmpty() ? null : itemStack;
-        queueUpdate();
+        itemStack = itemStack == null || itemStack.isEmpty() ? null : itemStack;
+        if (!Objects.equals(this.itemStack, itemStack)) {
+            queueUpdate();
+        }
+        this.itemStack = itemStack;
     }
 
     /**

@@ -382,6 +382,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         return this.player;
     }
 
+    @Nullable
+    public LanternPlayer getPlayerNullable() {
+        return this.player;
+    }
+
     @Override
     public int getLatency() {
         return this.latency;
@@ -792,7 +797,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             if (!event.isMessageCancelled()) {
                 event.getChannel().ifPresent(channel -> channel.send(this.player, event.getMessage()));
             }
-
             causeStack.popCause();
 
             // Remove the proxy user from the player and save the player data
@@ -949,6 +953,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (!joinEvent.isMessageCancelled()) {
             joinEvent.getChannel().ifPresent(channel -> channel.send(this.player, joinEvent.getMessage()));
         }
+
+        this.registeredChannels.forEach(channel -> Sponge.getEventManager()
+                .post(SpongeEventFactory.createChannelRegistrationEventRegister(cause, channel)));
 
         this.server.getDefaultResourcePack().ifPresent(this.player::sendResourcePack);
         this.player.resetIdleTimeoutCounter();

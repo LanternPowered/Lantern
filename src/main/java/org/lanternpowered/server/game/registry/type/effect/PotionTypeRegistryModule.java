@@ -29,12 +29,14 @@ import org.lanternpowered.server.effect.potion.LanternPotionType;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.potion.PotionTypes;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
 @RegistrationDependency({ PotionEffectTypeRegistryModule.class })
-public class PotionTypeRegistryModule extends InternalPluginCatalogRegistryModule<PotionType> {
+public class PotionTypeRegistryModule extends InternalPluginCatalogRegistryModule<PotionType> implements ForgeCatalogRegistryModule<PotionType> {
 
     private static final PotionTypeRegistryModule INSTANCE = new PotionTypeRegistryModule();
 
@@ -117,5 +119,10 @@ public class PotionTypeRegistryModule extends InternalPluginCatalogRegistryModul
                 .add(PotionEffect.of(PotionEffectTypes.WEAKNESS, 0, 4800)));
         register(new LanternPotionType("minecraft", "luck", "%s.effect.luck", 36)
                 .add(PotionEffect.of(PotionEffectTypes.LUCK, 0, 6000)));
+    }
+
+    @Override
+    public ForgeRegistryData getRegistryData() {
+        return new ForgeRegistryData("minecraft:potiontypes", getRegistryDataMappings());
     }
 }

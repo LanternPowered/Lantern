@@ -28,6 +28,7 @@ package org.lanternpowered.server.world.biome;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -35,7 +36,7 @@ import org.spongepowered.api.world.biome.VirtualBiomeType;
 
 import java.util.function.Function;
 
-public class LanternVirtualBiomeType extends AbstractBiomeType implements VirtualBiomeType {
+public class LanternVirtualBiomeType extends AbstractBiomeType implements VirtualBiomeType, VirtualCatalogType {
 
     private final Function<World, BiomeGenerationSettings> settingsFunction;
     private final BiomeType persistedType;

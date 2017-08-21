@@ -23,29 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.forge;
 
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.item.inventory.ItemStack;
+import io.netty.util.AttributeKey;
+import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 
-import javax.annotation.Nullable;
+public final class ForgeProtocol {
 
-public final class MessagePlayInCreativeWindowAction implements Message {
+    /**
+     * The attribute key of the server handshake phase.
+     */
+    public static final AttributeKey<ForgeServerHandshakePhase> HANDSHAKE_PHASE = AttributeKey.valueOf("fml-handshake-phase");
 
-    private final int slot;
-    @Nullable private final ItemStack itemStack;
+    /**
+     * The name of the main channel.
+     */
+    public static final String MAIN_CHANNEL = "FML";
 
-    public MessagePlayInCreativeWindowAction(int slot, @Nullable ItemStack itemStack) {
-        this.itemStack = itemStack;
-        this.slot = slot;
-    }
+    /**
+     * The name of the forge handshake channel.
+     */
+    public static final String HANDSHAKE_CHANNEL = "FML|HS";
 
-    public int getSlot() {
-        return this.slot;
-    }
+    /**
+     * The name of the forge multi part message channel.
+     */
+    public static final String MULTI_PART_MESSAGE_CHANNEL = "FML|MP";
 
-    @Nullable
-    public ItemStack getItemStack() {
-        return this.itemStack;
+    private ForgeProtocol() {
     }
 }

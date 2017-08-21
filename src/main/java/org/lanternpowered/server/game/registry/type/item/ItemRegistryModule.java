@@ -45,11 +45,14 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
@@ -116,7 +119,8 @@ import java.util.function.Function;
         RecordTypeRegistryModule.class,
         EquipmentTypeRegistryModule.class,
 })
-public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
+public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry,
+        ForgeCatalogRegistryModule<ItemType> {
 
     private static class Holder {
 
@@ -147,6 +151,24 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         this.internalIdByItemType.put(itemType, internalId);
         this.itemTypeByInternalId.put(internalId, itemType);
         Lantern.getGame().getPropertyRegistry().registerItemPropertyStores(((LanternItemType) itemType).getPropertyProviderCollection());
+    }
+
+    @Override
+    public ForgeRegistryData getRegistryData() {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
+        this.itemTypeByInternalId.int2ObjectEntrySet().forEach(entry -> {
+            if (!(entry.getValue() instanceof VirtualCatalogType)) {
+                map.put(entry.getValue().getId(), entry.getIntKey());
+            }
+        });
+        // The forge/vanilla client doesn't have a
+        // of a none item type like in sponge, however they
+        // use air (like the block) in this case.
+        // AIR MAY NEVER BE REMOVED, you can expect some
+        // crashes if you do so.
+        map.remove("minecraft:none");
+        map.put("minecraft:air", 0);
+        return new ForgeRegistryData("minecraft:items", map);
     }
 
     @Override

@@ -23,29 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.game.registry.forge;
 
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.item.inventory.ItemStack;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
-import javax.annotation.Nullable;
+public final class ForgeRegistryData {
 
-public final class MessagePlayInCreativeWindowAction implements Message {
+    private final String moduleId;
+    private final Object2IntMap<String> mappings;
 
-    private final int slot;
-    @Nullable private final ItemStack itemStack;
-
-    public MessagePlayInCreativeWindowAction(int slot, @Nullable ItemStack itemStack) {
-        this.itemStack = itemStack;
-        this.slot = slot;
+    /**
+     * Constructs a new {@link ForgeRegistryData} object.
+     *
+     * @param moduleId The module id
+     * @param mappings The mappings
+     */
+    public ForgeRegistryData(String moduleId, Object2IntMap<String> mappings) {
+        this.moduleId = moduleId;
+        this.mappings = mappings;
     }
 
-    public int getSlot() {
-        return this.slot;
+    /**
+     * Gets the module id.
+     *
+     * @return The module id
+     */
+    public String getModuleId() {
+        return this.moduleId;
     }
 
-    @Nullable
-    public ItemStack getItemStack() {
-        return this.itemStack;
+    /**
+     * Gets the mappings.
+     *
+     * @return The mappings
+     */
+    public Object2IntMap<String> getMappings() {
+        return this.mappings;
     }
 }

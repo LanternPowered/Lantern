@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
@@ -36,6 +37,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
+import org.lanternpowered.server.network.forge.ForgeProtocol;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -45,12 +47,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.Set;
 
 public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Message> {
 
     private static final AttributeKey<MultiPartMessage> FML_MULTI_PART_MESSAGE = AttributeKey.valueOf("fml-mpm");
+
+    private static final String REGISTER_CHANNEL = "REGISTER";
+    private static final String UNREGISTER_CHANNEL = "UNREGISTER";
 
     @Override
     public ByteBuffer encode(CodecContext context, Message message) throws CodecException {
@@ -63,10 +67,10 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             channel = message1.getChannel();
         } else if (message instanceof MessagePlayInOutRegisterChannels) {
             content = encodeChannels(((MessagePlayInOutRegisterChannels) message).getChannels());
-            channel = "REGISTER";
+            channel = REGISTER_CHANNEL;
         } else if (message instanceof MessagePlayInOutUnregisterChannels) {
             content = encodeChannels(((MessagePlayInOutUnregisterChannels) message).getChannels());
-            channel = "UNREGISTER";
+            channel = UNREGISTER_CHANNEL;
         } else {
             final MessageResult result = encode0(context, message);
             channel = result.channel;
@@ -96,47 +100,37 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
     }
 
     private Message decode0(CodecContext context, ByteBuffer content, String channel) {
-        if ("REGISTER".equals(channel)) {
-            Set<String> channels = decodeChannels(content);
-            Iterator<String> it = channels.iterator();
-            while (it.hasNext()) {
-                String channel0 = it.next();
-                if (channel0.startsWith("FML")) {
-                    it.remove();
-                }
-            }
+        if (REGISTER_CHANNEL.equals(channel)) {
+            final Set<String> channels = decodeChannels(content).stream()
+                    .filter(s -> !s.startsWith(ForgeProtocol.MAIN_CHANNEL))
+                    .collect(ImmutableSet.toImmutableSet());
             if (!channels.isEmpty()) {
                 return new MessagePlayInOutRegisterChannels(channels);
             }
-        } else if ("UNREGISTER".equals(channel)) {
-            Set<String> channels = decodeChannels(content);
-            Iterator<String> it = channels.iterator();
-            while (it.hasNext()) {
-                String channel0 = it.next();
-                if (channel0.startsWith("FML")) {
-                    it.remove();
-                }
-            }
+        } else if (UNREGISTER_CHANNEL.equals(channel)) {
+            final Set<String> channels = decodeChannels(content).stream()
+                    .filter(s -> !s.startsWith(ForgeProtocol.MAIN_CHANNEL))
+                    .collect(ImmutableSet.toImmutableSet());
             if (!channels.isEmpty()) {
                 return new MessagePlayInOutUnregisterChannels(channels);
             }
-        } else if ("FML|MP".equals(channel)) {
-            Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
-            MultiPartMessage message0 = attribute.get();
+        } else if (ForgeProtocol.MULTI_PART_MESSAGE_CHANNEL.equals(channel)) {
+            final Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
+            final MultiPartMessage message0 = attribute.get();
             if (message0 == null) {
-                String channel0 = content.readString();
-                int parts = content.readByte() & 0xff;
-                int size = content.readInteger();
+                final String channel0 = content.readString();
+                final int parts = content.readByte() & 0xff;
+                final int size = content.readInteger();
                 if (size <= 0 || size >= -16797616) {
                     throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Max: -16797616, Received: " + size);
                 }
                 attribute.set(new MultiPartMessage(channel0, context.byteBufAlloc().buffer(size), parts));
             } else {
-                int part = content.readByte() & 0xff;
+                final int part = content.readByte() & 0xff;
                 if (part != message0.index) {
                     throw new CodecException("Received FML MultiPart packet out of order, Expected: " + message0.index + ", Got: " + part);
                 }
-                int len = content.available() - 1;
+                final int len = content.available();
                 content.readBytes(message0.buffer, message0.offset, len);
                 message0.offset += len;
                 message0.index++;

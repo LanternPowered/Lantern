@@ -25,7 +25,10 @@
  */
 package org.lanternpowered.server.network.forge.message.codec.handshake;
 
+import static org.lanternpowered.server.network.forge.ForgeProtocol.HANDSHAKE_CHANNEL;
+
 import io.netty.handler.codec.CodecException;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData.Entry;
@@ -37,6 +40,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class ProcessorForgeHandshakeOutRegistryData implements Processor<MessageForgeHandshakeOutRegistryData> {
 
@@ -52,16 +56,22 @@ public final class ProcessorForgeHandshakeOutRegistryData implements Processor<M
             buf.writeByte((byte) CodecPlayInOutCustomPayload.FML_HANDSHAKE_REGISTRY_DATA);
             buf.writeBoolean(it.hasNext());
             buf.writeString(entry.getName());
-            final Map<String, Integer> ids = entry.getIds();
+            final Object2IntMap<String> ids = entry.getIds();
             buf.writeVarInt(ids.size());
-            for (Map.Entry<String, Integer> en : ids.entrySet()) {
+            for (Object2IntMap.Entry<String> en : ids.object2IntEntrySet()) {
                 buf.writeString(en.getKey());
-                buf.writeVarInt(en.getValue());
+                buf.writeVarInt(en.getIntValue());
             }
-            final List<String> substitutions = entry.getSubstitutions();
-            buf.writeVarInt(substitutions.size());
-            substitutions.forEach(buf::writeString);
-            output.add(new MessagePlayInOutChannelPayload("FML|HS", buf));
+            final Set<String> dummies = entry.getDummies();
+            buf.writeVarInt(dummies.size());
+            dummies.forEach(buf::writeString);
+            final Map<String, String> overrides = entry.getOverrides();
+            buf.writeVarInt(overrides.size());
+            for (Map.Entry<String, String> en : overrides.entrySet()) {
+                buf.writeString(en.getKey());
+                buf.writeString(en.getValue());
+            }
+            output.add(new MessagePlayInOutChannelPayload(HANDSHAKE_CHANNEL, buf));
         }
     }
 }

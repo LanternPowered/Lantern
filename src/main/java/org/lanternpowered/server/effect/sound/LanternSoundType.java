@@ -25,28 +25,40 @@
  */
 package org.lanternpowered.server.effect.sound;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 
-public final class LanternSoundType extends PluginCatalogType.Base implements SoundType {
+public class LanternSoundType extends PluginCatalogType.Base implements SoundType {
 
     private final int eventId;
 
     public LanternSoundType(String pluginId, String id, String name, int eventId) {
         super(pluginId, id, name);
+        checkArgument(eventId >= 0);
         this.eventId = eventId;
     }
 
-    public LanternSoundType(String pluginId, String id, String name) {
+    private LanternSoundType(String pluginId, String id, String name) {
         super(pluginId, id, name);
         this.eventId = -1;
+    }
+
+    /**
+     * Gets the event id. Returns {@code -1} when virtual (file name based).
+     *
+     * @return The event id
+     */
+    public int getEventId() {
+        return this.eventId;
     }
 
     public MessagePlayOutSoundEffectBase createMessage(Vector3d position, SoundCategory soundCategory,
@@ -57,6 +69,13 @@ public final class LanternSoundType extends PluginCatalogType.Base implements So
             return new MessagePlayOutSoundEffect(this.eventId, position, soundCategory, volume, pitch);
         } else {
             return new MessagePlayOutNamedSoundEffect(getName(), position, soundCategory, volume, pitch);
+        }
+    }
+
+    static class Virtual extends LanternSoundType implements VirtualCatalogType {
+
+        Virtual(String pluginId, String id, String name) {
+            super(pluginId, id, name);
         }
     }
 }

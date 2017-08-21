@@ -40,6 +40,8 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
@@ -75,6 +77,7 @@ import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.block.translation.SpongeTranslationProvider;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
@@ -91,6 +94,8 @@ import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
@@ -118,7 +123,8 @@ import java.util.function.Supplier;
         InstrumentTypeRegistryModule.class,
         BlockSoundGroupRegistryModule.class,
 })
-public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry {
+public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry,
+        ForgeCatalogRegistryModule<BlockType> {
 
     private static final BlockRegistryModule INSTANCE = new BlockRegistryModule();
 
@@ -142,6 +148,17 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     @Override
     public int getBlockStatesCount() {
         return this.blockStateByPackedType.size();
+    }
+
+    @Override
+    public ForgeRegistryData getRegistryData() {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
+        this.blockTypeByInternalId.short2ObjectEntrySet().forEach(entry -> {
+            if (!(entry.getValue() instanceof VirtualCatalogType)) {
+                map.put(entry.getValue().getId(), entry.getShortKey());
+            }
+        });
+        return new ForgeRegistryData("minecraft:blocks", map);
     }
 
     private void register0(int internalId, LanternBlockType blockType, BlockState2DataFunction stateToDataConverter) {
@@ -1066,11 +1083,6 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
                         .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
                                 tr("tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
-                        .itemType(builder -> builder
-                                .keysProvider(collection -> collection
-                                        .register(Keys.TREE_TYPE, LanternTreeType.OAK)
-                                )
-                        )
                         .properties(builder -> builder
                                 .add(hardness(2.0))
                                 .add(blastResistance(5.0)))
@@ -1727,11 +1739,6 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .withTrait(enumTrait, defaultValue).get()
                         .withTrait(LanternBooleanTraits.SEAMLESS, false).get())
                 .translation(TranslationProvider.of(enumTrait))
-                .itemType(builder -> builder
-                        .keysProvider(collection -> collection
-                                .register(Keys.SLAB_TYPE, defaultValue)
-                        )
-                )
                 .properties(builder -> builder
                         .add(hardness(2.0))
                         .add(blastResistance(10.0)));

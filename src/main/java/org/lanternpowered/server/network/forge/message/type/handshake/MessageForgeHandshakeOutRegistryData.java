@@ -26,10 +26,12 @@
 package org.lanternpowered.server.network.forge.message.type.handshake;
 
 import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lanternpowered.server.network.message.Message;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class MessageForgeHandshakeOutRegistryData implements Message {
 
@@ -46,11 +48,13 @@ public final class MessageForgeHandshakeOutRegistryData implements Message {
     public static class Entry {
 
         private final String name;
-        private final Map<String, Integer> ids;
-        private final List<String> substitutions;
+        private final Object2IntMap<String> ids;
+        private final Map<String, String> overrides;
+        private final Set<String> dummies;
 
-        public Entry(String name, Map<String, Integer> ids, List<String> substitutions) {
-            this.substitutions = substitutions;
+        public Entry(String name, Object2IntMap<String> ids, Map<String, String> overrides, Set<String> dummies) {
+            this.overrides = overrides;
+            this.dummies = dummies;
             this.name = name;
             this.ids = ids;
         }
@@ -59,12 +63,16 @@ public final class MessageForgeHandshakeOutRegistryData implements Message {
             return this.name;
         }
 
-        public Map<String, Integer> getIds() {
+        public Object2IntMap<String> getIds() {
             return this.ids;
         }
 
-        public List<String> getSubstitutions() {
-            return this.substitutions;
+        public Map<String, String> getOverrides() {
+            return this.overrides;
+        }
+
+        public Set<String> getDummies() {
+            return this.dummies;
         }
     }
 }

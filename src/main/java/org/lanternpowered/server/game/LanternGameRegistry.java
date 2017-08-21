@@ -733,6 +733,10 @@ public class LanternGameRegistry implements GameRegistry {
         return this;
     }
 
+    public Collection<CatalogRegistryModule<?>> getCatalogRegistryModules() {
+        return Collections.unmodifiableCollection(this.catalogRegistryMap.values());
+    }
+
     /**
      * Gets the {@link RegistryModule} for the specified class type.
      *

@@ -42,6 +42,6 @@ public final class LanternSoundTypeBuilder implements SoundType.Builder {
 
     @Override
     public SoundType build(String id) {
-        return new LanternSoundType(InternalPluginsInfo.SpongePlatform.IDENTIFIER, id, id);
+        return new LanternSoundType.Virtual(InternalPluginsInfo.SpongePlatform.IDENTIFIER, id, id);
     }
 }

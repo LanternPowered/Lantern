@@ -30,7 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import io.netty.util.Attribute;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
+import org.lanternpowered.server.network.forge.ForgeProtocol;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -41,11 +41,11 @@ public final class HandlerForgeHandshakeInHello implements Handler<MessageForgeH
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInOutHello message) {
         final NetworkSession session = context.getSession();
-        final Attribute<ForgeServerHandshakePhase> phase = session.getChannel().attr(ForgeHandshakePhase.PHASE);
+        final Attribute<ForgeServerHandshakePhase> phase = session.getChannel().attr(ForgeProtocol.HANDSHAKE_PHASE);
         if (phase.get() != ForgeServerHandshakePhase.HELLO) {
             session.disconnect(t("Retrieved unexpected forge handshake hello message."));
             return;
         }
-        Lantern.getLogger().info("{}: Forge handshake -> Received hello message.", session.getGameProfile().getName().get());
+        Lantern.getLogger().debug("{}: Forge handshake -> Received hello message.", session.getGameProfile().getName().get());
     }
 }

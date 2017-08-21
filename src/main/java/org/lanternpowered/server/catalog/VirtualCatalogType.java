@@ -23,29 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.catalog;
 
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.CatalogType;
 
-import javax.annotation.Nullable;
+public interface VirtualCatalogType extends CatalogType {
 
-public final class MessagePlayInCreativeWindowAction implements Message {
-
-    private final int slot;
-    @Nullable private final ItemStack itemStack;
-
-    public MessagePlayInCreativeWindowAction(int slot, @Nullable ItemStack itemStack) {
-        this.itemStack = itemStack;
-        this.slot = slot;
-    }
-
-    public int getSlot() {
-        return this.slot;
-    }
-
-    @Nullable
-    public ItemStack getItemStack() {
-        return this.itemStack;
-    }
 }

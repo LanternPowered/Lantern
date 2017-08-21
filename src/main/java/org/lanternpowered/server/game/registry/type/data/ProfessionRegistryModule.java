@@ -25,12 +25,15 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lanternpowered.server.data.type.LanternProfession;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.Professions;
 
-public class ProfessionRegistryModule extends PluginCatalogRegistryModule<Profession> {
+public class ProfessionRegistryModule extends InternalPluginCatalogRegistryModule<Profession> implements ForgeCatalogRegistryModule<Profession> {
 
     public ProfessionRegistryModule() {
         super(Professions.class);
@@ -44,5 +47,13 @@ public class ProfessionRegistryModule extends PluginCatalogRegistryModule<Profes
         register(new LanternProfession("minecraft", "blacksmith", 3));
         register(new LanternProfession("minecraft", "butcher", 4));
         register(new LanternProfession("minecraft", "nitwit", 5));
+    }
+
+    @Override
+    public ForgeRegistryData getRegistryData() {
+        final Object2IntMap<String> mappings = getRegistryDataMappings();
+        // Forge uses a different profession id then in sponge, fix this mapping just for the client
+        mappings.put("minecraft:smith", mappings.remove("minecraft:blacksmith"));
+        return new ForgeRegistryData("minecraft:villagerprofessions", mappings);
     }
 }

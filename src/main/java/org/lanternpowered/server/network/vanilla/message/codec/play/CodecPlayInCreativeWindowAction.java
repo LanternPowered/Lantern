@@ -37,8 +37,19 @@ public final class CodecPlayInCreativeWindowAction implements Codec<MessagePlayI
 
     @Override
     public MessagePlayInCreativeWindowAction decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        int slot = buf.readShort();
-        ItemStack item = buf.read(Types.ITEM_STACK);
+        final int slot = buf.readShort();
+        final ItemStack item = buf.read(Types.ITEM_STACK);
+        // Consume the trailing bytes, there is currently a bug
+        // in Forge that still allows access to unavailable item
+        // types if they are searched for in the creative search.
+        // These unavailable items are hidden in all the other tabs,
+        // these also have a 'none' type id -1 which makes it not
+        // possible to differentiate from the 'none' item in the
+        // type serializer
+        // This prevents spam of trailing bytes in this message.
+        if (item == null) { // Is null if id == -1
+            buf.setReadIndex(buf.readerIndex() + buf.available());
+        }
         return new MessagePlayInCreativeWindowAction(slot, item);
     }
 }

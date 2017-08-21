@@ -31,7 +31,7 @@ import io.netty.util.Attribute;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
-import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
+import org.lanternpowered.server.network.forge.ForgeProtocol;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutModList;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -43,7 +43,7 @@ public final class HandlerForgeHandshakeInModList implements Handler<MessageForg
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInOutModList message) {
         final NetworkSession session = context.getSession();
-        final Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
+        final Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeProtocol.HANDSHAKE_PHASE);
         if (phase.get() != ForgeServerHandshakePhase.HELLO) {
             session.disconnect(t("Retrieved unexpected forge handshake modList message."));
             return;
@@ -53,6 +53,6 @@ public final class HandlerForgeHandshakeInModList implements Handler<MessageForg
         // Just use a empty map for now
         session.send(new MessageForgeHandshakeInOutModList(new HashMap<>()));
         phase.set(ForgeServerHandshakePhase.WAITING_ACK);
-        Lantern.getLogger().info("{}: Forge handshake -> Received modList message.", session.getGameProfile().getName().get());
+        Lantern.getLogger().debug("{}: Forge handshake -> Received modList message.", session.getGameProfile().getName().get());
     }
 }

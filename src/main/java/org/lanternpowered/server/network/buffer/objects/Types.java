@@ -225,13 +225,13 @@ public final class Types {
 
         @Override
         public RawItemStack read(ByteBuffer buf) throws CodecException {
-            short id = buf.readShort();
+            final short id = buf.readShort();
             if (id == -1) {
                 return null;
             }
-            int amount = buf.readByte();
-            int data = buf.readShort();
-            DataView dataView = buf.readDataView();
+            final int amount = buf.readByte();
+            final int data = buf.readShort();
+            final DataView dataView = buf.readDataView();
             return new RawItemStack(id, data, amount, dataView);
         }
     });

@@ -27,10 +27,13 @@ package org.lanternpowered.server.game.registry.type.effect;
 
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 
-public final class PotionEffectTypeRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<PotionEffectType> {
+public final class PotionEffectTypeRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<PotionEffectType>
+        implements ForgeCatalogRegistryModule<PotionEffectType> {
 
     public static PotionEffectTypeRegistryModule get() {
         return Holder.INSTANCE;
@@ -69,6 +72,11 @@ public final class PotionEffectTypeRegistryModule extends AdditionalInternalPlug
         register(new LanternPotionEffectType("minecraft", "levitation", 25, "levitation"));
         register(new LanternPotionEffectType("minecraft", "luck", 26, "luck"));
         register(new LanternPotionEffectType("minecraft", "unluck", 27, "unluck"));
+    }
+
+    @Override
+    public ForgeRegistryData getRegistryData() {
+        return new ForgeRegistryData("minecraft:potions", getRegistryDataMappings());
     }
 
     private static final class Holder {

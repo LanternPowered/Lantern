@@ -27,15 +27,21 @@ package org.lanternpowered.server.game.registry.type.effect.sound;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
+public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> implements ForgeCatalogRegistryModule<SoundType> {
 
     public SoundTypeRegistryModule() {
         super(SoundTypes.class);
@@ -51,5 +57,17 @@ public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegist
             final String id = name.replaceAll("\\.", "_");
             register(new LanternSoundType("minecraft", id, name, i));
         }
+    }
+
+    @Override
+    public ForgeRegistryData getRegistryData() {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
+        getAll().forEach(soundType -> {
+            if (!(soundType instanceof VirtualCatalogType)) {
+                // Well okey, forge still uses dots in their sound type mappings :|
+                map.put(((PluginCatalogType) soundType).getPluginId() + ':' + soundType.getName(), ((LanternSoundType) soundType).getEventId());
+            }
+        });
+        return new ForgeRegistryData("minecraft:soundevents", map);
     }
 }

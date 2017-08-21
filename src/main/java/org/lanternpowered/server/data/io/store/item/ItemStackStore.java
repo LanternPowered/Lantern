@@ -110,7 +110,6 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
                 new DataValueItemTypeObjectSerializer<>(Keys.TREE_TYPE, TreeTypeRegistryModule.get());
         add(BlockTypes.LOG, treeTypeSerializer);
         add(BlockTypes.WOODEN_SLAB, treeTypeSerializer);
-        add(BlockTypes.DOUBLE_WOODEN_SLAB, treeTypeSerializer);
         add(BlockTypes.PLANKS, treeTypeSerializer);
         add(BlockTypes.LEAVES, treeTypeSerializer);
         add(BlockTypes.SAPLING, treeTypeSerializer);
@@ -122,12 +121,10 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         final DataValueItemTypeObjectSerializer<SlabType> stoneSlab1Serializer =
                 new DataValueItemTypeObjectSerializer<>(Keys.SLAB_TYPE, SlabTypeRegistryModule.get());
         add(BlockTypes.STONE_SLAB, stoneSlab1Serializer);
-        add(BlockTypes.DOUBLE_STONE_SLAB, stoneSlab1Serializer);
         final DataValueItemTypeObjectSerializer<SlabType> stoneSlab2Serializer =
                 new DataValueItemTypeObjectSerializer<>(Keys.SLAB_TYPE, SlabTypeRegistryModule.get(),
                         dataValue -> dataValue + 8, internalId -> internalId - 8);
         add(BlockTypes.STONE_SLAB2, stoneSlab2Serializer);
-        add(BlockTypes.DOUBLE_STONE_SLAB2, stoneSlab2Serializer);
         add(BlockTypes.QUARTZ_BLOCK, new QuartzItemTypeSerializer());
         final DataValueItemTypeObjectSerializer<SandstoneType> sandstoneTypeSerializer =
                 new DataValueItemTypeObjectSerializer<>(Keys.SANDSTONE_TYPE, SandstoneTypeRegistryModule.get());

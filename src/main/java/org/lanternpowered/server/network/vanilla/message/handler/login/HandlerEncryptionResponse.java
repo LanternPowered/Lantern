@@ -234,7 +234,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                     .createPropertiesMapFromJson(json.getAsJsonArray("properties"));
             final LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
 
-            Lantern.getLogger().info("Finished authenticating.");
+            Lantern.getLogger().debug("Finished authenticating.");
 
             final Cause cause = Cause.of(EventContext.empty(), session, gameProfile);
             final ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(cause,

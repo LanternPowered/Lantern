@@ -30,7 +30,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.spongepowered.api.CatalogType;
 
 import java.util.Optional;
@@ -76,5 +79,19 @@ public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends 
     @Override
     public Optional<T> getByInternalId(int internalId) {
         return Optional.ofNullable(this.byInternalId.get(internalId));
+    }
+
+    protected Int2ObjectMap<T> getInternalIdMappings() {
+        return this.byInternalId;
+    }
+
+    protected Object2IntMap<String> getRegistryDataMappings() {
+        final Object2IntMap<String> mappings = new Object2IntOpenHashMap<>();
+        this.byInternalId.int2ObjectEntrySet().forEach(entry -> {
+            if (!(entry.getValue() instanceof VirtualCatalogType)) {
+                mappings.put(entry.getValue().getId(), entry.getIntKey());
+            }
+        });
+        return mappings;
     }
 }

@@ -23,48 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.property;
+package org.lanternpowered.server.inventory.behavior.event;
 
-public final class SmeltingProgress {
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.inventory.client.TradingClientContainer;
 
-    private final int maxBurnTime;
-    private final int elapsedBurnTime;
+/**
+ * Is thrown when the selected offer in the
+ * {@link TradingClientContainer} is changed.
+ */
+public final class SelectTradingOfferEvent implements ContainerEvent {
 
-    private final int maxSmeltTime;
-    private final int elapsedSmeltTime;
+    private final int index;
 
-    public SmeltingProgress(int maxBurnTime, int elapsedBurnTime, int maxSmeltTime, int elapsedSmeltTime) {
-        this.maxBurnTime = maxBurnTime;
-        this.elapsedBurnTime = elapsedBurnTime;
-        this.maxSmeltTime = maxSmeltTime;
-        this.elapsedSmeltTime = elapsedSmeltTime;
+    public SelectTradingOfferEvent(int index) {
+        this.index = index;
     }
 
-    public int getMaxBurnTime() {
-        return this.maxBurnTime;
-    }
-
-    public int getElapsedBurnTime() {
-        return this.elapsedBurnTime;
-    }
-
-    public int getMaxSmeltTime() {
-        return this.maxSmeltTime;
-    }
-
-    public int getElapsedSmeltTime() {
-        return this.elapsedSmeltTime;
+    /**
+     * The selected offer index.
+     *
+     * @return The index
+     */
+    public int getIndex() {
+        return this.index;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof SmeltingProgress)) {
-            return false;
-        }
-        final SmeltingProgress o1 = (SmeltingProgress) o;
-        return o1.elapsedBurnTime == this.elapsedBurnTime &&
-                o1.elapsedSmeltTime == this.elapsedSmeltTime &&
-                o1.maxBurnTime == this.maxBurnTime &&
-                o1.maxSmeltTime == this.maxSmeltTime;
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("index", this.index)
+                .toString();
     }
 }

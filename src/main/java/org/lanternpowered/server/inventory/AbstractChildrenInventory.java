@@ -343,7 +343,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     }
 
     @Override
-    public Inventory intersect(Inventory inventory) {
+    public IInventory intersect(Inventory inventory) {
         checkNotNull(inventory, "inventory");
         if (!(inventory instanceof AbstractChildrenInventory)) {
             return empty();

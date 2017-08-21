@@ -27,20 +27,37 @@ package org.lanternpowered.server.block.tile.vanilla;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
+import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
-import org.lanternpowered.server.inventory.block.IChestInventory;
+import org.lanternpowered.server.inventory.VanillaOpenableInventory;
+import org.lanternpowered.server.inventory.block.ChestInventory;
+import org.lanternpowered.server.inventory.client.ChestClientContainer;
+import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
-public class TileDoubleChestInventory extends LanternOrderedInventory implements IChestInventory {
+public class TileDoubleChestInventory extends LanternOrderedInventory implements VanillaOpenableInventory {
 
     public TileDoubleChestInventory(@Nullable Inventory parent, @Nullable Translation name,
-            IChestInventory upperInventory, IChestInventory lowerInventory) {
+            ChestInventory upperInventory, ChestInventory lowerInventory) {
         super(parent, name == null ? tr("container.chestDouble") : name);
         registerChild(upperInventory);
         registerChild(lowerInventory);
         finalizeContent();
+    }
+
+    @Override
+    public ClientContainer constructClientContainer0(LanternContainer container) {
+        return new ChestClientContainer(TextTranslation.toText(getName()), 6);
+    }
+
+    @Override
+    public IInventory getShiftClickTarget(LanternContainer container, Slot slot) {
+        return isChild(slot) ? VanillaOpenableInventory.super.getShiftClickTarget(container, slot) : this;
     }
 }

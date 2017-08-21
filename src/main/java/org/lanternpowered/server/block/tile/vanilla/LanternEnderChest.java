@@ -37,7 +37,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Random;
 
-public class LanternEnderChest extends LanternContainerBase implements EnderChest {
+public class LanternEnderChest extends LanternContainerTileBase implements EnderChest {
 
     private final Random random = new Random();
 

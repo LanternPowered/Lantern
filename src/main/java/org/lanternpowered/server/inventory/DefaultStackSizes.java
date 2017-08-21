@@ -37,11 +37,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-final class DefaultStackSizes {
+public final class DefaultStackSizes {
 
     private static final Object2IntMap<String> STACK_SIZES = new Object2IntOpenHashMap<>();
 
-    static int getOriginalMaxSize(ItemType itemType) {
+    public static int getOriginalMaxSize(ItemType itemType) {
         final int size = STACK_SIZES.getInt(itemType.getId());
         return size == 0 ? itemType.getMaxStackQuantity() : size;
     }

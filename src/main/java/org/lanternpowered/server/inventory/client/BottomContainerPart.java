@@ -23,24 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.container;
+package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.block.IChestInventory;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
-import org.spongepowered.api.text.Text;
+public interface BottomContainerPart extends ContainerPart {
 
-public class ChestInventoryContainer extends LanternContainer {
-
-    public ChestInventoryContainer(LanternPlayerInventory humanInventory, IChestInventory openInventory) {
-        super(openInventory.getName(), humanInventory, openInventory);
-    }
-
-    @Override
-    protected void openInventoryFor(LanternPlayer viewer) {
-        viewer.getConnection().send(new MessagePlayOutOpenWindow(this.windowId, MessagePlayOutOpenWindow.WindowType.CONTAINER,
-                Text.of(this.openInventory.getName()), this.openInventory.getSlots().size(), 0));
-    }
 }

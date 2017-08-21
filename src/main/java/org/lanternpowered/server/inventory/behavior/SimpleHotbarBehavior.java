@@ -23,28 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.behavior;
 
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import javax.annotation.Nullable;
+import org.lanternpowered.server.inventory.client.ClientContainer;
 
-public class DispensorInventory extends LanternGridInventory {
+public class SimpleHotbarBehavior implements HotbarBehavior {
 
-    public DispensorInventory(@Nullable Inventory parent) {
-        this(parent, null);
+    private int slot;
+
+    @Override
+    public void setSelectedSlotIndex(int hotbarSlot) {
+        checkArgument(hotbarSlot >= 0 && hotbarSlot <= 8);
+        this.slot = hotbarSlot;
     }
 
-    public DispensorInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
+    @Override
+    public int getSelectedSlotIndex() {
+        return this.slot;
+    }
 
-        for (int y = 0; y < 3; y++) {
-            for (int x = 0; x < 3; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
-        this.finalizeContent();
+    @Override
+    public void handleSelectedSlotChange(ClientContainer clientContainer, int hotbarSlot) {
+        this.slot = hotbarSlot;
     }
 }

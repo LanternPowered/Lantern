@@ -23,11 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
-
-import org.lanternpowered.server.inventory.IInventory;
-import org.spongepowered.api.item.inventory.type.OrderedInventory;
-
-public interface IChestInventory extends OrderedInventory, IInventory {
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.behavior.event;

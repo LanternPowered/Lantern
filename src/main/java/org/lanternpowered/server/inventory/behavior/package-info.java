@@ -23,16 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
-
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
-
-public final class HandlerPlayInHeldItemChange implements Handler<MessagePlayInOutHeldItemChange> {
-
-    @Override
-    public void handle(NetworkContext context, MessagePlayInOutHeldItemChange message) {
-        context.getSession().getPlayer().getInventory().getHotbar().setRawSelectedSlotIndex(message.getSlot());
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.behavior;

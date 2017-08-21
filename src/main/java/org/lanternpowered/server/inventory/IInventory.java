@@ -118,4 +118,9 @@ public interface IInventory extends Inventory {
 
     boolean hasProperty(Inventory child, InventoryProperty<?, ?> property);
 
+    @Override
+    IInventory intersect(Inventory inventory);
+
+    @Override
+    IInventory union(Inventory inventory);
 }

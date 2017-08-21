@@ -48,9 +48,4 @@ public class LanternInputSlot extends LanternFilteringSlot implements InputSlot 
     public LanternInputSlot(@Nullable Inventory parent, @Nullable Translation name, @Nullable ItemFilter itemFilter) {
         super(parent, name, itemFilter);
     }
-
-    @Override
-    public boolean isReverseShiftClickOfferOrder() {
-        return false;
-    }
 }

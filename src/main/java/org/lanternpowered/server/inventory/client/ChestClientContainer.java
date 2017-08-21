@@ -23,24 +23,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.container;
+package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.block.ICraftingTableInventory;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import static com.google.common.base.Preconditions.checkArgument;
+
+import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.text.Text;
 
-public class CraftingTableInventoryContainer extends LanternContainer {
+import java.util.Arrays;
 
-    public CraftingTableInventoryContainer(LanternPlayerInventory playerInventory, ICraftingTableInventory openInventory) {
-        super(playerInventory, openInventory);
+public class ChestClientContainer extends ClientContainer {
+
+    private static final int[][] TOP_SLOT_FLAGS = new int[7][];
+    private static final int[][] ALL_SLOT_FLAGS = new int[7][];
+
+    static {
+        for (int i = 0; i < TOP_SLOT_FLAGS.length; i++) {
+            final int[] flags = new int[i * 9];
+            Arrays.fill(flags, FLAG_REVERSE_SHIFT_INSERTION);
+            TOP_SLOT_FLAGS[i] = flags;
+            ALL_SLOT_FLAGS[i] = compileAllSlotFlags(flags);
+        }
+    }
+
+    private final int rowIndex;
+
+    public ChestClientContainer(Text title, int rows) {
+        super(title);
+        checkArgument(rows >= 0 && rows <= 6);
+        this.rowIndex = rows;
     }
 
     @Override
-    protected void openInventoryFor(LanternPlayer viewer) {
-        viewer.getConnection().send(new MessagePlayOutOpenWindow(this.windowId, MessagePlayOutOpenWindow.WindowType.CRAFTING_TABLE,
-                Text.of(this.openInventory.getName()), this.openInventory.getSlots().size(), 0));
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.CONTAINER,
+                getTitle(), getTopSlotFlags().length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS[this.rowIndex];
+    }
+
+    @Override
+    protected int[] getSlotFlags() {
+        return ALL_SLOT_FLAGS[this.rowIndex];
     }
 }

@@ -137,8 +137,6 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInFinishUsingItem;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInHeldItemChange;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerDigging;
@@ -169,6 +167,7 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
@@ -318,7 +317,8 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInClientSettings.class, MessagePlayInClientSettings.class)
                 .bindHandler(new HandlerPlayInClientSettings());
         inbound.bind(CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class); // TODO: Handler
-        inbound.bind(CodecPlayInEnchantItem.class, MessagePlayInEnchantItem.class); // TODO: Handler
+        inbound.bind(CodecPlayInEnchantItem.class, MessagePlayInEnchantItem.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleEnchantItem));
         inbound.bind(CodecPlayInClickWindow.class, MessagePlayInClickWindow.class)
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowClick));
         inbound.bind(CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class)
@@ -349,7 +349,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInResourcePackStatus());
         inbound.bind(CodecPlayInAdvancementTree.class);
         inbound.bind(CodecPlayInOutHeldItemChange.class, MessagePlayInOutHeldItemChange.class)
-                .bindHandler(new HandlerPlayInHeldItemChange());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleHeldItemChange));
         inbound.bind(CodecPlayInCreativeWindowAction.class, MessagePlayInCreativeWindowAction.class)
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowCreativeClick));
         inbound.bind(CodecPlayInChangeSign.class, MessagePlayInChangeSign.class)
@@ -364,8 +364,10 @@ final class ProtocolPlay extends ProtocolBase {
 
         // Provided by CodecPlayInOutCustomPayload
         inbound.bindMessage(MessagePlayInOutBrand.class); // TODO: Handler
-        inbound.bindMessage(MessagePlayInChangeItemName.class); // TODO: Handler
-        inbound.bindMessage(MessagePlayInChangeOffer.class); // TODO: Handler
+        inbound.bindMessage(MessagePlayInChangeItemName.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleItemRename));
+        inbound.bindMessage(MessagePlayInChangeOffer.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleOfferChange));
         inbound.bindMessage(MessagePlayInEditCommandBlock.Block.class); // TODO: Handler
         inbound.bindMessage(MessagePlayInEditCommandBlock.AdvancedBlock.class); // TODO: Handler
         inbound.bindMessage(MessagePlayInEditCommandBlock.Entity.class); // TODO: Handler
@@ -374,13 +376,15 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bindMessage(MessagePlayInSignBook.class)
                 .bindHandler(new HandlerPlayInSignBook());
         inbound.bindMessage(MessagePlayInPickItem.class)
-                .bindHandler(new HandlerPlayInPickItem());
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handlePickItem));
         inbound.bindMessage(MessagePlayInOutChannelPayload.class)
                 .bindHandler(new HandlerPlayInChannelPayload());
         inbound.bindMessage(MessagePlayInOutRegisterChannels.class)
                 .bindHandler(new HandlerPlayInRegisterChannels());
         inbound.bindMessage(MessagePlayInOutUnregisterChannels.class)
                 .bindHandler(new HandlerPlayInUnregisterChannels());
+        inbound.bindMessage(MessagePlayInAcceptBeaconEffects.class)
+                .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleAcceptBeaconEffects));
         // Provided by CodecPlayInUseEntity
         inbound.bindMessage(MessagePlayInUseEntity.Attack.class)
                 .bindHandler(new HandlerPlayInUseEntityAttack());

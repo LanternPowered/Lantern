@@ -23,5 +23,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.inventory.container;
+package org.lanternpowered.server.inventory.client;
+
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
+
+public class HopperClientContainer extends ClientContainer {
+
+    private static final int[] TOP_SLOT_FLAGS = new int[] {
+            FLAG_REVERSE_SHIFT_INSERTION, // Slot 1
+            FLAG_REVERSE_SHIFT_INSERTION, // Slot 2
+            FLAG_REVERSE_SHIFT_INSERTION, // Slot 3
+            FLAG_REVERSE_SHIFT_INSERTION, // Slot 4
+            FLAG_REVERSE_SHIFT_INSERTION, // Slot 5
+    };
+    private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
+
+    public HopperClientContainer(Text title) {
+        super(title);
+    }
+
+    @Override
+    protected Message createInitMessage() {
+        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.HOPPER,
+                getTitle(), TOP_SLOT_FLAGS.length, 0);
+    }
+
+    @Override
+    protected int[] getTopSlotFlags() {
+        return TOP_SLOT_FLAGS;
+    }
+
+    @Override
+    protected int[] getSlotFlags() {
+        return ALL_SLOT_FLAGS;
+    }
+}

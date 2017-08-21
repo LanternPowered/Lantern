@@ -311,12 +311,12 @@ public class AltParentProxyInventory extends AbstractInventory {
     }
 
     @Override
-    public Inventory intersect(Inventory inventory) {
+    public IInventory intersect(Inventory inventory) {
         return this.delegate.intersect(inventory);
     }
 
     @Override
-    public Inventory union(Inventory inventory) {
+    public IInventory union(Inventory inventory) {
         return this.delegate.union(inventory);
     }
 
@@ -341,7 +341,7 @@ public class AltParentProxyInventory extends AbstractInventory {
     }
 
     @Override
-    protected Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher) {
+    public Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher) {
         return this.delegate.peekPollTransactions(limit, matcher);
     }
 

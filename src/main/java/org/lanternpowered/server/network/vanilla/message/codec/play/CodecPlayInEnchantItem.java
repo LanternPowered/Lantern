@@ -35,8 +35,8 @@ public final class CodecPlayInEnchantItem implements Codec<MessagePlayInEnchantI
 
     @Override
     public MessagePlayInEnchantItem decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        int windowId = buf.readByte();
-        int slot = buf.readByte();
+        final int windowId = buf.readByte();
+        final int slot = buf.readByte();
         return new MessagePlayInEnchantItem(windowId, slot);
     }
 }

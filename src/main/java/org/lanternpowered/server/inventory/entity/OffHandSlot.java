@@ -35,18 +35,8 @@ import javax.annotation.Nullable;
 
 public class OffHandSlot extends LanternSlot {
 
-    public OffHandSlot(@Nullable Inventory parent, @Nullable Translation name) {
+    OffHandSlot(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
         registerProperty(new EquipmentSlotType(EquipmentTypes.OFF_HAND));
-    }
-
-    @Override
-    public boolean isReverseShiftClickOfferOrder() {
-        return false;
-    }
-
-    @Override
-    public boolean doesAllowShiftClickOffer() {
-        return false;
     }
 }

@@ -31,7 +31,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 public final class HasPropertyItemFilter implements ItemFilter {
 
-    private final Class<? extends Property<?,?>> propertyType;
+    private final Class<? extends Property<?, ?>> propertyType;
 
     public HasPropertyItemFilter(Class<? extends Property<?, ?>> propertyType) {
         this.propertyType = propertyType;

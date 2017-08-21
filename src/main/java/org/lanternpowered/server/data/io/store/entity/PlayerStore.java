@@ -229,7 +229,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         final GameMode gameMode = dataView.getInt(GAME_MODE)
                 .flatMap(v -> GameModeRegistryModule.get().getByInternalId(v)).orElse(GameModes.NOT_SET);
         valueContainer.set(Keys.GAME_MODE, gameMode);
-        player.getInventory().getHotbar().setRawSelectedSlotIndex(dataView.getInt(SELECTED_ITEM_SLOT).orElse(0));
+        player.getInventory().getHotbar().setSelectedSlotIndex(dataView.getInt(SELECTED_ITEM_SLOT).orElse(0));
 
         // Deserialize the player inventory
         dataView.getViewList(INVENTORY).ifPresent(views -> deserializePlayerInventory(player.getInventory(), views));

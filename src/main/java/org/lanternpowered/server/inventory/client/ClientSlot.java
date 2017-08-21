@@ -23,11 +23,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.inventory.IInventory;
-import org.spongepowered.api.item.inventory.type.OrderedInventory;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public interface ICraftingTableInventory extends OrderedInventory, IInventory {
+/**
+ * Represents a bound slot on a {@link ClientContainer}.
+ */
+public interface ClientSlot {
 
+    /**
+     * Gets the {@link ItemStack} that is visible in
+     * this {@link ClientSlot}.
+     *
+     * @return The item stack
+     */
+    ItemStack getItem();
+
+    /**
+     * Represents a {@link ClientSlot} that just represents
+     * an icon. The slot cannot be modified through inventory
+     * operations.
+     */
+    interface Button extends ClientSlot {
+
+        /**
+         * Sets the icon {@link ItemStack}.
+         *
+         * @param itemStack The item stack
+         */
+        void setItem(ItemStack itemStack);
+    }
+
+    /**
+     * Represents a {@link ClientSlot} that is bound to
+     * a {@link LanternSlot}.
+     */
+    interface Slot extends ClientSlot {
+
+        /**
+         * Gets the {@link LanternSlot}.
+         *
+         * @return The slot
+         */
+        LanternSlot getSlot();
+    }
+
+    /**
+     * Nothing is bound, {@link #getItem()} will always return
+     * a empty {@link ItemStack}.
+     */
+    interface Empty extends ClientSlot {
+
+    }
 }

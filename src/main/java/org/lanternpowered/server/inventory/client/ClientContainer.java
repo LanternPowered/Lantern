@@ -718,6 +718,7 @@ public abstract class ClientContainer implements ContainerBase {
         // Send the cursor item if present
         if (!this.cursor.getRaw().isEmpty()) {
             messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
+            this.cursor.dirtyState = 0;
         }
         // Collect additional messages
         collectInitMessages(messages);

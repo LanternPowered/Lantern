@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.inventory.behavior.event.BeaconEffectsEvent;
 import org.lanternpowered.server.network.message.Message;
@@ -45,8 +47,12 @@ public class BeaconClientContainer extends ClientContainer {
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
-    public BeaconClientContainer(Text title) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("container.beacon");
+    }
+
+    public BeaconClientContainer() {
+        super(Title.DEFAULT);
     }
 
     @Override
@@ -66,8 +72,8 @@ public class BeaconClientContainer extends ClientContainer {
     }
 
     @Override
-    protected boolean disableShiftClickWhenFull() {
-        return false;
+    protected int getShiftFlags() {
+        return SHIFT_CLICK_WHEN_FULL_TOP_AND_FILTER;
     }
 
     @Override

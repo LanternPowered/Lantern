@@ -244,6 +244,15 @@ public final class EntityProtocolManager {
         return Optional.ofNullable(this.entityProtocols.get(entity));
     }
 
+    public int getProtocolId(LanternEntity entity) {
+        checkNotNull(entity, "entity");
+        final AbstractEntityProtocol<?> entry = this.entityProtocols.get(entity);
+        if (entry != null) {
+            return entry.getRootEntityId();
+        }
+        return INVALID_ENTITY_ID;
+    }
+
     /**
      * Adds the {@link Entity} to be tracked.
      *

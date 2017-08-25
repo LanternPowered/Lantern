@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.text.Text;
@@ -43,8 +45,12 @@ public class BrewingStandClientContainer extends ClientContainer {
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
-    public BrewingStandClientContainer(Text title) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("container.brewing");
+    }
+
+    public BrewingStandClientContainer() {
+        super(Title.DEFAULT);
     }
 
     @Override

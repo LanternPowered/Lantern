@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.inventory.behavior.event.AnvilRenameEvent;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
@@ -43,8 +45,12 @@ public class AnvilClientContainer extends ClientContainer {
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
-    public AnvilClientContainer(Text title) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("container.repair");
+    }
+
+    public AnvilClientContainer() {
+        super(Title.DEFAULT);
     }
 
     @Override

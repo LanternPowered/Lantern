@@ -38,11 +38,11 @@ import org.lanternpowered.server.entity.living.player.AbstractUser;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
-import org.lanternpowered.server.inventory.LanternEquipmentInventory;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
-import org.lanternpowered.server.inventory.entity.LanternUserInventory;
-import org.lanternpowered.server.inventory.entity.OffHandSlot;
+import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternMainPlayerInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerEquipmentInventory;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.data.DataContainer;
@@ -282,18 +282,18 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         }
     }
 
-    private static void deserializePlayerInventory(LanternUserInventory<?> inventory, List<DataView> itemViews) {
-        final LanternHumanMainInventory mainInventory = inventory.getMain();
-        final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
-        final OffHandSlot offHandSlot = inventory.getOffhand();
+    private static void deserializePlayerInventory(AbstractUserInventory<?> inventory, List<DataView> itemViews) {
+        final LanternMainPlayerInventory mainInventory = inventory.getMain();
+        final LanternPlayerEquipmentInventory equipmentInventory = inventory.getEquipment();
+        final AbstractSlot offHandSlot = inventory.getOffhand();
 
         for (DataView itemView : itemViews) {
             final int slot = itemView.getByte(SLOT).get() & 0xff;
             final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
 
-            if (slot >= 0 && slot < mainInventory.slotCount()) {
+            if (slot >= 0 && slot < mainInventory.capacity()) {
                 mainInventory.set(new SlotIndex(slot), itemStack);
-            } else if (slot >= 100 && slot - 100 < equipmentInventory.slotCount()) {
+            } else if (slot >= 100 && slot - 100 < equipmentInventory.capacity()) {
                 equipmentInventory.set(new SlotIndex(slot - 100), itemStack);
             } else if (slot == 150) {
                 offHandSlot.set(itemStack);
@@ -301,12 +301,12 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         }
     }
 
-    private static List<DataView> serializePlayerInventory(LanternUserInventory<?> inventory) {
+    private static List<DataView> serializePlayerInventory(AbstractUserInventory<?> inventory) {
         final List<DataView> itemViews = new ArrayList<>();
 
-        final LanternHumanMainInventory mainInventory = inventory.getMain();
-        final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
-        final OffHandSlot offHandSlot = inventory.getOffhand();
+        final LanternMainPlayerInventory mainInventory = inventory.getMain();
+        final LanternPlayerEquipmentInventory equipmentInventory = inventory.getEquipment();
+        final AbstractSlot offHandSlot = inventory.getOffhand();
 
         Iterable<Slot> slots = mainInventory.slots();
         for (Slot slot : slots) {

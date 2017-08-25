@@ -26,6 +26,7 @@
 package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
@@ -56,8 +57,12 @@ public class EntityEquipmentClientContainer extends ClientContainer {
     private final int rowIndex;
     private final int entityId;
 
-    public EntityEquipmentClientContainer(Text title, int chestRows, int entityId) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("Entity Equipment");
+    }
+
+    public EntityEquipmentClientContainer(int chestRows, int entityId) {
+        super(Title.DEFAULT);
         checkArgument(chestRows >= 0 && chestRows <= 5);
         this.rowIndex = chestRows;
         this.entityId = entityId;

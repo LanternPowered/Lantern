@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.inventory;
 
+@FunctionalInterface
 public interface InventoryCloseListener {
 
     void onClose(IInventory inventory);

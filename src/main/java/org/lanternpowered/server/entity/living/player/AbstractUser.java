@@ -31,8 +31,10 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
-import org.lanternpowered.server.inventory.block.EnderChestInventory;
-import org.lanternpowered.server.inventory.entity.LanternUserInventory;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.statistic.StatisticMap;
 import org.lanternpowered.server.world.LanternWorld;
@@ -70,7 +72,7 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
     private final StatisticMap statisticMap = new StatisticMap();
 
     // The ender chest inventory of this player.
-    private final EnderChestInventory enderChestInventory = new EnderChestInventory(null);
+    private final ChestInventory enderChestInventory;
 
     /**
      * This field is for internal use only, it is used while finding a proper
@@ -83,6 +85,8 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
         super(user.getUniqueId());
         this.user = user;
         offer(Keys.DISPLAY_NAME, Text.of(this.user.getName()));
+        this.enderChestInventory = VanillaInventoryArchetypes.ENDER_CHEST.builder()
+                .withCarrier(this).build(Lantern.getMinecraftPlugin());
     }
 
     @Override
@@ -161,11 +165,11 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
     }
 
     /**
-     * Gets the {@link EnderChestInventory}.
+     * Gets the {@link ChestInventory}.
      *
      * @return The ender chest inventory
      */
-    public EnderChestInventory getEnderChestInventory() {
+    public ChestInventory getEnderChestInventory() {
         return this.enderChestInventory;
     }
 
@@ -188,7 +192,7 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
     }
 
     @Override
-    public abstract LanternUserInventory<? extends User> getInventory();
+    public abstract AbstractUserInventory<? extends User> getInventory();
 
     // User methods
 

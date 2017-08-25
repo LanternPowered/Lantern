@@ -177,6 +177,10 @@ public final class Lists2 {
         return checkedOf(list, e -> checkNotNull(e, "element"));
     }
 
+    public static <T> List<T> nonNullArrayList() {
+        return nonNullOf(new ArrayList<T>());
+    }
+
     /**
      * Creates a checked list for the specified backing list, all the operations
      * should be done through the new list.

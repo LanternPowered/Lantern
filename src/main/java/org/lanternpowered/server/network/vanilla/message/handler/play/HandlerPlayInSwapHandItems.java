@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
@@ -41,7 +41,7 @@ public final class HandlerPlayInSwapHandItems implements Handler<MessagePlayInSw
     public void handle(NetworkContext context, MessagePlayInSwapHandItems message) {
         final LanternPlayerInventory inventory = context.getSession().getPlayer().getInventory();
 
-        final LanternSlot hotbarSlot = inventory.getHotbar().getSelectedSlot();
+        final AbstractSlot hotbarSlot = inventory.getHotbar().getSelectedSlot();
         final Slot offHandSlot = inventory.getOffhand();
 
         final ItemStack hotbarItem = hotbarSlot.peek().orElse(null);

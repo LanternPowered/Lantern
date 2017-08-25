@@ -54,12 +54,15 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBui
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.inventory.AbstractOrderedInventory;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
-import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
+import org.lanternpowered.server.inventory.vanilla.PlayerInventoryShiftClickBehavior;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
@@ -115,8 +118,8 @@ import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -244,8 +247,16 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         super((ProxyUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gameProfile));
         this.gameProfile = gameProfile;
         this.interactionHandler = new PlayerInteractionHandler(this);
-        this.inventory = new LanternPlayerInventory(null, null, this);
-        this.inventoryContainer = new PlayerInventoryContainer(this.inventory);
+        this.inventory = VanillaInventoryArchetypes.PLAYER.builder()
+                .withCarrier(this).build(Lantern.getMinecraftPlugin());
+        this.inventoryContainer = new PlayerInventoryContainer(this.inventory,
+                AbstractOrderedInventory.viewBuilder()
+                        .inventory(VanillaInventoryArchetypes.CRAFTING.builder()
+                                .build(Lantern.getMinecraftPlugin()))
+                        .inventory(this.inventory.getEquipment())
+                        .inventory(this.inventory.getOffhand())
+                        .shiftClickBehavior(PlayerInventoryShiftClickBehavior.INSTANCE)
+                        .build(Lantern.getMinecraftPlugin()));
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
         resetIdleTimeoutCounter();
@@ -399,7 +410,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             // Update the player inventory
-            this.inventoryContainer.init();
+            this.inventoryContainer.initClientContainer();
             if (oldWorld != world) {
                 if (this.worldBorder == null) {
                     world.getWorldBorder().addPlayer(this);
@@ -436,9 +447,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (!harvestEvent.isCancelled()) {
             final List<ItemStackSnapshot> drops = new ArrayList<>();
             if (!harvestEvent.keepsInventory()) {
-                // TODO: Use the other inventory methods, when fixed...
-                getInventory().getIndexBySlots().keySet().forEach(
-                        slot -> slot.poll().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
+                getInventory().<AbstractSlot>slots().forEach(slot ->
+                        slot.poll().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
             }
             if (!harvestEvent.keepsLevel()) {
                 offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());
@@ -888,13 +898,17 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public Optional<Container> openInventory(Inventory inventory) {
         checkNotNull(inventory, "inventory");
-        LanternContainer container;
-        if (inventory instanceof PlayerInventory) {
-            return Optional.empty();
-        } else if (inventory instanceof OpenableInventory) {
-            container = new LanternContainer(this.inventory, (OpenableInventory) inventory);
+        final LanternContainer container;
+        if (inventory instanceof LanternContainer) {
+            // You cannot open a player inventory container
+            if (inventory instanceof PlayerInventoryContainer) {
+                return Optional.empty();
+            }
+            container = (LanternContainer) inventory;
         } else {
-            throw new UnsupportedOperationException("Unsupported inventory type: " + inventory);
+            inventory.getInventoryProperty(GuiIdProperty.class).map(GuiIdProperty::getValue).orElseThrow(() ->
+                    new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getId()));
+            container = LanternContainer.construct(this.inventory, (AbstractOrderedInventory) inventory);
         }
         if (this.containerSession.setOpenContainer(container)) {
             return Optional.of(container);

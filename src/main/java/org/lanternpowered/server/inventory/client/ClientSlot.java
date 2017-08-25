@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 /**
@@ -58,16 +59,16 @@ public interface ClientSlot {
 
     /**
      * Represents a {@link ClientSlot} that is bound to
-     * a {@link LanternSlot}.
+     * a {@link AbstractSlot}.
      */
     interface Slot extends ClientSlot {
 
         /**
-         * Gets the {@link LanternSlot}.
+         * Gets the {@link AbstractSlot}.
          *
          * @return The slot
          */
-        LanternSlot getSlot();
+        AbstractInventorySlot getSlot();
     }
 
     /**

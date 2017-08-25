@@ -1216,6 +1216,28 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
             BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
         final CauseStack causeStack = CauseStack.current();
+        final List<Entity> entities = handlePreEntitySpawning(causeStack, entries);
+        if (entities.isEmpty()) {
+            return;
+        }
+        final SpawnEntityEvent spawnEvent = spawnEventConstructor.apply(causeStack.getCurrentCause(), entities);
+        // Post the spawn event
+        Sponge.getEventManager().post(spawnEvent);
+        // Spawn the entities in the world
+        finishSpawnEntityEvent(spawnEvent);
+    }
+
+    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
+        final List<Entity> entities = handlePreEntitySpawning(CauseStack.current(),
+                Collections.singleton(new EntitySpawningEntry(entityType, transform, entityConsumer)));
+        return entities.isEmpty() ? Optional.empty() : Optional.of(entities.get(0));
+    }
+
+    public static List<Entity> handlePreEntitySpawning(Iterable<EntitySpawningEntry> entries) {
+        return handlePreEntitySpawning(CauseStack.current(), entries);
+    }
+
+    private static List<Entity> handlePreEntitySpawning(CauseStack causeStack, Iterable<EntitySpawningEntry> entries) {
         final List<Entity> entities = new ArrayList<>();
         for (EntitySpawningEntry entry : entries) {
             // Call the pre construction event
@@ -1228,14 +1250,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
                         .createEntity(entry.entityType, entry.transform.getPosition(), entry.entityConsumer));
             }
         }
-        if (entities.isEmpty()) {
-            return;
-        }
-        final SpawnEntityEvent spawnEvent = spawnEventConstructor.apply(causeStack.getCurrentCause(), entities);
-        // Post the spawn event
-        Sponge.getEventManager().post(spawnEvent);
-        // Spawn the entities in the world
-        finishSpawnEntityEvent(spawnEvent);
+        return entities;
     }
 
     @Override

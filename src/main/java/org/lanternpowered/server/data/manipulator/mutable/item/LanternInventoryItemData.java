@@ -53,13 +53,13 @@ public class LanternInventoryItemData extends AbstractData<InventoryItemData, Im
         super(manipulator);
         final Element<CarriedInventory<?>> element = getValueCollection().getElement(LanternKeys.ITEM_INVENTORY).get();
         if (element.get() instanceof LanternEmptyCarriedInventory) {
-            element.set(new LanternEmptyCarriedInventory<>(null, this));
+            element.set(new LanternEmptyCarriedInventory(this));
         }
     }
 
     @Override
     public void registerKeys() {
-        getValueCollection().register(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory<>(null, this));
+        getValueCollection().register(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory(this));
     }
 
     @Override

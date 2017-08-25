@@ -48,15 +48,9 @@ public class LanternEnderChest extends LanternContainerTileBase implements Ender
     }
 
     @Override
-    public Result onViewerAdded(Viewer viewer, LanternContainer container) {
-        super.onViewerAdded(viewer, container);
-        return Result.IGNORE;
-    }
-
-    @Override
-    public Result onViewerRemoved(Viewer viewer, LanternContainer container) {
-        super.onViewerRemoved(viewer, container);
-        return Result.REMOVE_LISTENER;
+    public void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback) {
+        super.onViewerRemoved(viewer, container, callback);
+        callback.remove();
     }
 
     @Override

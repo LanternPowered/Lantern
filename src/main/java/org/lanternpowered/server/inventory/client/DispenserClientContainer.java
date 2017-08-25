@@ -25,14 +25,20 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.text.Text;
 
 public class DispenserClientContainer extends ChestClientContainer {
 
-    public DispenserClientContainer(Text title) {
-        super(title, 1);
+    static class Title {
+        static final Text DEFAULT = t("container.dispenser");
+    }
+
+    public DispenserClientContainer() {
+        super(Title.DEFAULT, 1);
     }
 
     @Override

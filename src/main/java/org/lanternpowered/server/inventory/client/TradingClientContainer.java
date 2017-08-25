@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.inventory.behavior.event.SelectTradingOfferEvent;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
@@ -39,8 +41,12 @@ public class TradingClientContainer extends ClientContainer {
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
-    public TradingClientContainer(Text title) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("container.trading");
+    }
+
+    public TradingClientContainer() {
+        super(Title.DEFAULT);
     }
 
     @Override

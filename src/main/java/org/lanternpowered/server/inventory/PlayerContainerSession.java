@@ -36,7 +36,6 @@ import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
@@ -174,15 +173,14 @@ public class PlayerContainerSession {
                     if (transaction.isValid()) {
                         if (transaction.getFinal().isEmpty()) {
                             frame.pushCause(event); // Add the event that caused the drop to the cause
-                            LanternEventHelper.fireDropItemEventDispense(frame.getCurrentCause(), entities -> entities.add(
-                                    LanternEventHelper.createDroppedItem(this.player.getLocation(), transaction.getOriginal())));
+                            LanternEventHelper.handleDroppedItemSpawning(this.player.getTransform(), transaction.getOriginal());
                             frame.popCause();
                         } else {
                             cursorItem = transaction.getFinal();
                         }
                     }
                     // Close the inventory
-                    this.openContainer.close();
+                    this.openContainer.close(causeStack);
                 } else {
                     sendClose = false;
                 }
@@ -196,12 +194,10 @@ public class PlayerContainerSession {
                             final ItemStackSnapshot cursorItem1 = cursorTransaction.getFinal();
                             if (!cursorItem1.isEmpty()) {
                                 frame.pushCause(event); // Add the event that caused the drop to the cause
-                                LanternEventHelper.fireDropItemEventDispense(frame.getCurrentCause(),
-                                        entities -> entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), cursorItem1)));
+                                LanternEventHelper.handleDroppedItemSpawning(this.player.getTransform(), cursorItem1);
                                 frame.popCause();
                             }
                         }
-                        container.removeViewer(this.player, container);
                         return false;
                     }
                     if (cursorTransaction.isValid()) {
@@ -255,7 +251,7 @@ public class PlayerContainerSession {
     }
 
     public void handleItemDrop(MessagePlayInDropHeldItem message) {
-        final LanternSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
+        final AbstractSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
         final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
         if (itemStack.isPresent()) {
@@ -267,7 +263,8 @@ public class PlayerContainerSession {
                 frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM);
 
                 final List<Entity> entities = new ArrayList<>();
-                entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.get().createSnapshot()));
+                LanternEventHelper.handlePreDroppedItemSpawning(
+                        this.player.getTransform(), itemStack.get().createSnapshot()).ifPresent(entities::add);
 
                 final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(causeStack.getCurrentCause(), entities);
                 Sponge.getEventManager().post(event);

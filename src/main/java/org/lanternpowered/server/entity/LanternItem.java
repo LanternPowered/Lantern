@@ -31,10 +31,10 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventContextKeys;
-import org.lanternpowered.server.inventory.AbstractInventory;
+import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
-import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
+import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -69,6 +69,8 @@ public class LanternItem extends LanternEntity implements Item {
         private static final ParticleEffect DEATH_EFFECT =
                 ParticleEffect.builder().type(ParticleTypes.CLOUD).quantity(3).offset(Vector3d.ONE.mul(0.1)).build();
     }
+
+    public static final int DROPPED_PICKUP_DELAY = 40;
 
     private static final AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.125, 0, -0.125), new Vector3d(0.125, 0.25, 0.125));
     private static final int NO_DESPAWN_DELAY = 59536;
@@ -196,19 +198,20 @@ public class LanternItem extends LanternEntity implements Item {
             if (inventory instanceof PlayerInventory) {
                 inventory = ((PlayerInventory) inventory).getMain();
             }
-            final PeekOfferTransactionsResult result = ((AbstractInventory) inventory).peekOfferFastTransactions(itemStack);
-            final ItemStack rest = result.getOfferResult().getRest();
+
+            final PeekedOfferTransactionResult peekResult = ((IInventory) inventory).peekOffer(itemStack);
+            final ItemStack rejected = peekResult.getRejectedItem().orElse(null);
 
             final CauseStack causeStack = CauseStack.current();
             final ChangeInventoryEvent.Pickup event;
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
                 frame.addContext(LanternEventContextKeys.ORIGINAL_ITEM_STACK, itemStack);
-                if (rest != null) {
-                    frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, rest);
+                if (rejected != null) {
+                    frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, rejected);
                 }
 
-                event = SpongeEventFactory.createChangeInventoryEventPickup(causeStack.getCurrentCause(), inventory, result.getTransactions());
-                event.setCancelled(!result.getOfferResult().isSuccess());
+                event = SpongeEventFactory.createChangeInventoryEventPickup(causeStack.getCurrentCause(), inventory, peekResult.getTransactions());
+                event.setCancelled(!peekResult.isSuccess());
 
                 Sponge.getEventManager().post(event);
             }
@@ -219,16 +222,16 @@ public class LanternItem extends LanternEntity implements Item {
                     .filter(Transaction::isValid)
                     .forEach(transaction -> transaction.getSlot().set(transaction.getFinal().createStack()));
             final int added;
-            if (rest != null) {
-                added = itemStack.getQuantity() - rest.getQuantity();
-                itemStack = rest;
+            if (rejected != null) {
+                added = itemStack.getQuantity() - rejected.getQuantity();
+                itemStack = rejected;
             } else {
                 added = itemStack.getQuantity();
             }
             if (added != 0 && entity instanceof Living) {
                 triggerEvent(new CollectEntityEvent((Living) entity, added));
             }
-            if (rest == null || isRemoved()) {
+            if (rejected == null || isRemoved()) {
                 itemStack = null;
             }
             if (itemStack == null) {

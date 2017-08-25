@@ -28,9 +28,9 @@ package org.lanternpowered.server.inventory.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.text.Text;
@@ -96,8 +96,8 @@ public class PlayerClientContainer extends ClientContainer {
     }
 
     @Override
-    protected boolean disableShiftClickWhenFull() {
-        return false;
+    protected int getShiftFlags() {
+        return SHIFT_CLICK_WHEN_FULL_TOP_AND_FILTER;
     }
 
     @Override
@@ -119,7 +119,7 @@ public class PlayerClientContainer extends ClientContainer {
     }
 
     @Override
-    public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+    public ClientSlot.Slot bindSlot(int index, AbstractInventorySlot slot) {
         return super.bindSlot(index, slot);
     }
 

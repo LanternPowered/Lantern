@@ -25,25 +25,25 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
+import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
+import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
+import org.lanternpowered.server.inventory.UnknownInventoryArchetype;
+import org.lanternpowered.server.inventory.sponge.SpongeInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.property.AcceptsItems;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.property.GuiIds;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
-@RegistrationDependency(ClientContainerRegistryModule.class)
+@RegistrationDependency({ ClientContainerRegistryModule.class, EquipmentTypeRegistryModule.class, ItemRegistryModule.class })
 public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModule<InventoryArchetype> {
 
     public InventoryArchetypeRegistryModule() {
@@ -54,203 +54,25 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
     public List<CatalogMappingData> getCatalogMappings() {
         return ImmutableList.<CatalogMappingData>builder()
                 .addAll(super.getCatalogMappings())
-                .add(new CatalogMappingData(LanternInventoryArchetypes.class, this.provideCatalogMap()))
+                .add(new CatalogMappingData(LanternInventoryArchetypes.class, provideCatalogMap()))
                 .build();
     }
 
     @Override
     public void registerDefaults() {
-        final LanternInventoryArchetypeBuilder builder = new LanternInventoryArchetypeBuilder();
-        builder.property(InventoryDimension.PROPERTY_NAME, new InventoryDimension(1, 1));
+        register(new UnknownInventoryArchetype("minecraft", "unknown"));
+        register(new UnknownInventoryArchetype("minecraft", "empty"));
 
-        final InventoryArchetype slotArchetype = builder.build("minecraft:slot", "Slot");
-        register(slotArchetype);
-
-        // Differences from the sponge impl, slot indexes are
-        // assigned in the order they are added.
-
-        builder.reset();
-        for (int i = 0; i < 9; i++) {
-            builder.with(new LanternInventoryArchetypeBuilder()
-                    .from(slotArchetype)
-                    .build("minecraft:slot_" + i, "Slot"));
+        for (Class<?> target : Arrays.asList(VanillaInventoryArchetypes.class, SpongeInventoryArchetypes.class)) {
+            for (Field field : target.getFields()) {
+                if (LanternInventoryArchetype.class.isAssignableFrom(field.getType())) {
+                    try {
+                        register((InventoryArchetype) field.get(null));
+                    } catch (IllegalAccessException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
         }
-
-        final InventoryArchetype menuRowArchetype = builder.property(new InventoryDimension(9, 1))
-                .build("sponge:menu_row", "Menu Row");
-        register(menuRowArchetype);
-
-        final InventoryArchetype menuColumnArchetype = builder.property(new InventoryDimension(1, 9))
-                .build("sponge:menu_column", "Menu Column");
-        register(menuColumnArchetype);
-
-        final InventoryArchetype buttonArchetype = builder.reset()
-                .from(slotArchetype)
-                .build("sponge:menu_button", "Menu Button");
-        register(buttonArchetype);
-
-        final InventoryArchetype menuGridArchetype = builder.reset()
-                .with(menuRowArchetype)
-                .with(menuRowArchetype)
-                .with(menuRowArchetype)
-                .property(new InventoryDimension(9, 3))
-                .property(new GuiIdProperty(GuiIds.CHEST))
-                .build("sponge:menu_grid", "Menu Grid");
-        register(menuGridArchetype);
-
-        final InventoryArchetype chestArchetype = builder.reset()
-                .with(menuGridArchetype)
-                .property(InventoryTitle.of(t("container.chest")))
-                .build("minecraft:chest", "Chest");
-        register(chestArchetype);
-
-        final InventoryArchetype doubleChestArchetype = builder.reset()
-                .with(chestArchetype)
-                .with(chestArchetype)
-                .property(new InventoryDimension(9, 6))
-                .property(new GuiIdProperty(GuiIds.CHEST))
-                .property(InventoryTitle.of(t("container.chestDouble")))
-                .build("minecraft:double_chest", "Double Chest");
-        register(doubleChestArchetype);
-
-        final InventoryArchetype furnaceArchetype = builder.reset()
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(slotArchetype)
-                        .build("minecraft:furnace_input", "Furnace Input"))
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(slotArchetype)
-                        .property(AcceptsItems.of(/*fuelsPredicate?*/))
-                        .build("minecraft:furnace_fuel", "Furnace Fuel"))
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(slotArchetype)
-                        .property(AcceptsItems.of())
-                        .build("minecraft:furnace_output", "Furnace Output"))
-                .property(new InventoryTitle(t("container.furnace")))
-                .property(new InventoryDimension(3, 1))
-                .property(new GuiIdProperty(GuiIds.FURNACE))
-                .build("minecraft:furnace", "Furnace");
-        register(furnaceArchetype);
-
-        final InventoryArchetype dispenserArchetype = builder.reset()
-                .with(menuGridArchetype)
-                .property(new InventoryDimension(3, 3))
-                .property(InventoryTitle.of(t("container.dispenser")))
-                .property(new GuiIdProperty(GuiIds.DISPENSER))
-                .build("minecraft:dispenser", "Dispenser");
-        register(dispenserArchetype);
-
-        final InventoryArchetype workbenchArchetype = builder.reset()
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(menuGridArchetype)
-                        .property(new InventoryDimension(3, 3))
-                        .build("minecraft:workbench_grid", "Workbench Grid"))
-                .with(slotArchetype)
-                .property(InventoryTitle.of(t("container.crafting")))
-                .property(new GuiIdProperty(GuiIds.CRAFTING_TABLE))
-                .build("minecraft:workbench", "Workbench");
-        register(workbenchArchetype);
-
-        final InventoryArchetype brewingStandArchetype = builder.reset()
-                .with(menuRowArchetype)
-                .property(new InventoryDimension(5, 1))
-                .property(InventoryTitle.of(t("container.brewing")))
-                .property(new GuiIdProperty(GuiIds.BREWING_STAND))
-                .build("minecraft:brewing_stand", "Brewing Stand");
-        register(brewingStandArchetype);
-
-        final InventoryArchetype hopperArchetype = builder.reset()
-                .with(menuRowArchetype)
-                .property(new InventoryDimension(5, 1))
-                .property(InventoryTitle.of(t("container.hopper")))
-                .property(new GuiIdProperty(GuiIds.HOPPER))
-                .build("minecraft:hopper", "Hopper");
-        register(hopperArchetype);
-
-        final InventoryArchetype beaconArchetype = builder.reset()
-                .with(slotArchetype)
-                .property(new InventoryDimension(1, 1))
-                .property(InventoryTitle.of(t("container.beacon")))
-                .property(new GuiIdProperty(GuiIds.BEACON))
-                .build("minecraft:beacon", "Beacon");
-        register(beaconArchetype);
-
-        final InventoryArchetype enchantingTableArchetype = builder.reset()
-                .with(slotArchetype)
-                .with(slotArchetype)
-                .property(new InventoryDimension(2, 1))
-                .property(InventoryTitle.of(t("container.enchant")))
-                .property(new GuiIdProperty(GuiIds.ENCHANTING_TABLE))
-                .build("minecraft:enchanting_table", "Enchanting Table");
-        register(enchantingTableArchetype);
-
-        final InventoryArchetype anvilArchetype = builder.reset()
-                .with(slotArchetype)
-                .with(slotArchetype)
-                .with(slotArchetype)
-                .property(new InventoryDimension(3, 1))
-                .property(InventoryTitle.of(t("container.repair")))
-                .property(new GuiIdProperty(GuiIds.ANVIL))
-                .build("minecraft:anvil", "Anvil");
-        register(anvilArchetype);
-
-        final InventoryArchetype villagerArchetype = builder.reset()
-                .with(slotArchetype)
-                .with(slotArchetype)
-                .with(slotArchetype)
-                .property(new InventoryDimension(3, 1))
-                .property(new GuiIdProperty(GuiIds.VILLAGER))
-                .build("minecraft:villager", "Villager");
-        register(villagerArchetype);
-
-        final InventoryArchetype horseArchetype = builder.reset()
-                .with(slotArchetype)
-                .with(slotArchetype)
-                .property(new InventoryDimension(2, 1))
-                .property(new GuiIdProperty(GuiIds.HORSE))
-                .build("minecraft:horse", "Horse");
-        register(horseArchetype);
-
-        final InventoryArchetype horseWithChestArchetype = builder.reset()
-                .with(horseArchetype)
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(menuGridArchetype)
-                        .property(new InventoryDimension(5, 3))
-                        .build("horse_grid", "Horse Grid"))
-                .property(new GuiIdProperty(GuiIds.HORSE))
-                .build("minecraft:horse_with_chest", "Horse with Chest");
-        register(horseWithChestArchetype);
-
-        final InventoryArchetype craftingArchetype = builder.reset()
-                .with(slotArchetype)
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(menuGridArchetype)
-                        .property(new InventoryDimension(2, 2))
-                        .build("minecraft:crafting_grid", "Crafting Grid"))
-                .property(InventoryTitle.of(t("container.crafting")))
-                .build("minecraft:crafting", "Crafting");
-        register(craftingArchetype);
-
-        final InventoryArchetype playerArchetype = builder.reset()
-                .with(craftingArchetype)
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(menuGridArchetype)
-                        .property(new InventoryDimension(1, 4))
-                        .build("minecraft:armor", "Armor"))
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(menuGridArchetype)
-                        .property(new InventoryDimension(9, 3)).build("minecraft:player_main", "Player Main"))
-                .with(new LanternInventoryArchetypeBuilder()
-                        .from(menuGridArchetype)
-                        .property(new InventoryDimension(9, 1)).build("minecraft:player_hotbar", "Player Hotbar"))
-                .build("minecraft:player", "Player");
-        register(playerArchetype);
-
-        final InventoryArchetype unknownArchetype = builder.reset()
-                .build("minecraft:unknown", "Unknown");
-        register(unknownArchetype);
-
-        final InventoryArchetype emptyArchetype = builder.reset()
-                .build("minecraft:empty", "Empty");
-        register(emptyArchetype);
     }
 }

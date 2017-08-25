@@ -27,6 +27,8 @@ package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -39,12 +41,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.DefaultStackSizes;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
@@ -55,7 +56,9 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -130,6 +133,12 @@ public abstract class ClientContainer implements ContainerBase {
      */
     private static int containerIdCounter = 1;
 
+    protected static int SHIFT_CLICK_WHEN_FULL_TOP = 0x1;
+
+    protected static int SHIFT_CLICK_TOP_FILTER = 0x2;
+
+    protected static int SHIFT_CLICK_WHEN_FULL_TOP_AND_FILTER = SHIFT_CLICK_WHEN_FULL_TOP | SHIFT_CLICK_TOP_FILTER;
+
     static {
         Arrays.fill(MAIN_INVENTORY_FLAGS, 0, MAIN_INVENTORY_FLAGS.length, FLAG_MAIN_INVENTORY);
         for (int i = 0; i < 9; i++) {
@@ -179,9 +188,9 @@ public abstract class ClientContainer implements ContainerBase {
 
     private final class SlotClientSlot extends BaseClientSlot implements ClientSlot.Slot {
 
-        private final LanternSlot slot;
+        private final AbstractInventorySlot slot;
 
-        private SlotClientSlot(int index, LanternSlot slot) {
+        private SlotClientSlot(int index, AbstractInventorySlot slot) {
             super(index);
             this.slot = slot;
         }
@@ -192,7 +201,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public LanternSlot getSlot() {
+        public AbstractInventorySlot getSlot() {
             return this.slot;
         }
 
@@ -242,8 +251,8 @@ public abstract class ClientContainer implements ContainerBase {
         return allFlags;
     }
 
-    private final Text title;
-    private final Multimap<LanternSlot, SlotClientSlot> slotMap = HashMultimap.create();
+    private Text title;
+    private final Multimap<AbstractInventorySlot, SlotClientSlot> slotMap = HashMultimap.create();
     private BaseClientSlot cursor = new EmptyClientSlot(CURSOR_SLOT_INDEX); // Not really a slot, but the implementation does the trick
     private final int containerId;
     @SuppressWarnings("NullableProblems") protected BaseClientSlot[] slots;
@@ -258,7 +267,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public void queueSlotChange(LanternSlot slot) {
+        public void queueSlotChange(Slot slot) {
             getRoot().queueSlotChange(slot);
         }
 
@@ -273,7 +282,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public void queueSilentSlotChange(LanternSlot slot) {
+        public void queueSilentSlotChange(Slot slot) {
             getRoot().queueSilentSlotChange(slot);
         }
 
@@ -288,7 +297,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+        public ClientSlot.Slot bindSlot(int index, AbstractInventorySlot slot) {
             return getRoot().bindSlot(localToGlobalIndex(index), slot);
         }
 
@@ -298,7 +307,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public Optional<LanternSlot> getSlot(int index) {
+        public Optional<AbstractInventorySlot> getSlot(int index) {
             return getRoot().getSlot(localToGlobalIndex(index));
         }
 
@@ -431,7 +440,7 @@ public abstract class ClientContainer implements ContainerBase {
             removeSlot(index);
             BaseClientSlot clientSlot = clientContainer.slots[s2 + i];
             if (clientSlot instanceof SlotClientSlot) {
-                final LanternSlot slot = ((SlotClientSlot) clientSlot).slot;
+                final AbstractInventorySlot slot = ((SlotClientSlot) clientSlot).slot;
                 clientSlot = new SlotClientSlot(index, slot);
                 this.slotMap.put(slot, (SlotClientSlot) clientSlot);
                 if (this.player != null) {
@@ -477,6 +486,15 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
+     * Sets the title.
+     *
+     * @param title The title
+     */
+    public void setTitle(Text title) {
+        this.title = title;
+    }
+
+    /**
      * Gets the container id.
      *
      * @return The container id
@@ -519,7 +537,7 @@ public abstract class ClientContainer implements ContainerBase {
         this.interactionBehavior = interactionBehavior;
     }
 
-    public void bindCursor(LanternSlot slot) {
+    public void bindCursor(AbstractInventorySlot slot) {
         bindSlot(CURSOR_SLOT_INDEX, slot);
     }
 
@@ -539,7 +557,7 @@ public abstract class ClientContainer implements ContainerBase {
         queueSilentSlotChangeSafely(clientSlot);
     }
 
-    protected ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+    protected ClientSlot.Slot bindSlot(int index, AbstractInventorySlot slot) {
         populate();
         final SlotClientSlot clientSlot = new SlotClientSlot(index, slot);
         removeSlot(index);
@@ -568,7 +586,7 @@ public abstract class ClientContainer implements ContainerBase {
         // Cleanup the old client slot
         final BaseClientSlot oldClientSlot = index == CURSOR_SLOT_INDEX ? this.cursor : this.slots[index];
         if (oldClientSlot instanceof SlotClientSlot) {
-            final LanternSlot slot = ((SlotClientSlot) oldClientSlot).slot;
+            final AbstractInventorySlot slot = ((SlotClientSlot) oldClientSlot).slot;
             // Remove the tracker from this slot
             if (this.slotMap.remove(slot, oldClientSlot) &&
                     this.player != null && this.slotMap.get(slot).isEmpty()) {
@@ -612,8 +630,8 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     @Override
-    public void queueSlotChange(LanternSlot slot) {
-        this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
+    public void queueSlotChange(Slot slot) {
+        this.slotMap.get((AbstractInventorySlot) checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
     }
 
     @Override
@@ -645,8 +663,8 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     @Override
-    public void queueSilentSlotChange(LanternSlot slot) {
-        this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
+    public void queueSilentSlotChange(Slot slot) {
+        this.slotMap.get((AbstractInventorySlot) checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
     }
 
     @Override
@@ -694,7 +712,7 @@ public abstract class ClientContainer implements ContainerBase {
         populate();
         this.player = (LanternPlayer) player;
         // Add the tracker to each slot
-        for (LanternSlot slot : this.slotMap.keySet()) {
+        for (AbstractInventorySlot slot : this.slotMap.keySet()) {
             slot.addTracker(this);
         }
     }
@@ -788,7 +806,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Releases all the {@link LanternSlot} and
+     * Releases all the {@link AbstractInventorySlot} and
      * removes the {@link LanternPlayer}.
      */
     public void release() {
@@ -798,7 +816,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
         this.player = null;
         // Remove the tracker from each slot
-        for (LanternSlot slot : this.slotMap.keySet()) {
+        for (AbstractInventorySlot slot : this.slotMap.keySet()) {
             slot.removeTracker(this);
         }
     }
@@ -821,7 +839,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     @Override
-    public Optional<LanternSlot> getSlot(int index) {
+    public Optional<AbstractInventorySlot> getSlot(int index) {
         populate();
         if (index != CURSOR_SLOT_INDEX && (index < 0 || index >= this.slots.length)) {
             return Optional.empty();
@@ -855,13 +873,12 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Gets whether shift clicking should be
-     * disabled when the top inventory is full.
+     * Gets flags related to shift clicking.
      *
-     * @return Disable shift click
+     * @return Shift click flags
      */
-    protected boolean disableShiftClickWhenFull() {
-        return true;
+    protected int getShiftFlags() {
+        return 0;
     }
 
     protected int clientSlotIndexToServer(int index) {
@@ -888,6 +905,10 @@ public abstract class ClientContainer implements ContainerBase {
 
     public void handleCreativeClick(int slotIndex, @Nullable ItemStack itemStack) {
         populate();
+        // You can only use this in creative mode
+        if (this.player == null || this.player.get(Keys.GAME_MODE).get() != GameModes.CREATIVE) {
+            return;
+        }
         // Convert the slot index
         slotIndex = clientSlotIndexToServer(slotIndex);
 
@@ -1012,12 +1033,20 @@ public abstract class ClientContainer implements ContainerBase {
         } else if (state == 2) {
             // Finish state
             if (!this.dragSlots.isEmpty()) {
-                tryProcessBehavior(behavior -> {
-                    final List<ClientSlot> clientSlots = Arrays.stream(this.dragSlots.toIntArray())
-                            .mapToObj(i -> this.slots[i])
-                            .collect(ImmutableList.toImmutableList());
-                    behavior.handleDrag(this, clientSlots, mode == 0 ? MouseButton.LEFT : mode == 1 ? MouseButton.RIGHT : MouseButton.MIDDLE);
-                });
+                // Only one slot can be considered
+                // a normal click
+                if (this.dragSlots.size() == 1) {
+                    if (mode < 2) {
+                        handleLeftRightClick(this.dragSlots.iterator().nextInt(), mode);
+                    }
+                } else {
+                    tryProcessBehavior(behavior -> {
+                        final List<ClientSlot> clientSlots = Arrays.stream(this.dragSlots.toIntArray())
+                                .mapToObj(i -> this.slots[i])
+                                .collect(ImmutableList.toImmutableList());
+                        behavior.handleDrag(this, clientSlots, mode == 0 ? MouseButton.LEFT : mode == 1 ? MouseButton.RIGHT : MouseButton.MIDDLE);
+                    });
+                }
             }
             // Just reset the drag
             resetDrag();
@@ -1070,7 +1099,7 @@ public abstract class ClientContainer implements ContainerBase {
     private void handleDoubleClick(int slotIndex) {
         if (this.doubleClickItem != null) {
             final ItemStack itemStack = this.doubleClickItem;
-            final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+            final int maxStack = ClientItemStackSizes.getOriginalMaxSize(itemStack.getType());
             final int[] flags = getSlotFlags();
             for (int i = 0; i < flags.length; i++) {
                 // The stack is full, stop
@@ -1093,6 +1122,8 @@ public abstract class ClientContainer implements ContainerBase {
             // Update the cursor
             queueSlotChangeSafely(this.cursor);
         }
+        final BaseClientSlot slot = this.slots[slotIndex];
+        queueSlotChange(slot);
         this.doubleClickItem = null;
         tryProcessBehavior(behavior -> behavior.handleDoubleClick(this, this.slots[slotIndex]));
     }
@@ -1121,20 +1152,20 @@ public abstract class ClientContainer implements ContainerBase {
      * @param button The button that was pressed (0: left; 1: right)
      */
     private void handleLeftRightClick(int slotIndex, int button) {
+        final boolean cursor = !this.cursor.getRaw().isEmpty();
         if (slotIndex != -1) {
             final BaseClientSlot slot = this.slots[slotIndex];
-            if (!slot.getRaw().isEmpty()) {
-                // Only changes can occur if the cursor slot and the target slot are empty
-                if (!this.cursor.getRaw().isEmpty()) {
-                    // Update the slot and cursor
-                    queueSilentSlotChangeSafely(slot);
-                    queueSlotChangeSafely(this.cursor);
-                } else {
+            // Only changes can occur if the cursor slot and the target slot aren't empty
+            if (cursor || !slot.getRaw().isEmpty()) {
+                // Update the slot and cursor
+                queueSilentSlotChangeSafely(slot);
+                queueSlotChangeSafely(this.cursor);
+                if (!cursor) {
                     // Store the clicked item, it's possible that a double click occurs
                     this.doubleClickItem = slot.getItem();
                 }
             }
-        } else if (!this.cursor.getRaw().isEmpty()) {
+        } else if (cursor) {
             queueSlotChange(this.cursor);
         }
         tryProcessBehavior(behavior -> behavior.handleClick(this,
@@ -1155,6 +1186,45 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     private void handleShiftClick0(int slotIndex) {
+        final BaseClientSlot slot = this.slots[slotIndex];
+        ItemStack itemStack = slot.getItem();
+        // Shift clicking on a empty slot doesn't have any effect
+        if (itemStack.isEmpty()) {
+            return;
+        }
+        final int[] flags = getSlotFlags();
+        final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;
+        final boolean hotbar = (flags[slotIndex] & FLAG_HOTBAR) != 0;
+        queueSilentSlotChangeSafely(slot);
+        for (int i = 0; i < flags.length; i++) {
+            // Don't shift to itself
+            if (i == slotIndex) {
+                continue;
+            }
+            // You can never shift insert to this slot
+            if ((flags[i] & FLAG_DISABLE_SHIFT_INSERTION) != 0) {
+                continue;
+            }
+            final boolean main1 = (flags[i] & FLAG_MAIN_INVENTORY) != 0;
+            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
+            // Only attempt to move from bottom to top or from top to bottom inventory
+            if (main == main1 && hotbar == hotbar1) {
+                continue;
+            }
+            final BaseClientSlot slot1 = this.slots[i];
+            final ItemStack itemStack1 = slot1.getRaw();
+            // Get the amount of items that can be put in the stack
+            final int maxStack = ClientItemStackSizes.getOriginalMaxSize(itemStack.getType());
+            final int limit = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
+            // If the items aren't equal, they won't be able to stack anyway,
+            // or if the slot is full
+            if (!itemStack1.isEmpty() && (!LanternItemStack.areSimilar(itemStack, itemStack1) ||
+                    itemStack1.getQuantity() >= limit)) {
+                continue;
+            }
+            queueSilentSlotChangeSafely(slot1);
+        }
+        /*
         final int[] flags = getSlotFlags();
         // Check if the slot is in the main inventory
         final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;
@@ -1166,6 +1236,7 @@ public abstract class ClientContainer implements ContainerBase {
         if (itemStack.isEmpty()) {
             return;
         }
+        final int shiftFlags = getShiftFlags();
         queueSilentSlotChangeSafely(slot);
         // Loop reverse through the slots if the insertion is reversed
         final boolean reverse = (flags[slotIndex] & FLAG_REVERSE_SHIFT_INSERTION) != 0;
@@ -1173,7 +1244,7 @@ public abstract class ClientContainer implements ContainerBase {
         final int end = reverse ? 0 : flags.length - 1;
         final int step = reverse ? -1 : 1;
         // Get the max stack size for the shifted item
-        final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+        final int maxStack = ClientItemStackSizes.getOriginalMaxSize(itemStack.getType());
         final IntList retrySlots = new IntArrayList();
         final IntList mainSlots = new IntArrayList();
         for (int i = start; i != end; i += step) {
@@ -1249,13 +1320,19 @@ public abstract class ClientContainer implements ContainerBase {
             }
         }
         // Shift between main and hotbar for the rest of the stack
-        if (disableShiftClickWhenFull()) {
+        if ((shiftFlags & SHIFT_CLICK_WHEN_FULL_TOP) == 0 &&
+                (shiftFlags & SHIFT_CLICK_TOP_FILTER) == 0) {
             return;
+        }
+        // Retry completely for the bottom inventory
+        if ((shiftFlags & SHIFT_CLICK_TOP_FILTER) == 0) {
+            itemStack = slot.getItem();
         }
         final int[] mainSlotsArray = mainSlots.toIntArray();
         if (reverse) {
             ArrayUtils.reverse(mainSlotsArray);
         }
+        retrySlots.clear();
         for (int i : mainSlotsArray) {
             // No need to check if shifting is disabled, it will always work
             // for the main inventory
@@ -1268,10 +1345,13 @@ public abstract class ClientContainer implements ContainerBase {
             final ItemStack itemStack1 = slot1.getRaw();
             // Get the amount of items that can be put in the stack
             final int limit = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
+            if (itemStack1.isEmpty()) {
+                retrySlots.add(i);
+                continue;
             // If the items aren't equal, they won't be able to stack anyway,
             // or if the slot is full
-            if (!itemStack1.isEmpty() && (!LanternItemStack.areSimilar(itemStack, itemStack1) ||
-                    itemStack1.getQuantity() >= limit)) {
+            } else if (!LanternItemStack.areSimilar(itemStack, itemStack1) ||
+                    itemStack1.getQuantity() >= limit) {
                 continue;
             }
             // Now, we take some items away from the shifted stack and continue
@@ -1287,5 +1367,21 @@ public abstract class ClientContainer implements ContainerBase {
                 return;
             }
         }
+        for (int i : retrySlots) {
+            final BaseClientSlot slot1 = this.slots[i];
+            // Now, we take some items away from the shifted stack and continue
+            // the process for the rest of the slots
+            final int removed = Math.min((flags[i] & FLAG_ONE_ITEM) != 0 ? 1 : 64, maxStack);
+            if (removed > 0) {
+                itemStack.setQuantity(Math.max(0, itemStack.getQuantity() - removed));
+                // Do it silently if possible, avoid any animations
+                queueSilentSlotChangeSafely(slot1);
+            }
+            // We are at the end, the stack is empty
+            if (itemStack.isEmpty()) {
+                return;
+            }
+        }
+        */
     }
 }

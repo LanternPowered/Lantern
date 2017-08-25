@@ -25,22 +25,25 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
-import org.lanternpowered.server.inventory.entity.LanternUserInventory;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.vanilla.LanternUserInventory;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Optional;
 
 public class OfflineUser extends AbstractUser {
 
-    private final LanternUserInventory<User> inventory = new LanternUserInventory<>(null, null, this);
+    private final LanternUserInventory inventory;
 
     public OfflineUser(ProxyUser user) {
         super(user);
+        this.inventory = VanillaInventoryArchetypes.USER.builder()
+                .withCarrier(this).build(Lantern.getMinecraftPlugin());
     }
 
     @Override
-    public LanternUserInventory<? extends User> getInventory() {
+    public LanternUserInventory getInventory() {
         return this.inventory;
     }
 

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.inventory.behavior.event.EnchantButtonEvent;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
 import org.lanternpowered.server.network.message.Message;
@@ -44,8 +46,12 @@ public class EnchantmentTableClientContainer extends ClientContainer {
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
-    public EnchantmentTableClientContainer(Text title) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("container.enchant");
+    }
+
+    public EnchantmentTableClientContainer() {
+        super(Title.DEFAULT);
     }
 
     @Override

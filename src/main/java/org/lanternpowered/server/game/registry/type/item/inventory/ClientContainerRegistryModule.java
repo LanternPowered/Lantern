@@ -25,33 +25,33 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
-import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.lanternpowered.server.inventory.InventoryPropertyHolder;
+import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.client.AnvilClientContainer;
 import org.lanternpowered.server.inventory.client.BeaconClientContainer;
 import org.lanternpowered.server.inventory.client.BrewingStandClientContainer;
 import org.lanternpowered.server.inventory.client.ChestClientContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
-import org.lanternpowered.server.inventory.client.ClientContainerProvider;
 import org.lanternpowered.server.inventory.client.ClientContainerType;
 import org.lanternpowered.server.inventory.client.CraftingTableClientContainer;
 import org.lanternpowered.server.inventory.client.DispenserClientContainer;
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
+import org.lanternpowered.server.inventory.client.EntityEquipmentClientContainer;
 import org.lanternpowered.server.inventory.client.FurnaceClientContainer;
 import org.lanternpowered.server.inventory.client.HopperClientContainer;
 import org.lanternpowered.server.inventory.client.ShulkerBoxClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.property.GuiId;
 import org.spongepowered.api.item.inventory.property.GuiIds;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.item.inventory.property.InventoryCapacity;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 public class ClientContainerRegistryModule extends PluginCatalogRegistryModule<GuiId> {
 
     private static final ClientContainerRegistryModule instance = new ClientContainerRegistryModule();
@@ -66,47 +66,43 @@ public class ClientContainerRegistryModule extends PluginCatalogRegistryModule<G
 
     @Override
     public void registerDefaults() {
-        register("minecraft", "chest", t("container.chest"), (text, propertyHolder) -> {
-            // A row amount should be provided as a property
-            final Vector2i dimension = propertyHolder.getProperty(InventoryDimension.class).map(InventoryDimension::getValue).orElse(null);
-            final int rows = dimension == null ? 1 : dimension.getY();
-            return new ChestClientContainer(text, rows);
+        register("minecraft", "chest", inventory -> {
+            final int rows = inventory.getInventoryProperty(InventoryCapacity.class)
+                            .map(capacity -> (int) Math.ceil(capacity.getValue().doubleValue() / 9.0))
+                            .orElse(1);
+            return new ChestClientContainer(rows);
         });
-        register("minecraft", "furnace", t("container.furnace"), (text, propertyHolder) -> new FurnaceClientContainer(text));
-        register("minecraft", "dispenser", t("container.dispenser"), (text, propertyHolder) -> new DispenserClientContainer(text));
-        register("minecraft", "crafting_table", t("container.crafting"), (text, propertyHolder) -> new CraftingTableClientContainer(text));
-        register("minecraft", "brewing_stand", t("container.brewing"), (text, propertyHolder) -> new BrewingStandClientContainer(text));
-        register("minecraft", "hopper", t("container.hopper"), (text, propertyHolder) -> new HopperClientContainer(text));
-        register("minecraft", "beacon", t("container.beacon"), (text, propertyHolder) -> new BeaconClientContainer(text));
-        register("minecraft", "enchanting_table", t("container.enchant"), (text, propertyHolder) -> new EnchantmentTableClientContainer(text));
-        register("minecraft", "anvil", t("container.repair"), (text, propertyHolder) -> new AnvilClientContainer(text));
-        register("minecraft", "villager", t("container.trading"), (text, propertyHolder) -> new TradingClientContainer(text));
-        // register("minecraft", "horse", t("container.horse"), (text, propertyHolder) -> new EntityEquipmentClientContainer(text)); TODO
-        register("minecraft", "shulker_box", t("container.shulkerBox"), (text, propertyHolder) -> new ShulkerBoxClientContainer(text));
-    }
-
-    private void register(String plugin, String id, Text defaultTitle, BiFunction<Text, InventoryPropertyHolder, ClientContainer> supplier) {
-        register(new ClientContainerType(plugin, id, new SimpleProvider(defaultTitle, supplier)));
-    }
-
-    private final class SimpleProvider implements ClientContainerProvider {
-
-        private final Text defaultTitle;
-        private final BiFunction<Text, InventoryPropertyHolder, ClientContainer> supplier;
-
-        private SimpleProvider(Text defaultTitle,
-                BiFunction<Text, InventoryPropertyHolder, ClientContainer> supplier) {
-            this.defaultTitle = defaultTitle;
-            this.supplier = supplier;
-        }
-
-        @Override
-        public ClientContainer apply(InventoryPropertyHolder propertyHolder) {
-            Text title = propertyHolder.getProperty(InventoryTitle.class).map(InventoryTitle::getValue).orElse(null);
-            if (title == null) {
-                title = this.defaultTitle;
+        register("minecraft", "furnace", inventory -> new FurnaceClientContainer());
+        register("minecraft", "dispenser", inventory -> new DispenserClientContainer());
+        register("minecraft", "crafting_table", inventory -> new CraftingTableClientContainer());
+        register("minecraft", "brewing_stand", inventory -> new BrewingStandClientContainer());
+        register("minecraft", "hopper", inventory -> new HopperClientContainer());
+        register("minecraft", "beacon", inventory -> new BeaconClientContainer());
+        register("minecraft", "enchanting_table", inventory -> new EnchantmentTableClientContainer());
+        register("minecraft", "anvil", inventory -> new AnvilClientContainer());
+        register("minecraft", "villager", inventory -> new TradingClientContainer());
+        register("minecraft", "horse", inventory -> {
+            int capacity = inventory.capacity();
+            capacity -= 2;
+            capacity = (int) Math.ceil((float) capacity / 3);
+            int entityId = -1;
+            if (inventory instanceof CarriedInventory) {
+                final Carrier carrier = ((CarriedInventory<Carrier>) inventory).getCarrier().orElse(null);
+                if (carrier instanceof Entity) {
+                    final LanternEntity entity = (LanternEntity) carrier;
+                    entityId = entity.getWorld().getEntityProtocolManager().getProtocolId(entity);
+                }
             }
-            return this.supplier.apply(title, propertyHolder);
-        }
+            if (entityId == -1) {
+                throw new IllegalStateException("Invalid carrier entity to create a container.");
+            }
+            // TODO: Dummy entity support?
+            return new EntityEquipmentClientContainer(capacity, entityId);
+        });
+        register("minecraft", "shulker_box", inventory -> new ShulkerBoxClientContainer());
+    }
+
+    private void register(String plugin, String id, Function<AbstractInventory, ClientContainer> supplier) {
+        register(new ClientContainerType(plugin, id, supplier));
     }
 }

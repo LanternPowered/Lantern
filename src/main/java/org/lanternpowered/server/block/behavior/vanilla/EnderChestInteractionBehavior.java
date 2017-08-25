@@ -33,7 +33,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractInventory;
-import org.lanternpowered.server.inventory.ContainerViewListener;
+import org.lanternpowered.server.inventory.InventoryViewerListener;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -48,11 +48,11 @@ public class EnderChestInteractionBehavior implements InteractWithBlockBehavior 
         if (player == null) {
             return BehaviorResult.CONTINUE;
         }
-        final AbstractInventory inventory = player.getEnderChestInventory();
         final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final AbstractInventory inventory = player.getEnderChestInventory();
         final Optional<TileEntity> optTileEntity = location.getTileEntity();
-        if (optTileEntity.isPresent() && optTileEntity.get() instanceof ContainerViewListener) {
-            inventory.addViewListener((ContainerViewListener) optTileEntity.get());
+        if (optTileEntity.isPresent() && optTileEntity.get() instanceof InventoryViewerListener) {
+            inventory.addViewListener((InventoryViewerListener) optTileEntity.get());
         }
         if (!player.openInventory(inventory).isPresent()) {
             return BehaviorResult.CONTINUE;

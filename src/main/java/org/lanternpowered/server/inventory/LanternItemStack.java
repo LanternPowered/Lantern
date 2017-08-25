@@ -242,6 +242,10 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
         return getType() == that.getType() && IValueContainer.matchContents(this, (IValueContainer) that);
     }
 
+    public static boolean isEmpty(@Nullable ItemStack itemStack) {
+        return itemStack == null || itemStack.isEmpty();
+    }
+
     public static boolean areSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
         //noinspection SimplifiableConditionalExpression
         return itemStackA == itemStackB ? true : itemStackA == null || itemStackB == null ? false :

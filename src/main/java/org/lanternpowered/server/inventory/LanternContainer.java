@@ -28,75 +28,81 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
-import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.client.ClientContainerType;
+import org.lanternpowered.server.inventory.type.slot.LanternSlot;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
+import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.item.inventory.property.GuiId;
+import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-public class LanternContainer extends LanternOrderedInventory implements Container {
+public class LanternContainer extends AbstractOrderedInventory implements Container {
+
+    /**
+     * Creates a new {@link LanternContainer}, the specified {@link LanternPlayerInventory} is
+     * used as the bottom inventory and also as top inventory if {@code null} is provided
+     * for the inventory that should be opened.
+     *
+     * @param playerInventory The player inventory
+     * @param openInventory The inventory to open
+     */
+    public static LanternContainer construct(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory) {
+        if (openInventory instanceof CarriedInventory) {
+            return new CarriedLanternContainer<>(playerInventory, openInventory);
+        }
+        return new LanternContainer(playerInventory, openInventory);
+    }
 
     private final Map<Player, ClientContainer> viewers = new HashMap<>();
-    private final LanternOrderedInventory openInventory;
-    private final LanternPlayerInventory playerInventory;
+
+    final AbstractOrderedInventory openInventory;
+    final LanternPlayerInventory playerInventory;
 
     /**
      * The slot for the cursor item.
      */
-    private final LanternSlot cursor = new LanternSlot(this);
+    private final LanternSlot cursor = new LanternSlot();
 
-    /**
-     * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
-     * used as the bottom inventory and also as top inventory if {@code null} is provided
-     * for the inventory that should be opened.
-     *
-     * @param playerInventory The player inventory
-     * @param openInventory The inventory to open
-     */
-    public LanternContainer(LanternPlayerInventory playerInventory, OpenableInventory openInventory) {
-        this(playerInventory, openInventory, openInventory.getName());
-    }
-
-    /**
-     * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
-     * used as the bottom inventory and also as top inventory if {@code null} is provided
-     * for the inventory that should be opened.
-     *
-     * @param playerInventory The player inventory
-     * @param openInventory The inventory to open
-     * @param name The name of the container
-     */
-    public LanternContainer(LanternPlayerInventory playerInventory, OpenableInventory openInventory, @Nullable Translation name) {
-        this(name, playerInventory, checkNotNull(openInventory, "openInventory"));
-    }
-
-    LanternContainer(@Nullable Translation name, LanternPlayerInventory playerInventory, @Nullable OpenableInventory openInventory) {
-        super(null, name);
-        this.playerInventory = checkNotNull(playerInventory, "playerInventory");
-        final LanternHumanMainInventory mainInventory = playerInventory.getMain();
-        if (openInventory != null) {
-            registerChild(openInventory);
-            registerChild(mainInventory);
-            this.openInventory = (LanternOrderedInventory) openInventory;
-        } else {
-            registerChild(playerInventory);
-            this.openInventory = playerInventory;
+    @SuppressWarnings("unchecked")
+    LanternContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory) {
+        this.playerInventory = playerInventory;
+        this.openInventory = openInventory;
+        final List<AbstractOrderedInventory> inventories = ImmutableList.of(openInventory, playerInventory.getMain());
+        final List<AbstractContainerSlot> slots = new ArrayList<>();
+        for (AbstractOrderedInventory inventory : inventories) {
+            for (AbstractSlot slot : inventory.getIndexedSlotInventories()) {
+                final AbstractContainerSlot containerSlot = ((AbstractInventorySlot) slot).constructContainerSlot();
+                containerSlot.slot = (AbstractInventorySlot) slot;
+                containerSlot.setParent(this);
+                slots.add(containerSlot);
+            }
         }
+        initWithSlots((List) inventories, (List) slots, null);
+    }
+
+    @Override
+    public EmptyInventory empty() {
+        return super.empty();
     }
 
     /**
@@ -115,7 +121,7 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
      *
      * @return The inventory
      */
-    public LanternOrderedInventory getOpenInventory() {
+    public AbstractOrderedInventory getOpenInventory() {
         return this.openInventory;
     }
 
@@ -155,6 +161,12 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
         }
     }
 
+    @Override
+    void queryInventories(Set<AbstractMutableInventory> inventories, Predicate<AbstractMutableInventory> predicate) {
+        super.queryInventories(inventories, inventory -> !(inventory instanceof AbstractSlot) && predicate.test(inventory));
+        getSlotInventories().stream().filter(predicate::test).forEach(inventories::add);
+    }
+
     /**
      * Attempts to get the {@link ClientContainer} for the
      * specified {@link Player}. {@link Optional#empty()} will
@@ -181,40 +193,40 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
     }
 
     @Nullable
-    ClientContainer removeViewer(Player viewer) {
+    void removeViewer(Player viewer) {
         checkNotNull(viewer, "viewer");
         final ClientContainer clientContainer = this.viewers.remove(viewer);
         if (clientContainer != null) {
             removeViewer(viewer, this);
             clientContainer.release();
         }
-        return clientContainer;
     }
 
     /**
      * Adds and opens a {@link ClientContainer} for the {@link Player}.
      *
      * @param viewer The viewer
-     * @return The constructed container
      */
-    ClientContainer addViewer(Player viewer) {
+    void addViewer(Player viewer) {
         checkNotNull(viewer, "viewer");
         checkState(!this.viewers.containsKey(viewer));
-        final ClientContainer clientContainer = ((OpenableInventory) this.openInventory).constructClientContainer(this);
+        final ClientContainer clientContainer;
+        // Get the gui id (ClientContainerType)
+        final GuiId guiId = this.openInventory.getInventoryProperty(GuiIdProperty.class)
+                .map(GuiIdProperty::getValue).orElseThrow(IllegalStateException::new);
+        clientContainer = ((ClientContainerType) guiId).createContainer(this.openInventory);
+        clientContainer.bindCursor(this.cursor);
+        clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(this));
+        this.openInventory.initClientContainer(clientContainer);
         // Bind the default bottom container part if the custom one is missing
         if (!clientContainer.getBottom().isPresent()) {
             final LanternPlayer player = (LanternPlayer) getPlayerInventory().getCarrier().get();
             clientContainer.bindBottom(player.getInventoryContainer().getClientContainer().getBottom().get());
         }
-        if (!clientContainer.getInteractionBehavior().isPresent()) {
-            final LanternPlayer player = (LanternPlayer) getPlayerInventory().getCarrier().get();
-            clientContainer.bindInteractionBehavior(player.getInventoryContainer().getClientContainer().getInteractionBehavior().get());
-        }
         this.viewers.put(viewer, clientContainer);
         clientContainer.bind(viewer);
         clientContainer.init();
         addViewer(viewer, this);
-        return clientContainer;
     }
 
     Collection<Player> getRawViewers() {

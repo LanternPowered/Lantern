@@ -25,19 +25,31 @@
  */
 package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
 
 public interface IInventory extends Inventory {
 
     @Override
     IInventory parent();
+
+    /**
+     * Gets the root {@link IInventory}.
+     *
+     * @return The root inventory
+     */
+    IInventory root();
+
+    <T extends Inventory> Iterable<T> orderedSlots();
 
     /**
      * Adds a {@link SlotChangeListener} to
@@ -48,11 +60,11 @@ public interface IInventory extends Inventory {
     void addChangeListener(SlotChangeListener listener);
 
     /**
-     * Adds a {@link ContainerViewListener} to this {@link Inventory}.
+     * Adds a {@link InventoryViewerListener} to this {@link Inventory}.
      *
      * @param listener The listener
      */
-    void addViewListener(ContainerViewListener listener);
+    void addViewListener(InventoryViewerListener listener);
 
     /**
      * Adds a {@link InventoryCloseListener} to this {@link Inventory}.
@@ -61,8 +73,22 @@ public interface IInventory extends Inventory {
      */
     void addCloseListener(InventoryCloseListener listener);
 
+    /**
+     * Polls the first available stack with the specific {@link ItemType}.
+     *
+     * @param itemType The item type
+     * @return The polled item stack, if found
+     * @see #poll()
+     */
     Optional<ItemStack> poll(ItemType itemType);
 
+    /**
+     * Polls the first available stack that is matched by the {@link Predicate}.
+     *
+     * @param matcher The matcher
+     * @return The polled item stack, if found
+     * @see #poll()
+     */
     Optional<ItemStack> poll(Predicate<ItemStack> matcher);
 
     Optional<ItemStack> poll(int limit, ItemType itemType);
@@ -77,7 +103,20 @@ public interface IInventory extends Inventory {
 
     Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher);
 
-    <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested);
+    Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher);
+
+    Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher);
+
+    PeekedOfferTransactionResult peekOffer(ItemStack itemStack);
+
+    /**
+     * Peeks for the result {@link SlotTransaction}s and {@link InventoryTransactionResult}
+     * that would occur if you try to set a item through {@link Inventory#set(ItemStack)}.
+     *
+     * @param itemStack The item stack to set
+     * @return The peeked transaction result
+     */
+    PeekedSetTransactionResult peekSet(@Nullable ItemStack itemStack);
 
     /**
      * Check whether the supplied item can be inserted into this one of the children of the
@@ -85,42 +124,31 @@ public interface IInventory extends Inventory {
      * always return false</b> for this item.
      *
      * @param stack ItemStack to check
-     * @return true if the stack is valid for one of the children of this inventory
+     * @return True if the stack is valid for at least one of the children of this inventory
      */
     boolean isValidItem(ItemStack stack);
 
-    /**
-     * Gets whether the specified {@link Inventory} a child is of this inventory,
-     * this includes if it's a child of a child inventory.
-     *
-     * @param child The child inventory
-     * @return Whether the inventory was a child of this inventory
-     */
-    boolean isChild(Inventory child);
-
-    /**
-     * Gets the amount of slots that are present in this inventory.
-     *
-     * @return The slot count
-     */
-    int slotCount();
-
-    /**
-     * Gets whether this {@link Inventory} a property
-     * contains of the specified type.
-     *
-     * @param property The property type
-     * @return Whether a property exists
-     */
-    boolean hasProperty(Class<? extends InventoryProperty<?, ?>> property);
-
-    boolean hasProperty(InventoryProperty<?, ?> property);
-
-    boolean hasProperty(Inventory child, InventoryProperty<?, ?> property);
+    <T extends Inventory> T queryNot(Class<?>... types);
 
     @Override
     IInventory intersect(Inventory inventory);
 
     @Override
     IInventory union(Inventory inventory);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    InventoryTransactionResult set(@Nullable ItemStack stack);
+
+    /**
+     * Similar to the {@link #set(ItemStack)} method but ignores
+     * the checking whether a specific item can be put into a
+     * {@link Slot}.
+     *
+     * @param stack The stack to insert
+     * @return The transaction result
+     */
+    InventoryTransactionResult setForced(@Nullable ItemStack stack);
 }

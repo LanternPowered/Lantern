@@ -114,6 +114,7 @@ import java.util.function.Function;
         CookedFishRegistryModule.class,
         PotionEffectTypeRegistryModule.class,
         RecordTypeRegistryModule.class,
+        EquipmentTypeRegistryModule.class,
 })
 public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
 

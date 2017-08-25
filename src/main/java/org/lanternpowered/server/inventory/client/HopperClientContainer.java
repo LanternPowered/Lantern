@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.text.Text;
@@ -40,8 +42,12 @@ public class HopperClientContainer extends ClientContainer {
     };
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
-    public HopperClientContainer(Text title) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("container.hopper");
+    }
+
+    public HopperClientContainer() {
+        super(Title.DEFAULT);
     }
 
     @Override

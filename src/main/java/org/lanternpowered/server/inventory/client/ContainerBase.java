@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.inventory.slot.SlotChangeTracker;
+import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.SlotChangeTracker;
 
 import java.util.Optional;
 
@@ -42,12 +42,12 @@ public interface ContainerBase extends SlotChangeTracker {
     Optional<ClientSlot> getClientSlot(int index);
 
     /**
-     * Attempts to get the bound {@link LanternSlot} for the given
+     * Attempts to get the bound {@link AbstractInventorySlot} for the given
      * index within this {@link ContainerPart}.
      *
      * @param index The slot index within this container part
      * @return The bound slot if present, otherwise {@link Optional#empty()}
      */
-    Optional<LanternSlot> getSlot(int index);
+    Optional<AbstractInventorySlot> getSlot(int index);
 
 }

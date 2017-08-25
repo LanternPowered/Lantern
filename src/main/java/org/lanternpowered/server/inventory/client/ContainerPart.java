@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 public interface ContainerPart extends ContainerBase {
@@ -46,13 +46,13 @@ public interface ContainerPart extends ContainerBase {
     void unbind(int index);
 
     /**
-     * Binds a {@link LanternSlot} to the given slot index
+     * Binds a {@link AbstractInventorySlot} to the given slot index
      * within this {@link ContainerPart}.
      *
      * @param index The slot index within this container part
      * @return The bound client slot
      */
-    ClientSlot.Slot bindSlot(int index, LanternSlot slot);
+    ClientSlot.Slot bindSlot(int index, AbstractInventorySlot slot);
 
     /**
      * Binds a {@link ItemStack} as a icon to the

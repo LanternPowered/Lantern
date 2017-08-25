@@ -27,8 +27,8 @@ package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.SimpleEquipmentInventory;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.IEquipmentInventory;
 import org.spongepowered.api.entity.Equipable;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -40,6 +40,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public interface AbstractEquipable extends Equipable {
 
     @Override
@@ -50,18 +51,18 @@ public interface AbstractEquipable extends Equipable {
     @Override
     default boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
         checkNotNull(type, "type");
-        final Inventory inventory = getInventory().query(type);
+        final Inventory inventory = getInventory().query(IEquipmentInventory.class);
         if (inventory instanceof EmptyInventory) {
             return false;
         }
-        final LanternSlot slot = inventory.first().<LanternSlot>slots().iterator().next();
+        final AbstractSlot slot = (AbstractSlot) inventory.<IEquipmentInventory>first().getSlot(type).orElse(null);
         return slot != null && (equipment == null || slot.isValidItem(equipment));
     }
 
     @Override
     default Optional<ItemStack> getEquipped(EquipmentType type) {
         checkNotNull(type, "type");
-        final Inventory inventory = getInventory().query(type);
+        final Inventory inventory = getInventory().query(IEquipmentInventory.class);
         if (inventory instanceof EmptyInventory) {
             return Optional.empty();
         }
@@ -71,11 +72,14 @@ public interface AbstractEquipable extends Equipable {
     @Override
     default boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
         checkNotNull(type, "type");
-        final Inventory inventory = getInventory().query(type);
+        final Inventory inventory = getInventory().query(IEquipmentInventory.class);
         if (inventory instanceof EmptyInventory) {
             return false;
         }
-        final LanternSlot slot = inventory.first().<LanternSlot>slots().iterator().next();
+        final AbstractSlot slot = (AbstractSlot) inventory.<IEquipmentInventory>first().getSlot(type).orElse(null);
+        if (slot == null) {
+            return false;
+        }
         final InventoryTransactionResult result = slot.set(equipment);
         return result.getType().equals(InventoryTransactionResult.Type.SUCCESS);
     }

@@ -26,25 +26,20 @@
 package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+public class LanternEmptyCarriedInventory extends LanternEmptyInventory implements CarriedInventory<Carrier> {
 
-public class LanternEmptyCarriedInventory<C extends Carrier> extends LanternEmptyInventory implements CarriedInventory<C> {
+    private final Carrier carrier;
 
-    @Nullable private final WeakReference<C> carrier;
-
-    public LanternEmptyCarriedInventory(@Nullable Inventory parent, @Nullable C carrier) {
-        super(parent);
-        this.carrier = carrier == null ? null : new WeakReference<>(carrier);
+    public LanternEmptyCarriedInventory(Carrier carrier) {
+        this.carrier = carrier;
     }
 
     @Override
-    public Optional<C> getCarrier() {
-        return this.carrier == null ? Optional.empty() : Optional.ofNullable(this.carrier.get());
+    public Optional<Carrier> getCarrier() {
+        return Optional.of(this.carrier);
     }
 }

@@ -29,283 +29,151 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.inventory.slot.SlotChangeListener;
+import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("SuspiciousMethodCalls")
-public class AbstractChildrenInventory extends AbstractMutableInventory {
+/**
+ * A base class for all the {@link Inventory}s that have multiple children,
+ * this should be every {@link Inventory} except {@link EmptyInventory}
+ * or {@link Slot}.
+ */
+@SuppressWarnings("unchecked")
+public abstract class AbstractChildrenInventory extends AbstractMutableInventory {
 
-    private final Object2IntMap<AbstractInventory> childrenIndexes = new Object2IntOpenHashMap<>();
+    @Nullable private Object2IntMap<AbstractMutableInventory> inventoryToIndex;
 
     /**
-     * All the children that are present in this {@link Inventory}.
+     * Gets a {@link List} with all the children
+     * in this inventory.
+     *
+     * @return The children list
      */
-    private final List<AbstractInventory> children;
+    protected abstract List<AbstractMutableInventory> getChildren();
 
-    public AbstractChildrenInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        this(parent, name, new ArrayList<>());
-    }
-
-    public AbstractChildrenInventory(@Nullable Inventory parent, @Nullable Translation name, List<AbstractInventory> children) {
-        super(parent, name);
-        this.children = checkNotNull(children, "children");
-    }
-
+    @Nullable
     @Override
     AbstractInventory getChild(int index) {
-        return index < 0 || index >= this.children.size() ? empty() : this.children.get(index);
+        final List<AbstractMutableInventory> children = getChildren();
+        return index < 0 || index >= children.size() ? null : children.get(index);
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     int getChildIndex(AbstractInventory inventory) {
-        return this.childrenIndexes.get(checkNotNull(inventory, "inventory"));
+        if (this.inventoryToIndex == null) {
+            this.inventoryToIndex = new Object2IntOpenHashMap<>();
+            this.inventoryToIndex.defaultReturnValue(AbstractOrderedInventory.INVALID_INDEX);
+            final List<AbstractMutableInventory> children = getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                this.inventoryToIndex.put(children.get(i), i);
+            }
+        }
+        return this.inventoryToIndex.get(inventory);
     }
 
     @Override
-    protected void finalizeContent() {
-        super.finalizeContent();
-        for (int i = 0; i < this.children.size(); i++) {
-            this.childrenIndexes.put(this.children.get(i), i);
+    void close(CauseStack causeStack) {
+        super.close(causeStack);
+        getChildren().forEach(inventory -> inventory.close(causeStack));
+    }
+
+    @Override
+    void addViewer(Viewer viewer, LanternContainer container) {
+        super.addViewer(viewer, container);
+        getChildren().forEach(child -> child.addViewer(viewer, container));
+    }
+
+    @Override
+    void removeViewer(Viewer viewer, LanternContainer container) {
+        super.removeViewer(viewer, container);
+        getChildren().forEach(child -> child.removeViewer(viewer, container));
+    }
+
+    @Override
+    protected <T extends Inventory> T queryInventories(Predicate<AbstractMutableInventory> predicate) {
+        final Set<AbstractMutableInventory> inventories = new LinkedHashSet<>();
+        queryInventories(inventories, predicate);
+        if (inventories.isEmpty()) {
+            return genericEmpty();
         }
+        // Construct the result inventory
+        final UnorderedChildrenInventoryQuery result = new UnorderedChildrenInventoryQuery();
+        result.init(ImmutableList.copyOf(inventories));
+        return (T) result;
     }
 
-    /**
-     * Gets the children of the inventory.
-     *
-     * @return The children
-     */
-    public List<AbstractInventory> getChildren() {
-        return Collections.unmodifiableList(this.children);
-    }
-
-    /**
-     * Registers a child {@link Inventory} for this inventory. {@link Slot}s
-     * cannot be added through this method.
-     *
-     * @param childInventory The child inventory
-     */
-    protected <T extends Inventory> T registerChild(T childInventory) {
-        checkNotNull(childInventory, "childInventory");
-        final AbstractInventory childInventory1 = (AbstractInventory) childInventory;
-        checkArgument(!this.children.contains(childInventory1), "The child is already registered");
-        this.children.add(childInventory1);
-        return childInventory;
-    }
-
-    /**
-     * Gets the {@link Slot}s of this inventory.
-     *
-     * @return The slots
-     */
-    public List<LanternSlot> getSlots() {
-        return Collections.unmodifiableList(getSlotInventories());
-    }
-
-    /**
-     * Constructs a {@link List} with all the {@link LanternSlot}s
-     * that are present in this {@link Inventory}.
-     *
-     * @return The slot inventories
-     */
-    protected List<LanternSlot> getSlotInventories() {
-        final ImmutableList.Builder<LanternSlot> slots = ImmutableList.builder();
-        for (AbstractInventory child : this.children) {
+    void queryInventories(Set<AbstractMutableInventory> inventories, Predicate<AbstractMutableInventory> predicate) {
+        for (AbstractMutableInventory child : getChildren()) {
+            if (predicate.test(child)) {
+                inventories.add(child);
+            }
             if (child instanceof AbstractChildrenInventory) {
-                slots.addAll(((AbstractChildrenInventory) child).getSlotInventories());
-            } else if (child instanceof LanternSlot) {
-                slots.add((LanternSlot) child);
+                ((AbstractChildrenInventory) child).queryInventories(inventories, predicate);
             }
         }
-        return slots.build();
-    }
-
-    /**
-     * Prioritizes a child {@link Inventory} to have a higher priority
-     * for {@link Inventory#poll}, {@link Inventory#offer(ItemStack)},
-     * ... functions. The child must be registered
-     *
-     * @param childInventory The child inventory
-     * @param <T> The child inventory type
-     * @return The child inventory
-     */
-    protected <T extends Inventory> T prioritizeChild(T childInventory) {
-        checkNotNull(childInventory, "inventory");
-        final AbstractInventory childInventory1 = (AbstractInventory) childInventory;
-        checkArgument(this.children.contains(childInventory1), "The inventory is not registered");
-        if (this.children.size() == 1) {
-            return childInventory;
-        }
-        this.children.remove(childInventory1);
-        this.children.add(0, childInventory1);
-        return childInventory;
-    }
-
-    private FastOfferResult offerFast(ItemStack stack, List<Inventory> processed, boolean add) {
-        FastOfferResult offerResult = null;
-        // Loop through the slots
-        for (AbstractInventory inventory : this.children) {
-            if (!add && processed.contains(inventory)) {
-                continue;
-            }
-            offerResult = inventory.offerFast(stack);
-            if (offerResult.getRest() == null) {
-                return offerResult;
-            }
-            stack = offerResult.getRest();
-            if (add) {
-                processed.add(inventory);
-            }
-        }
-        if (offerResult == null) {
-            return new FastOfferResult(stack, false);
-        }
-        return offerResult;
     }
 
     @Override
-    public FastOfferResult offerFast(ItemStack stack) {
-        checkNotNull(stack, "stack");
-        final List<Inventory> processed = new ArrayList<>();
-        final Inventory inventory = queryAny(stack);
-        if (inventory instanceof AbstractChildrenInventory) {
-            final FastOfferResult offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
-            if (offerResult.getRest() == null) {
-                return offerResult;
-            }
-            stack = offerResult.getRest();
-        }
-        return offerFast(stack, processed, false);
-    }
-
-    private PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack, List<Inventory> processed, boolean add) {
-        PeekOfferTransactionsResult peekResult = null;
-        final List<SlotTransaction> transactions = new ArrayList<>();
-        // Loop through the slots
-        for (AbstractInventory inventory : this.children) {
-            if (!add && processed.contains(inventory)) {
-                continue;
-            }
-            peekResult = inventory.peekOfferFastTransactions(stack);
-            if (peekResult.getOfferResult().getRest() == null) {
-                peekResult.getTransactions().addAll(transactions);
-                return peekResult;
-            } else {
-                transactions.addAll(peekResult.getTransactions());
-            }
-            stack = peekResult.getOfferResult().getRest();
-            if (add) {
-                processed.add(inventory);
-            }
-        }
-        if (peekResult == null) {
-            return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
-        }
-        return new PeekOfferTransactionsResult(transactions, peekResult.getOfferResult());
+    void setCarrier0(Carrier carrier) {
+        getChildren().forEach(child -> child.setCarrier0(carrier));
+        super.setCarrier0(carrier);
     }
 
     @Override
-    public PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack) {
-        checkNotNull(stack, "stack");
-        final PeekOfferTransactionsResult peekResult;
-        final List<Inventory> processed = new ArrayList<>();
-        final Inventory inventory = queryAny(stack);
-        if (inventory instanceof AbstractChildrenInventory) {
-            peekResult = ((AbstractChildrenInventory) inventory).peekOfferFastTransactions(stack, processed, true);
-            if (peekResult.getOfferResult().getRest() == null) {
-                return peekResult;
-            }
-            stack = peekResult.getOfferResult().getRest();
-        } else {
-            peekResult = null;
-        }
-        final PeekOfferTransactionsResult peekResult1 = peekOfferFastTransactions(stack, processed, false);
-        if (peekResult != null) {
-            peekResult1.getTransactions().addAll(peekResult.getTransactions());
-        }
-        return peekResult1;
-    }
-
-    List<Inventory> queryInventories(Predicate<Inventory> matcher, boolean nested) {
-        int count = 0;
-        final List<Inventory> matches = new ArrayList<>();
-        for (Inventory inventory : this.children) {
-            count++;
-            if (matcher.test(inventory)) {
-                matches.add(inventory);
-            }
-            if (nested) {
-                final Inventory inventory1 = ((AbstractInventory) inventory).query(matcher, true);
-                if (!(inventory1 instanceof EmptyInventory)) {
-                    matches.add(inventory1);
-                }
-            } else if (inventory instanceof AbstractChildrenInventory) {
-                matches.addAll(((AbstractChildrenInventory) inventory).queryInventories(matcher, false));
-            }
-        }
-        // All the children were a match, we will return this
-        if (!nested && matches.size() == count) {
-            return Collections.singletonList(this);
-        }
-        return matches;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        checkNotNull(matcher, "matcher");
-        if (!nested && matcher.test(this)) {
-            return (T) new AbstractChildrenInventory(null, null, Collections.singletonList(this)) {{ finalizeContent(); }};
-        }
-        final List<Inventory> matches = queryInventories(matcher, nested);
-        if (matches.isEmpty()) {
-            return (T) empty();
-        }
-        return (T) new AbstractChildrenInventory(null, null, Collections.unmodifiableList((List) matches)) {{ finalizeContent(); }};
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Inventory> Iterable<T> slots() {
-        return (Iterable) Iterables.unmodifiableIterable(getSlotInventories());
+    protected void setCarrier(Carrier carrier) {
     }
 
     @Override
-    public InventoryTransactionResult set(ItemStack stack) {
-        return InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE).reject(stack).build();
+    public void addChangeListener(SlotChangeListener listener) {
+        getChildren().forEach(child -> child.addChangeListener(listener));
     }
 
     @Override
     public void clear() {
-        // Clear all the sub inventories
-        iterator().forEachRemaining(Inventory::clear);
+        getChildren().forEach(AbstractMutableInventory::clear);
+    }
+
+    @Override
+    public InventoryTransactionResult set(@Nullable ItemStack stack) {
+        return InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE).reject(stack).build();
+    }
+
+    @Override
+    public InventoryTransactionResult setForced(@Nullable ItemStack stack) {
+        return set(stack);
+    }
+
+    @Override
+    public PeekedSetTransactionResult peekSet(@Nullable ItemStack itemStack) {
+        return new PeekedSetTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), itemStack, null);
     }
 
     @Override
     public int size() {
         int size = 0;
-        for (Inventory inventory : this.children) {
-            size += inventory.size();
+        for (AbstractMutableInventory child : getChildren()) {
+            size += child.size();
         }
         return size;
     }
@@ -313,58 +181,29 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     @Override
     public int totalItems() {
         int totalItems = 0;
-        for (Inventory inventory : this.children) {
-            totalItems += inventory.totalItems();
+        for (AbstractMutableInventory child : getChildren()) {
+            totalItems += child.totalItems();
         }
         return totalItems;
     }
 
     @Override
     public int capacity() {
-        int capacity = 0;
-        for (Inventory inventory : this.children) {
-            capacity += inventory.capacity();
-        }
-        return capacity;
+        return getSlotInventories().size();
     }
 
     @Override
     public boolean hasChildren() {
-        return !this.children.isEmpty();
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return 64;
-    }
-
-    @Override
-    public void setMaxStackSize(int size) {
-    }
-
-    @Override
-    public IInventory intersect(Inventory inventory) {
-        checkNotNull(inventory, "inventory");
-        if (!(inventory instanceof AbstractChildrenInventory)) {
-            return empty();
-        }
-        final List<LanternSlot> intersectedSlots = new ArrayList<>(getSlotInventories());
-        intersectedSlots.retainAll(((AbstractChildrenInventory) inventory).getSlotInventories());
-        if (intersectedSlots.isEmpty()) {
-            return empty();
-        }
-        return new LanternOrderedInventory(this, null) {
-            {
-                intersectedSlots.forEach(this::registerSlot);
-                finalizeContent();
-            }
-        };
+        return !getChildren().isEmpty();
     }
 
     @Override
     public boolean containsInventory(Inventory inventory) {
         checkNotNull(inventory, "inventory");
-        for (Inventory child : this.children) {
+        if (inventory == this) {
+            return true;
+        }
+        for (AbstractMutableInventory child : getChildren()) {
             if (child == inventory || child.containsInventory(inventory)) {
                 return true;
             }
@@ -372,18 +211,16 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterator<Inventory> iterator() {
-        return (Iterator) this.children.iterator();
+        return (Iterator) getChildren().iterator();
     }
 
     @Override
     public boolean contains(ItemStack stack) {
         checkNotNull(stack, "stack");
-        // Loop through the inventories
-        for (AbstractInventory inventory : this.children) {
-            if (inventory.contains(stack)) {
+        for (AbstractMutableInventory child : getChildren()) {
+            if (child.contains(stack)) {
                 return true;
             }
         }
@@ -393,8 +230,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     @Override
     public boolean containsAny(ItemStack stack) {
         checkNotNull(stack, "stack");
-        // Loop through the inventories
-        for (AbstractInventory inventory : this.children) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             if (inventory.containsAny(stack)) {
                 return true;
             }
@@ -405,8 +241,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     @Override
     public boolean contains(ItemType type) {
         checkNotNull(type, "type");
-        // Loop through the inventories
-        for (AbstractInventory inventory : this.children) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             if (inventory.contains(type)) {
                 return true;
             }
@@ -414,30 +249,33 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         return false;
     }
 
-    private static class ItemMatcher implements Predicate<ItemStack> {
-
-        private final ItemStack itemStack;
-
-        ItemMatcher(ItemStack itemStack) {
-            this.itemStack = itemStack;
+    @Override
+    public boolean isValidItem(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        for (AbstractMutableInventory child : getChildren()) {
+            if (child.isValidItem(stack)) {
+                return true;
+            }
         }
+        return false;
+    }
 
-        @Override
-        public boolean test(ItemStack itemStack) {
-            return ((LanternItemStack) this.itemStack).similarTo(itemStack);
-        }
+    // The max stack size can only be modified specifically for slots,
+    // so use the default value and disable modifying the max stack size
+
+    @Override
+    public int getMaxStackSize() {
+        return AbstractSlot.DEFAULT_MAX_STACK_SIZE;
     }
 
     @Override
-    public void addChangeListener(SlotChangeListener listener) {
-        this.children.forEach(inv -> inv.addChangeListener(listener));
+    public void setMaxStackSize(int size) {
     }
 
     @Override
     public Optional<ItemStack> poll(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
-        // Loop through the children inventories
-        for (AbstractInventory inventory : this.children) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             final Optional<ItemStack> itemStack = inventory.poll(matcher);
             if (itemStack.isPresent()) {
                 return itemStack;
@@ -454,8 +292,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
             return Optional.empty();
         }
         ItemStack stack = null;
-        // Loop through the children inventories
-        for (AbstractInventory inventory : this.children) {
+        for (AbstractInventory inventory : getChildren()) {
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.poll(limit, matcher).orElse(null);
@@ -464,8 +301,8 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
                         return Optional.of(stack);
                     } else {
                         limit -= stack.getQuantity();
-                        if (!(matcher instanceof ItemMatcher)) {
-                            matcher = new ItemMatcher(stack);
+                        if (!(matcher instanceof SimilarItemMatcher)) {
+                            matcher = new SimilarItemMatcher(stack);
                         }
                     }
                 }
@@ -485,26 +322,67 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     }
 
     @Override
-    public Optional<ItemStack> peek(Predicate<ItemStack> matcher) {
+    public Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
-        // Loop through the children inventories
-        for (AbstractInventory inventory : this.children) {
-            final Optional<ItemStack> itemStack = inventory.peek(matcher);
-            if (itemStack.isPresent()) {
-                return itemStack;
+        for (AbstractMutableInventory inventory : getChildren()) {
+            final Optional<PeekedPollTransactionResult> peekResult = inventory.peekPoll(matcher);
+            if (peekResult.isPresent()) {
+                return peekResult;
             }
         }
         return Optional.empty();
     }
 
     @Override
-    public Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher) {
+    public Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
+        checkArgument(limit >= 0, "Limit may not be negative");
+        if (limit == 0) {
+            return Optional.empty();
+        }
+        PeekedPollTransactionResult peekResult = null;
         // Loop through the children inventories
-        for (AbstractInventory inventory : this.children) {
-            final Optional<PeekPollTransactionsResult> peekResult = inventory.peekPollTransactions(matcher);
-            if (peekResult.isPresent()) {
-                return peekResult;
+        for (AbstractMutableInventory inventory : getChildren()) {
+            // Check whether the slot a item contains
+            if (peekResult == null) {
+                peekResult = inventory.peekPoll(limit, matcher).orElse(null);
+                if (peekResult != null) {
+                    if (peekResult.getPolledItem().getQuantity() >= limit) {
+                        return Optional.of(peekResult);
+                    } else {
+                        limit -= peekResult.getPolledItem().getQuantity();
+                        if (!(matcher instanceof SimilarItemMatcher)) {
+                            matcher = new SimilarItemMatcher(peekResult.getPolledItem());
+                        }
+                    }
+                }
+            } else {
+                final PeekedPollTransactionResult peekResult1 = inventory.peekPoll(limit, matcher).orElse(null);
+                if (peekResult1 != null) {
+                    final int peekedStackSize = peekResult1.getPolledItem().getQuantity();
+                    final ItemStack peekedItem = peekResult.getPolledItem();
+                    limit -= peekedStackSize;
+                    peekedItem.setQuantity(peekedItem.getQuantity() + peekedStackSize);
+                    final List<SlotTransaction> transactions = new ArrayList<>();
+                    transactions.addAll(peekResult.getTransactions());
+                    transactions.addAll(peekResult1.getTransactions());
+                    peekResult = new PeekedPollTransactionResult(transactions, peekedItem);
+                    if (limit <= 0) {
+                        return Optional.of(peekResult);
+                    }
+                }
+            }
+        }
+        return Optional.ofNullable(peekResult);
+    }
+
+    @Override
+    public Optional<ItemStack> peek(Predicate<ItemStack> matcher) {
+        checkNotNull(matcher, "matcher");
+        for (AbstractMutableInventory inventory : getChildren()) {
+            final Optional<ItemStack> itemStack = inventory.peek(matcher);
+            if (itemStack.isPresent()) {
+                return itemStack;
             }
         }
         return Optional.empty();
@@ -518,8 +396,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
             return Optional.empty();
         }
         ItemStack stack = null;
-        // Loop through the children inventories
-        for (AbstractInventory inventory : this.children) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.peek(limit, matcher).orElse(null);
@@ -528,8 +405,8 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
                         return Optional.of(stack);
                     } else {
                         limit -= stack.getQuantity();
-                        if (!(matcher instanceof ItemMatcher)) {
-                            matcher = new ItemMatcher(stack);
+                        if (!(matcher instanceof SimilarItemMatcher)) {
+                            matcher = new SimilarItemMatcher(stack);
                         }
                     }
                 }
@@ -538,7 +415,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
                 // Check whether the inventory a slot is to avoid
                 // boxing/unboxing and cloning the item stack
                 if (inventory instanceof Slot) {
-                    final ItemStack stack1 = ((LanternSlot) inventory).getRawItemStack();
+                    final ItemStack stack1 = ((AbstractSlot) inventory).getRawItemStack();
                     if (stack1 != null && matcher.test(stack1)) {
                         peekedStackSize = Math.min(((Slot) inventory).getStackSize(), limit);
                     }
@@ -548,7 +425,6 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
                         peekedStackSize = optItemStack.get().getQuantity();
                     }
                 }
-
                 if (peekedStackSize > 0) {
                     limit -= peekedStackSize;
                     stack.setQuantity(stack.getQuantity() + peekedStackSize);
@@ -561,105 +437,116 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         return Optional.ofNullable(stack);
     }
 
-    @Override
-    public Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher) {
-        checkNotNull(matcher, "matcher");
-        checkArgument(limit >= 0, "Limit may not be negative");
-        if (limit == 0) {
-            return Optional.empty();
-        }
-        PeekPollTransactionsResult peekResult = null;
-        // Loop through the children inventories
-        for (AbstractInventory inventory : this.children) {
-            // Check whether the slot a item contains
-            if (peekResult == null) {
-                peekResult = inventory.peekPollTransactions(limit, matcher).orElse(null);
-                if (peekResult != null) {
-                    if (peekResult.getPeekedItem().getQuantity() >= limit) {
-                        return Optional.of(peekResult);
-                    } else {
-                        limit -= peekResult.getPeekedItem().getQuantity();
-                        if (!(matcher instanceof ItemMatcher)) {
-                            matcher = new ItemMatcher(peekResult.getPeekedItem());
-                        }
-                    }
+    private PeekedOfferTransactionResult peekOffer(ItemStack stack, Set<Inventory> processed, boolean add) {
+        PeekedOfferTransactionResult peekResult = null;
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        // Loop through the slots
+        for (AbstractInventory inventory : getChildren()) {
+            if (!add && processed.contains(inventory)) {
+                continue;
+            }
+            peekResult = inventory.peekOffer(stack);
+            if (peekResult.isSuccess()) {
+                final Optional<ItemStack> rejectedItem = peekResult.getRejectedItem();
+                transactions.addAll(peekResult.getTransactions());
+                if (!rejectedItem.isPresent()) {
+                    return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS, transactions, null);
                 }
-            } else {
-                final PeekPollTransactionsResult peekResult1 = inventory.peekPollTransactions(limit, matcher).orElse(null);
-                if (peekResult1 != null) {
-                    final int peekedStackSize = peekResult1.getPeekedItem().getQuantity();
-                    final ItemStack peekedItem = peekResult.getPeekedItem();
-                    limit -= peekedStackSize;
-                    peekedItem.setQuantity(peekedItem.getQuantity() + peekedStackSize);
-                    peekResult.getTransactions().addAll(peekResult1.getTransactions());
-                    if (limit <= 0) {
-                        return Optional.of(peekResult);
-                    }
-                }
+                stack = rejectedItem.get();
+            }
+            if (add) {
+                processed.add(inventory);
             }
         }
-        return Optional.ofNullable(peekResult);
+        if (peekResult == null) {
+            return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), stack);
+        }
+        return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS, transactions, peekResult.getRejectedItem().orElse(null));
     }
 
     @Override
-    public PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack stack) {
-        return new PeekSetTransactionsResult(new ArrayList<>(), InventoryTransactionResult.builder()
-                .type(InventoryTransactionResult.Type.FAILURE).reject(stack).build());
+    public PeekedOfferTransactionResult peekOffer(ItemStack itemStack) {
+        checkNotNull(itemStack, "itemStack");
+        final PeekedOfferTransactionResult peekResult;
+        final Set<Inventory> processed = new HashSet<>();
+        final Inventory inventory = queryAny(itemStack);
+        if (inventory instanceof AbstractChildrenInventory) {
+            peekResult = ((AbstractChildrenInventory) inventory).peekOffer(itemStack, processed, true);
+            if (peekResult.isSuccess()) {
+                if (!peekResult.getRejectedItem().isPresent()) {
+                    return peekResult;
+                }
+                itemStack = peekResult.getRejectedItem().get();
+            }
+        } else {
+            peekResult = null;
+        }
+        final PeekedOfferTransactionResult peekResult1 = peekOffer(itemStack, processed, false);
+        if (peekResult == null || !peekResult.isSuccess()) {
+            return peekResult1;
+        } else if (!peekResult1.isSuccess()) {
+            return peekResult;
+        }
+        return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS,
+                ImmutableList.<SlotTransaction>builder()
+                        .addAll(peekResult.getTransactions())
+                        .addAll(peekResult1.getTransactions())
+                        .build(),
+                peekResult1.getRejectedItem().orElse(null));
     }
 
     @Override
-    public boolean isValidItem(ItemStack stack) {
+    public FastOfferResult offerFast(ItemStack stack) {
         checkNotNull(stack, "stack");
-        for (AbstractInventory child : this.children) {
-            if (child.isValidItem(stack)) {
-                return true;
+        final Set<Inventory> processed = new HashSet<>();
+        final Inventory inventory = queryAny(stack);
+        if (inventory instanceof AbstractChildrenInventory) {
+            final FastOfferResult offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
+            final Optional<ItemStack> rejectedItem = offerResult.getRejectedItem();
+            if (!rejectedItem.isPresent()) {
+                return offerResult;
+            }
+            stack = rejectedItem.get();
+        }
+        return offerFast(stack, processed, false);
+    }
+
+    private FastOfferResult offerFast(ItemStack stack, Set<Inventory> processed, boolean add) {
+        FastOfferResult offerResult = null;
+        for (AbstractMutableInventory inventory : getChildren()) {
+            if (!add && processed.contains(inventory)) {
+                continue;
+            }
+            offerResult = inventory.offerFast(stack);
+            final Optional<ItemStack> rejectedItem = offerResult.getRejectedItem();
+            if (!rejectedItem.isPresent()) {
+                return offerResult;
+            }
+            stack = rejectedItem.get();
+            if (add) {
+                processed.add(inventory);
             }
         }
-        return false;
-    }
-
-    @Override
-    public boolean isChild(Inventory child) {
-        checkNotNull(child, "child");
-        for (AbstractInventory child0 : this.children) {
-            if (child0 == child) {
-                return true;
-            }
-            if (child0.isChild(child)) {
-                return true;
-            }
+        if (offerResult == null) {
+            return new FastOfferResult(stack, false);
         }
-        return false;
+        return offerResult;
     }
 
-    @Override
-    public int slotCount() {
-        int slotCount = 0;
-        for (AbstractInventory child : this.children) {
-            if (child instanceof Slot) {
-                slotCount++;
-            } else {
-                slotCount += child.slotCount();
-            }
+    /**
+     * A {@link ItemStack} matcher that matches stacks that are similar, internal use only.
+     */
+    private static final class SimilarItemMatcher implements Predicate<ItemStack> {
+
+        private final ItemStack itemStack;
+
+        SimilarItemMatcher(ItemStack itemStack) {
+            this.itemStack = itemStack;
         }
-        return slotCount;
-    }
 
-    @Override
-    protected void addViewer(Viewer viewer, LanternContainer container) {
-        super.addViewer(viewer, container);
-        this.children.forEach(child -> child.addViewer(viewer, container));
-    }
-
-    @Override
-    protected void removeViewer(Viewer viewer, LanternContainer container) {
-        super.removeViewer(viewer, container);
-        this.children.forEach(child -> child.removeViewer(viewer, container));
-    }
-
-    @Override
-    void close() {
-        super.close();
-        this.children.forEach(AbstractInventory::close);
+        @Override
+        public boolean test(ItemStack itemStack) {
+            return ((LanternItemStack) this.itemStack).similarTo(itemStack);
+        }
     }
 }

@@ -43,7 +43,7 @@ public interface ITileEntityInventory extends TileEntityInventory<TileEntityCarr
     }
 
     @Override
-    default Optional<TileEntityCarrier> getCarrier() {
-        return getTileEntity();
+    default Optional<TileEntityCarrier> getTileEntity() {
+        return getCarrier();
     }
 }

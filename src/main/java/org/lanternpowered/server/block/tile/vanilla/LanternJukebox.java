@@ -29,11 +29,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.block.tile.ITileEntityInventory;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
-import org.lanternpowered.server.inventory.slot.HasPropertyItemFilter;
-import org.lanternpowered.server.inventory.slot.LanternFilteringSlot;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Jukebox;
@@ -54,29 +54,9 @@ import java.util.Optional;
 
 public final class LanternJukebox extends LanternTileEntity implements Jukebox, TileEntityCarrier {
 
-    private final class JukeboxInventory extends LanternFilteringSlot implements ITileEntityInventory {
-
-        JukeboxInventory() {
-            super(null, new HasPropertyItemFilter(RecordProperty.class));
-        }
-
-        @Override
-        protected void queueUpdate() {
-            super.queueUpdate();
-            // Stop the record if it's already playing,
-            // don't eject the current one, who's interacting
-            // with the inventory should handle that
-            stopRecord();
-        }
-
-        @Override
-        public Optional<TileEntityCarrier> getTileEntity() {
-            return Optional.of(LanternJukebox.this);
-        }
-    }
-
     // The internal inventory of the jukebox
-    private JukeboxInventory inventory = new JukeboxInventory();
+    private JukeboxInventory inventory = VanillaInventoryArchetypes.JUKEBOX.builder()
+            .withCarrier(this).build(Lantern.getMinecraftPlugin());
     private boolean playing;
 
     @Override

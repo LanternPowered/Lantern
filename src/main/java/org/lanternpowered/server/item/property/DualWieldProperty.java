@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.item.property;
 
-import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.spongepowered.api.data.property.BooleanProperty;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 
 /**
  * When this property is applied to a {@link ItemType} or {@link ItemStack}
- * then will they be able to use in the {@link OffHandSlot} and perform
+ * then will they be able to use in the off hand {@link Slot} and perform
  * attacks with it.
  */
 public final class DualWieldProperty extends BooleanProperty {

@@ -26,6 +26,7 @@
 package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
@@ -49,9 +50,17 @@ public class ChestClientContainer extends ClientContainer {
 
     private final int rowIndex;
 
-    public ChestClientContainer(Text title, int rows) {
+    static class Title {
+        static final Text DEFAULT = t("container.chest");
+    }
+
+    public ChestClientContainer(int rows) {
+        this(Title.DEFAULT, rows);
+    }
+
+    ChestClientContainer(Text title, int rows) {
         super(title);
-        checkArgument(rows >= 0 && rows <= 6);
+        checkArgument(rows >= 0 && rows <= 6, "invalid rows count %s", rows);
         this.rowIndex = rows;
     }
 

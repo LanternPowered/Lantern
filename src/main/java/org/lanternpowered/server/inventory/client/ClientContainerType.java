@@ -26,22 +26,18 @@
 package org.lanternpowered.server.inventory.client;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.inventory.InventoryPropertyHolder;
+import org.lanternpowered.server.inventory.AbstractInventory;
 import org.spongepowered.api.item.inventory.property.GuiId;
+
+import java.util.function.Function;
 
 public final class ClientContainerType extends PluginCatalogType.Base implements GuiId {
 
-    private final ClientContainerProvider containerProvider;
+    private final Function<AbstractInventory, ClientContainer> containerProvider;
 
     public ClientContainerType(String pluginId, String name,
-            ClientContainerProvider containerProvider) {
+            Function<AbstractInventory, ClientContainer> containerProvider) {
         super(pluginId, name);
-        this.containerProvider = containerProvider;
-    }
-
-    public ClientContainerType(String pluginId, String id, String name,
-            ClientContainerProvider containerProvider) {
-        super(pluginId, id, name);
         this.containerProvider = containerProvider;
     }
 
@@ -50,7 +46,7 @@ public final class ClientContainerType extends PluginCatalogType.Base implements
      *
      * @return The client container
      */
-    public ClientContainer createContainer(InventoryPropertyHolder propertyHolder) {
-        return this.containerProvider.apply(propertyHolder);
+    public ClientContainer createContainer(AbstractInventory openInventory) {
+        return this.containerProvider.apply(openInventory);
     }
 }

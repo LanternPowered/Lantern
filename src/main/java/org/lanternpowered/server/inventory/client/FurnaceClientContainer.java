@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
@@ -44,8 +46,12 @@ public class FurnaceClientContainer extends ClientContainer {
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
     private static final int MAX_PROGRESS_VALUE = 1000;
 
-    public FurnaceClientContainer(Text title) {
-        super(title);
+    static class Title {
+        static final Text DEFAULT = t("container.furnace");
+    }
+
+    public FurnaceClientContainer() {
+        super(Title.DEFAULT);
     }
 
     @Override
@@ -84,7 +90,7 @@ public class FurnaceClientContainer extends ClientContainer {
     }
 
     @Override
-    protected boolean disableShiftClickWhenFull() {
-        return false;
+    protected int getShiftFlags() {
+        return SHIFT_CLICK_WHEN_FULL_TOP_AND_FILTER;
     }
 }

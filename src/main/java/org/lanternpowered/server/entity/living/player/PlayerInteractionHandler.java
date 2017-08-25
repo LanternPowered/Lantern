@@ -39,8 +39,7 @@ import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.inventory.entity.OffHandSlot;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
@@ -130,7 +129,7 @@ public final class PlayerInteractionHandler {
             }
         }
         final HandType activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty()).orElse(null);
-        final LanternSlot slot = activeHand == null ? null : activeHand == HandTypes.MAIN_HAND ?
+        final AbstractSlot slot = activeHand == null ? null : activeHand == HandTypes.MAIN_HAND ?
                 this.player.getInventory().getHotbar().getSelectedSlot() : this.player.getInventory().getOffhand();
         // The interaction just started
         if (!Objects.equals(activeHand, this.lastActiveHand)) {
@@ -297,6 +296,9 @@ public final class PlayerInteractionHandler {
             return;
         }
 
+        // Try the action of the hotbar item first
+        final AbstractSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
+        final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
         // The offset can round up to 1, causing
         // an incorrect clicked block location
         final Vector3d pos2 = message.getClickOffset();
@@ -315,6 +317,7 @@ public final class PlayerInteractionHandler {
             // Add context
             frame.addContext(ContextKeys.INTERACTION_FACE, face);
             frame.addContext(ContextKeys.INTERACTION_LOCATION, clickedLocation);
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(clickedLocation.getExtent(), message.getPosition()));
             frame.addContext(ContextKeys.PLAYER, this.player);
 
             final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
@@ -376,7 +379,7 @@ public final class PlayerInteractionHandler {
         }
 
         // Try the action of the hotbar item first
-        final LanternSlot slot = activeHand.get() == HandTypes.MAIN_HAND ?
+        final AbstractSlot slot = activeHand.get() == HandTypes.MAIN_HAND ?
                 this.player.getInventory().getHotbar().getSelectedSlot() : this.player.getInventory().getOffhand();
 
         final ItemStack rawItemStack = slot.getRawItemStack();
@@ -397,11 +400,12 @@ public final class PlayerInteractionHandler {
         handleFinishItemInteraction0(slot, activeHand.get());
     }
 
-    private void handleFinishItemInteraction0(LanternSlot slot, HandType handType) {
+    private void handleFinishItemInteraction0(AbstractSlot slot, HandType handType) {
         final Optional<ItemStack> handItem = slot.peek();
         if (handItem.isPresent()) {
             final CauseStack causeStack = CauseStack.current();
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.pushCause(this.player);
                 frame.addContext(ContextKeys.PLAYER, this.player);
                 if (handItem.isPresent()) {
                     final LanternItemType itemType = (LanternItemType) handItem.get().getType();
@@ -447,9 +451,8 @@ public final class PlayerInteractionHandler {
                 if (!this.player.get(LanternKeys.CAN_DUAL_WIELD).orElse(false)) {
                     return;
                 }
-                final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
+                final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
                 final Optional<ItemStack> handItem = offHandSlot.peek();
-
                 if (handItem.isPresent()) {
                     final DualWieldProperty property = handItem.get().getProperty(DualWieldProperty.class).orElse(null);
                     //noinspection ConstantConditions
@@ -492,7 +495,7 @@ public final class PlayerInteractionHandler {
         return handleHandItemInteraction(context, HandTypes.MAIN_HAND, this.player.getInventory().getHotbar().getSelectedSlot(), snapshot);
     }
 
-    private boolean handleHandItemInteraction(BehaviorContextImpl context, HandType handType, LanternSlot slot,
+    private boolean handleHandItemInteraction(BehaviorContextImpl context, HandType handType, AbstractSlot slot,
             @Nullable BehaviorContext.Snapshot snapshot) {
         final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
         // The player is already interacting

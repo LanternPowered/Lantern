@@ -25,39 +25,53 @@
  */
 package org.lanternpowered.server.event;
 
+import org.lanternpowered.server.entity.LanternItem;
+import org.lanternpowered.server.world.EntitySpawningEntry;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public final class LanternEventHelper {
 
-    public static Entity createDroppedItem(Location<World> location, ItemStackSnapshot snapshot) {
-        final Entity entity = location.getExtent().createEntity(EntityTypes.ITEM, location.getPosition());
-        entity.offer(Keys.REPRESENTED_ITEM, snapshot);
-        entity.offer(Keys.PICKUP_DELAY, 40);
-        return entity;
+    public static void handleDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
+        LanternWorld.handleEntitySpawning(toSpawningEntries(entries));
     }
 
-    public static void fireDropItemEventDispense(Cause cause, Consumer<List<Entity>> consumer) {
-        final List<Entity> entities = new ArrayList<>();
-        consumer.accept(entities);
+    public static List<Entity> handlePreDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
+        return LanternWorld.handlePreEntitySpawning(toSpawningEntries(entries));
+    }
 
-        final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
-        Sponge.getEventManager().post(event);
-        if (!event.isCancelled()) {
-            LanternWorld.finishSpawnEntityEvent(event);
-        }
+    private static List<EntitySpawningEntry> toSpawningEntries(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
+        return StreamSupport.stream(entries.spliterator(), false)
+                .map(tuple -> new EntitySpawningEntry(EntityTypes.ITEM, tuple.getSecond(), entity -> {
+                    entity.offer(Keys.REPRESENTED_ITEM, tuple.getFirst());
+                    entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
+                }))
+                .collect(Collectors.toList());
+    }
+
+    public static Optional<Entity> handlePreDroppedItemSpawning(Transform<World> transform, ItemStackSnapshot snapshot) {
+        return LanternWorld.handlePreEntitySpawning(EntityTypes.ITEM, transform, entity -> {
+            entity.offer(Keys.REPRESENTED_ITEM, snapshot);
+            entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
+        });
+    }
+
+    public static void handleDroppedItemSpawning(Transform<World> transform, ItemStackSnapshot snapshot) {
+        LanternWorld.handleEntitySpawning(EntityTypes.ITEM, transform, entity -> {
+            entity.offer(Keys.REPRESENTED_ITEM, snapshot);
+            entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
+        }, SpongeEventFactory::createDropItemEventDispense);
     }
 }

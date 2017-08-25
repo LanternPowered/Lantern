@@ -27,26 +27,49 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class PlayerInventoryContainer extends LanternContainer {
+public class PlayerInventoryContainer extends CarriedLanternContainer<Player> {
 
     private PlayerClientContainer clientContainer;
 
-    public PlayerInventoryContainer(LanternPlayerInventory playerInventory) {
-        super((Translation) null, playerInventory, null);
+    public PlayerInventoryContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory topInventory) {
+        super(playerInventory, topInventory);
         // Construct the client container and attach the player
-        this.clientContainer = playerInventory.constructClientContainer(this);
+        this.clientContainer = new PlayerClientContainer(TextTranslation.toText(getName()));
+        this.clientContainer.bindCursor(getCursorSlot());
+        this.clientContainer.bindHotbarBehavior(playerInventory.getHotbar().getHotbarBehavior());
+        this.clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(this));
+        this.clientContainer.bindBottom();
+        getSlotsToIndexMap().object2IntEntrySet().forEach(
+                entry -> this.clientContainer.bindSlot(entry.getIntValue(), entry.getKey().transform()));
         this.clientContainer.bind(playerInventory.getCarrier().get());
+    }
+
+    @Override
+    void removeViewer(Player viewer) {
+        if (viewer == this.playerInventory.getCarrier().orElse(null)) {
+            return;
+        }
+        super.removeViewer(viewer);
+    }
+
+    @Override
+    void addViewer(Player viewer) {
+        if (viewer == this.playerInventory.getCarrier().orElse(null)) {
+            return;
+        }
+        super.addViewer(viewer);
     }
 
     @Override
@@ -76,7 +99,7 @@ public class PlayerInventoryContainer extends LanternContainer {
         return this.clientContainer;
     }
 
-    public void init() {
+    public void initClientContainer() {
         this.clientContainer.init();
     }
 }

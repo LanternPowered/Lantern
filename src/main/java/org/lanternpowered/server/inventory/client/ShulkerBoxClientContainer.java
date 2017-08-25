@@ -25,14 +25,20 @@
  */
 package org.lanternpowered.server.inventory.client;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.text.Text;
 
 public class ShulkerBoxClientContainer extends ChestClientContainer {
 
-    public ShulkerBoxClientContainer(Text title) {
-        super(title, 3);
+    static class Title {
+        static final Text DEFAULT = t("container.shulkerBox");
+    }
+
+    public ShulkerBoxClientContainer() {
+        super(Title.DEFAULT, 3);
     }
 
     @Override

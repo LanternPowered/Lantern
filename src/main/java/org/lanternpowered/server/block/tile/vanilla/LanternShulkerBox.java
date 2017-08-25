@@ -27,7 +27,10 @@ package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.InventorySnapshot;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -40,7 +43,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.Random;
 
-public class LanternShulkerBox extends LanternContainerTile<TileShulkerBoxInventory> {
+public class LanternShulkerBox extends LanternContainerTile<ChestInventory> {
 
     private final Random random = new Random();
 
@@ -60,8 +63,8 @@ public class LanternShulkerBox extends LanternContainerTile<TileShulkerBoxInvent
     }
 
     @Override
-    protected TileShulkerBoxInventory createInventory() {
-        return new TileShulkerBoxInventory(null, this);
+    protected ChestInventory createInventory() {
+        return VanillaInventoryArchetypes.SHULKER_BOX.builder().withCarrier(this).build(Lantern.getMinecraftPlugin());
     }
 
     @Override

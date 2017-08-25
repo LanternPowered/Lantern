@@ -25,6 +25,13 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.AbstractGridInventory;
+import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -33,6 +40,9 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.property.GuiIds;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -43,7 +53,15 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-public class LanternChest extends LanternContainerTile<TileChestInventory> implements Chest {
+public class LanternChest extends LanternContainerTile<ChestInventory> implements Chest {
+
+    public static final class DoubleChestInventory extends ChestInventory {
+
+        @Override
+        public InventoryArchetype getArchetype() {
+            return VanillaInventoryArchetypes.DOUBLE_CHEST;
+        }
+    }
 
     private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 
@@ -56,8 +74,10 @@ public class LanternChest extends LanternContainerTile<TileChestInventory> imple
     }
 
     @Override
-    protected TileChestInventory createInventory() {
-        return new TileChestInventory(null, this);
+    protected ChestInventory createInventory() {
+        return VanillaInventoryArchetypes.CHEST.builder()
+                .withCarrier(this)
+                .build(Lantern.getMinecraftPlugin());
     }
 
     @Override
@@ -73,13 +93,25 @@ public class LanternChest extends LanternContainerTile<TileChestInventory> imple
             }
             final Optional<TileEntity> optTileEntity = location.getRelative(directionToCheck).getTileEntity();
             if (optTileEntity.isPresent() && optTileEntity.get() instanceof LanternChest) {
+                final LanternChest otherChest = (LanternChest) optTileEntity.get();
+                final AbstractGridInventory.RowsViewBuilder<DoubleChestInventory> doubleChestBuilder = AbstractGridInventory.rowsViewBuilder()
+                        .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
+                        .title(tr("container.chestDouble"))
+                        .property(new GuiIdProperty(GuiIds.CHEST))
+                        .type(DoubleChestInventory.class);
                 if (directionToCheck != Direction.WEST && directionToCheck != Direction.NORTH) {
-                    return Optional.of(new TileDoubleChestInventory(null, null,
-                            this.inventory, ((LanternChest) optTileEntity.get()).inventory));
+                    doubleChestBuilder
+                            .grid(0, this.inventory)
+                            .grid(3, otherChest.inventory);
                 } else {
-                    return Optional.of(new TileDoubleChestInventory(null, null,
-                            ((LanternChest) optTileEntity.get()).inventory, this.inventory));
+                    doubleChestBuilder
+                            .grid(0, otherChest.inventory)
+                            .grid(3, this.inventory);
                 }
+                final DoubleChestInventory doubleChestInventory = doubleChestBuilder.build();
+                doubleChestInventory.addViewListener(this);
+                doubleChestInventory.addViewListener(otherChest);
+                return Optional.of(doubleChestInventory);
             }
         }
         return Optional.empty();

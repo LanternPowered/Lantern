@@ -71,9 +71,14 @@ import org.spongepowered.api.profile.property.ProfileProperty;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -81,6 +86,7 @@ import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -88,7 +94,7 @@ import javax.crypto.spec.SecretKeySpec;
 public final class HandlerEncryptionResponse implements Handler<MessageLoginInEncryptionResponse> {
 
     private final static String AUTH_BASE_URL =
-            "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s";
+            "https://sessionserver.mojang.com/session/minecraft/hasJoined";
     private final static Gson GSON = new Gson();
 
     @Override
@@ -156,12 +162,40 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             session.disconnect(t("Failed to hash login data."));
             return;
         }
-
-        Lantern.getScheduler().submitAsyncTask(() -> performAuth(session, authData.getUsername(), hash));
+        String preventProxiesIp = null;
+        if (Lantern.getGame().getGlobalConfig().shouldPreventProxyConnections()) {
+            final InetAddress address = context.getSession().getAddress().getAddress();
+            if (!isLocalAddress(address)) { // Ignore local addresses, they will always fail
+                try {
+                    preventProxiesIp = URLEncoder.encode(address.getHostAddress(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    Lantern.getLogger().error("Failed to encode the ip address to prevent proxies.", e);
+                    session.disconnect(t("Something funky happened."));
+                    return;
+                }
+            }
+        }
+        final String preventProxiesIp1 = preventProxiesIp;
+        Lantern.getScheduler().submitAsyncTask(() -> performAuth(session, authData.getUsername(), hash, preventProxiesIp1));
     }
 
-    private void performAuth(NetworkSession session, String username, String hash) {
-        final String postUrl = String.format(AUTH_BASE_URL, username, hash);
+    // https://stackoverflow.com/questions/2406341/how-to-check-if-an-ip-address-is-the-local-host-on-a-multi-homed-system
+    private static boolean isLocalAddress(InetAddress address) {
+        // Check if the address is a valid special local or loop back
+        if (address.isAnyLocalAddress() || address.isLoopbackAddress()) {
+            return true;
+        }
+        // Check if the address is defined on any interface
+        try {
+            return NetworkInterface.getByInetAddress(address) != null;
+        } catch (SocketException e) {
+            return false;
+        }
+    }
+
+    private void performAuth(NetworkSession session, String username, String hash, @Nullable String preventProxiesIp) {
+        final String postUrl = AUTH_BASE_URL + "?username=" + username + "&serverId=" + hash +
+                (preventProxiesIp == null ? "" : "?ip=" + preventProxiesIp);
         try {
             // Authenticate
             URLConnection connection = new URL(postUrl).openConnection();

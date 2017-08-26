@@ -196,6 +196,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "default-resource-pack", comment = "The default resource pack.\nLeave this empty to disable the default resource pack.")
         private String defaultResourcePack = "";
 
+        @Setting(value = "prevent-proxy-connections", comment = "Whether proxy connections should be prevented.\n"
+                + "This is only supported in the online mode.")
+        private boolean preventProxyConnections = false;
     }
 
     @ConfigSerializable
@@ -384,6 +387,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public boolean isOnlineMode() {
         return this.server.onlineMode;
+    }
+
+    public boolean shouldPreventProxyConnections() {
+        return this.server.preventProxyConnections;
     }
 
     @Override

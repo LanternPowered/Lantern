@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.behavior.simple;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.BlockDropsProviderBehavior;
@@ -42,7 +42,7 @@ public class SimpleBreakBehavior implements BreakBlockBehavior {
         final BlockSnapshotBuilder builder = BlockSnapshotBuilder.create();
         // Apply the creator and notifier to the block
         context.populateBlockSnapshot(builder, BehaviorContext.PopulationFlags.CREATOR_AND_NOTIFIER);
-        builder.location(context.tryGet(Parameters.BLOCK_LOCATION));
+        builder.location(context.requireContext(ContextKeys.BLOCK_LOCATION));
         // The block should be replaced with air
         builder.blockState(BlockTypes.AIR.getDefaultState());
         // Add the block change

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.scheduler;
 
+import org.lanternpowered.server.event.CauseStack;
+
 final class SyncScheduler extends SchedulerBase {
 
     // The number of ticks elapsed since this scheduler began.
@@ -63,7 +65,11 @@ final class SyncScheduler extends SchedulerBase {
     }
 
     @Override
-    protected void executeTaskRunnable(Runnable runnable) {
+    protected void executeTaskRunnable(ScheduledTask task, Runnable runnable) {
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(task.getOwner());
+        causeStack.pushCause(task);
         runnable.run();
+        causeStack.popCauses(2);
     }
 }

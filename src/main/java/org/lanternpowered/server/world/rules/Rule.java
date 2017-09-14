@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.rules;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -44,7 +44,7 @@ public final class Rule<T> {
     private final Rules rules;
     private T value;
 
-    public Rule(Rules rules, RuleType<T> ruleType) {
+    Rule(Rules rules, RuleType<T> ruleType) {
         this.value = ruleType.getDefaultValue();
         this.ruleType = ruleType;
         this.rules = rules;
@@ -54,25 +54,18 @@ public final class Rule<T> {
      * Sets the raw value of this rule, the value will be automatically parsed
      * as the required type.
      *
-     * @param value the value
+     * @param value The raw value
      * @throws IllegalArgumentException if the parsing failed
      */
     public void setRawValue(String value) throws IllegalArgumentException {
-        this.setValue0(this.ruleType.getDataType().parse(checkNotNull(value, "value")), value, null);
+        setValue0(this.ruleType.getDataType().parse(checkNotNull(value, "value")), value);
     }
 
     /**
-     * Sets the raw value of this rule, the value will be automatically parsed
-     * as the required type.
+     * Gets the raw value of this rule.
      *
-     * @param value the value
-     * @param cause the cause
-     * @throws IllegalArgumentException if the parsing failed
+     * @return The raw value
      */
-    public void setRawValue(String value, Cause cause) throws IllegalArgumentException {
-        this.setValue0(this.ruleType.getDataType().parse(checkNotNull(value, "value")), value, checkNotNull(cause, "cause"));
-    }
-
     public String getRawValue() {
         return this.ruleType.getDataType().serialize(this.value);
     }
@@ -80,48 +73,35 @@ public final class Rule<T> {
     /**
      * Sets the value of this rule.
      *
-     * @param value the value
+     * @param value The value
      */
     public void setValue(T value) {
-        this.setValue0(checkNotNull(value, "value"), null, null);
-    }
-
-    /**
-     * Sets the value of this rule.
-     *
-     * @param value the value
-     * @param cause the cause
-     */
-    public void setValue(T value, Cause cause) {
-        this.setValue0(checkNotNull(value, "value"), null, checkNotNull(cause, "cause"));
+        setValue0(checkNotNull(value, "value"), null);
     }
 
     /**
      * Gets the value of this rule.
      *
-     * @return the value
+     * @return The value
      */
     public T getValue() {
         return this.value;
     }
 
-    private void setValue0(T newValue, @Nullable String newRawValue, @Nullable Cause cause) {
-        Optional<LanternWorld> optWorld = this.rules.getWorld();
+    private void setValue0(T newValue, @Nullable String newRawValue) {
+        final Optional<LanternWorld> optWorld = this.rules.getWorld();
         if (optWorld.isPresent() && !newValue.equals(this.value)) {
-            LanternWorld world = optWorld.get();
+            final LanternWorld world = optWorld.get();
             if (newRawValue == null) {
                 newRawValue = this.ruleType.getDataType().serialize(newValue);
             }
-            if (cause == null) {
-                cause = Cause.source(Lantern.getMinecraftPlugin()).owner(world).build();
-            }
-            ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(
-                    cause, this.getRawValue(), newRawValue, this.ruleType.getName(), world);
+            final Cause cause = CauseStack.current().getCurrentCause();
+            final ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(
+                    cause, getRawValue(), newRawValue, this.ruleType.getName(), world);
             if (Sponge.getEventManager().post(event)) {
                 return;
             }
         }
         this.value = newValue;
     }
-
 }

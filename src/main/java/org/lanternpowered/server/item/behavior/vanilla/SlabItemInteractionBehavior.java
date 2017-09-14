@@ -28,7 +28,7 @@ package org.lanternpowered.server.item.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockType;
@@ -50,6 +50,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractWithItemBehavior {
 
     private final Supplier<BlockType> halfSlabType;
@@ -65,7 +66,7 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Location<World>> optLocation = context.get(Parameters.INTERACTION_LOCATION);
+        final Optional<Location<World>> optLocation = context.getContext(ContextKeys.INTERACTION_LOCATION);
         if (!optLocation.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
@@ -74,9 +75,9 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
         final BlockType doubleSlabType = this.doubleSlabType.get();
 
         Location<World> location = optLocation.get();
-        final Direction blockFace = context.get(Parameters.INTERACTION_FACE).get();
+        final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get();
 
-        final LanternBlockType blockType = (LanternBlockType) context.get(Parameters.ITEM_TYPE).get().getBlock().get();
+        final LanternBlockType blockType = (LanternBlockType) context.getContext(ContextKeys.ITEM_TYPE).get().getBlock().get();
         if (blockType != halfSlabType) {
             return BehaviorResult.PASS;
         }
@@ -84,8 +85,7 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
         BlockState state = location.getBlock();
         final BlockState.Builder stateBuilder = BlockState.builder();
         stateBuilder.blockType(blockType);
-        //noinspection unchecked
-        context.get(Parameters.USED_ITEM_STACK).ifPresent(
+        context.getContext(ContextKeys.USED_ITEM_STACK).ifPresent(
                 itemStack -> itemStack.getValues().forEach(value -> stateBuilder.add((Key) value.getKey(), value.get())));
         BlockState blockState = stateBuilder.build();
         BlockSnapshotBuilder snapshotBuilder = null;
@@ -138,14 +138,13 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
             }
             final BlockSnapshotBuilder snapshotBuilder1 = snapshotBuilder;
             snapshotBuilder1.location(location);
-            //noinspection unchecked
-            context.get(Parameters.USED_ITEM_STACK).ifPresent(
+            context.getContext(ContextKeys.USED_ITEM_STACK).ifPresent(
                     itemStack -> itemStack.getValues().forEach(value -> snapshotBuilder1.add((Key) value.getKey(), value.get())));
             context.addBlockChange(snapshotBuilder1.build());
 
-            context.get(Parameters.PLAYER).ifPresent(player -> {
+            context.getContext(ContextKeys.PLAYER).ifPresent(player -> {
                 if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                    context.tryGet(Parameters.USED_SLOT).poll(1);
+                    context.requireContext(ContextKeys.USED_SLOT).poll(1);
                 }
             });
             return BehaviorResult.SUCCESS;

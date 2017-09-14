@@ -26,9 +26,7 @@
 package org.lanternpowered.server.block.behavior.simple;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.List;

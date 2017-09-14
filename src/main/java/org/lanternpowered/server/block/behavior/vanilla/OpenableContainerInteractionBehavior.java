@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -40,11 +40,11 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public class OpeneableContainerInteractionBehavior implements InteractWithBlockBehavior {
+public class OpenableContainerInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.tryGet(Parameters.INTERACTION_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTileEntity = location.getTileEntity();
         if (!optTileEntity.isPresent()) {
             return BehaviorResult.CONTINUE;
@@ -53,12 +53,11 @@ public class OpeneableContainerInteractionBehavior implements InteractWithBlockB
         if (!optInventory.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
-        final LanternPlayer player = (LanternPlayer) context.get(Parameters.PLAYER).orElse(null);
+        final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
         if (player == null) {
             return BehaviorResult.CONTINUE;
         }
-        return player.openInventory(optInventory.get(), context.getCause()).isPresent() ?
-                BehaviorResult.SUCCESS : BehaviorResult.CONTINUE;
+        return player.openInventory(optInventory.get()).isPresent() ? BehaviorResult.SUCCESS : BehaviorResult.CONTINUE;
     }
 
     protected Optional<Inventory> getInventoryFrom(TileEntity tileEntity) {

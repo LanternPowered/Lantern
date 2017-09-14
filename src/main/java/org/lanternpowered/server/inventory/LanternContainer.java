@@ -52,8 +52,8 @@ import javax.annotation.Nullable;
 public class LanternContainer extends LanternOrderedInventory implements Container {
 
     private final Map<Player, ClientContainer> viewers = new HashMap<>();
-    final LanternOrderedInventory openInventory;
-    final LanternPlayerInventory playerInventory;
+    private final LanternOrderedInventory openInventory;
+    private final LanternPlayerInventory playerInventory;
 
     /**
      * The slot for the cursor item.
@@ -142,7 +142,7 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
     public void open(Player viewer, Cause cause) {
         checkNotNull(viewer, "viewer");
         checkNotNull(cause, "cause");
-        ((LanternPlayer) viewer).getContainerSession().setOpenContainer(this, cause);
+        ((LanternPlayer) viewer).getContainerSession().setOpenContainer(this);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
         checkNotNull(cause, "cause");
         final PlayerContainerSession session = ((LanternPlayer) viewer).getContainerSession();
         if (session.getOpenContainer() == this) {
-            session.setOpenContainer(null, cause);
+            session.setOpenContainer(null);
         }
     }
 

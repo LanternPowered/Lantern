@@ -31,7 +31,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
-import org.lanternpowered.server.util.VariableValueArray;
+import org.lanternpowered.server.util.collect.array.VariableValueArray;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 

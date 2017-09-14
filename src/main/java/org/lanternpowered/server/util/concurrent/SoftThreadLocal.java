@@ -23,14 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.util.concurrent;
 
 import static java.util.Objects.requireNonNull;
 
 import java.lang.ref.SoftReference;
 import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 /**
  * This is a {@link ThreadLocal} that uses {@link SoftReference}s to store
@@ -72,7 +70,6 @@ public class SoftThreadLocal<T> {
      *
      * @return The value
      */
-    @Nullable
     public T get() {
         final SoftReference<T> ref = this.threadLocal.get();
         if (ref != null) {
@@ -99,11 +96,10 @@ public class SoftThreadLocal<T> {
      *
      * @param value The value
      */
-    public void set(@Nullable T value) {
+    public void set(T value) {
         this.threadLocal.set(value == null ? null : new SoftReference<>(value));
     }
 
-    @Nullable
     T initialValue() {
         return null;
     }

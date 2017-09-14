@@ -27,6 +27,7 @@ package org.lanternpowered.server.network;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
@@ -52,6 +53,7 @@ import org.lanternpowered.server.data.io.PlayerIO;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
@@ -77,6 +79,8 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.network.PlayerConnection;
@@ -106,6 +110,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("ConstantConditions")
 public final class NetworkSession extends SimpleChannelInboundHandler<Message> implements PlayerConnection {
 
     /**
@@ -338,7 +343,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         // The player was able to spawn before the connection closed
         if (this.player != null) {
-            leavePlayer();
+            Lantern.getScheduler().callSync(this::leavePlayer);
             Lantern.getLogger().debug("{} ({}) disconnected. Reason: {}", this.gameProfile.getName().orElse("Unknown"),
                     this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
         } else if (getProtocolState() != ProtocolState.STATUS) { // Ignore the status requests
@@ -774,20 +779,20 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      * server and needs to be cleaned up.
      */
     private void leavePlayer() {
-        if (this.player == null) {
-            throw new IllegalStateException("The player must first be available!");
-        }
+        checkState(this.player != null, "The player must first be available!");
         final LanternWorld world = this.player.getWorld();
-        //noinspection ConstantConditions
         if (world != null) {
+            final CauseStack causeStack = CauseStack.current();
+            causeStack.pushCause(this.player);
+
             // Close the open container
-            this.player.getContainerSession().setRawOpenContainer(null, Cause.source(this.player).build());
+            this.player.getContainerSession().setRawOpenContainer(causeStack, null);
 
             final MessageChannel messageChannel = this.player.getMessageChannel();
             final Text quitMessage = t("multiplayer.player.left", this.player.getName());
 
             final ClientConnectionEvent.Disconnect event = SpongeEventFactory.createClientConnectionEventDisconnect(
-                    Cause.source(this.player).build(), messageChannel, Optional.of(messageChannel),
+                    causeStack.getCurrentCause(), messageChannel, Optional.of(messageChannel),
                     new MessageEvent.MessageFormatter(quitMessage), this.player, false);
 
             Sponge.getEventManager().post(event);
@@ -795,11 +800,12 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 event.getChannel().ifPresent(channel -> channel.send(this.player, event.getMessage()));
             }
 
+            causeStack.popCause();
+
             // Save the player data
             try {
                 PlayerIO.save(Lantern.getGame().getSavesDirectory(), this.player);
             } catch (IOException e) {
-                //noinspection ConstantConditions
                 Lantern.getLogger().warn("An error occurred while saving the player data of {} ({})", this.gameProfile.getName().get(),
                         this.gameProfile.getUniqueId(), e);
             }
@@ -831,7 +837,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         LanternWorld world = this.player.getWorld();
-        //noinspection ConstantConditions
         if (world == null) {
             LanternWorldProperties worldProperties = this.player.getTempWorld();
             boolean fixSpawnLocation = false;
@@ -902,7 +907,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         final MessageEvent.MessageFormatter messageFormatter = new MessageEvent.MessageFormatter(
                 kickReason != null ? kickReason : t("multiplayer.disconnect.not_allowed_to_join"));
 
-        final Cause cause = Cause.source(this.player).build();
+        final Cause cause = Cause.builder().append(this).build(EventContext.builder().add(EventContextKeys.PLAYER, this.player).build());
         final Transform<World> fromTransform = this.player.getTransform();
         final ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
                 fromTransform, fromTransform, this, messageFormatter, this.gameProfile, this.player, false);

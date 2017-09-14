@@ -31,6 +31,7 @@ import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.element.ElementListener;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.IInventory;
@@ -343,7 +344,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             blockState = (burning ? BlockTypes.LIT_FURNACE : BlockTypes.FURNACE).getDefaultState()
                     .withTrait(LanternEnumTraits.HORIZONTAL_FACING, blockState
                             .getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get()).get();
-            getLocation().setBlock(blockState, Cause.source(this).build());
+            getLocation().setBlock(blockState);
         }
     }
 

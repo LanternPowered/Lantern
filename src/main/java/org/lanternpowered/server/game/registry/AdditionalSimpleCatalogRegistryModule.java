@@ -35,12 +35,12 @@ import javax.annotation.Nullable;
 public class AdditionalSimpleCatalogRegistryModule<T extends CatalogType> extends SimpleCatalogRegistryModule<T>
         implements AdditionalCatalogRegistryModule<T> {
 
-    public AdditionalSimpleCatalogRegistryModule(@Nullable Class<?> catalogClass) {
-        super(catalogClass);
+    public AdditionalSimpleCatalogRegistryModule(Class<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
-    public AdditionalSimpleCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
-        super(catalogClass, mappingProvider);
+    public AdditionalSimpleCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider) {
+        super(catalogClasses, mappingProvider);
     }
 
     @Override

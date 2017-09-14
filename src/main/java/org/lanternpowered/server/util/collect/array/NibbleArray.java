@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.util.collect.array;
 
 import static org.lanternpowered.server.util.Conditions.checkArrayRange;
 
@@ -33,6 +33,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
+@NonnullByDefault
 public class NibbleArray {
 
     private final int length;

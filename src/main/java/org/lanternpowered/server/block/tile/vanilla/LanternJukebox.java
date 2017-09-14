@@ -43,7 +43,6 @@ import org.spongepowered.api.data.property.item.RecordProperty;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
@@ -107,16 +106,13 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
 
     @Override
     public void ejectRecord() {
-        ejectRecordItem().ifPresent(entity -> entity.getWorld().spawnEntity(entity,
-                Cause.builder().owner(this).build()));
+        ejectRecordItem().ifPresent(entity -> entity.getWorld().spawnEntity(entity));
     }
 
     private void updateBlockState() {
         final Location<World> location = getLocation();
         final BlockState block = location.getBlock();
-        location.setBlock(block
-                .withTrait(LanternBooleanTraits.HAS_RECORD, this.inventory.getRawItemStack() != null)
-                .orElse(block), Cause.source(this).build());
+        location.setBlock(block.withTrait(LanternBooleanTraits.HAS_RECORD, this.inventory.getRawItemStack() != null).orElse(block));
     }
 
     /**

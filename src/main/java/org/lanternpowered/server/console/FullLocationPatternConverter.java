@@ -58,7 +58,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
         final String name = event.getLoggerName();
         final StackTraceElement element;
         if (ConsoleManager.active && (ConsoleManager.REDIRECT_ERR.equals(name) || ConsoleManager.REDIRECT_OUT.equals(name))) {
-            element = calculateLocation(ConsoleManager.REDIRECT_FQCNS);
+            element = calculateLocation(ConsoleManager.REDIRECT_FQCNS, ConsoleManager.IGNORE_FQCNS);
         } else {
             element = event.getSource();
         }
@@ -69,7 +69,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
     }
 
     @Nullable
-    private static StackTraceElement calculateLocation(Set<String> fqcns) {
+    private static StackTraceElement calculateLocation(Set<String> fqcns, Set<String> ignoreFqcns) {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         StackTraceElement last = null;
 
@@ -77,6 +77,9 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
             String className = stackTrace[i].getClassName();
             if (fqcns.contains(className)) {
                 return last;
+            }
+            if (ignoreFqcns.contains(className)) {
+                return null;
             }
 
             if (className.equals("java.lang.Throwable") && stackTrace[i].getMethodName().equals("printStackTrace")) {

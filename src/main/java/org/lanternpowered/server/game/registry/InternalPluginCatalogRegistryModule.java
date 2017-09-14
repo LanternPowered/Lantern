@@ -43,20 +43,20 @@ public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends 
 
     private final Int2ObjectMap<T> byInternalId = new Int2ObjectOpenHashMap<>();
 
-    public InternalPluginCatalogRegistryModule(@Nullable Class<?> catalogClass) {
-        super(catalogClass);
+    public InternalPluginCatalogRegistryModule(Class<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
-    public InternalPluginCatalogRegistryModule(@Nullable Class<?> catalogClass, @Nullable String pattern) {
-        super(catalogClass, pattern);
+    public InternalPluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable String pattern) {
+        super(catalogClasses, pattern);
     }
 
-    public InternalPluginCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
-        super(catalogClass, mappingProvider);
+    public InternalPluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider) {
+        super(catalogClasses, mappingProvider);
     }
 
-    public InternalPluginCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
-        super(catalogClass, mappingProvider, pattern);
+    public InternalPluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
+        super(catalogClasses, mappingProvider, pattern);
     }
 
     protected boolean isDuplicateInternalIdAllowed() {

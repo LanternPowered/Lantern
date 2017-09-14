@@ -58,10 +58,11 @@ import org.lanternpowered.server.data.property.AbstractDirectionRelativeProperty
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
-import org.lanternpowered.server.util.NibbleArray;
+import org.lanternpowered.server.util.collect.array.NibbleArray;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.TrackerIdAllocator;
@@ -69,6 +70,7 @@ import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -90,8 +92,8 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
@@ -859,15 +861,14 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
-        return setBlock(x, y, z, block, BlockChangeFlag.ALL, cause);
+    public boolean setBlock(int x, int y, int z, BlockState block) {
+        return setBlock(x, y, z, block, BlockChangeFlag.ALL);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag, Cause cause) {
+    public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag) {
         checkNotNull(block, "block");
         checkNotNull(flag, "flag");
-        checkNotNull(cause, "cause");
         checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return false;
@@ -1050,7 +1051,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
         return false;
     }
 
@@ -1061,13 +1062,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public boolean spawnEntity(Entity entity, Cause cause) {
+    public boolean spawnEntity(Entity entity) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+    public boolean spawnEntities(Iterable<? extends Entity> entities) {
         return false;
     }
 
@@ -1122,7 +1123,20 @@ public class LanternChunk implements AbstractExtent, Chunk {
             // TODO: Update
         }
 
-        getTileEntities().forEach(tileEntity -> ((LanternTileEntity) tileEntity).pulse());
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this); // Add the chunk that is being pulsed
+        getTileEntities().forEach(tileEntity -> {
+            causeStack.pushCause(tileEntity); // Add the tile entity to the cause
+            try {
+                ((LanternTileEntity) tileEntity).pulse();
+            } catch (Throwable t) {
+                final Vector3i pos = tileEntity.getLocation().getBlockPosition();
+                Lantern.getLogger().error("Failed to pulse TileEntity at ({};{};{})", pos.getX(), pos.getY(), pos.getZ(), t);
+            } finally {
+                causeStack.popCause(); // Pop the tile entity
+            }
+        });
+        causeStack.popCause(); // Pop the chunk
     }
 
     @Override
@@ -1143,8 +1157,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public MutableBlockVolumeWorker<Chunk> getBlockWorker(Cause cause) {
-        return new LanternMutableBlockVolumeWorker<>(this, cause);
+    public MutableBlockVolumeWorker<Chunk> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override
@@ -1706,11 +1720,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value, Cause cause) {
-        return null;
-    }
-
-    @Override
     public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
         // TODO Auto-generated method stub
         return null;
@@ -1725,11 +1734,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
         // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function, Cause cause) {
         return null;
     }
 
@@ -1837,7 +1841,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean loadChunk(boolean generate) {
-        if (this.world.getChunkManager().load(this, () -> Cause.source(this.world).named("chunk", this).build(), generate)) {
+        if (this.world.getChunkManager().load(this, CauseStack.currentOrEmpty(), generate)) {
             this.loaded = true;
             return true;
         }
@@ -1846,7 +1850,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean unloadChunk() {
-        if (this.world.getChunkManager().unload(this, () -> Cause.source(this.world).named("chunk", this).build())) {
+        if (this.world.getChunkManager().unload(this, CauseStack.currentOrEmpty())) {
             this.loaded = false;
             return true;
         }
@@ -1880,43 +1884,44 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean hitBlock(int x, int y, int z, Direction side, GameProfile profile) {
+        checkVolumeBounds(x, y, z);
+        return this.world.hitBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, side, profile);
     }
 
     @Override
-    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean interactBlock(int x, int y, int z, Direction side, GameProfile profile) {
+        checkVolumeBounds(x, y, z);
+        return this.world.interactBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, side, profile);
     }
 
     @Override
-    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, GameProfile profile) {
+        checkVolumeBounds(x, y, z);
+        return this.world.interactBlockWith(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, itemStack, side, profile);
     }
 
     @Override
-    public boolean digBlock(int x, int y, int z, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean digBlock(int x, int y, int z, GameProfile profile) {
+        checkVolumeBounds(x, y, z);
+        return this.world.digBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, profile);
     }
 
     @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, GameProfile profile) {
+        checkVolumeBounds(x, y, z);
+        return this.world.digBlockWith(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, itemStack, profile);
     }
 
     @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, GameProfile profile) {
+        checkVolumeBounds(x, y, z);
+        return this.world.getBlockDigTimeWith(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, itemStack, profile);
     }
 
     @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, Cause cause) {
-        return false;
+    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, GameProfile profile) {
+        checkVolumeBounds(x, y, z);
+        return this.world.placeBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, block, direction, profile);
     }
 }

@@ -42,7 +42,6 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
@@ -117,18 +116,8 @@ public class LanternUser extends AbstractProxySubject implements AbstractPropert
     }
 
     @Override
-    public <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E value, Cause cause) {
-        return null;
-    }
-
-    @Override
     public DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function) {
         // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function, Cause cause) {
         return null;
     }
 

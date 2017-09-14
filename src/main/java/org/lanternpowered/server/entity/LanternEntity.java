@@ -41,11 +41,13 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
@@ -61,6 +63,7 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
@@ -609,14 +612,15 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     }
 
     @Override
-    public boolean damage(double damage, DamageSource damageSource, Cause cause) {
+    public boolean damage(double damage, DamageSource damageSource) {
         final Optional<Double> optHealth = get(Keys.HEALTH);
         if (!optHealth.isPresent()) {
             return false;
         }
         // TODO: Damage modifiers, etc.
-        final org.spongepowered.api.event.entity.DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
-                cause, new ArrayList<>(), this, damage);
+        final CauseStack causeStack = CauseStack.current();
+        final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
+                causeStack.getCurrentCause(), new ArrayList<>(), this, damage);
         if (event.isCancelled()) {
             return false;
         }

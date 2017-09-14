@@ -31,7 +31,7 @@ import org.spongepowered.api.block.BlockState;
 public final class BlockStateRegistryModule extends PluginCatalogRegistryModule<BlockState> {
 
     public BlockStateRegistryModule() {
-        super(null, "^[a-z][a-z0-9-_]+:[a-z][a-z0-9-_\\[\\]=,]+$");
+        super(new Class[0], "^[a-z][a-z0-9-_]+:[a-z][a-z0-9-_\\[\\]=,]+$");
     }
 
     void registerState(BlockState catalogType) {

@@ -41,6 +41,8 @@ import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.LanternCauseStack;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
@@ -63,6 +65,7 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.profile.GameProfileCache;
@@ -245,7 +248,7 @@ public final class LanternServer implements Server {
         this.logger.info("Ready for connections.");
         this.worldManager.init();
 
-        final Cause gameCause = Cause.source(this.game).build();
+        final Cause gameCause = Cause.of(EventContext.empty(), this.game);
 
         this.game.postGameStateChange(SpongeEventFactory.createGameAboutToStartServerEvent(gameCause));
         this.game.postGameStateChange(SpongeEventFactory.createGameStartingServerEvent(gameCause));
@@ -279,6 +282,9 @@ public final class LanternServer implements Server {
             }
         }
 
+        // Initialize a CauseStack on the server thread.
+        this.executor.submit(() -> CauseStack.set(new LanternCauseStack()));
+        // Start server ticking.
         this.executor.scheduleAtFixedRate(() -> {
             try {
                 pulse();
@@ -590,7 +596,7 @@ public final class LanternServer implements Server {
         }
         this.shuttingDown = true;
 
-        final Cause gameCause = Cause.source(this.game).build();
+        final Cause gameCause = Cause.of(EventContext.empty(), this.game);
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppingServerEvent(gameCause));
 
         // Debug a message

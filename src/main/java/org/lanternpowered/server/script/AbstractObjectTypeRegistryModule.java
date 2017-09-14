@@ -34,14 +34,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 public abstract class AbstractObjectTypeRegistryModule<O, T extends ObjectType<O>> extends PluginCatalogRegistryModule<T> {
 
     private final Map<Class<?>, T> byClass = new HashMap<>();
 
-    public AbstractObjectTypeRegistryModule(@Nullable Class<?> catalogClass) {
-        super(catalogClass);
+    public AbstractObjectTypeRegistryModule(Class<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
     @Override

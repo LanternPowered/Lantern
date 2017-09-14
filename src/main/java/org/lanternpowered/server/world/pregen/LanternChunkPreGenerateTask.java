@@ -27,13 +27,14 @@ package org.lanternpowered.server.world.pregen;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Throwables;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.lanternpowered.server.data.io.ChunkIOService;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
@@ -41,8 +42,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.world.ChunkPreGenerationEvent;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
@@ -80,7 +82,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
     private final int totalChunksToGenerate;
     private final Task spongeTask;
     private final int tickInterval;
-    private final Object plugin;
+    private final PluginContainer plugin;
 
     // If null, no listeners have been assigned, so they don't need to be registered or unregistered.
     @Nullable private final EventListener<ChunkPreGenerationEvent> eventListener;
@@ -99,7 +101,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
     private long generationEndTime = 0;
     private boolean isCancelled = false;
 
-    private LanternChunkPreGenerateTask(Object plugin, World world, Vector3d center, double diameter,
+    private LanternChunkPreGenerateTask(PluginContainer plugin, World world, Vector3d center, double diameter,
             int chunkCount, float tickPercent, int tickInterval, Cause cause, List<Consumer<ChunkPreGenerationEvent>> eventListeners) {
         final int preferredTickInterval = Lantern.getScheduler().getPreferredTickInterval();
 
@@ -336,7 +338,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
         private final double diameter;
         private final List<Consumer<ChunkPreGenerationEvent>> eventListeners = new ArrayList<>();
 
-        @Nullable private Object plugin;
+        @Nullable private PluginContainer plugin;
         private int tickInterval = DEFAULT_TICK_INTERVAL;
         private float tickPercent = DEFAULT_TICK_PERCENT;
         private int chunksPerTick = 0;
@@ -353,8 +355,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
 
         @Override
         public ChunkPreGenerate.Builder owner(Object plugin) {
-            checkNotNull(plugin, "plugin cannot be null");
-            this.plugin = plugin;
+            this.plugin = checkPlugin(plugin, "plugin");
             return this;
         }
 
@@ -410,10 +411,18 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
 
         @Override
         public ChunkPreGenerate start() {
-            checkNotNull(plugin, "owner cannot be null");
+            checkNotNull(plugin, "The plugin must be set");
             checkArgument(this.chunksPerTick > 0 || this.tickPercent > 0, "Must use at least one of \"chunks per tick\" or \"tick percent limit\"");
+            final CauseStack causeStack = CauseStack.currentOrNull();
+            final Cause cause;
+            if (causeStack == null) {
+                cause = Cause.of(EventContext.empty(), this.plugin);
+            } else {
+                // The plugin instance should already be in the stack
+                cause = causeStack.getCurrentCause();
+            }
             return new LanternChunkPreGenerateTask(this.plugin, this.world, this.center, this.diameter, this.chunksPerTick, this.tickPercent,
-                    this.tickInterval, Cause.of(NamedCause.owner(this.plugin)), this.eventListeners);
+                    this.tickInterval, cause, this.eventListeners);
         }
 
         @Override

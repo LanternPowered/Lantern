@@ -32,6 +32,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.spongepowered.api.effect.Viewer;
@@ -451,8 +452,11 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
 
     @Override
     void close() {
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this);
         for (InventoryCloseListener listener : this.closeListeners) {
             listener.onClose(this);
         }
+        causeStack.popCause();
     }
 }

@@ -54,6 +54,7 @@ import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
+import org.lanternpowered.server.event.LanternCauseStackManager;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.LanternGame;
@@ -92,6 +93,7 @@ import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.property.PropertyRegistry;
+import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelId;
@@ -229,6 +231,8 @@ public class LanternModule extends PrivateModule {
                 .to(LanternDataManager.class);
         bindAndExpose(PropertyRegistry.class)
                 .to(LanternPropertyRegistry.class);
+        bindAndExpose(CauseStackManager.class)
+                .to(LanternCauseStackManager.class);
 
         // Services
         bindService(PermissionService.class);

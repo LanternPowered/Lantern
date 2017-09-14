@@ -35,6 +35,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.entity.living.humanoid.player.PlayerChangeClientSettingsEvent;
 
 public final class HandlerPlayInClientSettings implements Handler<MessagePlayInClientSettings> {
@@ -42,8 +43,9 @@ public final class HandlerPlayInClientSettings implements Handler<MessagePlayInC
     @Override
     public void handle(NetworkContext context, MessagePlayInClientSettings message) {
         final LanternPlayer player = context.getSession().getPlayer();
+        final Cause cause = Cause.of(EventContext.empty(), player);
         final PlayerChangeClientSettingsEvent event = SpongeEventFactory.createPlayerChangeClientSettingsEvent(
-                Cause.source(player).build(), message.getChatVisibility(), LanternSkinPart.fromBitPattern(message.getSkinPartsBitPattern()),
+                cause, message.getChatVisibility(), LanternSkinPart.fromBitPattern(message.getSkinPartsBitPattern()),
                 message.getLocale(), player, message.getEnableColors(), message.getViewDistance());
         Sponge.getEventManager().post(event);
         player.setLocale(event.getLocale());

@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -40,9 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class FlatGenerationPopulator implements GenerationPopulator {
-
-    // The cause to populate chunks
-    private final Cause cause = Cause.source(this).build();
 
     // Using a cache to increase generation performance
     private final BlockState[] blockStateCache;
@@ -77,7 +73,7 @@ public final class FlatGenerationPopulator implements GenerationPopulator {
             }
             for (int x = min.getX(); x <= max.getX(); x++) {
                 for (int z = min.getZ(); z <= max.getZ(); z++) {
-                    buffer.setBlock(x, y, z, this.blockStateCache[y], this.cause);
+                    buffer.setBlock(x, y, z, this.blockStateCache[y]);
                 }
             }
         }

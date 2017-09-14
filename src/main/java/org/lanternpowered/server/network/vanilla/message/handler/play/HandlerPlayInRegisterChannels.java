@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
@@ -40,12 +41,16 @@ public final class HandlerPlayInRegisterChannels implements Handler<MessagePlayI
     public void handle(NetworkContext context, MessagePlayInOutRegisterChannels message) {
         final Set<String> channels = message.getChannels();
         final Set<String> registeredChannels = context.getSession().getRegisteredChannels();
-        final Cause cause = Cause.source(context.getSession().getPlayer()).named("connection", context.getSession()).build();
 
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(context.getSession());
+        causeStack.pushCause(context.getSession().getPlayer());
+        final Cause cause = causeStack.getCurrentCause();
         for (String channel : channels) {
             if (registeredChannels.add(channel)) {
                 Sponge.getEventManager().post(SpongeEventFactory.createChannelRegistrationEventRegister(cause, channel));
             }
         }
+        causeStack.popCauses(2);
     }
 }

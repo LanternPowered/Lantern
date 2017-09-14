@@ -43,7 +43,7 @@ import java.util.List;
 public final class AccessoryRegistryModule extends PluginCatalogRegistryModule<Accessory> {
 
     public AccessoryRegistryModule() {
-        super(null);
+        super();
     }
 
     @Override

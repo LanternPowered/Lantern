@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -44,17 +44,17 @@ public class EnderChestInteractionBehavior implements InteractWithBlockBehavior 
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final LanternPlayer player = (LanternPlayer) context.get(Parameters.PLAYER).orElse(null);
+        final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
         if (player == null) {
             return BehaviorResult.CONTINUE;
         }
         final AbstractInventory inventory = player.getEnderChestInventory();
-        final Location<World> location = context.tryGet(Parameters.INTERACTION_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTileEntity = location.getTileEntity();
         if (optTileEntity.isPresent() && optTileEntity.get() instanceof ContainerViewListener) {
             inventory.addViewListener((ContainerViewListener) optTileEntity.get());
         }
-        if (!player.openInventory(inventory, context.getCause()).isPresent()) {
+        if (!player.openInventory(inventory).isPresent()) {
             return BehaviorResult.CONTINUE;
         }
         return BehaviorResult.SUCCESS;

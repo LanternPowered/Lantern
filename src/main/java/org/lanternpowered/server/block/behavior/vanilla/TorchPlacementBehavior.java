@@ -28,10 +28,9 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
-import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -40,27 +39,26 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+@SuppressWarnings("ConstantConditions")
 public class TorchPlacementBehavior implements PlaceBlockBehavior {
 
     private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST };
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        Direction face = context.tryGet(Parameters.INTERACTION_FACE);
+        Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
         if (face == Direction.UP) {
             return BehaviorResult.PASS;
         }
-        final BlockSnapshot snapshot = context.getCause().get(BlockSnapshotProviderPlaceBehavior.BLOCK_SNAPSHOT, BlockSnapshot.class)
+        final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotProviderPlaceBehavior's BlockSnapshot isn't present."));
-        final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
-        final Location<World> clickLocation = context.tryGet(Parameters.INTERACTION_LOCATION);
-        //noinspection ConstantConditions
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location<World> clickLocation = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         boolean flag = clickLocation.getExtent().getProperty(
                 clickLocation.getBlockPosition(), face, SolidSideProperty.class).get().getValue();
         BlockSnapshotBuilder builder = BlockSnapshotBuilder.create().from(snapshot);
         if (!flag) {
             for (Direction direction : HORIZONTAL_DIRECTIONS) {
-                //noinspection ConstantConditions
                 flag = location.getExtent().getProperty(location.getBlockRelative(direction).getBlockPosition(),
                         direction.getOpposite(), SolidSideProperty.class).get().getValue();
                 if (flag) {

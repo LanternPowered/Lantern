@@ -28,7 +28,7 @@ package org.lanternpowered.server.item.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
@@ -40,9 +40,9 @@ public class ShieldInteractionBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
+        final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
-            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.tryGet(Parameters.INTERACTION_HAND)));
+            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.requireContext(ContextKeys.INTERACTION_HAND)));
             return BehaviorResult.SUCCESS;
         }
         return BehaviorResult.PASS;

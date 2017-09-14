@@ -42,7 +42,7 @@ import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.lanternpowered.server.text.translation.MinecraftTranslation;
 import org.lanternpowered.server.text.translation.TranslationManager;
-import org.lanternpowered.server.util.FastThreadLocals;
+import org.lanternpowered.server.util.concurrent.FastThreadLocals;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.TranslatableText;

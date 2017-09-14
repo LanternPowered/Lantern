@@ -53,12 +53,14 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.SimpleRemoteConnection;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.server.query.QueryServerEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.World;
@@ -150,15 +152,16 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         LanternServer server = this.queryServer.getGame().getServer();
 
         // TODO: Find out how to support the size and max size properties
-        final QueryServerEvent.Basic event = SpongeEventFactory.createQueryServerEventBasic(
-                Cause.source(ctx.channel().remoteAddress()).build(), (InetSocketAddress) ctx.channel().localAddress(),
-                "SMP", this.getWorldName(), server.getMotd().toPlain(), server.getMaxPlayers(),
-                Integer.MAX_VALUE, server.getOnlinePlayers().size(), 0);
+        final Cause cause = Cause.of(EventContext.empty(),
+                new SimpleRemoteConnection((InetSocketAddress) ctx.channel().remoteAddress(), null));
+        final QueryServerEvent.Basic event = SpongeEventFactory.createQueryServerEventBasic(cause,
+                (InetSocketAddress) ctx.channel().localAddress(), "SMP", this.getWorldName(), server.getMotd().toPlain(),
+                server.getMaxPlayers(), Integer.MAX_VALUE, server.getOnlinePlayers().size(), 0);
         Sponge.getEventManager().post(event);
 
         final InetSocketAddress address = event.getAddress();
 
-        ByteBuf buf = ctx.alloc().buffer();
+        final ByteBuf buf = ctx.alloc().buffer();
         buf.writeByte(ACTION_STATS);
         buf.writeInt(sessionId);
         writeString(buf, event.getMotd());
@@ -204,7 +207,8 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
         final List<String> playerNames = server.getOnlinePlayers()
                 .stream().map(CommandSource::getName).collect(Collectors.toList());
-        final Cause cause = Cause.source(ctx.channel().remoteAddress()).build();
+        final Cause cause = Cause.of(EventContext.empty(),
+                new SimpleRemoteConnection((InetSocketAddress) ctx.channel().remoteAddress(), null));
 
         final QueryServerEvent.Full event = SpongeEventFactory.createQueryServerEventFull(cause,
                 (InetSocketAddress) ctx.channel().localAddress(), new HashMap<>(),

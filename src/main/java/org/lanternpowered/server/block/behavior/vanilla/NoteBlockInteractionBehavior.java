@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.block.tile.vanilla.LanternNote;
@@ -43,7 +43,7 @@ public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.tryGet(Parameters.INTERACTION_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTile = location.getTileEntity();
         if (optTile.isPresent()) {
             final TileEntity tile = optTile.get();

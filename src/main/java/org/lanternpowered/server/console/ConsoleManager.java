@@ -40,10 +40,12 @@ import org.jline.reader.LineReader.Option;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
+import org.lanternpowered.server.event.LanternCauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation;
 import org.lanternpowered.server.scheduler.LanternScheduler;
+import org.lanternpowered.server.util.PrettyPrinter;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -60,7 +62,10 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public final class ConsoleManager {
 
-    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(PrintStream.class.getName(), LoggerPrintStream.class.getName());
+    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(
+            PrintStream.class.getName(), LoggerPrintStream.class.getName(), PrettyPrinter.class.getName());
+    static final Set<String> IGNORE_FQCNS = Sets.newHashSet(
+            LanternCauseStack.class.getName());
     static final String REDIRECT_ERR = "STDERR";
     static final String REDIRECT_OUT = "STDOUT";
     static volatile boolean active;

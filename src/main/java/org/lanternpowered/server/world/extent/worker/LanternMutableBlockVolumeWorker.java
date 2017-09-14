@@ -26,7 +26,6 @@
 package org.lanternpowered.server.world.extent.worker;
 
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeFiller;
@@ -34,12 +33,12 @@ import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeFiller;
 public class LanternMutableBlockVolumeWorker<V extends MutableBlockVolume> extends LanternBlockVolumeWorker<V>
         implements MutableBlockVolumeWorker<V> {
 
-    public LanternMutableBlockVolumeWorker(V volume, Cause cause) {
-        super(volume, cause);
+    public LanternMutableBlockVolumeWorker(V volume) {
+        super(volume);
     }
 
     @Override
-    public void fill(BlockVolumeFiller filler, Cause cause) {
+    public void fill(BlockVolumeFiller filler) {
         final int xMin = this.volume.getBlockMin().getX();
         final int yMin = this.volume.getBlockMin().getY();
         final int zMin = this.volume.getBlockMin().getZ();
@@ -50,7 +49,7 @@ public class LanternMutableBlockVolumeWorker<V extends MutableBlockVolume> exten
             for (int y = yMin; y <= yMax; y++) {
                 for (int x = xMin; x <= xMax; x++) {
                     final BlockState block = filler.produce(x, y, z);
-                    this.volume.setBlock(x, y, z, block, cause);
+                    this.volume.setBlock(x, y, z, block);
                 }
             }
         }

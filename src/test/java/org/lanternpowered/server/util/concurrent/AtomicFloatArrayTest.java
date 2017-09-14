@@ -32,6 +32,7 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 
 import com.flowpowered.math.GenericMath;
+import org.lanternpowered.server.util.collect.array.concurrent.AtomicFloatArray;
 
 public class AtomicFloatArrayTest {
 

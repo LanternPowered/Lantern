@@ -34,6 +34,7 @@ import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
@@ -47,8 +48,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
@@ -117,10 +117,15 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
                 messageText = rawMessageText;
             }
             final MessageChannel channel = player.getMessageChannel();
-            final MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(Cause.of(NamedCause.source(player)),
-                    channel, Optional.of(channel), new MessageEvent.MessageFormatter(nameText, messageText), rawMessageText, false);
-            if (!Sponge.getEventManager().post(event) && !event.isMessageCancelled()) {
-                event.getChannel().ifPresent(c -> c.send(player, event.getMessage(), ChatTypes.CHAT));
+
+            final CauseStack causeStack = CauseStack.current();
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.addContext(EventContextKeys.PLAYER, player);
+                final MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(causeStack.getCurrentCause(),
+                        channel, Optional.of(channel), new MessageEvent.MessageFormatter(nameText, messageText), rawMessageText, false);
+                if (!Sponge.getEventManager().post(event) && !event.isMessageCancelled()) {
+                    event.getChannel().ifPresent(c -> c.send(player, event.getMessage(), ChatTypes.CHAT));
+                }
             }
         }
         final Attribute<ChatData> attr = context.getChannel().attr(CHAT_DATA);

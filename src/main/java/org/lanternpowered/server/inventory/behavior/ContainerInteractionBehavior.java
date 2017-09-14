@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.inventory.behavior;
 
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.behavior.event.ContainerEvent;
 import org.lanternpowered.server.inventory.client.ClientContainer;
@@ -39,8 +40,14 @@ import javax.annotation.Nullable;
 /**
  * Represents the behavior when a {@link Player} interacts with
  * a {@link ClientContainer} and {@link LanternContainer}.
+ * <p>
+ * The current {@link CauseStack} will always be populated before
+ * a handler method is invoked. In the process will the {@link Player}
+ * be added as normal cause and context value. The {@link ClientContainer}
+ * will also be available in the cause.
+ * A {@link CauseStack.Frame} will be entered before the method is executed
+ * and exited when it is done.
  */
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType") // Ignore, only we should call this class
 public interface ContainerInteractionBehavior {
 
     /**

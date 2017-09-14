@@ -28,6 +28,7 @@ package org.lanternpowered.server.util;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.lanternpowered.server.util.collect.array.VariableValueArray;
 
 public class VariableValueArrayTest {
 

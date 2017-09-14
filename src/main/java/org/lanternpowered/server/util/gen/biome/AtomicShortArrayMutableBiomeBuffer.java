@@ -27,7 +27,7 @@ package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
-import org.lanternpowered.server.util.concurrent.AtomicShortArray;
+import org.lanternpowered.server.util.collect.array.concurrent.AtomicShortArray;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;

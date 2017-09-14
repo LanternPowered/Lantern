@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.text.LanternTexts;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -49,8 +50,6 @@ import org.spongepowered.api.command.InvocationCommandException;
 import org.spongepowered.api.command.dispatcher.Disambiguator;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.command.TabCompleteEvent;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -239,23 +238,26 @@ public class LanternCommandManager implements CommandManager {
 
     @Override
     public CommandResult process(CommandSource source, String commandLine) {
+        checkNotNull(source, "source");
         final String[] argSplit = commandLine.split(" ", 2);
-        final SendCommandEvent event = SpongeEventFactory.createSendCommandEvent(Cause.of(NamedCause.source(source)),
+        final CauseStack causeStack = CauseStack.currentOrEmpty();
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.pushCause(source);
+            final SendCommandEvent event = SpongeEventFactory.createSendCommandEvent(frame.getCurrentCause(),
                 argSplit.length > 1 ? argSplit[1] : "", argSplit[0], CommandResult.empty());
-        Sponge.getGame().getEventManager().post(event);
-        if (event.isCancelled()) {
-            return event.getResult();
-        }
+            Sponge.getGame().getEventManager().post(event);
+            if (event.isCancelled()) {
+                return event.getResult();
+            }
 
-        // Only the first part of argSplit is used at the moment, do the other in the future if needed.
-        argSplit[0] = event.getCommand();
+            // Only the first part of argSplit is used at the moment, do the other in the future if needed.
+            argSplit[0] = event.getCommand();
 
-        commandLine = event.getCommand();
-        if (!event.getArguments().isEmpty()) {
-            commandLine = commandLine + ' ' + event.getArguments();
-        }
+            commandLine = event.getCommand();
+            if (!event.getArguments().isEmpty()) {
+                commandLine = commandLine + ' ' + event.getArguments();
+            }
 
-        try {
             try {
                 return this.dispatcher.process(source, commandLine);
             } catch (InvocationCommandException ex) {
@@ -308,7 +310,9 @@ public class LanternCommandManager implements CommandManager {
     }
 
     public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition, boolean usingBlock) {
-        try {
+        final CauseStack causeStack = CauseStack.currentOrEmpty();
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.pushCause(source);
             final List<String> suggestions;
             final String[] argSplit = arguments.split(" ", 2);
             // TODO: Fix this in the SimpleDispatcher -> in 'getSuggestions' add after
@@ -316,15 +320,16 @@ public class LanternCommandManager implements CommandManager {
             if (argSplit.length == 1 && !arguments.endsWith(" ")) {
                 suggestions = this.dispatcher.getSuggestions(source, arguments, targetPosition);
             } else {
-                Optional<? extends CommandMapping> cmdOptional = this.dispatcher.get(argSplit[0], source);
+                final Optional<? extends CommandMapping> cmdOptional = this.dispatcher.get(argSplit[0], source);
                 if (!cmdOptional.isPresent()) {
                     suggestions = ImmutableList.of();
                 } else {
                     suggestions = cmdOptional.get().getCallable().getSuggestions(source, argSplit[1], targetPosition);
                 }
             }
+
             final List<String> rawSuggestions = new ArrayList<>(suggestions);
-            final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.source(source).build(),
+            final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(frame.getCurrentCause(),
                     ImmutableList.copyOf(suggestions), rawSuggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0],
                     arguments, Optional.ofNullable(targetPosition), usingBlock);
             Sponge.getGame().getEventManager().post(event);

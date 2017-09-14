@@ -47,7 +47,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
-import org.lanternpowered.server.util.VariableValueArray;
+import org.lanternpowered.server.util.collect.array.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.WorldEventListener;
 import org.lanternpowered.server.world.chunk.LanternChunk;

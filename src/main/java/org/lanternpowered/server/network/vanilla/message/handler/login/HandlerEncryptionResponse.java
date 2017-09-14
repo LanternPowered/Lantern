@@ -65,6 +65,7 @@ import org.lanternpowered.server.util.UUIDHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.profile.property.ProfileProperty;
@@ -235,7 +236,8 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
 
             Lantern.getLogger().info("Finished authenticating.");
 
-            final ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(Cause.source(gameProfile).build(),
+            final Cause cause = Cause.of(EventContext.empty(), session, gameProfile);
+            final ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(cause,
                     session, new MessageEvent.MessageFormatter(t("multiplayer.disconnect.not_allowed_to_join")), gameProfile, false);
 
             Sponge.getEventManager().post(event);

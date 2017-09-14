@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
@@ -48,9 +48,9 @@ import javax.annotation.Nullable;
 public class OpenableInteractionBehavior implements InteractWithBlockBehavior {
 
     public static OpenCloseAccess DEFAULT_ACCESS = (context, action, original) -> {
-        final Optional<String> optLockToken = context.tryGet(Parameters.BLOCK_LOCATION).get(Keys.LOCK_TOKEN);
+        final Optional<String> optLockToken = context.requireContext(ContextKeys.BLOCK_LOCATION).get(Keys.LOCK_TOKEN);
         if (optLockToken.isPresent()) {
-            final Optional<ItemStack> usedItem = context.get(Parameters.USED_ITEM_STACK);
+            final Optional<ItemStack> usedItem = context.getContext(ContextKeys.USED_ITEM_STACK);
             if (usedItem.isPresent()) {
                 final ItemStack itemStack = usedItem.get();
                 final Optional<String> optItemLockToken = itemStack.get(Keys.LOCK_TOKEN);
@@ -79,7 +79,7 @@ public class OpenableInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final Optional<Boolean> optIsOpen = location.get(Keys.OPEN);
         if (!optIsOpen.isPresent()) {
             return BehaviorResult.FAIL;

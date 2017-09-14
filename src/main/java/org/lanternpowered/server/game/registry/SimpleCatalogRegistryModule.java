@@ -45,12 +45,12 @@ public class SimpleCatalogRegistryModule<T extends CatalogType> extends Abstract
 
     @Nullable private Map<String, T> typesByName = null;
 
-    public SimpleCatalogRegistryModule(@Nullable Class<?> catalogClass) {
-        super(catalogClass);
+    public SimpleCatalogRegistryModule(Class<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
-    public SimpleCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
-        super(catalogClass, mappingProvider);
+    public SimpleCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider) {
+        super(catalogClasses, mappingProvider);
     }
 
     @Override

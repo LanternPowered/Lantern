@@ -31,6 +31,8 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.LanternEventContextKeys;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
@@ -44,7 +46,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -179,15 +180,21 @@ public class LanternItem extends LanternEntity implements Item {
             }
             final PeekOfferTransactionsResult result = ((AbstractInventory) inventory).peekOfferFastTransactions(itemStack);
             final ItemStack rest = result.getOfferResult().getRest();
-            final Cause.Builder cause = Cause.source(entity);
-            cause.named("OriginalItemStack", itemStack);
-            if (rest != null) {
-                cause.named("RestItemStack", rest);
+
+            final CauseStack causeStack = CauseStack.current();
+            final ChangeInventoryEvent.Pickup event;
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.addContext(LanternEventContextKeys.ORIGINAL_ITEM_STACK, itemStack);
+                if (rest != null) {
+                    frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, rest);
+                }
+
+                event = SpongeEventFactory.createChangeInventoryEventPickup(causeStack.getCurrentCause(),
+                        this, inventory, result.getTransactions());
+                event.setCancelled(!result.getOfferResult().isSuccess());
+
+                Sponge.getEventManager().post(event);
             }
-            final ChangeInventoryEvent.Pickup event = SpongeEventFactory.createChangeInventoryEventPickup(
-                    cause.build(), this, inventory, result.getTransactions());
-            event.setCancelled(!result.getOfferResult().isSuccess());
-            Sponge.getEventManager().post(event);
             if (event.isCancelled() && !isRemoved()) { // Don't continue if the entity was removed during the event
                 continue;
             }

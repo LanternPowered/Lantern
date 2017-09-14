@@ -41,9 +41,9 @@ public class MutableBlockViewDownsize extends AbstractBlockViewDownsize<MutableB
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+    public boolean setBlock(int x, int y, int z, BlockState block) {
         checkRange(x, y, z);
-        return this.volume.setBlock(x, y, z, block, cause);
+        return this.volume.setBlock(x, y, z, block);
     }
 
     @Override
@@ -59,8 +59,8 @@ public class MutableBlockViewDownsize extends AbstractBlockViewDownsize<MutableB
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
-        return new LanternMutableBlockVolumeWorker<>(this, cause);
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override

@@ -31,7 +31,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 
 import java.util.Optional;
 
-public class ChestInteractionBehavior extends OpeneableContainerInteractionBehavior {
+public class ChestInteractionBehavior extends OpenableContainerInteractionBehavior {
 
     @Override
     protected Optional<Inventory> getInventoryFrom(TileEntity tileEntity) {

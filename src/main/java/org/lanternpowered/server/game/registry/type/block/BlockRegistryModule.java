@@ -62,7 +62,7 @@ import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacem
 import org.lanternpowered.server.block.behavior.vanilla.JukeboxInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.LogAxisRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.NoteBlockInteractionBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.OpeneableContainerInteractionBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.OpenableContainerInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
@@ -102,7 +102,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
@@ -1534,7 +1533,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         return horizontalFacingBuilder()
                 .tileEntityType(() -> TileEntityTypes.FURNACE)
                 .behaviors(pipeline -> pipeline
-                        .add(new OpeneableContainerInteractionBehavior()))
+                        .add(new OpenableContainerInteractionBehavior()))
                 .properties(builder -> builder
                         .add(hardness(3.5))
                         .add(blastResistance(17.5)));
@@ -1684,7 +1683,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new SimplePlacementBehavior())
                         .add(new OppositeFaceDirectionalPlacementBehavior())
-                        .add(new OpeneableContainerInteractionBehavior())
+                        .add(new OpenableContainerInteractionBehavior())
                         .add(new SimpleBreakBehavior()));
         // TODO: Item drops?
     }

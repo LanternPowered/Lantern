@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
@@ -54,7 +54,7 @@ public class OpenableDoorInteractionBehavior extends OpenableInteractionBehavior
             return result;
         }
 
-        final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final BlockState baseState = location.getBlock();
         final LanternDoorHalf half = baseState.get(LanternKeys.DOOR_HALF).orElse(null);
         if (half == null) {

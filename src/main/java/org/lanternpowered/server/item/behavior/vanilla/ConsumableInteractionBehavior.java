@@ -28,7 +28,7 @@ package org.lanternpowered.server.item.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.PotionEffectHelper;
@@ -54,6 +54,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("ConstantConditions")
 public class ConsumableInteractionBehavior implements InteractWithItemBehavior, FinishUsingItemBehavior {
 
     public interface Consumer {
@@ -66,16 +67,14 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
+        final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
             final Player player = optPlayer.get();
-            final ItemStack itemStack = context.tryGet(Parameters.USED_ITEM_STACK);
+            final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
             final AlwaysConsumableProperty property = itemStack.getProperty(AlwaysConsumableProperty.class).orElse(null);
-            //noinspection ConstantConditions
             if (property == null || !property.getValue()) {
                 int status = 0;
                 final FoodRestorationProperty foodRestorationProperty = itemStack.getProperty(FoodRestorationProperty.class).orElse(null);
-                //noinspection ConstantConditions
                 if (foodRestorationProperty != null && foodRestorationProperty.getValue() != 0.0) {
                     final int maxFood = player.get(LanternKeys.MAX_FOOD_LEVEL).orElse(1);
                     final int food = player.get(Keys.FOOD_LEVEL).orElse(maxFood);
@@ -84,7 +83,6 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                 if (status != 2) {
                     final HealthRestorationProperty healthRestorationProperty = itemStack
                             .getProperty(HealthRestorationProperty.class).orElse(null);
-                    //noinspection ConstantConditions
                     if (healthRestorationProperty != null && healthRestorationProperty.getValue() != 0.0) {
                         final double maxHealth = player.get(Keys.MAX_HEALTH).orElse(1.0);
                         final double health = player.get(Keys.HEALTH).orElse(maxHealth);
@@ -95,7 +93,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                     return BehaviorResult.PASS;
                 }
             }
-            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.tryGet(Parameters.INTERACTION_HAND)));
+            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.requireContext(ContextKeys.INTERACTION_HAND)));
             return BehaviorResult.SUCCESS;
         }
         return BehaviorResult.PASS;
@@ -103,13 +101,12 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
 
     @Override
     public BehaviorResult tryUse(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
+        final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
             final Player player = optPlayer.get();
-            final ItemStack itemStack = context.tryGet(Parameters.USED_ITEM_STACK);
+            final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
 
             final FoodRestorationProperty foodRestorationProperty = itemStack.getProperty(FoodRestorationProperty.class).orElse(null);
-            //noinspection ConstantConditions
             if (foodRestorationProperty != null && foodRestorationProperty.getValue() != 0.0) {
                 final Optional<Integer> maxFood = player.get(LanternKeys.MAX_FOOD_LEVEL);
                 final Optional<Integer> optFoodLevel = player.get(Keys.FOOD_LEVEL);
@@ -119,7 +116,6 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                 }
             }
             final HealthRestorationProperty healthRestorationProperty = itemStack.getProperty(HealthRestorationProperty.class).orElse(null);
-            //noinspection ConstantConditions
             if (healthRestorationProperty != null && healthRestorationProperty.getValue() != 0.0) {
                 final Optional<Double> maxHealth = player.get(Keys.MAX_HEALTH);
                 final Optional<Double> optHealth = player.get(Keys.HEALTH);
@@ -128,7 +124,6 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                 }
             }
             final SaturationProperty saturationProperty = itemStack.getProperty(SaturationProperty.class).orElse(null);
-            //noinspection ConstantConditions
             if (saturationProperty != null && saturationProperty.getValue() != 0.0) {
                 final Optional<Double> maxSaturation = player.get(LanternKeys.MAX_SATURATION);
                 final Optional<Double> optSaturation = player.get(Keys.SATURATION);
@@ -138,7 +133,6 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                 }
             }
             final ApplicableEffectProperty applicableEffectProperty = itemStack.getProperty(ApplicableEffectProperty.class).orElse(null);
-            //noinspection ConstantConditions
             if (applicableEffectProperty != null && !applicableEffectProperty.getValue().isEmpty()) {
                 final List<PotionEffect> potionEffects = player.get(Keys.POTION_EFFECTS).orElse(Collections.emptyList());
                 player.offer(Keys.POTION_EFFECTS, PotionEffectHelper.merge(potionEffects, applicableEffectProperty.getValue()));
@@ -148,7 +142,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
             }
 
             if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                final Slot slot = context.tryGet(Parameters.USED_SLOT);
+                final Slot slot = context.requireContext(ContextKeys.USED_SLOT);
                 slot.poll(1);
                 if (this.restItemSupplier != null) {
                     if (slot.peek().isPresent()) {

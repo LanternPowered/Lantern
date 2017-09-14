@@ -23,48 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior;
+package org.lanternpowered.server.event;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+import org.spongepowered.api.event.cause.EventContextKey;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-import com.google.common.reflect.TypeToken;
+public final class LanternEventContextKeys {
 
-import java.util.concurrent.atomic.AtomicInteger;
+    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
 
-public final class Parameter<T> {
+    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
 
-    public static <T> Parameter<T> of(Class<T> type, String name) {
-        return of(TypeToken.of(type), name);
+    @SuppressWarnings("unchecked")
+    private static <T> EventContextKey<T> createFor(String id) {
+        return DummyObjectProvider.createFor(EventContextKey.class, id);
     }
 
-    public static <T> Parameter<T> of(TypeToken<T> type, String name) {
-        checkNotNull(type, "type");
-        checkNotNullOrEmpty(name, "name");
-        return new Parameter<>(type, name, counter.getAndIncrement());
-    }
-
-    private static final AtomicInteger counter = new AtomicInteger();
-
-    private final TypeToken<T> type;
-    private final String name;
-    private final int index;
-
-    private Parameter(TypeToken<T> type, String name, int index) {
-        this.name = name;
-        this.index = index;
-        this.type = type;
-    }
-
-    int getIndex() {
-        return this.index;
-    }
-
-    public TypeToken<T> getType() {
-        return this.type;
-    }
-
-    public String getName() {
-        return this.name;
+    private LanternEventContextKeys() {
     }
 }

@@ -65,7 +65,7 @@ public interface AbstractEquipable extends Equipable {
         if (inventory instanceof EmptyInventory) {
             return Optional.empty();
         }
-        return inventory.<SimpleEquipmentInventory>first().peek(type);
+        return inventory.peek();
     }
 
     @Override

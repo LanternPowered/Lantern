@@ -28,10 +28,12 @@ package org.lanternpowered.server.block.behavior.simple;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.LanternEventContextKey;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
@@ -41,25 +43,23 @@ import java.util.Optional;
 
 /**
  * Extracts the {@link BlockSnapshot} from the {@link ItemStack} with the key
- * {@link Parameters#USED_ITEM_STACK} and puts it into the context.
+ * {@link ContextKeys#USED_ITEM_STACK} and puts it into the context.
  * If the used item stack isn't present, then will snapshot be based of the default
  * block state.
  * Note: The snapshot will <strong>not</strong> contain a <strong>location</strong>.
  */
+@SuppressWarnings("unchecked")
 public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
-
-    public static final String BLOCK_SNAPSHOT = "TheBlockSnapshot";
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final BlockSnapshot.Builder builder = BlockSnapshotBuilder.createPositionless();
-        final Optional<ItemStack> optItem = context.get(Parameters.USED_ITEM_STACK);
+        final Optional<ItemStack> optItem = context.getContext(ContextKeys.USED_ITEM_STACK);
         if (optItem.isPresent()) {
             builder.blockState(optItem.get().getType().getBlock().get().getDefaultState());
-            //noinspection unchecked
             optItem.get().getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
         } else {
-            final Optional<BlockState> optState = context.get(Parameters.USED_BLOCK_STATE);
+            final Optional<BlockState> optState = context.getContext(ContextKeys.USED_BLOCK_STATE);
             if (optState.isPresent()) {
                 builder.blockState(optState.get());
             } else {
@@ -67,7 +67,7 @@ public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
             }
         }
         context.populateBlockSnapshot(builder, BehaviorContext.PopulationFlags.CREATOR | BehaviorContext.PopulationFlags.NOTIFIER);
-        context.insertCause(BLOCK_SNAPSHOT, builder.build());
+        context.addContext(ContextKeys.BLOCK_SNAPSHOT, builder.build());
         return BehaviorResult.CONTINUE;
     }
 }

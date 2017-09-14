@@ -37,9 +37,6 @@ public class Collections3 {
     }
 
     public static String toString(Iterable<?> iterable) {
-        if (iterable instanceof Collection) {
-            return toString((Collection<?>) iterable);
-        }
         return Arrays.toString(Iterables.toArray(iterable, Object.class));
     }
 }

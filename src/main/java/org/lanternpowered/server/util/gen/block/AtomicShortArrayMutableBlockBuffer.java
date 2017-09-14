@@ -27,10 +27,9 @@ package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.util.concurrent.AtomicShortArray;
+import org.lanternpowered.server.util.collect.array.concurrent.AtomicShortArray;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
@@ -51,7 +50,7 @@ public class AtomicShortArrayMutableBlockBuffer extends AbstractMutableBlockBuff
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+    public boolean setBlock(int x, int y, int z, BlockState block) {
         checkRange(x, y, z);
         this.blocks.set(index(x, y, z), BlockRegistryModule.get().getStateInternalIdAndData(block));
         return true;

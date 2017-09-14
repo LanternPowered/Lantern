@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
@@ -39,7 +39,6 @@ import org.spongepowered.api.data.property.item.RecordProperty;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
@@ -52,7 +51,7 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.tryGet(Parameters.INTERACTION_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTile = location.getTileEntity();
         if (optTile.isPresent()) {
             final TileEntity tile = optTile.get();
@@ -62,13 +61,11 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
                 boolean success = false;
                 if (optEjectedItem.isPresent()) {
                     final Entity entity = optEjectedItem.get();
-                    final Cause.Builder cause = context.get(Parameters.PLAYER)
-                            .map(Cause::source).orElseGet(Cause::builder);
-                    entity.getWorld().spawnEntity(entity, cause.owner(tile).build());
+                    entity.getWorld().spawnEntity(optEjectedItem.get());
                     // TODO: Include the entity in the behavior context
                     success = true;
                 }
-                final Optional<ItemStack> optItemStack = context.get(Parameters.USED_ITEM_STACK);
+                final Optional<ItemStack> optItemStack = context.getContext(ContextKeys.USED_ITEM_STACK);
                 if (optItemStack.isPresent()) {
                     final ItemStack itemStack = optItemStack.get();
                     final RecordProperty property = itemStack.getProperty(RecordProperty.class).orElse(null);
@@ -77,9 +74,9 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
                         final ItemStackSnapshot oldSnapshot = itemStack.createSnapshot();
                         itemStack.setQuantity(itemStack.getQuantity() - 1);
                         final ItemStackSnapshot newSnapshot = itemStack.createSnapshot();
-                        context.get(Parameters.PLAYER).ifPresent(player -> {
+                        context.getContext(ContextKeys.PLAYER).ifPresent(player -> {
                             if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                                context.get(Parameters.USED_SLOT).ifPresent(slot -> context.addSlotChange(
+                                context.getContext(ContextKeys.USED_SLOT).ifPresent(slot -> context.addSlotChange(
                                         new SlotTransaction(slot, oldSnapshot, newSnapshot)));
                             }
                         });

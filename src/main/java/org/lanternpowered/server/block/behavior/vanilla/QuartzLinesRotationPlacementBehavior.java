@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.spongepowered.api.block.BlockState;
@@ -42,7 +42,7 @@ public class QuartzLinesRotationPlacementBehavior implements PlaceBlockBehavior 
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Direction face = context.tryGet(Parameters.INTERACTION_FACE);
+        final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
         final Axis axis = Axis.getClosest(face.asOffset());
         final QuartzType newQuartzType = axis == Axis.X ? QuartzTypes.LINES_X : axis == Axis.Y ? QuartzTypes.LINES_Y : QuartzTypes.LINES_Z;
         context.transformBlockChanges((original, builder) -> {

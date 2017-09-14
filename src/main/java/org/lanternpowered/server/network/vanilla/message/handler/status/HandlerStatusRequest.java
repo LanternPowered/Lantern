@@ -35,6 +35,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.WrappedRemoteConnection;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
@@ -47,6 +48,7 @@ import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
@@ -80,7 +82,8 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         final LanternStatusResponse response = new LanternStatusResponse(Lantern.getGame().getPlatform().getMinecraftVersion(),
                 server.getFavicon(), description, players);
 
-        final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
+        final Cause cause = Cause.of(EventContext.empty(), new WrappedRemoteConnection(session));
+        final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(cause, client, response);
         Sponge.getEventManager().post(event);
 
         // Cancelled, we are done here

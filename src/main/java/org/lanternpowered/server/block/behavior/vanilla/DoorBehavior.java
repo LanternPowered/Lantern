@@ -31,10 +31,9 @@ import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
-import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -54,14 +53,15 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
+@SuppressWarnings("ConstantConditions")
 public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
     private static final Quaterniond LEFT_ANGLE = Quaternions.fromAxesAnglesDeg(new Vector3d(0, -90, 0));
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
-        final Direction face = context.tryGet(Parameters.INTERACTION_FACE);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
 
         // Door can only be placed by clicking in the floor
         if (face != Direction.DOWN) {
@@ -70,24 +70,22 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
         final Location<World> down = location.getBlockRelative(Direction.DOWN);
         final SolidCubeProperty solidProp = down.getProperty(SolidCubeProperty.class).get();
         // The door must be placed on a solid block
-        //noinspection ConstantConditions
         if (!solidProp.getValue()) {
             return BehaviorResult.PASS;
         }
         final Location<World> up = location.getBlockRelative(Direction.UP);
         final ReplaceableProperty replaceableProp = up.getProperty(ReplaceableProperty.class).get();
-        //noinspection ConstantConditions
         if (!replaceableProp.getValue()) {
             return BehaviorResult.PASS;
         }
-        final BlockSnapshot snapshot = context.getCause().get(BlockSnapshotProviderPlaceBehavior.BLOCK_SNAPSHOT, BlockSnapshot.class)
+        final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotRetrieveBehavior BlockSnapshot isn't present."));
         final BlockSnapshotBuilder builder = BlockSnapshotBuilder.create().from(snapshot);
         context.populateBlockSnapshot(builder, BehaviorContext.PopulationFlags.CREATOR_AND_NOTIFIER);
 
         Direction facing = Direction.NORTH;
         Vector3i left = Vector3i.UNIT_X;
-        final Optional<Entity> optSource = context.getCause().first(Entity.class);
+        final Optional<Entity> optSource = context.first(Entity.class);
         if (optSource.isPresent()) {
             final Entity source = optSource.get();
             final Vector3d rotVector;
@@ -114,7 +112,7 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
     @Override
     public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.get(Parameters.BLOCK_LOCATION).get();
+        final Location<World> location = context.getContext(ContextKeys.BLOCK_LOCATION).get();
 
         final BlockState baseState = location.getBlock();
         final LanternDoorHalf half = baseState.get(LanternKeys.DOOR_HALF).get();

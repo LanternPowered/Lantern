@@ -43,7 +43,7 @@ import java.util.OptionalInt;
 public class LanternFuelRegistryModule extends PluginCatalogRegistryModule<IFuel> implements IFuelRegistry {
 
     public LanternFuelRegistryModule() {
-        super(null);
+        super();
     }
 
     @Override

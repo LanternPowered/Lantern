@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
@@ -45,11 +44,9 @@ import java.util.function.BiFunction;
 public class LanternBlockVolumeWorker<V extends BlockVolume> implements BlockVolumeWorker<V> {
 
     protected final V volume;
-    protected final Cause cause;
 
-    public LanternBlockVolumeWorker(V volume, Cause cause) {
+    public LanternBlockVolumeWorker(V volume) {
         this.volume = checkNotNull(volume, "volume");
-        this.cause = checkNotNull(cause, "cause");
     }
 
     @Override
@@ -74,7 +71,7 @@ public class LanternBlockVolumeWorker<V extends BlockVolume> implements BlockVol
             for (int y = yMin; y <= yMax; y++) {
                 for (int x = xMin; x <= xMax; x++) {
                     final BlockState block = mapper.map(unmodifiableVolume, x, y, z);
-                    destination.setBlock(x + xOffset, y + yOffset, z + zOffset, block, this.cause);
+                    destination.setBlock(x + xOffset, y + yOffset, z + zOffset, block);
                 }
             }
         }
@@ -103,8 +100,7 @@ public class LanternBlockVolumeWorker<V extends BlockVolume> implements BlockVol
                 for (int x = xMin; x <= xMax; x++) {
                     final BlockState block = merger.merge(firstUnmodifiableVolume, x, y, z,
                             secondUnmodifiableVolume, x + xOffsetSecond, y + yOffsetSecond, z + zOffsetSecond);
-                    destination.setBlock(x + xOffsetDestination, y + yOffsetDestination,
-                            z + zOffsetDestination, block, this.cause);
+                    destination.setBlock(x + xOffsetDestination, y + yOffsetDestination, z + zOffsetDestination, block);
                 }
             }
         }

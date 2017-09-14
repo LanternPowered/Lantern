@@ -23,13 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.teleport;
+package org.lanternpowered.server.network;
 
-import org.spongepowered.api.event.cause.entity.teleport.common.AbstractTeleportCause;
+import org.spongepowered.api.network.PlayerConnection;
+import org.spongepowered.api.network.RemoteConnection;
 
-public class LanternTeleportCause extends AbstractTeleportCause {
+import java.net.InetSocketAddress;
 
-    protected LanternTeleportCause(LanternTeleportCauseBuilder builder) {
-        super(builder);
+/**
+ * A {@link RemoteConnection} that wraps around another {@link RemoteConnection}. Mainly
+ * used to hide the {@link PlayerConnection} when passing in a {@link NetworkSession}
+ * in status events.
+ */
+public final class WrappedRemoteConnection implements RemoteConnection {
+
+    private final RemoteConnection remoteConnection;
+
+    public WrappedRemoteConnection(RemoteConnection remoteConnection) {
+        this.remoteConnection = remoteConnection;
+    }
+
+    @Override
+    public InetSocketAddress getAddress() {
+        return this.remoteConnection.getAddress();
+    }
+
+    @Override
+    public InetSocketAddress getVirtualHost() {
+        return this.remoteConnection.getVirtualHost();
+    }
+
+    @Override
+    public String toString() {
+        return this.remoteConnection.toString();
     }
 }

@@ -29,7 +29,6 @@ import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
@@ -49,7 +48,7 @@ public class ShortArrayMutableBlockBuffer extends AbstractMutableBlockBuffer {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+    public boolean setBlock(int x, int y, int z, BlockState block) {
         checkRange(x, y, z);
         this.blocks[index(x, y, z)] = BlockRegistryModule.get().getStateInternalIdAndData(block);
         return true;

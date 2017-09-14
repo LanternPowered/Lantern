@@ -27,6 +27,7 @@ package org.lanternpowered.server.behavior;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,20 +38,22 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
-import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,93 +64,74 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
-
-@SuppressWarnings({"unchecked", "ConstantConditions"})
+@SuppressWarnings({"unchecked", "ConstantConditions", "SuspiciousMethodCalls"})
 public class BehaviorContextImpl implements BehaviorContext {
 
-    public static final class Snapshot implements BehaviorContext.Snapshot {
+    public final class Snapshot implements BehaviorContext.Snapshot {
 
         private final Int2ObjectMap<Object> parameterValues;
         private final Map<Location<World>, BlockSnapshot> blockSnapshots;
         private final Set<BlockSnapshot> positionlessBlockSnapshots;
         private final Set<SlotTransaction> slotTransactions;
         private final Set<EntitySnapshot> entitySnapshots;
-        private final Cause cause;
+        private final CauseStack.Frame causeStackFrame;
 
         Snapshot(Int2ObjectMap<Object> parameterValues, Map<Location<World>, BlockSnapshot> blockSnapshots,
                 Set<BlockSnapshot> positionlessBlockSnapshots, Set<SlotTransaction> slotTransactions,
-                Set<EntitySnapshot> entitySnapshots, Cause cause) {
+                Set<EntitySnapshot> entitySnapshots, CauseStack.Frame causeStackFrame) {
             this.parameterValues = parameterValues;
             this.blockSnapshots = blockSnapshots;
             this.positionlessBlockSnapshots = positionlessBlockSnapshots;
             this.slotTransactions = slotTransactions;
             this.entitySnapshots = entitySnapshots;
-            this.cause = cause;
+            this.causeStackFrame = causeStackFrame;
         }
     }
 
-    private Cause cause;
+    private final CauseStack causeStack;
+    private final Deque<Snapshot> snapshots = new ArrayDeque<>();
+
     private Int2ObjectMap<Object> parameterValues = new Int2ObjectOpenHashMap<>();
     private Map<Location<World>, BlockSnapshot> blockSnapshots = new HashMap<>();
     private Set<BlockSnapshot> positionlessBlockSnapshots = new HashSet<>();
     private Set<SlotTransaction> slotTransactions = new HashSet<>();
     private Set<EntitySnapshot> entitySnapshots = new HashSet<>();
 
-    public BehaviorContextImpl(Cause cause) {
-        this.cause = cause;
+    public BehaviorContextImpl(CauseStack causeStack) {
+        this.causeStack = causeStack;
     }
 
     @Override
-    public Snapshot createSnapshot() {
+    public Snapshot pushSnapshot() {
         return new Snapshot(new Int2ObjectOpenHashMap<>(this.parameterValues),
                 ImmutableMap.copyOf(this.blockSnapshots),
                 ImmutableSet.copyOf(this.positionlessBlockSnapshots),
                 ImmutableSet.copyOf(this.slotTransactions),
-                ImmutableSet.copyOf(this.entitySnapshots), this.cause);
+                ImmutableSet.copyOf(this.entitySnapshots),
+                this.causeStack.pushCauseFrame());
     }
 
     @Override
-    public void restoreSnapshot(BehaviorContext.Snapshot snapshot) {
+    public void popSnapshot(BehaviorContext.Snapshot snapshot) {
         checkNotNull(snapshot, "snapshot");
-        final Snapshot snapshot1 = (Snapshot) snapshot;
-        this.parameterValues = new Int2ObjectOpenHashMap<>(snapshot1.parameterValues);
-        this.blockSnapshots = new HashMap<>(snapshot1.blockSnapshots);
-        this.positionlessBlockSnapshots = new HashSet<>(snapshot1.positionlessBlockSnapshots);
-        this.slotTransactions = new HashSet<>(snapshot1.slotTransactions);
-        this.entitySnapshots = new HashSet<>(snapshot1.entitySnapshots);
-        this.cause = snapshot1.cause;
-    }
-
-    @Override
-    public <V> Optional<V> get(Parameter<V> parameter) {
-        checkNotNull(parameter, "parameter");
-        return Optional.ofNullable((V) this.parameterValues.get(parameter.getIndex()));
-    }
-
-    @Override
-    public <V> void set(Parameter<V> parameter, @Nullable V value) {
-        checkNotNull(parameter, "parameter");
-        if (value == null) {
-            this.parameterValues.remove(parameter.getIndex());
-        } else {
-            this.parameterValues.put(parameter.getIndex(), value);
+        checkState(this.snapshots.contains(snapshot), "snapshot isn't present in this context");
+        Snapshot snapshot1;
+        while ((snapshot1 = this.snapshots.poll()) != snapshot) {
+            snapshot1.causeStackFrame.close();
         }
+        snapshot1 = (Snapshot) snapshot;
+
+        this.parameterValues = snapshot1.parameterValues;
+        this.blockSnapshots = snapshot1.blockSnapshots;
+        this.positionlessBlockSnapshots = snapshot1.positionlessBlockSnapshots;
+        this.slotTransactions = snapshot1.slotTransactions;
+        this.entitySnapshots = snapshot1.entitySnapshots;
+        this.causeStack.popCauseFrame(snapshot1.causeStackFrame);
     }
 
     @Override
-    public Cause getCause() {
-        return this.cause;
-    }
-
-    @Override
-    public void insertCause(String name, Object cause) {
-        this.cause = Cause.builder().from(this.cause).named(name, cause).build();
-    }
-
-    @Override
-    public void insertCause(NamedCause cause) {
-        this.cause = Cause.builder().from(this.cause).named(cause).build();
+    public CauseStack getCauseStack() {
+        return this.causeStack;
     }
 
     @Override
@@ -260,19 +244,14 @@ public class BehaviorContextImpl implements BehaviorContext {
         boolean notifier = (populationFlags & PopulationFlags.NOTIFIER) != 0;
         if (creator || notifier) {
             if (notifier) {
-                final Optional<Object> optNotifierObj = this.cause.get(NamedCause.NOTIFIER, Object.class);
-                if (optNotifierObj.isPresent()) {
-                    final Object notifierObj = optNotifierObj.get();
-                    if (notifierObj instanceof UUID) {
-                        builder.notifier((UUID) notifierObj);
-                        notifier = false; // Make sure that the notifier isn't overridden
-                    } else if (notifierObj instanceof Identifiable) {
-                        builder.notifier(((Identifiable) notifierObj).getUniqueId());
-                        notifier = false; // Make sure that the notifier isn't overridden
-                    }
+                final Optional<User> optNotifier = this.causeStack.getContext(EventContextKeys.NOTIFIER);
+                if (optNotifier.isPresent()) {
+                    final User notifierObj = optNotifier.get();
+                    builder.notifier(notifierObj.getUniqueId());
+                    notifier = false; // Make sure that the notifier isn't overridden
                 }
             }
-            final Optional<Entity> optEntity = this.cause.first(Entity.class);
+            final Optional<Entity> optEntity = this.causeStack.first(Entity.class);
             if (optEntity.isPresent()) {
                 final UUID uuid = optEntity.get().getUniqueId();
                 if (creator) {
@@ -291,20 +270,27 @@ public class BehaviorContextImpl implements BehaviorContext {
         BehaviorResult result = null;
         for (B behavior : pipeline.getBehaviors()) {
             if (snapshot == null) {
-                snapshot = createSnapshot();
+                snapshot = pushSnapshot();
             }
             result = function.process(this, behavior);
             if (result == BehaviorResult.SUCCESS) {
                 return result;
             } else if (result == BehaviorResult.PASS) {
-                restoreSnapshot(snapshot);
+                popSnapshot(snapshot);
             } else if (result == BehaviorResult.FAIL) {
                 return result;
             } else if (result == BehaviorResult.CONTINUE) {
-                snapshot = createSnapshot();
+                snapshot = pushSnapshot();
             }
         }
         return result == null ? BehaviorResult.FAIL : result;
+    }
+
+    public void revert() {
+        Snapshot snapshot1;
+        while ((snapshot1 = this.snapshots.poll()) != null) {
+            snapshot1.causeStackFrame.close();
+        }
     }
 
     public void accept() {
@@ -314,5 +300,6 @@ public class BehaviorContextImpl implements BehaviorContext {
         for (SlotTransaction slotTransaction : this.slotTransactions) {
             slotTransaction.getSlot().set(LanternItemStack.toNullable(slotTransaction.getFinal()));
         }
+        revert();
     }
 }

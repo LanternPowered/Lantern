@@ -52,7 +52,7 @@ public class UnmodifiableBlockViewDownsize extends AbstractBlockViewDownsize<Blo
     }
 
     @Override
-    public BlockVolumeWorker<? extends UnmodifiableBlockVolume> getBlockWorker(Cause cause) {
-        return new LanternBlockVolumeWorker<>(this, cause);
+    public BlockVolumeWorker<? extends UnmodifiableBlockVolume> getBlockWorker() {
+        return new LanternBlockVolumeWorker<>(this);
     }
 }

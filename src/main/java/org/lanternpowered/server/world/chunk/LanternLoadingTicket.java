@@ -32,6 +32,7 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.data.DataContainer;
@@ -94,8 +95,9 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
                 int size = this.queue.size();
 
                 if (numChunks < size) {
+                    final CauseStack causeStack = CauseStack.currentOrEmpty();
                     for (int i = 0; i < size - numChunks; i++) {
-                        this.chunkManager.unforce(this, this.queue.poll(), true);
+                        this.chunkManager.unforce(this, this.queue.poll(), causeStack);
                     }
                 }
             }
@@ -171,7 +173,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
             if (!this.queue.contains(chunk)) {
                 // Remove the oldest chunk if necessary
                 if (this.queue.size() >= this.numChunks) {
-                    this.chunkManager.unforce(this, this.queue.poll(), true);
+                    this.chunkManager.unforce(this, this.queue.poll(), CauseStack.currentOrEmpty());
                 }
                 this.queue.add(chunk);
                 this.chunkManager.force(this, chunk);
@@ -194,7 +196,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
                 return false;
             }
             if (this.queue.remove(chunk0)) {
-                this.chunkManager.unforce(this, chunk0, true);
+                this.chunkManager.unforce(this, chunk0, CauseStack.currentOrEmpty());
                 return true;
             }
         }
@@ -207,8 +209,9 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
             if (this.released) {
                 return;
             }
+            final CauseStack causeStack = CauseStack.currentOrEmpty();
             while (!this.queue.isEmpty()) {
-                this.chunkManager.unforce(this, this.queue.poll(), true);
+                this.chunkManager.unforce(this, this.queue.poll(), causeStack);
             }
         }
     }

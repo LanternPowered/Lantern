@@ -28,10 +28,11 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 
@@ -39,7 +40,8 @@ public class HorizontalRotationPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final LanternPlayer player = (LanternPlayer) context.get(Parameters.PLAYER).orElse(null);
+        final CauseStack causeStack = context.getCauseStack();
+        final LanternPlayer player = (LanternPlayer) causeStack.getContext(ContextKeys.PLAYER).orElse(null);
 
         // Get the direction the chest should face
         final Direction facing;

@@ -114,13 +114,22 @@ public class LanternScheduler implements Scheduler {
     /**
      * Calls the callable from the main thread.
      * 
-     * @param callable the callable
-     * @return the future result
+     * @param callable The callable
+     * @return The future result
      */
     public <V> Future<V> callSync(Callable<V> callable) {
         final ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
         createTaskBuilder().execute(future).submit(Lantern.getMinecraftPlugin());
         return future;
+    }
+
+    /**
+     * Calls the callable from the main thread.
+     *
+     * @param runnable The runnable
+     */
+    public void callSync(Runnable runnable) {
+        createTaskBuilder().execute(runnable).submit(Lantern.getMinecraftPlugin());
     }
 
     private SchedulerBase getDelegate(Task task) {

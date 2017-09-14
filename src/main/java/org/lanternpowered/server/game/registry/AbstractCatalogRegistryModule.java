@@ -50,29 +50,32 @@ public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
     @Nullable private Collection<T> values;
     Map<String, T> types = new HashMap<>();
     @Nullable Function<T, String> mappingProvider;
-    @Nullable private final Class<?> catalogClass;
+    private final Class<?>[] catalogClasses;
     @Nullable private final String patternValue;
     @Nullable private final Pattern pattern;
 
-    public AbstractCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
-        this(catalogClass, mappingProvider, null);
+    public AbstractCatalogRegistryModule(Class<?>... catalogClasses) {
+        this(null, catalogClasses, null);
     }
 
-    public AbstractCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
-        this(mappingProvider, checkNotNull(catalogClass, "catalogClass"), pattern);
+    public AbstractCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider) {
+        this(catalogClasses, mappingProvider, null);
     }
 
-    public AbstractCatalogRegistryModule(@Nullable Class<?> catalogClass) {
-        this(null, catalogClass, null);
+    public AbstractCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
+        this(mappingProvider, checkNotNull(catalogClasses, "catalogClasses"), pattern);
     }
 
-    public AbstractCatalogRegistryModule(@Nullable Class<?> catalogClass, @Nullable String pattern) {
-        this(null, catalogClass, pattern);
+    public AbstractCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable String pattern) {
+        this(null, catalogClasses, pattern);
     }
 
-    private AbstractCatalogRegistryModule(@Nullable Function<T, String> mappingProvider, @Nullable Class<?> catalogClass, @Nullable String pattern) {
+    private AbstractCatalogRegistryModule(@Nullable Function<T, String> mappingProvider, Class<?>[] catalogClasses, @Nullable String pattern) {
+        this.catalogClasses = checkNotNull(catalogClasses, "catalogClasses");
+        for (Class<?> catalogClass : catalogClasses) {
+            checkNotNull(catalogClass, "catalogClass is null in " + getClass().getName());
+        }
         this.mappingProvider = mappingProvider;
-        this.catalogClass = catalogClass;
         this.patternValue = pattern;
         this.pattern = pattern == null ? null : Pattern.compile(pattern);
     }
@@ -116,6 +119,14 @@ public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
 
     @Override
     public List<CatalogMappingData> getCatalogMappings() {
-        return this.catalogClass == null ? ImmutableList.of() : ImmutableList.of(new CatalogMappingData(this.catalogClass, provideCatalogMap()));
+        if (this.catalogClasses.length == 0) {
+            return ImmutableList.of();
+        }
+        final ImmutableList.Builder<CatalogMappingData> builder = ImmutableList.builder();
+        final Map<String, T> mappings = provideCatalogMap();
+        for (Class<?> catalogClass : this.catalogClasses) {
+            builder.add(new CatalogMappingData(catalogClass, mappings));
+        }
+        return builder.build();
     }
 }

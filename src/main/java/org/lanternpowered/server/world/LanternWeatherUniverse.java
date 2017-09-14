@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.script.context.ContextImpl;
 import org.lanternpowered.server.world.rules.RuleTypes;
@@ -38,7 +39,6 @@ import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.util.weighted.WeightedTable;
 import org.spongepowered.api.world.weather.Weather;
@@ -79,12 +79,12 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
     /**
      * Pulses the weather.
      */
-    void pulse() {
-        pulseWeather();
+    void pulse(CauseStack causeStack) {
+        pulseWeather(causeStack);
         pulseSky();
     }
 
-    private void pulseWeather() {
+    private void pulseWeather(CauseStack causeStack) {
         if (!this.world.getOrCreateRule(RuleTypes.DO_WEATHER_CYCLE).getValue()) {
             return;
         }
@@ -92,7 +92,7 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
         final long remaining = this.weatherData.getRemainingDuration() - 1;
         if (remaining <= 0) {
             final LanternWeather next = this.nextWeather();
-            if (this.setWeather(next, next.getRandomTicksDuration(), true)) {
+            if (setWeather(causeStack, next, next.getRandomTicksDuration(), true)) {
                 // If the event is cancelled, continue the current weather for
                 // a random amount of time, maybe more luck next time
                 final LanternWeather current = this.weatherData.getWeather();
@@ -147,8 +147,8 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
      *
      * @return The next weather type
      */
+    @SuppressWarnings("unchecked")
     private LanternWeather nextWeather() {
-        //noinspection unchecked
         final List<LanternWeather> weathers = new ArrayList(this.world.game.getRegistry().getAllOf(Weather.class));
         final LanternWeather current = this.weatherData.getWeather();
         weathers.remove(current);
@@ -178,21 +178,20 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
 
     @Override
     public void setWeather(Weather weather) {
-        this.setWeather(weather, ((LanternWeather) weather).getRandomTicksDuration());
+        setWeather(weather, ((LanternWeather) weather).getRandomTicksDuration());
     }
 
     @Override
     public void setWeather(Weather weather, long duration) {
-        this.setWeather(weather, duration, false);
+        setWeather(CauseStack.current(), weather, duration, false);
     }
 
-    private boolean setWeather(Weather weather, long duration, boolean doEvent) {
+    private boolean setWeather(CauseStack causeStack, Weather weather, long duration, boolean doEvent) {
         checkNotNull(weather, "weather");
-        final Cause cause = Cause.source(this.world).build();
         final LanternWeather current = this.weatherData.getWeather();
         if (doEvent) {
             final ChangeWorldWeatherEvent event = SpongeEventFactory.createChangeWorldWeatherEvent(
-                    cause, (int) duration, (int) duration, current, weather, weather, this.world);
+                    causeStack.getCurrentCause(), (int) duration, (int) duration, current, weather, weather, this.world);
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {
                 return true;

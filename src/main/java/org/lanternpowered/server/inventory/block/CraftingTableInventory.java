@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory.block;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.IInventory;
@@ -41,7 +42,6 @@ import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
@@ -76,8 +76,8 @@ public class CraftingTableInventory extends LanternCraftingInventory implements 
             if (parent instanceof CarriedInventory) {
                 ((CarriedInventory<Carrier>) parent).getCarrier().ifPresent(carrier -> {
                     if (carrier instanceof Locatable) {
-                        final Cause cause = Cause.source(this).named(NamedCause.owner(carrier)).build();
                         final Location<World> location = ((Locatable) carrier).getLocation();
+                        final Cause cause = CauseStack.current().getCurrentCause();
                         LanternEventHelper.fireDropItemEventDispense(cause, entities -> getCraftingGrid().slots().forEach(
                                 slot -> slot.poll().filter(stack -> !stack.isEmpty()).ifPresent(
                                         stack -> entities.add(LanternEventHelper.createDroppedItem(location, stack.createSnapshot())))));

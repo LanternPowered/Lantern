@@ -28,13 +28,11 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.command.element.GenericArguments2;
-import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.text.Text;
@@ -67,13 +65,7 @@ public final class CommandBan extends CommandProvider {
                                     .reason(reason == null ? null : Text.of(reason))
                                     .source(src)
                                     .build();
-                            // Try to ban the player with a custom cause builder
-                            // to append the command source, only possible for our BanService
-                            if (banService instanceof BanConfig) {
-                                ((BanConfig) banService).addBan(ban, () -> Cause.source(src).build());
-                            } else {
-                                banService.addBan(ban);
-                            }
+                            banService.addBan(ban);
                             Lantern.getServer().getPlayer(gameProfile.getUniqueId()).ifPresent(
                                     player -> player.kick(t("multiplayer.disconnect.banned")));
                             src.sendMessage(t("commands.ban.success", target));

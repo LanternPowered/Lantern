@@ -28,6 +28,9 @@ package org.lanternpowered.server.util.concurrent;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import org.junit.Test;
+import org.lanternpowered.server.util.collect.array.concurrent.AtomicByteArray;
+import org.lanternpowered.server.util.collect.array.concurrent.AtomicNibbleArray;
+import org.lanternpowered.server.util.collect.array.concurrent.AtomicShortArray;
 
 public class AtomicPerformanceTests {
 

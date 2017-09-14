@@ -47,6 +47,8 @@ import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.LanternCauseStack;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.game.version.MinecraftVersionCache;
 import org.lanternpowered.server.inject.Option;
@@ -72,8 +74,10 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
+import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -128,6 +132,7 @@ public class LanternGame implements Game {
     }
 
     @Inject private Logger logger;
+    @Inject private org.apache.logging.log4j.Logger log4jLogger;
 
     // The platform
     @Inject private LanternPlatform platform;
@@ -225,6 +230,9 @@ public class LanternGame implements Game {
     @Inject
     private LanternGame() {
         game = this;
+
+        // Set the CauseStack for the main thread, at startup
+        CauseStack.set(new LanternCauseStack());
     }
 
     public void initialize() throws IOException {
@@ -275,7 +283,10 @@ public class LanternGame implements Game {
         registerService(RconService.class, new EmptyRconService(this.globalConfig.getRconPassword()));
 
         // Create the cause to post events...
-        final Cause gameCause = Cause.source(this).build();
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this);
+        final Cause gameCause = causeStack.getCurrentCause();
+
         // Call the construction events
         postGameStateChange(SpongeEventFactory.createGameConstructionEvent(gameCause));
 
@@ -324,6 +335,9 @@ public class LanternGame implements Game {
 
         // Load-complete phase
         postGameStateChange(SpongeEventFactory.createGameLoadCompleteEvent(gameCause));
+
+        // Pop off the game instance
+        causeStack.popCause();
     }
 
     public <T extends GameStateEvent> void postGameStateChange(T event) {
@@ -410,7 +424,16 @@ public class LanternGame implements Game {
      * @return The logger
      */
     public Logger getLogger() {
-        return game.logger;
+        return this.logger;
+    }
+
+    /**
+     * Gets the logger of the game.
+     *
+     * @return The logger
+     */
+    public org.apache.logging.log4j.Logger getLog4jLogger() {
+        return this.log4jLogger;
     }
 
     @Override
@@ -531,5 +554,9 @@ public class LanternGame implements Game {
 
     public MinecraftVersionCache getMinecraftVersionCache() {
         return this.minecraftVersionCache;
+    }
+
+    public UserStorageService getUserStorageService() {
+        return this.userStorageService.get();
     }
 }

@@ -23,42 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.spawn;
+package org.lanternpowered.server.network;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
-import org.spongepowered.api.data.manipulator.immutable.ImmutableMobSpawnerData;
-import org.spongepowered.api.event.cause.entity.spawn.MobSpawnerSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.common.AbstractSpawnCauseBuilder;
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.network.RemoteConnection;
 
-public class LanternMobSpawnerSpawnCauseBuilder extends AbstractSpawnCauseBuilder<MobSpawnerSpawnCause, MobSpawnerSpawnCause.Builder>
-        implements MobSpawnerSpawnCause.Builder {
+import java.net.InetSocketAddress;
 
-    protected ImmutableMobSpawnerData mobSpawnerData;
+import javax.annotation.Nullable;
 
-    @Override
-    public MobSpawnerSpawnCause.Builder spawnerData(ImmutableMobSpawnerData spawnerData) {
-        this.mobSpawnerData = checkNotNull(spawnerData, "spawnerData");
-        return this;
+public final class SimpleRemoteConnection implements RemoteConnection {
+
+    private final InetSocketAddress address;
+    @Nullable private final InetSocketAddress virtualHostAddress;
+
+    public SimpleRemoteConnection(InetSocketAddress address, @Nullable InetSocketAddress virtualHostAddress) {
+        this.address = checkNotNull(address, "address");
+        this.virtualHostAddress = virtualHostAddress;
     }
 
     @Override
-    public MobSpawnerSpawnCause.Builder from(MobSpawnerSpawnCause value) {
-        this.mobSpawnerData = value.getMobSpawnerData();
-        return super.from(value);
+    public InetSocketAddress getAddress() {
+        return this.address;
     }
 
     @Override
-    public MobSpawnerSpawnCause.Builder reset() {
-        this.mobSpawnerData = null;
-        return super.reset();
+    public InetSocketAddress getVirtualHost() {
+        return this.virtualHostAddress == null ? this.address : this.virtualHostAddress;
     }
 
     @Override
-    public MobSpawnerSpawnCause build() {
-        checkState(this.spawnType != null, "The spawn type must be set");
-        checkState(this.mobSpawnerData != null, "The mob spawner data must be set");
-        return new LanternMobSpawnerSpawnCause(this);
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("address", this.address)
+                .add("virtualHost", this.virtualHostAddress)
+                .toString();
     }
 }

@@ -30,10 +30,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.service.ProviderRegistration;
@@ -91,8 +92,9 @@ public class LanternServiceManager implements ServiceManager {
         }
 
         final PluginContainer container = containerOptional.get();
+        final CauseStack causeStack = CauseStack.currentOrEmpty();
         final ProviderRegistration<?> oldProvider = this.providers.put(service, new Provider<>(container, service, provider));
-        this.eventManager.post(SpongeEventFactory.createChangeServiceProviderEvent(Cause.source(container).build(),
+        this.eventManager.post(SpongeEventFactory.createChangeServiceProviderEvent(causeStack.getCurrentCause(),
                 this.providers.get(service), Optional.ofNullable(oldProvider)));
     }
 

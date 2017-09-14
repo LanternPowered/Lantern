@@ -38,7 +38,7 @@ public final class DataManipulatorRegistryModule extends AdditionalPluginCatalog
     }
 
     private DataManipulatorRegistryModule() {
-        super(null);
+        super();
     }
 
     @Override

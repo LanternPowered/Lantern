@@ -28,9 +28,7 @@ package org.lanternpowered.server.world.extent;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
@@ -40,7 +38,6 @@ import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -81,15 +78,15 @@ public interface AbstractExtent extends Extent {
     }
 
     @Override
-    default MutableBlockVolumeWorker<? extends Extent> getBlockWorker(Cause cause) {
-        return new LanternMutableBlockVolumeWorker<>(this, cause);
+    default MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override
-    default boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
+    default boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
         final Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
         checkArgument(location != null, "location is not present in snapshot");
-        return restoreSnapshot(location.getBlockPosition(), snapshot, force, flag, cause);
+        return restoreSnapshot(location.getBlockPosition(), snapshot, force, flag);
     }
 
     @Override

@@ -28,12 +28,12 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.block.CraftingTableInventory;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
 
 import java.util.Optional;
@@ -42,10 +42,11 @@ public class CraftingTableInteractionBehavior implements InteractWithBlockBehavi
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
+        final CauseStack causeStack = context.getCauseStack();
+        final Optional<Player> optPlayer = causeStack.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
             final Optional<Container> optContainer = optPlayer.get().openInventory(
-                    new CraftingTableInventory(optPlayer.get().getInventory(), null), Cause.source(optPlayer.get()).build());
+                    new CraftingTableInventory(optPlayer.get().getInventory(), null));
             if (optContainer.isPresent()) {
                 return BehaviorResult.SUCCESS;
             }

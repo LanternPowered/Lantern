@@ -30,10 +30,11 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.key.Keys;
@@ -51,22 +52,23 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Location<World>> optLocation = context.get(Parameters.INTERACTION_LOCATION);
+        final CauseStack causeStack = context.getCauseStack();
+        final Optional<Location<World>> optLocation = causeStack.getContext(ContextKeys.INTERACTION_LOCATION);
         if (!optLocation.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
 
-        final Direction blockFace = context.get(Parameters.INTERACTION_FACE).get();
+        final Direction blockFace = causeStack.getContext(ContextKeys.INTERACTION_FACE).get();
         Location<World> location = optLocation.get();
         if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
             location = location.add(blockFace.getOpposite().asBlockOffset());
         }
-        context.set(Parameters.BLOCK_LOCATION, location);
+        causeStack.addContext(ContextKeys.BLOCK_LOCATION, location);
 
-        final LanternBlockType blockType = (LanternBlockType) context.get(Parameters.ITEM_TYPE).get().getBlock().get();
-        context.set(Parameters.BLOCK_TYPE, blockType);
+        final LanternBlockType blockType = (LanternBlockType) causeStack.getContext(ContextKeys.ITEM_TYPE).get().getBlock().get();
+        causeStack.addContext(ContextKeys.BLOCK_TYPE, blockType);
 
-        final BehaviorContext.Snapshot snapshot = context.createSnapshot();
+        final BehaviorContext.Snapshot snapshot = context.pushSnapshot();
 
         // Continue processing through the placement pipeline
         final boolean success = context.process(blockType.getPipeline().pipeline(PlaceBlockBehavior.class),
@@ -78,16 +80,15 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
                 final int buildHeight = location1.getExtent().getDimension().getBuildHeight();
                 // Check if the block is placed within the building limits
                 if (location1.getBlockY() >= buildHeight) {
-                    context.restoreSnapshot(snapshot);
-                    context.get(Parameters.PLAYER).ifPresent(player -> {
-                        player.sendMessage(ChatTypes.ACTION_BAR, t("build.tooHigh", buildHeight));
-                    });
+                    context.popSnapshot(snapshot);
+                    causeStack.getContext(ContextKeys.PLAYER).ifPresent(player ->
+                            player.sendMessage(ChatTypes.ACTION_BAR, t("build.tooHigh", buildHeight)));
                     return BehaviorResult.FAIL;
                 }
             }
-            context.get(Parameters.PLAYER).ifPresent(player -> {
+            causeStack.getContext(ContextKeys.PLAYER).ifPresent(player -> {
                 if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                    context.tryGet(Parameters.USED_SLOT).poll(1);
+                    causeStack.requireContext(ContextKeys.USED_SLOT).poll(1);
                 }
             });
             return BehaviorResult.SUCCESS;

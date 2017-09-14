@@ -31,6 +31,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 
 import java.util.Set;
 
@@ -40,7 +41,7 @@ public final class HandlerPlayInUnregisterChannels implements Handler<MessagePla
     public void handle(NetworkContext context, MessagePlayInOutUnregisterChannels message) {
         final Set<String> channels = message.getChannels();
         final Set<String> registeredChannels = context.getSession().getRegisteredChannels();
-        final Cause cause = Cause.source(context.getSession().getPlayer()).named("connection", context.getSession()).build();
+        final Cause cause = Cause.of(EventContext.empty(), context.getSession().getPlayer(), context.getSession());
 
         for (String channel : channels) {
             if (registeredChannels.remove(channel)) {

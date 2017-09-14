@@ -50,20 +50,20 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
 
     @Nullable private Map<String, T> typesByName = null;
 
-    public PluginCatalogRegistryModule(@Nullable Class<?> catalogClass) {
-        super(catalogClass);
+    public PluginCatalogRegistryModule(Class<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
-    public PluginCatalogRegistryModule(@Nullable Class<?> catalogClass, @Nullable String pattern) {
-        super(catalogClass, pattern);
+    public PluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable String pattern) {
+        super(catalogClasses, pattern);
     }
 
-    public PluginCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
-        super(catalogClass, mappingProvider);
+    public PluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider) {
+        super(catalogClasses, mappingProvider);
     }
 
-    public PluginCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
-        super(catalogClass, mappingProvider, pattern);
+    public PluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
+        super(catalogClasses, mappingProvider, pattern);
     }
 
     @Override

@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.client.AnvilClientContainer;
 import org.lanternpowered.server.inventory.client.BeaconClientContainer;
@@ -49,13 +50,12 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
+import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
@@ -113,99 +113,114 @@ public class PlayerContainerSession {
      *
      * @param container The container
      */
-    public boolean setOpenContainer(@Nullable LanternContainer container, Cause cause) {
-        return setRawOpenContainer(container, cause, true, false);
+    public boolean setOpenContainer(@Nullable LanternContainer container) {
+        return setRawOpenContainer(CauseStack.current(), container, true, false);
     }
 
-    public boolean setRawOpenContainer(@Nullable LanternContainer container, Cause cause) {
-        return setRawOpenContainer(container, cause, false, false);
+    /**
+     * Opens the players container when this is caused
+     * by a players client.
+     */
+    private void openPlayerContainer() {
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this.player);
+        setRawOpenContainer(causeStack, this.player.getInventoryContainer());
+        causeStack.popCause();
+    }
+
+    public boolean setRawOpenContainer(CauseStack causeStack, @Nullable LanternContainer container) {
+        return setRawOpenContainer(causeStack, container, false, false);
     }
 
     public void handleWindowClose(MessagePlayInOutCloseWindow message) {
         if (this.openContainer == null || message.getWindow() != getContainerId()) {
             return;
         }
-        final Cause cause = Cause.source(this.player).build();
-        setRawOpenContainer(null, cause, false, true);
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this.player);
+        setRawOpenContainer(causeStack, null, false, true);
+        causeStack.popCause();
     }
 
-    /**
-     * Sets the open container.
-     *
-     * @param container The container
-     */
-    private boolean setRawOpenContainer(@Nullable LanternContainer container, Cause cause, boolean sendClose, boolean client) {
-        if (this.openContainer != container) {
-            ItemStackSnapshot cursorItem = ItemStackSnapshot.NONE;
-            if (this.openContainer != null) {
-                final ItemStackSnapshot cursorItemSnapshot = this.openContainer.getCursorSlot().peek()
-                        .map(LanternItemStackSnapshot::wrap).orElse(LanternItemStackSnapshot.none());
-                final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
-                        cause, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
-                Sponge.getEventManager().post(event);
-                if (event.isCancelled()) {
-                    // Stop the client from closing the container, resend the open message
-                    if (client) {
-                        // This can't be done to the player inventory, player inventory uses index 0
-                        // The optional should always return something at this point, otherwise
-                        // something is broken
-                        final ClientContainer clientContainer = getClientContainer();
-                        if (clientContainer.getContainerId() != 0) {
-                            // Reinitialize the client container
-                            clientContainer.init();
+    private boolean setRawOpenContainer(CauseStack causeStack, @Nullable LanternContainer container, boolean sendClose, boolean client) {
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            if (this.openContainer != container) {
+                frame.addContext(EventContextKeys.PLAYER, this.player);
+                ItemStackSnapshot cursorItem = ItemStackSnapshot.NONE;
+                if (this.openContainer != null) {
+                    final ItemStackSnapshot cursorItemSnapshot = this.openContainer.getCursorSlot().peek()
+                            .map(LanternItemStackSnapshot::wrap).orElse(LanternItemStackSnapshot.none());
+                    final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
+                            frame.getCurrentCause(), new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
+                    Sponge.getEventManager().post(event);
+                    if (event.isCancelled()) {
+                        // Stop the client from closing the container, resend the open message
+                        if (client) {
+                            // This can't be done to the player inventory, player inventory uses index 0
+                            // The optional should always return something at this point, otherwise
+                            // something is broken
+                            final ClientContainer clientContainer = getClientContainer();
+                            if (clientContainer.getContainerId() != 0) {
+                                // Reinitialize the client container
+                                clientContainer.init();
+                                return false;
+                            }
+                        } else {
+                            // Just return
                             return false;
                         }
-                    } else {
-                        // Just return
-                        return false;
                     }
-                }
-                final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
-                if (transaction.isValid()) {
-                    if (transaction.getFinal().isEmpty()) {
-                        LanternEventHelper.fireDropItemEventDispense(cause, entities -> entities.add(
-                                LanternEventHelper.createDroppedItem(this.player.getLocation(), transaction.getOriginal())));
-                    } else {
-                        cursorItem = transaction.getFinal();
-                    }
-                }
-                // Close the inventory
-                this.openContainer.close();
-            } else {
-                sendClose = false;
-            }
-            if (container != null) {
-                final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, cursorItem);
-                final InteractInventoryEvent.Open event = SpongeEventFactory.createInteractInventoryEventOpen(
-                        cause, cursorTransaction, container);
-                Sponge.getEventManager().post(event);
-                if (event.isCancelled()) {
-                    if (cursorTransaction.isValid()) {
-                        final ItemStackSnapshot cursorItem1 = cursorTransaction.getFinal();
-                        if (!cursorItem1.isEmpty()) {
-                            LanternEventHelper.fireDropItemEventDispense(cause, entities -> entities.add(
-                                    LanternEventHelper.createDroppedItem(this.player.getLocation(), cursorItem1)));
+                    final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
+                    if (transaction.isValid()) {
+                        if (transaction.getFinal().isEmpty()) {
+                            frame.pushCause(event); // Add the event that caused the drop to the cause
+                            LanternEventHelper.fireDropItemEventDispense(frame.getCurrentCause(), entities -> entities.add(
+                                    LanternEventHelper.createDroppedItem(this.player.getLocation(), transaction.getOriginal())));
+                            frame.popCause();
+                        } else {
+                            cursorItem = transaction.getFinal();
                         }
                     }
-                    container.removeViewer(this.player, container);
-                    return false;
+                    // Close the inventory
+                    this.openContainer.close();
+                } else {
+                    sendClose = false;
                 }
-                if (cursorTransaction.isValid()) {
-                    final ItemStackSnapshot cursorItem1 = cursorTransaction.getFinal();
-                    container.getCursorSlot().setRawItemStack(cursorItem1.createStack());
+                if (container != null) {
+                    final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, cursorItem);
+                    final InteractInventoryEvent.Open event = SpongeEventFactory.createInteractInventoryEventOpen(
+                            frame.getCurrentCause(), cursorTransaction, container);
+                    Sponge.getEventManager().post(event);
+                    if (event.isCancelled()) {
+                        if (cursorTransaction.isValid()) {
+                            final ItemStackSnapshot cursorItem1 = cursorTransaction.getFinal();
+                            if (!cursorItem1.isEmpty()) {
+                                frame.pushCause(event); // Add the event that caused the drop to the cause
+                                LanternEventHelper.fireDropItemEventDispense(frame.getCurrentCause(),
+                                        entities -> entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), cursorItem1)));
+                                frame.popCause();
+                            }
+                        }
+                        container.removeViewer(this.player, container);
+                        return false;
+                    }
+                    if (cursorTransaction.isValid()) {
+                        final ItemStackSnapshot cursorItem1 = cursorTransaction.getFinal();
+                        container.getCursorSlot().setRawItemStack(cursorItem1.createStack());
+                    }
+                    sendClose = false;
+                    container.addViewer(this.player);
                 }
-                sendClose = false;
-                container.addViewer(this.player);
+                if (sendClose && getContainerId() != 0) {
+                    this.player.getConnection().send(new MessagePlayInOutCloseWindow(getContainerId()));
+                }
+                if (this.openContainer != null) {
+                    this.openContainer.removeViewer(this.player);
+                }
             }
-            if (sendClose && getContainerId() != 0) {
-                this.player.getConnection().send(new MessagePlayInOutCloseWindow(getContainerId()));
-            }
-            if (this.openContainer != null) {
-                this.openContainer.removeViewer(this.player);
-            }
+            this.openContainer = container;
+            return true;
         }
-        this.openContainer = container;
-        return true;
     }
 
     public void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
@@ -219,7 +234,7 @@ public class PlayerContainerSession {
         final int windowId = message.getWindowId();
         if (this.openContainer == null) {
             if (message.getWindowId() == 0) {
-                setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
+                openPlayerContainer();
             } else {
                 return;
             }
@@ -233,7 +248,7 @@ public class PlayerContainerSession {
 
     public void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
         if (this.openContainer == null) {
-            setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
+            openPlayerContainer();
         }
         final ClientContainer clientContainer = getClientContainer();
         clientContainer.handleCreativeClick(message.getSlot(), message.getItemStack());
@@ -244,32 +259,34 @@ public class PlayerContainerSession {
         final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
         if (itemStack.isPresent()) {
-            final Cause cause = Cause.builder()
-                    .named("SpawnCause", SpawnCause.builder().type(SpawnTypes.DROPPED_ITEM).build())
-                    .named(NamedCause.SOURCE, this.player)
-                    .named("Slot", slot)
-                    .build();
+            final CauseStack causeStack = CauseStack.current();
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.pushCause(this.player);
+                frame.pushCause(slot);
+                frame.addContext(EventContextKeys.PLAYER, this.player);
+                frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM);
 
-            final List<Entity> entities = new ArrayList<>();
-            entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.get().createSnapshot()));
+                final List<Entity> entities = new ArrayList<>();
+                entities.add(LanternEventHelper.createDroppedItem(this.player.getLocation(), itemStack.get().createSnapshot()));
 
-            final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
-            Sponge.getEventManager().post(event);
+                final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(causeStack.getCurrentCause(), entities);
+                Sponge.getEventManager().post(event);
 
-            if (!event.isCancelled()) {
-                if (message.isFullStack()) {
-                    slot.poll();
-                } else {
-                    slot.poll(1);
+                if (!event.isCancelled()) {
+                    if (message.isFullStack()) {
+                        slot.poll();
+                    } else {
+                        slot.poll(1);
+                    }
+                    LanternWorld.finishSpawnEntityEvent(event);
                 }
-                LanternEventHelper.finishSpawnEntityEvent(event);
             }
         }
     }
 
     public void handleDisplayedRecipe(MessagePlayInDisplayedRecipe message) {
         if (this.openContainer == null) {
-            setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
+            openPlayerContainer();
         }
     }
 
@@ -277,7 +294,7 @@ public class PlayerContainerSession {
         final int windowId = message.getWindowId();
         if (this.openContainer == null) {
             if (message.getWindowId() == 0) {
-                setRawOpenContainer(this.player.getInventoryContainer(), Cause.source(this.player).build());
+                openPlayerContainer();
             } else {
                 return;
             }

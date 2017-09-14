@@ -35,6 +35,7 @@ import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.SimpleRemoteConnection;
 import org.lanternpowered.server.network.status.LanternStatusClient;
 import org.lanternpowered.server.network.status.LanternStatusHelper;
 import org.lanternpowered.server.network.status.LanternStatusResponse;
@@ -43,6 +44,7 @@ import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -66,7 +68,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object object) throws Exception {
         final LanternServer server = this.session.getServer();
 
-        ByteBuf buf = (ByteBuf) object;
+        final ByteBuf buf = (ByteBuf) object;
         buf.markReaderIndex();
 
         // Whether it was a valid legacy message
@@ -165,64 +167,73 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                 }
             }
 
-            final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol, true);
-            if (clientVersion == LanternMinecraftVersion.UNKNOWN) {
-                Lantern.getLogger().debug("Client with unknown legacy protocol version {} pinged the server.", protocol);
-            }
-
             // The message was successfully decoded as a legacy one
             legacy = true;
 
-            final MinecraftVersion serverVersion = Lantern.getGame().getPlatform().getMinecraftVersion();
-            Text description = server.getMotd();
+            final boolean full1 = full;
+            final int protocol1 = protocol;
+            final InetSocketAddress virtualAddress1 = virtualAddress;
 
-            final InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
-            final LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress);
-            final ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
-            final LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
+            // Call the event in the main thread
+            Lantern.getScheduler().callSync(() -> {
+                final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol1, true);
+                if (clientVersion == LanternMinecraftVersion.UNKNOWN) {
+                    Lantern.getLogger().debug("Client with unknown legacy protocol version {} pinged the server.", protocol1);
+                }
 
-            final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
-            Sponge.getEventManager().post(event);
+                final MinecraftVersion serverVersion = Lantern.getGame().getPlatform().getMinecraftVersion();
+                Text description = server.getMotd();
 
-            // Cancelled, we are done here
-            if (event.isCancelled()) {
-                ctx.channel().close();
-                return;
-            }
+                final InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+                final LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress1);
+                final ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
+                final LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
 
-            description = response.getDescription();
-            int online = players.getOnline();
-            final int max = players.getMax();
+                final SimpleRemoteConnection connection = new SimpleRemoteConnection(address, virtualAddress1);
+                final Cause cause = Cause.of(EventContext.empty(), connection);
+                final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(cause, client, response);
+                Sponge.getEventManager().post(event);
 
-            // The players should be hidden, this will replace the player count
-            // with ???
-            if (!response.getPlayers().isPresent()) {
-                online = -1;
-            }
+                // Cancelled, we are done here
+                if (event.isCancelled()) {
+                    ctx.channel().close();
+                    return;
+                }
 
-            final String data;
+                description = response.getDescription();
+                int online = players.getOnline();
+                final int max = players.getMax();
 
-            if (full) {
-                final String description0 = getFirstLine(TextSerializers.LEGACY_FORMATTING_CODE.serialize(description));
-                // 1. This value is always 1.
-                // 2. The protocol version, just use a value out of range
-                //    of the available ones.
-                // 3. The version/name string of the server.
-                // 4. The motd of the server. In legacy format.
-                // 5. The online players
-                // 6. The maximum amount of players
-                data = String.format("\u00A7%s\u0000%s\u0000%s\u0000%s\u0000%s\u0000%s",
-                        1, 127, response.getVersion().getName(), description0, online, max);
-            } else {
-                final String description0 = getFirstLine(TextSerializers.PLAIN.serialize(description));
-                // 1. The motd of the server. In legacy format.
-                // 2. The online players
-                // 3. The maximum amount of players
-                data = String.format("%s\u00A7%s\u00A7%s",
-                        description0, online, max);
-            }
+                // The players should be hidden, this will replace the player count
+                // with ???
+                if (!response.getPlayers().isPresent()) {
+                    online = -1;
+                }
 
-            sendDisconnectMessage(ctx, data);
+                final String data;
+
+                if (full1) {
+                    final String description0 = getFirstLine(TextSerializers.LEGACY_FORMATTING_CODE.serialize(description));
+                    // 1. This value is always 1.
+                    // 2. The protocol version, just use a value out of range
+                    //    of the available ones.
+                    // 3. The version/name string of the server.
+                    // 4. The motd of the server. In legacy format.
+                    // 5. The online players
+                    // 6. The maximum amount of players
+                    data = String.format("\u00A7%s\u0000%s\u0000%s\u0000%s\u0000%s\u0000%s",
+                            1, 127, response.getVersion().getName(), description0, online, max);
+                } else {
+                    final String description0 = getFirstLine(TextSerializers.PLAIN.serialize(description));
+                    // 1. The motd of the server. In legacy format.
+                    // 2. The online players
+                    // 3. The maximum amount of players
+                    data = String.format("%s\u00A7%s\u00A7%s",
+                            description0, online, max);
+                }
+
+                sendDisconnectMessage(ctx, data);
+            });
         } catch (Exception ignore) {
         } finally {
             if (legacy) {

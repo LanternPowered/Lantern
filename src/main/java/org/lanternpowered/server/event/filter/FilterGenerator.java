@@ -52,7 +52,6 @@ import org.lanternpowered.server.event.filter.delegate.GetterFilterSourceDelegat
 import org.lanternpowered.server.event.filter.delegate.HasDataFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.IncludeSubtypeFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.LastCauseFilterSourceDelegate;
-import org.lanternpowered.server.event.filter.delegate.NamedCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.ParameterFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.ParameterFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.RootCauseFilterSourceDelegate;
@@ -71,7 +70,6 @@ import org.spongepowered.api.event.filter.cause.All;
 import org.spongepowered.api.event.filter.cause.Before;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Last;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.data.Has;
 import org.spongepowered.api.event.filter.data.Supports;
@@ -332,7 +330,6 @@ final class FilterGenerator {
         CAUSE_AFTER(After.class),
         CAUSE_ALL(All.class),
         CAUSE_ROOT(Root.class),
-        CAUSE_NAMED(Named.class),
         GETTER(Getter.class),
         ;
 
@@ -360,9 +357,6 @@ final class FilterGenerator {
             }
             if (this == CAUSE_ROOT) {
                 return new RootCauseFilterSourceDelegate((Root) anno);
-            }
-            if (this == CAUSE_NAMED) {
-                return new NamedCauseFilterSourceDelegate((Named) anno);
             }
             if (this == GETTER) {
                 return new GetterFilterSourceDelegate((Getter) anno);

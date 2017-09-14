@@ -31,7 +31,6 @@ import org.lanternpowered.server.world.extent.MutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBlockVolumeWrapper;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
@@ -44,8 +43,8 @@ public abstract class AbstractMutableBlockBuffer extends AbstractBlockBuffer imp
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
-        return new LanternMutableBlockVolumeWorker<>(this, cause);
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override
@@ -54,8 +53,8 @@ public abstract class AbstractMutableBlockBuffer extends AbstractBlockBuffer imp
     }
 
     @Override
-    public boolean setBlockType(int x, int y, int z, BlockType type, Cause cause) {
-        return setBlock(x, y, z, type.getDefaultState(), cause);
+    public boolean setBlockType(int x, int y, int z, BlockType type) {
+        return setBlock(x, y, z, type.getDefaultState());
     }
 
     @Override

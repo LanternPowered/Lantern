@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.event;
 
+import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -56,17 +57,7 @@ public final class LanternEventHelper {
         final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(cause, entities);
         Sponge.getEventManager().post(event);
         if (!event.isCancelled()) {
-            finishSpawnEntityEvent(event);
-        }
-    }
-
-    public static void finishSpawnEntityEvent(SpawnEntityEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-        final Cause cause = Cause.source(event).build();
-        for (Entity entity : event.getEntities()) {
-            entity.getWorld().spawnEntity(entity, cause);
+            LanternWorld.finishSpawnEntityEvent(event);
         }
     }
 }

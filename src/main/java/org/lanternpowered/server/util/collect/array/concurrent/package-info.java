@@ -23,13 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.teleport;
-
-import org.spongepowered.api.event.cause.entity.teleport.common.AbstractPortalTeleportCause;
-
-public class LanternPortalTeleportCause extends AbstractPortalTeleportCause {
-
-    protected LanternPortalTeleportCause(LanternPortalTeleportCauseBuilder builder) {
-        super(builder);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.util.collect.array.concurrent;

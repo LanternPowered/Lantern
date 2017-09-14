@@ -28,10 +28,11 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.block.tile.vanilla.LanternNote;
+import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.tileentity.Note;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.world.Location;
@@ -43,7 +44,8 @@ public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.tryGet(Parameters.INTERACTION_LOCATION);
+        final CauseStack causeStack = context.getCauseStack();
+        final Location<World> location = causeStack.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTile = location.getTileEntity();
         if (optTile.isPresent()) {
             final TileEntity tile = optTile.get();

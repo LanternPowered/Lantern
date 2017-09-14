@@ -41,9 +41,9 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+    public boolean setBlock(int x, int y, int z, BlockState block) {
         return this.volume.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-                this.inverseTransform.transformZ(x, y, z), block, cause);
+                this.inverseTransform.transformZ(x, y, z), block);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
-        return new LanternMutableBlockVolumeWorker<>(this, cause);
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override

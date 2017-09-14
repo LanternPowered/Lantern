@@ -23,20 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.teleport;
-
-import static com.google.common.base.Preconditions.checkState;
-
-import org.spongepowered.api.event.cause.entity.teleport.PortalTeleportCause;
-import org.spongepowered.api.event.cause.entity.teleport.common.AbstractPortalTeleportCauseBuilder;
-
-public class LanternPortalTeleportCauseBuilder extends AbstractPortalTeleportCauseBuilder<PortalTeleportCause, PortalTeleportCause.Builder>
-        implements PortalTeleportCause.Builder {
-
-    @Override
-    public PortalTeleportCause build() {
-        checkState(this.teleportType != null, "The teleport type must be set");
-        checkState(this.agent != null, "The agent must be set");
-        return new LanternPortalTeleportCause(this);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.util.collect.array;

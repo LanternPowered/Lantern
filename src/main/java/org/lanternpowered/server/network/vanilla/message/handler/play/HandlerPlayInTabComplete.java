@@ -37,6 +37,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.command.TabCompleteEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -102,9 +103,9 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                     .map(CommandSource::getName)
                     .filter(n -> n.toLowerCase().startsWith(part1))
                     .collect(Collectors.toList());
+            final Cause cause = Cause.of(EventContext.empty(), context.getSession().getPlayer());
             final TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(
-                    Cause.source(context.getSession().getPlayer()).build(),
-                    ImmutableList.copyOf(suggestions), suggestions, text, Optional.ofNullable(targetBlock), false);
+                    cause, ImmutableList.copyOf(suggestions), suggestions, text, Optional.ofNullable(targetBlock), false);
             if (!Sponge.getEventManager().post(event)) {
                 context.getSession().send(new MessagePlayOutTabComplete(suggestions));
             }

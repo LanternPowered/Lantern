@@ -32,12 +32,11 @@ import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.script.function.action.Action;
-import org.lanternpowered.server.util.FastThreadLocals;
+import org.lanternpowered.server.util.concurrent.FastThreadLocals;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.Chunk;
 
 import java.util.Random;
@@ -57,7 +56,6 @@ public class LightningSpawnerAction implements Action {
     @Override
     public void run(ScriptContext scriptContext) {
         final LanternWorld world = (LanternWorld) scriptContext.get(Parameters.WORLD).get();
-        final Cause cause = Cause.source(world.getWeather()).named("World", world).build();
 
         final Random random = RANDOM.get();
         final Iterable<Chunk> chunks = world.getLoadedChunks();
@@ -75,7 +73,7 @@ public class LightningSpawnerAction implements Action {
                 final int z = chunk1.getZ() << 4 | (value >> 4) & 0xf;
 
                 final Entity entity = world.createEntity(EntityTypes.LIGHTNING, new Vector3d(x, world.getHighestYAt(x, z), z));
-                world.spawnEntity(entity, cause);
+                world.spawnEntity(entity);
             }
         }
     }

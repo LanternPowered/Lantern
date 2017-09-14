@@ -41,13 +41,12 @@ public class ActionTypeRegistryModule extends AbstractObjectTypeRegistryModule<A
     }
 
     private ActionTypeRegistryModule() {
-        super(null);
     }
 
     @Override
     public void registerDefaults() {
-        this.register(new ActionTypeImpl("lantern", "multi", MultiAction.class));
-        this.register(new ActionTypeImpl("lantern", "conditional", ConditionalAction.class));
-        this.register(new ActionTypeImpl("lantern", "lightning_weather_spawner", LightningSpawnerAction.class));
+        register(new ActionTypeImpl("lantern", "multi", MultiAction.class));
+        register(new ActionTypeImpl("lantern", "conditional", ConditionalAction.class));
+        register(new ActionTypeImpl("lantern", "lightning_weather_spawner", LightningSpawnerAction.class));
     }
 }

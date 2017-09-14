@@ -63,7 +63,7 @@ public class PlayerInventoryContainer extends LanternContainer {
 
     @Override
     Collection<Player> getRawViewers() {
-        final Player player = this.playerInventory.getCarrier().orElse(null);
+        final Player player = getPlayerInventory().getCarrier().orElse(null);
         if (player != null) {
             final Set<Player> viewers = new HashSet<>(super.getRawViewers());
             viewers.add(player);

@@ -53,15 +53,6 @@ import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceB
 import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternFallingBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternIndirectEntityDamageSourceBuilder;
-import org.lanternpowered.server.cause.entity.spawn.LanternBlockSpawnCauseBuilder;
-import org.lanternpowered.server.cause.entity.spawn.LanternBreedingSpawnCauseBuilder;
-import org.lanternpowered.server.cause.entity.spawn.LanternEntitySpawnCauseBuilder;
-import org.lanternpowered.server.cause.entity.spawn.LanternMobSpawnerSpawnCauseBuilder;
-import org.lanternpowered.server.cause.entity.spawn.LanternSpawnCauseBuilder;
-import org.lanternpowered.server.cause.entity.spawn.LanternWeatherSpawnCauseBuilder;
-import org.lanternpowered.server.cause.entity.teleport.LanternEntityTeleportCauseBuilder;
-import org.lanternpowered.server.cause.entity.teleport.LanternPortalTeleportCauseBuilder;
-import org.lanternpowered.server.cause.entity.teleport.LanternTeleportCauseBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
@@ -83,6 +74,7 @@ import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.event.LanternEventContextKeyBuilder;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.fluid.LanternFluidStackBuilder;
 import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder;
@@ -103,6 +95,7 @@ import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistry
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
@@ -322,6 +315,8 @@ import org.spongepowered.api.entity.ai.task.AbstractAITask;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
+import org.spongepowered.api.event.cause.EventContextKey;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
@@ -329,16 +324,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.dismount.DismountType;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.MobSpawnerSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
-import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCause;
-import org.spongepowered.api.event.cause.entity.teleport.EntityTeleportCause;
-import org.spongepowered.api.event.cause.entity.teleport.PortalTeleportCause;
-import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.extra.fluid.FluidStack;
 import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
@@ -481,15 +467,6 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(Scoreboard.Builder.class, LanternScoreboardBuilder::new)
                 .registerBuilderSupplier(Team.Builder.class, LanternTeamBuilder::new)
                 .registerBuilderSupplier(ServerBossBar.Builder.class, LanternBossBarBuilder::new)
-                .registerBuilderSupplier(BlockSpawnCause.Builder.class, LanternBlockSpawnCauseBuilder::new)
-                .registerBuilderSupplier(BreedingSpawnCause.Builder.class, LanternBreedingSpawnCauseBuilder::new)
-                .registerBuilderSupplier(EntitySpawnCause.Builder.class, LanternEntitySpawnCauseBuilder::new)
-                .registerBuilderSupplier(MobSpawnerSpawnCause.Builder.class, LanternMobSpawnerSpawnCauseBuilder::new)
-                .registerBuilderSupplier(SpawnCause.Builder.class, LanternSpawnCauseBuilder::new)
-                .registerBuilderSupplier(WeatherSpawnCause.Builder.class, LanternWeatherSpawnCauseBuilder::new)
-                .registerBuilderSupplier(EntityTeleportCause.Builder.class, LanternEntityTeleportCauseBuilder::new)
-                .registerBuilderSupplier(PortalTeleportCause.Builder.class, LanternPortalTeleportCauseBuilder::new)
-                .registerBuilderSupplier(TeleportCause.Builder.class, LanternTeleportCauseBuilder::new)
                 .registerBuilderSupplier(BlockDamageSource.Builder.class, LanternBlockDamageSourceBuilder::new)
                 .registerBuilderSupplier(DamageSource.Builder.class, LanternDamageSourceBuilder::new)
                 .registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
@@ -510,6 +487,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(FluidStack.Builder.class, LanternFluidStackBuilder::new)
                 .registerBuilderSupplier(FluidStackSnapshot.Builder.class, LanternFluidStackSnapshotBuilder::new)
                 .registerBuilderSupplier(ItemStack.Builder.class, LanternItemStackBuilder::new)
+                .registerBuilderSupplier(EventContextKey.Builder.class, LanternEventContextKeyBuilder::new)
                 // Recipes
                 .registerBuilderSupplier(ShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
                 .registerBuilderSupplier(IShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
@@ -644,6 +622,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
+                .registerModule(EventContextKey.class, new EventContextKeysModule())
                 // Recipes
                 .registerModule(CraftingRecipe.class, this.craftingRecipeRegistry.getRegistryModule())
                 .registerModule(ISmeltingRecipe.class, this.smeltingRecipeRegistry.getRegistryModule())

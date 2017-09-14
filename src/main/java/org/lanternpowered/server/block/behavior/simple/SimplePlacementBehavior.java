@@ -28,19 +28,21 @@ package org.lanternpowered.server.block.behavior.simple;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
+import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.BlockSnapshot;
 
 public class SimplePlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final BlockSnapshot snapshot = context.getCause().get(BlockSnapshotProviderPlaceBehavior.BLOCK_SNAPSHOT, BlockSnapshot.class)
+        final CauseStack causeStack = context.getCauseStack();
+        final BlockSnapshot snapshot = causeStack.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotProviderPlaceBehavior's BlockSnapshot isn't present."));
-        context.addBlockChange(BlockSnapshotBuilder.create().from(snapshot).location(context.tryGet(Parameters.BLOCK_LOCATION)).build());
+        context.addBlockChange(BlockSnapshotBuilder.create().from(snapshot).location(causeStack.requireContext(ContextKeys.BLOCK_LOCATION)).build());
         return BehaviorResult.CONTINUE;
     }
 }

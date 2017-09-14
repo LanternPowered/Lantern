@@ -56,6 +56,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 
 import java.nio.charset.StandardCharsets;
@@ -107,7 +108,8 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         final Channel channel = ctx.channel();
         final RconSource source = this.server.newSource(channel);
 
-        final RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(Cause.source(source).build(), source);
+        final Cause cause = Cause.of(EventContext.empty(), source.getConnection());
+        final RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(cause, source);
         Sponge.getEventManager().post(event);
         if (event.isCancelled()) {
             ctx.channel().close();
@@ -129,7 +131,8 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (source == null) {
             return;
         }
-        final RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(Cause.source(source).build(), source);
+        final Cause cause = Cause.of(EventContext.empty(), source.getConnection());
+        final RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(cause, source);
         Sponge.getEventManager().post(event);
 
         this.server.onChannelInactive(source);
@@ -138,7 +141,8 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {
         final RconSource source = ctx.channel().attr(SOURCE).get();
         if (password.equals(payload)) {
-            final RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(Cause.source(source).build(), source);
+            final Cause cause = Cause.of(EventContext.empty(), source.getConnection());
+            final RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(cause, source);
 
             if (!Sponge.getEventManager().post(event)) {
                 source.setLoggedIn(true);

@@ -23,26 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.concurrent;
+package org.lanternpowered.server.util.collect.array.concurrent;
 
 import static org.lanternpowered.server.util.Conditions.checkArrayRange;
+
+import org.lanternpowered.server.util.collect.array.NibbleArray;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
-public class AtomicByteArray implements Serializable {
+public class AtomicNibbleArray implements Serializable {
 
-    private static final long serialVersionUID = 3434275139515033068L;
+    private static final long serialVersionUID = -8011969936196392062L;
 
-    // The amount of bytes packed in one integer
-    private static final int PACKED_VALUES = Integer.SIZE / Byte.SIZE;
+    // The amount of bits in a nibble
+    private static final int NIBBLE_SIZE = 4;
+
+    // The amount of nibbles packed in one integer
+    private static final int PACKED_VALUES = Integer.SIZE / NIBBLE_SIZE;
 
     private static final int VALUE_BITS = Integer.SIZE / PACKED_VALUES;
     private static final int VALUE_MASK = (1 << VALUE_BITS) - 1;
 
     private static final int INDEX_MASK = PACKED_VALUES - 1;
     private static final int INDEX_BITS = PACKED_VALUES >> 1;
+
+    private static final int DOUBLE_VALUE_BITS = VALUE_BITS * 2;
+    private static final int DOUBLE_VALUE_MASK = (1 << DOUBLE_VALUE_BITS) - 1;
+
+    private static final int HALF_PACKED_VALUES = PACKED_VALUES / 2;
+    private static final int HALF_INDEX_BITS = HALF_PACKED_VALUES >> 1;
+
+    private static final int QUARTER_PACKED_VALUES = PACKED_VALUES / 4;
 
     private static int key(int combined, int index, byte value) {
         index *= VALUE_BITS;
@@ -64,51 +77,64 @@ public class AtomicByteArray implements Serializable {
     private final AtomicIntegerArray backingArray;
 
     /**
-     * Creates a new {@link AtomicByteArray} of the given length, with all
+     * Creates a new {@link AtomicNibbleArray} of the given length, with all
      * elements initially zero.
      *
      * @param length the length of the array
      */
-    public AtomicByteArray(int length) {
+    public AtomicNibbleArray(int length) {
         this.length = length;
-        this.backingArraySize = (int) Math.ceil((double) length / (double) PACKED_VALUES);
+        this.backingArraySize = (int) Math.ceil(((double) length) / PACKED_VALUES);
         this.backingArray = new AtomicIntegerArray(this.backingArraySize);
     }
 
     /**
-     * Creates a new {@link AtomicByteArray} of the given content.
+     * Creates a new {@link AtomicNibbleArray} of the contents from the
+     * {@link NibbleArray}.
      *
-     * @param content the content
+     * @param length the length of the array
      */
-    public AtomicByteArray(byte[] content) {
-        this(content.length, content);
+    public AtomicNibbleArray(NibbleArray nibbleArray) {
+        this(nibbleArray.length(), nibbleArray.getPackedArray(), true);
     }
 
     /**
-     * Creates a new {@link AtomicByteArray} of the given length, with all
+     * Creates a new {@link AtomicNibbleArray} of the given length, with all
      * elements copied from the initial content array. The lengths don't have
      * to match, if it's shorter then the remaining content be set to zero,
      * and if it's longer then will the rest of the content be ignored.
+     * 
+     * When {@code packed} is true, then each byte will contain two nibbles
+     * and if false just one. (Stored in the 4 least significant bits.)
      *
      * @param length the length of the array
      * @param initialContent the initial content
+     * @param packed whether the initial content is packed
      */
-    public AtomicByteArray(int length, byte[] initialContent) {
+    public AtomicNibbleArray(int length, byte[] initialContent, boolean packed) {
         this.length = length;
-        this.backingArraySize = (int) Math.ceil((double) length / (double) PACKED_VALUES);
+        this.backingArraySize = (int) Math.ceil(((double) length) / PACKED_VALUES);
 
         int[] array = new int[this.backingArraySize];
         for (int i = 0; i < this.backingArraySize; i++) {
-            int j = i << INDEX_BITS;
+            int j = i << (packed ? HALF_INDEX_BITS : INDEX_BITS);
             int value = 0;
             boolean flag = false;
-            for (int k = 0; k < PACKED_VALUES; k++) {
+            for (int k = 0; k < (packed ? HALF_PACKED_VALUES : PACKED_VALUES); k++) {
                 int l = j + k;
-                if (l >= initialContent.length || l >= length) {
+                int m = packed ? k << 1 : l;
+                if (l >= initialContent.length || m >= length) {
                     flag = true;
                     break;
                 }
-                value = key(value, k, initialContent[l]);
+                value = key(value, m, initialContent[l]);
+                if (packed) {
+                    if (++m >= length) {
+                        flag = true;
+                        break;
+                    }
+                    value = key(value, m, (byte) (initialContent[l] >> 4));
+                }
             }
             array[i] = value;
             if (flag) {
@@ -124,7 +150,7 @@ public class AtomicByteArray implements Serializable {
     }
 
     /**
-     * Gets the length of the array
+     * Gets the length of the array.
      *
      * @return the length
      */
@@ -133,7 +159,7 @@ public class AtomicByteArray implements Serializable {
     }
 
     /**
-     * Gets an element from the array at a given index
+     * Gets an element from the array at a given index.
      *
      * @param index the index
      * @return the element
@@ -334,6 +360,58 @@ public class AtomicByteArray implements Serializable {
     public final byte[] getArray() {
         return this.getArray(null);
     }
+
+    /**
+     * Gets an array containing all the values in the array but packed with in each
+     * byte two nibbles. If the array length isn't even, the length will be rounded
+     * up and the last value will only contain one value. This means that it is
+     * possible that the length and the array length may be different.
+     * 
+     * The returned values are not guaranteed to be from the same time instant.
+     *
+     * If an array is provided and it is the correct length, then
+     * that array will be used as the destination array.
+     *
+     * @param array the provided array
+     * @return an array containing the values in the array
+     */
+    public final byte[] getPackedArray(byte[] array) {
+        int length = (int) Math.ceil((double) this.length / (double) QUARTER_PACKED_VALUES); 
+        if (array == null || array.length != length) {
+            array = new byte[length];
+        }
+        for (int i = 0; i < this.backingArraySize; i++) {
+            boolean flag = false;
+            int packed = this.getPacked(i);
+            int index = i << HALF_INDEX_BITS;
+            for (int j = 0; j < HALF_PACKED_VALUES; j++) {
+                int k = index + j;
+                if (k >= length) {
+                    flag = true;
+                    break;
+                }
+                array[k] = (byte) ((packed >> (DOUBLE_VALUE_BITS * j)) & DOUBLE_VALUE_MASK);
+            }
+            if (flag) {
+                break;
+            }
+        }
+        return array;
+    }
+
+    /**
+    * Gets an array containing all the values in the array but packed with in each
+    * byte two nibbles. If the array length isn't even, the length will be rounded
+    * up and the last value will only contain one value. This means that it is
+    * possible that the length and the array length may be different.
+    * 
+    * The returned values are not guaranteed to be from the same time instant.
+    *
+    * @return an array containing the values in the array
+    */
+   public final byte[] getPackedArray() {
+       return this.getPackedArray(null);
+   }
 
     /**
      * Returns a string representation of the array.

@@ -28,7 +28,6 @@ package org.lanternpowered.server.config.user.ban;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -39,6 +38,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.user.UserStorage;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.CloseableService;
@@ -63,10 +63,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 @Singleton
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "SuspiciousMethodCalls"})
 public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService, CloseableService {
 
     private static final String FILE_NAME = "bans.json";
@@ -210,26 +209,18 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
         return ban.isPresent() && removeBan(ban.get());
     }
 
-    /**
-     * Removes the specified {@link Ban} and calls the proper event
-     * if needed with the specified {@link Cause}.
-     *
-     * @param ban The ban
-     * @param causeSupplier The cause supplier
-     * @return Whether a ban was removed
-     */
-    public boolean removeBan(Ban ban, Supplier<Cause> causeSupplier) {
+    @Override
+    public boolean removeBan(Ban ban) {
         checkNotNull(ban, "ban");
-        checkNotNull(causeSupplier, "causeSupplier");
-        //noinspection SuspiciousMethodCalls
         if (this.entries0.remove(ban)) {
+            final CauseStack causeStack = CauseStack.currentOrEmpty();
             // Post the pardon events
             final Event event;
+            final Cause cause = causeStack.getCurrentCause();
             if (ban instanceof Ban.Ip) {
-                event = SpongeEventFactory.createPardonIpEvent(causeSupplier.get(), (Ban.Ip) ban);
+                event = SpongeEventFactory.createPardonIpEvent(cause, (Ban.Ip) ban);
             } else {
                 final Ban.Profile profileBan = (Ban.Profile) ban;
-                final Cause cause = causeSupplier.get();
                 // Check if the pardoned player is online (not yet been kicked)
                 final Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
                 if (optTarget.isPresent()) {
@@ -248,33 +239,9 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
         return false;
     }
 
-    private static Supplier<Cause> getCauseSupplierFor(Ban ban) {
-        return () -> {
-            Object src = ban.getBanCommandSource().orElse(null);
-            if (src == null) {
-                src = ban.getBanSource().orElse(null);
-            }
-            return Cause.source(src == null ? ban : src).build();
-        };
-    }
-
     @Override
-    public boolean removeBan(Ban ban) {
+    public Optional<? extends Ban> addBan(Ban ban) {
         checkNotNull(ban, "ban");
-        return removeBan(ban, getCauseSupplierFor(ban));
-    }
-
-    /**
-     * Adds the specified {@link Ban} and calls the proper event
-     * if needed with the specified {@link Cause}.
-     *
-     * @param ban The ban
-     * @param causeSupplier The cause supplier
-     * @return The previous ban attached to new bans profile or ip address
-     */
-    public Optional<? extends Ban> addBan(Ban ban, Supplier<Cause> causeSupplier) {
-        checkNotNull(ban, "ban");
-        checkNotNull(causeSupplier, "causeSupplier");
         final Optional<Ban> oldBan;
         if (ban instanceof Ban.Ip) {
             oldBan = (Optional) getBanFor(((Ban.Ip) ban).getAddress());
@@ -284,13 +251,14 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
         oldBan.ifPresent(this.entries0::remove);
         this.entries0.add((BanEntry) ban);
         if (!oldBan.isPresent() || !oldBan.get().equals(ban)) {
+            final CauseStack causeStack = CauseStack.currentOrEmpty();
             // Post the ban events
             final Event event;
+            final Cause cause = causeStack.getCurrentCause();
             if (ban instanceof Ban.Ip) {
-                event = SpongeEventFactory.createBanIpEvent(causeSupplier.get(), (Ban.Ip) ban);
+                event = SpongeEventFactory.createBanIpEvent(cause, (Ban.Ip) ban);
             } else {
                 final Ban.Profile profileBan = (Ban.Profile) ban;
-                final Cause cause = causeSupplier.get();
                 // Check if the pardoned player is online (not yet been kicked)
                 final Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
                 if (optTarget.isPresent()) {
@@ -309,14 +277,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     }
 
     @Override
-    public Optional<? extends Ban> addBan(Ban ban) {
-        checkNotNull(ban, "ban");
-        return addBan(ban, getCauseSupplierFor(ban));
-    }
-
-    @Override
     public boolean hasBan(Ban ban) {
-        //noinspection SuspiciousMethodCalls
         return this.entries0.contains(checkNotNull(ban, "ban"));
     }
 

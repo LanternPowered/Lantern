@@ -37,6 +37,8 @@ import com.google.inject.name.Named;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ScoreboardIO;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.LanternCauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
@@ -45,7 +47,6 @@ import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.util.Functional;
@@ -290,9 +291,12 @@ public final class LanternWorldManager {
         if (!world0.getPlayers().isEmpty()) {
             return false;
         }
+        final CauseStack causeStack = CauseStack.currentOrEmpty();
+        causeStack.pushCause(world);
         // Post the unload world event
         this.game.getEventManager().post(SpongeEventFactory.createUnloadWorldEvent(
-                Cause.source(this.game.getMinecraftPlugin()).build(), world));
+                causeStack.getCurrentCause(), world));
+        causeStack.popCause();
         // Save all the world data
         world0.shutdown();
         // Remove the tick task
@@ -563,8 +567,9 @@ public final class LanternWorldManager {
         }
         // Store the new properties
         addWorldProperties(worldProperties, worldFolder, dimensionId);
+        final CauseStack causeStack = CauseStack.currentOrEmpty();
         Sponge.getEventManager().post(SpongeEventFactory.createConstructWorldPropertiesEvent(
-                Cause.source(Lantern.getMinecraftPlugin()).build(), worldArchetype, worldProperties));
+                causeStack.getCurrentCause(), worldArchetype, worldProperties));
         // Save the world properties to reserve the world folder
         saveWorldProperties(worldProperties);
         return worldProperties;
@@ -652,7 +657,10 @@ public final class LanternWorldManager {
         } catch (IOException e) {
             this.logger.warn("An error occurred while loading the chunk loading tickets", e);
         }
-        final LoadWorldEvent event = SpongeEventFactory.createLoadWorldEvent(Cause.source(Lantern.getMinecraftPlugin()).build(), world);
+        final CauseStack causeStack = CauseStack.currentOrEmpty();
+        causeStack.pushCause(world);
+        final LoadWorldEvent event = SpongeEventFactory.createLoadWorldEvent(causeStack.getCurrentCause(), world);
+        causeStack.popCause();
         Sponge.getEventManager().post(event);
         if (event.isCancelled()) {
             return Optional.empty();
@@ -699,6 +707,9 @@ public final class LanternWorldManager {
         }
         final Thread thread = ThreadHelper.newFastThreadLocalThread(thread0 -> {
             try {
+                // Initialize the world cause stack.
+                CauseStack.set(new LanternCauseStack());
+
                 while (!thread0.isInterrupted() && !this.tickEnd.isTerminated()) {
                     this.tickBegin.arriveAndAwaitAdvance();
                     try {
@@ -754,7 +765,7 @@ public final class LanternWorldManager {
             try {
                 this.executor.submit(this::tickEnd);
             } catch (RejectedExecutionException ex) {
-                this.shutdown();
+                shutdown();
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

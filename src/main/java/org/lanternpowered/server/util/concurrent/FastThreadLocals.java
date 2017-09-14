@@ -23,13 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.spawn;
+package org.lanternpowered.server.util.concurrent;
 
-import org.spongepowered.api.event.cause.entity.spawn.common.AbstractEntitySpawnCause;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public class LanternEntitySpawnCause extends AbstractEntitySpawnCause {
+import io.netty.util.concurrent.FastThreadLocal;
 
-    protected LanternEntitySpawnCause(LanternEntitySpawnCauseBuilder builder) {
-        super(builder);
+import java.util.function.Supplier;
+
+public final class FastThreadLocals {
+
+    public static <S> FastThreadLocal<S> withInitial(Supplier<? extends S> supplier) {
+        checkNotNull(supplier, "supplier");
+        return new FastThreadLocal<S>() {
+            @Override
+            protected S initialValue() throws Exception {
+                return supplier.get();
+            }
+        };
+    }
+
+    private FastThreadLocals() {
     }
 }

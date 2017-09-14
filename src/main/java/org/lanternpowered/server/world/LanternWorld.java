@@ -36,15 +36,16 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.behavior.Behavior;
-import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.action.BlockAction;
+import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.config.world.WorldConfig;
@@ -57,6 +58,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
@@ -84,6 +86,7 @@ import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -95,9 +98,12 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.property.block.HardnessProperty;
+import org.spongepowered.api.data.property.block.UnbreakableProperty;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -108,8 +114,13 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.BookView;
@@ -161,6 +172,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class LanternWorld implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer, RuleHolder {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
@@ -340,10 +352,10 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
             this.logger.info("Generating spawn volume...");
 
+            final CauseStack causeStack = CauseStack.current();
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
-                    this.chunkManager.getOrCreateChunk(x, z,
-                            () -> Cause.source(this.game.getMinecraftPlugin()).owner(this).build(), true);
+                    this.chunkManager.getOrCreateChunk(x, z, causeStack, true);
                     this.spawnLoadingTicket.forceChunk(new Vector2i(x, z));
                 }
             }
@@ -449,8 +461,8 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public MutableBlockVolumeWorker<World> getBlockWorker(Cause cause) {
-        return new LanternMutableBlockVolumeWorker<>(this, cause);
+    public MutableBlockVolumeWorker<World> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override
@@ -638,15 +650,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
-        boolean spawned = true;
-        for (Entity entity : entities) {
-            spawned &= spawnEntity(entity, cause);
-        }
-        return spawned;
-    }
-
-    @Override
     public Collection<TileEntity> getTileEntities() {
         // TODO Auto-generated method stub
         return Collections.emptyList();
@@ -724,13 +727,13 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState blockState, Cause cause) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, cause);
+    public boolean setBlock(int x, int y, int z, BlockState blockState) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockState blockState, BlockChangeFlag flag, Cause cause) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, flag, cause);
+    public boolean setBlock(int x, int y, int z, BlockState blockState, BlockChangeFlag flag) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, flag);
     }
 
     @Override
@@ -739,17 +742,16 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force,
-            BlockChangeFlag flag, Cause cause) {
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4)
-                .restoreSnapshot(x, y, z, snapshot, force, flag, cause);
+                .restoreSnapshot(x, y, z, snapshot, force, flag);
     }
 
     @Override
-    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
+    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
         final Vector3i pos = checkNotNull(snapshot, "snapshot").getPosition();
         return this.chunkManager.getOrLoadChunk(pos.getX() >> 4, pos.getZ() >> 4)
-                .restoreSnapshot(pos.getX(), pos.getY(), pos.getZ(), snapshot, force, flag, cause);
+                .restoreSnapshot(pos.getX(), pos.getY(), pos.getZ(), snapshot, force, flag);
     }
 
     @Override
@@ -843,11 +845,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value, Cause cause) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, key, value, cause);
-    }
-
-    @Override
     public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, value);
     }
@@ -860,11 +857,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, manipulator, function);
-    }
-
-    @Override
-    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function, Cause cause) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, manipulator, function, cause);
     }
 
     @Override
@@ -1128,8 +1120,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
             return Optional.empty();
         }
         if (generate) {
-            return Optional.of(this.chunkManager.getOrCreateChunk(new Vector2i(x, z),
-                    () -> Cause.source(this.game.getMinecraftPlugin()).owner(this).build(), true));
+            return Optional.of(this.chunkManager.getOrCreateChunk(new Vector2i(x, z), CauseStack.currentOrEmpty(), true));
         } else {
             return Optional.ofNullable(this.chunkManager.getChunk(x, z));
         }
@@ -1150,26 +1141,66 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         return Optional.ofNullable(this.entitiesByUniqueId.get(checkNotNull(uuid, "uuid")));
     }
 
+    /**
+     * Finishes the {@link SpawnEntityEvent} by spawning the {@link Entity}s
+     * in the world. Nothing will happen if the event is cancelled.
+     *
+     * @param event The event
+     */
+    public static boolean finishSpawnEntityEvent(SpawnEntityEvent event) {
+        if (event.isCancelled()) {
+            return false;
+        }
+        boolean success = false;
+        for (Entity entity : event.getEntities()) {
+            final LanternWorld world = (LanternWorld) entity.getWorld();
+            success |= world.spawnEntity0(entity);
+        }
+        return success;
+    }
+
     @Override
-    public boolean spawnEntity(Entity entity, Cause cause) {
+    public boolean spawnEntity(Entity entity) {
         checkNotNull(entity, "entity");
         checkArgument(!entity.isRemoved(), "The entity may not be removed.");
         checkArgument(entity.getWorld() == this, "The entity is not be located in this world.");
-        checkNotNull(cause, "cause");
+        final CauseStack causeStack = CauseStack.current();
+        final SpawnEntityEvent.Custom event = SpongeEventFactory.createSpawnEntityEventCustom(
+                causeStack.getCurrentCause(), Lists.newArrayList(entity));
+        Sponge.getEventManager().post(event);
+        return finishSpawnEntityEvent(event);
+    }
+
+    @Override
+    public boolean spawnEntities(Iterable<? extends Entity> entities) {
+        for (Entity entity : entities) {
+            checkNotNull(entity, "entity");
+            checkArgument(!entity.isRemoved(), "The entity may not be removed.");
+            checkArgument(entity.getWorld() == this, "The entity is not be located in this world.");
+        }
+        final CauseStack causeStack = CauseStack.current();
+        final SpawnEntityEvent.Custom event = SpongeEventFactory.createSpawnEntityEventCustom(
+                causeStack.getCurrentCause(), Lists.newArrayList(entities));
+        Sponge.getEventManager().post(event);
+        return finishSpawnEntityEvent(event);
+    }
+
+    private boolean spawnEntity0(Entity entity) {
         final LanternEntity entity1 = addEntity((LanternEntity) entity);
         if (entity1 != null) {
             if (entity == entity1) {
-                throw new IllegalArgumentException("The entity is already spawned.");
+                Lantern.getLogger().warn("The entity " + entity1 + " is already spawned. Skipping...");
             } else {
-                throw new IllegalArgumentException("There is already a entity spawned with the unique id.");
+                Lantern.getLogger().warn("There is already a entity spawned with the unique id: " + entity.getUniqueId() + ". Skipping...");
             }
+            return false;
         }
         final LanternEntity entity2 = (LanternEntity) entity;
         final Vector3i position = entity2.getPosition().toInt();
         final Vector3i chunkPos = new Vector3i(position.getX() >> 4, fixEntityYSection(position.getY() >> 4), position.getZ() >> 4);
         final LanternChunk chunk = (LanternChunk) loadChunk(chunkPos.getX(), 0, chunkPos.getZ(), true).get();
         chunk.addEntity(entity2, chunkPos.getY());
-        return true;
+        return false;
     }
 
     public void addEntities(Iterable<Entity> entities) {
@@ -1186,7 +1217,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         }
         final EntityProtocolType entityProtocolType = entity.getEntityProtocolType();
         if (entityProtocolType != null) {
-            //noinspection unchecked
             this.entityProtocolManager.add(entity, entityProtocolType);
         }
         entity.setPositionAndWorld(this, entity.getPosition());
@@ -1302,9 +1332,8 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public void triggerExplosion(Explosion explosion, Cause cause) {
+    public void triggerExplosion(Explosion explosion) {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
@@ -1324,10 +1353,13 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     public void pulse() {
-        this.chunkManager.pulse();
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this);
+
+        this.chunkManager.pulse(causeStack);
         this.timeUniverse.pulse();
         if (this.weatherUniverse != null) {
-            this.weatherUniverse.pulse();
+            this.weatherUniverse.pulse(causeStack);
         }
 
         // Pulse the entities
@@ -1335,6 +1367,8 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
         // Pulse the tile entities
         getLoadedChunks().forEach(chunk -> ((LanternChunk) chunk).pulse());
+
+        causeStack.popCause();
 
         // TODO: Maybe async?
         this.observedChunkManager.pulse();
@@ -1358,63 +1392,148 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean hitBlock(int x, int y, int z, Direction side, GameProfile profile) {
+        checkNotNull(side, "side");
+        checkNotNull(profile, "profile");
+        final int digTime = getBlockDigTimeWith(x, y, z, profile, null);
+        return digTime == 0 && digBlock(x, y, z, profile);
     }
 
     @Override
-    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
-        cause = Cause.builder().from(cause).named(Parameters.USED_ITEM_STACK.getName(), itemStack).build();
-        return interactBlock(x, y, z, side, cause, ctx -> ctx.set(Parameters.USED_ITEM_STACK, itemStack));
+    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, GameProfile profile) {
+        checkNotNull(profile, "profile");
+        checkNotNull(itemStack, "itemStack");
+        return interactBlock(x, y, z, side, profile, itemStack);
     }
 
     @Override
-    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
-        return interactBlock(x, y, z, side, cause, ctx -> {});
+    public boolean interactBlock(int x, int y, int z, Direction side, GameProfile profile) {
+        checkNotNull(profile, "profile");
+        return interactBlock(x, y, z, side, profile, null);
     }
 
-    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause, Consumer<BehaviorContext> consumer) {
+    private boolean interactBlock(int x, int y, int z, Direction side, @Nullable GameProfile profile, @Nullable ItemStack itemStack) {
+        checkNotNull(side, "side");
+
         final LanternBlockType blockType = ((LanternBlockType) getBlockType(x, y, z));
         final BehaviorPipeline<Behavior> pipeline = blockType.getPipeline();
-        final BehaviorContextImpl context = new BehaviorContextImpl(cause);
-        context.set(Parameters.INTERACTION_FACE, side);
-        context.set(Parameters.BLOCK_LOCATION, new Location<>(this, x, y, z));
-        context.set(Parameters.BLOCK_TYPE, blockType);
-        consumer.accept(context);
-        // Just pass an object trough to make sure that a value is present when successful
-        return context.process(pipeline.pipeline(InteractWithBlockBehavior.class),
-                (ctx, behavior) -> behavior.tryInteract(pipeline, ctx)).isSuccess();
+
+        final CauseStack causeStack = CauseStack.current();
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.addContext(ContextKeys.INTERACTION_FACE, side);
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(this, x, y, z));
+            frame.addContext(ContextKeys.BLOCK_TYPE, blockType);
+            if (profile != null) {
+                frame.addContext(EventContextKeys.PLAYER_SIMULATED, profile);
+            }
+            if (itemStack != null) {
+                frame.addContext(ContextKeys.USED_ITEM_STACK, itemStack);
+            }
+            final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
+            // Just pass an object trough to make sure that a value is present when successful
+            if (context.process(pipeline.pipeline(InteractWithBlockBehavior.class),
+                    (ctx, behavior) -> behavior.tryInteract(pipeline, ctx)).isSuccess()) {
+                context.accept();
+                return true;
+            }
+            context.revert();
+            return false;
+        }
     }
 
     @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Direction side, Cause cause) {
-        cause = Cause.builder().from(cause).named(Parameters.USED_BLOCK_STATE.getName(), block).build();
+    public boolean placeBlock(int x, int y, int z, BlockState block, Direction side, @Nullable GameProfile profile) {
+        final BehaviorPipeline<Behavior> pipeline = ((LanternBlockType) block.getType()).getPipeline();
+
+        final CauseStack causeStack = CauseStack.current();
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.addContext(ContextKeys.USED_BLOCK_STATE, block);
+            frame.addContext(ContextKeys.INTERACTION_FACE, side);
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(this, x, y, z));
+            frame.addContext(ContextKeys.BLOCK_TYPE, block.getType());
+            if (profile != null) {
+                frame.addContext(EventContextKeys.PLAYER_SIMULATED, profile);
+            }
+            final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
+            // Just pass an object trough to make sure that a value is present when successful
+            if (context.process(pipeline.pipeline(PlaceBlockBehavior.class),
+                    (ctx, behavior) -> behavior.tryPlace(pipeline, ctx)).isSuccess()) {
+                context.accept();
+                return true;
+            }
+            context.revert();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean digBlock(int x, int y, int z, GameProfile profile) {
+        checkNotNull(profile, "profile");
+        return digBlock(x, y, z, profile, null);
+    }
+
+    @Override
+    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, GameProfile profile) {
+        checkNotNull(profile, "profile");
+        checkNotNull(itemStack, "itemStack");
+        return digBlock(x, y, z, profile, itemStack);
+    }
+
+    private boolean digBlock(int x, int y, int z, @Nullable GameProfile profile, @Nullable ItemStack itemStack) {
         final LanternBlockType blockType = ((LanternBlockType) getBlockType(x, y, z));
         final BehaviorPipeline<Behavior> pipeline = blockType.getPipeline();
-        final BehaviorContextImpl context = new BehaviorContextImpl(cause);
-        context.set(Parameters.INTERACTION_FACE, side);
-        context.set(Parameters.BLOCK_LOCATION, new Location<>(this, x, y, z));
-        context.set(Parameters.BLOCK_TYPE, blockType);
-        // Just pass an object trough to make sure that a value is present when successful
-        return context.process(pipeline.pipeline(PlaceBlockBehavior.class),
-                (ctx, behavior) -> behavior.tryPlace(pipeline, ctx)).isSuccess();
+
+        final CauseStack causeStack = CauseStack.current();
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(this, x, y, z));
+            frame.addContext(ContextKeys.BLOCK_TYPE, blockType);
+            if (profile != null) {
+                frame.addContext(EventContextKeys.PLAYER_SIMULATED, profile);
+            }
+            if (itemStack != null) {
+                frame.addContext(ContextKeys.USED_ITEM_STACK, itemStack);
+            }
+            final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
+            // Just pass an object trough to make sure that a value is present when successful
+            if (context.process(pipeline.pipeline(BreakBlockBehavior.class),
+                    (ctx, behavior) -> behavior.tryBreak(pipeline, ctx)).isSuccess()) {
+                context.accept();
+                return true;
+            }
+            context.revert();
+            return false;
+        }
     }
 
     @Override
-    public boolean digBlock(int x, int y, int z, Cause cause) {
-        return false;
+    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, GameProfile profile) {
+        checkNotNull(profile, "profile");
+        checkNotNull(itemStack, "itemStack");
+        return getBlockDigTimeWith(x, y, z, profile, itemStack);
     }
 
-    @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        cause = Cause.builder().from(cause).named(Parameters.USED_ITEM_STACK.getName(), itemStack).build();
-        return digBlock(x, y, z, cause);
-    }
-
-    @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        // TODO Auto-generated method stub
+    public int getBlockDigTimeWith(int x, int y, int z, @Nullable GameProfile profile, @Nullable ItemStack itemStack) {
+        // Check if the user has the creative game mode
+        if (profile != null) {
+            final Optional<User> optUser = Lantern.getGame().getUserStorageService().get(profile);
+            if (optUser.isPresent()) {
+                final User user = optUser.get();
+                if (user.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET) == GameModes.CREATIVE) {
+                    return 0;
+                }
+            }
+        }
+        final Optional<UnbreakableProperty> optUnbreakableProperty = getProperty(x, y, z, UnbreakableProperty.class);
+        if (optUnbreakableProperty.isPresent() && optUnbreakableProperty.get().getValue() == Boolean.TRUE) {
+            return -1;
+        }
+        final Optional<HardnessProperty> optHardnessProperty = getProperty(x, y, z, HardnessProperty.class);
+        if (optHardnessProperty.isPresent()) {
+            final Double value = optHardnessProperty.get().getValue();
+            double hardness = value == null ? 0 : value;
+            // TODO: Calculate the duration
+            return hardness <= 0 ? 0 : 1;
+        }
         return 0;
     }
 

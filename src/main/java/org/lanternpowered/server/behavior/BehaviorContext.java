@@ -28,86 +28,40 @@ package org.lanternpowered.server.behavior;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
+import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
-import javax.annotation.Nullable;
 
 public interface BehaviorContext {
 
     interface Snapshot {
-
     }
 
     /**
-     * Sets the value for the provided {@link Parameter}.
+     * Gets the current {@link CauseStack}.
      *
-     * @param parameter The parameter
-     * @param value The value
-     * @param <V> The value type
+     * @return The cause stack
      */
-    <V> void set(Parameter<V> parameter, @Nullable V value);
+    CauseStack getCauseStack();
 
     /**
-     * Gets the value for the provided
-     * {@link Parameter}, if present.
-     *
-     * @param parameter The parameter
-     * @param <V> The value type
-     * @return The value, if present
-     */
-    <V> Optional<V> get(Parameter<V> parameter);
-
-    default <V> V tryGet(Parameter<V> parameter) {
-        return get(parameter).orElseThrow(() ->
-                new IllegalStateException("The parameter " + parameter.getName() + " doesn't exist in this context."));
-    }
-
-    /**
-     * Creates a {@link Snapshot}.
+     * Pushes a {@link Snapshot}.
      *
      * @return The snapshot
      */
-    Snapshot createSnapshot();
+    Snapshot pushSnapshot();
 
     /**
-     * Restores the specified {@link Snapshot}.
-     *
-     * @param snapshot The snapshot
+     * Reverts all the changes made since the {@link Snapshot}.
      */
-    void restoreSnapshot(Snapshot snapshot);
-
-    /**
-     * The cause that triggered the block placement.
-     *
-     * @return The cause
-     */
-    Cause getCause();
-
-    /**
-     * Inserts a entry into the {@link Cause}.
-     *
-     * @param name The name of the cause
-     * @param cause The cause
-     */
-    void insertCause(String name, Object cause);
-
-    /**
-     * Inserts a {@link NamedCause} into the {@link Cause}.
-     *
-     * @param cause The named cause
-     */
-    void insertCause(NamedCause cause);
+    void popSnapshot(Snapshot snapshot);
 
     /**
      * Gets all the {@link BlockSnapshot}s.

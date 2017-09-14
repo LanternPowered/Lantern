@@ -28,16 +28,16 @@ package org.lanternpowered.server.item.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
@@ -48,19 +48,20 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final LanternPlayer player = (LanternPlayer) context.tryGet(Parameters.PLAYER);
-        final ItemStack itemStack = context.tryGet(Parameters.USED_ITEM_STACK);
+        final CauseStack causeStack = context.getCauseStack();
+        final LanternPlayer player = (LanternPlayer) causeStack.requireContext(ContextKeys.PLAYER);
+        final ItemStack itemStack = causeStack.requireContext(ContextKeys.USED_ITEM_STACK);
 
         final PeekOfferTransactionsResult result = player.getInventory().getEquipment().peekOfferFastTransactions(itemStack.copy());
         if (result.getOfferResult().isSuccess()) {
             final List<SlotTransaction> transactions = result.getTransactions();
-            final LanternSlot slot = (LanternSlot) context.get(Parameters.USED_SLOT).orElse(null);
+            final LanternSlot slot = (LanternSlot) causeStack.getContext(ContextKeys.USED_SLOT).orElse(null);
             if (slot != null) {
                 transactions.add(new SlotTransaction(
                         slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(result.getOfferResult().getRest())));
             }
             final ChangeInventoryEvent.Equipment event = SpongeEventFactory.createChangeInventoryEventEquipment(
-                    Cause.source(player).build(), player.getInventory(), result.getTransactions());
+                    causeStack.getCurrentCause(), player.getInventory(), result.getTransactions());
             if (event.isCancelled()) {
                 return BehaviorResult.CONTINUE;
             }

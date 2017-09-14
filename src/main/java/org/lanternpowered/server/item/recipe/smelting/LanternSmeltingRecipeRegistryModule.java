@@ -43,10 +43,6 @@ import org.spongepowered.api.text.format.TextColors;
 @RegistrationDependency({ ItemRegistryModule.class, LanternCraftingRecipeRegistryModule.class })
 public class LanternSmeltingRecipeRegistryModule extends LanternRecipeRegistryModule<ISmeltingRecipe> {
 
-    public LanternSmeltingRecipeRegistryModule() {
-        super(null);
-    }
-
     @DelayedRegistration(RegistrationPhase.POST_INIT)
     @Override
     public void registerDefaults() {

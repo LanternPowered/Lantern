@@ -26,13 +26,14 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.resourcepack.ResourcePack;
 
 import java.util.Optional;
@@ -48,7 +49,11 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
                     player.getName(), message.getStatus());
             return;
         }
-        Sponge.getEventManager().post(SpongeEventFactory.createResourcePackStatusEvent(
-                Cause.source(player).build(), resourcePack.get(), player, message.getStatus()));
+        final CauseStack causeStack = CauseStack.current();
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.addContext(EventContextKeys.PLAYER, player);
+            Sponge.getEventManager().post(SpongeEventFactory.createResourcePackStatusEvent(
+                    frame.getCurrentCause(), resourcePack.get(), player, message.getStatus()));
+        }
     }
 }

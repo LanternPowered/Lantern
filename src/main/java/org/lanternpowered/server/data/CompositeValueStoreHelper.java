@@ -32,7 +32,6 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
-import org.spongepowered.api.event.cause.Cause;
 
 import java.util.function.Function;
 
@@ -52,11 +51,6 @@ public final class CompositeValueStoreHelper {
                 store.transform(key, function).isSuccessful();
     }
 
-    public static <E> boolean offer(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, E element, Cause cause) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).offerFast(key, element, cause) :
-                store.offer(key, element, cause).isSuccessful();
-    }
-
     public static <E> boolean offer(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, E element) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).offerFast(key, element) :
                 store.offer(key, element).isSuccessful();
@@ -72,19 +66,9 @@ public final class CompositeValueStoreHelper {
                 store.tryOffer(key, value).isSuccessful();
     }
 
-    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, E value, Cause cause) throws IllegalArgumentException {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).tryOfferFast(key, value, cause) :
-                store.tryOffer(key, value, cause).isSuccessful();
-    }
-
     public static <E> boolean tryOffer(CompositeValueStore<?,?> store, BaseValue<E> value) throws IllegalArgumentException {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).tryOfferFast(value) :
                 store.tryOffer(value).isSuccessful();
-    }
-
-    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, BaseValue<E> value, Cause cause) throws IllegalArgumentException {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).tryOfferFast(value, cause) :
-                store.tryOffer(value, cause).isSuccessful();
     }
 
     public static boolean remove(CompositeValueStore<?,?> store, Key<?> key) {
@@ -102,19 +86,9 @@ public final class CompositeValueStoreHelper {
                 store.undo(result).isSuccessful();
     }
 
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, H valueContainer, MergeFunction function, Cause cause) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainer, function, cause) :
-                store.offer(valueContainer, function, cause).isSuccessful();
-    }
-
     public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, H valueContainer, MergeFunction function) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainer, function) :
                 store.offer(valueContainer, function).isSuccessful();
-    }
-
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, H valueContainer, Cause cause) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainer, cause) :
-                store.offer(valueContainer, cause).isSuccessful();
     }
 
     public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, H valueContainer) {
@@ -125,17 +99,6 @@ public final class CompositeValueStoreHelper {
     public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, Iterable<H> valueContainers) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainers) :
                 store.offer(valueContainers).isSuccessful();
-    }
-
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, Iterable<H> valueContainers, Cause cause) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainers, cause) :
-                store.offer(valueContainers, cause).isSuccessful();
-    }
-
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, Iterable<H> valueContainers,
-            MergeFunction function, Cause cause) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainers, function, cause) :
-                store.offer(valueContainers, function, cause).isSuccessful();
     }
 
     public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, Iterable<H> valueContainers,
@@ -153,12 +116,6 @@ public final class CompositeValueStoreHelper {
             MergeFunction function) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).tryOfferFast(valueContainer, function) :
                 store.tryOffer(valueContainer, function).isSuccessful();
-    }
-
-    public static <H extends ValueContainer<?>> boolean tryOffer(CompositeValueStore<?, H> store, H valueContainer,
-            MergeFunction function, Cause cause) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).tryOfferFast(valueContainer, function, cause) :
-                store.tryOffer(valueContainer, function, cause).isSuccessful();
     }
 
     public static <H extends ValueContainer<?>> boolean remove(CompositeValueStore<?, H> store, Class<? extends H> containerClass) {

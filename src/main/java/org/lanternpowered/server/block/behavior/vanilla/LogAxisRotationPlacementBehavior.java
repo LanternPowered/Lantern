@@ -28,10 +28,11 @@ package org.lanternpowered.server.block.behavior.vanilla;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.data.type.LanternLogAxis;
+import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.LogAxis;
 
@@ -39,7 +40,8 @@ public class LogAxisRotationPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        context.get(Parameters.INTERACTION_FACE).ifPresent(face -> {
+        final CauseStack causeStack = context.getCauseStack();
+        causeStack.getContext(ContextKeys.INTERACTION_FACE).ifPresent(face -> {
             final LogAxis axis = LanternLogAxis.fromDirection(face);
             context.transformBlockChanges((original, builder) -> builder.add(Keys.LOG_AXIS, axis));
         });

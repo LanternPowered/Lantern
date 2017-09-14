@@ -37,6 +37,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.DefaultStackSizes;
 import org.lanternpowered.server.inventory.IInventory;
@@ -51,6 +52,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -948,11 +950,19 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     protected void tryProcessBehavior(Consumer<ContainerInteractionBehavior> behavior) {
+        checkNotNull(this.player);
         if (this.interactionBehavior != null) {
-            try {
-                behavior.accept(this.interactionBehavior);
-            } catch (Throwable t) {
-                Lantern.getLogger().error("Failed to process the inventory interaction behavior", t);
+            final CauseStack causeStack = CauseStack.current();
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.pushCause(this.player);
+                frame.pushCause(this);
+                // Also add the player as context
+                frame.addContext(EventContextKeys.PLAYER, this.player);
+                try {
+                    behavior.accept(this.interactionBehavior);
+                } catch (Throwable t) {
+                    Lantern.getLogger().error("Failed to process the inventory interaction behavior", t);
+                }
             }
         }
     }

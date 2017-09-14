@@ -39,6 +39,10 @@ public class Lantern {
         return LanternGame.game.getLogger();
     }
 
+    public static org.apache.logging.log4j.Logger getLog4jLogger() {
+        return LanternGame.game.getLog4jLogger();
+    }
+
     public static PluginContainer getMinecraftPlugin() {
         return LanternGame.game.getMinecraftPlugin();
     }

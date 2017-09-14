@@ -303,7 +303,10 @@ public class LanternEventManager implements EventManager {
     @Override
     public boolean post(Event event) {
         checkNotNull(event, "event");
+        final CauseStack causeStack = CauseStack.currentOrEmpty();
         for (RegisteredListener listener : this.listenersCache.get(event.getClass())) {
+            // Add the calling plugin to the cause stack
+            causeStack.pushCause(listener.getPlugin());
             try {
                 if (event instanceof AbstractEvent) {
                     ((AbstractEvent) event).currentOrder = listener.getOrder();
@@ -313,6 +316,7 @@ public class LanternEventManager implements EventManager {
                 this.logger.error("Could not pass {} to {}", event.getClass().getSimpleName(),
                         listener.getPlugin(), e);
             }
+            causeStack.popCause();
         }
         if (event instanceof AbstractEvent) {
             ((AbstractEvent) event).currentOrder = null;

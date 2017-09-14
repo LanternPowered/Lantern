@@ -65,7 +65,6 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -912,9 +911,8 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     }
 
     @Override
-    public Optional<Container> openInventory(Inventory inventory, Cause cause) {
+    public Optional<Container> openInventory(Inventory inventory) {
         checkNotNull(inventory, "inventory");
-        checkNotNull(cause, "cause");
         LanternContainer container;
         if (inventory instanceof PlayerInventory) {
             return Optional.empty();
@@ -923,16 +921,15 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         } else {
             throw new UnsupportedOperationException("Unsupported inventory type: " + inventory);
         }
-        if (this.containerSession.setOpenContainer(container, cause)) {
+        if (this.containerSession.setOpenContainer(container)) {
             return Optional.of(container);
         }
         return Optional.empty();
     }
 
     @Override
-    public boolean closeInventory(Cause cause) {
-        checkNotNull(cause, "cause");
-        return this.containerSession.setOpenContainer(null, cause);
+    public boolean closeInventory() {
+        return this.containerSession.setOpenContainer(null);
     }
 
     @Override

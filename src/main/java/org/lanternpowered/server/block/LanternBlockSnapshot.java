@@ -43,8 +43,6 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -60,8 +58,6 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHolder {
-
-    private static Cause RESTORE_CAUSE = Cause.of(NamedCause.of("EMPTY", "EMPTY"));
 
     /**
      * Represents the {@link Location} of a block.
@@ -323,7 +319,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (loc == null || (!force && loc.getBlockType() != this.state.getType())) {
             return false;
         }
-        loc.setBlock(this.state, flag, RESTORE_CAUSE);
+        loc.setBlock(this.state, flag);
         final World world = loc.getExtent();
         world.setCreator(this.location.position, this.creator.orElse(null));
         world.setNotifier(this.location.position, this.notifier.orElse(null));

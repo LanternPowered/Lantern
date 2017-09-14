@@ -29,12 +29,10 @@ import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.item.recipe.Recipe;
 
-import javax.annotation.Nullable;
-
 public class LanternRecipeRegistryModule<T extends CatalogType & Recipe> extends PluginCatalogRegistryModule<T> {
 
-    public LanternRecipeRegistryModule(@Nullable Class<?> catalogClass) {
-        super(catalogClass);
+    public LanternRecipeRegistryModule(Class<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
     @Override

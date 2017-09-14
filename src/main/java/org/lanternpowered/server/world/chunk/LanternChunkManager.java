@@ -48,13 +48,14 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.lanternpowered.server.util.FastSoftThreadLocal;
 import org.lanternpowered.server.util.ThreadHelper;
+import org.lanternpowered.server.util.concurrent.FastSoftThreadLocal;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
@@ -98,6 +99,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,7 +117,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -266,7 +267,7 @@ public final class LanternChunkManager {
 
         @Override
         public void run() {
-            unload0(this.callable.coords, () -> Cause.source(world).build(), false);
+            unload0(this.callable.coords, CauseStack.currentOrEmpty(), false);
         }
     }
 
@@ -286,15 +287,16 @@ public final class LanternChunkManager {
     }
 
     private void doChunkLoad(Vector2i coords) {
-        final Set<ChunkLoadingTicket> tickets = this.ticketsByPos.get(coords);
+        Set<ChunkLoadingTicket> tickets = this.ticketsByPos.get(coords);
         if (tickets == null) {
             return;
         }
+        tickets = new HashSet<>(tickets);
+        final CauseStack causeStack = CauseStack.current();
+        tickets.forEach(causeStack::pushCause);
         // Chunk may be null if's already being loaded by a different thread.
-        getOrCreateChunk(coords, () -> {
-            // Build the cause only if the chunk isn't already loaded
-            return Cause.source(this.world).named("tickets", tickets.toArray(new Object[tickets.size()])).build();
-        }, true, false);
+        getOrCreateChunk(coords, causeStack, true, false);
+        causeStack.popCauses(tickets.size());
     }
 
     // The game instance
@@ -645,7 +647,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrCreateChunk(int x, int z, boolean generate) {
-        return getOrCreateChunk(x, z, () -> Cause.source(this.world).build(), generate);
+        return getOrCreateChunk(x, z, CauseStack.currentOrEmpty(), generate);
     }
 
     /**
@@ -656,8 +658,8 @@ public final class LanternChunkManager {
      * @param z the z coordinate
      * @return the chunk
      */
-    public LanternChunk getOrCreateChunk(int x, int z, Supplier<Cause> cause, boolean generate) {
-        return getOrCreateChunk(new Vector2i(x, z), cause, generate);
+    public LanternChunk getOrCreateChunk(int x, int z, CauseStack causeStack, boolean generate) {
+        return getOrCreateChunk(new Vector2i(x, z), causeStack, generate);
     }
 
     /**
@@ -669,21 +671,21 @@ public final class LanternChunkManager {
      * @param generate whether the chunk should be generated if missing
      * @return the chunk
      */
-    public LanternChunk getOrCreateChunk(Vector2i coords, Supplier<Cause> cause, boolean generate) {
+    public LanternChunk getOrCreateChunk(Vector2i coords, CauseStack cause, boolean generate) {
         return getOrCreateChunk(coords, cause, generate, true);
     }
 
     /**
      *
      * @param coords the coordinates of the chunk to load
-     * @param cause a supplier of the cause that triggered the chunk load
+     * @param causeStack a supplier of the cause that triggered the chunk load
      * @param generate whether the chunk should be generated if not found
      * @param wait whether the current thread should wait for the loading to finish, this should only
      *             be internally used inside the chunk manager
      * @return the chunk
      */
-    private LanternChunk getOrCreateChunk(Vector2i coords, Supplier<Cause> cause, boolean generate, boolean wait) {
-        checkNotNull(cause, "cause");
+    private LanternChunk getOrCreateChunk(Vector2i coords, CauseStack causeStack, boolean generate, boolean wait) {
+        checkNotNull(causeStack, "causeStack");
         LanternChunk chunk = this.loadedChunks.get(checkNotNull(coords, "coords"));
         // Chunk is already loaded
         if (chunk != null) {
@@ -701,7 +703,7 @@ public final class LanternChunkManager {
             if (!this.ticketsByPos.containsKey(coords)) {
                 this.pendingForUnload.add(new UnloadingChunkEntry(coords));
             }
-            this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause.get(), chunk));
+            this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(causeStack.getCurrentCause(), chunk));
             this.world.getEventListener().onLoadChunk(chunk);
             // Resurrect all the entities in the chunk
             chunk.resurrectEntities();
@@ -732,7 +734,7 @@ public final class LanternChunkManager {
             return chunk;
         }
         // Try to load the chunk
-        load(chunk, cause, generate);
+        load(chunk, causeStack, generate);
         this.world.addEntities(chunk.getEntities());
         if (!this.ticketsByPos.containsKey(coords)) {
             this.pendingForUnload.add(new UnloadingChunkEntry(coords));
@@ -907,17 +909,17 @@ public final class LanternChunkManager {
      * if {@code generate} is set to {@code true}.
      *
      * @param chunk the chunk to load
-     * @param cause the cause
+     * @param causeStack the cause stack
      * @param generate whether the chunk should be generated if missing
      * @return true if it was successful
      */
-    public boolean load(LanternChunk chunk, Supplier<Cause> cause, boolean generate) {
-        return load0(chunk, cause, generate, true);
+    public boolean load(LanternChunk chunk, CauseStack causeStack, boolean generate) {
+        return load0(chunk, causeStack, generate, true);
     }
 
-    private boolean load0(LanternChunk chunk, Supplier<Cause> cause, boolean generate, boolean wait) {
+    private boolean load0(LanternChunk chunk, CauseStack causeStack, boolean generate, boolean wait) {
         checkNotNull(chunk, "chunk");
-        checkNotNull(cause, "cause");
+        checkNotNull(causeStack, "causeStack");
         if (chunk.loaded) {
             return chunk.loadingSuccess;
         }
@@ -953,7 +955,7 @@ public final class LanternChunkManager {
             try {
                 // Try to load the chunk
                 if (this.chunkIOService.read(chunk)) {
-                    this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause.get(), chunk));
+                    this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(causeStack.getCurrentCause(), chunk));
                     this.world.getEventListener().onLoadChunk(chunk);
                     return true;
                 }
@@ -969,7 +971,7 @@ public final class LanternChunkManager {
                 chunk.initializeEmpty();
                 return success = false;
             }
-            Cause cause0 = cause.get();
+            Cause cause0 = causeStack.getCurrentCause();
             // Generate chunk
             try {
                 generate(chunk, cause0);
@@ -1124,7 +1126,7 @@ public final class LanternChunkManager {
         }
 
         @Override
-        public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+        public boolean setBlock(int x, int y, int z, BlockState block) {
             checkNotNull(block, "blockState");
             checkRange(x, y, z);
             final int sy = y >> 4;
@@ -1203,29 +1205,29 @@ public final class LanternChunkManager {
      * 
      * @param x the x coordinate
      * @param z the z coordinate
-     * @param cause the cause
+     * @param causeStack the cause stack
      * @return true if it was successful
      */
-    public boolean unload(int x, int z, Supplier<Cause> cause) {
-        return unload(new Vector2i(x, z), cause);
+    public boolean unload(int x, int z, CauseStack causeStack) {
+        return unload(new Vector2i(x, z), causeStack);
     }
 
     /**
      * Attempts to unload the chunk at the specified coordinates.
      * 
      * @param coords the coordinates
-     * @param cause the cause
+     * @param causeStack the cause
      * @return true if it was successful
      */
-    public boolean unload(Vector2i coords, Supplier<Cause> cause) {
-        return unload0(coords, cause, true);
+    public boolean unload(Vector2i coords, CauseStack causeStack) {
+        return unload0(coords, causeStack, true);
     }
 
-    private boolean unload0(Vector2i coords, Supplier<Cause> cause, boolean wait) {
-        checkNotNull(cause, "cause");
+    private boolean unload0(Vector2i coords, CauseStack causeStack, boolean wait) {
+        checkNotNull(causeStack, "causeStack");
         final LanternChunk chunk = getChunk(checkNotNull(coords, "coords"));
         if (chunk != null) {
-            return unload0(chunk, cause, wait);
+            return unload0(chunk, causeStack, wait);
         }
         return true;
     }
@@ -1233,17 +1235,17 @@ public final class LanternChunkManager {
     /**
      * Attempts to unload the specified chunk.
      * 
-     * @param chunk the chunk to unload
-     * @param cause the cause
+     * @param chunk The chunk to unload
+     * @param causeStack The cause stack
      * @return true if it was successful
      */
-    public boolean unload(LanternChunk chunk, Supplier<Cause> cause) {
+    public boolean unload(LanternChunk chunk, CauseStack causeStack) {
         checkNotNull(chunk, "chunk");
-        checkNotNull(cause, "cause");
-        return unload0(chunk, cause, true);
+        checkNotNull(causeStack, "causeStack");
+        return unload0(chunk, causeStack, true);
     }
 
-    private boolean unload0(LanternChunk chunk, Supplier<Cause> cause, boolean wait) {
+    private boolean unload0(LanternChunk chunk, CauseStack causeStack, boolean wait) {
         final Vector2i coords = chunk.getCoords();
         // Forced chunks cannot be unloaded
         if (this.ticketsByPos.containsKey(coords)) {
@@ -1277,7 +1279,7 @@ public final class LanternChunkManager {
                 task.cancel();
             }
             // Post the chunk unload event
-            this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(cause.get(), chunk));
+            this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(causeStack.getCurrentCause(), chunk));
             this.world.getEventListener().onUnloadChunk(chunk);
             // Remove from the loaded chunks
             this.loadedChunks.remove(coords);
@@ -1366,9 +1368,17 @@ public final class LanternChunkManager {
         }
         if  (callEvents) {
             final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
-            this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
-                    Cause.source(ticket).owner(this.world).build(), coords0, ticket));
+            final CauseStack causeStack = CauseStack.currentOrNull();
+            if (causeStack != null) {
+                postForcedChunkEvent(causeStack, ticket, coords0);
+            } else {
+                Lantern.getScheduler().callSync(() -> postForcedChunkEvent(CauseStack.current(), ticket, coords0));
+            }
         }
+    }
+
+    private void postForcedChunkEvent(CauseStack causeStack, LanternLoadingTicket ticket, Vector3i coords) {
+        Sponge.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(causeStack.getCurrentCause(), coords, ticket));
     }
 
     /**
@@ -1377,7 +1387,7 @@ public final class LanternChunkManager {
      * @param ticket the ticket
      * @param coords the coordinates
      */
-    void unforce(LanternLoadingTicket ticket, Vector2i coords, boolean callEvents) {
+    void unforce(LanternLoadingTicket ticket, Vector2i coords, @Nullable CauseStack causeStack) {
         if (unlockInternally(coords, ticket)) {
             final LanternChunk chunk = getChunk(coords, false);
             // Try to cancel any queued chunk loadings
@@ -1394,10 +1404,9 @@ public final class LanternChunkManager {
                 }
             }
         }
-        if (callEvents) {
+        if (causeStack != null) {
             final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
-            this.game.getEventManager().post(SpongeEventFactory.createUnforcedChunkEvent(
-                    Cause.source(ticket).owner(this.world).build(), coords0, ticket));
+            Sponge.getEventManager().post(SpongeEventFactory.createUnforcedChunkEvent(causeStack.getCurrentCause(), coords0, ticket));
         }
     }
 
@@ -1436,11 +1445,12 @@ public final class LanternChunkManager {
         } catch (IOException e) {
             this.game.getLogger().warn("An error occurred while saving the chunk loading tickets", e);
         }
+        final CauseStack causeStack = CauseStack.current();
+        final Cause cause = causeStack.getCurrentCause();
         for (Entry<Vector2i, LanternChunk> entry : this.loadedChunks.entrySet()) {
             final LanternChunk chunk = entry.getValue();
             // Post the chunk unload event
-            this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(
-                    Cause.source(this.game.getMinecraftPlugin()).owner(this.world).build(), chunk));
+            this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(cause, chunk));
             // Save the chunk
             save(chunk);
         }
@@ -1458,14 +1468,14 @@ public final class LanternChunkManager {
     /**
      * Pulses the chunk manager.
      */
-    public void pulse() {
+    public void pulse(CauseStack causeStack) {
         UnloadingChunkEntry entry;
         while ((entry = this.pendingForUnload.peek()) != null &&
                 (System.currentTimeMillis() - entry.time) > UNLOAD_DELAY) {
             this.pendingForUnload.poll();
             if (!this.ticketsByPos.containsKey(entry.coords)) {
                 // TODO: Create unload tasks
-                unload(entry.coords, () -> Cause.source(this.world).build());
+                unload(entry.coords, causeStack);
             }
         }
     }
@@ -1473,14 +1483,16 @@ public final class LanternChunkManager {
     public void loadTickets() throws IOException {
         final Multimap<String, LanternLoadingTicket> tickets = LanternLoadingTicketIO.load(this.worldFolder, this, this.chunkLoadService);
         final Iterator<Entry<String, LanternLoadingTicket>> it = tickets.entries().iterator();
+        final CauseStack causeStack = CauseStack.current();
         while (it.hasNext()) {
             final LanternLoadingTicket ticket = it.next().getValue();
             if (ticket instanceof LanternEntityLoadingTicket) {
                 final LanternEntityLoadingTicket ticket0 = (LanternEntityLoadingTicket) ticket;
                 final EntityReference ref = ticket0.getEntityReference().orElse(null);
                 if (ref != null) {
-                    final LanternChunk chunk = getOrCreateChunk(ref.getChunkCoords(),
-                            () -> Cause.source(ticket0).owner(this.world).build(), true, true);
+                    causeStack.pushCause(ticket0);
+                    final LanternChunk chunk = getOrCreateChunk(ref.getChunkCoords(), causeStack, true, true);
+                    causeStack.popCause();
                     final Entity entity = chunk.getEntity(ref.getUniqueId()).orElse(null);
                     if (entity != null) {
                         ticket0.bindToEntity(entity);

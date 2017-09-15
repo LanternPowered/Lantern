@@ -31,15 +31,15 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 
-public final class CodecInOutPing implements Codec<MessageInOutKeepAlive> {
+public final class CodecInOutKeepAlive implements Codec<MessageInOutKeepAlive> {
 
     @Override
     public ByteBuffer encode(CodecContext context, MessageInOutKeepAlive message) throws CodecException {
-        return context.byteBufAlloc().buffer().writeVarInt(message.getId());
+        return context.byteBufAlloc().buffer(Long.BYTES).writeLong(message.getTime());
     }
 
     @Override
     public MessageInOutKeepAlive decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        return new MessageInOutKeepAlive(buf.readVarInt());
+        return new MessageInOutKeepAlive(buf.readLong());
     }
 }

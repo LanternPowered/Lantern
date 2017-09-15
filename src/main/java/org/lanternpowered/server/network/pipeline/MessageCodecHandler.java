@@ -53,6 +53,7 @@ import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -173,10 +174,13 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
                 processor.process(context, message, output);
             }
         } else {
-            messageRegistration.getHandler().ifPresent(handler -> {
+            final Optional<Handler> optHandler = messageRegistration.getHandler();
+            if (optHandler.isPresent()) {
                 // Add the message to the output
-                output.add(new HandlerMessage(message, (Handler) handler));
-            });
+                output.add(new HandlerMessage(message, optHandler.get()));
+            } else {
+                output.add(message);
+            }
         }
     }
 }

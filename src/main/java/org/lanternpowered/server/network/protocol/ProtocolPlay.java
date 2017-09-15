@@ -29,7 +29,7 @@ import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.network.message.CodecRegistration;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistry;
-import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutPing;
+import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInChangeSign;
@@ -325,7 +325,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleWindowClose));
         inbound.bind(CodecPlayInOutCustomPayload.class);
         inbound.bind(CodecPlayInUseEntity.class);
-        inbound.bind(CodecInOutPing.class, MessageInOutKeepAlive.class);
+        inbound.bind(CodecInOutKeepAlive.class, MessageInOutKeepAlive.class);
         inbound.bind(CodecPlayInPlayerOnGroundState.class, MessagePlayInPlayerOnGroundState.class)
                 .bindHandler(new HandlerPlayInPlayerOnGroundState());
         inbound.bind(CodecPlayInPlayerMovement.class, MessagePlayInPlayerMovement.class)
@@ -473,7 +473,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(); // TODO: Explosion
         outbound.bind(CodecPlayOutUnloadChunk.class, MessagePlayOutUnloadChunk.class);
         outbound.bind(CodecPlayOutChangeGameState.class, MessagePlayOutChangeGameState.class);
-        outbound.bind(CodecInOutPing.class, MessageInOutKeepAlive.class);
+        outbound.bind(CodecInOutKeepAlive.class, MessageInOutKeepAlive.class);
         outbound.bind(CodecPlayOutChunkData.class, MessagePlayOutChunkData.class);
         final CodecRegistration<Message, CodecPlayOutEffect> codecPlayOutEntityEffect = outbound.bind(CodecPlayOutEffect.class);
         codecPlayOutEntityEffect.bind(MessagePlayOutEffect.class);

@@ -202,14 +202,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     private volatile int latency;
 
     /**
-     * The id that was used in the keep alive message.
-     */
-    private int keepAliveId = -1;
-
-    /**
      * The time that the last the keep alive message was send.
      */
-    private long keepAliveTime;
+    private long keepAliveTime = -1L;
 
     /**
      * The keep alive/initial connection timer task.
@@ -227,17 +222,20 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.server = server;
     }
 
+    private static long currentTime() {
+        return System.nanoTime() / 1000000L;
+    }
+
     private void handleKeepAlive(MessageInOutKeepAlive message) {
-        if (this.keepAliveId == message.getId()) {
+        if (this.keepAliveTime == message.getTime()) {
+            final long time = currentTime();
             // Calculate the latency
-            this.latency = (int) ((this.latency * 3 + (System.currentTimeMillis() - this.keepAliveTime) / 1000L) / 4);
+            this.latency = (int) ((this.latency * 3 + (time - this.keepAliveTime)) / 4);
+            this.keepAliveTime = -1L;
             if (this.gameProfile != null) {
                 // Update the global tab list
                 GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(this.latency));
             }
-        } else {
-            Lantern.getLogger().debug("A keep alive message {} didn't receive a response in time, "
-                    + "the next message is already been send.", this.keepAliveId);
         }
     }
 
@@ -312,19 +310,21 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (this.connectionTask != null) {
             this.connectionTask.cancel(true);
         }
-        // Send a keep alive message to the client every 40 ticks (2 seconds),
-        // doing this also in the event loop to keep it separate from the main
-        // thread.
         this.connectionTask = this.channel.eventLoop().scheduleAtFixedRate(() -> {
             final ProtocolState protocolState = this.protocolState;
             if (protocolState == ProtocolState.PLAY || protocolState == ProtocolState.FORGE_HANDSHAKE) {
-                this.keepAliveId = this.random.nextInt();
-                this.keepAliveTime = System.currentTimeMillis();
-                send(new MessageInOutKeepAlive(this.keepAliveId));
+                final long time = currentTime();
+                if (this.keepAliveTime == -1L) {
+                    this.keepAliveTime = time;
+                    send(new MessageInOutKeepAlive(time));
+                } else {
+                    disconnect(t("disconnect.timeout"));
+                }
             }
-        }, 0, 2, TimeUnit.SECONDS);
+        }, 0, 15, TimeUnit.SECONDS);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         this.networkManager.onInactive(this);
@@ -339,12 +339,10 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // The player was able to spawn before the connection closed
         if (this.player != null) {
             leavePlayer();
-            //noinspection ConstantConditions
             Lantern.getLogger().debug("{} ({}) disconnected. Reason: {}", this.gameProfile.getName().orElse("Unknown"),
                     this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
         } else if (getProtocolState() != ProtocolState.STATUS) { // Ignore the status requests
             // The player left before he was able to connect
-            //noinspection ConstantConditions
             Lantern.getLogger().debug("A player{} failed to join from {}. Reason: {}", this.gameProfile == null ? "" :
                             " (" + this.gameProfile.getName().orElse("Unknown") + ')',
                     this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));

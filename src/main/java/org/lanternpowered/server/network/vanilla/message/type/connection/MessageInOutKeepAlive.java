@@ -29,23 +29,18 @@ import org.lanternpowered.server.network.message.Message;
 
 public final class MessageInOutKeepAlive implements Message {
 
-    private final int id;
+    private final long time;
 
     /**
-     * Creates a keep alive message.
+     * Constructs a new {@link MessageInOutKeepAlive}.
      * 
-     * @param id The keep alive id
+     * @param time The time
      */
-    public MessageInOutKeepAlive(int id) {
-        this.id = id;
+    public MessageInOutKeepAlive(long time) {
+        this.time = time;
     }
 
-    /**
-     * Gets the keep alive id.
-     * 
-     * @return The keep alive id
-     */
-    public int getId() {
-        return this.id;
+    public long getTime() {
+        return this.time;
     }
 }

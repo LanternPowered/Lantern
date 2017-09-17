@@ -1,19 +1,177 @@
 [
     {
+        "version": 1,
+        "name": [
+            "alpha-1.0.17",
+            "alpha-1.0.17.2",
+            "alpha-1.0.17.3",
+            "alpha-1.0.17.4"
+        ]
+    },
+    {
+        "version": 2,
+        "name": [
+            "alpha-1.1.0",
+            "alpha-1.1.1",
+            "alpha-1.1.2",
+            "alpha-1.1.2.1"
+        ]
+    },
+    {
+        "version": 3,
+        "name": [
+            "alpha-1.2.0",
+            "alpha-1.2.0.1",
+            "alpha-1.2.0.2",
+            "alpha-1.2.1",
+            "alpha-1.2.1.1"
+        ]
+    },
+    {
+        "version": 4,
+        "name": [
+            "alpha-1.2.2"
+        ]
+    },
+    {
+        "version": 5,
+        "name": [
+            "alpha-1.2.3",
+            "alpha-1.2.3.1",
+            "alpha-1.2.3.2",
+            "alpha-1.2.3.3",
+            "alpha-1.2.3.4"
+        ]
+    },
+    {
         "version": 6,
-        "name": "0.0.23a_01"
+        "name": [
+            "alpha-1.2.4",
+            "alpha-1.2.4.1",
+            "alpha-1.2.5",
+            "alpha-1.2.6"
+        ]
     },
     {
         "version": 7,
-        "name": "0.30c"
+        "name": [
+            "beta-1.0",
+            "beta-1.0.1",
+            "beta-1.0.2",
+            "beta-1.1",
+            "beta-1.1.1"
+        ]
+    },
+    {
+        "version": 8,
+        "name": [
+            "beta-1.1.2",
+            "beta-1.2",
+            "beta-1.2.1",
+            "beta-1.2.2"
+        ]
+    },
+    {
+        "version": 9,
+        "name": [
+            "beta-1.3",
+            "beta-1.3.1"
+        ]
+    },
+    {
+        "version": 10,
+        "name": [
+            "beta-1.4",
+            "beta-1.4.1"
+        ]
+    },
+    {
+        "version": 11,
+        "name": [
+            "beta-1.5",
+            "beta-1.5.1"
+        ]
+    },
+    {
+        "version": 12,
+        "name": "beta-1.6-test-b3"
+    },
+    {
+        "version": 13,
+        "name": [
+            "beta-1.6",
+            "beta-1.6.1",
+            "beta-1.6.2",
+            "beta-1.6.3",
+            "beta-1.6.4",
+            "beta-1.6.5",
+            "beta-1.6.6"
+        ]
+    },
+    {
+        "version": 14,
+        "name": [
+            "beta-1.7",
+            "beta-1.7.1",
+            "beta-1.7.2",
+            "beta-1.7.3"
+        ]
+    },
+    {
+        "version": 15,
+        "name": "beta-1.8-pre1"
+    },
+    {
+        "version": 16,
+        "name": "beta-1.8-pre2"
+    },
+    {
+        "version": 17,
+        "name": [
+            "beta-1.8",
+            "beta-1.8.1"
+        ]
+    },
+    {
+        "version": 18,
+        "name": "beta-1.9-pre1"
+    },
+    {
+        "version": 19,
+        "name": [
+            "beta-1.9-pre2",
+            "beta-1.9-pre3"
+        ]
+    },
+    {
+        "version": 20,
+        "name": "beta-1.9-pre4"
+    },
+    {
+        "version": 21,
+        "name": "beta-1.9-pre5"
     },
     {
         "version": 22,
-        "name": "1.0.0"
+        "name": [
+            "beta-1.9-pre6",
+            "1.0.0-rc1",
+            "1.0.0-rc2",
+            "1.0.0",
+            "1.0.1",
+            "11w47a",
+            "11w48a",
+            "11w49a",
+            "11w50a"
+        ],
+        "overridden_name": "1.0.1"
     },
     {
         "version": 23,
-        "name": "1.1"
+        "name": [
+            "12w01a",
+            "1.1"
+        ]
     },
     {
         "version": 24,
@@ -29,11 +187,20 @@
     },
     {
         "version": 28,
-        "name": "1.2.3"
+        "name": [
+            "12w08a",
+            "1.2-pre",
+            "1.2.1",
+            "1.2.2",
+            "1.2.3"
+        ]
     },
     {
         "version": 29,
-        "name": "1.2.5"
+        "name": [
+            "1.2.4",
+            "1.2.5"
+        ]
     },
     {
         "version": 30,
@@ -45,11 +212,17 @@
     },
     {
         "version": 32,
-        "name": "12w19a"
+        "name": [
+            "12w18a",
+            "12w19a"
+        ]
     },
     {
         "version": 33,
-        "name": "12w21ab"
+        "name": [
+            "12w21a",
+            "12w21b"
+        ]
     },
     {
         "version": 34,
@@ -65,7 +238,10 @@
     },
     {
         "version": 37,
-        "name": "12w26a"
+        "name": [
+            "12w25a",
+            "12w26a"
+        ]
     },
     {
         "version": 38,
@@ -73,7 +249,10 @@
     },
     {
         "version": 39,
-        "name": "1.3.2"
+        "name": [
+            "1.3.1",
+            "1.3.2"
+        ]
     },
     {
         "version": 40,
@@ -85,11 +264,28 @@
     },
     {
         "version": 42,
-        "name": "12w34b"
+        "name": [
+            "12w34b",
+            "12w36a",
+            "12w37a"
+        ]
+    },
+    {
+        "version": 43,
+        "name": [
+            "12w38a",
+            "12w38b",
+            "12w39a",
+            "12w39b"
+        ]
+    },
+    {
+        "version": 44,
+        "name": "12w40a"
     },
     {
         "version": 45,
-        "name": "12w40a"
+        "name": "12w40b"
     },
     {
         "version": 46,
@@ -105,7 +301,10 @@
     },
     {
         "version": 49,
-        "name": "1.4.5"
+        "name": [
+            "1.4.4",
+            "1.4.5"
+        ]
     },
     {
         "version": 50,
@@ -113,7 +312,10 @@
     },
     {
         "version": 51,
-        "name": "1.4.7"
+        "name": [
+            "1.4.6",
+            "1.4.7"
+        ]
     },
     {
         "version": 52,
@@ -149,7 +351,10 @@
     },
     {
         "version": 60,
-        "name": "1.5.1"
+        "name": [
+            "1.5",
+            "1.5.1"
+        ]
     },
     {
         "version": 61,
@@ -173,7 +378,12 @@
     },
     {
         "version": 67,
-        "name": "13w23a"
+        "name": [
+            "13w21a",
+            "13w21b",
+            "13w22a",
+            "13w23a"
+        ]
     },
     {
         "version": 68,
@@ -189,11 +399,18 @@
     },
     {
         "version": 71,
-        "name": "13w25c"
+        "name": [
+            "13w25a",
+            "13w25b",
+            "13w25c"
+        ]
     },
     {
         "version": 72,
-        "name": "1.6-pre"
+        "name": [
+            "13w26a",
+            "1.6-pre"
+        ]
     },
     {
         "version": 73,
@@ -205,11 +422,17 @@
     },
     {
         "version": 75,
-        "name": "13w36b"
+        "name": [
+            "13w36a",
+            "13w36b"
+        ]
     },
     {
         "version": 76,
-        "name": "13w37b"
+        "name": [
+            "13w37a",
+            "13w37b"
+        ]
     },
     {
         "version": 77,
@@ -221,10 +444,29 @@
     },
     {
         "version": 79,
-        "name": "13w38c"
+        "name": [
+            "13w38a",
+            "13w38b",
+            "13w38c"
+        ]
     },
     {
         "version": 80,
-        "name": "13w39b"
+        "name": [
+            "13w19a",
+            "13w39b"
+        ]
+    },
+    {
+        "version": 90,
+        "name": "2.0-april-fools-blue"
+    },
+    {
+        "version": 91,
+        "name": "2.0-april-fools-red"
+    },
+    {
+        "version": 92,
+        "name": "2.0-april-fools-purple"
     }
 ]

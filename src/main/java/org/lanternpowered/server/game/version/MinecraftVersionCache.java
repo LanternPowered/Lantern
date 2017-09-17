@@ -25,8 +25,12 @@
  */
 package org.lanternpowered.server.game.version;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import com.google.common.collect.Streams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -36,7 +40,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public final class MinecraftVersionCache {
@@ -61,7 +68,20 @@ public final class MinecraftVersionCache {
         for (int i = 0; i < array.size(); i++) {
             final JsonObject obj = array.get(i).getAsJsonObject();
 
-            final String name = obj.get("name").getAsString();
+            final List<String> names;
+            final JsonElement json = obj.get("name");
+            if (json.isJsonPrimitive()) {
+                names = Collections.singletonList(json.getAsString());
+            } else {
+                names = Streams.stream(json.getAsJsonArray().iterator())
+                        .map(JsonElement::getAsString)
+                        .collect(Collectors.toList());
+            }
+            String name = names.get(names.size() - 1);
+            if (obj.has("overridden_name")) {
+                name = obj.get("overridden_name").getAsString();
+                checkState(names.contains(name), "The overridden name must be in the list of names.");
+            }
             final int protocol = obj.get("version").getAsInt();
 
             final LanternMinecraftVersion version = new LanternMinecraftVersion(name, protocol, legacy);

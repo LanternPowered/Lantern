@@ -117,7 +117,6 @@ public class BehaviorContextImpl implements BehaviorContext {
         checkState(this.snapshots.contains(snapshot), "snapshot isn't present in this context");
         Snapshot snapshot1;
         while ((snapshot1 = this.snapshots.poll()) != snapshot) {
-            System.out.println("DEBUG");
             this.causeStack.popCauseFrame(snapshot1.causeStackFrame);
         }
         snapshot1 = (Snapshot) snapshot;

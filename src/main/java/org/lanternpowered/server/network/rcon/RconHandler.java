@@ -52,6 +52,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -162,8 +163,14 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
             sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
             return;
         }
-        Sponge.getCommandManager().process(source, payload);
-        sendLargeResponse(ctx, requestId, source.flush());
+        // Process the command on the main thread.
+        Lantern.getScheduler().callSync(() -> {
+            final CauseStack causeStack = CauseStack.current();
+            causeStack.pushCause(source.getConnection());
+            Sponge.getCommandManager().process(source, payload);
+            causeStack.popCause();
+            sendLargeResponse(ctx, requestId, source.flush());
+        });
     }
 
     private static void sendResponse(ChannelHandlerContext ctx, int requestId, int type, String payload) {

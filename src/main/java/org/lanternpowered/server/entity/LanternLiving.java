@@ -30,13 +30,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
+import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +55,9 @@ import java.util.UUID;
 public class LanternLiving extends LanternEntity implements Living {
 
     private Vector3d headRotation = Vector3d.ZERO;
+    private long lastFoodTickTime = LanternGame.currentTimeTicks();
+    private long lastPeacefulFoodTickTime = LanternGame.currentTimeTicks();
+    private long lastPeacefulHealthTickTime = LanternGame.currentTimeTicks();
 
     public LanternLiving(UUID uniqueId) {
         super(uniqueId);
@@ -85,6 +97,21 @@ public class LanternLiving extends LanternEntity implements Living {
     public void pulse() {
         super.pulse();
 
+        pulsePotions();
+        pulseFood();
+    }
+
+    @Override
+    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
+        return Optional.empty();
+    }
+
+    private void pulsePotions() {
         // TODO: Move potion effects to a component? + The key registration
         final List<PotionEffect> potionEffects = get(Keys.POTION_EFFECTS).get();
         if (!potionEffects.isEmpty()) {
@@ -102,22 +129,116 @@ public class LanternLiving extends LanternEntity implements Living {
                 }
                 if (potionEffect.getType() == PotionEffectTypes.GLOWING) {
                     offer(Keys.GLOWING, duration > 0);
-                }
-                if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY) {
+                } else if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY) {
                     offer(Keys.INVISIBLE, duration > 0);
+                } else if (potionEffect.getType() == PotionEffectTypes.HUNGER && supports(Keys.EXHAUSTION)) {
+                    offer(Keys.EXHAUSTION, Math.min(get(Keys.EXHAUSTION).orElse(0.0) + (0.005 * (potionEffect.getAmplifier() + 1)),
+                            get(LanternKeys.MAX_EXHAUSTION).orElse(40.0)));
+                } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(FoodData.class)) {
+                    final int amount = potionEffect.getAmplifier() + 1;
+                    offer(Keys.FOOD_LEVEL, Math.min(get(Keys.FOOD_LEVEL).orElse(20) + amount, get(LanternKeys.MAX_FOOD_LEVEL).orElse(20)));
+                    offer(Keys.SATURATION, Math.min(get(Keys.SATURATION).orElse(0.0) + (amount * 2), get(Keys.FOOD_LEVEL).orElse(20)));
                 }
             }
             offer(Keys.POTION_EFFECTS, newPotionEffects.build());
         }
     }
 
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return Optional.empty();
+    private void pulseFood() {
+        if(!supports(FoodData.class) || get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
+            return;
+        }
+        final Difficulty difficulty = getWorld().getDifficulty();
+
+        final MutableBoundedValue<Double> tempExhaustion = getValue(Keys.EXHAUSTION).get();
+        if (tempExhaustion.get() > 4.0) {
+            final MutableBoundedValue<Double> tempSaturation = getValue(Keys.SATURATION).get();
+
+            if (tempSaturation.get() > tempSaturation.getMinValue()) {
+                offer(Keys.SATURATION, Math.max(tempSaturation.get() - 1.0, tempSaturation.getMinValue()));
+            } else if (!difficulty.equals(Difficulties.PEACEFUL)) {
+                offer(Keys.FOOD_LEVEL, Math.max(get(Keys.FOOD_LEVEL).orElse(0) - 1, getValue(Keys.FOOD_LEVEL).get().getMinValue()));
+            }
+
+            offer(Keys.EXHAUSTION, Math.max(tempExhaustion.get() - 4.0, tempExhaustion.getMinValue()));
+        }
+
+        final boolean naturalRegeneration = getWorld().getOrCreateRule(RuleTypes.NATURAL_REGENERATION).getValue();
+
+        final MutableBoundedValue<Double> saturation = getValue(Keys.SATURATION).get();
+        final MutableBoundedValue<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
+        final MutableBoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+
+        final long currentTickTime = LanternGame.currentTimeTicks();
+
+        if (naturalRegeneration && canBeHealed() && saturation.get() > saturation.getMinValue() && foodLevel.get() >= foodLevel.getMaxValue()) {
+            if ((currentTickTime - this.lastFoodTickTime) >= 10) {
+                final double amount = Math.min(saturation.get(), 6.0);
+                heal(amount / 6.0);
+                offer(Keys.EXHAUSTION, Math.min(exhaustion.get() + amount, exhaustion.getMaxValue()));
+                this.lastFoodTickTime = currentTickTime;
+            }
+        } else if (naturalRegeneration && foodLevel.get() >= 18 && canBeHealed()) {
+            if ((currentTickTime - this.lastFoodTickTime) >= 80) {
+                heal(1.0);
+                offer(Keys.EXHAUSTION, Math.min(6.0 + exhaustion.get(), exhaustion.getMaxValue()));
+                this.lastFoodTickTime = currentTickTime;
+            }
+        } else if (foodLevel.get() <= foodLevel.getMinValue()) {
+            if ((currentTickTime - this.lastFoodTickTime) >= 80) {
+                final double health = get(Keys.HEALTH).orElse(20.0);
+                if (health > 10.0 && difficulty.equals(Difficulties.EASY) || health > 1.0 && difficulty.equals(Difficulties.NORMAL)
+                        || difficulty.equals(Difficulties.HARD)) {
+                    damage(1.0, DamageSources.STARVATION);
+                }
+                this.lastFoodTickTime = currentTickTime;
+            }
+        } else {
+            this.lastFoodTickTime = currentTickTime;
+        }
+
+        // Peaceful restoration
+        if (naturalRegeneration && difficulty.equals(Difficulties.PEACEFUL)) {
+            if (((currentTickTime - this.lastPeacefulHealthTickTime) >= 20) && canBeHealed()) {
+                heal(1.0);
+                this.lastPeacefulHealthTickTime = currentTickTime;
+            }
+
+            final int oldFoodLevel = get(Keys.FOOD_LEVEL).orElse(0);
+            if (((currentTickTime - this.lastPeacefulFoodTickTime)) >= 10
+                    && oldFoodLevel < get(LanternKeys.MAX_FOOD_LEVEL).orElse(20)) {
+                offer(Keys.FOOD_LEVEL, oldFoodLevel + 1);
+                this.lastPeacefulFoodTickTime = currentTickTime;
+            }
+        }
     }
 
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return Optional.empty();
+    /**
+     * Whether or not this entity can be healed properly.
+     *
+     * <p>If they aren't dead and have less than max health
+     * they can be healed.</p>
+     *
+     * @return If this entity can be healed
+     */
+    public boolean canBeHealed() {
+        final MutableBoundedValue<Double> health = health();
+        return health.get() > health.getMinValue() && health.get() < health.getMaxValue();
     }
+
+    /**
+     * Heals the entity for the specified amount.
+     *
+     * <p>Will not heal them if they are dead and will not set
+     * them above their maximum health.</p>
+     *
+     * @param amount The amount to heal for
+     */
+    public void heal(double amount) {
+        final MutableBoundedValue<Double> health = health();
+        if (health.get() > health.getMinValue()) {
+            offer(Keys.HEALTH, Math.min(health.get() + amount, health.getMaxValue()));
+        }
+    }
+
 }

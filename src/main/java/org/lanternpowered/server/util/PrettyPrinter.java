@@ -937,7 +937,7 @@ public class PrettyPrinter {
      * @return fluent interface
      */
     public PrettyPrinter trace(String logger) {
-        return this.trace(System.err, LogManager.getLogger(logger));
+        return this.trace(LogManager.getLogger(logger));
     }
 
     /**
@@ -949,7 +949,7 @@ public class PrettyPrinter {
      * @return fluent interface
      */
     public PrettyPrinter trace(String logger, Level level) {
-        return this.trace(System.err, LogManager.getLogger(logger), level);
+        return this.trace(LogManager.getLogger(logger), level);
     }
 
     /**
@@ -960,7 +960,7 @@ public class PrettyPrinter {
      * @return fluent interface
      */
     public PrettyPrinter trace(Logger logger) {
-        return this.trace(System.err, logger);
+        return this.trace(logger, Level.DEBUG);
     }
 
     /**
@@ -972,7 +972,8 @@ public class PrettyPrinter {
      * @return fluent interface
      */
     public PrettyPrinter trace(Logger logger, Level level) {
-        return this.trace(System.err, logger, level);
+        this.log(logger, level);
+        return this;
     }
 
     /**
@@ -983,19 +984,8 @@ public class PrettyPrinter {
      * @return fluent interface
      */
     public PrettyPrinter trace(PrintStream stream) {
-        return this.trace(stream, PrettyPrinter.getDefaultLoggerName());
-    }
-
-    /**
-     * Outputs this printer to the specified stream and to a logger decorated
-     * with the calling class name with the specified level
-     *
-     * @param stream Output stream to print to
-     * @param level Log level to write messages
-     * @return fluent interface
-     */
-    public PrettyPrinter trace(PrintStream stream, Level level) {
-        return this.trace(stream, PrettyPrinter.getDefaultLoggerName(), level);
+        this.print(stream);
+        return this;
     }
 
     /**

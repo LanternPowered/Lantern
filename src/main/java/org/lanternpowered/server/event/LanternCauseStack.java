@@ -28,7 +28,6 @@ package org.lanternpowered.server.event;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import io.netty.util.concurrent.FastThreadLocal;
-import org.apache.logging.log4j.Level;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.PrettyPrinter;
 import org.spongepowered.api.event.cause.Cause;
@@ -177,6 +176,9 @@ public final class LanternCauseStack implements CauseStack {
         checkNotNull(oldFrame, "oldFrame");
         final CauseStackFrameImpl frame = this.frames.peek();
         if (frame != oldFrame) {
+            if (frame.stack != this) {
+                throw new IllegalStateException("Cause Stack Frame Corruption! Attempted to pop a frame from a different stack.");
+            }
             // If the given frame is not the top frame then some form of
             // corruption of the stack has occurred and we do our best to correct
             // it.
@@ -193,18 +195,20 @@ public final class LanternCauseStack implements CauseStack {
                 }
                 i++;
             }
+            final String name = Thread.currentThread().getName();
             if (!DEBUG_CAUSE_FRAMES && offset == -1) {
                 // if we're not debugging the cause frames then throw an error
                 // immediately otherwise let the pretty printer output the frame
                 // that was erroneously popped.
-                throw new IllegalStateException("Cause Stack Frame Corruption! Attempted to pop a frame that was not on the stack.");
+                throw new IllegalStateException("Cause Stack Frame Corruption on the Thread \"" + name +
+                        "\"! Attempted to pop a frame that was not on the stack.");
             }
-            final PrettyPrinter printer = new PrettyPrinter(100).add("Cause Stack Frame Corruption!").centre().hr()
+            final PrettyPrinter printer = new PrettyPrinter(100)
+                    .add("Cause Stack Frame Corruption on the Thread \"" + name + "\"!").centre().hr()
                     .add("Found %d frames left on the stack. Clearing them all.", new Object[]{offset + 1});
             if (!DEBUG_CAUSE_FRAMES) {
-                printer.add()
-                        .add("Please add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.");
-                Lantern.getLogger().warn("  Add -Dsponge.debugcauseframes to your startup flags to enable further debugging output.");
+                printer.add().add("Please add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.");
+                Lantern.getLogger().warn("  Add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.");
             } else {
                 printer.add()
                         .add("Attempting to pop frame:")
@@ -217,13 +221,14 @@ public final class LanternCauseStack implements CauseStack {
             while (offset >= 0) {
                 CauseStackFrameImpl f = this.frames.peek();
                 if (DEBUG_CAUSE_FRAMES && offset > 0) {
-                    printer.add("   Stack frame in position %n:", offset);
+                    printer.add();
+                    printer.add(String.format("    Stack frame in position %s:", offset));
                     printer.add(f.debugStack);
                 }
                 popCauseFrame(f);
                 offset--;
             }
-            printer.trace(System.err, Lantern.getLog4jLogger(), Level.ERROR);
+            printer.trace(System.err);
             if (offset == -1) {
                 // Popping a frame that was not on the stack is not recoverable
                 // so we throw an exception.

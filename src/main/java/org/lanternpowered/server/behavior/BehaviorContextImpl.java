@@ -30,8 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -67,7 +65,7 @@ import java.util.function.Function;
 @SuppressWarnings({"unchecked", "ConstantConditions", "SuspiciousMethodCalls"})
 public class BehaviorContextImpl implements BehaviorContext {
 
-    public final class Snapshot implements BehaviorContext.Snapshot {
+    private final class Snapshot implements BehaviorContext.Snapshot {
 
         private final Int2ObjectMap<Object> parameterValues;
         private final Map<Location<World>, BlockSnapshot> blockSnapshots;
@@ -103,12 +101,14 @@ public class BehaviorContextImpl implements BehaviorContext {
 
     @Override
     public Snapshot pushSnapshot() {
-        return new Snapshot(new Int2ObjectOpenHashMap<>(this.parameterValues),
-                ImmutableMap.copyOf(this.blockSnapshots),
-                ImmutableSet.copyOf(this.positionlessBlockSnapshots),
-                ImmutableSet.copyOf(this.slotTransactions),
-                ImmutableSet.copyOf(this.entitySnapshots),
+        final Snapshot snapshot = new Snapshot(new Int2ObjectOpenHashMap<>(this.parameterValues),
+                new HashMap<>(this.blockSnapshots),
+                new HashSet<>(this.positionlessBlockSnapshots),
+                new HashSet<>(this.slotTransactions),
+                new HashSet<>(this.entitySnapshots),
                 this.causeStack.pushCauseFrame());
+        this.snapshots.push(snapshot);
+        return snapshot;
     }
 
     @Override
@@ -117,7 +117,8 @@ public class BehaviorContextImpl implements BehaviorContext {
         checkState(this.snapshots.contains(snapshot), "snapshot isn't present in this context");
         Snapshot snapshot1;
         while ((snapshot1 = this.snapshots.poll()) != snapshot) {
-            snapshot1.causeStackFrame.close();
+            System.out.println("DEBUG");
+            this.causeStack.popCauseFrame(snapshot1.causeStackFrame);
         }
         snapshot1 = (Snapshot) snapshot;
 
@@ -289,7 +290,7 @@ public class BehaviorContextImpl implements BehaviorContext {
     public void revert() {
         Snapshot snapshot1;
         while ((snapshot1 = this.snapshots.poll()) != null) {
-            snapshot1.causeStackFrame.close();
+            this.causeStack.popCauseFrame(snapshot1.causeStackFrame);
         }
     }
 

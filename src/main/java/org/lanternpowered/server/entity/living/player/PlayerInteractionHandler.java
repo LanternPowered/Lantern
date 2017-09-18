@@ -332,9 +332,6 @@ public final class PlayerInteractionHandler {
                 frame.addContext(ContextKeys.USED_BLOCK_STATE, blockState);
 
                 BehaviorContext.Snapshot snapshot1 = context.pushSnapshot();
-                frame.addContext(ContextKeys.USED_ITEM_STACK, hotbarSlot.peek().orElse(null));
-                frame.addContext(ContextKeys.USED_SLOT, hotbarSlot);
-                frame.addContext(ContextKeys.INTERACTION_HAND, HandTypes.MAIN_HAND);
 
                 final BehaviorResult result = context.process(blockType.getPipeline().pipeline(InteractWithBlockBehavior.class),
                         (ctx, behavior) -> behavior.tryInteract(blockType.getPipeline(), ctx));
@@ -350,10 +347,6 @@ public final class PlayerInteractionHandler {
 
                 context.popSnapshot(snapshot1);
                 snapshot1 = context.pushSnapshot();
-
-                causeStack.addContext(ContextKeys.USED_ITEM_STACK, offHandSlot.peek().orElse(null));
-                causeStack.addContext(ContextKeys.USED_SLOT, offHandSlot);
-                causeStack.addContext(ContextKeys.INTERACTION_HAND, HandTypes.OFF_HAND);
 
                 if (result.isSuccess()) {
                     snapshot1 = context.pushSnapshot();

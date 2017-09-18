@@ -31,7 +31,6 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -41,10 +40,9 @@ public class ShieldInteractionBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Optional<Player> optPlayer = causeStack.getContext(ContextKeys.PLAYER);
+        final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
-            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(causeStack.requireContext(ContextKeys.INTERACTION_HAND)));
+            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.requireContext(ContextKeys.INTERACTION_HAND)));
             return BehaviorResult.SUCCESS;
         }
         return BehaviorResult.PASS;

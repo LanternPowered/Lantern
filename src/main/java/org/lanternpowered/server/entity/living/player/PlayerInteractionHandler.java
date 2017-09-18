@@ -405,22 +405,22 @@ public final class PlayerInteractionHandler {
         final Optional<ItemStack> handItem = slot.peek();
         if (handItem.isPresent()) {
             final CauseStack causeStack = CauseStack.current();
-            final CauseStack.Frame frame = causeStack.pushCauseFrame();
-            causeStack.addContext(ContextKeys.PLAYER, this.player);
-            if (handItem.isPresent()) {
-                final LanternItemType itemType = (LanternItemType) handItem.get().getType();
-                causeStack.addContext(ContextKeys.USED_ITEM_STACK, handItem.get());
-                causeStack.addContext(ContextKeys.USED_SLOT, slot);
-                causeStack.addContext(ContextKeys.INTERACTION_HAND, handType);
-                causeStack.addContext(ContextKeys.ITEM_TYPE, itemType);
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.addContext(ContextKeys.PLAYER, this.player);
+                if (handItem.isPresent()) {
+                    final LanternItemType itemType = (LanternItemType) handItem.get().getType();
+                    frame.addContext(ContextKeys.USED_ITEM_STACK, handItem.get());
+                    frame.addContext(ContextKeys.USED_SLOT, slot);
+                    frame.addContext(ContextKeys.INTERACTION_HAND, handType);
+                    frame.addContext(ContextKeys.ITEM_TYPE, itemType);
 
-                final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
-                if (context.process(itemType.getPipeline().pipeline(FinishUsingItemBehavior.class),
-                        (ctx, behavior) -> behavior.tryUse(itemType.getPipeline(), ctx)).isSuccess()) {
-                    context.accept();
+                    final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
+                    if (context.process(itemType.getPipeline().pipeline(FinishUsingItemBehavior.class),
+                            (ctx, behavior) -> behavior.tryUse(itemType.getPipeline(), ctx)).isSuccess()) {
+                        context.accept();
+                    }
                 }
             }
-            causeStack.popCauseFrame(frame);
         }
         resetItemUseTime();
     }
@@ -506,11 +506,10 @@ public final class PlayerInteractionHandler {
         final Optional<ItemStack> handItem = slot.peek();
         if (handItem.isPresent()) {
             final LanternItemType itemType = (LanternItemType) handItem.get().getType();
-            final CauseStack causeStack = context.getCauseStack();
-            causeStack.addContext(ContextKeys.USED_ITEM_STACK, handItem.get());
-            causeStack.addContext(ContextKeys.USED_SLOT, slot);
-            causeStack.addContext(ContextKeys.INTERACTION_HAND, handType);
-            causeStack.addContext(ContextKeys.ITEM_TYPE, itemType);
+            context.addContext(ContextKeys.USED_ITEM_STACK, handItem.get());
+            context.addContext(ContextKeys.USED_SLOT, slot);
+            context.addContext(ContextKeys.INTERACTION_HAND, handType);
+            context.addContext(ContextKeys.ITEM_TYPE, itemType);
 
             final BehaviorResult result = context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
                     (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx));

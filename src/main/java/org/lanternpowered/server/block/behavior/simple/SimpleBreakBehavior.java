@@ -42,7 +42,7 @@ public class SimpleBreakBehavior implements BreakBlockBehavior {
         final BlockSnapshotBuilder builder = BlockSnapshotBuilder.create();
         // Apply the creator and notifier to the block
         context.populateBlockSnapshot(builder, BehaviorContext.PopulationFlags.CREATOR_AND_NOTIFIER);
-        builder.location(context.getCauseStack().requireContext(ContextKeys.BLOCK_LOCATION));
+        builder.location(context.requireContext(ContextKeys.BLOCK_LOCATION));
         // The block should be replaced with air
         builder.blockState(BlockTypes.AIR.getDefaultState());
         // Add the block change

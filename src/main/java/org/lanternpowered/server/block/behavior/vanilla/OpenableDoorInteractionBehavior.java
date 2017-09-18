@@ -32,7 +32,6 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -55,8 +54,7 @@ public class OpenableDoorInteractionBehavior extends OpenableInteractionBehavior
             return result;
         }
 
-        final CauseStack causeStack = context.getCauseStack();
-        final Location<World> location = causeStack.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final BlockState baseState = location.getBlock();
         final LanternDoorHalf half = baseState.get(LanternKeys.DOOR_HALF).orElse(null);
         if (half == null) {

@@ -31,7 +31,6 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 
@@ -39,8 +38,7 @@ public class HopperPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        Direction facing = causeStack.requireContext(ContextKeys.INTERACTION_FACE);
+        Direction facing = context.requireContext(ContextKeys.INTERACTION_FACE);
         if (facing == Direction.UP) {
             facing = Direction.DOWN;
         }

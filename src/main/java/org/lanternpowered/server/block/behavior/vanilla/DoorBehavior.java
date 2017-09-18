@@ -38,7 +38,6 @@ import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.util.Quaternions;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -61,9 +60,8 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Location<World> location = causeStack.requireContext(ContextKeys.BLOCK_LOCATION);
-        final Direction face = causeStack.requireContext(ContextKeys.INTERACTION_FACE);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
 
         // Door can only be placed by clicking in the floor
         if (face != Direction.DOWN) {
@@ -80,14 +78,14 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
         if (!replaceableProp.getValue()) {
             return BehaviorResult.PASS;
         }
-        final BlockSnapshot snapshot = causeStack.getContext(ContextKeys.BLOCK_SNAPSHOT)
+        final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotRetrieveBehavior BlockSnapshot isn't present."));
         final BlockSnapshotBuilder builder = BlockSnapshotBuilder.create().from(snapshot);
         context.populateBlockSnapshot(builder, BehaviorContext.PopulationFlags.CREATOR_AND_NOTIFIER);
 
         Direction facing = Direction.NORTH;
         Vector3i left = Vector3i.UNIT_X;
-        final Optional<Entity> optSource = causeStack.first(Entity.class);
+        final Optional<Entity> optSource = context.first(Entity.class);
         if (optSource.isPresent()) {
             final Entity source = optSource.get();
             final Vector3d rotVector;
@@ -114,7 +112,7 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
     @Override
     public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.getCauseStack().getContext(ContextKeys.BLOCK_LOCATION).get();
+        final Location<World> location = context.getContext(ContextKeys.BLOCK_LOCATION).get();
 
         final BlockState baseState = location.getBlock();
         final LanternDoorHalf half = baseState.get(LanternKeys.DOOR_HALF).get();

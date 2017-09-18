@@ -32,7 +32,6 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -45,8 +44,7 @@ public class OpenableContainerInteractionBehavior implements InteractWithBlockBe
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Location<World> location = causeStack.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTileEntity = location.getTileEntity();
         if (!optTileEntity.isPresent()) {
             return BehaviorResult.CONTINUE;
@@ -55,7 +53,7 @@ public class OpenableContainerInteractionBehavior implements InteractWithBlockBe
         if (!optInventory.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
-        final LanternPlayer player = (LanternPlayer) causeStack.getContext(ContextKeys.PLAYER).orElse(null);
+        final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
         if (player == null) {
             return BehaviorResult.CONTINUE;
         }

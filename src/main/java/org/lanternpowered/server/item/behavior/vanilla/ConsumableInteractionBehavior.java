@@ -33,7 +33,6 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.PotionEffectHelper;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
@@ -68,11 +67,10 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Optional<Player> optPlayer = causeStack.getContext(ContextKeys.PLAYER);
+        final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
             final Player player = optPlayer.get();
-            final ItemStack itemStack = causeStack.requireContext(ContextKeys.USED_ITEM_STACK);
+            final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
             final AlwaysConsumableProperty property = itemStack.getProperty(AlwaysConsumableProperty.class).orElse(null);
             if (property == null || !property.getValue()) {
                 int status = 0;
@@ -95,7 +93,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                     return BehaviorResult.PASS;
                 }
             }
-            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(causeStack.requireContext(ContextKeys.INTERACTION_HAND)));
+            optPlayer.get().offer(LanternKeys.ACTIVE_HAND, Optional.of(context.requireContext(ContextKeys.INTERACTION_HAND)));
             return BehaviorResult.SUCCESS;
         }
         return BehaviorResult.PASS;
@@ -103,11 +101,10 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
 
     @Override
     public BehaviorResult tryUse(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Optional<Player> optPlayer = causeStack.getContext(ContextKeys.PLAYER);
+        final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
             final Player player = optPlayer.get();
-            final ItemStack itemStack = causeStack.requireContext(ContextKeys.USED_ITEM_STACK);
+            final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
 
             final FoodRestorationProperty foodRestorationProperty = itemStack.getProperty(FoodRestorationProperty.class).orElse(null);
             if (foodRestorationProperty != null && foodRestorationProperty.getValue() != 0.0) {
@@ -145,7 +142,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
             }
 
             if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                final Slot slot = causeStack.requireContext(ContextKeys.USED_SLOT);
+                final Slot slot = context.requireContext(ContextKeys.USED_SLOT);
                 slot.poll(1);
                 if (this.restItemSupplier != null) {
                     if (slot.peek().isPresent()) {

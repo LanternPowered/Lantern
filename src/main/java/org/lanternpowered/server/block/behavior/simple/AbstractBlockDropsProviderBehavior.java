@@ -47,7 +47,7 @@ public abstract class AbstractBlockDropsProviderBehavior implements BlockDropsPr
     public void tryAddDrops(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final List<ItemStackSnapshot> itemStacks = new ArrayList<>();
         collectDrops(context, itemStacks);
-        final Location<World> location = context.getCauseStack().requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final Vector3d position = location.getPosition().add(0.5, 0.5, 0.5);
         itemStacks.forEach(itemStack -> {
             final Entity entity = location.getExtent().createEntity(EntityTypes.ITEM, position);

@@ -37,7 +37,7 @@ public class OppositeFaceDirectionalPlacementBehavior implements PlaceBlockBehav
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        context.getCauseStack().getContext(ContextKeys.INTERACTION_FACE).ifPresent(face ->
+        context.getContext(ContextKeys.INTERACTION_FACE).ifPresent(face ->
                 context.transformBlockChanges((original, builder) -> builder.add(Keys.DIRECTION, face.getOpposite())));
         return BehaviorResult.CONTINUE;
     }

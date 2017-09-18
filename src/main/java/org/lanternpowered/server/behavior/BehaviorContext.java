@@ -32,6 +32,7 @@ import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
+import org.spongepowered.api.event.cause.EventContextKey;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.Collection;
@@ -39,10 +40,16 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public interface BehaviorContext {
+public interface BehaviorContext extends CauseStack {
 
     interface Snapshot {
     }
+
+    @Override
+    BehaviorContext pushCause(Object obj);
+
+    @Override
+    <T> BehaviorContext addContext(EventContextKey<T> key, T value);
 
     /**
      * Gets the current {@link CauseStack}.

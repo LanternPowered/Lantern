@@ -34,7 +34,6 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.key.Keys;
@@ -52,21 +51,20 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Optional<Location<World>> optLocation = causeStack.getContext(ContextKeys.INTERACTION_LOCATION);
+        final Optional<Location<World>> optLocation = context.getContext(ContextKeys.INTERACTION_LOCATION);
         if (!optLocation.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
 
-        final Direction blockFace = causeStack.getContext(ContextKeys.INTERACTION_FACE).get();
+        final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get();
         Location<World> location = optLocation.get();
         if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
             location = location.add(blockFace.getOpposite().asBlockOffset());
         }
-        causeStack.addContext(ContextKeys.BLOCK_LOCATION, location);
+        context.addContext(ContextKeys.BLOCK_LOCATION, location);
 
-        final LanternBlockType blockType = (LanternBlockType) causeStack.getContext(ContextKeys.ITEM_TYPE).get().getBlock().get();
-        causeStack.addContext(ContextKeys.BLOCK_TYPE, blockType);
+        final LanternBlockType blockType = (LanternBlockType) context.getContext(ContextKeys.ITEM_TYPE).get().getBlock().get();
+        context.addContext(ContextKeys.BLOCK_TYPE, blockType);
 
         final BehaviorContext.Snapshot snapshot = context.pushSnapshot();
 
@@ -81,14 +79,14 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
                 // Check if the block is placed within the building limits
                 if (location1.getBlockY() >= buildHeight) {
                     context.popSnapshot(snapshot);
-                    causeStack.getContext(ContextKeys.PLAYER).ifPresent(player ->
+                    context.getContext(ContextKeys.PLAYER).ifPresent(player ->
                             player.sendMessage(ChatTypes.ACTION_BAR, t("build.tooHigh", buildHeight)));
                     return BehaviorResult.FAIL;
                 }
             }
-            causeStack.getContext(ContextKeys.PLAYER).ifPresent(player -> {
+            context.getContext(ContextKeys.PLAYER).ifPresent(player -> {
                 if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                    causeStack.requireContext(ContextKeys.USED_SLOT).poll(1);
+                    context.requireContext(ContextKeys.USED_SLOT).poll(1);
                 }
             });
             return BehaviorResult.SUCCESS;

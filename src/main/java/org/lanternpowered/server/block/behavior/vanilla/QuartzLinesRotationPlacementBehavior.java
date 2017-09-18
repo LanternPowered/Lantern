@@ -42,7 +42,7 @@ public class QuartzLinesRotationPlacementBehavior implements PlaceBlockBehavior 
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Direction face = context.getCauseStack().requireContext(ContextKeys.INTERACTION_FACE);
+        final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
         final Axis axis = Axis.getClosest(face.asOffset());
         final QuartzType newQuartzType = axis == Axis.X ? QuartzTypes.LINES_X : axis == Axis.Y ? QuartzTypes.LINES_Y : QuartzTypes.LINES_Z;
         context.transformBlockChanges((original, builder) -> {

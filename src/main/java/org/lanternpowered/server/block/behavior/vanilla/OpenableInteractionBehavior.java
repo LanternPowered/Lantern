@@ -34,7 +34,6 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -49,10 +48,9 @@ import javax.annotation.Nullable;
 public class OpenableInteractionBehavior implements InteractWithBlockBehavior {
 
     public static OpenCloseAccess DEFAULT_ACCESS = (context, action, original) -> {
-        final CauseStack causeStack = context.getCauseStack();
-        final Optional<String> optLockToken = causeStack.requireContext(ContextKeys.BLOCK_LOCATION).get(Keys.LOCK_TOKEN);
+        final Optional<String> optLockToken = context.requireContext(ContextKeys.BLOCK_LOCATION).get(Keys.LOCK_TOKEN);
         if (optLockToken.isPresent()) {
-            final Optional<ItemStack> usedItem = causeStack.getContext(ContextKeys.USED_ITEM_STACK);
+            final Optional<ItemStack> usedItem = context.getContext(ContextKeys.USED_ITEM_STACK);
             if (usedItem.isPresent()) {
                 final ItemStack itemStack = usedItem.get();
                 final Optional<String> optItemLockToken = itemStack.get(Keys.LOCK_TOKEN);
@@ -81,8 +79,7 @@ public class OpenableInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Location<World> location = causeStack.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final Optional<Boolean> optIsOpen = location.get(Keys.OPEN);
         if (!optIsOpen.isPresent()) {
             return BehaviorResult.FAIL;

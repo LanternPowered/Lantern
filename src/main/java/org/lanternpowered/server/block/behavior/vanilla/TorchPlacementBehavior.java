@@ -33,7 +33,6 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.block.property.SolidSideProperty;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
@@ -47,15 +46,14 @@ public class TorchPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        Direction face = causeStack.requireContext(ContextKeys.INTERACTION_FACE);
+        Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
         if (face == Direction.UP) {
             return BehaviorResult.PASS;
         }
-        final BlockSnapshot snapshot = causeStack.getContext(ContextKeys.BLOCK_SNAPSHOT)
+        final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotProviderPlaceBehavior's BlockSnapshot isn't present."));
-        final Location<World> location = causeStack.requireContext(ContextKeys.BLOCK_LOCATION);
-        final Location<World> clickLocation = causeStack.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location<World> clickLocation = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         boolean flag = clickLocation.getExtent().getProperty(
                 clickLocation.getBlockPosition(), face, SolidSideProperty.class).get().getValue();
         BlockSnapshotBuilder builder = BlockSnapshotBuilder.create().from(snapshot);

@@ -48,20 +48,19 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final LanternPlayer player = (LanternPlayer) causeStack.requireContext(ContextKeys.PLAYER);
-        final ItemStack itemStack = causeStack.requireContext(ContextKeys.USED_ITEM_STACK);
+        final LanternPlayer player = (LanternPlayer) context.requireContext(ContextKeys.PLAYER);
+        final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
 
         final PeekOfferTransactionsResult result = player.getInventory().getEquipment().peekOfferFastTransactions(itemStack.copy());
         if (result.getOfferResult().isSuccess()) {
             final List<SlotTransaction> transactions = result.getTransactions();
-            final LanternSlot slot = (LanternSlot) causeStack.getContext(ContextKeys.USED_SLOT).orElse(null);
+            final LanternSlot slot = (LanternSlot) context.getContext(ContextKeys.USED_SLOT).orElse(null);
             if (slot != null) {
                 transactions.add(new SlotTransaction(
                         slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(result.getOfferResult().getRest())));
             }
             final ChangeInventoryEvent.Equipment event = SpongeEventFactory.createChangeInventoryEventEquipment(
-                    causeStack.getCurrentCause(), player.getInventory(), result.getTransactions());
+                    context.getCurrentCause(), player.getInventory(), result.getTransactions());
             if (event.isCancelled()) {
                 return BehaviorResult.CONTINUE;
             }

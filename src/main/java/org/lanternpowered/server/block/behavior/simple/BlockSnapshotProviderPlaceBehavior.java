@@ -54,13 +54,12 @@ public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final BlockSnapshot.Builder builder = BlockSnapshotBuilder.createPositionless();
-        final CauseStack causeStack = context.getCauseStack();
-        final Optional<ItemStack> optItem = causeStack.getContext(ContextKeys.USED_ITEM_STACK);
+        final Optional<ItemStack> optItem = context.getContext(ContextKeys.USED_ITEM_STACK);
         if (optItem.isPresent()) {
             builder.blockState(optItem.get().getType().getBlock().get().getDefaultState());
             optItem.get().getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
         } else {
-            final Optional<BlockState> optState = causeStack.getContext(ContextKeys.USED_BLOCK_STATE);
+            final Optional<BlockState> optState = context.getContext(ContextKeys.USED_BLOCK_STATE);
             if (optState.isPresent()) {
                 builder.blockState(optState.get());
             } else {
@@ -68,7 +67,7 @@ public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
             }
         }
         context.populateBlockSnapshot(builder, BehaviorContext.PopulationFlags.CREATOR | BehaviorContext.PopulationFlags.NOTIFIER);
-        causeStack.addContext(ContextKeys.BLOCK_SNAPSHOT, builder.build());
+        context.addContext(ContextKeys.BLOCK_SNAPSHOT, builder.build());
         return BehaviorResult.CONTINUE;
     }
 }

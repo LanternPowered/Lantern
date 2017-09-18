@@ -31,7 +31,6 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.spongepowered.api.data.type.HandTypes;
@@ -43,13 +42,12 @@ public class OpenHeldBookBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final ItemStack itemStack = causeStack.getContext(ContextKeys.USED_SLOT).flatMap(Slot::peek).orElse(null);
+        final ItemStack itemStack = context.getContext(ContextKeys.USED_SLOT).flatMap(Slot::peek).orElse(null);
         if (itemStack != null && itemStack.getType() == ItemTypes.WRITTEN_BOOK) {
-            final LanternPlayer player = (LanternPlayer) causeStack.getContext(ContextKeys.PLAYER).orElse(null);
+            final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
             if (player != null) {
-                player.getConnection().send(new MessagePlayOutOpenBook(causeStack
-                        .getContext(ContextKeys.INTERACTION_HAND).orElse(HandTypes.MAIN_HAND)));
+                player.getConnection().send(new MessagePlayOutOpenBook(
+                        context.getContext(ContextKeys.INTERACTION_HAND).orElse(HandTypes.MAIN_HAND)));
                 return BehaviorResult.SUCCESS;
             }
         }

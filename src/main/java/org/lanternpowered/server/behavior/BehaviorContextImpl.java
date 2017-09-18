@@ -42,6 +42,10 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKey;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -64,6 +68,83 @@ import java.util.function.Function;
 
 @SuppressWarnings({"unchecked", "ConstantConditions", "SuspiciousMethodCalls"})
 public class BehaviorContextImpl implements BehaviorContext {
+
+    @Override
+    public Cause getCurrentCause() {
+        return this.causeStack.getCurrentCause();
+    }
+
+    @Override
+    public EventContext getCurrentContext() {
+        return this.causeStack.getCurrentContext();
+    }
+
+    @Override
+    public Object popCause() {
+        return this.causeStack.popCause();
+    }
+
+    @Override
+    public void popCauses(int n) {
+        this.causeStack.popCauses(n);
+    }
+
+    @Override
+    public Object peekCause() {
+        return this.causeStack.peekCause();
+    }
+
+    @Override
+    public void popCauseFrame(StackFrame handle) {
+        this.causeStack.popCauseFrame(handle);
+    }
+
+    @Override
+    public <T> Optional<T> getContext(EventContextKey<T> key) {
+        return this.causeStack.getContext(key);
+    }
+
+    @Override
+    public <T> Optional<T> removeContext(EventContextKey<T> key) {
+        return this.causeStack.removeContext(key);
+    }
+
+    @Override
+    public <T> Optional<T> first(Class<T> target) {
+        return this.causeStack.first(target);
+    }
+
+    @Override
+    public <T> Optional<T> last(Class<T> target) {
+        return this.causeStack.last(target);
+    }
+
+    @Override
+    public boolean containsType(Class<?> target) {
+        return this.causeStack.containsType(target);
+    }
+
+    @Override
+    public boolean contains(Object object) {
+        return this.causeStack.contains(object);
+    }
+
+    @Override
+    public Frame pushCauseFrame() {
+        return this.causeStack.pushCauseFrame();
+    }
+
+    @Override
+    public BehaviorContextImpl pushCause(Object obj) {
+        this.causeStack.pushCause(obj);
+        return this;
+    }
+
+    @Override
+    public <T> BehaviorContextImpl addContext(EventContextKey<T> key, T value) {
+        this.causeStack.addContext(key, value);
+        return this;
+    }
 
     private final class Snapshot implements BehaviorContext.Snapshot {
 

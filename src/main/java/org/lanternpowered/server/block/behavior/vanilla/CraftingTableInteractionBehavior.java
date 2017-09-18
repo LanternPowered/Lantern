@@ -31,7 +31,6 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.block.CraftingTableInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Container;
@@ -42,8 +41,7 @@ public class CraftingTableInteractionBehavior implements InteractWithBlockBehavi
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Optional<Player> optPlayer = causeStack.getContext(ContextKeys.PLAYER);
+        final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
             final Optional<Container> optContainer = optPlayer.get().openInventory(
                     new CraftingTableInventory(optPlayer.get().getInventory(), null));

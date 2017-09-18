@@ -32,7 +32,6 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.key.Keys;
@@ -52,8 +51,7 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final Location<World> location = causeStack.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTile = location.getTileEntity();
         if (optTile.isPresent()) {
             final TileEntity tile = optTile.get();
@@ -67,7 +65,7 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
                     // TODO: Include the entity in the behavior context
                     success = true;
                 }
-                final Optional<ItemStack> optItemStack = causeStack.getContext(ContextKeys.USED_ITEM_STACK);
+                final Optional<ItemStack> optItemStack = context.getContext(ContextKeys.USED_ITEM_STACK);
                 if (optItemStack.isPresent()) {
                     final ItemStack itemStack = optItemStack.get();
                     final RecordProperty property = itemStack.getProperty(RecordProperty.class).orElse(null);
@@ -76,9 +74,9 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
                         final ItemStackSnapshot oldSnapshot = itemStack.createSnapshot();
                         itemStack.setQuantity(itemStack.getQuantity() - 1);
                         final ItemStackSnapshot newSnapshot = itemStack.createSnapshot();
-                        causeStack.getContext(ContextKeys.PLAYER).ifPresent(player -> {
+                        context.getContext(ContextKeys.PLAYER).ifPresent(player -> {
                             if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                                causeStack.getContext(ContextKeys.USED_SLOT).ifPresent(slot -> context.addSlotChange(
+                                context.getContext(ContextKeys.USED_SLOT).ifPresent(slot -> context.addSlotChange(
                                         new SlotTransaction(slot, oldSnapshot, newSnapshot)));
                             }
                         });

@@ -34,7 +34,6 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
@@ -47,11 +46,10 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final CauseStack causeStack = context.getCauseStack();
-        final BlockSnapshot snapshot = causeStack.getContext(ContextKeys.BLOCK_SNAPSHOT)
+        final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotProviderPlaceBehavior's BlockSnapshot isn't present."));
-        final Location<World> location = causeStack.requireContext(ContextKeys.BLOCK_LOCATION);
-        final LanternPlayer player = (LanternPlayer) causeStack.getContext(ContextKeys.PLAYER).orElse(null);
+        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
 
         // Get the direction the chest should face
         Direction facing;

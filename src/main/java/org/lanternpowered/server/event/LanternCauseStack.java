@@ -204,8 +204,8 @@ public final class LanternCauseStack implements CauseStack {
                         "\"! Attempted to pop a frame that was not on the stack.");
             }
             final PrettyPrinter printer = new PrettyPrinter(100)
-                    .add("Cause Stack Frame Corruption on the Thread \"" + name + "\"!").centre().hr()
-                    .add("Found %d frames left on the stack. Clearing them all.", new Object[]{offset + 1});
+                    .add("Cause Stack Frame Corruption on the Thread \"%s\"!", name).centre().hr()
+                    .add("Found %d frames left on the stack. Clearing them all.", new Object[] { offset + 1 });
             if (!DEBUG_CAUSE_FRAMES) {
                 printer.add().add("Please add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.");
                 Lantern.getLogger().warn("  Add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.");

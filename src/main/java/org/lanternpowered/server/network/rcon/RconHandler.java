@@ -61,6 +61,7 @@ import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutionException;
 
 final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
@@ -157,20 +158,23 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
     }
 
-    private static void handleCommand(ChannelHandlerContext ctx, String payload, int requestId) {
+    private static void handleCommand(ChannelHandlerContext ctx, String payload, int requestId)
+            throws ExecutionException, InterruptedException {
         final RconSource source = ctx.channel().attr(SOURCE).get();
         if (!source.getLoggedIn()) {
             sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
             return;
         }
-        // Process the command on the main thread.
-        Lantern.getScheduler().callSync(() -> {
+        // Process the command on the main thread and send
+        // the response on the netty thread.
+        final String content = Lantern.getScheduler().callSync(() -> {
             final CauseStack causeStack = CauseStack.current();
             causeStack.pushCause(source.getConnection());
             Sponge.getCommandManager().process(source, payload);
             causeStack.popCause();
-            sendLargeResponse(ctx, requestId, source.flush());
-        });
+            return source.flush();
+        }).get();
+        sendLargeResponse(ctx, requestId, content);
     }
 
     private static void sendResponse(ChannelHandlerContext ctx, int requestId, int type, String payload) {

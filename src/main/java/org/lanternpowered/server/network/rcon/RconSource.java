@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 
 public final class RconSource extends AbstractProxySubject implements org.spongepowered.api.command.source.RconSource {
 
-    public static final String NAME_FORMAT = "Rcon{%s}";
+    public static final String NAME_FORMAT = "Rcon[%s]";
     public static final Pattern NAME_PATTERN = Pattern.compile('^' + String.format(NAME_FORMAT, "(.+)") + '$');
 
     private final StringBuffer buffer = new StringBuffer();

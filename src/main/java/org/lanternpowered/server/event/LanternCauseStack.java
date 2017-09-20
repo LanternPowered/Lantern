@@ -27,6 +27,7 @@ package org.lanternpowered.server.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
 import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.PrettyPrinter;
@@ -166,7 +167,7 @@ public final class LanternCauseStack implements CauseStack {
             // Attach an exception to the frame so that if there is any frame
             // corruption we can print out the stack trace of when the frames
             // were created.
-            frame.debugStack = new Exception();
+            frame.debugStack = new Exception("");
         }
         return frame;
     }
@@ -210,20 +211,20 @@ public final class LanternCauseStack implements CauseStack {
                 printer.add().add("Please add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.");
                 Lantern.getLogger().warn("  Add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.");
             } else {
-                printer.add()
-                        .add("Attempting to pop frame:")
-                        .add(frame.debugStack)
-                        .add()
-                        .add("Frames being popped are:")
-                        .add(((CauseStackFrameImpl) oldFrame).debugStack);
+                printer.add();
+                printer.add("> Attempting to pop frame:");
+                printStack(printer, frame.debugStack);
+                printer.add();
+                printer.add("> Frames being popped are:");
+                printStack(printer, ((CauseStackFrameImpl) oldFrame).debugStack);
             }
 
             while (offset >= 0) {
                 CauseStackFrameImpl f = this.frames.peek();
                 if (DEBUG_CAUSE_FRAMES && offset > 0) {
                     printer.add();
-                    printer.add(String.format("    Stack frame in position %s:", offset));
-                    printer.add(f.debugStack);
+                    printer.add(String.format("> Stack frame in position %s:", offset));
+                    printStack(printer, f.debugStack);
                 }
                 popCauseFrame(f);
                 offset--;
@@ -258,6 +259,22 @@ public final class LanternCauseStack implements CauseStack {
             this.cause.pop();
         }
         this.minDepth = frame.oldMinDepth;
+    }
+
+    /**
+     * A custom print {@link Throwable} method to ignore
+     * the first entry in the stack.
+     *
+     * @param printer The printer
+     * @param th The throwable
+     */
+    private static void printStack(PrettyPrinter printer, Throwable th) {
+        final String margin = Strings.repeat(" ", 4);
+        final StackTraceElement[] stackTrace = th.getStackTrace();
+        printer.add("%s: %s", th.getClass().getName(), th.getMessage());
+        for (int i = 1; i < stackTrace.length; i++) {
+            printer.add("%s%s", margin, stackTrace[i]);
+        }
     }
 
     @Override

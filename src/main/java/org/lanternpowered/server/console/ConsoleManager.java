@@ -56,6 +56,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -64,8 +65,7 @@ public final class ConsoleManager {
 
     static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(
             PrintStream.class.getName(), LoggerPrintStream.class.getName(), PrettyPrinter.class.getName());
-    static final Set<String> IGNORE_FQCNS = Sets.newHashSet(
-            LanternCauseStack.class.getName());
+    static final Set<String> IGNORE_FQCNS = new HashSet<>();
     static final String REDIRECT_ERR = "STDERR";
     static final String REDIRECT_OUT = "STDOUT";
     static volatile boolean active;
@@ -94,6 +94,9 @@ public final class ConsoleManager {
         REDIRECT_FQCNS.add(LanternConsoleSource.class.getName());
         // Register the fqcn for the message channel
         REDIRECT_FQCNS.add(MessageChannel.class.getName());
+        // Ignore the cause stack as fqcn, stack traces will
+        // already be printed nicely with PrettyPrinter
+        IGNORE_FQCNS.add(LanternCauseStack.class.getName());
 
         System.setOut(IoBuilder.forLogger(REDIRECT_OUT).setLevel(Level.INFO).buildPrintStream());
         System.setErr(IoBuilder.forLogger(REDIRECT_ERR).setLevel(Level.ERROR).buildPrintStream());

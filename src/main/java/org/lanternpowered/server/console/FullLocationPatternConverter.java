@@ -30,7 +30,6 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
 
-import java.util.Set;
 import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
@@ -55,13 +54,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
 
     @Override
     public void format(LogEvent event, StringBuilder builder) {
-        final String name = event.getLoggerName();
-        final StackTraceElement element;
-        if (ConsoleManager.active && (ConsoleManager.REDIRECT_ERR.equals(name) || ConsoleManager.REDIRECT_OUT.equals(name))) {
-            element = calculateLocation(ConsoleManager.REDIRECT_FQCNS, ConsoleManager.IGNORE_FQCNS);
-        } else {
-            element = event.getSource();
-        }
+        final StackTraceElement element = calculateLocation(event.getLoggerFqcn());
         if (element != null) {
             // quoteReplacement is required for elements leading to inner class (containing a $ character)
             builder.append(this.format.replaceAll("%path", Matcher.quoteReplacement(element.toString())));
@@ -69,24 +62,26 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
     }
 
     @Nullable
-    private static StackTraceElement calculateLocation(Set<String> fqcns, Set<String> ignoreFqcns) {
-        StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+    private static StackTraceElement calculateLocation(String fqcn) {
+        final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         StackTraceElement last = null;
 
         for (int i = stackTrace.length - 1; i > 0; i--) {
             String className = stackTrace[i].getClassName();
-            if (fqcns.contains(className)) {
+            // Check if the target logger source should be redirected
+            if (ConsoleManager.REDIRECT_FQCNS.contains(className) || className.equals(fqcn)) {
                 return last;
             }
-            if (ignoreFqcns.contains(className)) {
+            // Check if the target logger source should be ignored
+            if (ConsoleManager.IGNORE_FQCNS.contains(className)) {
                 return null;
             }
-
-            if (className.equals("java.lang.Throwable") && stackTrace[i].getMethodName().equals("printStackTrace")) {
+            // Reaching the printStackTrace method is also the end of the road
+            if (className.equals("java.lang.Throwable") &&
+                    stackTrace[i].getMethodName().equals("printStackTrace")) {
                 return null;
             }
-
-            // Ignore Kotlin
+            // Ignore Kotlin and Java packages
             boolean isIgnored = false;
             for (String ignored : ignoredPackages) {
                 if (className.startsWith(ignored)) {
@@ -94,7 +89,6 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
                     break;
                 }
             }
-
             if (!isIgnored) {
                 last = stackTrace[i];
             }

@@ -43,8 +43,6 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -190,30 +188,6 @@ public class LanternUser extends AbstractProxySubject implements AbstractPropert
     @Override
     public UUID getUniqueId() {
         return this.gameProfile.getUniqueId();
-    }
-
-    @Override
-    public boolean canEquip(EquipmentType type) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean canEquip(EquipmentType type, ItemStack equipment) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Optional<ItemStack> getEquipped(EquipmentType type) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean equip(EquipmentType type, ItemStack equipment) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

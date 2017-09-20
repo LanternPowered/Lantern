@@ -65,7 +65,7 @@ public final class MultimapTypeSerializer implements TypeSerializer<Multimap> {
                 multimap.put(keyValue, valueValue);
             }
         }
-        return null;
+        return multimap;
     }
 
     @Override

@@ -23,62 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game;
+package org.lanternpowered.launch.dependencies;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-public final class DirectoryKeys {
+public final class Dependencies {
 
-    /**
-     * The root folder key.
-     */
-    public static final String ROOT = "root-folder";
+    private final List<Repository> repositories;
+    private final List<Dependency> dependencies;
 
-    /**
-     * The config folder key.
-     */
-    public static final String CONFIG = "config-folder";
-
-    /**
-     * The plugins folder key.
-     */
-    public static final String PLUGINS = "plugins-folder";
-
-    /**
-     * The world folder key.
-     */
-    public static final String WORLD = "world-folder";
-
-    /**
-     * The root world folder key.
-     */
-    public static final String ROOT_WORLD = "root-world-folder";
-
-    public static final class DefaultValues {
-
-        /**
-         * The root folder {@link Path}.
-         */
-        public static final Path ROOT = Paths.get("");
-
-        /**
-         * The config folder {@link Path}.
-         */
-        public static final Path CONFIG = ROOT.resolve("config");
-
-        /**
-         * The plugins folder {@link Path}.
-         */
-        public static final Path PLUGINS = ROOT.resolve("plugins");
-
-        /**
-         * The libraries folder {@link Path}.
-         */
-        public static final Path LIBRARIES = ROOT.resolve("libraries");
-
+    public Dependencies(List<Repository> repositories, List<Dependency> dependencies) {
+        this.repositories = Collections.unmodifiableList(new ArrayList<>(repositories));
+        this.dependencies = Collections.unmodifiableList(new ArrayList<>(dependencies));
     }
 
-    private DirectoryKeys() {
+    public List<Repository> getRepositories() {
+        return this.repositories;
+    }
+
+    public List<Dependency> getDependencies() {
+        return this.dependencies;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Dependencies{Repositories:%s,Dependencies:%s}",
+                Arrays.toString(this.repositories.toArray()),
+                Arrays.toString(this.dependencies.toArray()));
     }
 }

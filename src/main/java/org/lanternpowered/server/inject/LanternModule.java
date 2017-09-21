@@ -415,22 +415,6 @@ public class LanternModule extends PrivateModule {
     }
 
     @Exposed
-    @Named(DirectoryKeys.LIBRARIES)
-    @Provides
-    @Singleton
-    private Path provideLibrariesDirectory(@Option({ "libraries-directory", "libraries-dir" }) @Nullable Path librariesDir) {
-        return librariesDir == null ? DirectoryKeys.DefaultValues.LIBRARIES : librariesDir;
-    }
-
-    @Exposed
-    @Named(DirectoryKeys.LIBRARIES)
-    @Provides
-    @Singleton
-    private File provideLibrariesDirectoryAsFile(@Named(DirectoryKeys.LIBRARIES) Path librariesDir) {
-        return librariesDir.toFile();
-    }
-
-    @Exposed
     @Named(DirectoryKeys.ROOT_WORLD)
     @Provides
     @Singleton

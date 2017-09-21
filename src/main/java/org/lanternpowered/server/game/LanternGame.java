@@ -54,7 +54,6 @@ import org.lanternpowered.server.game.version.MinecraftVersionCache;
 import org.lanternpowered.server.inject.Option;
 import org.lanternpowered.server.inject.Service;
 import org.lanternpowered.server.inject.ServiceProvider;
-import org.lanternpowered.server.library.LibraryManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.rcon.EmptyRconService;
@@ -74,10 +73,8 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
-import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -242,10 +239,6 @@ public class LanternGame implements Game {
             throw new RuntimeException("The current version and version in the cache don't match: " +
                     LanternMinecraftVersion.CURRENT + " != " + versionCacheEntry);
         }
-
-        // Load the libraries
-        final LibraryManager libraryManager = this.injector.getInstance(LibraryManager.class);
-        libraryManager.load();
 
         // Load the plugin instances
         try {

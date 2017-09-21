@@ -23,5 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.library;
+package org.lanternpowered.launch.dependencies;
+
+import java.net.URL;
+
+import static java.util.Objects.requireNonNull;
+
+public final class Repository {
+
+    private final URL url;
+    private final String name;
+
+    public Repository(URL url, String name) {
+        this.url = requireNonNull(url, "url");
+        this.name = name;
+    }
+
+    public URL getUrl() {
+        return this.url;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Repository{URL:%s,Name:%s}", this.url, this.name);
+    }
+}

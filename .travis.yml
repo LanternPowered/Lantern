@@ -1,19 +1,6 @@
 sudo: required
 dist: trusty
 
-after_success:
-  - |
-      declare exitCode
-
-      if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
-        curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
-        exitCode=$?
-
-        if [ $exitCode -eq 0 ]; then
-          ./gradlew artifactoryPublish
-        fi
-      fi
-
 language: java
 jdk:
   - openjdk8

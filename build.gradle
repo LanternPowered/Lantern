@@ -12,33 +12,19 @@ buildscript {
 
 plugins {
     id 'com.github.hierynomus.license' version '0.14.0'
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
     id 'org.spongepowered.plugin' version '0.8.1'
 }
 
 apply from: rootProject.file('gradle/lantern.gradle')
 
-// Apply plugin
+// Apply plugins
 apply plugin: 'org.lanternpowered.gradle'
 apply plugin: 'org.lanternpowered.run-configs'
 
 // Basic project information
 archivesBaseName = 'lanternserver'
 version = '1.0.0-SNAPSHOT'
-
-// Repositories
-repositories {
-    mavenCentral()
-    maven {
-        url 'http://repo.spongepowered.org/maven'
-    }
-    maven {
-        url 'https://oss.sonatype.org/content/groups/public'
-    }
-    maven {
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
 
 sourceSets {
     java6 {
@@ -52,31 +38,41 @@ compileJava6Java {
     targetCompatibility = '1.6'
 }
 
-// Disable some tasks to make the building go faster
-api.tasks.javadoc.enabled = false
-api.tasks.javadocJar.enabled = false
-api.tasks.checkstyleMain.enabled = false
-api.tasks.checkstyleTest.enabled = false
-// Disable this task to avoid that we turn the dependency
-// dirty when we call this on our project
-api.tasks.wrapper.enabled = false
+// The java6 sourceset
+idea.module.sourceDirs += file('src/java6/java')
+
+// Disable some tasks to make the building go faster and
+// disable the wrapper task to avoid that we turn the
+// dependency dirty when we call this on our project.
+[api.tasks.javadoc,
+ api.tasks.javadocJar,
+ api.tasks.checkstyleMain,
+ api.tasks.checkstyleTest,
+ api.tasks.wrapper]*.enabled = false
 
 configurations {
-    fastutil
-    compile {
-        extendsFrom fastutil
-    }
+    // A configuration that will be excluded
+    // in the generated pom file
+    compileExcluded
+    compileTinyJson
+    compile.extendsFrom(compileExcluded, compileTinyJson)
 }
 
 ext.testDataPacks = project(':test-data-packs')
 ext.testPlugins = project(':test-plugins')
-ext.fastutilVersion = '7.1.0'
+evaluationDependsOn testPlugins.path
+
 // Project dependencies
 dependencies {
     // Add the test plugins to the class path
-    compile testPlugins
+    compileExcluded testPlugins
     // Add the test data packs to the class path
-    compile testDataPacks
+    compileExcluded testDataPacks
+    // Add the sponge api
+    compileExcluded api
+    // Add a tiny json library just to read the
+    // library files
+    compileTinyJson 'com.googlecode.json-simple:json-simple:1.1.1'
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
@@ -102,10 +98,10 @@ dependencies {
 
     // Console
     compile 'net.java.dev.jna:jna:4.4.0'
-    compile 'net.minecrell:terminalconsoleappender:1.0.0-SNAPSHOT'
+    compile 'net.minecrell:terminalconsoleappender:1.0.0'
 
     // Fastutil
-    fastutil "it.unimi.dsi:fastutil:$fastutilVersion"
+    compile 'it.unimi.dsi:fastutil:7.1.0'
 
     // Database connectors
     compile 'com.zaxxer:HikariCP:2.6.3'
@@ -124,11 +120,6 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.8.47'
 }
 
-idea.module {
-    // The java6 sourceset
-    sourceDirs += file('src/java6/java')
-}
-
 runConfigurations {
     theConfig {
         name = 'Lantern Server'
@@ -137,28 +128,132 @@ runConfigurations {
     }
 }
 
-// The base jar, includes all the lantern and sponge classes,
-// including generated event classes
-jar {
+// Always print full stack trace if something goes wrong in the unit tests
+test.testLogging.exceptionFormat = 'full'
+
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import groovy.json.JsonBuilder
+
+processResources {
+    // Minimize the json files
+    doLast {
+        fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each { File file ->
+            file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+        }
+    }
+}
+
+////////////////////////////////////
+/// Collect Dependency Artifacts ///
+////////////////////////////////////
+
+def ignoredDependencyArtifacts = new HashSet<>()
+// Don't include the api again
+ignoredDependencyArtifacts.add "$api.group:$api.name"
+ignoredDependencyArtifacts.add "$testDataPacks.group:$testDataPacks.name"
+ignoredDependencyArtifacts.add "$testPlugins.group:$testPlugins.name"
+// We already include 'asm-all'
+ignoredDependencyArtifacts.add 'org.ow2.asm:asm'
+
+def dependencyArtifacts = new ArrayList<>()
+
+configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact a ->
+    def id = a.moduleVersion.id
+    def e = "$id.group:$id.name"
+    // Check if we want the artifact, check for the java (String) and groovy strings (GString)
+    if (!ignoredDependencyArtifacts.contains(e) && !ignoredDependencyArtifacts.contains((String) e)) {
+        dependencyArtifacts.add(a)
+    }
+}
+
+/////////////////////////////////////////////////
+/// Generate the jar with all the lantern and ///
+///  sponge classes, and all their resources. ///
+/////////////////////////////////////////////////
+
+jar.enabled = false
+
+task theJar(type: ShadowJar) {
+    classifier = ''
+    duplicatesStrategy = 'EXCLUDE'
+    includeEmptyDirs = false
+
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
 
+    // Include the lantern classes
+    from sourceSets.main.output
     // Include the api classes
     from api.sourceSets.main.output
     // Include generated event classes
     from fileTree(api.tasks.genEventImpl.outputs.files.first())
 
+    // Include the tiny json library
+    from zipTree(project.configurations.compileTinyJson.first())
+    // Relocate the library
+    relocate('org.json.simple', 'org.lanternpowered.launch.org.json.simple')
+
     // Include the java 6 classes
     from sourceSets.java6.output
+
+    /////////////////////////////////////////
+    /// Generate a json file with all the ///
+    //    dependencies and repositories.  ///
+    /////////////////////////////////////////
+
+    def dependencyEntries = new ArrayList<>()
+    dependencyArtifacts.each { ResolvedArtifact a -> dependencyEntries.add(a.moduleVersion.id.toString()) }
+
+    def data = new HashMap<>()
+    data['repositories'] = []
+    if (project.hasProperty('lanternRepo')) {
+        data['repositories'].add(project.lanternRepo)
+    }
+    data['dependencies'] = dependencyEntries
+
+    def librariesFile = new File(buildDir, 'dependencies.json')
+    librariesFile.text = new JsonBuilder(data).toPrettyString()
+
+    from librariesFile
 }
+// Run theJar on build
+assemble.dependsOn theJar
+
+/////////////////////////////////////////
+/// Generate a fat jar which includes ///
+///     all the dependency jars.      ///
+/////////////////////////////////////////
+
+task fatJar(type: Jar, dependsOn: theJar) {
+    // Include the default jar
+    from zipTree(theJar.archivePath)
+
+    // Always update the fat jar
+    outputs.upToDateWhen { false }
+
+    // Generate the dependencies
+    classifier = 'fat'
+
+    dependencyArtifacts.each { ResolvedArtifact a ->
+        Dependency d = dependencies.create(a.moduleVersion.id.toString())
+        from (a.file, { spec ->
+            spec.rename {
+                "dependencies/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
+            }
+        })
+    }
+}
+// Run fatJar on build
+assemble.dependsOn fatJar
+
+/////////////////////////////////////////////
+/// Apply manifest file properties to the ///
+///        fat and normal jars.           ///
+/////////////////////////////////////////////
 
 afterEvaluate {
-    applyManifest(jar)
-    applyManifest(fatJar)
-}
-
-void applyManifest(def jar) {
-    jar.manifest {
+    [theJar, fatJar]*.manifest {
         attributes(
                 'Main-Class': 'org.lanternpowered.launch.VersionCheckingMain',
                 'Implementation-Name': project.name,
@@ -173,115 +268,10 @@ void applyManifest(def jar) {
     }
 }
 
-import groovy.json.JsonSlurper
-import groovy.json.JsonOutput
-
-processResources {
-    // Minimize the json files
-    doLast {
-        fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each {
-            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
-        }
-    }
-}
-
-test {
-    testLogging {
-        exceptionFormat = 'full' // Always print full stack trace if something goes wrong in the unit tests
-    }
-}
-
-// A task to minimize the fastutil jar to only
-// include the classes we actually used
-task fastutilJar(type: ShadowJar) {
-    // The classifier
-    classifier = 'fastutil'
-    // Exclude empty directories
-    includeEmptyDirs = false
-    // Include all the fastutil classes into the process
-    from zipTree(project.configurations.fastutil.first())
-
-    // Loop through the files and check for the files which
-    // should be included in the final jar
-    transform(DependencyClassTransformer) {
-        dependencyFiles.include 'it/unimi/dsi/fastutil/**'
-        filesToScan.include 'it/unimi/dsi/fastutil/bytes/Byte2CharOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/bytes/Byte2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2CharOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2IntMaps.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2IntOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2LongMaps.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2LongOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2ShortOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ByteOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2IntOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectArrayMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntArraySet.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectMaps.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectLinkedOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2LongOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntArrayList.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntLists.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntOpenHashSet.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ShortOpenHashMap.class'
-    }
-}
-
-// A task to build faster
-task buildFast(dependsOn: build)
-
-gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-    // Mark the fast util jar as not update to make it regenerate
-    fastutilJar.outputs.upToDateWhen { graph.allTasks.contains(buildFast) && fastutilJar.archivePath.exists() }
-}
-
-task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
-    // Include the default jar
-    from zipTree(jar.archivePath)
-
-    // Always update the fat jar
-    outputs.upToDateWhen { false }
-
-    // Generate the dependencies
-    classifier = 'fat'
-
-    // All the entries that should be ignored
-    Set<String> entries = []
-    // Don't include the api again
-    entries.add "$api.group:$api.name"
-    entries.add "$testDataPacks.group:$testDataPacks.name"
-    entries.add "$testPlugins.group:$testPlugins.name"
-    // We already include 'asm-all'
-    entries.add 'org.ow2.asm:asm'
-
-    Map<String, Tuple2<Dependency, File>> filesMap = new HashMap<>()
-    configurations.compile.resolvedConfiguration.resolvedArtifacts.each { a ->
-        def id = a.moduleVersion.id
-        def e = "$id.group:$id.name"
-        // Check if we want the artifact, check for the java (String) and groovy strings (GString)
-        if (!entries.contains(e) && !entries.contains((String) e)) {
-            filesMap[(String) e] = new Tuple2<>(dependencies.create(id.toString()), a.file)
-        }
-    }
-
-    // Replace the fastutil dependency
-    filesMap['it.unimi.dsi:fastutil'] = new Tuple2<>(
-            dependencies.create("it.unimi.dsi:fastutil:$fastutilVersion-minimized"), fastutilJar.archivePath)
-
-    // Include all the dependencies
-    for (Map.Entry<String, Tuple2<Dependency, File>> entry : filesMap.entrySet()) {
-        Tuple2<Dependency, File> t = entry.value
-        from (t.second, { spec ->
-            Dependency d = t.first
-            spec.rename {
-                "libraries/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
-            }
-        })
-    }
-}
+////////////////////////////////////////////////////
+/// Generate a source jar which includes all the ///
+//    sources from lantern and the sponge api.   ///
+////////////////////////////////////////////////////
 
 sourceJar {
     from sourceSets.java6.allSource
@@ -290,12 +280,58 @@ sourceJar {
     from api.sourceSets.ap.allSource
 }
 
-// Run fatJar on build
-assemble.dependsOn fatJar
+artifacts {
+    archives theJar
+    archives sourceJar
+}
+
+////////////////////////////////////////////////////////////////
+/// Upload artifacts and dependencies to a maven repository. ///
+////////////////////////////////////////////////////////////////
+
+if (project.hasProperty('lanternRepo')) {
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            main(MavenPublication) {
+                groupId project.group
+                artifactId project.archivesBaseName
+                version project.version
+
+                artifact theJar
+                artifact sourceJar
+            }
+        }
+        repositories {
+            maven {
+                url project.lanternRepo
+                if (project.hasProperty('lanternUsername') && project.hasProperty('lanternPassword')) {
+                    authentication(userName: project.lanternUsername, password: project.lanternPassword)
+                }
+            }
+        }
+    }
+
+    // Upload all the dependency artifacts
+    dependencyArtifacts.each { ResolvedArtifact a ->
+        Dependency d = dependencies.create(a.moduleVersion.id.toString())
+        publishing.publications.create(d.group + '_' + d.name, MavenPublication) {
+            groupId d.group
+            artifactId d.name
+            version d.version
+            artifact a.file
+        }
+    }
+}
+
+////////////////////////////////////
+/// Gradle Wrapper update tasks. ///
+////////////////////////////////////
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0'
+    gradleVersion = '4.4.1'
 }
 
 // A custom update wrapper task, using a custom task prevents

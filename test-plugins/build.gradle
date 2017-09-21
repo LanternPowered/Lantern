@@ -20,6 +20,11 @@ sponge {
     }
 }
 
+// Project dependencies
+dependencies {
+    compile api
+}
+
 // The 'assemble' task is never called in this
 // sub project, so we need an alternative
 jar.dependsOn sourceJar

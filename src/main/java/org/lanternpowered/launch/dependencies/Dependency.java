@@ -23,62 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game;
+package org.lanternpowered.launch.dependencies;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import static java.util.Objects.requireNonNull;
 
-public final class DirectoryKeys {
+public final class Dependency {
 
-    /**
-     * The root folder key.
-     */
-    public static final String ROOT = "root-folder";
+    public static final String SNAPSHOT_TAG = "-SNAPSHOT";
 
-    /**
-     * The config folder key.
-     */
-    public static final String CONFIG = "config-folder";
+    private final String group;
+    private final String name;
+    private final String version;
 
-    /**
-     * The plugins folder key.
-     */
-    public static final String PLUGINS = "plugins-folder";
-
-    /**
-     * The world folder key.
-     */
-    public static final String WORLD = "world-folder";
-
-    /**
-     * The root world folder key.
-     */
-    public static final String ROOT_WORLD = "root-world-folder";
-
-    public static final class DefaultValues {
-
-        /**
-         * The root folder {@link Path}.
-         */
-        public static final Path ROOT = Paths.get("");
-
-        /**
-         * The config folder {@link Path}.
-         */
-        public static final Path CONFIG = ROOT.resolve("config");
-
-        /**
-         * The plugins folder {@link Path}.
-         */
-        public static final Path PLUGINS = ROOT.resolve("plugins");
-
-        /**
-         * The libraries folder {@link Path}.
-         */
-        public static final Path LIBRARIES = ROOT.resolve("libraries");
-
+    public Dependency(String group, String name, String version) {
+        this.version = requireNonNull(version, "version");
+        this.group = requireNonNull(group, "group");
+        this.name = requireNonNull(name, "name");
     }
 
-    private DirectoryKeys() {
+    public String getGroup() {
+        return this.group;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public boolean isSnapshot() {
+        return this.version.contains(SNAPSHOT_TAG);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Dependency{Group:%s,Name:%s,Version:%s}", this.group, this.name, this.version);
     }
 }

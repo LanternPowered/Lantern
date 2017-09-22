@@ -25,12 +25,13 @@
  */
 package org.lanternpowered.server.data.io;
 
+import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.data.DataQueries;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.AbstractUser;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
 import java.io.IOException;
@@ -38,29 +39,45 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.UUID;
 
-public final class PlayerIO {
+public final class UserIO {
 
     private final static Path SPONGE_PLAYER_DATA_FOLDER = Paths.get("data", "sponge");
     private final static Path PLAYER_DATA_FOLDER = Paths.get("playerdata");
     private final static Path STATISTICS_FOLDER = Paths.get("stats");
+    private final static DataQuery NAME = DataQuery.of("Name");
 
-    public static void load(Path dataFolder, LanternPlayer player) throws IOException {
+    public static boolean exists(Path dataFolder, UUID uniqueId) {
+        final String fileName = uniqueId.toString() + ".dat";
+        final Path dataFile = dataFolder.resolve(PLAYER_DATA_FOLDER).resolve(fileName);
+        return Files.exists(dataFile);
+    }
+
+    public static Optional<String> loadName(Path dataFolder, UUID uniqueId) throws IOException {
+        final Path path = dataFolder.resolve(SPONGE_PLAYER_DATA_FOLDER).resolve(uniqueId.toString() + ".dat");
+        if (Files.exists(path)) {
+            return NbtStreamUtils.read(Files.newInputStream(path), true).getString(NAME);
+        }
+        return Optional.empty();
+    }
+
+    public static void load(Path dataFolder, AbstractUser player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
 
         // Search for the player data and load it
         Path dataFile = dataFolder.resolve(PLAYER_DATA_FOLDER).resolve(fileName);
         if (Files.exists(dataFile)) {
-            DataContainer dataContainer = NbtStreamUtils.read(Files.newInputStream(dataFile), true);
+            final DataContainer dataContainer = NbtStreamUtils.read(Files.newInputStream(dataFile), true);
 
             // Load sponge data if present and attach it to the main data
             dataFile = dataFolder.resolve(SPONGE_PLAYER_DATA_FOLDER).resolve(fileName);
             if (Files.exists(dataFile)) {
-                DataContainer spongeDataContainer = NbtStreamUtils.read(Files.newInputStream(dataFile), true);
+                final DataContainer spongeDataContainer = NbtStreamUtils.read(Files.newInputStream(dataFile), true);
                 dataContainer.set(DataQueries.EXTENDED_SPONGE_DATA, spongeDataContainer);
             }
 
-            final ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
+            final ObjectStore<AbstractUser> objectStore = ObjectStoreRegistry.get().get(AbstractUser.class).get();
             objectStore.deserialize(player, dataContainer);
         }
 
@@ -70,11 +87,11 @@ public final class PlayerIO {
         }
     }
 
-    public static void save(Path dataFolder, LanternPlayer player) throws IOException {
+    public static void save(Path dataFolder, AbstractUser player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
 
         final DataContainer dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-        final ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
+        final ObjectStore<AbstractUser> objectStore = ObjectStoreRegistry.get().get(AbstractUser.class).get();
         objectStore.serialize(player, dataContainer);
 
         final Optional<DataView> optSpongeData = dataContainer.getView(DataQueries.EXTENDED_SPONGE_DATA);
@@ -93,7 +110,9 @@ public final class PlayerIO {
         }
         dataFile = dataFolder0.resolve(fileName);
         if (optSpongeData.isPresent()) {
-            NbtStreamUtils.write(optSpongeData.get(), Files.newOutputStream(dataFile), true);
+            final DataView spongeData = optSpongeData.get();
+            spongeData.set(NAME, player.getName());
+            NbtStreamUtils.write(spongeData, Files.newOutputStream(dataFile), true);
         } else {
             Files.deleteIfExists(dataFile);
         }
@@ -102,6 +121,6 @@ public final class PlayerIO {
         player.getStatisticMap().save(statisticsFile);
     }
 
-    private PlayerIO() {
+    private UserIO() {
     }
 }

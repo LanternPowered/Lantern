@@ -23,36 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.entity.living.player;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.lanternpowered.server.inventory.entity.LanternUserInventory;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.UUID;
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
+public class OfflineUser extends AbstractUser {
 
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    private final LanternUserInventory<User> inventory = new LanternUserInventory<>(null, null, this);
+
+    public OfflineUser(ProxyUser user) {
+        super(user);
     }
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        getValueCollection().registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
+    public LanternUserInventory<? extends User> getInventory() {
+        return this.inventory;
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return Optional.empty();
+    public boolean isOnline() {
+        return false;
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
+    public Optional<Player> getPlayer() {
         return Optional.empty();
     }
 }

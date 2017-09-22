@@ -39,12 +39,11 @@ import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.advancement.TestAdvancementTree;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.io.store.entity.PlayerStore;
+import org.lanternpowered.server.data.element.ElementKeyRegistration;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.entity.LanternHumanoid;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
@@ -58,7 +57,6 @@ import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
-import org.lanternpowered.server.inventory.block.EnderChestInventory;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.item.CooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
@@ -76,28 +74,22 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
-import org.lanternpowered.server.permission.ProxySubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
-import org.lanternpowered.server.statistic.StatisticMap;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;
-import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -106,8 +98,6 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.message.MessageChannelEvent;
@@ -119,10 +109,8 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
@@ -134,7 +122,6 @@ import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
-import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
@@ -144,7 +131,6 @@ import org.spongepowered.api.world.WorldBorder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -153,18 +139,14 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class LanternPlayer extends LanternHumanoid implements ProxySubject, Player, AbstractViewer, NetworkIdHolder {
+@SuppressWarnings("ConstantConditions")
+public class LanternPlayer extends AbstractUser implements Player, AbstractViewer, NetworkIdHolder {
 
     private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -0.3), new Vector3d(0.3, 1.8, 0.3));
 
-    private final LanternUser user;
-    private final LanternGameProfile gameProfile;
     private final NetworkSession session;
 
     private final LanternTabList tabList = new LanternTabList(this);
-
-    // The statistics of this player
-    private final StatisticMap statisticMap = new StatisticMap();
 
     // The entity id that will be used for the client
     private int networkEntityId = -1;
@@ -209,11 +191,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     private final LanternPlayerInventory inventory;
 
     /**
-     * The ender chest inventory of this {@link Player}.
-     */
-    private final EnderChestInventory enderChestInventory;
-
-    /**
      * The {@link LanternContainer} of the players inventory.
      */
     private final PlayerInventoryContainer inventoryContainer;
@@ -239,13 +216,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     private long lastActiveTime;
 
     /**
-     * This field is for internal use only, it is used while finding a proper
-     * world to spawn the player in. Used at {@link NetworkSession#initPlayer()} and
-     * {@link PlayerStore}.
-     */
-    @Nullable private LanternWorldProperties tempWorld;
-
-    /**
      * The entity that is being spectated by this player.
      */
     @Nullable private Entity spectatorEntity;
@@ -257,25 +227,25 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     private final AdvancementsProgress advancementsProgress = new AdvancementsProgress();
 
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
-        super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
+        super((ProxyUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gameProfile));
         this.interactionHandler = new PlayerInteractionHandler(this);
         this.inventory = new LanternPlayerInventory(null, null, this);
         this.inventoryContainer = new PlayerInventoryContainer(this.inventory);
-        this.enderChestInventory = new EnderChestInventory(null);
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
-        this.gameProfile = gameProfile;
-        // Get or create the user object
-        this.user = (LanternUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
-                .getOrCreate(gameProfile);
-        this.user.setPlayer(this);
         resetIdleTimeoutCounter();
         setBoundingBoxBase(BOUNDING_BOX_BASE);
-        offer(Keys.DISPLAY_NAME, Text.of(gameProfile.getName().get()));
+        // Attach this player to the proxy user and load player data
+        getProxyUser().setInternalUser(this);
     }
 
     public Set<LanternBossBar> getBossBars() {
         return this.bossBars;
+    }
+
+    @Override
+    public String getName() {
+        return super.getName();
     }
 
     @Override
@@ -303,84 +273,12 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     public void registerKeys() {
         super.registerKeys();
         final ValueCollection c = getValueCollection();
-        c.register(LanternKeys.ACCESSORIES, new ArrayList<>());
-        c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
-        c.register(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
-        c.register(LanternKeys.MAX_SATURATION, 40.0, 0.0, Double.MAX_VALUE);
-        c.register(Keys.SATURATION, 40.0, 0.0, LanternKeys.MAX_SATURATION);
-        c.register(Keys.LAST_DATE_PLAYED, null);
-        c.register(Keys.FIRST_DATE_PLAYED, null);
-        c.registerNonRemovable(Keys.WALKING_SPEED, 0.1);
-        c.registerNonRemovable(LanternKeys.FIELD_OF_VIEW_MODIFIER, 1.0);
-        c.registerNonRemovable(Keys.IS_FLYING, false);
-        c.registerNonRemovable(Keys.IS_SNEAKING, false);
-        c.registerNonRemovable(Keys.IS_SPRINTING, false);
-        c.registerNonRemovable(Keys.FLYING_SPEED, 0.1);
-        c.registerNonRemovable(Keys.CAN_FLY, false);
-        c.registerNonRemovable(Keys.RESPAWN_LOCATIONS, new HashMap<>());
-        c.registerNonRemovable(Keys.GAME_MODE, GameModes.NOT_SET).addListener(
-                (oldElement, newElement) -> {
-                    ((LanternGameMode) newElement).getAbilityApplier().accept(this);
-                    // This MUST be updated, unless you want strange behavior on the client,
-                    // the client has 3 different concepts of 'isCreative', and each combination
-                    // gives a different outcome...
-                    // For example:
-                    // - Disable noClip and glow in spectator, but you can place blocks
-                    // - NoClip in creative, but you cannot change your hotbar, or drop items
-                    // Not really worth the trouble right now
-                    // TODO: Differentiate the 'global tab list entry' and the entry to update
-                    // TODO: these kind of settings to avoid possible 'strange' behavior.
-                    GlobalTabList.getInstance().get(this.gameProfile).ifPresent(e -> e.setGameMode(newElement));
-                });
-        c.registerNonRemovable(Keys.DOMINANT_HAND, HandPreferences.RIGHT);
-        c.registerNonRemovable(LanternKeys.IS_ELYTRA_FLYING, false);
-        c.registerNonRemovable(LanternKeys.ELYTRA_GLIDE_SPEED, 0.1);
-        c.registerNonRemovable(LanternKeys.ELYTRA_SPEED_BOOST, false);
-        c.registerNonRemovable(LanternKeys.SUPER_STEVE, false);
-        c.registerNonRemovable(LanternKeys.CAN_WALL_JUMP, false);
-        c.registerNonRemovable(LanternKeys.CAN_DUAL_WIELD, false);
-        c.registerNonRemovable(LanternKeys.SCORE, 0);
-        c.registerNonRemovable(LanternKeys.ACTIVE_HAND, Optional.empty());
-        c.registerNonRemovable(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, false);
-        c.registerNonRemovable(LanternKeys.RECIPE_BOOK_GUI_OPEN, false);
-        c.registerProcessor(Keys.STATISTICS).add(builder -> builder
-                .offerHandler((key, valueContainer, map) -> {
-                    this.statisticMap.setStatisticValues(map);
-                    return DataTransactionResult.successNoData();
-                })
-                .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
-                .failAlwaysRemoveHandler());
-        c.registerNonRemovable(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty())
+        ((ElementKeyRegistration<?, Optional<AdvancementTree>>) c.get(LanternKeys.OPEN_ADVANCEMENT_TREE).get())
                 .addListener((oldElement, newElement) -> {
-                    //noinspection ConstantConditions
                     if (getWorld() != null) {
                         this.session.send(new MessagePlayOutSelectAdvancementTree(newElement.map(AdvancementTree::getInternalId).orElse(null)));
                     }
                 });
-    }
-
-    @Nullable
-    public LanternWorldProperties getTempWorld() {
-        return this.tempWorld;
-    }
-
-    public void setTempWorld(@Nullable LanternWorldProperties tempTargetWorld) {
-        this.tempWorld = tempTargetWorld;
-    }
-
-    @Override
-    public String getName() {
-        return this.gameProfile.getName().get();
-    }
-
-    /**
-     * Sets the {@link LanternWorld} without triggering
-     * any changes for this player.
-     *
-     * @param world The world
-     */
-    public void setRawWorld(@Nullable LanternWorld world) {
-        super.setWorld(world);
     }
 
     @Override
@@ -393,7 +291,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         if (world == oldWorld) {
             return;
         }
-        //noinspection ConstantConditions
         if (oldWorld != null) {
             if (this.loadingTicket != null) {
                 this.loadingTicket.release();
@@ -420,7 +317,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
             final boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
             final boolean lowHorizon = world.getProperties().getConfig().isLowHorizon();
             // The player has joined the server
-            //noinspection ConstantConditions
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
                 this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.networkEntityId,
@@ -444,7 +340,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
                 getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
                         .tryGet(TestAdvancementTree.DIG_DIRT_CRITERION).set(4);
             } else {
-                //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();
                     // The client only creates a new world instance on the client if a
@@ -501,7 +396,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
             this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));
             this.tabList.clear();
             // Remove this player from the global tab list
-            GlobalTabList.getInstance().get(this.gameProfile).ifPresent(GlobalTabListEntry::removeEntry);
+            GlobalTabList.getInstance().get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
         }
     }
 
@@ -532,7 +427,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     public void setPosition(Vector3d position) {
         super.setPosition(position);
         final LanternWorld world = getWorld();
-        //noinspection ConstantConditions
         if (world != null) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
         }
@@ -542,7 +436,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     public void setRotation(Vector3d rotation) {
         super.setRotation(rotation);
         final LanternWorld world = getWorld();
-        //noinspection ConstantConditions
         if (world != null) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(0, 0, 0,
                     (float) rotation.getX(), (float) rotation.getY(), RELATIVE_POSITION, 0));
@@ -652,7 +545,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         // joining the server or switching worlds
         if (this.loadingTicket == null || ((ChunkLoadingTicket) this.loadingTicket).isReleased()) {
             this.loadingTicket = this.getWorld().getChunkManager().createPlayerEntityTicket(
-                    Lantern.getMinecraftPlugin(), this.gameProfile.getUniqueId()).get();
+                    Lantern.getMinecraftPlugin(), getUniqueId()).get();
             this.loadingTicket.bindToEntity(this);
         }
         return (ChunkLoadingTicket) this.loadingTicket;
@@ -660,7 +553,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
 
     public void pulseChunkChanges() {
         final LanternWorld world = getWorld();
-        //noinspection ConstantConditions
         if (world == null) {
             return;
         }
@@ -731,31 +623,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         this.knownChunks.addAll(newChunks);
     }
 
-    public User getUserObject() {
-        return this.user;
-    }
-
-    @Override
-    public void setInternalSubject(@Nullable SubjectReference subject) {
-        // We don't have to set the internal subject in the player instance
-        // because it's already set in the user
-    }
-
-    @Override
-    public SubjectReference getInternalSubject() {
-        return this.user.getInternalSubject();
-    }
-
-    @Override
-    public String getSubjectCollectionIdentifier() {
-        return this.user.getSubjectCollectionIdentifier();
-    }
-
-    @Override
-    public Tristate getPermissionDefault(String permission) {
-        return this.user.getPermissionDefault(permission);
-    }
-
     @Override
     public boolean isOnline() {
         return this.session.getChannel().isActive();
@@ -764,21 +631,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     @Override
     public Optional<Player> getPlayer() {
         return Optional.of(this);
-    }
-
-    @Override
-    public Optional<CommandSource> getCommandSource() {
-        return Optional.of(this);
-    }
-
-    @Override
-    public GameProfile getProfile() {
-        return this.gameProfile;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return getUniqueId().toString();
     }
 
     @Override
@@ -1017,7 +869,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     @Override
     public void setScoreboard(Scoreboard scoreboard) {
         checkNotNull(scoreboard, "scoreboard");
-        //noinspection ConstantConditions
         if (this.scoreboard != null && scoreboard != this.scoreboard) {
             this.scoreboard.removePlayer(this);
         }
@@ -1038,11 +889,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     @Override
     public void setSleepingIgnored(boolean sleepingIgnored) {
         this.sleepingIgnored = sleepingIgnored;
-    }
-
-    @Override
-    public EnderChestInventory getEnderChestInventory() {
-        return this.enderChestInventory;
     }
 
     @Override
@@ -1129,10 +975,6 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
             return;
         }
         offer(LanternKeys.IS_ELYTRA_FLYING, true);
-    }
-
-    public StatisticMap getStatisticMap() {
-        return this.statisticMap;
     }
 
     public CooldownTracker getCooldownTracker() {

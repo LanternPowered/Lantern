@@ -49,7 +49,6 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.ScheduledFuture;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.data.io.PlayerIO;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
@@ -103,7 +102,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
@@ -139,11 +137,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     private final NetworkManager networkManager;
     private final LanternServer server;
     private final Channel channel;
-
-    /**
-     * A shared random.
-     */
-    private final Random random = new Random();
 
     /**
      * The network context that is used by the handlers.
@@ -802,16 +795,13 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
             causeStack.popCause();
 
-            // Save the player data
-            try {
-                PlayerIO.save(Lantern.getGame().getSavesDirectory(), this.player);
-            } catch (IOException e) {
-                Lantern.getLogger().warn("An error occurred while saving the player data of {} ({})", this.gameProfile.getName().get(),
-                        this.gameProfile.getUniqueId(), e);
-            }
-
+            // Remove the proxy user from the player and save the player data
+            this.player.getProxyUser().setInternalUser(null);
+            // Destroy the player entity
             this.player.remove(LanternEntity.RemoveState.DESTROYED);
+            // Detach the player from the world
             this.player.setWorld(null);
+            // Release the players entity id
             EntityProtocolManager.releaseEntityId(this.player.getNetworkId());
         }
     }
@@ -829,12 +819,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.player = new LanternPlayer(this.gameProfile, this);
         this.player.setNetworkId(EntityProtocolManager.acquireEntityId());
         this.player.setEntityProtocolType(EntityProtocolTypes.PLAYER);
-
-        try {
-            PlayerIO.load(Lantern.getGame().getSavesDirectory(), this.player);
-        } catch (IOException e) {
-            Lantern.getLogger().warn("An error occurred while loading the player data", e);
-        }
 
         LanternWorld world = this.player.getWorld();
         if (world == null) {

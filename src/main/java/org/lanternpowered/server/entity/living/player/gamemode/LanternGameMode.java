@@ -26,7 +26,7 @@
 package org.lanternpowered.server.entity.living.player.gamemode;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -34,29 +34,29 @@ import java.util.function.Consumer;
 
 public class LanternGameMode extends PluginCatalogType.Base.Translatable.Internal implements GameMode {
 
-    private final Consumer<LanternPlayer> abilityApplier;
+    private final Consumer<DataHolder> abilityApplier;
 
-    public LanternGameMode(String pluginId, String name, String translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
+    public LanternGameMode(String pluginId, String name, String translation, int internalId, Consumer<DataHolder> abilityApplier) {
         super(pluginId, name, translation, internalId);
         this.abilityApplier = abilityApplier;
     }
 
-    public LanternGameMode(String pluginId, String name, Translation translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
+    public LanternGameMode(String pluginId, String name, Translation translation, int internalId, Consumer<DataHolder> abilityApplier) {
         super(pluginId, name, translation, internalId);
         this.abilityApplier = abilityApplier;
     }
 
-    public LanternGameMode(String pluginId, String id, String name, String translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
+    public LanternGameMode(String pluginId, String id, String name, String translation, int internalId, Consumer<DataHolder> abilityApplier) {
         super(pluginId, id, name, translation, internalId);
         this.abilityApplier = abilityApplier;
     }
 
-    public LanternGameMode(String pluginId, String id, String name, Translation translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
+    public LanternGameMode(String pluginId, String id, String name, Translation translation, int internalId, Consumer<DataHolder> abilityApplier) {
         super(pluginId, id, name, translation, internalId);
         this.abilityApplier = abilityApplier;
     }
 
-    public Consumer<LanternPlayer> getAbilityApplier() {
+    public Consumer<DataHolder> getAbilityApplier() {
         return this.abilityApplier;
     }
 }

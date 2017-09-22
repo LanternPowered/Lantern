@@ -34,14 +34,14 @@ import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.AbstractUser;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import org.lanternpowered.server.inventory.entity.LanternUserInventory;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
@@ -73,7 +73,7 @@ import java.util.UUID;
  * {@link DataQueries#SPONGE_DATA}.
  */
 @SuppressWarnings({"OptionalGetWithoutIsPresent", "unchecked", "ConstantConditions"})
-public class PlayerStore extends LivingStore<LanternPlayer> {
+public class UserStore<T extends AbstractUser> extends LivingStore<T> {
 
     private static final DataQuery ABILITIES = DataQuery.of("abilities");
 
@@ -109,7 +109,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static final DataQuery OPEN_ADVANCEMENT_TREE = DataQuery.of("openAdvancementTree"); // Lantern
 
     @Override
-    public void deserialize(LanternPlayer player, DataView dataView) {
+    public void deserialize(T player, DataView dataView) {
         super.deserialize(player, dataView);
         final int dimension = dataView.getInt(DIMENSION).orElse(0);
         Lantern.getWorldManager().getWorldProperties(dimension).ifPresent(worldProperties -> {
@@ -124,14 +124,17 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     }
 
     @Override
-    public void serialize(LanternPlayer entity, DataView dataView) {
+    public void serialize(T entity, DataView dataView) {
         super.serialize(entity, dataView);
         dataView.remove(HEAD_ROTATION);
-        dataView.set(DIMENSION, Lantern.getWorldManager().getWorldDimensionId(entity.getWorld().getUniqueId()).orElse(0));
+        final LanternWorld world = entity.getWorld();
+        final UUID uniqueId = world != null ? world.getUniqueId() :
+                entity.getTempWorld() != null ? entity.getTempWorld().getUniqueId() : null;
+        dataView.set(DIMENSION, uniqueId == null ? 0 : Lantern.getWorldManager().getWorldDimensionId(uniqueId).orElse(0));
     }
 
     @Override
-    public void serializeValues(LanternPlayer player, SimpleValueContainer valueContainer, DataView dataView) {
+    public void serializeValues(T player, SimpleValueContainer valueContainer, DataView dataView) {
         valueContainer.remove(Keys.IS_SPRINTING);
         valueContainer.remove(Keys.IS_SNEAKING);
         valueContainer.remove(LanternKeys.ACTIVE_HAND);
@@ -190,7 +193,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     }
 
     @Override
-    public void deserializeValues(LanternPlayer player, SimpleValueContainer valueContainer, DataView dataView) {
+    public void deserializeValues(T player, SimpleValueContainer valueContainer, DataView dataView) {
         // Try to convert old bukkit values first
         dataView.getLong(BUKKIT_FIRST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.FIRST_DATE_PLAYED, Instant.ofEpochMilli(v)));
         dataView.getLong(BUKKIT_LAST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.LAST_DATE_PLAYED, Instant.ofEpochMilli(v)));
@@ -279,7 +282,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         }
     }
 
-    private static void deserializePlayerInventory(LanternPlayerInventory inventory, List<DataView> itemViews) {
+    private static void deserializePlayerInventory(LanternUserInventory<?> inventory, List<DataView> itemViews) {
         final LanternHumanMainInventory mainInventory = inventory.getMain();
         final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
         final OffHandSlot offHandSlot = inventory.getOffhand();
@@ -298,7 +301,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         }
     }
 
-    private static List<DataView> serializePlayerInventory(LanternPlayerInventory inventory) {
+    private static List<DataView> serializePlayerInventory(LanternUserInventory<?> inventory) {
         final List<DataView> itemViews = new ArrayList<>();
 
         final LanternHumanMainInventory mainInventory = inventory.getMain();

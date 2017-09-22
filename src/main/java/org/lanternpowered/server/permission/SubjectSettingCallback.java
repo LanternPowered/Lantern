@@ -26,9 +26,7 @@
 package org.lanternpowered.server.permission;
 
 import org.lanternpowered.server.service.permission.LanternPermissionService;
-import org.lanternpowered.server.service.permission.UserCollection;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectReference;
 
@@ -68,13 +66,7 @@ final class SubjectSettingCallback implements Predicate<PermissionService> {
         if (input instanceof LanternPermissionService) {
             final LanternPermissionService service = (LanternPermissionService) input;
             final LanternSubjectCollection collection = service.get(ref.getSubjectCollectionIdentifier());
-
-            if (ref instanceof User && collection instanceof UserCollection) {
-                // GameProfile is already resolved, use it directly
-                subject = collection.get(((User) ref).getProfile().getUniqueId().toString()).asSubjectReference();
-            } else {
-                subject = collection.get(ref.getIdentifier()).asSubjectReference();
-            }
+            subject = collection.get(ref.getIdentifier()).asSubjectReference();
         } else {
             // build a new subject reference using the permission service
             // this doesn't actually load the subject, so it will be lazily init'd when needed.

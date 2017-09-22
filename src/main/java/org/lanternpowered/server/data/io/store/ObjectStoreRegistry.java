@@ -36,7 +36,7 @@ import org.lanternpowered.server.block.tile.vanilla.LanternNote;
 import org.lanternpowered.server.data.io.store.entity.EntityStore;
 import org.lanternpowered.server.data.io.store.entity.ItemStore;
 import org.lanternpowered.server.data.io.store.entity.LivingStore;
-import org.lanternpowered.server.data.io.store.entity.PlayerStore;
+import org.lanternpowered.server.data.io.store.entity.UserStore;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.io.store.tile.ContainerTileEntityStore;
 import org.lanternpowered.server.data.io.store.tile.JukeboxTileEntitySerializer;
@@ -45,7 +45,7 @@ import org.lanternpowered.server.data.io.store.tile.TileEntityObjectStore;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.entity.LanternLiving;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.AbstractUser;
 import org.lanternpowered.server.inventory.LanternItemStack;
 
 import java.util.HashMap;
@@ -86,7 +86,7 @@ public final class ObjectStoreRegistry {
         register(LanternEntity.class, new EntityStore<>());
         register(LanternItem.class, new ItemStore());
         register(LanternLiving.class, new LivingStore<>());
-        register(LanternPlayer.class, new PlayerStore());
+        register(AbstractUser.class, new UserStore<>());
         register(LanternItemStack.class, ItemStackStore.INSTANCE);
 
         // Tile entities

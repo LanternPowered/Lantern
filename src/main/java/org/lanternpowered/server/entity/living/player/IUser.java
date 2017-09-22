@@ -23,36 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.entity.living.player;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.User;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
+interface IUser extends User {
 
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    @Override
+    default String getName() {
+        return getProfile().getName().get();
     }
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        getValueCollection().registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
+    default UUID getUniqueId() {
+        return getProfile().getUniqueId();
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return Optional.empty();
+    default String getIdentifier() {
+        return getProfile().getUniqueId().toString();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return Optional.empty();
+    default Optional<CommandSource> getCommandSource() {
+        return (Optional) getPlayer();
     }
 }

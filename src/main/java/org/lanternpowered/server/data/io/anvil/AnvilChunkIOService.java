@@ -50,6 +50,7 @@ package org.lanternpowered.server.data.io.anvil;
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_AREA;
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_MASK;
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_SIZE;
+import static org.lanternpowered.server.world.chunk.LanternChunk.fixEntityYSection;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
@@ -277,7 +278,8 @@ public class AnvilChunkIOService implements ChunkIOService {
             for (DataView entityView : entityViews) {
                 try {
                     final LanternEntity entity = entitySerializer.deserialize(entityView);
-                    chunk.addEntity(entity, entity.getPosition().getFloorY() >> 4);
+                    final int ySection = fixEntityYSection(entity.getPosition().getFloorY() >> 4);
+                    chunk.addEntity(entity, ySection);
                 } catch (InvalidDataException e) {
                     this.logger.warn("Error loading entity in the chunk ({},{}) in the world {}",
                             x, z, getWorldProperties().getWorldName(), e);

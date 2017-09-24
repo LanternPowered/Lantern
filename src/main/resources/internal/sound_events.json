@@ -543,6 +543,9 @@
     "record.wait",
     "record.ward",
     "ui.button.click",
+    "ui.toast.in",
+    "ui.toast.out",
+    "ui.toast.challenge_complete",
     "weather.rain",
     "weather.rain.above"
 ]

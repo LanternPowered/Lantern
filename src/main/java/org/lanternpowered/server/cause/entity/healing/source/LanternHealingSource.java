@@ -23,21 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.event;
+package org.lanternpowered.server.cause.entity.healing.source;
 
-public final class DamageEntityEvent implements EntityEvent {
+import org.spongepowered.api.event.cause.entity.health.source.common.AbstractHealingSource;
+import org.spongepowered.api.event.cause.entity.health.source.common.AbstractHealingSourceBuilder;
 
-    public static DamageEntityEvent of() {
-        return INSTANCE;
-    }
+public class LanternHealingSource extends AbstractHealingSource {
 
-    private static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
-
-    private DamageEntityEvent() {
-    }
-
-    @Override
-    public EntityEventType type() {
-        return EntityEventType.ALIVE;
+    LanternHealingSource(AbstractHealingSourceBuilder<?, ?> builder) {
+        super(builder);
     }
 }

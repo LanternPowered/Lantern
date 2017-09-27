@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.DamageEntityEvent;
+import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.LanternGame;
@@ -147,7 +147,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
-        if (event instanceof DamageEntityEvent) {
+        if (event instanceof DamagedEntityEvent) {
             context.sendToAll(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 1));
         } else if (event instanceof SwingHandEntityEvent) {
             final HandType handType = ((SwingHandEntityEvent) event).getHandType();

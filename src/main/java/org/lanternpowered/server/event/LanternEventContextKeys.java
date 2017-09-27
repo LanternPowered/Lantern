@@ -26,6 +26,7 @@
 package org.lanternpowered.server.event;
 
 import org.spongepowered.api.event.cause.EventContextKey;
+import org.spongepowered.api.event.cause.entity.health.HealingType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
@@ -34,6 +35,8 @@ public final class LanternEventContextKeys {
     public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
 
     public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
+
+    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
 
     @SuppressWarnings("unchecked")
     private static <T> EventContextKey<T> createFor(String id) {

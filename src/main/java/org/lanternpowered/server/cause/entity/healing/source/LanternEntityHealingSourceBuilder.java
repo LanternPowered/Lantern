@@ -23,22 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.damage.source;
+package org.lanternpowered.server.cause.entity.healing.source;
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import static com.google.common.base.Preconditions.checkState;
 
-class LanternIndirectEntityDamageSource extends LanternEntityDamageSource implements IndirectEntityDamageSource {
+import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource;
+import org.spongepowered.api.event.cause.entity.health.source.common.AbstractEntityHealingSourceBuilder;
 
-    private final Entity indirectSource;
-
-    LanternIndirectEntityDamageSource(LanternIndirectEntityDamageSourceBuilder builder) {
-        super(builder);
-        this.indirectSource = builder.indirect;
-    }
+public class LanternEntityHealingSourceBuilder extends AbstractEntityHealingSourceBuilder<EntityHealingSource, EntityHealingSource.Builder>
+        implements EntityHealingSource.Builder {
 
     @Override
-    public Entity getIndirectSource() {
-        return this.indirectSource;
+    public EntityHealingSource build() throws IllegalStateException {
+        checkState(this.healingType != null, "The healing type must be set");
+        checkState(this.entity != null, "The entity must be set");
+        return new LanternEntityHealingSource(this);
     }
 }

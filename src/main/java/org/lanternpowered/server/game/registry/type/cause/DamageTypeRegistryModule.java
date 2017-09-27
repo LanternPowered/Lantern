@@ -32,6 +32,9 @@ import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 
 public class DamageTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<DamageType> {
 
+    public static final LanternDamageType POISON = new LanternDamageType("minecraft", "poison");
+    public static final LanternDamageType WITHER = new LanternDamageType("minecraft", "wither");
+
     public DamageTypeRegistryModule() {
         super(DamageTypes.class);
     }
@@ -53,5 +56,7 @@ public class DamageTypeRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(new LanternDamageType("minecraft", "suffocate"));
         register(new LanternDamageType("minecraft", "sweeping_attack"));
         register(new LanternDamageType("minecraft", "void"));
+        register(POISON);
+        register(WITHER);
     }
 }

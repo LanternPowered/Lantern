@@ -23,22 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.damage.source;
+package org.lanternpowered.server.cause.entity.damage;
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.event.cause.entity.damage.DamageModifierType;
 
-class LanternIndirectEntityDamageSource extends LanternEntityDamageSource implements IndirectEntityDamageSource {
+public class LanternDamageModifierType extends PluginCatalogType.Base implements DamageModifierType {
 
-    private final Entity indirectSource;
-
-    LanternIndirectEntityDamageSource(LanternIndirectEntityDamageSourceBuilder builder) {
-        super(builder);
-        this.indirectSource = builder.indirect;
+    public LanternDamageModifierType(String pluginId, String name) {
+        super(pluginId, name);
     }
 
-    @Override
-    public Entity getIndirectSource() {
-        return this.indirectSource;
+    public LanternDamageModifierType(String pluginId, String id, String name) {
+        super(pluginId, id, name);
     }
 }

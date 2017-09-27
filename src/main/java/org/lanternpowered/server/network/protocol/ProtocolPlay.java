@@ -399,7 +399,8 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInFinishUsingItem());
         inbound.bindMessage(MessagePlayInSwapHandItems.class)
                 .bindHandler(new HandlerPlayInSwapHandItems());
-        inbound.bindMessage(MessagePlayInPerformRespawn.class); // TODO: Handler
+        inbound.bindMessage(MessagePlayInPerformRespawn.class)
+                .bindHandler((context, message) -> context.getSession().getPlayer().handleRespawn());
         inbound.bindMessage(MessagePlayInRequestStatistics.class)
                 .bindHandler(new HandlerPlayInRequestStatistics());
         // Provided by CodecPlayInPlayerAction

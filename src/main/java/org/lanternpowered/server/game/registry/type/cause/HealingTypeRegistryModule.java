@@ -23,22 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.damage.source;
+package org.lanternpowered.server.game.registry.type.cause;
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.lanternpowered.server.cause.entity.healing.LanternHealingType;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.spongepowered.api.event.cause.entity.health.HealingType;
+import org.spongepowered.api.event.cause.entity.health.HealingTypes;
 
-class LanternIndirectEntityDamageSource extends LanternEntityDamageSource implements IndirectEntityDamageSource {
+public class HealingTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<HealingType> {
 
-    private final Entity indirectSource;
+    public static final LanternHealingType GENERIC = new LanternHealingType("minecraft", "generic");
+    public static final LanternHealingType MAGIC = new LanternHealingType("minecraft", "magic");
 
-    LanternIndirectEntityDamageSource(LanternIndirectEntityDamageSourceBuilder builder) {
-        super(builder);
-        this.indirectSource = builder.indirect;
+    public HealingTypeRegistryModule() {
+        super(HealingTypes.class);
     }
 
     @Override
-    public Entity getIndirectSource() {
-        return this.indirectSource;
+    public void registerDefaults() {
+        register(new LanternHealingType("minecraft", "boss"));
+        register(new LanternHealingType("minecraft", "food"));
+        register(new LanternHealingType("minecraft", "plugin"));
+        register(new LanternHealingType("minecraft", "potion"));
+        register(new LanternHealingType("minecraft", "undead"));
+        register(GENERIC);
+        register(MAGIC);
     }
 }

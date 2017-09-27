@@ -51,9 +51,11 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
@@ -97,9 +99,13 @@ import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.entity.HarvestEntityEvent;
+import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.world.ChangeWorldBorderEvent;
@@ -107,10 +113,12 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
@@ -122,6 +130,7 @@ import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
+import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
@@ -171,7 +180,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     // Whether you should ignore this player when checking for sleeping players to reset the time
     private boolean sleepingIgnored;
 
-    // The chunks the client knowns about
+    // The chunks the client knows about
     private final Set<Vector2i> knownChunks = new HashSet<>();
 
     // The interaction handler
@@ -284,14 +293,18 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public void setWorld(@Nullable LanternWorld world) {
         final LanternWorld oldWorld = getWorld();
+        if (world == oldWorld) {
+            return;
+        }
+        setWorld(oldWorld, world);
+    }
+
+    private void setWorld(@Nullable LanternWorld oldWorld, @Nullable LanternWorld world) {
         if (oldWorld != world) {
             this.interactionHandler.reset();
         }
         super.setWorld(world);
-        if (world == oldWorld) {
-            return;
-        }
-        if (oldWorld != null) {
+        if (oldWorld != null && world != oldWorld) {
             if (this.loadingTicket != null) {
                 this.loadingTicket.release();
                 this.loadingTicket = null;
@@ -339,6 +352,18 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 AdvancementTrees.INSTANCE.initialize(this);
                 getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
                         .tryGet(TestAdvancementTree.DIG_DIRT_CRITERION).set(4);
+                this.session.send(new MessagePlayOutSelectAdvancementTree(
+                        get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
+                // TODO: Unlock all the recipes for now, mappings between the internal ids and
+                // TODO: the readable ids still has to be made
+                final int[] recipes = new int[435];
+                for (int i = 0; i < recipes.length; i++) {
+                    recipes[i] = i;
+                }
+                this.session.send(new MessagePlayOutUnlockRecipes.Add(
+                        get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
+                        get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
+                        new IntArrayList(recipes)));
             } else {
                 if (oldWorld != null && oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();
@@ -347,8 +372,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     // messages to trick the client to do it anyway
                     // This is also needed to avoid weird client bugs
                     if (oldDimensionType == dimensionType) {
-                        oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ? DimensionTypes.NETHER :
-                                DimensionTypes.OVERWORLD);
+                        oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ?
+                                DimensionTypes.NETHER : DimensionTypes.OVERWORLD);
                         this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, difficulty, lowHorizon));
                     }
                 }
@@ -356,37 +381,25 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
-            if (this.worldBorder == null) {
-                world.getWorldBorder().addPlayer(this);
-            }
             // Send the first chunks
             pulseChunkChanges();
+            // Update the sky, this contains the darkness and rain levels
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
+            // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
-            this.session.send(new MessagePlayOutSelectAdvancementTree(
-                    get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
-            setScoreboard(world.getScoreboard());
+            // Update the player inventory
             this.inventoryContainer.init();
-            this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
-            // Add the player to the world
-            world.addPlayer(this);
-            // TODO: Unlock all the recipes for now, mappings between the internal ids and
-            // TODO: the readable ids still has to be made
-            final int[] recipes = new int[435];
-            for (int i = 0; i < recipes.length; i++) {
-                recipes[i] = i;
+            if (oldWorld != world) {
+                if (this.worldBorder == null) {
+                    world.getWorldBorder().addPlayer(this);
+                }
+                // Send the boss bars
+                this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
+                // Set the scoreboard
+                setScoreboard(world.getScoreboard());
+                // Add the player to the world
+                world.addPlayer(this);
             }
-            /*
-            this.session.send(new MessagePlayOutUnlockRecipes.Init(
-                    get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
-                    get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
-                    new IntArrayList(recipes),
-                    new IntArrayList(recipes)));
-                    */
-            this.session.send(new MessagePlayOutUnlockRecipes.Add(
-                    get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
-                    get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
-                    new IntArrayList(recipes)));
         } else {
             if (this.worldBorder != null) {
                 this.worldBorder.removePlayer(this);
@@ -398,6 +411,81 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // Remove this player from the global tab list
             GlobalTabList.getInstance().get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
         }
+    }
+
+    @Override
+    protected void handleDeath(CauseStack causeStack) {
+        // Call the harvest event
+        final boolean keepsInventory = getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
+        final int exp = keepsInventory ? 0 : Math.min(100, get(Keys.EXPERIENCE_LEVEL).orElse(0) * 7);
+        // Humanoids get their own sub-interface for the event
+        final HarvestEntityEvent.TargetPlayer harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetPlayer(
+                causeStack.getCurrentCause(), exp, exp, this, keepsInventory, keepsInventory, 0);
+        Sponge.getEventManager().post(harvestEvent);
+        if (!harvestEvent.isCancelled()) {
+            final List<ItemStackSnapshot> drops = new ArrayList<>();
+            if (!harvestEvent.keepsInventory()) {
+                // TODO: Use the other inventory methods, when fixed...
+                getInventory().getIndexBySlots().keySet().forEach(
+                        slot -> slot.poll().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
+            }
+            if (!harvestEvent.keepsLevel()) {
+                offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());
+            }
+            // Finalize the harvest event
+            finalizeHarvestEvent(causeStack, harvestEvent, drops);
+        }
+
+        // Ban the player if the world is hardcode
+        if (getWorld().getProperties().isHardcore()) {
+            final BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+            // Add a permanent ban
+            banService.addBan(Ban.of(getProfile(), t("gameMode.hardcore.banMessage")));
+            // Bye, bye!
+            kick(t("deathScreen.title.hardcore"));
+        }
+    }
+
+    @Override
+    protected boolean pulseDeath(int deltaTicks) {
+        // A player is never removed after a delay, it will exist until
+        // the player respawns or disconnects.
+        return isDead();
+    }
+
+    public void handleRespawn() {
+        Transform<World> transform = getTransform();
+        final LanternWorld world = (LanternWorld) transform.getExtent();
+        if (isDead()) {
+            // TODO: Get the proper spawn location
+            final Transform<World> toTransform = new Transform<>(transform.getExtent(), new Vector3d(0, 100, 0));
+
+            // Make the player less dead...
+            setDead(false);
+            // Reset player settings
+            offer(Keys.HEALTH, get(Keys.MAX_HEALTH).get());
+            offer(Keys.FOOD_LEVEL, get(LanternKeys.MAX_FOOD_LEVEL).get());
+            offer(Keys.ABSORPTION, 0.0);
+            offer(Keys.EXHAUSTION, DEFAULT_EXHAUSTION);
+            offer(Keys.SATURATION, DEFAULT_SATURATION);
+            offer(Keys.POTION_EFFECTS, new ArrayList<>());
+            offer(LanternKeys.SCORE, 0);
+
+            final CauseStack causeStack = CauseStack.current();
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.pushCause(this);
+                frame.addContext(EventContextKeys.PLAYER, this);
+
+                final RespawnPlayerEvent event = SpongeEventFactory.createRespawnPlayerEvent(causeStack.getCurrentCause(),
+                        transform, toTransform, this, this, false, true);
+                Sponge.getEventManager().post(event);
+
+                // Get the to transform, this can be overridden in the event
+                transform = event.getToTransform();
+            }
+        }
+        setWorld(world, (LanternWorld) transform.getExtent());
+        setPosition(transform.getPosition());
     }
 
     private static LanternTabListEntryBuilder createTabListEntryBuilder(LanternPlayer player) {
@@ -502,7 +590,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public void pulse() {
+    public void pulse(int deltaTicks) {
         // Check whether the player is still active
         int timeout = Lantern.getGame().getGlobalConfig().getPlayerIdleTimeout();
         if (timeout > 0 && System.currentTimeMillis() - this.lastActiveTime >= timeout * 60000) {
@@ -510,7 +598,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             return;
         }
 
-        super.pulse();
+        super.pulse(deltaTicks);
 
         // TODO: Maybe async?
         pulseChunkChanges();

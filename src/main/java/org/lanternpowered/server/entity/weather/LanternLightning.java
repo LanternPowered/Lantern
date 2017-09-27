@@ -28,6 +28,7 @@ package org.lanternpowered.server.entity.weather;
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -40,10 +41,11 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
      * The amount of ticks that the lightning will be alive.
      */
     private int ticksToLive = 10;
+    private boolean remove;
 
     public LanternLightning(UUID uniqueId) {
         super(uniqueId);
-        this.setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
+        setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
     }
 
     @Override
@@ -53,18 +55,30 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
     }
 
     @Override
-    public void pulse() {
-        super.pulse();
+    public void pulse(int deltaTicks) {
+        super.pulse(deltaTicks);
 
-        this.ticksToLive--;
-        if (this.ticksToLive <= 0) {
-            this.remove();
-        } else if (this.ticksToLive == 1) {
-            final Vector3d position = this.getPosition();
-            this.getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
-                    10000.0, 0.8 + this.getRandom().nextDouble() * 0.2);
-            this.getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT, SoundCategories.WEATHER, position,
-                    2.0, 0.5 + this.getRandom().nextDouble() * 0.2);
+        this.ticksToLive -= deltaTicks;
+        if (this.ticksToLive > 0) {
+            return;
+        }
+        if (this.remove) {
+            try (CauseStack.Frame frame = CauseStack.current().pushCauseFrame()) {
+                // Add this entity to the cause of removal
+                frame.pushCause(this);
+                // Remove the entity
+                remove();
+            }
+        } else {
+            // Remove the entity the next pulse
+            this.remove = true;
+
+            // Play the sound effects
+            final Vector3d position = getPosition();
+            getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
+                    10000.0, 0.8 + getRandom().nextDouble() * 0.2);
+            getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT, SoundCategories.WEATHER, position,
+                    2.0, 0.5 + getRandom().nextDouble() * 0.2);
 
             // TODO: Damage entities?
             // TODO: Create fire

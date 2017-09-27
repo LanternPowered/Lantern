@@ -27,16 +27,15 @@ package org.lanternpowered.server.cause.entity.damage.source;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-public class LanternBlockDamageSource extends AbstractDamageSource implements BlockDamageSource {
+class LanternBlockDamageSource extends LanternDamageSource implements BlockDamageSource {
 
     private final Location<World> location;
     private final BlockSnapshot blockSnapshot;
 
-    protected LanternBlockDamageSource(LanternBlockDamageSourceBuilder builder,
+    LanternBlockDamageSource(LanternBlockDamageSourceBuilder builder,
             Location<World> location, BlockSnapshot blockSnapshot) {
         super(builder);
         this.location = location;

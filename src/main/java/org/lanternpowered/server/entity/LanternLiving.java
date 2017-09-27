@@ -44,6 +44,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
@@ -54,10 +55,18 @@ import java.util.UUID;
 
 public class LanternLiving extends LanternEntity implements Living {
 
+    /**
+     * The amount if ticks that a {@link Living} still exists after
+     * being killed before it is removed from the {@link World}.
+     */
+    public static final int DEFAULT_DEATH_BEFORE_REMOVAL_TICKS = 30;
+
     private Vector3d headRotation = Vector3d.ZERO;
     private long lastFoodTickTime = LanternGame.currentTimeTicks();
     private long lastPeacefulFoodTickTime = LanternGame.currentTimeTicks();
     private long lastPeacefulHealthTickTime = LanternGame.currentTimeTicks();
+
+    private int removeTicks = 0;
 
     public LanternLiving(UUID uniqueId) {
         super(uniqueId);
@@ -76,6 +85,19 @@ public class LanternLiving extends LanternEntity implements Living {
 
     protected void setRawHeadRotation(Vector3d rotation) {
         this.headRotation = checkNotNull(rotation, "rotation");
+    }
+
+    protected void pulseDeath() {
+        final double health = get(Keys.HEALTH).get();
+        if (health <= 0) {
+            // Destroy the entity
+            if (this.removeTicks++ >= DEFAULT_DEATH_BEFORE_REMOVAL_TICKS) {
+                remove(RemoveState.DESTROYED);
+            }
+        } else {
+            // Reset the counter
+            this.removeTicks = 0;
+        }
     }
 
     @Override
@@ -99,6 +121,7 @@ public class LanternLiving extends LanternEntity implements Living {
 
         pulsePotions();
         pulseFood();
+        pulseDeath();
     }
 
     @Override
@@ -132,12 +155,14 @@ public class LanternLiving extends LanternEntity implements Living {
                 } else if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY) {
                     offer(Keys.INVISIBLE, duration > 0);
                 } else if (potionEffect.getType() == PotionEffectTypes.HUNGER && supports(Keys.EXHAUSTION)) {
-                    offer(Keys.EXHAUSTION, Math.min(get(Keys.EXHAUSTION).orElse(0.0) + (0.005 * (potionEffect.getAmplifier() + 1)),
-                            get(LanternKeys.MAX_EXHAUSTION).orElse(40.0)));
+                    final MutableBoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+                    final double value = exhaustion.get() + 0.005 * (potionEffect.getAmplifier() + 1.0);
+                    offer(Keys.EXHAUSTION, Math.min(value, exhaustion.getMaxValue()));
                 } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(FoodData.class)) {
                     final int amount = potionEffect.getAmplifier() + 1;
-                    offer(Keys.FOOD_LEVEL, Math.min(get(Keys.FOOD_LEVEL).orElse(20) + amount, get(LanternKeys.MAX_FOOD_LEVEL).orElse(20)));
-                    offer(Keys.SATURATION, Math.min(get(Keys.SATURATION).orElse(0.0) + (amount * 2), get(Keys.FOOD_LEVEL).orElse(20)));
+                    final int food = Math.min(get(Keys.FOOD_LEVEL).get() + amount, get(LanternKeys.MAX_FOOD_LEVEL).get());
+                    offer(Keys.FOOD_LEVEL, food);
+                    offer(Keys.SATURATION, Math.min(get(Keys.SATURATION).get() + (amount * 2), food));
                 }
             }
             offer(Keys.POTION_EFFECTS, newPotionEffects.build());
@@ -145,30 +170,30 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     private void pulseFood() {
-        if(!supports(FoodData.class) || get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
+        if (!supports(FoodData.class) || get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
             return;
         }
         final Difficulty difficulty = getWorld().getDifficulty();
 
-        final MutableBoundedValue<Double> tempExhaustion = getValue(Keys.EXHAUSTION).get();
-        if (tempExhaustion.get() > 4.0) {
-            final MutableBoundedValue<Double> tempSaturation = getValue(Keys.SATURATION).get();
+        MutableBoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+        MutableBoundedValue<Double> saturation = getValue(Keys.SATURATION).get();
+        MutableBoundedValue<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
 
-            if (tempSaturation.get() > tempSaturation.getMinValue()) {
-                offer(Keys.SATURATION, Math.max(tempSaturation.get() - 1.0, tempSaturation.getMinValue()));
+        if (exhaustion.get() > 4.0) {
+            if (saturation.get() > saturation.getMinValue()) {
+                offer(Keys.SATURATION, Math.max(saturation.get() - 1.0, saturation.getMinValue()));
+                // Get the updated saturation
+                saturation = getValue(Keys.SATURATION).get();
             } else if (!difficulty.equals(Difficulties.PEACEFUL)) {
-                offer(Keys.FOOD_LEVEL, Math.max(get(Keys.FOOD_LEVEL).orElse(0) - 1, getValue(Keys.FOOD_LEVEL).get().getMinValue()));
+                offer(Keys.FOOD_LEVEL, Math.max(foodLevel.get() - 1, foodLevel.getMinValue()));
+                // Get the updated food level
+                foodLevel = getValue(Keys.FOOD_LEVEL).get();
             }
-
-            offer(Keys.EXHAUSTION, Math.max(tempExhaustion.get() - 4.0, tempExhaustion.getMinValue()));
+            offer(Keys.EXHAUSTION, Math.max(exhaustion.get() - 4.0, exhaustion.getMinValue()));
+            exhaustion = getValue(Keys.EXHAUSTION).get();
         }
 
         final boolean naturalRegeneration = getWorld().getOrCreateRule(RuleTypes.NATURAL_REGENERATION).getValue();
-
-        final MutableBoundedValue<Double> saturation = getValue(Keys.SATURATION).get();
-        final MutableBoundedValue<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
-        final MutableBoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
-
         final long currentTickTime = LanternGame.currentTimeTicks();
 
         if (naturalRegeneration && canBeHealed() && saturation.get() > saturation.getMinValue() && foodLevel.get() >= foodLevel.getMaxValue()) {
@@ -187,7 +212,8 @@ public class LanternLiving extends LanternEntity implements Living {
         } else if (foodLevel.get() <= foodLevel.getMinValue()) {
             if ((currentTickTime - this.lastFoodTickTime) >= 80) {
                 final double health = get(Keys.HEALTH).orElse(20.0);
-                if (health > 10.0 && difficulty.equals(Difficulties.EASY) || health > 1.0 && difficulty.equals(Difficulties.NORMAL)
+                if ((health > 10.0 && difficulty.equals(Difficulties.EASY))
+                        || (health > 1.0 && difficulty.equals(Difficulties.NORMAL))
                         || difficulty.equals(Difficulties.HARD)) {
                     damage(1.0, DamageSources.STARVATION);
                 }
@@ -199,13 +225,13 @@ public class LanternLiving extends LanternEntity implements Living {
 
         // Peaceful restoration
         if (naturalRegeneration && difficulty.equals(Difficulties.PEACEFUL)) {
-            if (((currentTickTime - this.lastPeacefulHealthTickTime) >= 20) && canBeHealed()) {
+            if (currentTickTime - this.lastPeacefulHealthTickTime >= 20 && canBeHealed()) {
                 heal(1.0);
                 this.lastPeacefulHealthTickTime = currentTickTime;
             }
 
             final int oldFoodLevel = get(Keys.FOOD_LEVEL).orElse(0);
-            if (((currentTickTime - this.lastPeacefulFoodTickTime)) >= 10
+            if (currentTickTime - this.lastPeacefulFoodTickTime >= 10
                     && oldFoodLevel < get(LanternKeys.MAX_FOOD_LEVEL).orElse(20)) {
                 offer(Keys.FOOD_LEVEL, oldFoodLevel + 1);
                 this.lastPeacefulFoodTickTime = currentTickTime;

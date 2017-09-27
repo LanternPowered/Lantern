@@ -51,6 +51,7 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternContainer;
@@ -97,9 +98,12 @@ import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.world.ChangeWorldBorderEvent;
@@ -284,14 +288,18 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public void setWorld(@Nullable LanternWorld world) {
         final LanternWorld oldWorld = getWorld();
+        if (world == oldWorld) {
+            return;
+        }
+        setWorld(oldWorld, world);
+    }
+
+    private void setWorld(@Nullable LanternWorld oldWorld, @Nullable LanternWorld world) {
         if (oldWorld != world) {
             this.interactionHandler.reset();
         }
         super.setWorld(world);
-        if (world == oldWorld) {
-            return;
-        }
-        if (oldWorld != null) {
+        if (oldWorld != null && world != oldWorld) {
             if (this.loadingTicket != null) {
                 this.loadingTicket.release();
                 this.loadingTicket = null;
@@ -339,6 +347,18 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 AdvancementTrees.INSTANCE.initialize(this);
                 getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
                         .tryGet(TestAdvancementTree.DIG_DIRT_CRITERION).set(4);
+                this.session.send(new MessagePlayOutSelectAdvancementTree(
+                        get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
+                // TODO: Unlock all the recipes for now, mappings between the internal ids and
+                // TODO: the readable ids still has to be made
+                final int[] recipes = new int[435];
+                for (int i = 0; i < recipes.length; i++) {
+                    recipes[i] = i;
+                }
+                this.session.send(new MessagePlayOutUnlockRecipes.Add(
+                        get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
+                        get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
+                        new IntArrayList(recipes)));
             } else {
                 if (oldWorld != null && oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();
@@ -347,8 +367,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     // messages to trick the client to do it anyway
                     // This is also needed to avoid weird client bugs
                     if (oldDimensionType == dimensionType) {
-                        oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ? DimensionTypes.NETHER :
-                                DimensionTypes.OVERWORLD);
+                        oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ?
+                                DimensionTypes.NETHER : DimensionTypes.OVERWORLD);
                         this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, difficulty, lowHorizon));
                     }
                 }
@@ -356,37 +376,25 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
-            if (this.worldBorder == null) {
-                world.getWorldBorder().addPlayer(this);
-            }
             // Send the first chunks
             pulseChunkChanges();
+            // Update the sky, this contains the darkness and rain levels
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
+            // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
-            this.session.send(new MessagePlayOutSelectAdvancementTree(
-                    get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
-            setScoreboard(world.getScoreboard());
+            // Update the player inventory
             this.inventoryContainer.init();
-            this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
-            // Add the player to the world
-            world.addPlayer(this);
-            // TODO: Unlock all the recipes for now, mappings between the internal ids and
-            // TODO: the readable ids still has to be made
-            final int[] recipes = new int[435];
-            for (int i = 0; i < recipes.length; i++) {
-                recipes[i] = i;
+            if (oldWorld != world) {
+                if (this.worldBorder == null) {
+                    world.getWorldBorder().addPlayer(this);
+                }
+                // Send the boss bars
+                this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
+                // Set the scoreboard
+                setScoreboard(world.getScoreboard());
+                // Add the player to the world
+                world.addPlayer(this);
             }
-            /*
-            this.session.send(new MessagePlayOutUnlockRecipes.Init(
-                    get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
-                    get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
-                    new IntArrayList(recipes),
-                    new IntArrayList(recipes)));
-                    */
-            this.session.send(new MessagePlayOutUnlockRecipes.Add(
-                    get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
-                    get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
-                    new IntArrayList(recipes)));
         } else {
             if (this.worldBorder != null) {
                 this.worldBorder.removePlayer(this);
@@ -398,6 +406,39 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // Remove this player from the global tab list
             GlobalTabList.getInstance().get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
         }
+    }
+
+    @Override
+    public void pulseDeath() {
+        // A player is never removed after a delay, it will exist until
+        // the player respawns or disconnects.
+    }
+
+    public void handleRespawn() {
+        Transform<World> transform = getTransform();
+        final LanternWorld world = (LanternWorld) transform.getExtent();
+        if (get(Keys.HEALTH).get() <= 0) {
+            // TODO: Get the proper spawn location
+            final Transform<World> toTransform = new Transform<>(transform.getExtent(), new Vector3d(0, 100, 0));
+
+            // Reset player settings
+            offer(Keys.HEALTH, get(Keys.MAX_HEALTH).get());
+
+            final CauseStack causeStack = CauseStack.current();
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.pushCause(this);
+                frame.addContext(EventContextKeys.PLAYER, this);
+
+                final RespawnPlayerEvent event = SpongeEventFactory.createRespawnPlayerEvent(causeStack.getCurrentCause(),
+                        transform, toTransform, this, this, false, true);
+                Sponge.getEventManager().post(event);
+
+                // Get the to transform, this can be overridden in the event
+                transform = event.getToTransform();
+            }
+        }
+        setWorld(world, (LanternWorld) transform.getExtent());
+        setPosition(transform.getPosition());
     }
 
     private static LanternTabListEntryBuilder createTabListEntryBuilder(LanternPlayer player) {

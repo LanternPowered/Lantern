@@ -87,7 +87,6 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
         super.registerKeys();
         final ValueCollection c = getValueCollection();
         c.register(LanternKeys.ACCESSORIES, new ArrayList<>());
-        c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
         c.register(LanternKeys.MAX_EXHAUSTION, 40.0, 0.0, Double.MAX_VALUE);
         c.register(Keys.EXHAUSTION, 0.0, 0.0, LanternKeys.MAX_EXHAUSTION);
         c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);

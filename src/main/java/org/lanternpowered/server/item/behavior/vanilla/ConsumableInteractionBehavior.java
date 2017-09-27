@@ -107,9 +107,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
             final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
 
             final FoodRestorationProperty foodRestorationProperty = itemStack.getProperty(FoodRestorationProperty.class).orElse(null);
-            int foodLevelForSaturation = 1;
             if (foodRestorationProperty != null && foodRestorationProperty.getValue() != 0.0) {
-                foodLevelForSaturation = foodRestorationProperty.getValue();
                 final Optional<Integer> maxFood = player.get(LanternKeys.MAX_FOOD_LEVEL);
                 final Optional<Integer> optFoodLevel = player.get(Keys.FOOD_LEVEL);
                 if (optFoodLevel.isPresent()) {

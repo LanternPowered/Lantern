@@ -423,6 +423,17 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
             // Reset player settings
             offer(Keys.HEALTH, get(Keys.MAX_HEALTH).get());
+            offer(Keys.FOOD_LEVEL, get(LanternKeys.MAX_FOOD_LEVEL).get());
+            offer(Keys.ABSORPTION, 0.0);
+            offer(Keys.TOTAL_EXPERIENCE, 0);
+            offer(Keys.EXHAUSTION, DEFAULT_EXHAUSTION);
+            offer(Keys.SATURATION, DEFAULT_SATURATION);
+            offer(LanternKeys.SCORE, 0);
+
+            // Clear the player inventory
+            if (!world.getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue()) {
+                getInventory().clear();
+            }
 
             final CauseStack causeStack = CauseStack.current();
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {

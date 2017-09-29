@@ -43,7 +43,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
 
     public LanternLightning(UUID uniqueId) {
         super(uniqueId);
-        this.setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
+        setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
     }
 
     @Override
@@ -53,18 +53,18 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
     }
 
     @Override
-    public void pulse() {
-        super.pulse();
+    public void pulse(int deltaTicks) {
+        super.pulse(deltaTicks);
 
         this.ticksToLive--;
         if (this.ticksToLive <= 0) {
-            this.remove();
+            remove();
         } else if (this.ticksToLive == 1) {
-            final Vector3d position = this.getPosition();
-            this.getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
-                    10000.0, 0.8 + this.getRandom().nextDouble() * 0.2);
-            this.getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT, SoundCategories.WEATHER, position,
-                    2.0, 0.5 + this.getRandom().nextDouble() * 0.2);
+            final Vector3d position = getPosition();
+            getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
+                    10000.0, 0.8 + getRandom().nextDouble() * 0.2);
+            getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT, SoundCategories.WEATHER, position,
+                    2.0, 0.5 + getRandom().nextDouble() * 0.2);
 
             // TODO: Damage entities?
             // TODO: Create fire

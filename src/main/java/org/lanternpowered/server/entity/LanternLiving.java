@@ -107,7 +107,7 @@ public class LanternLiving extends LanternEntity implements Living {
         if (isDead()) {
             return;
         }
-        setDead();
+        setDead(true);
         final CauseStack causeStack = CauseStack.current();
 
         final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
@@ -135,8 +135,8 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     @Override
-    void setDead() {
-        this.dead = true;
+    public void setDead(boolean dead) {
+        this.dead = dead;
     }
 
     @Override
@@ -155,16 +155,16 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     @Override
-    public void pulse() {
+    public void pulse(int deltaTicks) {
         if (!pulseDeath()) {
-            pulseLiving();
+            pulseLiving(deltaTicks);
         }
     }
 
-    protected void pulseLiving() {
-        super.pulse();
+    protected void pulseLiving(int deltaTicks) {
+        super.pulse(deltaTicks);
 
-        pulsePotions();
+        pulsePotions(deltaTicks);
         pulseFood();
     }
 
@@ -178,7 +178,7 @@ public class LanternLiving extends LanternEntity implements Living {
         return Optional.empty();
     }
 
-    private void pulsePotions() {
+    private void pulsePotions(int deltaTicks) {
         // TODO: Move potion effects to a component? + The key registration
         final List<PotionEffect> potionEffects = get(Keys.POTION_EFFECTS).get();
         if (!potionEffects.isEmpty()) {
@@ -186,7 +186,7 @@ public class LanternLiving extends LanternEntity implements Living {
             final ImmutableList.Builder<PotionEffect> newPotionEffects = ImmutableList.builder();
             for (PotionEffect potionEffect : potionEffects) {
                 final boolean instant = potionEffect.getType().isInstant();
-                final int duration = instant ? 1 : potionEffect.getDuration() - 1;
+                final int duration = instant ? 1 : potionEffect.getDuration() - deltaTicks;
                 if (duration > 0) {
                     final PotionEffect newPotionEffect = builder.from(potionEffect).duration(duration).build();
                     ((LanternPotionEffectType) newPotionEffect.getType()).getEffectConsumer().accept(this, newPotionEffect);
@@ -200,7 +200,7 @@ public class LanternLiving extends LanternEntity implements Living {
                     offer(Keys.INVISIBLE, duration > 0);
                 } else if (potionEffect.getType() == PotionEffectTypes.HUNGER && supports(Keys.EXHAUSTION)) {
                     final MutableBoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
-                    final double value = exhaustion.get() + 0.005 * (potionEffect.getAmplifier() + 1.0);
+                    final double value = exhaustion.get() + (double) deltaTicks * 0.005 * (potionEffect.getAmplifier() + 1.0);
                     offer(Keys.EXHAUSTION, Math.min(value, exhaustion.getMaxValue()));
                 } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(FoodData.class)) {
                     final int amount = potionEffect.getAmplifier() + 1;

@@ -43,6 +43,7 @@ import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.text.LanternTexts;
@@ -61,9 +62,12 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.message.MessageEvent;
@@ -141,6 +145,9 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
 
     @Nullable private LanternEntity vehicle;
     private final List<LanternEntity> passengers = new ArrayList<>();
+
+    private long lastPulseTime = -1;
+    private long voidDamageCounter;
 
     @Override
     public ValueCollection getValueCollection() {
@@ -250,7 +257,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
      * Marks this {@link Entity} as dead, should
      * only be implemented by a {@link Living}.
      */
-    void setDead() {
+    void setDead(boolean dead) {
     }
 
     void postDestructEvent(DestructEntityEvent event) {
@@ -290,8 +297,9 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
             // Call the normal destroy entity event,
             // don't do it if the entity is dead.
             if (!isDead()) {
-                final CauseStack causeStack = CauseStack.current();
+                setDead(true);
 
+                final CauseStack causeStack = CauseStack.current();
                 // TODO: Message channel?
                 final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEvent(causeStack.getCurrentCause(),
                         MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, false);
@@ -632,14 +640,35 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         return this.removeState != RemoveState.CHUNK_UNLOAD;
     }
 
+    public final void pulse() {
+        final long time = LanternGame.currentTimeTicks();
+        final long deltaTicks = this.lastPulseTime == -1 ? 1 : time - this.lastPulseTime;
+        if (deltaTicks > 0) {
+            pulse((int) deltaTicks);
+            this.lastPulseTime = time;
+        }
+    }
+
     /**
      * Pulses the entity.
+     *
+     * @param deltaTicks The amount of ticks that passed since the last pulse
      */
-    public void pulse() {
+    public void pulse(int deltaTicks) {
         synchronized (this.passengers) {
             if (this.vehicle != null) {
                 this.position = this.vehicle.getPosition();
             }
+        }
+        // Deal some void damage
+        if (getPosition().getY() < -64.0) {
+            this.voidDamageCounter += deltaTicks;
+            while (this.voidDamageCounter >= 10) {
+                damage(4.0, DamageSources.VOID);
+                this.voidDamageCounter -= 10;
+            }
+        } else {
+            this.voidDamageCounter = 0;
         }
     }
 
@@ -659,7 +688,22 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         checkNotNull(damageSource, "damageSource");
         final Optional<Double> optHealth = get(Keys.HEALTH);
         if (!optHealth.isPresent()) {
+            // A special case, make void damage always pass through for
+            // entities without health, instantly destroying them.
+            if (damageSource.getType() == DamageTypes.VOID) {
+                remove(RemoveState.DESTROYED);
+                return true;
+            }
             return false;
+        }
+        // Always throw the event. Plugins may want to override
+        // default checking behavior.
+        boolean cancelled = false;
+        // Check if the damage affects creative mode, and check
+        // if the player is in creative mode
+        if (!damageSource.doesAffectCreative() &&
+                get(Keys.GAME_MODE).orElse(null) == GameModes.CREATIVE) {
+            cancelled = true;
         }
         // TODO: Damage modifiers, etc.
         final CauseStack causeStack = CauseStack.current();
@@ -668,17 +712,18 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
             frame.addContext(EventContextKeys.DAMAGE_TYPE, damageSource.getType());
             final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
                     causeStack.getCurrentCause(), new ArrayList<>(), this, damage);
+            event.setCancelled(cancelled);
+            Sponge.getEventManager().post(event);
             if (event.isCancelled()) {
                 return false;
             }
             damage = event.getFinalDamage();
-        }
-        if (damage > 0) {
-            offer(Keys.HEALTH, Math.max(optHealth.get() - damage, 0));
-            return true;
+            if (damage > 0) {
+                offer(Keys.HEALTH, Math.max(optHealth.get() - damage, 0));
+            }
         }
         triggerEvent(DamagedEntityEvent.of());
-        return false;
+        return true;
     }
 
     @Override

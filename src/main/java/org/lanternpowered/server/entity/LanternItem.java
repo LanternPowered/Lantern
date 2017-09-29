@@ -92,8 +92,8 @@ public class LanternItem extends LanternEntity implements Item {
     }
 
     @Override
-    public void pulse() {
-        super.pulse();
+    public void pulse(int deltaTicks) {
+        super.pulse(deltaTicks);
 
         int pickupDelay = get(Keys.PICKUP_DELAY).orElse(0);
         int despawnDelay = get(Keys.DESPAWN_DELAY).orElse(NO_DESPAWN_DELAY);

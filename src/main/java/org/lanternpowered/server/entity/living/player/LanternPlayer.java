@@ -422,6 +422,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // TODO: Get the proper spawn location
             final Transform<World> toTransform = new Transform<>(transform.getExtent(), new Vector3d(0, 100, 0));
 
+            // Make the player less dead...
+            setDead(false);
             // Reset player settings
             offer(Keys.HEALTH, get(Keys.MAX_HEALTH).get());
             offer(Keys.FOOD_LEVEL, get(LanternKeys.MAX_FOOD_LEVEL).get());
@@ -556,7 +558,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public void pulse() {
+    public void pulse(int deltaTicks) {
         // Check whether the player is still active
         int timeout = Lantern.getGame().getGlobalConfig().getPlayerIdleTimeout();
         if (timeout > 0 && System.currentTimeMillis() - this.lastActiveTime >= timeout * 60000) {
@@ -564,7 +566,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             return;
         }
 
-        super.pulse();
+        super.pulse(deltaTicks);
 
         // TODO: Maybe async?
         pulseChunkChanges();

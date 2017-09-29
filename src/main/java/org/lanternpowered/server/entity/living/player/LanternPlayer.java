@@ -103,6 +103,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.entity.HarvestEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
@@ -409,7 +410,30 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public boolean pulseDeath() {
+    protected void postHarvestEvent(CauseStack causeStack) {
+        final boolean keepsInventory = getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
+        final boolean keepsExpLevels = getWorld().getOrCreateRule(RuleTypes.KEEP_EXPERIENCE_LEVELS).getValue();
+        final int exp = collectExperience();
+        // Humanoids get their own sub-interface for the event
+        final HarvestEntityEvent.TargetPlayer harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetPlayer(
+                causeStack.getCurrentCause(), exp, exp, this, keepsInventory, keepsExpLevels, 0);
+        Sponge.getEventManager().post(harvestEvent);
+        if (harvestEvent.isCancelled()) {
+            return;
+        }
+        // Finalize the harvest event
+        finalizeHarvestEvent(causeStack, harvestEvent);
+        if (!harvestEvent.keepsInventory()) {
+            // TODO: Drop all the items
+            getInventory().clear();
+        }
+        if (!harvestEvent.keepsLevel()) {
+            offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());
+        }
+    }
+
+    @Override
+    protected boolean pulseDeath(int deltaTicks) {
         // A player is never removed after a delay, it will exist until
         // the player respawns or disconnects.
         return isDead();
@@ -418,7 +442,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     public void handleRespawn() {
         Transform<World> transform = getTransform();
         final LanternWorld world = (LanternWorld) transform.getExtent();
-        if (get(Keys.HEALTH).get() <= 0) {
+        if (isDead()) {
             // TODO: Get the proper spawn location
             final Transform<World> toTransform = new Transform<>(transform.getExtent(), new Vector3d(0, 100, 0));
 
@@ -428,16 +452,10 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             offer(Keys.HEALTH, get(Keys.MAX_HEALTH).get());
             offer(Keys.FOOD_LEVEL, get(LanternKeys.MAX_FOOD_LEVEL).get());
             offer(Keys.ABSORPTION, 0.0);
-            offer(Keys.TOTAL_EXPERIENCE, 0);
             offer(Keys.EXHAUSTION, DEFAULT_EXHAUSTION);
             offer(Keys.SATURATION, DEFAULT_SATURATION);
             offer(Keys.POTION_EFFECTS, new ArrayList<>());
             offer(LanternKeys.SCORE, 0);
-
-            // Clear the player inventory
-            if (!world.getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue()) {
-                getInventory().clear();
-            }
 
             final CauseStack causeStack = CauseStack.current();
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {

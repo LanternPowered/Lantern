@@ -53,6 +53,9 @@ import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceB
 import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternFallingBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternIndirectEntityDamageSourceBuilder;
+import org.lanternpowered.server.cause.entity.healing.source.LanternEntityHealingSourceBuilder;
+import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSource;
+import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSourceBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
@@ -94,9 +97,12 @@ import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistry
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.ConstantDamageSourceRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.ConstantHealingSourceRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.DamageModifierTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule;
+import org.lanternpowered.server.game.registry.type.cause.HealingTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
@@ -318,6 +324,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.cause.EventContextKey;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.damage.DamageModifierType;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
@@ -325,6 +332,10 @@ import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.dismount.DismountType;
+import org.spongepowered.api.event.cause.entity.health.HealingType;
+import org.spongepowered.api.event.cause.entity.health.HealthModifierType;
+import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource;
+import org.spongepowered.api.event.cause.entity.health.source.HealingSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.extra.fluid.FluidStack;
@@ -473,6 +484,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
                 .registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
                 .registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
+                .registerBuilderSupplier(HealingSource.Builder.class, LanternHealingSourceBuilder::new)
+                .registerBuilderSupplier(EntityHealingSource.Builder.class, LanternEntityHealingSourceBuilder::new)
                 .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
                 .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
                 .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
@@ -511,7 +524,10 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
                 .registerModule(Accessory.class, new AccessoryRegistryModule())
                 .registerModule(DamageType.class, new DamageTypeRegistryModule())
+                .registerModule(DamageModifierType.class, new DamageModifierTypeRegistryModule())
                 .registerModule(new ConstantDamageSourceRegistryModule())
+                .registerModule(HealingType.class, new HealingTypeRegistryModule())
+                .registerModule(new ConstantHealingSourceRegistryModule())
                 .registerModule(DismountType.class, new DismountTypeRegistryModule())
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(TeleportType.class, new TeleportTypeRegistryModule())

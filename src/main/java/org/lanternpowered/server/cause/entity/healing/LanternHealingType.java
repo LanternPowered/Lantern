@@ -23,26 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.cause.entity.healing;
 
-import org.spongepowered.api.event.cause.EventContextKey;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-public final class LanternEventContextKeys {
+public class LanternHealingType extends PluginCatalogType.Base implements HealingType {
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
-
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
+    public LanternHealingType(String pluginId, String name) {
+        super(pluginId, name);
     }
 
-    private LanternEventContextKeys() {
+    public LanternHealingType(String pluginId, String id, String name) {
+        super(pluginId, id, name);
     }
 }

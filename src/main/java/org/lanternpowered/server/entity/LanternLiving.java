@@ -29,23 +29,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.rules.RuleTypes;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.ExperienceOrb;
+import org.spongepowered.api.entity.Item;
+import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
+import org.spongepowered.api.event.cause.entity.health.source.HealingSources;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.HarvestEntityEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -58,6 +71,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@SuppressWarnings("ConstantConditions")
 public class LanternLiving extends LanternEntity implements Living {
 
     /**
@@ -96,6 +110,8 @@ public class LanternLiving extends LanternEntity implements Living {
                         handleDeath();
                     }
                 });
+        //noinspection unchecked
+        c.register((Key<MutableBoundedValue<Double>>) (Key) Keys.ABSORPTION, 0.0, 0.0, 1024.0);
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
     }
 
@@ -104,21 +120,90 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     private void handleDeath() {
+        // Can happen when a dead player joins, just
+        // mark the player as dead since the events
+        // have already been thrown.
+        if (getWorld() == null) {
+            setDead(true);
+        }
         if (isDead()) {
             return;
         }
         setDead(true);
         final CauseStack causeStack = CauseStack.current();
 
+        // Post the entity destruction event
         final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
                 MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, false);
         postDestructEvent(event);
+
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            // Add the destruct event to the cause, this can be used
+            // to track the cause of the entity death.
+            frame.pushCause(event);
+            // Post the harvest event
+            postHarvestEvent(causeStack);
+        }
     }
 
-    protected boolean pulseDeath() {
+    protected void postHarvestEvent(CauseStack causeStack) {
+        final int exp = collectExperience();
+        // Humanoids get their own sub-interface for the event
+        final HarvestEntityEvent harvestEvent;
+        if (this instanceof Humanoid) {
+            harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetHumanoid(
+                    causeStack.getCurrentCause(), exp, exp, (Humanoid) this);
+        } else {
+            harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetLiving(
+                    causeStack.getCurrentCause(), exp, exp, this);
+        }
+        Sponge.getEventManager().post(harvestEvent);
+        // Finalize the harvest event
+        finalizeHarvestEvent(causeStack, harvestEvent);
+    }
+
+    /**
+     * Finalize the {@link HarvestEntityEvent}. This will spawn all
+     * the dropped {@link Item}s and {@link ExperienceOrb}s. But only
+     * if the event isn't cancelled.
+     *
+     * @param causeStack The cause stack
+     * @param event The harvest event
+     */
+    protected void finalizeHarvestEvent(CauseStack causeStack, HarvestEntityEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        final int exp = event.getExperience();
+        // No experience, don't spawn any entity
+        if (exp <= 0) {
+            return;
+        }
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.pushCause(event);
+            frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
+            // Create a experience orb
+            final ExperienceOrb experienceOrb = (ExperienceOrb) getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, getPosition());
+            // There is no specific event to spawn experience orbs
+            final SpawnEntityEvent spawnEvent = SpongeEventFactory.createSpawnEntityEvent(
+                    causeStack.getCurrentCause(), Lists.newArrayList(experienceOrb));
+            Sponge.getEventManager().post(spawnEvent);
+            // Finish the spawn event
+            LanternWorld.finishSpawnEntityEvent(spawnEvent);
+        }
+    }
+
+    /**
+     * Pulses this {@link Living} and checks if the entity is still alive, a
+     * dead entity will be removed after a specific amount of ticks.
+     *
+     * @return Whether the entity is dead
+     */
+    protected boolean pulseDeath(int deltaTicks) {
         if (isDead()) {
+            this.removeTicks += deltaTicks;
             // Destroy the entity
-            if (this.removeTicks++ >= DEFAULT_DEATH_BEFORE_REMOVAL_TICKS) {
+            if (this.removeTicks >= DEFAULT_DEATH_BEFORE_REMOVAL_TICKS) {
                 super.remove(RemoveState.DESTROYED);
             }
             return true;
@@ -129,13 +214,26 @@ public class LanternLiving extends LanternEntity implements Living {
         }
     }
 
+    /**
+     * Collects a experience value from this {@link Living}. This is the
+     * amount of experience that will be dropped when the entity is killed.
+     * <p>
+     * The {@link CauseStack} may be used to retrieve contextual data how
+     * the {@link Living} got killed.
+     *
+     * @return The experience value
+     */
+    protected int collectExperience() {
+        return 0;
+    }
+
     @Override
     public boolean isDead() {
         return this.dead;
     }
 
     @Override
-    public void setDead(boolean dead) {
+    protected void setDead(boolean dead) {
         this.dead = dead;
     }
 
@@ -155,8 +253,8 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     @Override
-    public void pulse(int deltaTicks) {
-        if (!pulseDeath()) {
+    protected void pulse(int deltaTicks) {
+        if (!pulseDeath(deltaTicks)) {
             pulseLiving(deltaTicks);
         }
     }
@@ -240,16 +338,16 @@ public class LanternLiving extends LanternEntity implements Living {
         final boolean naturalRegeneration = getWorld().getOrCreateRule(RuleTypes.NATURAL_REGENERATION).getValue();
         final long currentTickTime = LanternGame.currentTimeTicks();
 
-        if (naturalRegeneration && canBeHealed() && saturation.get() > saturation.getMinValue() && foodLevel.get() >= foodLevel.getMaxValue()) {
+        if (naturalRegeneration && saturation.get() > saturation.getMinValue() && foodLevel.get() >= foodLevel.getMaxValue()) {
             if ((currentTickTime - this.lastFoodTickTime) >= 10) {
                 final double amount = Math.min(saturation.get(), 6.0);
-                heal(amount / 6.0);
+                heal(amount / 6.0, HealingSources.FOOD);
                 offer(Keys.EXHAUSTION, Math.min(exhaustion.get() + amount, exhaustion.getMaxValue()));
                 this.lastFoodTickTime = currentTickTime;
             }
-        } else if (naturalRegeneration && foodLevel.get() >= 18 && canBeHealed()) {
+        } else if (naturalRegeneration && foodLevel.get() >= 18) {
             if ((currentTickTime - this.lastFoodTickTime) >= 80) {
-                heal(1.0);
+                heal(1.0, HealingSources.FOOD);
                 offer(Keys.EXHAUSTION, Math.min(6.0 + exhaustion.get(), exhaustion.getMaxValue()));
                 this.lastFoodTickTime = currentTickTime;
             }
@@ -269,8 +367,8 @@ public class LanternLiving extends LanternEntity implements Living {
 
         // Peaceful restoration
         if (naturalRegeneration && difficulty.equals(Difficulties.PEACEFUL)) {
-            if (currentTickTime - this.lastPeacefulHealthTickTime >= 20 && canBeHealed()) {
-                heal(1.0);
+            if (currentTickTime - this.lastPeacefulHealthTickTime >= 20) {
+                heal(1.0, HealingSources.MAGIC);
                 this.lastPeacefulHealthTickTime = currentTickTime;
             }
 
@@ -282,33 +380,4 @@ public class LanternLiving extends LanternEntity implements Living {
             }
         }
     }
-
-    /**
-     * Whether or not this entity can be healed properly.
-     *
-     * <p>If they aren't dead and have less than max health
-     * they can be healed.</p>
-     *
-     * @return If this entity can be healed
-     */
-    public boolean canBeHealed() {
-        final MutableBoundedValue<Double> health = health();
-        return health.get() > health.getMinValue() && health.get() < health.getMaxValue();
-    }
-
-    /**
-     * Heals the entity for the specified amount.
-     *
-     * <p>Will not heal them if they are dead and will not set
-     * them above their maximum health.</p>
-     *
-     * @param amount The amount to heal for
-     */
-    public void heal(double amount) {
-        final MutableBoundedValue<Double> health = health();
-        if (health.get() > health.getMinValue()) {
-            offer(Keys.HEALTH, Math.min(health.get() + amount, health.getMaxValue()));
-        }
-    }
-
 }

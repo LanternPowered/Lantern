@@ -23,26 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.cause.entity.healing.source;
 
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import static com.google.common.base.Preconditions.checkState;
 
-public final class LanternEventContextKeys {
+import org.spongepowered.api.event.cause.entity.health.source.HealingSource;
+import org.spongepowered.api.event.cause.entity.health.source.common.AbstractHealingSourceBuilder;
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
+public class LanternHealingSourceBuilder extends AbstractHealingSourceBuilder<HealingSource, HealingSource.Builder> implements HealingSource.Builder {
 
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
-    }
-
-    private LanternEventContextKeys() {
+    @Override
+    public HealingSource build() throws IllegalStateException {
+        checkState(this.healingType != null, "The healing type must be set");
+        return new LanternHealingSource(this);
     }
 }

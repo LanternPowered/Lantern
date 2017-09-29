@@ -23,26 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.game.registry.type.cause;
 
-import org.spongepowered.api.event.cause.EventContextKey;
+import org.lanternpowered.server.cause.entity.healing.LanternHealingType;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.spongepowered.api.event.cause.entity.health.HealingTypes;
 
-public final class LanternEventContextKeys {
+public class HealingTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<HealingType> {
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
+    public static final LanternHealingType GENERIC = new LanternHealingType("minecraft", "generic");
+    public static final LanternHealingType MAGIC = new LanternHealingType("minecraft", "magic");
 
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
+    public HealingTypeRegistryModule() {
+        super(HealingTypes.class);
     }
 
-    private LanternEventContextKeys() {
+    @Override
+    public void registerDefaults() {
+        register(new LanternHealingType("minecraft", "boss"));
+        register(new LanternHealingType("minecraft", "food"));
+        register(new LanternHealingType("minecraft", "plugin"));
+        register(new LanternHealingType("minecraft", "potion"));
+        register(new LanternHealingType("minecraft", "undead"));
+        register(GENERIC);
+        register(MAGIC);
     }
 }

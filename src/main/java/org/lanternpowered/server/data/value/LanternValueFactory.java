@@ -70,6 +70,7 @@ import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.weighted.WeightedTable;
 
@@ -99,7 +100,8 @@ public class LanternValueFactory implements ValueFactory {
     private final Collection<ValueProcessorKeyRegistration<?,?>> unmodifiableKeyRegistrations =
             Collections.unmodifiableCollection((Collection) this.keyRegistrations.values());
 
-    private final static Comparator<Integer> COMPARATOR = Integer::compare;
+    private final static Comparator<Integer> INT_COMPARATOR = Integer::compare;
+    private final static Comparator<Double> DOUBLE_COMPARATOR = Double::compare;
 
     private LanternValueFactory() {
         registerSupplier(Value.class, ValueSupplier.<Value, Object>of(
@@ -124,13 +126,17 @@ public class LanternValueFactory implements ValueFactory {
         registerSupplier(MutableBoundedValue.class, ValueSupplier.of(
                 (key, element) -> {
                     if (key.getElementToken().getRawType() == Integer.class) {
-                        return new LanternBoundedValue(key, element, COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
+                        return new LanternBoundedValue(key, element, INT_COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    } else if (key.getElementToken().getRawType() == Double.class) {
+                        return new LanternBoundedValue(key, element, DOUBLE_COMPARATOR, -Double.MAX_VALUE, Double.MAX_VALUE);
                     }
                     throw new IllegalStateException();
                 },
                 (key, element, defElement) -> {
                     if (key.getElementToken().getRawType() == Integer.class) {
-                        return new LanternBoundedValue(key, element, COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
+                        return new LanternBoundedValue(key, element, INT_COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    } else if (key.getElementToken().getRawType() == Double.class) {
+                        return new LanternBoundedValue(key, element, DOUBLE_COMPARATOR, -Double.MAX_VALUE, Double.MAX_VALUE);
                     }
                     throw new IllegalStateException();
                 }));

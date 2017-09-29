@@ -43,6 +43,7 @@ import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.LanternEventContextKeys;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
@@ -56,6 +57,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -64,12 +66,19 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
+import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
+import org.spongepowered.api.event.cause.entity.damage.DamageModifierTypes;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
+import org.spongepowered.api.event.cause.entity.health.source.HealingSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.HealEntityEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -78,6 +87,7 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RelativePositions;
+import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -87,6 +97,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.DoubleUnaryOperator;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -654,7 +667,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
      *
      * @param deltaTicks The amount of ticks that passed since the last pulse
      */
-    public void pulse(int deltaTicks) {
+    protected void pulse(int deltaTicks) {
         synchronized (this.passengers) {
             if (this.vehicle != null) {
                 this.position = this.vehicle.getPosition();
@@ -705,24 +718,81 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
                 get(Keys.GAME_MODE).orElse(null) == GameModes.CREATIVE) {
             cancelled = true;
         }
+        final List<Tuple<DamageFunction, Consumer<DamageEntityEvent>>> damageFunctions = new ArrayList<>();
+        // Only collect damage modifiers if the event isn't cancelled
+        if (!cancelled) {
+            collectDamageFunctions(damageFunctions);
+        }
         // TODO: Damage modifiers, etc.
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.pushCause(damageSource);
             frame.addContext(EventContextKeys.DAMAGE_TYPE, damageSource.getType());
-            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
-                    causeStack.getCurrentCause(), new ArrayList<>(), this, damage);
+            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(),
+                    damageFunctions.stream().map(Tuple::getFirst).collect(Collectors.toList()), this, damage);
             event.setCancelled(cancelled);
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {
                 return false;
             }
+            damageFunctions.forEach(tuple -> tuple.getSecond().accept(event));
             damage = event.getFinalDamage();
             if (damage > 0) {
                 offer(Keys.HEALTH, Math.max(optHealth.get() - damage, 0));
             }
         }
         triggerEvent(DamagedEntityEvent.of());
+        return true;
+    }
+
+    protected void collectDamageFunctions(List<Tuple<DamageFunction, Consumer<DamageEntityEvent>>> damageFunctions) {
+        // Absorption health modifier
+        get(Keys.ABSORPTION).filter(value -> value > 0).ifPresent(value -> {
+            final DoubleUnaryOperator function = d -> -(Math.max(d - Math.max(d - value, 0), 0));
+            final DamageModifier modifier = DamageModifier.builder()
+                    .cause(Cause.of(EventContext.empty(), this))
+                    .type(DamageModifierTypes.ABSORPTION)
+                    .build();
+            damageFunctions.add(new Tuple<>(new DamageFunction(modifier, function), event -> {
+                final double mod = event.getDamage(modifier);
+                offer(Keys.ABSORPTION, Math.max(get(Keys.ABSORPTION).get() + mod, 0));
+            }));
+        });
+    }
+
+    /**
+     * Heals the entity for the specified amount.
+     *
+     * <p>Will not heal them if they are dead and will not set
+     * them above their maximum health.</p>
+     *
+     * @param amount The amount to heal for
+     * @param source The healing source
+     */
+    public boolean heal(double amount, HealingSource source) {
+        if (isDead()) {
+            return false;
+        }
+        final MutableBoundedValue<Double> health = getValue(Keys.HEALTH).orElse(null);
+        if (health == null || health.get() >= health.getMaxValue()) {
+            return false;
+        }
+        final CauseStack causeStack = CauseStack.current();
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.pushCause(source);
+            frame.addContext(LanternEventContextKeys.HEALING_TYPE, source.getHealingType());
+
+            final HealEntityEvent event = SpongeEventFactory.createHealEntityEvent(
+                    frame.getCurrentCause(), new ArrayList<>(), this, amount);
+            Sponge.getEventManager().post(event);
+            if (event.isCancelled()) {
+                return false;
+            }
+            amount = event.getFinalHealAmount();
+            if (amount > 0) {
+                offer(Keys.HEALTH, Math.min(health.get() + amount, health.getMaxValue()));
+            }
+        }
         return true;
     }
 

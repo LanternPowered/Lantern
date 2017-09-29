@@ -23,26 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.cause.entity.healing.source;
 
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import static com.google.common.base.Preconditions.checkState;
 
-public final class LanternEventContextKeys {
+import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource;
+import org.spongepowered.api.event.cause.entity.health.source.common.AbstractEntityHealingSourceBuilder;
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
+public class LanternEntityHealingSourceBuilder extends AbstractEntityHealingSourceBuilder<EntityHealingSource, EntityHealingSource.Builder>
+        implements EntityHealingSource.Builder {
 
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
-    }
-
-    private LanternEventContextKeys() {
+    @Override
+    public EntityHealingSource build() throws IllegalStateException {
+        checkState(this.healingType != null, "The healing type must be set");
+        checkState(this.entity != null, "The entity must be set");
+        return new LanternEntityHealingSource(this);
     }
 }

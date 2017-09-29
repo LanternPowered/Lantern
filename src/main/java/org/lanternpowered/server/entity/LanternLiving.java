@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -42,8 +43,12 @@ import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -68,6 +73,12 @@ public class LanternLiving extends LanternEntity implements Living {
 
     private int removeTicks = 0;
 
+    /**
+     * Whether this {@link Living} entity is
+     * dead, reached zero health.
+     */
+    private boolean dead;
+
     public LanternLiving(UUID uniqueId) {
         super(uniqueId);
     }
@@ -79,7 +90,12 @@ public class LanternLiving extends LanternEntity implements Living {
         c.register(Keys.MAX_AIR, 300, 0, Integer.MAX_VALUE);
         c.register(Keys.REMAINING_AIR, 300, 0, Keys.MAX_AIR);
         c.register(Keys.MAX_HEALTH, 20.0, 0.0, 1024.0);
-        c.register(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH);
+        c.register(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH)
+                .addListener((oldElement, newElement) -> {
+                    if (newElement <= 0) {
+                        handleDeath();
+                    }
+                });
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
     }
 
@@ -87,17 +103,40 @@ public class LanternLiving extends LanternEntity implements Living {
         this.headRotation = checkNotNull(rotation, "rotation");
     }
 
-    protected void pulseDeath() {
-        final double health = get(Keys.HEALTH).get();
-        if (health <= 0) {
+    private void handleDeath() {
+        if (isDead()) {
+            return;
+        }
+        setDead();
+        final CauseStack causeStack = CauseStack.current();
+
+        final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
+                MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, false);
+        postDestructEvent(event);
+    }
+
+    protected boolean pulseDeath() {
+        if (isDead()) {
             // Destroy the entity
             if (this.removeTicks++ >= DEFAULT_DEATH_BEFORE_REMOVAL_TICKS) {
-                remove(RemoveState.DESTROYED);
+                super.remove(RemoveState.DESTROYED);
             }
+            return true;
         } else {
             // Reset the counter
             this.removeTicks = 0;
+            return false;
         }
+    }
+
+    @Override
+    public boolean isDead() {
+        return this.dead;
+    }
+
+    @Override
+    void setDead() {
+        this.dead = true;
     }
 
     @Override
@@ -117,11 +156,16 @@ public class LanternLiving extends LanternEntity implements Living {
 
     @Override
     public void pulse() {
+        if (!pulseDeath()) {
+            pulseLiving();
+        }
+    }
+
+    protected void pulseLiving() {
         super.pulse();
 
         pulsePotions();
         pulseFood();
-        pulseDeath();
     }
 
     @Override

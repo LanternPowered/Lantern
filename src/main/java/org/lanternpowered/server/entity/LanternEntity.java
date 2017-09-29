@@ -39,6 +39,7 @@ import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
@@ -47,6 +48,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
@@ -60,9 +62,13 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
@@ -149,7 +155,8 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     public enum RemoveState {
         /**
          * The entity was destroyed through the {@link #remove()}
-         * method. Will not be respawned in any case.
+         * method (or when it reached zero health). Will not be
+         * respawned in any case.
          */
         DESTROYED,
         /**
@@ -229,6 +236,30 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         this.entityProtocolType = entityProtocolType;
     }
 
+    /**
+     * Gets whether this {@link Entity} is dead, should
+     * only be implemented by a {@link Living}.
+     *
+     * @return Is dead
+     */
+    boolean isDead() {
+        return false;
+    }
+
+    /**
+     * Marks this {@link Entity} as dead, should
+     * only be implemented by a {@link Living}.
+     */
+    void setDead() {
+    }
+
+    void postDestructEvent(DestructEntityEvent event) {
+        Sponge.getEventManager().post(event);
+        if (!event.isMessageCancelled()) {
+            // TODO
+        }
+    }
+
     @Override
     public boolean isRemoved() {
         return this.removeState != null;
@@ -248,10 +279,24 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
 
     public void remove(RemoveState removeState) {
         checkNotNull(removeState, "removeState");
+        if (this.removeState == removeState) {
+            return;
+        }
         this.removeState = removeState;
         if (removeState == RemoveState.DESTROYED) {
             setVehicle(null);
             clearPassengers();
+
+            // Call the normal destroy entity event,
+            // don't do it if the entity is dead.
+            if (!isDead()) {
+                final CauseStack causeStack = CauseStack.current();
+
+                // TODO: Message channel?
+                final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEvent(causeStack.getCurrentCause(),
+                        MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, false);
+                postDestructEvent(event);
+            }
         }
     }
 
@@ -611,26 +656,28 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
 
     @Override
     public boolean damage(double damage, DamageSource damageSource) {
+        checkNotNull(damageSource, "damageSource");
         final Optional<Double> optHealth = get(Keys.HEALTH);
         if (!optHealth.isPresent()) {
             return false;
         }
         // TODO: Damage modifiers, etc.
         final CauseStack causeStack = CauseStack.current();
-        final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
-                causeStack.getCurrentCause(), new ArrayList<>(), this, damage);
-        if (event.isCancelled()) {
-            return false;
-        }
-        damage = event.getFinalDamage();
-        if (damage > 0) {
-            final double health = optHealth.get() - damage;
-            offer(Keys.HEALTH, health);
-            if (health <= 0.0) {
-                // TODO: Notify stuff and kill the entity
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.pushCause(damageSource);
+            frame.addContext(EventContextKeys.DAMAGE_TYPE, damageSource.getType());
+            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
+                    causeStack.getCurrentCause(), new ArrayList<>(), this, damage);
+            if (event.isCancelled()) {
+                return false;
             }
+            damage = event.getFinalDamage();
+        }
+        if (damage > 0) {
+            offer(Keys.HEALTH, Math.max(optHealth.get() - damage, 0));
             return true;
         }
+        triggerEvent(DamagedEntityEvent.of());
         return false;
     }
 

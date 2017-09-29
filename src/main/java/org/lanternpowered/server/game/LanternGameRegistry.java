@@ -93,6 +93,7 @@ import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModu
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.ConstantDamageSourceRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule;
@@ -510,6 +511,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
                 .registerModule(Accessory.class, new AccessoryRegistryModule())
                 .registerModule(DamageType.class, new DamageTypeRegistryModule())
+                .registerModule(new ConstantDamageSourceRegistryModule())
                 .registerModule(DismountType.class, new DismountTypeRegistryModule())
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(TeleportType.class, new TeleportTypeRegistryModule())

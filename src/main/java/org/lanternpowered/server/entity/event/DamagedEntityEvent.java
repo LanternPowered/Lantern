@@ -25,15 +25,15 @@
  */
 package org.lanternpowered.server.entity.event;
 
-public final class DamageEntityEvent implements EntityEvent {
+public final class DamagedEntityEvent implements EntityEvent {
 
-    public static DamageEntityEvent of() {
+    public static DamagedEntityEvent of() {
         return INSTANCE;
     }
 
-    private static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
+    private static final DamagedEntityEvent INSTANCE = new DamagedEntityEvent();
 
-    private DamageEntityEvent() {
+    private DamagedEntityEvent() {
     }
 
     @Override

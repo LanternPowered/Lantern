@@ -175,7 +175,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     // Whether you should ignore this player when checking for sleeping players to reset the time
     private boolean sleepingIgnored;
 
-    // The chunks the client knowns about
+    // The chunks the client knows about
     private final Set<Vector2i> knownChunks = new HashSet<>();
 
     // The interaction handler
@@ -409,9 +409,10 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public void pulseDeath() {
+    public boolean pulseDeath() {
         // A player is never removed after a delay, it will exist until
         // the player respawns or disconnects.
+        return isDead();
     }
 
     public void handleRespawn() {
@@ -428,6 +429,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             offer(Keys.TOTAL_EXPERIENCE, 0);
             offer(Keys.EXHAUSTION, DEFAULT_EXHAUSTION);
             offer(Keys.SATURATION, DEFAULT_SATURATION);
+            offer(Keys.POTION_EFFECTS, new ArrayList<>());
             offer(LanternKeys.SCORE, 0);
 
             // Clear the player inventory

@@ -55,6 +55,7 @@ import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
@@ -112,6 +113,8 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.resourcepack.ResourcePack;
@@ -413,7 +416,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     protected void postHarvestEvent(CauseStack causeStack) {
         final boolean keepsInventory = getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
         final boolean keepsExpLevels = getWorld().getOrCreateRule(RuleTypes.KEEP_EXPERIENCE_LEVELS).getValue();
-        final int exp = collectExperience();
+        final int exp = collectExperience(causeStack);
         // Humanoids get their own sub-interface for the event
         final HarvestEntityEvent.TargetPlayer harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetPlayer(
                 causeStack.getCurrentCause(), exp, exp, this, keepsInventory, keepsExpLevels, 0);
@@ -421,15 +424,17 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (harvestEvent.isCancelled()) {
             return;
         }
-        // Finalize the harvest event
-        finalizeHarvestEvent(causeStack, harvestEvent);
+        final List<ItemStackSnapshot> drops = new ArrayList<>();
         if (!harvestEvent.keepsInventory()) {
-            // TODO: Drop all the items
-            getInventory().clear();
+            // TODO: Use the other inventory methods, when fixed...
+            getInventory().getIndexBySlots().keySet().forEach(
+                    slot -> slot.poll().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
         }
         if (!harvestEvent.keepsLevel()) {
             offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());
         }
+        // Finalize the harvest event
+        finalizeHarvestEvent(causeStack, harvestEvent, drops);
     }
 
     @Override

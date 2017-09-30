@@ -1181,26 +1181,26 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     public static void handleEntitySpawning(EntityType entityType, Transform<World> transform,
             Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
-        handleEntitySpawning(Collections.singleton(new Tuple<>(entityType, transform)), entityConsumer, spawnEventConstructor);
+        handleEntitySpawning(Collections.singleton(new EntitySpawningEntry(entityType, transform, entityConsumer)), spawnEventConstructor);
     }
 
-    public static void handleEntitySpawning(Iterable<Tuple<EntityType, Transform<World>>> entries, Consumer<Entity> entityConsumer) {
-        handleEntitySpawning(entries, entityConsumer, SpongeEventFactory::createSpawnEntityEvent);
+    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries) {
+        handleEntitySpawning(entries, SpongeEventFactory::createSpawnEntityEvent);
     }
 
-    public static void handleEntitySpawning(Iterable<Tuple<EntityType, Transform<World>>> entries,
-            Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
+    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
+            BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
         final CauseStack causeStack = CauseStack.current();
         final List<Entity> entities = new ArrayList<>();
-        for (Tuple<EntityType, Transform<World>> tuple : entries) {
-            final Transform<World> transform = tuple.getSecond();
+        for (EntitySpawningEntry entry : entries) {
             // Call the pre construction event
             final ConstructEntityEvent.Pre preConstructEvent = SpongeEventFactory.createConstructEntityEventPre(
-                    causeStack.getCurrentCause(), tuple.getFirst(), transform);
+                    causeStack.getCurrentCause(), entry.entityType, entry.transform);
             Sponge.getEventManager().post(preConstructEvent);
             if (!preConstructEvent.isCancelled()) {
                 // Calls the post construction event
-                entities.add(((LanternWorld) transform.getExtent()).createEntity(tuple.getFirst(), transform.getPosition(), entityConsumer));
+                entities.add(((LanternWorld) entry.transform.getExtent())
+                        .createEntity(entry.entityType, entry.transform.getPosition(), entry.entityConsumer));
             }
         }
         if (entities.isEmpty()) {

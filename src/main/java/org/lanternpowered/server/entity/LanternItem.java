@@ -46,6 +46,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.entity.ExpireEntityEvent;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -122,8 +123,17 @@ public class LanternItem extends LanternEntity implements Item {
             offer(Keys.DESPAWN_DELAY, despawnDelay);
         }
         if (despawnDelay <= 0) {
+            final CauseStack causeStack = CauseStack.current();
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.pushCause(this);
+                final ExpireEntityEvent.TargetItem event = SpongeEventFactory.createExpireEntityEventTargetItem(
+                        causeStack.getCurrentCause(), this);
+                Sponge.getEventManager().post(event);
+            }
+
             // A death animation/particle?
             getWorld().spawnParticles(EffectHolder.DEATH_EFFECT, getBoundingBox().get().getCenter());
+            // Remove the item
             remove();
         } else {
             pulsePhysics();
@@ -174,6 +184,10 @@ public class LanternItem extends LanternEntity implements Item {
             return;
         }
         for (Entity entity : entities) {
+            // Ignore dead entities
+            if (entity instanceof LanternLiving && ((LanternLiving) entity).isDead()) {
+                continue;
+            }
             Inventory inventory = ((Carrier) entity).getInventory();
             if (inventory instanceof PlayerInventory) {
                 inventory = ((PlayerInventory) inventory).getMain();
@@ -266,7 +280,7 @@ public class LanternItem extends LanternEntity implements Item {
                     if (quantity > max) {
                         final ItemStack itemStack2 = itemStackSnapshot2.createStack();
                         itemStack2.setQuantity(quantity - max);
-                        entity.offer(Keys.REPRESENTED_ITEM, itemStack2.createSnapshot());
+                        entity.offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack2));
                         quantity = max;
                     } else {
                         entity.remove();
@@ -283,7 +297,7 @@ public class LanternItem extends LanternEntity implements Item {
                 }
             }
             if (itemStack != null) {
-                offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+                offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack));
                 return new CombineData(pickupDelay, despawnDelay);
             }
         }

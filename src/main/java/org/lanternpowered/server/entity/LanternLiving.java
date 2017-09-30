@@ -34,6 +34,8 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.util.collect.Lists2;
+import org.lanternpowered.server.world.EntitySpawningEntry;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
@@ -46,6 +48,7 @@ import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -57,9 +60,12 @@ import org.spongepowered.api.event.cause.entity.health.source.HealingSources;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.HarvestEntityEvent;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -68,6 +74,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("ConstantConditions")
 public class LanternLiving extends LanternEntity implements Living {
@@ -145,7 +152,7 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     protected void postHarvestEvent(CauseStack causeStack) {
-        final int exp = collectExperience();
+        final int exp = collectExperience(causeStack);
         // Humanoids get their own sub-interface for the event
         final HarvestEntityEvent harvestEvent;
         if (this instanceof Humanoid) {
@@ -157,7 +164,7 @@ public class LanternLiving extends LanternEntity implements Living {
         }
         Sponge.getEventManager().post(harvestEvent);
         // Finalize the harvest event
-        finalizeHarvestEvent(causeStack, harvestEvent);
+        finalizeHarvestEvent(causeStack, harvestEvent, new ArrayList<>());
     }
 
     /**
@@ -168,21 +175,42 @@ public class LanternLiving extends LanternEntity implements Living {
      * @param causeStack The cause stack
      * @param event The harvest event
      */
-    protected void finalizeHarvestEvent(CauseStack causeStack, HarvestEntityEvent event) {
+    protected void finalizeHarvestEvent(CauseStack causeStack, HarvestEntityEvent event, List<ItemStackSnapshot> itemStackSnapshots) {
         if (event.isCancelled()) {
-            return;
-        }
-        final int exp = event.getExperience();
-        // No experience, don't spawn any entity
-        if (exp <= 0) {
             return;
         }
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.pushCause(event);
-            frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
-            // Spawn a experience orb with the experience value
-            LanternWorld.handleEntitySpawning(EntityTypes.EXPERIENCE_ORB, getTransform(),
-                    entity -> entity.offer(Keys.CONTAINED_EXPERIENCE, exp));
+
+            final int exp = event.getExperience();
+            // No experience, don't spawn any entity
+            if (exp > 0) {
+                frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
+                // Spawn a experience orb with the experience value
+                LanternWorld.handleEntitySpawning(EntityTypes.EXPERIENCE_ORB, getTransform(),
+                        entity -> entity.offer(Keys.CONTAINED_EXPERIENCE, exp));
+            }
+
+            frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM);
+            // Collect entity drops
+            collectDrops(causeStack, itemStackSnapshots);
+            if (!itemStackSnapshots.isEmpty()) {
+                final DropItemEvent.Pre preDropEvent = SpongeEventFactory.createDropItemEventPre(
+                        frame.getCurrentCause(), ImmutableList.copyOf(itemStackSnapshots), Lists2.nonNullOf(itemStackSnapshots));
+                Sponge.getEventManager().post(preDropEvent);
+                if (!preDropEvent.isCancelled()) {
+                    final Transform<World> transform = getTransform().setPosition(
+                            getBoundingBox().map(AABB::getCenter).orElse(Vector3d.ZERO));
+                    final List<EntitySpawningEntry> entries = itemStackSnapshots.stream()
+                            .filter(snapshot -> !snapshot.isEmpty())
+                            .map(snapshot -> new EntitySpawningEntry(EntityTypes.ITEM, transform, entity -> {
+                                entity.offer(Keys.REPRESENTED_ITEM, snapshot);
+                                entity.offer(Keys.PICKUP_DELAY, 15);
+                            }))
+                            .collect(Collectors.toList());
+                    LanternWorld.handleEntitySpawning(entries, SpongeEventFactory::createDropItemEventDestruct);
+                }
+            }
         }
     }
 
@@ -214,10 +242,20 @@ public class LanternLiving extends LanternEntity implements Living {
      * The {@link CauseStack} may be used to retrieve contextual data how
      * the {@link Living} got killed.
      *
+     * @param causeStack The cause stack
      * @return The experience value
      */
-    protected int collectExperience() {
+    protected int collectExperience(CauseStack causeStack) {
         return 0;
+    }
+
+    /**
+     * Collects all the dropped {@link ItemStackSnapshot}s for this {@link Living}.
+     *
+     * @param causeStack The cause stack
+     * @param itemStackSnapshots The item stack snapshots
+     */
+    protected void collectDrops(CauseStack causeStack, List<ItemStackSnapshot> itemStackSnapshots) {
     }
 
     @Override

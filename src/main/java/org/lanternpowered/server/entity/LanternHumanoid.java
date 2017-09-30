@@ -25,13 +25,10 @@
  */
 package org.lanternpowered.server.entity;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.UUID;
 
 public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
@@ -44,15 +41,5 @@ public abstract class LanternHumanoid extends LanternLiving implements Humanoid,
     public void registerKeys() {
         super.registerKeys();
         getValueCollection().registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return Optional.empty();
     }
 }

@@ -125,11 +125,10 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
             }
             final SaturationProperty saturationProperty = itemStack.getProperty(SaturationProperty.class).orElse(null);
             if (saturationProperty != null && saturationProperty.getValue() != 0.0) {
-                final Optional<Double> maxSaturation = player.get(LanternKeys.MAX_SATURATION);
                 final Optional<Double> optSaturation = player.get(Keys.SATURATION);
                 if (optSaturation.isPresent()) {
                     player.offer(Keys.SATURATION, Math.min(optSaturation.get() + saturationProperty.getValue(),
-                            maxSaturation.orElse(Double.MAX_VALUE)));
+                            player.get(Keys.FOOD_LEVEL).orElse(20)));
                 }
             }
             final ApplicableEffectProperty applicableEffectProperty = itemStack.getProperty(ApplicableEffectProperty.class).orElse(null);

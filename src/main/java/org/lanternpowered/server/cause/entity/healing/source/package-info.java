@@ -23,22 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.damage.source;
-
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-
-class LanternIndirectEntityDamageSource extends LanternEntityDamageSource implements IndirectEntityDamageSource {
-
-    private final Entity indirectSource;
-
-    LanternIndirectEntityDamageSource(LanternIndirectEntityDamageSourceBuilder builder) {
-        super(builder);
-        this.indirectSource = builder.indirect;
-    }
-
-    @Override
-    public Entity getIndirectSource() {
-        return this.indirectSource;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.cause.entity.healing.source;

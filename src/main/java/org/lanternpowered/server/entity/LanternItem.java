@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.entity;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -34,6 +32,7 @@ import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventContextKeys;
 import org.lanternpowered.server.inventory.AbstractInventory;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
@@ -46,6 +45,8 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.entity.ExpireEntityEvent;
+import org.spongepowered.api.event.entity.item.ItemMergeItemEvent;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -92,8 +93,8 @@ public class LanternItem extends LanternEntity implements Item {
     }
 
     @Override
-    public void pulse() {
-        super.pulse();
+    public void pulse(int deltaTicks) {
+        super.pulse(deltaTicks);
 
         int pickupDelay = get(Keys.PICKUP_DELAY).orElse(0);
         int despawnDelay = get(Keys.DESPAWN_DELAY).orElse(NO_DESPAWN_DELAY);
@@ -122,9 +123,21 @@ public class LanternItem extends LanternEntity implements Item {
             offer(Keys.DESPAWN_DELAY, despawnDelay);
         }
         if (despawnDelay <= 0) {
+            final CauseStack causeStack = CauseStack.current();
+            try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                frame.pushCause(this);
+
+                // Throw the expire entity event
+                final ExpireEntityEvent.TargetItem event = SpongeEventFactory.createExpireEntityEventTargetItem(
+                        causeStack.getCurrentCause(), this);
+                Sponge.getEventManager().post(event);
+
+                // Remove the item, also within this context
+                remove();
+            }
+
             // A death animation/particle?
             getWorld().spawnParticles(EffectHolder.DEATH_EFFECT, getBoundingBox().get().getCenter());
-            remove();
         } else {
             pulsePhysics();
         }
@@ -174,6 +187,10 @@ public class LanternItem extends LanternEntity implements Item {
             return;
         }
         for (Entity entity : entities) {
+            // Ignore dead entities
+            if (entity instanceof LanternLiving && ((LanternLiving) entity).isDead()) {
+                continue;
+            }
             Inventory inventory = ((Carrier) entity).getInventory();
             if (inventory instanceof PlayerInventory) {
                 inventory = ((PlayerInventory) inventory).getMain();
@@ -238,54 +255,79 @@ public class LanternItem extends LanternEntity implements Item {
 
     @Nullable
     private CombineData combineItemStacks(int pickupDelay, int despawnDelay) {
-        ItemStackSnapshot itemStackSnapshot1 = get(Keys.REPRESENTED_ITEM).orElse(null);
-        if (itemStackSnapshot1 == null) {
+        // Remove items with no item stack
+        final ItemStackSnapshot itemStackSnapshot1 = get(Keys.REPRESENTED_ITEM).orElse(null);
+        if (itemStackSnapshot1 == null || itemStackSnapshot1.isEmpty()) {
             remove();
             return null;
         }
-        if (itemStackSnapshot1.getQuantity() >= itemStackSnapshot1.getType().getMaxStackQuantity()) {
+        final int max = itemStackSnapshot1.getType().getMaxStackQuantity();
+        int quantity1 = itemStackSnapshot1.getQuantity();
+        // Check if the stack is already at it's maximum size
+        if (quantity1 >= max) {
             return null;
         }
-        checkNotNull(getWorld());
-        Set<Entity> entities = getWorld().getIntersectingEntities(
+        final CauseStack causeStack = CauseStack.current();
+        final CauseStack.Frame frame = causeStack.pushCauseFrame();
+        frame.pushCause(this);
+        // Search for surrounding items
+        final Set<Entity> entities = getWorld().getIntersectingEntities(
                 getBoundingBox().get().expand(0.6, 0.0, 0.6), entity -> entity != this && entity instanceof LanternItem);
-        if (!entities.isEmpty()) {
-            ItemStack itemStack = null;
-            for (Entity entity : entities) {
-                final int pickupDelay1 = entity.get(Keys.PICKUP_DELAY).orElse(0);
-                if (pickupDelay1 == NO_PICKUP_DELAY) {
-                    continue;
-                }
-                final ItemStackSnapshot itemStackSnapshot2 = entity.get(Keys.REPRESENTED_ITEM).get();
-                if (itemStackSnapshot2.getQuantity() < itemStackSnapshot1.getQuantity()) {
-                    continue;
-                }
-                if (((LanternItemStackSnapshot) itemStackSnapshot1).similarTo(itemStackSnapshot2)) {
-                    final int max = itemStackSnapshot1.getType().getMaxStackQuantity();
-                    int quantity = itemStackSnapshot1.getQuantity() + itemStackSnapshot2.getQuantity();
-                    if (quantity > max) {
-                        final ItemStack itemStack2 = itemStackSnapshot2.createStack();
-                        itemStack2.setQuantity(quantity - max);
-                        entity.offer(Keys.REPRESENTED_ITEM, itemStack2.createSnapshot());
-                        quantity = max;
-                    } else {
-                        entity.remove();
-                    }
-                    if (itemStack == null) {
-                        itemStack = itemStackSnapshot1.createStack();
-                    }
-                    itemStack.setQuantity(quantity);
-                    pickupDelay = Math.max(pickupDelay, pickupDelay1);
-                    despawnDelay = Math.max(despawnDelay, entity.get(Keys.DESPAWN_DELAY).orElse(NO_DESPAWN_DELAY));
-                    if (quantity >= max) {
-                        break;
-                    }
-                }
+        ItemStack itemStack1 = null;
+        for (Entity entity : entities) {
+            final int pickupDelay1 = entity.get(Keys.PICKUP_DELAY).orElse(0);
+            if (pickupDelay1 == NO_PICKUP_DELAY) {
+                continue;
             }
-            if (itemStack != null) {
-                offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-                return new CombineData(pickupDelay, despawnDelay);
+            final ItemStackSnapshot itemStackSnapshot2 = entity.get(Keys.REPRESENTED_ITEM).get();
+            int quantity2 = itemStackSnapshot2.getQuantity();
+            // Don't bother stacks that are already filled and
+            // make sure that the stacks can be merged
+            if (quantity2 >= max || !LanternItemStack.areSimilar(itemStackSnapshot1, itemStackSnapshot2)) {
+                continue;
             }
+            // Call the merge event
+            final ItemMergeItemEvent event = SpongeEventFactory.createItemMergeItemEvent(causeStack.getCurrentCause(), (Item) entity, this);
+            Sponge.getEventManager().post(event);
+            if (event.isCancelled()) {
+                continue;
+            }
+            // Merge the items
+            quantity1 += quantity2;
+            if (quantity1 > max) {
+                quantity2 = quantity1 - max;
+                quantity1 = max;
+
+                // Create a new stack and offer it back the entity
+                final ItemStack itemStack2 = itemStackSnapshot2.createStack();
+                itemStack2.setQuantity(quantity2);
+
+                // The snapshot can be wrapped
+                entity.offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack2));
+            } else {
+                // The other entity is completely drained and will be removed
+                entity.offer(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE);
+                entity.remove();
+            }
+            // The item stack has changed
+            if (itemStack1 == null) {
+                itemStack1 = itemStackSnapshot1.createStack();
+            }
+            itemStack1.setQuantity(quantity1);
+
+            // When merging items, also merge the pickup and despawn delays
+            pickupDelay = Math.max(pickupDelay, pickupDelay1);
+            despawnDelay = Math.max(despawnDelay, entity.get(Keys.DESPAWN_DELAY).orElse(NO_DESPAWN_DELAY));
+
+            // The stack is already full, stop here
+            if (quantity1 == max) {
+                break;
+            }
+        }
+        causeStack.popCauseFrame(frame);
+        if (itemStack1 != null) {
+            offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack1));
+            return new CombineData(pickupDelay, despawnDelay);
         }
         return null;
     }

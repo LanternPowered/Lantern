@@ -1285,12 +1285,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final int maxYSection = fixEntityYSection(((int) Math.ceil(box.getMax().getY() + 2.0)) >> 4);
         final int minYSection = fixEntityYSection(((int) Math.floor(box.getMin().getY() - 2.0)) >> 4);
         for (int i = minYSection; i <= maxYSection; i++) {
-            for (LanternEntity entity : this.entities[i]) {
+            forEachEntity(i, entity -> {
                 final Optional<AABB> aabb = entity.getBoundingBox();
                 if (aabb.isPresent() && aabb.get().intersects(box)) {
                     collisionBoxes.add(aabb.get());
                 }
-            }
+            });
         }
         final Vector3i min = box.getMin().toInt();
         final Vector3i max = box.getMax().toInt();
@@ -1324,7 +1324,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     public void addIntersectingEntities(ImmutableSet.Builder<Entity> builder, int maxYSection, int minYSection, AABB box, Predicate<Entity> filter) {
         for (int i = minYSection; i <= maxYSection; i++) {
-            for (LanternEntity entity : this.entities[i]) {
+            forEachEntity(i, entity -> {
                 final Optional<AABB> aabb = entity.getBoundingBox();
                 if (aabb.isPresent()) {
                     if (aabb.get().intersects(box) && filter.test(entity)) {
@@ -1333,14 +1333,14 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 } else if (box.contains(entity.getPosition()) && filter.test(entity)) {
                     builder.add(entity);
                 }
-            }
+            });
         }
     }
 
     public void addIntersectingEntitiesBoxes(ImmutableSet.Builder<AABB> builder, int maxYSection, int minYSection,
             AABB box, Predicate<Entity> filter) {
         for (int i = minYSection; i <= maxYSection; i++) {
-            for (LanternEntity entity : this.entities[i]) {
+            forEachEntity(i, entity -> {
                 final Optional<AABB> aabb = entity.getBoundingBox();
                 if (aabb.isPresent()) {
                     if (aabb.get().intersects(box) && filter.test(entity)) {
@@ -1349,7 +1349,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 } else if (box.contains(entity.getPosition()) && filter.test(entity)) {
                     builder.add(aabb.get());
                 }
-            }
+            });
         }
     }
 
@@ -1358,19 +1358,23 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return null;
     }
 
-    private void forEachEntity(Consumer<LanternEntity> consumer) {
-        for (Set<LanternEntity> entities : this.entities) {
-            final Iterator<LanternEntity> iterator = entities.iterator();
-            while (iterator.hasNext()) {
-                final LanternEntity entity = iterator.next();
-                // Only remove the entities that are "destroyed",
-                // the other ones can be resurrected after chunk loading
-                if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
-                    iterator.remove();
-                } else {
-                    consumer.accept(entity);
-                }
+    private void forEachEntity(int section, Consumer<LanternEntity> consumer) {
+        final Iterator<LanternEntity> iterator = this.entities[section].iterator();
+        while (iterator.hasNext()) {
+            final LanternEntity entity = iterator.next();
+            // Only remove the entities that are "destroyed",
+            // the other ones can be resurrected after chunk loading
+            if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+                iterator.remove();
+            } else {
+                consumer.accept(entity);
             }
+        }
+    }
+
+    private void forEachEntity(Consumer<LanternEntity> consumer) {
+        for (int i = 0; i < this.entities.length; i++) {
+            forEachEntity(i, consumer);
         }
     }
 

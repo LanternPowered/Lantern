@@ -60,6 +60,9 @@ import javax.annotation.Nullable;
 
 public abstract class AbstractUser extends LanternHumanoid implements IUser {
 
+    public static final double DEFAULT_EXHAUSTION = 0.0;
+    public static final double DEFAULT_SATURATION = 5.0;
+
     // The proxy user
     private final ProxyUser user;
 
@@ -87,10 +90,12 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
         super.registerKeys();
         final ValueCollection c = getValueCollection();
         c.register(LanternKeys.ACCESSORIES, new ArrayList<>());
+        c.register(LanternKeys.MAX_EXHAUSTION, 40.0, 0.0, Double.MAX_VALUE);
+        c.register(Keys.EXHAUSTION, DEFAULT_EXHAUSTION, 0.0, LanternKeys.MAX_EXHAUSTION);
         c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
         c.register(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
-        c.register(LanternKeys.MAX_SATURATION, 40.0, 0.0, Double.MAX_VALUE);
-        c.register(Keys.SATURATION, 40.0, 0.0, LanternKeys.MAX_SATURATION);
+        c.registerWithSuppliedMax(Keys.SATURATION, DEFAULT_SATURATION, 0.0,
+                container -> container.get(Keys.FOOD_LEVEL).orElse(20).doubleValue());
         c.register(Keys.LAST_DATE_PLAYED, null);
         c.register(Keys.FIRST_DATE_PLAYED, null);
         c.registerNonRemovable(Keys.WALKING_SPEED, 0.1);

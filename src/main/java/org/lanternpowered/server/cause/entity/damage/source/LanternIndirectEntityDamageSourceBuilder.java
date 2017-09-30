@@ -25,13 +25,16 @@
  */
 package org.lanternpowered.server.cause.entity.damage.source;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractIndirectEntityDamageSource.AbstractIndirectEntityDamageSourceBuilder;
 
-public class LanternIndirectEntityDamageSourceBuilder extends AbstractIndirectEntityDamageSourceBuilder<IndirectEntityDamageSource, IndirectEntityDamageSource.Builder>
-        implements IndirectEntityDamageSource.Builder {
+public class LanternIndirectEntityDamageSourceBuilder extends AbstractEntityDamageSourceBuilder<IndirectEntityDamageSource,
+        IndirectEntityDamageSource.Builder, LanternIndirectEntityDamageSourceBuilder> implements IndirectEntityDamageSource.Builder {
+
+    protected Entity indirect;
 
     @Override
     public IndirectEntityDamageSource build() throws IllegalStateException {
@@ -39,5 +42,12 @@ public class LanternIndirectEntityDamageSourceBuilder extends AbstractIndirectEn
         checkState(this.source != null, "The entity must be set");
         checkState(this.indirect != null, "The proxy source must be set");
         return new LanternIndirectEntityDamageSource(this);
+    }
+
+    @Override
+    public LanternIndirectEntityDamageSourceBuilder proxySource(Entity proxy) {
+        checkNotNull(proxy, "proxy");
+        this.indirect = proxy;
+        return this;
     }
 }

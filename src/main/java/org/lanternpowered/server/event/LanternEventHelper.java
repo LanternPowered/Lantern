@@ -46,7 +46,7 @@ public final class LanternEventHelper {
     public static Entity createDroppedItem(Location<World> location, ItemStackSnapshot snapshot) {
         final Entity entity = location.getExtent().createEntity(EntityTypes.ITEM, location.getPosition());
         entity.offer(Keys.REPRESENTED_ITEM, snapshot);
-        entity.offer(Keys.PICKUP_DELAY, 60);
+        entity.offer(Keys.PICKUP_DELAY, 40);
         return entity;
     }
 

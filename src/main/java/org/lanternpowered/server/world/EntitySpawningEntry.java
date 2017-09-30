@@ -23,22 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.damage.source;
+package org.lanternpowered.server.world;
 
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.world.World;
 
-class LanternIndirectEntityDamageSource extends LanternEntityDamageSource implements IndirectEntityDamageSource {
+import java.util.function.Consumer;
 
-    private final Entity indirectSource;
+public final class EntitySpawningEntry {
 
-    LanternIndirectEntityDamageSource(LanternIndirectEntityDamageSourceBuilder builder) {
-        super(builder);
-        this.indirectSource = builder.indirect;
+    final EntityType entityType;
+    final Transform<World> transform;
+    final Consumer<Entity> entityConsumer;
+
+    /**
+     * Constructs a new {@link EntitySpawningEntry}.
+     *
+     * @param entityType The entity type that will be constructed
+     * @param transform The transform that should be applied to the entity
+     */
+    public EntitySpawningEntry(EntityType entityType, Transform<World> transform) {
+        this(entityType, transform, entity -> {});
     }
 
-    @Override
-    public Entity getIndirectSource() {
-        return this.indirectSource;
+    /**
+     * Constructs a new {@link EntitySpawningEntry}.
+     *
+     * @param entityType The entity type that will be constructed
+     * @param transform The transform that should be applied to the entity
+     * @param entityConsumer The consumer that can be used to apply properties to the entity
+     */
+    public EntitySpawningEntry(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
+        this.entityConsumer = entityConsumer;
+        this.entityType = entityType;
+        this.transform = transform;
     }
 }

@@ -50,6 +50,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerHealthUpdate;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCamera;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
@@ -87,6 +88,11 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     private byte lastYaw0;
     private byte lastPitch0;
     private byte lastFlags0;
+
+    private float lastAbsorption;
+    private float lastHealth;
+    private int lastFoodLevel;
+    private boolean lastHungry = true;
 
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
@@ -291,6 +297,15 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             this.lastFlySpeed = flySpeed;
             this.lastFieldOfView = fieldOfView;
         }
+        final float health = this.entity.get(Keys.HEALTH).get().floatValue();
+        final int foodLevel = this.entity.get(Keys.FOOD_LEVEL).get();
+        final float saturation = this.entity.get(Keys.SATURATION).get().floatValue();
+        if (health != this.lastHealth || foodLevel != this.lastFoodLevel || saturation == 0.0f != this.lastHungry) {
+            context.sendToSelf(() -> new MessagePlayOutPlayerHealthUpdate(health, foodLevel, saturation));
+            this.lastHealth = health;
+            this.lastFoodLevel = foodLevel;
+            this.lastHungry = saturation == 0.0f;
+        }
         super.update(context);
         final TopHat topHat = getTopHat();
         if (topHat != this.lastTopHat) {
@@ -391,11 +406,15 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 (this.entity.get(LanternKeys.SUPER_STEVE).orElse(false) && !this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false));
     }
 
+    private float getAbsorption() {
+        return getEntity().get(Keys.ABSORPTION).get().floatValue();
+    }
+
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
         parameterList.add(EntityParameters.Humanoid.SCORE, this.entity.get(LanternKeys.SCORE).orElse(0));
-        parameterList.add(EntityParameters.Humanoid.ADDITIONAL_HEARTS, 0f);
+        parameterList.add(EntityParameters.Humanoid.ADDITIONAL_HEARTS, getAbsorption());
     }
 
     @Override
@@ -406,6 +425,11 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         if (hasNoGravity != this.lastHasNoGravity) {
             parameterList.add(EntityParameters.Base.NO_GRAVITY, hasNoGravity);
             this.lastHasNoGravity = hasNoGravity;
+        }
+        final float absorption = getAbsorption();
+        if (absorption != this.lastAbsorption) {
+            parameterList.add(EntityParameters.Humanoid.ADDITIONAL_HEARTS, absorption);
+            this.lastAbsorption = absorption;
         }
     }
 

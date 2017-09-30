@@ -30,18 +30,17 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSourceBuilder;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-public class LanternBlockDamageSourceBuilder extends AbstractDamageSourceBuilder<BlockDamageSource, BlockDamageSource.Builder>
+public class LanternBlockDamageSourceBuilder extends AbstractDamageSourceBuilder<BlockDamageSource, BlockDamageSource.Builder, LanternBlockDamageSourceBuilder>
         implements BlockDamageSource.Builder {
 
     protected Location<World> location;
     protected BlockSnapshot blockSnapshot;
 
     @Override
-    public BlockDamageSource.Builder block(Location<World> location) {
+    public LanternBlockDamageSourceBuilder block(Location<World> location) {
         this.location = checkNotNull(location, "location");
         if (this.blockSnapshot == null) {
             this.blockSnapshot = location.createSnapshot();
@@ -50,7 +49,7 @@ public class LanternBlockDamageSourceBuilder extends AbstractDamageSourceBuilder
     }
 
     @Override
-    public BlockDamageSource.Builder block(BlockSnapshot blockSnapshot) {
+    public LanternBlockDamageSourceBuilder block(BlockSnapshot blockSnapshot) {
         this.blockSnapshot = checkNotNull(blockSnapshot, "blockSnapshot");
         if (this.location == null) {
             this.location = blockSnapshot.getLocation().orElse(null);

@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
@@ -58,7 +57,6 @@ import org.spongepowered.api.event.cause.entity.health.source.HealingSources;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.HarvestEntityEvent;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -182,14 +180,9 @@ public class LanternLiving extends LanternEntity implements Living {
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.pushCause(event);
             frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
-            // Create a experience orb
-            final ExperienceOrb experienceOrb = (ExperienceOrb) getWorld().createEntity(EntityTypes.EXPERIENCE_ORB, getPosition());
-            // There is no specific event to spawn experience orbs
-            final SpawnEntityEvent spawnEvent = SpongeEventFactory.createSpawnEntityEvent(
-                    causeStack.getCurrentCause(), Lists.newArrayList(experienceOrb));
-            Sponge.getEventManager().post(spawnEvent);
-            // Finish the spawn event
-            LanternWorld.finishSpawnEntityEvent(spawnEvent);
+            // Spawn a experience orb with the experience value
+            LanternWorld.handleEntitySpawning(EntityTypes.EXPERIENCE_ORB, getTransform(),
+                    entity -> entity.offer(Keys.CONTAINED_EXPERIENCE, exp));
         }
     }
 

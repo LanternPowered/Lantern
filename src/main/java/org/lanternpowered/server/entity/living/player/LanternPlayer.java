@@ -114,11 +114,11 @@ import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
@@ -130,6 +130,7 @@ import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
+import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
@@ -413,7 +414,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    protected void postHarvestEvent(CauseStack causeStack) {
+    protected void handleDeath(CauseStack causeStack) {
+        // Call the harvest event
         final boolean keepsInventory = getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
         final boolean keepsExpLevels = getWorld().getOrCreateRule(RuleTypes.KEEP_EXPERIENCE_LEVELS).getValue();
         final int exp = collectExperience(causeStack);
@@ -421,20 +423,28 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         final HarvestEntityEvent.TargetPlayer harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetPlayer(
                 causeStack.getCurrentCause(), exp, exp, this, keepsInventory, keepsExpLevels, 0);
         Sponge.getEventManager().post(harvestEvent);
-        if (harvestEvent.isCancelled()) {
-            return;
+        if (!harvestEvent.isCancelled()) {
+            final List<ItemStackSnapshot> drops = new ArrayList<>();
+            if (!harvestEvent.keepsInventory()) {
+                // TODO: Use the other inventory methods, when fixed...
+                getInventory().getIndexBySlots().keySet().forEach(
+                        slot -> slot.poll().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
+            }
+            if (!harvestEvent.keepsLevel()) {
+                offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());
+            }
+            // Finalize the harvest event
+            finalizeHarvestEvent(causeStack, harvestEvent, drops);
         }
-        final List<ItemStackSnapshot> drops = new ArrayList<>();
-        if (!harvestEvent.keepsInventory()) {
-            // TODO: Use the other inventory methods, when fixed...
-            getInventory().getIndexBySlots().keySet().forEach(
-                    slot -> slot.poll().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
+
+        // Ban the player if the world is hardcode
+        if (getWorld().getProperties().isHardcore()) {
+            final BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+            // Add a permanent ban
+            banService.addBan(Ban.of(getProfile(), t("gameMode.hardcore.banMessage")));
+            // Bye, bye!
+            kick(t("deathScreen.title.hardcore"));
         }
-        if (!harvestEvent.keepsLevel()) {
-            offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());
-        }
-        // Finalize the harvest event
-        finalizeHarvestEvent(causeStack, harvestEvent, drops);
     }
 
     @Override

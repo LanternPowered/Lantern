@@ -147,11 +147,11 @@ public class LanternLiving extends LanternEntity implements Living {
             // to track the cause of the entity death.
             frame.pushCause(event);
             // Post the harvest event
-            postHarvestEvent(causeStack);
+            handleDeath(causeStack);
         }
     }
 
-    protected void postHarvestEvent(CauseStack causeStack) {
+    protected void handleDeath(CauseStack causeStack) {
         final int exp = collectExperience(causeStack);
         // Humanoids get their own sub-interface for the event
         final HarvestEntityEvent harvestEvent;

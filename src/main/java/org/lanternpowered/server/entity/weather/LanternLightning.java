@@ -31,6 +31,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.event.SpongeEventFactory;
 
 import java.util.UUID;
 
@@ -40,6 +41,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
      * The amount of ticks that the lightning will be alive.
      */
     private int ticksToLive = 10;
+    private boolean remove;
 
     public LanternLightning(UUID uniqueId) {
         super(uniqueId);
@@ -56,10 +58,17 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
     public void pulse(int deltaTicks) {
         super.pulse(deltaTicks);
 
-        this.ticksToLive--;
-        if (this.ticksToLive <= 0) {
+        this.ticksToLive -= deltaTicks;
+        if (this.ticksToLive > 0) {
+            return;
+        }
+        if (this.remove) {
             remove();
-        } else if (this.ticksToLive == 1) {
+        } else {
+            // Remove the entity the next pulse
+            this.remove = true;
+
+            // Play the sound effects
             final Vector3d position = getPosition();
             getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
                     10000.0, 0.8 + getRandom().nextDouble() * 0.2);

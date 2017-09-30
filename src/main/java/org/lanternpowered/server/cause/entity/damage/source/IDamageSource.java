@@ -26,19 +26,15 @@
 package org.lanternpowered.server.cause.entity.damage.source;
 
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 
-class LanternIndirectEntityDamageSource extends LanternEntityDamageSource implements IndirectEntityDamageSource {
+public interface IDamageSource extends DamageSource {
 
-    private final Entity indirectSource;
-
-    LanternIndirectEntityDamageSource(LanternIndirectEntityDamageSourceBuilder builder) {
-        super(builder);
-        this.indirectSource = builder.indirect;
-    }
-
-    @Override
-    public Entity getIndirectSource() {
-        return this.indirectSource;
-    }
+    /**
+     * Gets the exhaustion that should be added
+     * to the damaged {@link Entity}.
+     *
+     * @return The exhaustion
+     */
+    double getExhaustion();
 }

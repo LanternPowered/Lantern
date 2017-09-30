@@ -28,16 +28,18 @@ package org.lanternpowered.server.cause.entity.damage.source;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableFallingBlockData;
 import org.spongepowered.api.entity.FallingBlock;
 import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractEntityDamageSource;
 
-public class LanternFallingBlockDamageSource extends AbstractEntityDamageSource implements FallingBlockDamageSource {
+class LanternFallingBlockDamageSource extends LanternEntityDamageSource implements FallingBlockDamageSource {
 
     private final ImmutableFallingBlockData fallingBlockData;
 
-    protected LanternFallingBlockDamageSource(LanternFallingBlockDamageSourceBuilder builder,
-            ImmutableFallingBlockData fallingBlockData) {
+    LanternFallingBlockDamageSource(LanternFallingBlockDamageSourceBuilder builder) {
         super(builder);
-        this.fallingBlockData = fallingBlockData;
+        if (builder.fallingBlockData == null) {
+            this.fallingBlockData = getSource().getFallingBlockData().asImmutable();
+        } else {
+            this.fallingBlockData = builder.fallingBlockData;
+        }
     }
 
     @Override

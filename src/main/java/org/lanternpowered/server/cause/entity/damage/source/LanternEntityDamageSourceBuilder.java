@@ -28,10 +28,9 @@ package org.lanternpowered.server.cause.entity.damage.source;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractEntityDamageSource.AbstractEntityDamageSourceBuilder;
 
-public class LanternEntityDamageSourceBuilder extends AbstractEntityDamageSourceBuilder<EntityDamageSource, EntityDamageSource.Builder>
-        implements EntityDamageSource.Builder {
+public class LanternEntityDamageSourceBuilder extends AbstractEntityDamageSourceBuilder<
+        EntityDamageSource, EntityDamageSource.Builder, LanternEntityDamageSourceBuilder> implements EntityDamageSource.Builder {
 
     @Override
     public EntityDamageSource build() throws IllegalStateException {

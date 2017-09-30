@@ -25,38 +25,72 @@
  */
 package org.lanternpowered.server.cause.entity.damage.source;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
-import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableFallingBlockData;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.FallingBlock;
-import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.DamageType;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 
 import javax.annotation.Nullable;
 
-public class LanternFallingBlockDamageSourceBuilder extends AbstractEntityDamageSourceBuilder<FallingBlockDamageSource,
-        FallingBlockDamageSource.Builder, LanternFallingBlockDamageSourceBuilder> implements FallingBlockDamageSource.Builder {
+@SuppressWarnings("unchecked")
+public abstract class AbstractDamageSourceBuilder<T extends DamageSource, B extends DamageSource.DamageSourceBuilder<T, B>, O extends B>
+        extends org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSourceBuilder<T, B> {
 
-    @Nullable protected ImmutableFallingBlockData fallingBlockData;
+    @Nullable protected Double exhaustion;
 
-    @Override
-    public LanternFallingBlockDamageSourceBuilder entity(Entity entity) {
-        checkNotNull(entity, "Entity source cannot be null!");
-        checkArgument(entity instanceof FallingBlock, "Entity source must be a falling block!");
-        return super.entity(entity);
+    /**
+     * Sets the exhaustion that should be added
+     * to the damaged {@link Entity}.
+     *
+     * @param exhaustion The exhaustion
+     * @return This builder, for chaining
+     */
+    public O exhaustion(double exhaustion) {
+        this.exhaustion = exhaustion;
+        return (O) this;
     }
 
     @Override
-    public LanternFallingBlockDamageSourceBuilder fallingBlock(ImmutableFallingBlockData fallingBlockData) {
-        this.fallingBlockData = checkNotNull(fallingBlockData, "fallingBlockData");
-        return this;
+    public O absolute() {
+        return (O) super.absolute();
     }
 
     @Override
-    public FallingBlockDamageSource build() throws IllegalStateException {
-        checkState(this.source != null, "The falling block entity must be set");
-        return new LanternFallingBlockDamageSource(this);
+    public O bypassesArmor() {
+        return (O) super.bypassesArmor();
+    }
+
+    @Override
+    public O creative() {
+        return (O) super.creative();
+    }
+
+    @Override
+    public O explosion() {
+        return (O) super.explosion();
+    }
+
+    @Override
+    public O magical() {
+        return (O) super.magical();
+    }
+
+    @Override
+    public O scalesWithDifficulty() {
+        return (O) super.scalesWithDifficulty();
+    }
+
+    @Override
+    public O type(DamageType damageType) {
+        return (O) super.type(damageType);
+    }
+
+    @Override
+    public O from(T value) {
+        return (O) super.from(value);
+    }
+
+    @Override
+    public O reset() {
+        return (O) super.reset();
     }
 }

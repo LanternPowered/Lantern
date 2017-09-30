@@ -25,11 +25,20 @@
  */
 package org.lanternpowered.server.cause.entity.damage.source;
 
-import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractEntityDamageSource;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 
-public class LanternEntityDamageSource extends AbstractEntityDamageSource {
+class LanternEntityDamageSource extends LanternDamageSource implements EntityDamageSource {
 
-    protected LanternEntityDamageSource(LanternEntityDamageSourceBuilder builder) {
+    private final Entity source;
+
+    LanternEntityDamageSource(AbstractEntityDamageSourceBuilder builder) {
         super(builder);
+        this.source = builder.source;
+    }
+
+    @Override
+    public Entity getSource() {
+        return this.source;
     }
 }

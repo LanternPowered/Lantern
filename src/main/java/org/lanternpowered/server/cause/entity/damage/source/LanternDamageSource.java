@@ -27,9 +27,24 @@ package org.lanternpowered.server.cause.entity.damage.source;
 
 import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSource;
 
-public class LanternDamageSource extends AbstractDamageSource {
+class LanternDamageSource extends AbstractDamageSource implements IDamageSource {
 
-    protected LanternDamageSource(LanternDamageSourceBuilder builder) {
+    private final double exhaustion;
+
+    LanternDamageSource(AbstractDamageSourceBuilder builder) {
         super(builder);
+        final Double exhaustion = builder.exhaustion;
+        if (exhaustion != null) {
+            this.exhaustion = exhaustion;
+        } else if (isBypassingArmor() || isAbsolute()) { // Mimic the behavior in vanilla minecraft
+            this.exhaustion = 0;
+        } else {
+            this.exhaustion = 0.1;
+        }
+    }
+
+    @Override
+    public double getExhaustion() {
+        return this.exhaustion;
     }
 }

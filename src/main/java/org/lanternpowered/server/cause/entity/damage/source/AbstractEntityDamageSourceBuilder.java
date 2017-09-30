@@ -25,20 +25,27 @@
  */
 package org.lanternpowered.server.cause.entity.damage.source;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 
-class LanternIndirectEntityDamageSource extends LanternEntityDamageSource implements IndirectEntityDamageSource {
+public abstract class AbstractEntityDamageSourceBuilder
+        <T extends EntityDamageSource, B extends EntityDamageSource.EntityDamageSourceBuilder<T, B>, O extends B>
+        extends AbstractDamageSourceBuilder<T, B, O> implements EntityDamageSource.EntityDamageSourceBuilder<T, B> {
 
-    private final Entity indirectSource;
+    protected Entity source;
 
-    LanternIndirectEntityDamageSource(LanternIndirectEntityDamageSourceBuilder builder) {
-        super(builder);
-        this.indirectSource = builder.indirect;
+    @Override
+    public O entity(Entity entity) {
+        this.source = checkNotNull(entity, "Entity source cannot be null!");
+        return (O) this;
     }
 
     @Override
-    public Entity getIndirectSource() {
-        return this.indirectSource;
+    public O reset() {
+        super.reset();
+        this.source = null;
+        return (O) this;
     }
 }

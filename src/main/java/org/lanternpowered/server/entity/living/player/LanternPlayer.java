@@ -417,11 +417,10 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     protected void handleDeath(CauseStack causeStack) {
         // Call the harvest event
         final boolean keepsInventory = getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
-        final boolean keepsExpLevels = getWorld().getOrCreateRule(RuleTypes.KEEP_EXPERIENCE_LEVELS).getValue();
-        final int exp = collectExperience(causeStack);
+        final int exp = keepsInventory ? 0 : Math.min(100, get(Keys.EXPERIENCE_LEVEL).orElse(0) * 7);
         // Humanoids get their own sub-interface for the event
         final HarvestEntityEvent.TargetPlayer harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetPlayer(
-                causeStack.getCurrentCause(), exp, exp, this, keepsInventory, keepsExpLevels, 0);
+                causeStack.getCurrentCause(), exp, exp, this, keepsInventory, keepsInventory, 0);
         Sponge.getEventManager().post(harvestEvent);
         if (!harvestEvent.isCancelled()) {
             final List<ItemStackSnapshot> drops = new ArrayList<>();

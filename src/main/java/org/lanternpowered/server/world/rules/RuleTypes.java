@@ -55,8 +55,6 @@ public final class RuleTypes {
             RuleType.create(DefaultGameRules.GAME_LOOP_FUNCTION, RuleDataTypes.STRING, "-");
     public static final RuleType<Boolean> KEEP_INVENTORY =
             RuleType.create(DefaultGameRules.KEEP_INVENTORY, RuleDataTypes.BOOLEAN, false);
-    public static final RuleType<Boolean> KEEP_EXPERIENCE_LEVELS =
-            RuleType.create("keepExperienceLevels", RuleDataTypes.BOOLEAN, false); // Custom rule
     public static final RuleType<Boolean> LOG_ADMIN_COMMANDS =
             RuleType.create(DefaultGameRules.LOG_ADMIN_COMMANDS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Integer> MAX_COMMAND_CHAIN_LENGTH =

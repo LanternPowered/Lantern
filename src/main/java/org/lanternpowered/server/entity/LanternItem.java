@@ -126,15 +126,18 @@ public class LanternItem extends LanternEntity implements Item {
             final CauseStack causeStack = CauseStack.current();
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
                 frame.pushCause(this);
+
+                // Throw the expire entity event
                 final ExpireEntityEvent.TargetItem event = SpongeEventFactory.createExpireEntityEventTargetItem(
                         causeStack.getCurrentCause(), this);
                 Sponge.getEventManager().post(event);
+
+                // Remove the item, also within this context
+                remove();
             }
 
             // A death animation/particle?
             getWorld().spawnParticles(EffectHolder.DEATH_EFFECT, getBoundingBox().get().getCenter());
-            // Remove the item
-            remove();
         } else {
             pulsePhysics();
         }
@@ -265,6 +268,8 @@ public class LanternItem extends LanternEntity implements Item {
             return null;
         }
         final CauseStack causeStack = CauseStack.current();
+        final CauseStack.Frame frame = causeStack.pushCauseFrame();
+        frame.pushCause(this);
         // Search for surrounding items
         final Set<Entity> entities = getWorld().getIntersectingEntities(
                 getBoundingBox().get().expand(0.6, 0.0, 0.6), entity -> entity != this && entity instanceof LanternItem);
@@ -319,6 +324,7 @@ public class LanternItem extends LanternEntity implements Item {
                 break;
             }
         }
+        causeStack.popCauseFrame(frame);
         if (itemStack1 != null) {
             offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack1));
             return new CombineData(pickupDelay, despawnDelay);

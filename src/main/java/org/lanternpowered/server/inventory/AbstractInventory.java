@@ -37,6 +37,7 @@ import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
@@ -64,6 +65,16 @@ public abstract class AbstractInventory implements IInventory {
 
     int getChildIndex(AbstractInventory inventory) {
         return -1;
+    }
+
+    @Override
+    public Inventory root() {
+        Inventory inventory = this;
+        Inventory parent;
+        while ((parent = inventory.parent()) != inventory) {
+            inventory = parent;
+        }
+        return inventory;
     }
 
     @SuppressWarnings("unchecked")

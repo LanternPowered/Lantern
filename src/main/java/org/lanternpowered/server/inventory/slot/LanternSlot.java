@@ -51,7 +51,6 @@ import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -148,6 +147,16 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     @Override
     public boolean isValidItem(ItemStack stack) {
         return doesAllowEquipmentType(stack) && doesAcceptItemType(stack);
+    }
+
+    @Override
+    public Slot transform(Slot.Type type) {
+        return this;// TODO
+    }
+
+    @Override
+    public Slot transform() {
+        return this;// TODO
     }
 
     @Override

@@ -40,4 +40,14 @@ public class AltParentProxySlot extends AltParentProxyInventory implements Slot 
     public int getStackSize() {
         return ((Slot) this.delegate).getStackSize();
     }
+
+    @Override
+    public Slot transform(Type type) {
+        return (Slot) AltParentProxyInventories.get(this, ((Slot) this.delegate).transform(type));
+    }
+
+    @Override
+    public Slot transform() {
+        return (Slot) AltParentProxyInventories.get(this, ((Slot) this.delegate).transform());
+    }
 }

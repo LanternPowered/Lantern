@@ -47,47 +47,27 @@ public final class LanternExtentBufferFactory implements ExtentBufferFactory {
     }
 
     @Override
-    public MutableBiomeVolume createBiomeBuffer(Vector3i size) {
+    public MutableBiomeVolume createBiomeBuffer(Vector3i min, Vector3i size) {
         final BiomeType[] array = new BiomeType[size.getX() * size.getY() * size.getZ()];
         Arrays.fill(array, BiomeTypes.OCEAN);
-        return new ObjectArrayMutableBiomeBuffer(array, Vector3i.ZERO, size);
+        return new ObjectArrayMutableBiomeBuffer(array, min, size);
     }
 
     @Override
-    public MutableBiomeVolume createBiomeBuffer(int xSize, int ySize, int zSize) {
-        return this.createBiomeBuffer(new Vector3i(xSize, ySize, zSize));
-    }
-
-    @Override
-    public MutableBiomeVolume createThreadSafeBiomeBuffer(Vector3i size) {
+    public MutableBiomeVolume createThreadSafeBiomeBuffer(Vector3i min, Vector3i size) {
         final BiomeType[] array = new BiomeType[size.getX() * size.getY() * size.getZ()];
         Arrays.fill(array, BiomeTypes.OCEAN);
-        return new AtomicObjectArrayMutableBiomeBuffer(array, Vector3i.ZERO, size);
+        return new AtomicObjectArrayMutableBiomeBuffer(array, min, size);
     }
 
     @Override
-    public MutableBiomeVolume createThreadSafeBiomeBuffer(int xSize, int ySize, int zSize) {
-        return this.createThreadSafeBiomeBuffer(new Vector3i(xSize, ySize, zSize));
+    public MutableBlockVolume createBlockBuffer(Vector3i min, Vector3i size) {
+        return new ShortArrayMutableBlockBuffer(min, size);
     }
 
     @Override
-    public MutableBlockVolume createBlockBuffer(Vector3i size) {
-        return new ShortArrayMutableBlockBuffer(Vector3i.ZERO, size);
-    }
-
-    @Override
-    public MutableBlockVolume createBlockBuffer(int xSize, int ySize, int zSize) {
-        return this.createBlockBuffer(new Vector3i(xSize, ySize, zSize));
-    }
-
-    @Override
-    public MutableBlockVolume createThreadSafeBlockBuffer(Vector3i size) {
-        return new AtomicShortArrayMutableBlockBuffer(Vector3i.ZERO, size);
-    }
-
-    @Override
-    public MutableBlockVolume createThreadSafeBlockBuffer(int xSize, int ySize, int zSize) {
-        return this.createThreadSafeBlockBuffer(new Vector3i(xSize, ySize, zSize));
+    public MutableBlockVolume createThreadSafeBlockBuffer(Vector3i min, Vector3i size) {
+        return new AtomicShortArrayMutableBlockBuffer(min, size);
     }
 
     @Override

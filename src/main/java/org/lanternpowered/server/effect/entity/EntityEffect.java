@@ -23,30 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.effect;
+package org.lanternpowered.server.effect.entity;
 
-import org.lanternpowered.server.effect.sound.LanternSoundCategory;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.effect.sound.SoundCategories;
-import org.spongepowered.api.effect.sound.SoundCategory;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.spongepowered.api.entity.Entity;
 
-public final class SoundCategoryRegistryModule extends PluginCatalogRegistryModule<SoundCategory> {
+public interface EntityEffect {
 
-    public SoundCategoryRegistryModule() {
-        super(SoundCategories.class);
+    /**
+     * A sound effect that does nothing.
+     */
+    EntityEffect NONE = entity -> {};
+
+    /**
+     * Plays this {@link EntityEffect} for the
+     * given {@link Entity}.
+     *
+     * @param entity The entity
+     */
+    default void play(Entity entity) {
+        play((LanternEntity) entity);
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new LanternSoundCategory("minecraft", "master", 0));
-        register(new LanternSoundCategory("minecraft", "music", 1));
-        register(new LanternSoundCategory("minecraft", "record", 2));
-        register(new LanternSoundCategory("minecraft", "weather", 3));
-        register(new LanternSoundCategory("minecraft", "block", 4));
-        register(new LanternSoundCategory("minecraft", "hostile", 5));
-        register(new LanternSoundCategory("minecraft", "neutral", 6));
-        register(new LanternSoundCategory("minecraft", "player", 7));
-        register(new LanternSoundCategory("minecraft", "ambient", 8));
-        register(new LanternSoundCategory("minecraft", "voice", 9));
-    }
+    /**
+     * Plays this {@link EntityEffect} for the
+     * given {@link LanternEntity}.
+     *
+     * @param entity The entity
+     */
+    void play(LanternEntity entity);
 }

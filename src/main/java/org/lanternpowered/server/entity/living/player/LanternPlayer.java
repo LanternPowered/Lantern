@@ -41,7 +41,11 @@ import org.lanternpowered.server.data.element.ElementKeyRegistration;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
+import org.lanternpowered.server.effect.entity.EntityEffectCollection;
+import org.lanternpowered.server.effect.entity.EntityEffectTypes;
+import org.lanternpowered.server.effect.entity.sound.DefaultLivingFallSoundEffect;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
@@ -100,8 +104,10 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
@@ -157,6 +163,14 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public class LanternPlayer extends AbstractUser implements Player, AbstractViewer, NetworkIdHolder {
+
+    public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = LanternLiving.DEFAULT_EFFECT_COLLECTION.toBuilder()
+            // Override the fall sound
+            .replaceOrAdd(EntityEffectTypes.FALL, DefaultLivingFallSoundEffect.class,
+                    new DefaultLivingFallSoundEffect(
+                            SoundTypes.ENTITY_PLAYER_SMALL_FALL,
+                            SoundTypes.ENTITY_PLAYER_BIG_FALL))
+            .build();
 
     private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -0.3), new Vector3d(0.3, 1.8, 0.3));
 
@@ -265,6 +279,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         // Load the advancements
         this.advancementsProgress.init();
         resetIdleTimeoutCounter();
+        setEffectCollection(DEFAULT_EFFECT_COLLECTION.copy());
+        setSoundCategory(SoundCategories.PLAYER);
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         // Attach this player to the proxy user and load player data
         getProxyUser().setInternalUser(this);

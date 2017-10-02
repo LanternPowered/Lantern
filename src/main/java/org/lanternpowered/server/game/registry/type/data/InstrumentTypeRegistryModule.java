@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.SoundTypeRegistryModule;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;

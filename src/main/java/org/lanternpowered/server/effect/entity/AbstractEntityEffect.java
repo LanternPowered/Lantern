@@ -23,32 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.effect.entity;
 
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.entity.EntityBodyPosition;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.spongepowered.api.data.property.entity.EyeHeightProperty;
 
-public final class LanternEventContextKeys {
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
+@SuppressWarnings("ConstantConditions")
+public abstract class AbstractEntityEffect implements EntityEffect {
 
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
+    private final EntityBodyPosition position;
 
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    public static final EventContextKey<Double> BASE_DAMAGE_VALUE = createFor("BASE_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> ORIGINAL_DAMAGE_VALUE = createFor("ORIGINAL_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> FINAL_DAMAGE_VALUE = createFor("FINAL_DAMAGE_VALUE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
+    protected AbstractEntityEffect(EntityBodyPosition position) {
+        this.position = position;
     }
 
-    private LanternEventContextKeys() {
+    protected AbstractEntityEffect() {
+        this(EntityBodyPosition.FEET);
     }
+
+    @Override
+    public void play(LanternEntity entity) {
+        final Random random = ThreadLocalRandom.current();
+        Vector3d relativePosition = Vector3d.ZERO;
+        if (this.position == EntityBodyPosition.HEAD) {
+            final EyeHeightProperty eyeHeightProperty = entity.getProperty(EyeHeightProperty.class).orElse(null);
+            if (eyeHeightProperty != null) {
+                relativePosition = new Vector3d(0, eyeHeightProperty.getValue(), 0);
+            }
+        }
+        play(entity, relativePosition, random);
+    }
+
+    protected abstract void play(LanternEntity entity, Vector3d relativePosition, Random random);
 }

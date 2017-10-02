@@ -27,8 +27,8 @@ package org.lanternpowered.server.game.registry.type.world;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.SoundCategoryRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.SoundTypeRegistryModule;
 import org.lanternpowered.server.script.LanternScriptGameRegistry;
 import org.lanternpowered.server.script.function.action.ActionTypeRegistryModule;
 import org.lanternpowered.server.script.function.condition.ConditionTypeRegistryModule;

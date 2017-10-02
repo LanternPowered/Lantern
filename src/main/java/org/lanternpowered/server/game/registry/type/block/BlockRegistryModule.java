@@ -116,6 +116,7 @@ import java.util.function.Supplier;
         KeyRegistryModule.class,
         EquipmentTypeRegistryModule.class,
         InstrumentTypeRegistryModule.class,
+        BlockSoundGroupRegistryModule.class,
 })
 public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry {
 

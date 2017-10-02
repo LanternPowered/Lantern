@@ -23,32 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.effect.entity.animation;
 
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.lanternpowered.server.effect.entity.EntityEffect;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 
-public final class LanternEventContextKeys {
+/**
+ * Plays a entity hurt animation. This will make a
+ * living entity become red for a few ticks.
+ */
+public class DefaultLivingHurtAnimation implements EntityEffect {
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
-
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    public static final EventContextKey<Double> BASE_DAMAGE_VALUE = createFor("BASE_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> ORIGINAL_DAMAGE_VALUE = createFor("ORIGINAL_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> FINAL_DAMAGE_VALUE = createFor("FINAL_DAMAGE_VALUE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
-    }
-
-    private LanternEventContextKeys() {
+    @Override
+    public void play(LanternEntity entity) {
+        entity.triggerEvent(DamagedEntityEvent.of());
     }
 }

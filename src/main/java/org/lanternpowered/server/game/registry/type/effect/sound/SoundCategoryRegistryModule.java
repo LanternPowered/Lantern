@@ -23,32 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.game.registry.type.effect.sound;
 
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.lanternpowered.server.effect.sound.LanternSoundCategory;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundCategory;
 
-public final class LanternEventContextKeys {
+public final class SoundCategoryRegistryModule extends PluginCatalogRegistryModule<SoundCategory> {
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
-
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    public static final EventContextKey<Double> BASE_DAMAGE_VALUE = createFor("BASE_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> ORIGINAL_DAMAGE_VALUE = createFor("ORIGINAL_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> FINAL_DAMAGE_VALUE = createFor("FINAL_DAMAGE_VALUE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
+    public SoundCategoryRegistryModule() {
+        super(SoundCategories.class);
     }
 
-    private LanternEventContextKeys() {
+    @Override
+    public void registerDefaults() {
+        register(new LanternSoundCategory("minecraft", "master", 0));
+        register(new LanternSoundCategory("minecraft", "music", 1));
+        register(new LanternSoundCategory("minecraft", "record", 2));
+        register(new LanternSoundCategory("minecraft", "weather", 3));
+        register(new LanternSoundCategory("minecraft", "block", 4));
+        register(new LanternSoundCategory("minecraft", "hostile", 5));
+        register(new LanternSoundCategory("minecraft", "neutral", 6));
+        register(new LanternSoundCategory("minecraft", "player", 7));
+        register(new LanternSoundCategory("minecraft", "ambient", 8));
+        register(new LanternSoundCategory("minecraft", "voice", 9));
     }
 }

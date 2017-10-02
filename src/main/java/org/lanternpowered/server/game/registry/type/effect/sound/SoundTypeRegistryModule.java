@@ -23,32 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.game.registry.type.effect.sound;
 
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.effect.sound.SoundTypes;
 
-public final class LanternEventContextKeys {
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
+public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
 
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    public static final EventContextKey<Double> BASE_DAMAGE_VALUE = createFor("BASE_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> ORIGINAL_DAMAGE_VALUE = createFor("ORIGINAL_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> FINAL_DAMAGE_VALUE = createFor("FINAL_DAMAGE_VALUE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
+    public SoundTypeRegistryModule() {
+        super(SoundTypes.class);
     }
 
-    private LanternEventContextKeys() {
+    @Override
+    public void registerDefaults() {
+        final Gson gson = new Gson();
+        final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
+                .getResourceAsStream("/internal/sound_events.json"))), JsonArray.class);
+        for (int i = 0; i < array.size(); i++) {
+            final String name = array.get(i).getAsString();
+            final String id = name.replaceAll("\\.", "_");
+            register(new LanternSoundType("minecraft", id, name, i));
+        }
     }
 }

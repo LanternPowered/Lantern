@@ -87,6 +87,11 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
 
     @Nullable private ObjectProvider<AABB> boundingBoxProvider;
 
+    /**
+     * The block sound group of this block type.
+     */
+    private BlockSoundGroup blockSoundGroup = BlockSoundGroups.STONE;
+
     LanternBlockType(String pluginId, String name, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
             @Nullable TileEntityProvider tileEntityProvider, ExtendedBlockStateProvider extendedBlockStateProvider) {
@@ -216,7 +221,16 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
 
     @Override
     public BlockSoundGroup getSoundGroup() {
-        return null; // TODO
+        return this.blockSoundGroup;
+    }
+
+    /**
+     * Sets the block sound group of this block type.
+     *
+     * @param blockSoundGroup The block sound group
+     */
+    void setSoundGroup(BlockSoundGroup blockSoundGroup) {
+        this.blockSoundGroup = blockSoundGroup;
     }
 
     public ExtendedBlockStateProvider getExtendedBlockStateProvider() {

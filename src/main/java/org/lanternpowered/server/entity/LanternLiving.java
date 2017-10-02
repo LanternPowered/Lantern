@@ -31,6 +31,13 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.effect.entity.EntityEffect;
+import org.lanternpowered.server.effect.entity.EntityEffectCollection;
+import org.lanternpowered.server.effect.entity.EntityEffectTypes;
+import org.lanternpowered.server.effect.entity.animation.DefaultLivingDeathAnimation;
+import org.lanternpowered.server.effect.entity.animation.DefaultLivingHurtAnimation;
+import org.lanternpowered.server.effect.entity.sound.DefaultLivingFallSoundEffect;
+import org.lanternpowered.server.effect.entity.sound.DefaultLivingSoundEffect;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
@@ -46,6 +53,7 @@ import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
@@ -81,6 +89,16 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ConstantConditions")
 public class LanternLiving extends LanternEntity implements Living {
 
+    public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = EntityEffectCollection.builder()
+            .add(EntityEffectTypes.HURT, new DefaultLivingSoundEffect(EntityBodyPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
+            .add(EntityEffectTypes.HURT, new DefaultLivingHurtAnimation())
+            .add(EntityEffectTypes.DEATH, new DefaultLivingSoundEffect(EntityBodyPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
+            .add(EntityEffectTypes.DEATH, new DefaultLivingDeathAnimation())
+            .add(EntityEffectTypes.FALL, new DefaultLivingFallSoundEffect(
+                    SoundTypes.ENTITY_GENERIC_SMALL_FALL,
+                    SoundTypes.ENTITY_GENERIC_BIG_FALL))
+            .build();
+
     /**
      * The amount if ticks that a {@link Living} still exists after
      * being killed before it is removed from the {@link World}.
@@ -104,6 +122,7 @@ public class LanternLiving extends LanternEntity implements Living {
         super(uniqueId);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void registerKeys() {
         super.registerKeys();
@@ -117,7 +136,6 @@ public class LanternLiving extends LanternEntity implements Living {
                         handleDeath();
                     }
                 });
-        //noinspection unchecked
         c.register((Key<MutableBoundedValue<Double>>) (Key) Keys.ABSORPTION, 0.0, 0.0, 1024.0);
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
     }
@@ -160,6 +178,14 @@ public class LanternLiving extends LanternEntity implements Living {
         if (!event.getKeepInventory() && this instanceof Carrier) {
             ((Carrier) this).getInventory().clear();
         }
+
+        final EntityEffectCollection effects = getEffectCollection();
+        // Handle the death effect
+        Optional<EntityEffect> effect = effects.getCombined(EntityEffectTypes.DEATH);
+        if (!effect.isPresent()) {
+            effect = effects.getCombined(EntityEffectTypes.HURT);
+        }
+        effect.ifPresent(e -> e.play(this));
     }
 
     protected void handleDeath(CauseStack causeStack) {
@@ -267,6 +293,18 @@ public class LanternLiving extends LanternEntity implements Living {
      * @param itemStackSnapshots The item stack snapshots
      */
     protected void collectDrops(CauseStack causeStack, List<ItemStackSnapshot> itemStackSnapshots) {
+    }
+
+    @Override
+    protected void handleDamage(CauseStack causeStack, double health) {
+        super.handleDamage(causeStack, health);
+
+        // The death animation will be played in handleDeath
+        if (health > 0) {
+            // Handle the hurt effect
+            final EntityEffectCollection effects = getEffectCollection();
+            effects.getCombinedOrEmpty(EntityEffectTypes.HURT).play(this);
+        }
     }
 
     @Override

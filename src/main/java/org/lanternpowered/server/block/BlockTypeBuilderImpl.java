@@ -26,6 +26,7 @@
 package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.blockSoundGroup;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidCube;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidSide;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
@@ -36,6 +37,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
+import org.lanternpowered.server.block.property.BlockSoundGroupProperty;
 import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
 import org.lanternpowered.server.block.provider.ObjectProvider;
@@ -49,10 +51,12 @@ import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.data.property.block.SolidCubeProperty;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
@@ -64,6 +68,7 @@ import org.spongepowered.api.world.World;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -216,6 +221,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
         return this;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public LanternBlockType build(String pluginId, String id) {
         MutableBehaviorPipeline<Behavior> behaviorPipeline = this.behaviorPipeline;
@@ -336,10 +342,32 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             }
         }
         blockType.setBoundingBoxProvider(boundingBoxProvider);
-        blockType.setPropertyProviderCollection(properties.build());
         if (this.defaultStateProvider != null) {
             blockType.setDefaultBlockState(this.defaultStateProvider.apply(blockType.getDefaultState()));
         }
+        final Optional<PropertyProvider<BlockSoundGroupProperty>> optProvider = properties.build().get(BlockSoundGroupProperty.class);
+        // Apply the default block sound group property if missing
+        if (optProvider.isPresent()) {
+            final BlockSoundGroup blockSoundGroup = optProvider.get().get(blockType.getDefaultState(), null, null).getValue();
+            if (blockSoundGroup != null) {
+                blockType.setSoundGroup(blockSoundGroup);
+            }
+        } else if (boundingBoxProvider != null) {
+            final PropertyProvider<PassableProperty> passableProvider = properties.build().get(PassableProperty.class).orElse(null);
+            if (passableProvider instanceof ConstantObjectProvider) {
+                if (passableProvider.get(blockType.getDefaultState(), null, null).getValue()) {
+                    properties.add(blockSoundGroup(null));
+                } else {
+                    properties.add(blockSoundGroup(blockType.getSoundGroup())); // Use the default sound group
+                }
+            } else {
+                final BlockSoundGroupProperty defaultSoundGroup = new BlockSoundGroupProperty(blockType.getSoundGroup());
+                final BlockSoundGroupProperty noSoundGroup = new BlockSoundGroupProperty(null);
+                properties.add(BlockSoundGroupProperty.class, (blockState, location, face) ->
+                        passableProvider.get(blockState, location, face).getValue() ? noSoundGroup : defaultSoundGroup);
+            }
+        }
+        blockType.setPropertyProviderCollection(properties.build());
         if (this.itemTypeBuilder != null) {
             final ItemType itemType = this.itemTypeBuilder.blockType(blockType)
                     .behaviors(pipeline -> {

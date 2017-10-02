@@ -83,6 +83,9 @@ import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
+import org.lanternpowered.server.effect.entity.EntityEffectCollection;
+import org.lanternpowered.server.effect.entity.EntityEffectType;
+import org.lanternpowered.server.effect.entity.LanternEntityEffectCollectionBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventContextKeyBuilder;
@@ -106,6 +109,7 @@ import org.lanternpowered.server.game.registry.type.attribute.AttributeOperation
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.BlockSoundGroupRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
@@ -161,8 +165,9 @@ import org.lanternpowered.server.game.registry.type.effect.ParticleOptionRegistr
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.SoundCategoryRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.entity.EntityEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.extra.AccessoryRegistryModule;
@@ -516,6 +521,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EntityHealingSource.Builder.class, LanternEntityHealingSourceBuilder::new)
                 .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
                 .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
+                .registerBuilderSupplier(EntityEffectCollection.Builder.class, LanternEntityEffectCollectionBuilder::new)
                 .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
                 .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
                 .registerBuilderSupplier(Inventory.Builder.class, LanternInventoryBuilder::create)
@@ -557,6 +563,7 @@ public class LanternGameRegistry implements GameRegistry {
         registerModule(LanternOperation.class, new AttributeOperationRegistryModule())
                 .registerModule(LanternAttribute.class, new AttributeRegistryModule())
                 .registerModule(new AttributeTargetRegistryModule())
+                .registerModule(new BlockSoundGroupRegistryModule())
                 .registerModule(BlockType.class, BlockRegistryModule.get())
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
@@ -626,6 +633,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.get())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
+                .registerModule(EntityEffectType.class, new EntityEffectTypeRegistryModule())
                 .registerModule(GameMode.class, GameModeRegistryModule.get())
                 .registerModule(EquipmentType.class, new EquipmentTypeRegistryModule())
                 .registerModule(ItemType.class, ItemRegistryModule.get())

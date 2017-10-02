@@ -28,6 +28,9 @@ package org.lanternpowered.server.entity;
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.effect.entity.EntityEffectCollection;
+import org.lanternpowered.server.effect.entity.EntityEffectTypes;
+import org.lanternpowered.server.effect.entity.particle.item.ItemDeathParticleEffect;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventContextKeys;
@@ -39,8 +42,6 @@ import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
@@ -64,11 +65,9 @@ import javax.annotation.Nullable;
 
 public class LanternItem extends LanternEntity implements Item {
 
-    private static final class EffectHolder {
-
-        private static final ParticleEffect DEATH_EFFECT =
-                ParticleEffect.builder().type(ParticleTypes.CLOUD).quantity(3).offset(Vector3d.ONE.mul(0.1)).build();
-    }
+    public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = EntityEffectCollection.builder()
+            .add(EntityEffectTypes.DEATH, new ItemDeathParticleEffect())
+            .build();
 
     public static final int DROPPED_PICKUP_DELAY = 40;
 
@@ -82,6 +81,7 @@ public class LanternItem extends LanternEntity implements Item {
         super(uniqueId);
         setEntityProtocolType(EntityProtocolTypes.ITEM);
         setBoundingBoxBase(BOUNDING_BOX_BASE);
+        setEffectCollection(DEFAULT_EFFECT_COLLECTION.copy());
     }
 
     @Override
@@ -113,6 +113,9 @@ public class LanternItem extends LanternEntity implements Item {
             if (data != null) {
                 pickupDelay = data.pickupDelay;
                 despawnDelay = data.despawnDelay;
+
+                // Play the merge effect?
+                getEffectCollection().getCombinedOrEmpty(EntityEffectTypes.MERGE).play(this);
             }
         }
         if (this.counter % 10 == 0 && pickupDelay != NO_PICKUP_DELAY && pickupDelay <= 0) {
@@ -138,8 +141,8 @@ public class LanternItem extends LanternEntity implements Item {
                 remove();
             }
 
-            // A death animation/particle?
-            getWorld().spawnParticles(EffectHolder.DEATH_EFFECT, getBoundingBox().get().getCenter());
+            // Play the death effect?
+            getEffectCollection().getCombinedOrEmpty(EntityEffectTypes.DEATH).play(this);
         } else {
             pulsePhysics();
         }

@@ -23,33 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.effect;
+package org.lanternpowered.server.entity;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.SoundTypes;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
-
-    public SoundTypeRegistryModule() {
-        super(SoundTypes.class);
-    }
-
-    @Override
-    public void registerDefaults() {
-        final Gson gson = new Gson();
-        final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
-                .getResourceAsStream("/internal/sound_events.json"))), JsonArray.class);
-        for (int i = 0; i < array.size(); i++) {
-            final String name = array.get(i).getAsString();
-            final String id = name.replaceAll("\\.", "_");
-            register(new LanternSoundType("minecraft", id, name, i));
-        }
-    }
+public enum EntityBodyPosition {
+    /**
+     * The head position.
+     */
+    HEAD,
+    /**
+     * The feet position, this is usually the
+     * lowest possible position of the entity.
+     */
+    FEET,
 }

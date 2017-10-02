@@ -23,32 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.effect.entity.sound.weather;
 
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.effect.entity.AbstractEntityEffect;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.spongepowered.api.effect.sound.SoundTypes;
 
-public final class LanternEventContextKeys {
+import java.util.Random;
 
-    public static final EventContextKey<ItemStack> ORIGINAL_ITEM_STACK = createFor("ORIGINAL_ITEM_STACK");
+public class LightningSoundEffect extends AbstractEntityEffect {
 
-    public static final EventContextKey<ItemStack> REST_ITEM_STACK = createFor("REST_ITEM_STACK");
-
-    public static final EventContextKey<HealingType> HEALING_TYPE = createFor("HEALING_TYPE");
-
-    public static final EventContextKey<Double> BASE_DAMAGE_VALUE = createFor("BASE_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> ORIGINAL_DAMAGE_VALUE = createFor("ORIGINAL_DAMAGE_VALUE");
-
-    public static final EventContextKey<Double> FINAL_DAMAGE_VALUE = createFor("FINAL_DAMAGE_VALUE");
-
-    @SuppressWarnings("unchecked")
-    private static <T> EventContextKey<T> createFor(String id) {
-        return DummyObjectProvider.createFor(EventContextKey.class, id);
-    }
-
-    private LanternEventContextKeys() {
+    @Override
+    protected void play(LanternEntity entity, Vector3d position, Random random) {
+        entity.playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER,
+                10000.0, 0.8 + random.nextDouble() * 0.2);
+        entity.playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT,
+                2.0, 0.5 + random.nextDouble() * 0.2);
     }
 }

@@ -36,6 +36,7 @@ import org.lanternpowered.server.entity.weather.LanternLightning;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.entity.EntityEffectTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -46,7 +47,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RegistrationDependency({ EntityProtocolTypeRegistryModule.class, KeyRegistryModule.class, InventoryArchetypeRegistryModule.class })
+@RegistrationDependency({ EntityProtocolTypeRegistryModule.class, KeyRegistryModule.class,
+        InventoryArchetypeRegistryModule.class, EntityEffectTypeRegistryModule.class })
 public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<EntityType> {
 
     private static final EntityTypeRegistryModule INSTANCE = new EntityTypeRegistryModule();

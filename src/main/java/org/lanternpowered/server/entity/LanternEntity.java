@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.flowpowered.math.imaginary.Quaterniond;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
@@ -39,7 +40,7 @@ import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.entity.event.DamagedEntityEvent;
+import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
@@ -58,6 +59,9 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundCategory;
+import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -134,6 +138,11 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     private Vector3d scale = Vector3d.ONE;
 
     /**
+     * The {@link EntityEffectCollection} of this entity.
+     */
+    private EntityEffectCollection effectCollection = EntityEffectCollection.build();
+
+    /**
      * The entity protocol type of this entity.
      */
     @Nullable private EntityProtocolType<?> entityProtocolType;
@@ -161,6 +170,8 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
 
     private long lastPulseTime = -1;
     private long voidDamageCounter;
+
+    private SoundCategory soundCategory = SoundCategories.NEUTRAL;
 
     @Override
     public ValueCollection getValueCollection() {
@@ -347,6 +358,14 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
      */
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
+    }
+
+    public EntityEffectCollection getEffectCollection() {
+        return this.effectCollection;
+    }
+
+    public void setEffectCollection(EntityEffectCollection effectCollection) {
+        this.effectCollection = effectCollection;
     }
 
     @Override
@@ -723,6 +742,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         if (!cancelled) {
             collectDamageFunctions(damageFunctions);
         }
+        double health = optHealth.get();
         // TODO: Damage modifiers, etc.
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
@@ -738,13 +758,22 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
             damageFunctions.forEach(tuple -> tuple.getSecond().accept(event));
             damage = event.getFinalDamage();
             if (damage > 0) {
-                offer(Keys.HEALTH, Math.max(optHealth.get() - damage, 0));
+                health = Math.max(optHealth.get() - damage, 0);
+                offer(Keys.HEALTH, health);
             }
             final double exhaustion = damageSource.getExhaustion();
             getValue(Keys.EXHAUSTION).ifPresent(value -> offer(Keys.EXHAUSTION, Math.min(value.getMaxValue(), value.get() + exhaustion)));
+            // Add some values to the context that may be useful in the handleDamage method,
+            // for example the base damage value is used by the falling sound effect
+            frame.addContext(LanternEventContextKeys.BASE_DAMAGE_VALUE, damage);
+            frame.addContext(LanternEventContextKeys.ORIGINAL_DAMAGE_VALUE, event.getOriginalDamage());
+            frame.addContext(LanternEventContextKeys.FINAL_DAMAGE_VALUE, event.getFinalDamage());
+            handleDamage(causeStack, health);
         }
-        triggerEvent(DamagedEntityEvent.of());
         return true;
+    }
+
+    protected void handleDamage(CauseStack causeStack, double health) {
     }
 
     protected void collectDamageFunctions(List<Tuple<DamageFunction, Consumer<DamageEntityEvent>>> damageFunctions) {
@@ -844,5 +873,77 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
      */
     public void triggerEvent(EntityEvent event) {
         getWorld().getEntityProtocolManager().triggerEvent(this, event);
+    }
+
+    /**
+     * Gets the {@link SoundCategory} of this entity.
+     *
+     * @return The sound category
+     */
+    public SoundCategory getSoundCategory() {
+        return this.soundCategory;
+    }
+
+    /**
+     * Sets the {@link SoundCategory} of this entity.
+     *
+     * @param soundCategory  The sound category
+     */
+    public void setSoundCategory(SoundCategory soundCategory) {
+        this.soundCategory = soundCategory;
+    }
+
+    /**
+     * Plays a sound which is caused by this {@link LanternEntity}.
+     *
+     * @param soundType The sound type
+     * @param volume The volume
+     * @param pitch The pitch value
+     */
+    public void playSound(SoundType soundType, double volume, double pitch) {
+        playSound(soundType, Vector3d.ZERO, volume, pitch);
+    }
+
+    /**
+     * Plays a sound which is caused by this {@link LanternEntity}.
+     *
+     * @param soundType The sound type
+     * @param relativeSoundPosition The relative position to the entity to play the sound at
+     * @param volume The volume
+     * @param pitch The pitch value
+     */
+    public void playSound(SoundType soundType, Vector3d relativeSoundPosition, double volume, double pitch) {
+        // Silent entities don't make any sounds
+        if (get(Keys.IS_SILENT).orElse(false)) {
+            return;
+        }
+        this.world.playSound(soundType, this.soundCategory, getPosition().add(relativeSoundPosition), volume, pitch);
+    }
+
+    /**
+     * Plays a sound which is caused by this {@link LanternEntity}. Playing a sound
+     * oriented around the entity will rotate the relative position based on the orientation
+     * of the entity (the y axis in most cases).
+     *
+     * @param soundType The sound type
+     * @param relativeSoundPosition The relative position to the entity to play the sound at
+     * @param volume The volume
+     * @param pitch The pitch value
+     */
+    public void playOrientedSound(SoundType soundType, Vector3d relativeSoundPosition, double volume, double pitch) {
+        playSound(soundType, orientRelativePosition(relativeSoundPosition), volume, pitch);
+    }
+
+    /**
+     * Orients the relative position around the entity based on it's orientation. The
+     * relative position should always assume that the entity has no rotation, since
+     * it will be rotated by this method.
+     *
+     * @param relativePosition The relative position
+     * @return The oriented relative position
+     */
+    protected Vector3d orientRelativePosition(Vector3d relativePosition) {
+        final Quaterniond rot = Quaterniond.fromAxesAnglesDeg(0, getRotation().getY(), 0);
+        return rot.rotate(relativePosition);
     }
 }

@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
+import org.lanternpowered.server.block.property.BlockSoundGroupProperty;
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.BlastResistanceProperty;
 import org.spongepowered.api.data.property.block.FlammableProperty;
@@ -299,6 +301,12 @@ public final class PropertyProviders {
     public static PropertyProviderCollection instrument(InstrumentType instrument) {
         return PropertyProviderCollection.builder()
                 .add(InstrumentProperty.class, new ConstantPropertyProvider<>(new InstrumentProperty(instrument)))
+                .build();
+    }
+    
+    public static PropertyProviderCollection blockSoundGroup(BlockSoundGroup blockSoundGroup) {
+        return PropertyProviderCollection.builder()
+                .add(BlockSoundGroupProperty.class, new ConstantPropertyProvider<>(new BlockSoundGroupProperty(blockSoundGroup)))
                 .build();
     }
 }

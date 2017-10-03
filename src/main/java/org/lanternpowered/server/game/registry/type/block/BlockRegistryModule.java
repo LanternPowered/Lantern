@@ -1559,10 +1559,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder furnaceBuilder() {
         return horizontalFacingBuilder()
-                .properties(PropertyProviderCollections.STONE.toBuilder()
                 .tileEntityType(() -> TileEntityTypes.FURNACE)
                 .behaviors(pipeline -> pipeline
                         .add(new OpenableContainerInteractionBehavior()))
+                .properties(PropertyProviderCollections.STONE.toBuilder()
                         .add(hardness(3.5))
                         .add(blastResistance(17.5)));
     }

@@ -78,6 +78,7 @@ public class SimpleCatalogRegistryModule<T extends CatalogType> extends Abstract
             }
             this.typesByName.putIfAbsent(name, catalogType);
         }
+        this.registrationConsumers.forEach(consumer -> consumer.accept(catalogType));
     }
 
     @Override

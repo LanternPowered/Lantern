@@ -34,6 +34,8 @@ import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
+import org.lanternpowered.server.item.property.ToolAspectsProperty;
+import org.lanternpowered.server.item.tool.ToolAspect;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
@@ -252,6 +254,27 @@ public final class PropertyProviders {
         final RecordProperty property = new RecordProperty(recordType);
         return PropertyProviderCollection.builder()
                 .add(RecordProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection toolAspects(ToolAspect... toolAspects) {
+        final ToolAspectsProperty property = new ToolAspectsProperty(toolAspects);
+        return PropertyProviderCollection.builder()
+                .add(ToolAspectsProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection toolAspects(Iterable<ToolAspect> toolAspects) {
+        final ToolAspectsProperty property = new ToolAspectsProperty(toolAspects);
+        return PropertyProviderCollection.builder()
+                .add(ToolAspectsProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection toolAspects(ObjectProvider<Iterable<ToolAspect>> toolAspects) {
+        return PropertyProviderCollection.builder()
+                .add(ToolAspectsProperty.class, (itemType, itemStack) ->
+                        new ToolAspectsProperty(toolAspects.get(itemType, itemStack)))
                 .build();
     }
 

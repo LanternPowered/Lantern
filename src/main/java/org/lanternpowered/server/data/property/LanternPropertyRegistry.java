@@ -34,10 +34,12 @@ import com.google.inject.Singleton;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.data.property.block.BlockPropertyStore;
 import org.lanternpowered.server.data.property.item.ItemPropertyStore;
+import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.PropertyStore;
+import org.spongepowered.api.item.ItemType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,9 +67,9 @@ public final class LanternPropertyRegistry implements PropertyRegistry {
     }
 
     @SuppressWarnings({"unchecked", "Convert2streamapi", "SuspiciousMethodCalls"})
-    public void registerItemPropertyStores(org.lanternpowered.server.item.PropertyProviderCollection collection) {
-        for (Class<? extends Property> entry : collection.keys()) {
-            register(entry, new ItemPropertyStore(entry));
+    public void registerItemPropertyStores(ItemType itemType) {
+        for (Class<? extends Property> entry : ((LanternItemType) itemType).getPropertyProviderCollection().keys()) {
+            register(entry, new ItemPropertyStore(itemType, entry));
         }
     }
 

@@ -156,6 +156,7 @@ import org.lanternpowered.server.game.registry.type.fluid.FluidTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.ToolAspectRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
@@ -210,6 +211,7 @@ import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistryModule;
+import org.lanternpowered.server.item.tool.ToolAspect;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
@@ -564,6 +566,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(Profession.class, new ProfessionRegistryModule())
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
                 .registerModule(ToolType.class, new ToolTypeRegistryModule())
+                .registerModule(ToolAspect.class, new ToolAspectRegistryModule())
                 .registerModule(ArmorType.class, new ArmorTypeRegistryModule())
                 .registerModule(PistonType.class,
                         new EnumValueRegistryModule<PistonType>(LanternPistonType.class, PistonTypes.class) {})

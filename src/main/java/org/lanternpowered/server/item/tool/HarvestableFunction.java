@@ -23,35 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.item;
+package org.lanternpowered.server.item.tool;
 
-import org.lanternpowered.server.data.property.common.AbstractItemStackPropertyStore;
-import org.lanternpowered.server.item.LanternItemType;
-import org.lanternpowered.server.item.PropertyProvider;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.item.ItemType;
+import org.lanternpowered.server.event.CauseStack;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.Optional;
+@FunctionalInterface
+public interface HarvestableFunction {
 
-public class ItemPropertyStore<T extends Property<?,?>> extends AbstractItemStackPropertyStore<T> {
-
-    private final ItemType itemType;
-    private final Class<T> propertyType;
-
-    public ItemPropertyStore(ItemType itemType, Class<T> propertyType) {
-        this.itemType = itemType;
-        this.propertyType = propertyType;
-    }
-
-    @Override
-    protected Optional<T> getFor(ItemStack itemStack) {
-        final ItemType itemType = itemStack.getType();
-        if (itemType != this.itemType) {
-            return Optional.empty();
-        }
-        final Optional<PropertyProvider<? extends T>> provider = ((LanternItemType) itemStack.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.ofNullable(provider.get().get(itemType, itemStack)) : Optional.empty();
-    }
+    /**
+     * Gets whether the {@link ItemStack} can harvest the {@link BlockState}. The
+     * {@link CauseStack} is provided to expose additional contextual data.
+     * Harvestable means that drops may be collected from the {@link BlockState}
+     * when destroyed with the provided {@link ItemStack}.
+     *
+     * @param causeStack The cause stack
+     * @param blockState The block state
+     * @param usedItemStack The used item stack
+     * @return The strength value
+     */
+    boolean isHarvestable(CauseStack causeStack, BlockState blockState, ItemStack usedItemStack);
 }

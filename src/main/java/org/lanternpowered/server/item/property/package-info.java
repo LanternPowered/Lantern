@@ -23,35 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.item;
-
-import org.lanternpowered.server.data.property.common.AbstractItemStackPropertyStore;
-import org.lanternpowered.server.item.LanternItemType;
-import org.lanternpowered.server.item.PropertyProvider;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
-
-import java.util.Optional;
-
-public class ItemPropertyStore<T extends Property<?,?>> extends AbstractItemStackPropertyStore<T> {
-
-    private final ItemType itemType;
-    private final Class<T> propertyType;
-
-    public ItemPropertyStore(ItemType itemType, Class<T> propertyType) {
-        this.itemType = itemType;
-        this.propertyType = propertyType;
-    }
-
-    @Override
-    protected Optional<T> getFor(ItemStack itemStack) {
-        final ItemType itemType = itemStack.getType();
-        if (itemType != this.itemType) {
-            return Optional.empty();
-        }
-        final Optional<PropertyProvider<? extends T>> provider = ((LanternItemType) itemStack.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.ofNullable(provider.get().get(itemType, itemStack)) : Optional.empty();
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.item.property;

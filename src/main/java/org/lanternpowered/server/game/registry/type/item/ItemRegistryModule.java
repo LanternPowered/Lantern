@@ -36,6 +36,7 @@ import static org.lanternpowered.server.item.PropertyProviders.foodRestoration;
 import static org.lanternpowered.server.item.PropertyProviders.maximumUseDuration;
 import static org.lanternpowered.server.item.PropertyProviders.recordType;
 import static org.lanternpowered.server.item.PropertyProviders.saturation;
+import static org.lanternpowered.server.item.PropertyProviders.toolAspects;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
 import static org.lanternpowered.server.item.PropertyProviders.useDuration;
 import static org.lanternpowered.server.item.PropertyProviders.useLimit;
@@ -72,7 +73,9 @@ import org.lanternpowered.server.item.behavior.vanilla.consumable.FishForwarding
 import org.lanternpowered.server.item.behavior.vanilla.consumable.GoldenAppleEffectsProvider;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider;
+import org.lanternpowered.server.item.property.HarvestingPropertyProvider;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
+import org.lanternpowered.server.item.tool.ToolAspects;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
@@ -132,6 +135,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     private ItemRegistryModule() {
         super(ItemTypes.class);
         this.internalIdByItemType.defaultReturnValue(-1);
+        BlockRegistryModule.get().addRegistrationConsumer(
+                blockType -> HarvestingPropertyProvider.INSTANCE.invalidate());
     }
 
     /**
@@ -145,7 +150,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         super.register(itemType);
         this.internalIdByItemType.put(itemType, internalId);
         this.itemTypeByInternalId.put(internalId, itemType);
-        Lantern.getGame().getPropertyRegistry().registerItemPropertyStores(((LanternItemType) itemType).getPropertyProviderCollection());
+        Lantern.getGame().getPropertyRegistry().registerItemPropertyStores(itemType);
     }
 
     @Override
@@ -177,18 +182,27 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /// Iron Shovel ///
         ///////////////////
         register(256, toolBuilder(251, ToolTypes.IRON)
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SHOVEL)))
                 .translation("item.shovelIron.name")
                 .build("minecraft", "iron_shovel"));
         ////////////////////
         /// Iron Pickaxe ///
         ////////////////////
         register(257, toolBuilder(251, ToolTypes.IRON)
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.PICKAXE)))
                 .translation("item.pickaxeIron.name")
                 .build("minecraft", "iron_pickaxe"));
         ////////////////////
         ///   Iron Axe   ///
         ////////////////////
         register(258, toolBuilder(251, ToolTypes.IRON)
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.AXE)))
                 .translation("item.hatchetIron.name")
                 .build("minecraft", "iron_axe"));
         ///////////////////////
@@ -253,91 +267,117 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///  Iron Sword ///
         ///////////////////
         register(267, toolBuilder(251, ToolTypes.IRON)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SWORD)))
                 .translation("item.swordIron.name")
                 .build("minecraft", "iron_sword"));
         ////////////////////
         /// Wooden Sword ///
         ////////////////////
         register(268, toolBuilder(60, ToolTypes.WOOD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SWORD)))
                 .translation("item.swordWood.name")
                 .build("minecraft", "wooden_sword"));
         /////////////////////
         /// Wooden Shovel ///
         /////////////////////
         register(269, toolBuilder(60, ToolTypes.WOOD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SHOVEL)))
                 .translation("item.shovelWood.name")
                 .build("minecraft", "wooden_shovel"));
         //////////////////////
         /// Wooden Pickaxe ///
         //////////////////////
         register(270, toolBuilder(60, ToolTypes.WOOD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.PICKAXE)))
                 .translation("item.pickaxeWood.name")
                 .build("minecraft", "wooden_pickaxe"));
         //////////////////////
         ///   Wooden Axe   ///
         //////////////////////
         register(271, toolBuilder(60, ToolTypes.WOOD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.AXE)))
                 .translation("item.hatchetWood.name")
                 .build("minecraft", "wooden_axe"));
         ////////////////////
         ///  Stone Sword ///
         ////////////////////
         register(272, toolBuilder(132, ToolTypes.STONE)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SWORD)))
                 .translation("item.swordStone.name")
                 .build("minecraft", "stone_sword"));
         /////////////////////
         ///  Stone Shovel ///
         /////////////////////
         register(273, toolBuilder(132, ToolTypes.STONE)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SHOVEL)))
                 .translation("item.shovelStone.name")
                 .build("minecraft", "stone_shovel"));
         //////////////////////
         ///  Stone Pickaxe ///
         //////////////////////
         register(274, toolBuilder(132, ToolTypes.STONE)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.PICKAXE)))
                 .translation("item.pickaxeStone.name")
                 .build("minecraft", "stone_pickaxe"));
         //////////////////////
         ///    Stone Axe   ///
         //////////////////////
         register(275, toolBuilder(132, ToolTypes.STONE)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.AXE)))
                 .translation("item.hatchetStone.name")
                 .build("minecraft", "stone_axe"));
         /////////////////////
         /// Diamond Sword ///
         /////////////////////
         register(276, toolBuilder(1562, ToolTypes.DIAMOND)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SWORD)))
                 .translation("item.swordDiamond.name")
                 .build("minecraft", "diamond_sword"));
         //////////////////////
         /// Diamond Shovel ///
         //////////////////////
         register(277, toolBuilder(1562, ToolTypes.DIAMOND)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SHOVEL)))
                 .translation("item.shovelDiamond.name")
                 .build("minecraft", "diamond_shovel"));
         ///////////////////////
         /// Diamond Pickaxe ///
         ///////////////////////
         register(278, toolBuilder(1562, ToolTypes.DIAMOND)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.PICKAXE)))
                 .translation("item.pickaxeDiamond.name")
                 .build("minecraft", "diamond_pickaxe"));
         ///////////////////////
         ///   Diamond Axe   ///
         ///////////////////////
         register(279, toolBuilder(1562, ToolTypes.DIAMOND)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.AXE)))
                 .translation("item.hatchetDiamond.name")
                 .build("minecraft", "diamond_axe"));
         ///////////////////////
@@ -369,28 +409,36 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///  Golden Sword ///
         /////////////////////
         register(283, toolBuilder(33, ToolTypes.GOLD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SWORD)))
                 .translation("item.swordGold.name")
                 .build("minecraft", "golden_sword"));
         //////////////////////
         ///  Golden Shovel ///
         //////////////////////
         register(284, toolBuilder(33, ToolTypes.GOLD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.SHOVEL)))
                 .translation("item.shovelGold.name")
                 .build("minecraft", "golden_shovel"));
         ///////////////////////
         ///  Golden Pickaxe ///
         ///////////////////////
         register(285, toolBuilder(33, ToolTypes.GOLD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.PICKAXE)))
                 .translation("item.pickaxeGold.name")
                 .build("minecraft", "golden_pickaxe"));
         ///////////////////////
         ///    Golden Axe   ///
         ///////////////////////
         register(286, toolBuilder(33, ToolTypes.GOLD)
-                .properties(builder -> builder.add(dualWield(true)))
+                .properties(builder -> builder
+                        .add(dualWield(true))
+                        .add(toolAspects(ToolAspects.AXE)))
                 .translation("item.hatchetGold.name")
                 .build("minecraft", "golden_axe"));
         ///////////////////////
@@ -415,30 +463,40 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///    Wooden Hoe   ///
         ///////////////////////
         register(290, toolBuilder(60, ToolTypes.WOOD)
+                .properties(builder -> builder
+                        .add(toolAspects(ToolAspects.HOE)))
                 .translation("item.hoeWood.name")
                 .build("minecraft", "wooden_hoe"));
         ///////////////////////
         ///     Stone Hoe   ///
         ///////////////////////
         register(291, toolBuilder(132, ToolTypes.STONE)
+                .properties(builder -> builder
+                        .add(toolAspects(ToolAspects.HOE)))
                 .translation("item.hoeStone.name")
                 .build("minecraft", "stone_hoe"));
         ///////////////////////
         ///     Iron Hoe    ///
         ///////////////////////
         register(292, toolBuilder(251, ToolTypes.IRON)
+                .properties(builder -> builder
+                        .add(toolAspects(ToolAspects.HOE)))
                 .translation("item.hoeIron.name")
                 .build("minecraft", "iron_hoe"));
         ///////////////////////
         ///   Diamond Hoe   ///
         ///////////////////////
         register(293, toolBuilder(1562, ToolTypes.DIAMOND)
+                .properties(builder -> builder
+                        .add(toolAspects(ToolAspects.HOE)))
                 .translation("item.hoeDiamond.name")
                 .build("minecraft", "diamond_hoe"));
         ///////////////////////
         ///    Golden Hoe   ///
         ///////////////////////
         register(294, toolBuilder(33, ToolTypes.GOLD)
+                .properties(builder -> builder
+                        .add(toolAspects(ToolAspects.HOE)))
                 .translation("item.hoeGold.name")
                 .build("minecraft", "golden_hoe"));
         ///////////////////////
@@ -909,6 +967,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///   Shears   ///
         //////////////////
         register(359, builder()
+                .properties(builder -> builder
+                        .add(toolAspects(ToolAspects.SHEARS)))
                 .translation("item.shears.name")
                 .maxStackQuantity(1)
                 .build("minecraft", "shears"));

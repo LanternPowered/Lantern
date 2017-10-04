@@ -35,10 +35,12 @@ import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -53,6 +55,7 @@ public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
     private final Class<?>[] catalogClasses;
     @Nullable private final String patternValue;
     @Nullable private final Pattern pattern;
+    final List<Consumer<T>> registrationConsumers = new ArrayList<>();
 
     public AbstractCatalogRegistryModule(Class<?>... catalogClasses) {
         this(null, catalogClasses, null);
@@ -82,6 +85,10 @@ public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
 
     void checkFinalizedContent() {
         checkState(this.values == null, "The content is already finalized.");
+    }
+
+    public void addRegistrationConsumer(Consumer<T> consumer) {
+        this.registrationConsumers.add(consumer);
     }
 
     /**

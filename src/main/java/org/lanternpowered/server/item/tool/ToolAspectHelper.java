@@ -23,35 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.item;
+package org.lanternpowered.server.item.tool;
 
-import org.lanternpowered.server.data.property.common.AbstractItemStackPropertyStore;
-import org.lanternpowered.server.item.LanternItemType;
-import org.lanternpowered.server.item.PropertyProvider;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.item.ItemType;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.item.property.ToolAspectsProperty;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.Optional;
+@SuppressWarnings("ConstantConditions")
+public final class ToolAspectHelper {
 
-public class ItemPropertyStore<T extends Property<?,?>> extends AbstractItemStackPropertyStore<T> {
-
-    private final ItemType itemType;
-    private final Class<T> propertyType;
-
-    public ItemPropertyStore(ItemType itemType, Class<T> propertyType) {
-        this.itemType = itemType;
-        this.propertyType = propertyType;
+    public static boolean isHarvestable(BlockState blockState, ItemStack usedItemStack) {
+        return isHarvestable(CauseStack.currentOrEmpty(), blockState, usedItemStack);
     }
 
-    @Override
-    protected Optional<T> getFor(ItemStack itemStack) {
-        final ItemType itemType = itemStack.getType();
-        if (itemType != this.itemType) {
-            return Optional.empty();
+    public static boolean isHarvestable(CauseStack causeStack, BlockState blockState, ItemStack usedItemStack) {
+        final ToolAspectsProperty toolAspectsProperty = usedItemStack
+                .getProperty(ToolAspectsProperty.class).orElse(null);
+        if (toolAspectsProperty == null) {
+            return false;
         }
-        final Optional<PropertyProvider<? extends T>> provider = ((LanternItemType) itemStack.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.ofNullable(provider.get().get(itemType, itemStack)) : Optional.empty();
+        for (ToolAspect toolAspect : toolAspectsProperty.getValue()) {
+            if (toolAspect.isHarvestable(causeStack, blockState, usedItemStack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ToolAspectHelper() {
     }
 }

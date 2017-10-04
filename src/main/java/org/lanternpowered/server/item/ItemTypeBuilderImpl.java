@@ -34,7 +34,9 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
 import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.item.property.HarvestingPropertyProvider;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.property.item.HarvestingProperty;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
@@ -142,13 +144,16 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
             }
             translationProvider = TranslationProvider.of(tr(path));
         }
-        PropertyProviderCollection properties;
+        PropertyProviderCollection.Builder properties;
         if (this.propertiesBuilder != null) {
-            properties = this.propertiesBuilder.build();
+            properties = this.propertiesBuilder;
         } else {
-            properties = PropertyProviderCollection.builder().build();
+            properties = PropertyProviderCollection.builder();
         }
-        return new LanternItemType(pluginId, name, properties, behaviorPipeline, translationProvider,
+        if (!properties.build().get(HarvestingProperty.class).isPresent()) {
+            properties.add(HarvestingProperty.class, HarvestingPropertyProvider.INSTANCE);
+        }
+        return new LanternItemType(pluginId, name, properties.build(), behaviorPipeline, translationProvider,
                 this.keysProvider, this.blockType, this.maxStackQuantity);
     }
 }

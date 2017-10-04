@@ -98,6 +98,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
             this.typesByName = new HashMap<>();
         }
         this.typesByName.put(name, catalogType);
+        this.registrationConsumers.forEach(consumer -> consumer.accept(catalogType));
     }
 
     @Override

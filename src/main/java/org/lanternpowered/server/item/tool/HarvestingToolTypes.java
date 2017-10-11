@@ -25,26 +25,26 @@
  */
 package org.lanternpowered.server.item.tool;
 
-import org.lanternpowered.server.event.CauseStack;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.annotation.CatalogedBy;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-// TODO: Better name
-@CatalogedBy(ToolAspects.class)
-public interface ToolAspect extends CatalogType {
+public final class HarvestingToolTypes {
 
-    /**
-     * Gets whether the {@link ItemStack} can harvest the {@link BlockState}. The
-     * {@link CauseStack} is provided to expose additional contextual data.
-     * Harvestable means that drops may be collected from the {@link BlockState}
-     * when destroyed with the provided {@link ItemStack}.
-     *
-     * @param causeStack The cause stack
-     * @param blockState The block state
-     * @param usedItemStack The used item stack
-     * @return The strength value
-     */
-    boolean isHarvestable(CauseStack causeStack, BlockState blockState, ItemStack usedItemStack);
+    // SORTFIELDS:ON
+
+    public static final HarvestingToolType AXE = DummyObjectProvider.createFor(HarvestingToolType.class, "AXE");
+
+    public static final HarvestingToolType HOE = DummyObjectProvider.createFor(HarvestingToolType.class, "HOE");
+
+    public static final HarvestingToolType PICKAXE = DummyObjectProvider.createFor(HarvestingToolType.class, "PICKAXE");
+
+    public static final HarvestingToolType SHEARS = DummyObjectProvider.createFor(HarvestingToolType.class, "SHEARS");
+
+    public static final HarvestingToolType SHOVEL = DummyObjectProvider.createFor(HarvestingToolType.class, "SHOVEL");
+
+    public static final HarvestingToolType SWORD = DummyObjectProvider.createFor(HarvestingToolType.class, "SWORD");
+
+    // SORTFIELDS:OFF
+
+    private HarvestingToolTypes() {
+    }
 }

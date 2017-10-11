@@ -25,26 +25,32 @@
  */
 package org.lanternpowered.server.item.tool;
 
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.item.property.HarvestingToolsProperty;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public final class ToolAspects {
+@SuppressWarnings("ConstantConditions")
+public final class HarvestingToolHelper {
 
-    // SORTFIELDS:ON
+    public static boolean isHarvestable(BlockState blockState, ItemStack usedItemStack) {
+        return isHarvestable(CauseStack.currentOrEmpty(), blockState, usedItemStack);
+    }
 
-    public static final ToolAspect AXE = DummyObjectProvider.createFor(ToolAspect.class, "AXE");
+    public static boolean isHarvestable(CauseStack causeStack, BlockState blockState, ItemStack usedItemStack) {
+        final HarvestingToolsProperty harvestingToolsProperty = usedItemStack
+                .getProperty(HarvestingToolsProperty.class).orElse(null);
+        if (harvestingToolsProperty == null) {
+            return false;
+        }
+        for (HarvestingToolType harvestingToolType : harvestingToolsProperty.getValue()) {
+            if (harvestingToolType.isHarvestable(causeStack, blockState, usedItemStack)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    public static final ToolAspect HOE = DummyObjectProvider.createFor(ToolAspect.class, "HOE");
-
-    public static final ToolAspect PICKAXE = DummyObjectProvider.createFor(ToolAspect.class, "PICKAXE");
-
-    public static final ToolAspect SHEARS = DummyObjectProvider.createFor(ToolAspect.class, "SHEARS");
-
-    public static final ToolAspect SHOVEL = DummyObjectProvider.createFor(ToolAspect.class, "SHOVEL");
-
-    public static final ToolAspect SWORD = DummyObjectProvider.createFor(ToolAspect.class, "SWORD");
-
-    // SORTFIELDS:OFF
-
-    private ToolAspects() {
+    private HarvestingToolHelper() {
     }
 }

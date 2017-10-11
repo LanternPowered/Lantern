@@ -23,28 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.property;
+package org.lanternpowered.server.item.tool;
 
-import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.item.tool.ToolAspect;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.AbstractProperty;
+import org.lanternpowered.server.event.CauseStack;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.annotation.CatalogedBy;
 
-import javax.annotation.Nullable;
-import java.util.Set;
+@CatalogedBy(HarvestingToolTypes.class)
+public interface HarvestingToolType extends CatalogType {
 
-public final class ToolAspectsProperty extends AbstractProperty<String, Set<ToolAspect>> {
-
-    public ToolAspectsProperty(Iterable<ToolAspect> aspects) {
-        super(ImmutableSet.copyOf(aspects));
-    }
-
-    public ToolAspectsProperty(ToolAspect... aspects) {
-        super(ImmutableSet.copyOf(aspects));
-    }
-
-    @Override
-    public int compareTo(@Nullable Property<?, ?> o) {
-        return 0;
-    }
+    /**
+     * Gets whether the {@link ItemStack} can harvest the {@link BlockState}. The
+     * {@link CauseStack} is provided to expose additional contextual data.
+     * Harvestable means that drops may be collected from the {@link BlockState}
+     * when destroyed with the provided {@link ItemStack}.
+     *
+     * @param causeStack The cause stack
+     * @param blockState The block state
+     * @param usedItemStack The used item stack
+     * @return The strength value
+     */
+    boolean isHarvestable(CauseStack causeStack, BlockState blockState, ItemStack usedItemStack);
 }

@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.item.PropertyProvider;
-import org.lanternpowered.server.item.tool.ToolAspect;
+import org.lanternpowered.server.item.tool.HarvestingToolType;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.property.item.HarvestingProperty;
 import org.spongepowered.api.item.ItemType;
@@ -54,13 +54,13 @@ public final class HarvestingPropertyProvider implements PropertyProvider<Harves
     public HarvestingProperty get(ItemType itemType, @Nullable ItemStack itemStack) {
         return this.cache.computeIfAbsent(itemType, type -> {
             final ImmutableSet.Builder<BlockType> blockTypes = ImmutableSet.builder();
-            final ToolAspectsProperty toolAspectsProperty = itemType
-                    .getDefaultProperty(ToolAspectsProperty.class).orElse(null);
+            final HarvestingToolsProperty harvestingToolsProperty = itemType
+                    .getDefaultProperty(HarvestingToolsProperty.class).orElse(null);
             final CauseStack causeStack = CauseStack.currentOrEmpty();
             final ItemStack itemStack1 = ItemStack.of(itemType, 1);
-            if (toolAspectsProperty != null) {
+            if (harvestingToolsProperty != null) {
                 for (BlockType blockType : BlockRegistryModule.get().getAll()) {
-                    for (ToolAspect aspect : toolAspectsProperty.getValue()) {
+                    for (HarvestingToolType aspect : harvestingToolsProperty.getValue()) {
                         if (aspect.isHarvestable(causeStack, blockType.getDefaultState(), itemStack1)) {
                             blockTypes.add(blockType);
                             break;

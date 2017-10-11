@@ -54,7 +54,6 @@ import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageS
 import org.lanternpowered.server.cause.entity.damage.source.LanternFallingBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternIndirectEntityDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.healing.source.LanternEntityHealingSourceBuilder;
-import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSource;
 import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSourceBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
@@ -156,7 +155,7 @@ import org.lanternpowered.server.game.registry.type.fluid.FluidTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ToolAspectRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.HarvestingToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
@@ -211,7 +210,7 @@ import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistryModule;
-import org.lanternpowered.server.item.tool.ToolAspect;
+import org.lanternpowered.server.item.tool.HarvestingToolType;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
@@ -325,7 +324,6 @@ import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifierType;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
@@ -335,7 +333,6 @@ import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamage
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.dismount.DismountType;
 import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.event.cause.entity.health.HealthModifierType;
 import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource;
 import org.spongepowered.api.event.cause.entity.health.source.HealingSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
@@ -566,7 +563,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(Profession.class, new ProfessionRegistryModule())
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
                 .registerModule(ToolType.class, new ToolTypeRegistryModule())
-                .registerModule(ToolAspect.class, new ToolAspectRegistryModule())
+                .registerModule(HarvestingToolType.class, new HarvestingToolTypeRegistryModule())
                 .registerModule(ArmorType.class, new ArmorTypeRegistryModule())
                 .registerModule(PistonType.class,
                         new EnumValueRegistryModule<PistonType>(LanternPistonType.class, PistonTypes.class) {})

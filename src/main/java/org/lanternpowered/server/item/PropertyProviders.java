@@ -34,8 +34,8 @@ import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
-import org.lanternpowered.server.item.property.ToolAspectsProperty;
-import org.lanternpowered.server.item.tool.ToolAspect;
+import org.lanternpowered.server.item.property.HarvestingToolsProperty;
+import org.lanternpowered.server.item.tool.HarvestingToolType;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
@@ -257,24 +257,24 @@ public final class PropertyProviders {
                 .build();
     }
 
-    public static PropertyProviderCollection toolAspects(ToolAspect... toolAspects) {
-        final ToolAspectsProperty property = new ToolAspectsProperty(toolAspects);
+    public static PropertyProviderCollection harvestingTools(HarvestingToolType... harvestingToolTypes) {
+        final HarvestingToolsProperty property = new HarvestingToolsProperty(harvestingToolTypes);
         return PropertyProviderCollection.builder()
-                .add(ToolAspectsProperty.class, (itemType, itemStack) -> property)
+                .add(HarvestingToolsProperty.class, (itemType, itemStack) -> property)
                 .build();
     }
 
-    public static PropertyProviderCollection toolAspects(Iterable<ToolAspect> toolAspects) {
-        final ToolAspectsProperty property = new ToolAspectsProperty(toolAspects);
+    public static PropertyProviderCollection harvestingTools(Iterable<HarvestingToolType> harvestingToolTypes) {
+        final HarvestingToolsProperty property = new HarvestingToolsProperty(harvestingToolTypes);
         return PropertyProviderCollection.builder()
-                .add(ToolAspectsProperty.class, (itemType, itemStack) -> property)
+                .add(HarvestingToolsProperty.class, (itemType, itemStack) -> property)
                 .build();
     }
 
-    public static PropertyProviderCollection toolAspects(ObjectProvider<Iterable<ToolAspect>> toolAspects) {
+    public static PropertyProviderCollection harvestingTools(ObjectProvider<Iterable<HarvestingToolType>> harvestingToolTypes) {
         return PropertyProviderCollection.builder()
-                .add(ToolAspectsProperty.class, (itemType, itemStack) ->
-                        new ToolAspectsProperty(toolAspects.get(itemType, itemStack)))
+                .add(HarvestingToolsProperty.class, (itemType, itemStack) ->
+                        new HarvestingToolsProperty(harvestingToolTypes.get(itemType, itemStack)))
                 .build();
     }
 

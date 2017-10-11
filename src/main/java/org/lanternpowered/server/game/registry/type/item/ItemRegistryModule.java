@@ -33,10 +33,10 @@ import static org.lanternpowered.server.item.PropertyProviders.armorType;
 import static org.lanternpowered.server.item.PropertyProviders.dualWield;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.item.PropertyProviders.foodRestoration;
+import static org.lanternpowered.server.item.PropertyProviders.harvestingTools;
 import static org.lanternpowered.server.item.PropertyProviders.maximumUseDuration;
 import static org.lanternpowered.server.item.PropertyProviders.recordType;
 import static org.lanternpowered.server.item.PropertyProviders.saturation;
-import static org.lanternpowered.server.item.PropertyProviders.toolAspects;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
 import static org.lanternpowered.server.item.PropertyProviders.useDuration;
 import static org.lanternpowered.server.item.PropertyProviders.useLimit;
@@ -75,7 +75,7 @@ import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider;
 import org.lanternpowered.server.item.property.HarvestingPropertyProvider;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
-import org.lanternpowered.server.item.tool.ToolAspects;
+import org.lanternpowered.server.item.tool.HarvestingToolTypes;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
@@ -184,7 +184,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(256, toolBuilder(251, ToolTypes.IRON)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SHOVEL)))
+                        .add(harvestingTools(HarvestingToolTypes.SHOVEL)))
                 .translation("item.shovelIron.name")
                 .build("minecraft", "iron_shovel"));
         ////////////////////
@@ -193,7 +193,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(257, toolBuilder(251, ToolTypes.IRON)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.PICKAXE)))
+                        .add(harvestingTools(HarvestingToolTypes.PICKAXE)))
                 .translation("item.pickaxeIron.name")
                 .build("minecraft", "iron_pickaxe"));
         ////////////////////
@@ -202,7 +202,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(258, toolBuilder(251, ToolTypes.IRON)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.AXE)))
+                        .add(harvestingTools(HarvestingToolTypes.AXE)))
                 .translation("item.hatchetIron.name")
                 .build("minecraft", "iron_axe"));
         ///////////////////////
@@ -269,7 +269,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(267, toolBuilder(251, ToolTypes.IRON)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SWORD)))
+                        .add(harvestingTools(HarvestingToolTypes.SWORD)))
                 .translation("item.swordIron.name")
                 .build("minecraft", "iron_sword"));
         ////////////////////
@@ -278,7 +278,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(268, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SWORD)))
+                        .add(harvestingTools(HarvestingToolTypes.SWORD)))
                 .translation("item.swordWood.name")
                 .build("minecraft", "wooden_sword"));
         /////////////////////
@@ -287,7 +287,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(269, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SHOVEL)))
+                        .add(harvestingTools(HarvestingToolTypes.SHOVEL)))
                 .translation("item.shovelWood.name")
                 .build("minecraft", "wooden_shovel"));
         //////////////////////
@@ -296,7 +296,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(270, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.PICKAXE)))
+                        .add(harvestingTools(HarvestingToolTypes.PICKAXE)))
                 .translation("item.pickaxeWood.name")
                 .build("minecraft", "wooden_pickaxe"));
         //////////////////////
@@ -305,7 +305,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(271, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.AXE)))
+                        .add(harvestingTools(HarvestingToolTypes.AXE)))
                 .translation("item.hatchetWood.name")
                 .build("minecraft", "wooden_axe"));
         ////////////////////
@@ -314,7 +314,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(272, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SWORD)))
+                        .add(harvestingTools(HarvestingToolTypes.SWORD)))
                 .translation("item.swordStone.name")
                 .build("minecraft", "stone_sword"));
         /////////////////////
@@ -323,7 +323,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(273, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SHOVEL)))
+                        .add(harvestingTools(HarvestingToolTypes.SHOVEL)))
                 .translation("item.shovelStone.name")
                 .build("minecraft", "stone_shovel"));
         //////////////////////
@@ -332,7 +332,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(274, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.PICKAXE)))
+                        .add(harvestingTools(HarvestingToolTypes.PICKAXE)))
                 .translation("item.pickaxeStone.name")
                 .build("minecraft", "stone_pickaxe"));
         //////////////////////
@@ -341,7 +341,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(275, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.AXE)))
+                        .add(harvestingTools(HarvestingToolTypes.AXE)))
                 .translation("item.hatchetStone.name")
                 .build("minecraft", "stone_axe"));
         /////////////////////
@@ -350,7 +350,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(276, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SWORD)))
+                        .add(harvestingTools(HarvestingToolTypes.SWORD)))
                 .translation("item.swordDiamond.name")
                 .build("minecraft", "diamond_sword"));
         //////////////////////
@@ -359,7 +359,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(277, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SHOVEL)))
+                        .add(harvestingTools(HarvestingToolTypes.SHOVEL)))
                 .translation("item.shovelDiamond.name")
                 .build("minecraft", "diamond_shovel"));
         ///////////////////////
@@ -368,7 +368,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(278, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.PICKAXE)))
+                        .add(harvestingTools(HarvestingToolTypes.PICKAXE)))
                 .translation("item.pickaxeDiamond.name")
                 .build("minecraft", "diamond_pickaxe"));
         ///////////////////////
@@ -377,7 +377,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(279, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.AXE)))
+                        .add(harvestingTools(HarvestingToolTypes.AXE)))
                 .translation("item.hatchetDiamond.name")
                 .build("minecraft", "diamond_axe"));
         ///////////////////////
@@ -411,7 +411,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(283, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SWORD)))
+                        .add(harvestingTools(HarvestingToolTypes.SWORD)))
                 .translation("item.swordGold.name")
                 .build("minecraft", "golden_sword"));
         //////////////////////
@@ -420,7 +420,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(284, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.SHOVEL)))
+                        .add(harvestingTools(HarvestingToolTypes.SHOVEL)))
                 .translation("item.shovelGold.name")
                 .build("minecraft", "golden_shovel"));
         ///////////////////////
@@ -429,7 +429,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(285, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.PICKAXE)))
+                        .add(harvestingTools(HarvestingToolTypes.PICKAXE)))
                 .translation("item.pickaxeGold.name")
                 .build("minecraft", "golden_pickaxe"));
         ///////////////////////
@@ -438,7 +438,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(286, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder
                         .add(dualWield(true))
-                        .add(toolAspects(ToolAspects.AXE)))
+                        .add(harvestingTools(HarvestingToolTypes.AXE)))
                 .translation("item.hatchetGold.name")
                 .build("minecraft", "golden_axe"));
         ///////////////////////
@@ -464,7 +464,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(290, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder
-                        .add(toolAspects(ToolAspects.HOE)))
+                        .add(harvestingTools(HarvestingToolTypes.HOE)))
                 .translation("item.hoeWood.name")
                 .build("minecraft", "wooden_hoe"));
         ///////////////////////
@@ -472,7 +472,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(291, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder
-                        .add(toolAspects(ToolAspects.HOE)))
+                        .add(harvestingTools(HarvestingToolTypes.HOE)))
                 .translation("item.hoeStone.name")
                 .build("minecraft", "stone_hoe"));
         ///////////////////////
@@ -480,7 +480,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(292, toolBuilder(251, ToolTypes.IRON)
                 .properties(builder -> builder
-                        .add(toolAspects(ToolAspects.HOE)))
+                        .add(harvestingTools(HarvestingToolTypes.HOE)))
                 .translation("item.hoeIron.name")
                 .build("minecraft", "iron_hoe"));
         ///////////////////////
@@ -488,7 +488,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(293, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder
-                        .add(toolAspects(ToolAspects.HOE)))
+                        .add(harvestingTools(HarvestingToolTypes.HOE)))
                 .translation("item.hoeDiamond.name")
                 .build("minecraft", "diamond_hoe"));
         ///////////////////////
@@ -496,7 +496,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(294, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder
-                        .add(toolAspects(ToolAspects.HOE)))
+                        .add(harvestingTools(HarvestingToolTypes.HOE)))
                 .translation("item.hoeGold.name")
                 .build("minecraft", "golden_hoe"));
         ///////////////////////
@@ -968,7 +968,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(359, builder()
                 .properties(builder -> builder
-                        .add(toolAspects(ToolAspects.SHEARS)))
+                        .add(harvestingTools(HarvestingToolTypes.SHEARS)))
                 .translation("item.shears.name")
                 .maxStackQuantity(1)
                 .build("minecraft", "shears"));

@@ -30,11 +30,11 @@ import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public class LanternToolAspect extends PluginCatalogType.Base implements ToolAspect {
+public class LanternHarvestingToolType extends PluginCatalogType.Base implements HarvestingToolType {
 
     private final HarvestableFunction harvestableFunction;
 
-    public LanternToolAspect(String pluginId, String name, HarvestableFunction harvestableFunction) {
+    public LanternHarvestingToolType(String pluginId, String name, HarvestableFunction harvestableFunction) {
         super(pluginId, name);
         this.harvestableFunction = harvestableFunction;
     }

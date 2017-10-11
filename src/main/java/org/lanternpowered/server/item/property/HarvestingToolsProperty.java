@@ -23,32 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.item;
+package org.lanternpowered.server.item.property;
 
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.lanternpowered.server.item.tool.LanternToolAspect;
-import org.lanternpowered.server.item.tool.ToolAspect;
-import org.lanternpowered.server.item.tool.ToolAspects;
+import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.item.tool.HarvestingToolType;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.AbstractProperty;
 
-public final class ToolAspectRegistryModule extends PluginCatalogRegistryModule<ToolAspect> {
+import javax.annotation.Nullable;
+import java.util.Set;
 
-    public ToolAspectRegistryModule() {
-        super(ToolAspects.class);
+public final class HarvestingToolsProperty extends AbstractProperty<String, Set<HarvestingToolType>> {
+
+    public HarvestingToolsProperty(Iterable<HarvestingToolType> aspects) {
+        super(ImmutableSet.copyOf(aspects));
+    }
+
+    public HarvestingToolsProperty(HarvestingToolType... aspects) {
+        super(ImmutableSet.copyOf(aspects));
     }
 
     @Override
-    public void registerDefaults() {
-        register(new LanternToolAspect("minecraft", "axe",
-                (causeStack, blockState, usedItemStack) -> false));
-        register(new LanternToolAspect("minecraft", "hoe",
-                (causeStack, blockState, usedItemStack) -> false));
-        register(new LanternToolAspect("minecraft", "pickaxe",
-                (causeStack, blockState, usedItemStack) -> false));
-        register(new LanternToolAspect("minecraft", "shears",
-                (causeStack, blockState, usedItemStack) -> false));
-        register(new LanternToolAspect("minecraft", "shovel",
-                (causeStack, blockState, usedItemStack) -> false));
-        register(new LanternToolAspect("minecraft", "sword",
-                (causeStack, blockState, usedItemStack) -> false));
+    public int compareTo(@Nullable Property<?, ?> o) {
+        return 0;
     }
 }

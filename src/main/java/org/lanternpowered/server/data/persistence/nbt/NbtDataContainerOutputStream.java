@@ -26,20 +26,6 @@
 package org.lanternpowered.server.data.persistence.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BOOLEAN_IDENTIFER;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BYTE;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BYTE_ARRAY;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.COMPOUND;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.DOUBLE;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.END;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.FLOAT;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.INT;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.INT_ARRAY;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LIST;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LONG;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.SHORT;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.STRING;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.UNKNOWN;
 
 import org.lanternpowered.server.data.persistence.DataContainerOutput;
 import org.spongepowered.api.data.DataQuery;
@@ -54,11 +40,11 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * A data output stream that serializes data views into the nbt format.
  */
+@SuppressWarnings("unchecked")
 public class NbtDataContainerOutputStream implements Closeable, Flushable, DataContainerOutput {
 
     private final DataOutputStream dos;
@@ -82,17 +68,6 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 (DataOutputStream) outputStream : new DataOutputStream(outputStream));
     }
 
-    /**
-     * Creates a new nbt data view output stream.
-     * 
-     * @param outputStream the output stream
-     * @param compressed whether the content is compressed
-     * @throws IOException 
-     */
-    public NbtDataContainerOutputStream(OutputStream outputStream, boolean compressed) throws IOException {
-        this(compressed ? new GZIPOutputStream(checkNotNull(outputStream, "outputStream")) : outputStream);
-    }
-
     @Override
     public void close() throws IOException {
         this.dos.close();
@@ -109,118 +84,250 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
     }
 
     @SuppressWarnings("unchecked")
-    private void writePayload(byte type, Object object) throws IOException {
-        if (type == UNKNOWN) {
-            throw new IOException("Attempted to serialize a unsupported object type: " + object.getClass().getName());
-        } else if (type == BYTE) {
-            if (object instanceof Boolean) {
-                object = (byte) (((Boolean) object) ? 1 : 0);
-            }
-            this.dos.writeByte((Byte) object);
-        } else if (type == BYTE_ARRAY) {
-            byte[] array0;
-            if (object instanceof byte[]) {
-                array0 = (byte[]) object;
-            } else {
-                Byte[] array1 = (Byte[]) object;
-                array0 = new byte[array1.length];
-                for (int i = 0; i < array0.length; i++) {
-                    array1[i] = array0[i];
+    private void writePayload(NbtType nbtType, Object object) throws IOException {
+        switch (nbtType) {
+            case BYTE:
+                this.dos.writeByte((Byte) object);
+                break;
+            case BYTE_ARRAY:
+                final byte[] byteArray = (byte[]) object;
+                this.dos.writeInt(byteArray.length);
+                this.dos.write(byteArray);
+                break;
+            case SHORT:
+                this.dos.writeShort((Short) object);
+                break;
+            case SHORT_ARRAY:
+                final short[] shortArray = (short[]) object;
+                this.dos.writeByte(NbtType.SHORT.type);
+                this.dos.writeInt(shortArray.length);
+                for (short shortValue : shortArray) {
+                    this.dos.writeShort(shortValue);
                 }
-            }
-            this.dos.writeInt(array0.length);
-            this.dos.write(array0);
-        } else if (type == COMPOUND) {
-            // Convert the object in something we can serialize
-            if (object instanceof DataView) {
-                object = ((DataView) object).getValues(false);
-            } else if (object instanceof DataSerializable) {
-                object = ((DataSerializable) object).toContainer().getValues(false);
-            }
-            for (Entry<DataQuery, Object> entry : ((Map<DataQuery, Object>) object).entrySet()) {
-                writeEntry(entry.getKey().asString('.'), entry.getValue());
-            }
-            this.dos.writeByte(END);
-        } else if (type == DOUBLE) {
-            this.dos.writeDouble((Double) object);
-        } else if (type == FLOAT) {
-            this.dos.writeFloat((Float) object);
-        } else if (type == INT) {
-            this.dos.writeInt((Integer) object);
-        } else if (type == INT_ARRAY) {
-            if (object instanceof int[]) {
-                int[] array0 = (int[]) object;
-                this.dos.writeInt(array0.length);
-                for (int value : array0) {
-                    this.dos.writeInt(value);
+                break;
+            case CHAR:
+                this.dos.writeUTF(new String(new char[] { (Character) object }));
+                break;
+            case CHAR_ARRAY:
+                this.dos.writeUTF(new String((char[]) object));
+                break;
+            case INT:
+                this.dos.writeInt((Integer) object);
+                break;
+            case INT_ARRAY:
+                final int[] intArray = (int[]) object;
+                this.dos.writeInt(intArray.length);
+                for (int intValue : intArray) {
+                    this.dos.writeInt(intValue);
                 }
-            } else {
-                Integer[] array0 = (Integer[]) object;
-                this.dos.writeInt(array0.length);
-                for (Integer value : array0) {
-                    this.dos.writeInt(value);
+                break;
+            case LONG:
+                this.dos.writeLong((Long) object);
+                break;
+            case LONG_ARRAY:
+                final long[] longArray = (long[]) object;
+                this.dos.writeInt(longArray.length);
+                for (long longValue : longArray) {
+                    this.dos.writeLong(longValue);
                 }
-            }
-        } else if (type == LIST) {
-            List<Object> list = (List<Object>) object;
-            byte type0 = END;
-            if (!list.isEmpty()) {
-                type0 = typeFor(list.get(0));
-            }
-            this.dos.writeByte(type0);
-            this.dos.writeInt(list.size());
-            for (Object object0 : list) {
-                this.writePayload(type0, object0);
-            }
-        } else if (type == LONG) {
-            this.dos.writeLong((Long) object);
-        } else if (type == SHORT) {
-            this.dos.writeShort((Short) object);
-        } else if (type == STRING) {
-            this.dos.writeUTF((String) object);
+                break;
+            case FLOAT:
+                this.dos.writeFloat((Float) object);
+                break;
+            case FLOAT_ARRAY:
+                final float[] floatArray = (float[]) object;
+                this.dos.writeByte(NbtType.FLOAT.type);
+                this.dos.writeInt(floatArray.length);
+                for (float floatValue : floatArray) {
+                    this.dos.writeFloat(floatValue);
+                }
+                break;
+            case DOUBLE:
+                this.dos.writeDouble((Double) object);
+                break;
+            case DOUBLE_ARRAY:
+                final double[] doubleArray = (double[]) object;
+                this.dos.writeByte(NbtType.DOUBLE.type);
+                this.dos.writeInt(doubleArray.length);
+                for (double doubleValue : doubleArray) {
+                    this.dos.writeDouble(doubleValue);
+                }
+                break;
+            case STRING:
+                this.dos.writeUTF((String) object);
+                break;
+            case STRING_ARRAY:
+                final String[] stringArray = (String[]) object;
+                this.dos.writeByte(NbtType.STRING.type);
+                this.dos.writeInt(stringArray.length);
+                for (String string : stringArray) {
+                    this.dos.writeUTF(string);
+                }
+                break;
+            case BOOLEAN:
+                this.dos.writeBoolean((Boolean) object);
+                break;
+            case BOOLEAN_ARRAY:
+                final boolean[] booleanArray = (boolean[]) object;
+                int length = booleanArray.length / 8;
+                if (booleanArray.length % 8 != 0) {
+                    length++;
+                }
+                this.dos.writeInt(length + 2);
+                this.dos.writeShort(booleanArray.length);
+                int j = 0;
+                for (int i = 0; i < length; i++) {
+                    byte value = 0;
+                    while (j < booleanArray.length) {
+                        final int k = j % 8;
+                        if (booleanArray[j++]) {
+                            value |= 1 << k;
+                        }
+                    }
+                    this.dos.writeByte(value);
+                }
+                break;
+            case LIST:
+                writeList(nbtType, (List<Object>) object);
+                break;
+            case COMPOUND:
+                writeCompound(object);
+                break;
+            case COMPOUND_ARRAY:
+                final Object[] dataViews = (Object[]) object;
+                this.dos.writeByte(NbtType.COMPOUND.type);
+                this.dos.writeInt(dataViews.length);
+                for (Object dataView : dataViews) {
+                    writeCompound(dataView);
+                }
+                break;
+            case MAP:
+                writeMap((Map) object);
+                break;
+            case MAP_ARRAY:
+                final Map[] maps = (Map[]) object;
+                this.dos.writeByte(NbtType.LIST.type);
+                this.dos.writeInt(maps.length);
+                for (Map map : maps) {
+                    writeMap(map);
+                }
+                break;
+            default:
+                throw new IOException("Attempted to serialize a unsupported object type: " + object.getClass().getName());
+        }
+    }
+
+    private void writeCompound(Object object) throws IOException {
+        // Convert the object in something we can serialize
+        if (object instanceof DataView) {
+            object = ((DataView) object).getValues(false);
+        } else if (object instanceof DataSerializable) {
+            object = ((DataSerializable) object).toContainer().getValues(false);
+        }
+        for (Entry<DataQuery, Object> entry : ((Map<DataQuery, Object>) object).entrySet()) {
+            writeEntry(entry.getKey().asString('.'), entry.getValue());
+        }
+        this.dos.writeByte(NbtType.END.type);
+    }
+
+    private void writeMap(Map map) throws IOException {
+        this.dos.writeByte(NbtType.COMPOUND.type);
+        this.dos.writeInt(map.size());
+        for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) map).entrySet()) {
+            writeEntry(NbtType.mapKeyName, entry.getKey());
+            writeEntry(NbtType.mapValueName, entry.getValue());
+            this.dos.writeByte(NbtType.END.type);
+        }
+    }
+
+    private void writeList(NbtType nbtType, List<Object> list) throws IOException {
+        this.dos.writeByte(nbtType.type);
+        this.dos.writeInt(list.size());
+        for (Object object0 : list) {
+            writePayload(nbtType, object0);
         }
     }
 
     private void writeEntry(String key, Object object) throws IOException {
-        final byte type = typeFor(object);
-        this.dos.writeByte(type);
-        if (object instanceof Boolean || (object instanceof List && !((List<?>) object).isEmpty()
-                && ((List<?>) object).get(0) instanceof Boolean)) {
-            key += BOOLEAN_IDENTIFER;
-        }
-        this.dos.writeUTF(key);
-        try {
-            writePayload(type, object);
-        } catch (Exception e) {
-            throw new IOException("Exception while serializing key: " + key, e);
+        NbtType nbtType = typeFor(object);
+        this.dos.writeByte(nbtType.type);
+        if (nbtType == NbtType.LIST) {
+            final List<Object> list = (List<Object>) object;
+            if (list.isEmpty()) {
+                nbtType = NbtType.END;
+            } else {
+                nbtType = typeFor(list.get(0));
+                if (nbtType.suffix != null) {
+                    key += "$List$" + nbtType.suffix;
+                }
+            }
+            this.dos.writeUTF(key);
+            writeList(nbtType, list);
+        } else {
+            if (nbtType.suffix != null) {
+                key += '$' + nbtType.suffix;
+            }
+            this.dos.writeUTF(key);
+            try {
+                writePayload(nbtType, object);
+            } catch (Exception e) {
+                throw new IOException("Exception while serializing key: " + key, e);
+            }
         }
     }
 
-    private byte typeFor(Object object) {
-        if (object instanceof Byte || object instanceof Boolean) {
-            return BYTE;
-        } else if (object instanceof Byte[] || object instanceof byte[]) {
-            return BYTE_ARRAY;
-        } else if (object instanceof Map || object instanceof DataView) {
-            return COMPOUND;
+    private NbtType typeFor(Object object) {
+        if (object instanceof Boolean) {
+            return NbtType.BOOLEAN;
+        } else if (object instanceof boolean[]) {
+            return NbtType.BOOLEAN_ARRAY;
+        } else if (object instanceof Byte) {
+            return NbtType.BYTE;
+        } else if (object instanceof byte[]) {
+            return NbtType.BYTE_ARRAY;
+        } else if (object instanceof Map) {
+            return NbtType.MAP;
+        } else if (object instanceof DataView) {
+            return NbtType.COMPOUND;
         } else if (object instanceof Double) {
-            return DOUBLE;
+            return NbtType.DOUBLE;
+        } else if (object instanceof double[]) {
+            return NbtType.DOUBLE_ARRAY;
         } else if (object instanceof Float) {
-            return FLOAT;
+            return NbtType.FLOAT;
+        } else if (object instanceof float[]) {
+            return NbtType.FLOAT_ARRAY;
         } else if (object instanceof Integer) {
-            return INT;
-        } else if (object instanceof Integer[] || object instanceof int[]) {
-            return INT_ARRAY;
+            return NbtType.INT;
+        } else if (object instanceof int[]) {
+            return NbtType.INT_ARRAY;
         } else if (object instanceof List) {
-            return LIST;
+            return NbtType.LIST;
         } else if (object instanceof Long) {
-            return LONG;
+            return NbtType.LONG;
+        } else if (object instanceof long[]) {
+            return NbtType.LONG_ARRAY;
         } else if (object instanceof Short) {
-            return SHORT;
+            return NbtType.SHORT;
+        } else if (object instanceof short[]) {
+            return NbtType.SHORT_ARRAY;
         } else if (object instanceof String) {
-            return STRING;
+            return NbtType.STRING;
+        } else if (object instanceof String[]) {
+            return NbtType.STRING_ARRAY;
+        } else if (object instanceof Character) {
+            return NbtType.CHAR;
+        } else if (object instanceof char[]) {
+            return NbtType.CHAR_ARRAY;
+        } else if (object.getClass().isArray()) {
+            final Class<?> componentType = object.getClass().getComponentType();
+            if (Map.class.isAssignableFrom(componentType)) {
+                return NbtType.MAP_ARRAY;
+            } else if (DataView.class.isAssignableFrom(componentType)) {
+                return NbtType.COMPOUND_ARRAY;
+            }
         }
-        return UNKNOWN;
+        return NbtType.UNKNOWN;
     }
 
 }

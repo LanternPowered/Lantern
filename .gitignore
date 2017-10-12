@@ -77,3 +77,5 @@ nb-configuration.xml
 /openCmd.bat
 /run
 *.launch
+
+test\.nbt

@@ -27,6 +27,7 @@ package org.lanternpowered.server.game;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.AssetRepository;
+import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.slf4j.Logger;

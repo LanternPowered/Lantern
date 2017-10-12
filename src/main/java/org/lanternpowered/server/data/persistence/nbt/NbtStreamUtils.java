@@ -31,6 +31,8 @@ import org.spongepowered.api.data.DataView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public final class NbtStreamUtils {
 
@@ -44,7 +46,8 @@ public final class NbtStreamUtils {
      * @throws IOException
      */
     public static DataContainer read(InputStream inputStream, boolean compressed) throws IOException {
-        try (NbtDataContainerInputStream input = new NbtDataContainerInputStream(inputStream, compressed)) {
+        try (NbtDataContainerInputStream input = new NbtDataContainerInputStream(
+                compressed ? new GZIPInputStream(inputStream) : inputStream)) {
             return input.read();
         }
     }
@@ -58,7 +61,8 @@ public final class NbtStreamUtils {
      * @throws IOException
      */
     public static void write(DataView dataView, OutputStream outputStream, boolean compressed) throws IOException {
-        try (NbtDataContainerOutputStream output = new NbtDataContainerOutputStream(outputStream, compressed)) {
+        try (NbtDataContainerOutputStream output = new NbtDataContainerOutputStream(
+                compressed ? new GZIPOutputStream(outputStream) : outputStream)) {
             output.write(dataView);
             output.flush();
         }

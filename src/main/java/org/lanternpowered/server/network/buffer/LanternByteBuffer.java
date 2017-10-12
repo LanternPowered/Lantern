@@ -44,6 +44,7 @@ import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nullable;
 
@@ -670,7 +671,7 @@ public class LanternByteBuffer implements ByteBuffer {
         this.buf.readerIndex(index);
         try {
             try (NbtDataContainerInputStream input = new NbtDataContainerInputStream(
-                    new LimitInputStream(new ByteBufInputStream(this.buf), maxBytes), false, maximumDepth)) {
+                    new LimitInputStream(new ByteBufInputStream(this.buf), maxBytes), maximumDepth)) {
                 return input.read();
             }
         } catch (IOException e) {

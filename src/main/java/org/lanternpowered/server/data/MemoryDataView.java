@@ -40,6 +40,7 @@ import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.EqualsHelper;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -142,17 +143,19 @@ class MemoryDataView implements DataView {
         final ImmutableMap.Builder<DataQuery, Object> builder = ImmutableMap.builder();
         for (DataQuery query : getKeys(deep)) {
             final Object value = get(query).get();
+            /*
             if (value instanceof DataView) {
                 builder.put(query, ((DataView) value).getValues(deep));
             } else {
                 builder.put(query, get(query).get());
-            }
+            }*/
+            builder.put(query, value);
         }
         return builder.build();
     }
 
     @Override
-    public final boolean contains(DataQuery path) {
+    public boolean contains(DataQuery path) {
         checkNotNull(path, "path");
         final List<String> queryParts = path.getParts();
         final String key = queryParts.get(0);
@@ -215,6 +218,8 @@ class MemoryDataView implements DataView {
                         return Optional.of(ArrayUtils.clone((double[]) object));
                     } else if (object instanceof boolean[]) {
                         return Optional.of(ArrayUtils.clone((boolean[]) object));
+                    } else if (object instanceof char[]) {
+                        return Optional.of(ArrayUtils.clone((char[]) object));
                     } else {
                         return Optional.of(ArrayUtils.clone((Object[]) object));
                     }
@@ -238,6 +243,7 @@ class MemoryDataView implements DataView {
         checkNotNull(value, "value");
 
         final LanternDataManager manager = getDataManager();
+
         final List<String> parts = path.getParts();
         final String key = parts.get(0);
         if (parts.size() > 1) {
@@ -278,8 +284,8 @@ class MemoryDataView implements DataView {
                 value instanceof Boolean) {
             this.map.put(key, value);
             return this;
-        } else if (manager != null && (optDataTypeSerializer =
-                manager.getTypeSerializer(typeToken = TypeToken.of(value.getClass()))).isPresent()) {
+        } else if (manager != null && (optDataTypeSerializer = manager.getTypeSerializer(
+                typeToken = TypeToken.of(value.getClass()))).isPresent()) {
             final DataTypeSerializer serializer = optDataTypeSerializer.get();
             final Object serialized = serializer.serialize(typeToken, manager.getTypeSerializerContext(), value);
             if (serialized instanceof DataContainer) {
@@ -310,6 +316,8 @@ class MemoryDataView implements DataView {
                     this.map.put(key, ArrayUtils.clone((double[]) value));
                 } else if (value instanceof boolean[]) {
                     this.map.put(key, ArrayUtils.clone((boolean[]) value));
+                } else if (value instanceof char[]) {
+                    this.map.put(key, ArrayUtils.clone((char[]) value));
                 } else {
                     this.map.put(key, ArrayUtils.clone((Object[]) value));
                 }
@@ -817,8 +825,7 @@ class MemoryDataView implements DataView {
             return false;
         }
         final MemoryDataView other = (MemoryDataView) obj;
-
-        return Objects.equal(this.map.entrySet(), other.map.entrySet())
+        return EqualsHelper.equal(this.map, other.map)
                 && Objects.equal(this.path, other.path);
     }
 

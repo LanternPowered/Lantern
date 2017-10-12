@@ -43,6 +43,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> extends AbstractLanternPropertyStore<T>
         implements DirectionRelativePropertyStore<T> {
 
@@ -50,17 +51,17 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
 
     @Override
     public Optional<T> getFor(PropertyHolder propertyHolder) {
-        return this.getFor0(propertyHolder, null);
+        return getFor0(propertyHolder, null);
     }
 
     @Override
     public Optional<T> getFor(PropertyHolder propertyHolder, Direction direction) {
-        return this.getFor0(propertyHolder, checkNotNull(direction, "direction"));
+        return getFor0(propertyHolder, checkNotNull(direction, "direction"));
     }
 
     @Override
     public Optional<T> getFor(Location<World> location, Direction direction) {
-        return this.getFor0(location, checkNotNull(direction, "direction"));
+        return getFor0(location, checkNotNull(direction, "direction"));
     }
 
     private Optional<T> getFor0(PropertyHolder propertyHolder, @Nullable Direction direction) {
@@ -72,12 +73,12 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
         } else if (propertyHolder instanceof Location) {
             return getFor0((Location<World>) propertyHolder, direction);
         } else if (propertyHolder instanceof ItemType) {
-            Optional<BlockType> type = ((ItemType) propertyHolder).getBlock();
+            final Optional<BlockType> type = ((ItemType) propertyHolder).getBlock();
             if (type.isPresent()) {
                 return getFor(type.get().getDefaultState(), null, direction);
             }
         } else if (propertyHolder instanceof ItemStack) {
-            Optional<BlockType> type = ((ItemStack) propertyHolder).getType().getBlock();
+            final Optional<BlockType> type = ((ItemStack) propertyHolder).getType().getBlock();
             if (type.isPresent()) {
                 return getFor(((LanternBlockType) type.get()).getStateFromItemStack((ItemStack) propertyHolder), null, direction);
             }

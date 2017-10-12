@@ -38,7 +38,7 @@ public abstract class AbstractItemStackPropertyStore<T extends Property<?, ?>> e
     @Override
     public Optional<T> getFor(PropertyHolder propertyHolder) {
         if (propertyHolder instanceof ItemStack) {
-            return this.getFor((ItemStack) propertyHolder);
+            return getFor((ItemStack) propertyHolder);
         }
         return Optional.empty();
     }

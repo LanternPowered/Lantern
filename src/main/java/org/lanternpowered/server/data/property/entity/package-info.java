@@ -23,24 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.common;
-
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.PropertyHolder;
-import org.spongepowered.api.entity.Entity;
-
-import java.util.Optional;
-
-public abstract class AbstractEntityPropertyStore<T extends Property<?, ?>> extends AbstractLanternPropertyStore<T> {
-
-    protected abstract Optional<T> getFor(Entity entity);
-
-    @Override
-    public Optional<T> getFor(PropertyHolder propertyHolder) {
-        if (propertyHolder instanceof Entity) {
-            return getFor((Entity) propertyHolder);
-        }
-        return Optional.empty();
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.data.property.entity;

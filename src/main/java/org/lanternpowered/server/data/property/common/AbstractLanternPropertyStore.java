@@ -38,12 +38,12 @@ public abstract class AbstractLanternPropertyStore<T extends Property<?, ?>> imp
 
     @Override
     public Optional<T> getFor(Location<World> location) {
-        return this.getFor((PropertyHolder) location);
+        return getFor(location, Direction.NONE);
     }
 
     @Override
     public Optional<T> getFor(Location<World> location, Direction direction) {
-        return this.getFor(location);
+        return getFor((PropertyHolder) location);
     }
 
     @Override

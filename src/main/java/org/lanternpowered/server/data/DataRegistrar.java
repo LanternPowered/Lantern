@@ -35,6 +35,7 @@ import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
+import org.lanternpowered.server.data.property.entity.DominantHandPropertyStore;
 import org.lanternpowered.server.data.property.item.BurningFuelPropertyStore;
 import org.lanternpowered.server.data.property.item.SmeltablePropertyStore;
 import org.lanternpowered.server.data.value.LanternValueFactory;
@@ -49,6 +50,7 @@ import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
 import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
+import org.spongepowered.api.data.property.entity.DominantHandProperty;
 import org.spongepowered.api.data.property.item.BurningFuelProperty;
 import org.spongepowered.api.data.property.item.SmeltableProperty;
 import org.spongepowered.api.data.type.BodyPart;
@@ -86,6 +88,8 @@ public class DataRegistrar {
         // Block property stores
         propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
         propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
+        // Entity property stores
+        propertyRegistry.register(DominantHandProperty.class, new DominantHandPropertyStore());
         // Item property stores
         propertyRegistry.register(SmeltableProperty.class, new SmeltablePropertyStore());
         propertyRegistry.register(BurningFuelProperty.class, new BurningFuelPropertyStore());

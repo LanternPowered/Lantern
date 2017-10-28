@@ -30,12 +30,12 @@ import org.spongepowered.api.effect.sound.SoundCategory;
 
 import javax.annotation.Nullable;
 
-public final class MessagePlayOutStopSound implements Message {
+public final class MessagePlayOutStopSounds implements Message {
 
     @Nullable private final String sound;
     @Nullable private final SoundCategory soundCategory;
 
-    public MessagePlayOutStopSound(@Nullable String sound, @Nullable SoundCategory category) {
+    public MessagePlayOutStopSounds(@Nullable String sound, @Nullable SoundCategory category) {
         this.soundCategory = category;
         this.sound = sound;
     }

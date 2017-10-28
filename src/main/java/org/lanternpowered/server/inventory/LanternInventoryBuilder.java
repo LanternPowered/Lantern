@@ -33,6 +33,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
@@ -75,11 +76,15 @@ public class LanternInventoryBuilder implements Inventory.Builder {
     }
 
     @Override
+    public Inventory.Builder property(InventoryProperty<?, ?> property) {
+        return property((String) AbstractInventoryProperty.getDefaultKey(property.getClass()), property);
+    }
+
+    @Override
     public LanternInventoryBuilder property(@Nullable String name, InventoryProperty property) {
         checkNotNull(property, "property");
         //noinspection ConstantConditions
         if (name != null) {
-            //noinspection unchecked
             this.inventoryPropertiesByName.put(name, property);
         }
         //noinspection unchecked

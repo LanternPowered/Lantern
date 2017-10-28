@@ -75,6 +75,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
@@ -767,6 +768,30 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         checkNotNull(category, "category");
         this.session.send(((LanternSoundType) sound).createMessage(position,
                 category, (float) Math.max(minVolume, volume), (float) pitch));
+    }
+
+    @Override
+    public void stopSounds() {
+        stopSounds0(null, null);
+    }
+
+    @Override
+    public void stopSounds(SoundType sound) {
+        stopSounds0(checkNotNull(sound, "sound"), null);
+    }
+
+    @Override
+    public void stopSounds(SoundCategory category) {
+        stopSounds0(null, checkNotNull(category, "category"));
+    }
+
+    @Override
+    public void stopSounds(SoundType sound, SoundCategory category) {
+        stopSounds0(checkNotNull(sound, "sound"), checkNotNull(category, "category"));
+    }
+
+    private void stopSounds0(@Nullable SoundType sound, @Nullable SoundCategory category) {
+        this.session.send(new MessagePlayOutStopSounds(sound == null ? null : sound.getName(), category));
     }
 
     @Override

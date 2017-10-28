@@ -66,6 +66,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
@@ -1005,6 +1006,30 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         checkNotNull(category, "category");
         this.broadcast(() -> ((LanternSoundType) sound).createMessage(position,
                 category, (float) Math.max(minVolume, volume), (float) pitch));
+    }
+
+    @Override
+    public void stopSounds() {
+        stopSounds0(null, null);
+    }
+
+    @Override
+    public void stopSounds(SoundType sound) {
+        stopSounds0(checkNotNull(sound, "sound"), null);
+    }
+
+    @Override
+    public void stopSounds(SoundCategory category) {
+        stopSounds0(null, checkNotNull(category, "category"));
+    }
+
+    @Override
+    public void stopSounds(SoundType sound, SoundCategory category) {
+        stopSounds0(checkNotNull(sound, "sound"), checkNotNull(category, "category"));
+    }
+
+    private void stopSounds0(@Nullable SoundType sound, @Nullable SoundCategory category) {
+        broadcast(() -> new MessagePlayOutStopSounds(sound == null ? null : sound.getName(), category));
     }
 
     @Override

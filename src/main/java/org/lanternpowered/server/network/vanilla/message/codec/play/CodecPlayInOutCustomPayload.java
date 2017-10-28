@@ -69,7 +69,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
         } else if (message instanceof MessagePlayOutStopSounds) {
             final MessagePlayOutStopSounds message0 = (MessagePlayOutStopSounds) message;
             final ByteBuffer buf = context.byteBufAlloc().buffer();
-            buf.writeString(message0.getCategory() == null ? "" : message0.getCategory().getId());
+            buf.writeString(message0.getCategory() == null ? "" : message0.getCategory().getName());
             buf.writeString(message0.getSound() == null ? "" : message0.getSound());
             return new MessageResult("MC|StopSound", buf);
         }

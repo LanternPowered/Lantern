@@ -68,11 +68,14 @@ final class FlatGeneratorSettingsParser {
             final BlockState block = layer.getBlockState();
             // Append the block id
             builder.append(block.getType().getKey());
+            /*
             final int data = BlockRegistryModule.get().getStateData(block);
             // Only append the data if needed
             if (data > 0) {
                 builder.append(':').append(data);
             }
+            */
+            // TODO: Add properties
             layers.add(builder.toString());
         });
 
@@ -183,7 +186,8 @@ final class FlatGeneratorSettingsParser {
                     blockType = BlockRegistryModule.get().get(CatalogKey.resolve(blockStatePart)).orElse(BlockTypes.STONE);
                 }
 
-                layers.add(new FlatLayer(BlockRegistryModule.get().getStateByTypeAndData(blockType, (byte) blockData).get(), depth));
+                // TODO: Convert block data value/id...
+                layers.add(new FlatLayer(blockType.getDefaultState(), depth));
             });
         }
 

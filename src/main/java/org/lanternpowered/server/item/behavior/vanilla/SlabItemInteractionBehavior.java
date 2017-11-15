@@ -33,35 +33,67 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.EnumTrait;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
-import org.spongepowered.api.data.type.PortionType;
-import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
-import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractWithItemBehavior {
+public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
 
-    private final Supplier<BlockType> halfSlabType;
-    private final Supplier<BlockType> doubleSlabType;
-    private final EnumTrait<E> variantTrait;
-
-    public SlabItemInteractionBehavior(EnumTrait<E> variantTrait,
-            Supplier<BlockType> halfSlabType, Supplier<BlockType> doubleSlabType) {
-        this.halfSlabType = halfSlabType;
-        this.doubleSlabType = doubleSlabType;
-        this.variantTrait = variantTrait;
+    @Nullable
+    private BlockSnapshotBuilder tryPlaceSlabAt(Location<World> location, Direction blockFace,
+            LanternBlockType blockType) {
+        BlockState state = location.getBlock();
+        // There is already a half/double slab placed
+        if (state.getType() == blockType) {
+            final LanternSlabPortion type = state.getTraitValue(LanternEnumTraits.SLAB_PORTION).get();
+            // Already a full block
+            if (type == LanternSlabPortion.DOUBLE) {
+                return null;
+            }
+            final double y = location.getY() - location.getBlockY();
+            boolean success = false;
+            if (blockFace == Direction.UP) {
+                success = type == LanternSlabPortion.TOP || y >= 0.5;
+            } else if (blockFace == Direction.DOWN) {
+                success = type == LanternSlabPortion.BOTTOM || y < 0.5;
+            } else if ((y < 0.5 && type == LanternSlabPortion.TOP) ||
+                    (y >= 0.5 && type == LanternSlabPortion.BOTTOM)) {
+                success = true;
+            }
+            if (!success) {
+                return null;
+            }
+            return BlockSnapshotBuilder.create().blockState(state
+                    .withTrait(LanternEnumTraits.SLAB_PORTION, LanternSlabPortion.DOUBLE).get());
+        } else if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
+            return null;
+        } else {
+            // We can replace the block
+            final double y = location.getY() - location.getBlockY();
+            final LanternSlabPortion type;
+            if (blockFace == Direction.UP) {
+                type = LanternSlabPortion.BOTTOM;
+            } else if (blockFace == Direction.DOWN) {
+                type = LanternSlabPortion.TOP;
+            } else if (y >= 0.5) {
+                type = LanternSlabPortion.TOP;
+            } else {
+                type = LanternSlabPortion.BOTTOM;
+            }
+            return BlockSnapshotBuilder.create().blockState(blockType.getDefaultState()
+                    .withTrait(LanternEnumTraits.SLAB_PORTION, type).get());
+        }
     }
 
     @Override
@@ -71,85 +103,26 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
             return BehaviorResult.CONTINUE;
         }
 
-        final BlockType halfSlabType = this.halfSlabType.get();
-        final BlockType doubleSlabType = this.doubleSlabType.get();
-
         Location<World> location = optLocation.get();
-        final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get().getOpposite();
 
+        final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get();
         final LanternBlockType blockType = (LanternBlockType) context.getContext(ContextKeys.ITEM_TYPE).get().getBlock().get();
-        if (blockType != halfSlabType) {
-            return BehaviorResult.PASS;
-        }
 
-        BlockState state = location.getBlock();
-        final BlockState.Builder stateBuilder = BlockState.builder();
-        stateBuilder.blockType(blockType);
-        context.getContext(ContextKeys.USED_ITEM_STACK).ifPresent(
-                itemStack -> itemStack.getValues().forEach(value -> stateBuilder.add((Key) value.getKey(), value.get())));
-        BlockState blockState = stateBuilder.build();
-        BlockSnapshotBuilder snapshotBuilder = null;
-
-        boolean success = false;
-        if (state.getType() == blockType) {
-            if (state.getTraitValue(this.variantTrait).get().equals(blockState.getTraitValue(this.variantTrait).get())) {
-                final PortionType portionType = state.getTraitValue(LanternEnumTraits.PORTION_TYPE).get();
-                if ((blockFace == Direction.DOWN && portionType == PortionTypes.BOTTOM) ||
-                        (blockFace == Direction.UP && portionType == PortionTypes.TOP)) {
-                    snapshotBuilder = BlockSnapshotBuilder.create().blockState(doubleSlabType.getDefaultState());
-                    success = true;
-                }
-            }
-        } else if (location.getProperty(ReplaceableProperty.class).get().getValue()) {
-            success = true;
-        }
-        if (!success) {
-            location = location.add(blockFace.getOpposite().asBlockOffset());
-            state = location.getBlock();
-            if (state.getType() == blockType) {
-                if (state.getTraitValue(this.variantTrait).get().equals(blockState.getTraitValue(this.variantTrait).get())) {
-                    final PortionType portionType = state.getTraitValue(LanternEnumTraits.PORTION_TYPE).get();
-                    if ((blockFace == Direction.DOWN && portionType == PortionTypes.TOP) ||
-                            (blockFace == Direction.UP && portionType == PortionTypes.BOTTOM)) {
-                        snapshotBuilder = BlockSnapshotBuilder.create().blockState(doubleSlabType.getDefaultState());
-                        success = true;
-                    }
-                }
-            } else if (location.getProperty(ReplaceableProperty.class).get().getValue()) {
-                success = true;
+        BlockSnapshotBuilder builder = tryPlaceSlabAt(location, blockFace, blockType);
+        if (builder == null) {
+            location = location.add(blockFace.asOffset());
+            builder = tryPlaceSlabAt(location, blockFace, blockType);
+            if (builder == null) {
+                return BehaviorResult.FAIL;
             }
         }
-        if (success) {
-            if (snapshotBuilder == null) {
-                PortionType portionType;
-                if (blockFace == Direction.UP) {
-                    portionType = PortionTypes.TOP;
-                } else if (blockFace == Direction.DOWN) {
-                    portionType = PortionTypes.BOTTOM;
-                } else {
-                    final double y = location.getY() - location.getBlockY();
-                    if (y >= 0.5) {
-                        portionType = PortionTypes.TOP;
-                    } else {
-                        portionType = PortionTypes.BOTTOM;
-                    }
-                }
-                snapshotBuilder = BlockSnapshotBuilder.create().blockState(halfSlabType.getDefaultState()).add(Keys.PORTION_TYPE, portionType);
+
+        context.addBlockChange(builder.location(location).build());
+        context.getContext(ContextKeys.PLAYER).ifPresent(player -> {
+            if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
+                context.requireContext(ContextKeys.USED_SLOT).poll(1);
             }
-            final BlockSnapshotBuilder snapshotBuilder1 = snapshotBuilder;
-            snapshotBuilder1.location(location);
-            context.getContext(ContextKeys.USED_ITEM_STACK).ifPresent(
-                    itemStack -> itemStack.getValues().forEach(value -> snapshotBuilder1.add((Key) value.getKey(), value.get())));
-            context.addBlockChange(snapshotBuilder1.build());
-
-            context.getContext(ContextKeys.PLAYER).ifPresent(player -> {
-                if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                    context.requireContext(ContextKeys.USED_SLOT).poll(1);
-                }
-            });
-            return BehaviorResult.CONTINUE;
-        }
-
-        return BehaviorResult.FAIL;
+        });
+        return BehaviorResult.SUCCESS;
     }
 }

@@ -34,7 +34,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.CoalType;
 import org.spongepowered.api.data.type.TreeTypes;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
@@ -79,13 +78,12 @@ public class TestInventoryPlugin {
                             .withCarrier((Carrier) src)
                             .build(this);
                     System.out.println(inventory.getClass().getName());
-                    final ItemStack itemStack = ItemStack.of(ItemTypes.LOG, 64);
-                    itemStack.offer(Keys.TREE_TYPE, TreeTypes.JUNGLE);
-                    inventory.offer(itemStack);
+                    inventory.offer(ItemStack.of(ItemTypes.JUNGLE_LOG, 64));
                     ((Player) src).openInventory(inventory);
                     return CommandResult.success();
                 })
                 .build(), "test-a-inv");
+        /*
         Keys.COAL_TYPE.registerEvent(ItemStack.class, event1 -> {
             final DataTransactionResult result = event1.getEndResult();
             final List<ImmutableValue<?>> newSuccessfulData = new ArrayList<>(result.getSuccessfulData());
@@ -114,5 +112,6 @@ public class TestInventoryPlugin {
                     .success(newSuccessfulData)
                     .build());
         });
+        */
     }
 }

@@ -53,9 +53,9 @@ public class LanternTeam implements Team {
     @Nullable private LanternScoreboard scoreboard;
     private TextColor color;
     final Set<Text> members = new HashSet<>();
+    private Text displayName;
     private Text prefix;
     private Text suffix;
-    private Text displayName;
     private boolean allowFriendlyFire;
     private boolean canSeeFriendlyInvisibles;
     private Visibility nameTagVisibility;
@@ -70,6 +70,8 @@ public class LanternTeam implements Team {
         this.suffix = suffix;
         this.name = name;
         this.color = color;
+        this.prefix = prefix;
+        this.suffix = suffix;
         this.allowFriendlyFire = allowFriendlyFire;
         this.canSeeFriendlyInvisibles = canSeeFriendlyInvisibles;
         this.nameTagVisibility = nameTagVisibility;
@@ -156,8 +158,7 @@ public class LanternTeam implements Team {
 
     @Override
     public void setPrefix(Text prefix) throws IllegalArgumentException {
-        final int length = prefix.toPlain().length();
-        checkArgument(length <= 16, "Prefix is %s characters long! It must be at most 16.", length);
+        checkNotNull(prefix, "prefix");
         final boolean update = !this.prefix.equals(prefix);
         this.prefix = prefix;
         if (update) {
@@ -172,10 +173,9 @@ public class LanternTeam implements Team {
 
     @Override
     public void setSuffix(Text suffix) throws IllegalArgumentException {
-        final int length = suffix.toPlain().length();
-        checkArgument(length <= 16, "Suffix is %s characters long! It must be at most 16.", length);
+        checkNotNull(suffix, "suffix");
         final boolean update = !this.suffix.equals(suffix);
-        this.suffix = prefix;
+        this.suffix = suffix;
         if (update) {
             sendUpdate();
         }

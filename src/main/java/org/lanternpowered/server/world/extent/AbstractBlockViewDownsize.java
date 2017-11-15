@@ -27,9 +27,9 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.VecHelper;
-import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
-import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
-import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.AtomicIntArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.IntArrayImmutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.IntArrayMutableBlockBuffer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
@@ -97,10 +97,10 @@ public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implement
     public MutableBlockVolume getBlockCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
+                return new IntArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                         this, this.min, this.max, this.size), this.min, this.size);
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
+                return new AtomicIntArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                         this, this.min, this.max, this.size), this.min, this.size);
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -109,7 +109,7 @@ public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implement
 
     @Override
     public ImmutableBlockVolume getImmutableBlockCopy() {
-        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(
+        return IntArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(
                 this, this.min, this.max, this.size), this.min, this.size);
     }
 }

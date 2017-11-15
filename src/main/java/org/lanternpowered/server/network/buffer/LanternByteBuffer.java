@@ -39,7 +39,8 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.item.NetworkItemHelper;
+import org.lanternpowered.server.network.item.RawItemStack;
 import org.spongepowered.api.data.DataView;
 
 import java.io.IOException;
@@ -872,26 +873,12 @@ public final class LanternByteBuffer implements ByteBuffer {
     @Nullable
     @Override
     public RawItemStack readRawItemStack() {
-        final short id = this.buf.readShort();
-        if (id == -1) {
-            return null;
-        }
-        final int amount = this.buf.readByte();
-        final int data = this.buf.readShort();
-        final DataView dataView = readDataView();
-        return new RawItemStack(id, data, amount, dataView);
+        return NetworkItemHelper.readRawFrom(this);
     }
 
     @Override
     public LanternByteBuffer writeRawItemStack(@Nullable RawItemStack rawItemStack) {
-        if (rawItemStack == null) {
-            this.buf.writeShort((short) -1);
-        } else {
-            this.buf.writeShort((short) rawItemStack.getItemType());
-            this.buf.writeByte((byte) rawItemStack.getAmount());
-            this.buf.writeShort((short) rawItemStack.getData());
-            writeDataView(rawItemStack.getDataView());
-        }
+        NetworkItemHelper.writeRawTo(this, rawItemStack);
         return this;
     }
 
@@ -914,6 +901,11 @@ public final class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer copy() {
         return new LanternByteBuffer(this.buf.copy());
+    }
+
+    @Override
+    public int readableBytes() {
+        return this.buf.readableBytes();
     }
 
     private <T> T getAt(int index, Supplier<T> supplier) {

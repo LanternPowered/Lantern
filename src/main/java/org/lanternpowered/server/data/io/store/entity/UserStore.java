@@ -44,6 +44,7 @@ import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerArmorInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPrimaryPlayerInventory;
+import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.CatalogKey;
@@ -104,8 +105,10 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
     private static final DataQuery ENDER_CHEST_INVENTORY = DataQuery.of("EnderItems");
 
     private static final DataQuery RECIPE_BOOK = DataQuery.of("recipeBook");
-    private static final DataQuery RECIPE_BOOK_GUI_OPEN = DataQuery.of("isGuiOpen");
-    private static final DataQuery RECIPE_BOOK_FILTER_ACTIVE = DataQuery.of("isFilteringCraftable");
+    private static final DataQuery CRAFTING_RECIPE_BOOK_GUI_OPEN = DataQuery.of("isGuiOpen");
+    private static final DataQuery CRAFTING_RECIPE_BOOK_FILTER_ACTIVE = DataQuery.of("isFilteringCraftable");
+    private static final DataQuery SMELTING_RECIPE_BOOK_GUI_OPEN = DataQuery.of("isFurnaceGuiOpen");
+    private static final DataQuery SMELTING_RECIPE_BOOK_FILTER_ACTIVE = DataQuery.of("isFurnaceFilteringCraftable");
 
     private static final DataQuery OPEN_ADVANCEMENT_TREE = DataQuery.of("openAdvancementTree"); // Lantern
 
@@ -172,8 +175,20 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         dataView.set(ENDER_CHEST_INVENTORY, serializeEnderChest(player.getEnderChestInventory()));
 
         final DataView recipeBook = dataView.createView(RECIPE_BOOK);
-        recipeBook.set(RECIPE_BOOK_FILTER_ACTIVE, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).orElse(false) ? 1 : 0));
-        recipeBook.set(RECIPE_BOOK_GUI_OPEN, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_GUI_OPEN).orElse(false) ? 1 : 0));
+        RecipeBookState recipeBookState = valueContainer.remove(LanternKeys.CRAFTING_RECIPE_BOOK_STATE).orElse(null);
+        if (recipeBookState != null) {
+            recipeBook.set(CRAFTING_RECIPE_BOOK_FILTER_ACTIVE,
+                    (byte) (recipeBookState.isFilterActive() ? 1 : 0));
+            recipeBook.set(CRAFTING_RECIPE_BOOK_GUI_OPEN,
+                    (byte) (recipeBookState.isCurrentlyOpen() ? 1 : 0));
+        }
+        recipeBookState = valueContainer.remove(LanternKeys.SMELTING_RECIPE_BOOK_STATE).orElse(null);
+        if (recipeBookState != null) {
+            recipeBook.set(SMELTING_RECIPE_BOOK_FILTER_ACTIVE,
+                    (byte) (recipeBookState.isFilterActive() ? 1 : 0));
+            recipeBook.set(SMELTING_RECIPE_BOOK_GUI_OPEN,
+                    (byte) (recipeBookState.isCurrentlyOpen() ? 1 : 0));
+        }
 
         valueContainer.remove(LanternKeys.OPEN_ADVANCEMENT_TREE).ifPresent(o ->
                 o.ifPresent(advancementTree -> dataView.set(OPEN_ADVANCEMENT_TREE, advancementTree.getKey())));
@@ -238,8 +253,12 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         dataView.getViewList(ENDER_CHEST_INVENTORY).ifPresent(views -> deserializeEnderChest(player.getEnderChestInventory(), views));
 
         dataView.getView(RECIPE_BOOK).ifPresent(view -> {
-            view.getInt(RECIPE_BOOK_FILTER_ACTIVE).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, v > 0));
-            view.getInt(RECIPE_BOOK_GUI_OPEN).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_GUI_OPEN, v > 0));
+            boolean filterActive = view.getInt(CRAFTING_RECIPE_BOOK_FILTER_ACTIVE).orElse(0) > 0;
+            boolean currentlyOpen = view.getInt(CRAFTING_RECIPE_BOOK_GUI_OPEN).orElse(0) > 0;
+            valueContainer.set(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, new RecipeBookState(currentlyOpen, filterActive));
+            filterActive = view.getInt(SMELTING_RECIPE_BOOK_FILTER_ACTIVE).orElse(0) > 0;
+            currentlyOpen = view.getInt(SMELTING_RECIPE_BOOK_GUI_OPEN).orElse(0) > 0;
+            valueContainer.set(LanternKeys.SMELTING_RECIPE_BOOK_STATE, new RecipeBookState(currentlyOpen, filterActive));
         });
         dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> valueContainer
                 .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTreeRegistryModule.get().get(CatalogKey.resolve(id))));

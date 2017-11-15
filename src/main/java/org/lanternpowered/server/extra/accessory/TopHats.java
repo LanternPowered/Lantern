@@ -64,7 +64,7 @@ public final class TopHats {
 
     public static final TopHat RED = DummyObjectProvider.createFor(TopHat.class, "RED");
 
-    public static final TopHat SILVER = DummyObjectProvider.createFor(TopHat.class, "SILVER");
+    public static final TopHat LIGHT_GRAY = DummyObjectProvider.createFor(TopHat.class, "LIGHT_GRAY");
 
     public static final TopHat SNOW = DummyObjectProvider.createFor(TopHat.class, "SNOW");
 

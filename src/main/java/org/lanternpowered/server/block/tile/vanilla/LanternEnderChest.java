@@ -50,13 +50,13 @@ public class LanternEnderChest extends LanternContainerTileBase implements Ender
 
     @Override
     protected void playOpenSound(Location<World> location) {
-        location.getExtent().playSound(SoundTypes.BLOCK_ENDERCHEST_OPEN, SoundCategories.BLOCK,
+        location.getExtent().playSound(SoundTypes.BLOCK_ENDER_CHEST_OPEN, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 
     @Override
     protected void playCloseSound(Location<World> location) {
-        location.getExtent().playSound(SoundTypes.BLOCK_ENDERCHEST_CLOSE, SoundCategories.BLOCK,
+        location.getExtent().playSound(SoundTypes.BLOCK_ENDER_CHEST_CLOSE, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 }

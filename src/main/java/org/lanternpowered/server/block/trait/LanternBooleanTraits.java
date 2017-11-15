@@ -33,15 +33,11 @@ public final class LanternBooleanTraits {
 
     public static final BooleanTrait SNOWY = LanternBooleanTrait.minecraft("snowy", Keys.SNOWED);
 
-    public static final BooleanTrait DECAYABLE = LanternBooleanTrait.minecraft("decayable", Keys.DECAYABLE);
-
-    public static final BooleanTrait CHECK_DECAY = LanternBooleanTrait.minecraft("check_decay", LanternKeys.CHECK_DECAY);
+    public static final BooleanTrait PERSISTENT = LanternBooleanTrait.minecraft("persistent", Keys.PERSISTENT);
 
     public static final BooleanTrait IS_WET = LanternBooleanTrait.minecraft("wet", Keys.IS_WET);
 
     public static final BooleanTrait OCCUPIED = LanternBooleanTrait.minecraft("occupied", Keys.OCCUPIED);
-
-    public static final BooleanTrait SEAMLESS = LanternBooleanTrait.minecraft("seamless", Keys.SEAMLESS);
 
     public static final BooleanTrait ENABLED = LanternBooleanTrait.minecraft("enabled", LanternKeys.ENABLED);
 
@@ -51,5 +47,18 @@ public final class LanternBooleanTraits {
 
     public static final BooleanTrait EXPLODE = LanternBooleanTrait.minecraft("explode", LanternKeys.EXPLODE);
 
-    public static final BooleanTrait HAS_RECORD = LanternBooleanTrait.minecraft("has_record", LanternKeys.HAS_RECORD);
+    public static final BooleanTrait HAS_MUSIC_DISC = LanternBooleanTrait.minecraft("has_record", LanternKeys.HAS_MUSIC_DISC);
+
+    public static final BooleanTrait LIT = LanternBooleanTrait.minecraft("lit", Keys.LIT);
+
+    public static final BooleanTrait WATERLOGGED = LanternBooleanTrait.minecraft("waterlogged", LanternKeys.WATERLOGGED);
+
+    public static final BooleanTrait CONNECTED_NORTH = LanternBooleanTrait.minecraft("north", LanternKeys.CONNECTED_NORTH);
+
+    public static final BooleanTrait CONNECTED_SOUTH = LanternBooleanTrait.minecraft("south", LanternKeys.CONNECTED_SOUTH);
+
+    public static final BooleanTrait CONNECTED_EAST = LanternBooleanTrait.minecraft("east", LanternKeys.CONNECTED_EAST);
+
+    public static final BooleanTrait CONNECTED_WEST = LanternBooleanTrait.minecraft("west", LanternKeys.CONNECTED_WEST);
+
 }

@@ -160,12 +160,12 @@ class LanternCauseStack : CauseStack {
                 // if we're not debugging the cause frames then throw an error
                 // immediately otherwise let the pretty printer output the frame
                 // that was erroneously popped.
-                throw IllegalStateException("Cause Stack Frame Corruption on the Thread \"" + name +
-                        "\"! Attempted to pop a frame that was not on the stack.")
+                throw IllegalStateException("Cause Stack Frame Corruption on the Thread \"$name\"! " +
+                        "Attempted to pop a frame that was not on the stack.")
             }
             val printer = PrettyPrinter(100)
-                    .add("Cause Stack Frame Corruption on the Thread \"%s\"!", name).centre().hr()
-                    .add("Found %d frames left on the stack. Clearing them all.", arrayOf(offset + 1))
+                    .add("Cause Stack Frame Corruption on the Thread \"$name\"!").centre().hr()
+                    .add("Found ${offset + 1} frames left on the stack. Clearing them all.")
             if (!DEBUG_CAUSE_FRAMES) {
                 printer.add().add("Please add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.")
                 Lantern.getLogger().warn("  Add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.")

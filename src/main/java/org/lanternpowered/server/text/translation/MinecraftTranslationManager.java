@@ -28,14 +28,15 @@ package org.lanternpowered.server.text.translation;
 import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.asset.ReloadListener;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.JsonResourceBundle;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -68,10 +69,10 @@ public final class MinecraftTranslationManager implements TranslationManager, Re
 
     @Override
     public void onReload() {
-        final Asset asset = Lantern.getAssetRepository().get("minecraft", "lang/en_us.properties").orElseThrow(
+        final Asset asset = Lantern.getAssetRepository().get("minecraft", "lang/en_us.json").orElseThrow(
                 () -> new IllegalStateException("The minecraft language file is missing!"));
-        try {
-            this.resourceBundle = new PropertyResourceBundle(asset.getUrl().openStream());
+        try (InputStream is = asset.getUrl().openStream()) {
+            this.resourceBundle = JsonResourceBundle.loadFrom(is);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to create the minecraft language resource bundle!", e);
         }

@@ -26,16 +26,13 @@
 package org.lanternpowered.server.block.aabb;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.type.LanternPortionType;
+import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.data.type.LanternRailDirection;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-import javax.annotation.Nullable;
 
 public class BoundingBoxes {
 
@@ -91,11 +88,14 @@ public class BoundingBoxes {
         private static final AABB WEST = new AABB(0.7, 0.2, 0.35, 1.0, 0.8, 0.65);
     }
 
-    public static AABB torch(BlockState blockState) {
+    public static AABB torch() {
+        return Torch.UP;
+    }
+
+
+    public static AABB wallTorch(BlockState blockState) {
         final Direction direction = blockState.get(Keys.DIRECTION).get();
         switch (direction) {
-            case UP:
-                return Torch.UP;
             case NORTH:
                 return Torch.NORTH;
             case EAST:
@@ -134,8 +134,15 @@ public class BoundingBoxes {
     }
 
     public static AABB slab(BlockState blockState) {
-        final LanternPortionType portionType = (LanternPortionType) blockState.get(Keys.PORTION_TYPE).get();
-        return portionType == LanternPortionType.TOP ? Slab.TOP : Slab.BOTTOM;
+        final LanternSlabPortion portionType = (LanternSlabPortion) blockState.get(Keys.SLAB_PORTION).get();
+        switch (portionType) {
+            case BOTTOM:
+                return Slab.BOTTOM;
+            case TOP:
+                return Slab.TOP;
+            default:
+                return DEFAULT;
+        }
     }
 
     private final static class Bush {
@@ -155,34 +162,27 @@ public class BoundingBoxes {
         private static final AABB CONNECTED_EAST = new AABB(0.0625, 0.0, 0.0625, 1.0, 0.875, 0.9375);
         private static final AABB CONNECTED_SOUTH = new AABB(0.0625, 0.0D, 0.0625, 0.9375, 0.875, 1.0);
         private static final AABB CONNECTED_WEST = new AABB(0.0, 0.0, 0.0625, 0.9375, 0.875, 0.9375);
-
-        private static final Direction[] DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
     }
 
     public static AABB chest() {
         return Chest.DEFAULT;
     }
 
-    public static AABB doubleChest(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
-        if (location != null) {
-            for (Direction direction : Chest.DIRECTIONS) {
-                if (blockState.getType() == location.getBlockRelative(direction).getBlock().getType()) {
-                    switch (direction) {
-                        case NORTH:
-                            return Chest.CONNECTED_NORTH;
-                        case EAST:
-                            return Chest.CONNECTED_EAST;
-                        case SOUTH:
-                            return Chest.CONNECTED_SOUTH;
-                        case WEST:
-                            return Chest.CONNECTED_WEST;
-                        default:
-                            throw new IllegalStateException();
-                    }
-                }
-            }
+    public static AABB doubleChest(BlockState blockState) {
+        switch (LanternChest.getConnectedDirection(blockState)) {
+            case SOUTH:
+                return Chest.CONNECTED_SOUTH;
+            case NORTH:
+                return Chest.CONNECTED_NORTH;
+            case WEST:
+                return Chest.CONNECTED_WEST;
+            case EAST:
+                return Chest.CONNECTED_EAST;
+            case NONE:
+                return Chest.DEFAULT;
+            default:
+                throw new IllegalStateException();
         }
-        return Chest.DEFAULT;
     }
 
     private BoundingBoxes() {

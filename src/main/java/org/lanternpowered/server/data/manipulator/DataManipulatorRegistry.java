@@ -33,6 +33,7 @@ import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.manipulator.gen.DataManipulatorGenerator;
+import org.lanternpowered.server.data.manipulator.immutable.block.LanternImmutableBigMushroomPoresData;
 import org.lanternpowered.server.data.manipulator.immutable.block.LanternImmutableConnectedDirectionData;
 import org.lanternpowered.server.data.manipulator.immutable.block.LanternImmutableWireAttachmentData;
 import org.lanternpowered.server.data.manipulator.immutable.entity.LanternImmutableBodyPartRotationalData;
@@ -41,6 +42,7 @@ import org.lanternpowered.server.data.manipulator.immutable.entity.LanternImmuta
 import org.lanternpowered.server.data.manipulator.immutable.fluid.LanternImmutableFluidTankData;
 import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableInventoryItemData;
 import org.lanternpowered.server.data.manipulator.immutable.tileentity.LanternImmutableBeaconData;
+import org.lanternpowered.server.data.manipulator.mutable.block.LanternBigMushroomPoresData;
 import org.lanternpowered.server.data.manipulator.mutable.block.LanternConnectedDirectionData;
 import org.lanternpowered.server.data.manipulator.mutable.block.LanternWireAttachmentData;
 import org.lanternpowered.server.data.manipulator.mutable.entity.LanternBodyPartRotationalData;
@@ -71,52 +73,40 @@ import org.spongepowered.api.data.manipulator.immutable.ImmutablePotionEffectDat
 import org.spongepowered.api.data.manipulator.immutable.ImmutableRepresentedItemData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableRepresentedPlayerData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableRotationalData;
-import org.spongepowered.api.data.manipulator.immutable.ImmutableSkullData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableTargetedLocationData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableWetData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableAttachedData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableAxisData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableBigMushroomData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableBrickData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableBigMushroomPoresData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableChestAttachmentData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableComparatorData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableConnectedDirectionData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDecayableData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDelayableData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDirectionalData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDirtData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDisarmedData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDisguisedBlockData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDoublePlantData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDropData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableExtendedData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableFilledData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableGrowthData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableHingeData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableInWallData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableInstrumentData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableLayeredData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableLogAxisData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableLitData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableMoistureData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableNoteData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableOccupiedData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableOpenData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutablePistonData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutablePlantData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutablePortionData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutablePoweredData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutablePrismarineData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableQuartzData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableRailDirectionData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableRedstonePoweredData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSandData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSandstoneData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSeamlessData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableShrubData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSlabData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSlabPortionData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSnowedData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableStairShapeData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableStoneData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableTreeData;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableWallData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSurfaceAttachmentData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableWireAttachmentData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableAbsorptionData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableActiveItemData;
@@ -197,13 +187,9 @@ import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableVelocity
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableAuthorData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableBlockItemData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableBreakableData;
-import org.spongepowered.api.data.manipulator.immutable.item.ImmutableCoalData;
-import org.spongepowered.api.data.manipulator.immutable.item.ImmutableCookedFishData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableDurabilityData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableEnchantmentData;
-import org.spongepowered.api.data.manipulator.immutable.item.ImmutableFishData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableGenerationData;
-import org.spongepowered.api.data.manipulator.immutable.item.ImmutableGoldenAppleData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableHideData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableInventoryItemData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableLoreData;
@@ -220,7 +206,6 @@ import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableCool
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableEndGatewayData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableFurnaceData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableLockableData;
-import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableNoteData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableSignData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableStructureData;
 import org.spongepowered.api.data.manipulator.mutable.ColoredData;
@@ -234,52 +219,40 @@ import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.data.manipulator.mutable.RepresentedItemData;
 import org.spongepowered.api.data.manipulator.mutable.RepresentedPlayerData;
 import org.spongepowered.api.data.manipulator.mutable.RotationalData;
-import org.spongepowered.api.data.manipulator.mutable.SkullData;
 import org.spongepowered.api.data.manipulator.mutable.TargetedLocationData;
 import org.spongepowered.api.data.manipulator.mutable.VariantData;
 import org.spongepowered.api.data.manipulator.mutable.WetData;
 import org.spongepowered.api.data.manipulator.mutable.block.AttachedData;
 import org.spongepowered.api.data.manipulator.mutable.block.AxisData;
-import org.spongepowered.api.data.manipulator.mutable.block.BigMushroomData;
-import org.spongepowered.api.data.manipulator.mutable.block.BrickData;
+import org.spongepowered.api.data.manipulator.mutable.block.BigMushroomPoresData;
+import org.spongepowered.api.data.manipulator.mutable.block.ChestAttachmentData;
 import org.spongepowered.api.data.manipulator.mutable.block.ComparatorData;
 import org.spongepowered.api.data.manipulator.mutable.block.ConnectedDirectionData;
 import org.spongepowered.api.data.manipulator.mutable.block.DecayableData;
 import org.spongepowered.api.data.manipulator.mutable.block.DelayableData;
 import org.spongepowered.api.data.manipulator.mutable.block.DirectionalData;
-import org.spongepowered.api.data.manipulator.mutable.block.DirtData;
 import org.spongepowered.api.data.manipulator.mutable.block.DisarmedData;
-import org.spongepowered.api.data.manipulator.mutable.block.DisguisedBlockData;
-import org.spongepowered.api.data.manipulator.mutable.block.DoublePlantData;
 import org.spongepowered.api.data.manipulator.mutable.block.DropData;
 import org.spongepowered.api.data.manipulator.mutable.block.ExtendedData;
 import org.spongepowered.api.data.manipulator.mutable.block.FilledData;
 import org.spongepowered.api.data.manipulator.mutable.block.GrowthData;
 import org.spongepowered.api.data.manipulator.mutable.block.HingeData;
 import org.spongepowered.api.data.manipulator.mutable.block.InWallData;
+import org.spongepowered.api.data.manipulator.mutable.block.InstrumentData;
 import org.spongepowered.api.data.manipulator.mutable.block.LayeredData;
-import org.spongepowered.api.data.manipulator.mutable.block.LogAxisData;
+import org.spongepowered.api.data.manipulator.mutable.block.LitData;
 import org.spongepowered.api.data.manipulator.mutable.block.MoistureData;
+import org.spongepowered.api.data.manipulator.mutable.block.NoteData;
 import org.spongepowered.api.data.manipulator.mutable.block.OccupiedData;
 import org.spongepowered.api.data.manipulator.mutable.block.OpenData;
-import org.spongepowered.api.data.manipulator.mutable.block.PistonData;
-import org.spongepowered.api.data.manipulator.mutable.block.PlantData;
 import org.spongepowered.api.data.manipulator.mutable.block.PortionData;
 import org.spongepowered.api.data.manipulator.mutable.block.PoweredData;
-import org.spongepowered.api.data.manipulator.mutable.block.PrismarineData;
-import org.spongepowered.api.data.manipulator.mutable.block.QuartzData;
 import org.spongepowered.api.data.manipulator.mutable.block.RailDirectionData;
 import org.spongepowered.api.data.manipulator.mutable.block.RedstonePoweredData;
-import org.spongepowered.api.data.manipulator.mutable.block.SandData;
-import org.spongepowered.api.data.manipulator.mutable.block.SandstoneData;
-import org.spongepowered.api.data.manipulator.mutable.block.SeamlessData;
-import org.spongepowered.api.data.manipulator.mutable.block.ShrubData;
-import org.spongepowered.api.data.manipulator.mutable.block.SlabData;
+import org.spongepowered.api.data.manipulator.mutable.block.SlabPortionData;
 import org.spongepowered.api.data.manipulator.mutable.block.SnowedData;
 import org.spongepowered.api.data.manipulator.mutable.block.StairShapeData;
-import org.spongepowered.api.data.manipulator.mutable.block.StoneData;
-import org.spongepowered.api.data.manipulator.mutable.block.TreeData;
-import org.spongepowered.api.data.manipulator.mutable.block.WallData;
+import org.spongepowered.api.data.manipulator.mutable.block.SurfaceAttachmentData;
 import org.spongepowered.api.data.manipulator.mutable.block.WireAttachmentData;
 import org.spongepowered.api.data.manipulator.mutable.entity.AbsorptionData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ActiveItemData;
@@ -360,13 +333,9 @@ import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.data.manipulator.mutable.item.AuthorData;
 import org.spongepowered.api.data.manipulator.mutable.item.BlockItemData;
 import org.spongepowered.api.data.manipulator.mutable.item.BreakableData;
-import org.spongepowered.api.data.manipulator.mutable.item.CoalData;
-import org.spongepowered.api.data.manipulator.mutable.item.CookedFishData;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
 import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
-import org.spongepowered.api.data.manipulator.mutable.item.FishData;
 import org.spongepowered.api.data.manipulator.mutable.item.GenerationData;
-import org.spongepowered.api.data.manipulator.mutable.item.GoldenAppleData;
 import org.spongepowered.api.data.manipulator.mutable.item.HideData;
 import org.spongepowered.api.data.manipulator.mutable.item.InventoryItemData;
 import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
@@ -383,48 +352,29 @@ import org.spongepowered.api.data.manipulator.mutable.tileentity.CooldownData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.EndGatewayData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.FurnaceData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.LockableData;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.NoteData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.StructureData;
 import org.spongepowered.api.data.type.Arts;
-import org.spongepowered.api.data.type.BigMushroomTypes;
-import org.spongepowered.api.data.type.BrickTypes;
 import org.spongepowered.api.data.type.Careers;
-import org.spongepowered.api.data.type.CoalTypes;
+import org.spongepowered.api.data.type.ChestAttachmentTypes;
 import org.spongepowered.api.data.type.ComparatorTypes;
-import org.spongepowered.api.data.type.CookedFishes;
-import org.spongepowered.api.data.type.DirtTypes;
-import org.spongepowered.api.data.type.DisguisedBlockTypes;
-import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.DyeColors;
-import org.spongepowered.api.data.type.Fishes;
-import org.spongepowered.api.data.type.GoldenApples;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.Hinges;
 import org.spongepowered.api.data.type.HorseColors;
 import org.spongepowered.api.data.type.HorseStyles;
-import org.spongepowered.api.data.type.LogAxes;
+import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.NotePitches;
 import org.spongepowered.api.data.type.OcelotTypes;
 import org.spongepowered.api.data.type.ParrotVariants;
 import org.spongepowered.api.data.type.PickupRules;
-import org.spongepowered.api.data.type.PistonTypes;
-import org.spongepowered.api.data.type.PlantTypes;
 import org.spongepowered.api.data.type.PortionTypes;
-import org.spongepowered.api.data.type.PrismarineTypes;
-import org.spongepowered.api.data.type.QuartzTypes;
 import org.spongepowered.api.data.type.RabbitTypes;
 import org.spongepowered.api.data.type.RailDirections;
-import org.spongepowered.api.data.type.SandTypes;
-import org.spongepowered.api.data.type.SandstoneTypes;
-import org.spongepowered.api.data.type.ShrubTypes;
-import org.spongepowered.api.data.type.SkullTypes;
-import org.spongepowered.api.data.type.SlabTypes;
+import org.spongepowered.api.data.type.SlabPortions;
 import org.spongepowered.api.data.type.StairShapes;
-import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.type.StructureModes;
-import org.spongepowered.api.data.type.TreeTypes;
-import org.spongepowered.api.data.type.WallTypes;
+import org.spongepowered.api.data.type.Surfaces;
 import org.spongepowered.api.data.type.WireAttachmentTypes;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -502,7 +452,6 @@ public class DataManipulatorRegistry {
         /// variant containers
         registerVariant(DyeableData.class, ImmutableDyeableData.class, Keys.DYE_COLOR, DyeColors.WHITE);
         registerVariant(RotationalData.class, ImmutableRotationalData.class, Keys.ROTATION, Rotations.LEFT);
-        registerVariant(SkullData.class, ImmutableSkullData.class, Keys.SKULL_TYPE, SkullTypes.SKELETON);
 
         /// list containers
         registerList(FireworkEffectData.class, ImmutableFireworkEffectData.class, Keys.FIREWORK_EFFECTS);
@@ -522,8 +471,20 @@ public class DataManipulatorRegistry {
                     c.register(Keys.CONNECTED_SOUTH, false);
                     c.register(Keys.CONNECTED_NORTH, false);
                 });
+        register(BigMushroomPoresData.class, ImmutableBigMushroomPoresData.class, LanternBigMushroomPoresData.class, LanternImmutableBigMushroomPoresData.class,
+                c -> {
+                    c.register(Keys.BIG_MUSHROOM_PORES_DOWN, false);
+                    c.register(Keys.BIG_MUSHROOM_PORES_EAST, false);
+                    c.register(Keys.BIG_MUSHROOM_PORES_NORTH, false);
+                    c.register(Keys.BIG_MUSHROOM_PORES_SOUTH, false);
+                    c.register(Keys.BIG_MUSHROOM_PORES_UP, false);
+                    c.register(Keys.BIG_MUSHROOM_PORES_WEST, false);
+                });
         register(DecayableData.class, ImmutableDecayableData.class,
-                c -> c.register(Keys.DECAYABLE, true));
+                c -> {
+                    c.register(Keys.DECAY_DISTANCE, 6, 1, 7);
+                    c.register(Keys.PERSISTENT, false);
+                });
         register(DelayableData.class, ImmutableDelayableData.class,
                 c -> c.register(Keys.DELAY, 1, 0, Integer.MAX_VALUE));
         register(DirectionalData.class, ImmutableDirectionalData.class,
@@ -542,6 +503,8 @@ public class DataManipulatorRegistry {
                 c -> c.register(Keys.IN_WALL, false));
         register(LayeredData.class, ImmutableLayeredData.class,
                 c -> c.register(Keys.LAYER, 1));
+        register(LitData.class, ImmutableLitData.class,
+                c -> c.register(Keys.LIT, false));
         register(MoistureData.class, ImmutableMoistureData.class,
                 c -> c.register(Keys.MOISTURE, 0));
         register(OccupiedData.class, ImmutableOccupiedData.class,
@@ -552,8 +515,6 @@ public class DataManipulatorRegistry {
                 c -> c.register(Keys.POWERED, false));
         register(RedstonePoweredData.class, ImmutableRedstonePoweredData.class,
                 c -> c.register(Keys.POWER, 0));
-        register(SeamlessData.class, ImmutableSeamlessData.class,
-                c -> c.register(Keys.SEAMLESS, false));
         register(SnowedData.class, ImmutableSnowedData.class,
                 c -> c.register(Keys.SNOWED, false));
         register(WireAttachmentData.class, ImmutableWireAttachmentData.class, LanternWireAttachmentData.class, LanternImmutableWireAttachmentData.class,
@@ -566,28 +527,15 @@ public class DataManipulatorRegistry {
 
         /// variant containers
         registerVariant(AxisData.class, ImmutableAxisData.class, Keys.AXIS, Axis.X);
-        registerVariant(BigMushroomData.class, ImmutableBigMushroomData.class, Keys.BIG_MUSHROOM_TYPE, BigMushroomTypes.CENTER);
-        registerVariant(BrickData.class, ImmutableBrickData.class, Keys.BRICK_TYPE, BrickTypes.DEFAULT);
+        registerVariant(ChestAttachmentData.class, ImmutableChestAttachmentData.class, Keys.CHEST_ATTACHMENT, ChestAttachmentTypes.NONE);
         registerVariant(ComparatorData.class, ImmutableComparatorData.class, Keys.COMPARATOR_TYPE, ComparatorTypes.COMPARE);
-        registerVariant(DirtData.class, ImmutableDirtData.class, Keys.DIRT_TYPE, DirtTypes.DIRT);
-        registerVariant(DisguisedBlockData.class, ImmutableDisguisedBlockData.class, Keys.DISGUISED_BLOCK_TYPE, DisguisedBlockTypes.STONE);
-        registerVariant(DoublePlantData.class, ImmutableDoublePlantData.class, Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.GRASS);
         registerVariant(HingeData.class, ImmutableHingeData.class, Keys.HINGE_POSITION, Hinges.LEFT);
-        registerVariant(LogAxisData.class, ImmutableLogAxisData.class, Keys.LOG_AXIS, LogAxes.X);
-        registerVariant(PistonData.class, ImmutablePistonData.class, Keys.PISTON_TYPE, PistonTypes.NORMAL);
-        registerVariant(PlantData.class, ImmutablePlantData.class, Keys.PLANT_TYPE, PlantTypes.POPPY);
+        registerVariant(InstrumentData.class, ImmutableInstrumentData.class, Keys.INSTRUMENT, InstrumentTypes.HARP);
         registerVariant(PortionData.class, ImmutablePortionData.class, Keys.PORTION_TYPE, PortionTypes.BOTTOM);
-        registerVariant(PrismarineData.class, ImmutablePrismarineData.class, Keys.PRISMARINE_TYPE, PrismarineTypes.BRICKS);
-        registerVariant(QuartzData.class, ImmutableQuartzData.class, Keys.QUARTZ_TYPE, QuartzTypes.DEFAULT);
         registerVariant(RailDirectionData.class, ImmutableRailDirectionData.class, Keys.RAIL_DIRECTION, RailDirections.NORTH_SOUTH);
-        registerVariant(SandData.class, ImmutableSandData.class, Keys.SAND_TYPE, SandTypes.NORMAL);
-        registerVariant(SandstoneData.class, ImmutableSandstoneData.class, Keys.SANDSTONE_TYPE, SandstoneTypes.DEFAULT);
-        registerVariant(ShrubData.class, ImmutableShrubData.class, Keys.SHRUB_TYPE, ShrubTypes.DEAD_BUSH);
-        registerVariant(SlabData.class, ImmutableSlabData.class, Keys.SLAB_TYPE, SlabTypes.WOOD);
+        registerVariant(SlabPortionData.class, ImmutableSlabPortionData.class, Keys.SLAB_PORTION, SlabPortions.BOTTOM);
         registerVariant(StairShapeData.class, ImmutableStairShapeData.class, Keys.STAIR_SHAPE, StairShapes.STRAIGHT);
-        registerVariant(StoneData.class, ImmutableStoneData.class, Keys.STONE_TYPE, StoneTypes.STONE);
-        registerVariant(TreeData.class, ImmutableTreeData.class, Keys.TREE_TYPE, TreeTypes.OAK);
-        registerVariant(WallData.class, ImmutableWallData.class, Keys.WALL_TYPE, WallTypes.NORMAL);
+        registerVariant(SurfaceAttachmentData.class, ImmutableSurfaceAttachmentData.class, Keys.ATTACHMENT_SURFACE, Surfaces.FLOOR);
 
         /// list containers
 
@@ -619,7 +567,7 @@ public class DataManipulatorRegistry {
                     c.register(Keys.AREA_EFFECT_CLOUD_AGE, 0);
                     c.register(Keys.AREA_EFFECT_CLOUD_DURATION, 100);
                     c.register(Keys.AREA_EFFECT_CLOUD_DURATION_ON_USE, 0);
-                    c.register(Keys.AREA_EFFECT_CLOUD_PARTICLE_TYPE, ParticleTypes.SPLASH_POTION);
+                    c.register(Keys.AREA_EFFECT_CLOUD_PARTICLE_TYPE, ParticleTypes.ENTITY_EFFECT);
                     c.register(Keys.AREA_EFFECT_CLOUD_RADIUS, 10.0);
                     c.register(Keys.AREA_EFFECT_CLOUD_RADIUS_ON_USE, 0.0);
                     c.register(Keys.AREA_EFFECT_CLOUD_RADIUS_PER_TICK, 0.1);
@@ -750,7 +698,7 @@ public class DataManipulatorRegistry {
                     c.register(Keys.FLYING_SPEED, 0.2);
                 });
         register(PersistingData.class, ImmutablePersistingData.class,
-                c -> c.register(Keys.PERSISTS, false));
+                c -> c.register(Keys.PERSISTENT, false));
         register(PickupDelayData.class, ImmutablePickupDelayData.class,
                 c -> {
                     c.register(Keys.PICKUP_DELAY, 0);
@@ -885,10 +833,6 @@ public class DataManipulatorRegistry {
                 c -> c.register(Keys.PLACEABLE_BLOCKS, new HashSet<>()));
 
         /// variant containers
-        registerVariant(CoalData.class, ImmutableCoalData.class, Keys.COAL_TYPE, CoalTypes.COAL);
-        registerVariant(CookedFishData.class, ImmutableCookedFishData.class, Keys.COOKED_FISH, CookedFishes.COD);
-        registerVariant(FishData.class, ImmutableFishData.class, Keys.FISH_TYPE, Fishes.COD);
-        registerVariant(GoldenAppleData.class, ImmutableGoldenAppleData.class, Keys.GOLDEN_APPLE_TYPE, GoldenApples.GOLDEN_APPLE);
         registerVariant(SpawnableData.class, ImmutableSpawnableData.class, Keys.SPAWNABLE_ENTITY_TYPE, EntityTypes.CHICKEN);
 
         /// list containers

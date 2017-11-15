@@ -73,7 +73,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
      * Gets a empty {@link ItemStack}.
      *
      * <p>A empty item stack will always have the item type
-     * {@link ItemTypes#NONE} and a quantity of {@code 0}.
+     * {@link ItemTypes#AIR} and a quantity of {@code 0}.
      * And any data offered to it will be rejected.</p>
      *
      * @return The empty item stack
@@ -106,7 +106,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     public LanternItemStack(ItemType itemType, int quantity) {
         // Use empty containers for the none item type
         this(itemType, quantity, ValueCollection.create(),
-                itemType == ItemTypes.NONE ? AdditionalContainerCollection.empty() : AdditionalContainerCollection.createConcurrent());
+                itemType == ItemTypes.AIR ? AdditionalContainerCollection.empty() : AdditionalContainerCollection.createConcurrent());
         registerKeys();
     }
 
@@ -166,12 +166,12 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
 
     @Override
     public ItemType getType() {
-        return this.quantity == 0 ? ItemTypes.NONE : this.itemType;
+        return this.quantity == 0 ? ItemTypes.AIR : this.itemType;
     }
 
     @Override
     public int getQuantity() {
-        return this.itemType == ItemTypes.NONE ? 0 : this.quantity;
+        return this.itemType == ItemTypes.AIR ? 0 : this.quantity;
     }
 
     @Override
@@ -229,7 +229,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
 
     @Override
     public boolean isEmpty() {
-        return this.itemType == ItemTypes.NONE || this.quantity <= 0;
+        return this.itemType == ItemTypes.AIR || this.quantity <= 0;
     }
 
     @Override

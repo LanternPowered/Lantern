@@ -151,11 +151,11 @@ public final class CommandParticle extends CommandProvider {
                     final LanternWorld world = CommandHelper.getWorld(src, args);
 
                     final int dataLength;
-                    if (particleType == ParticleTypes.BLOCK_CRACK ||
-                            particleType == ParticleTypes.BLOCK_DUST ||
-                            particleType == ParticleTypes.FALLING_DUST) {
+                    if (particleType == ParticleTypes.BREAK_BLOCK ||
+                            particleType == ParticleTypes.FALLING_DUST ||
+                            particleType == ParticleTypes.BLOCK) {
                         dataLength = 1;
-                    } else if (particleType == ParticleTypes.ITEM_CRACK) {
+                    } else if (particleType == ParticleTypes.ITEM) {
                         dataLength = 2;
                     } else {
                         dataLength = 0;
@@ -167,7 +167,7 @@ public final class CommandParticle extends CommandProvider {
                     }
 
                     final MessagePlayOutSpawnParticle message = new MessagePlayOutSpawnParticle(
-                            particleId, position, offset, speed, count, params, longDistance);
+                            particleId, position, offset, speed, count, null, longDistance);
                     if (args.hasAny("player")) {
                         args.<LanternPlayer>getOne("player").get().getConnection().send(message);
                     } else {

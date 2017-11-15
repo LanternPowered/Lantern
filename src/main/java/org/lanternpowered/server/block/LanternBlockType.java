@@ -72,8 +72,6 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, A
 
     @Nullable private final TileEntityProvider tileEntityProvider;
 
-    private final ExtendedBlockStateProvider extendedBlockStateProvider;
-
     /**
      * The default block state of this block type.
      */
@@ -96,13 +94,12 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, A
 
     LanternBlockType(CatalogKey key, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
-            @Nullable TileEntityProvider tileEntityProvider, ExtendedBlockStateProvider extendedBlockStateProvider) {
+            @Nullable TileEntityProvider tileEntityProvider) {
         super(key);
         this.translationProvider = translationProvider;
         this.behaviorPipeline = behaviorPipeline;
         this.tileEntityProvider = tileEntityProvider;
         this.tickRandomly = !behaviorPipeline.pipeline(RandomTickBehavior.class).getBehaviors().isEmpty();
-        this.extendedBlockStateProvider = extendedBlockStateProvider;
         this.blockStateBase = new LanternBlockStateMap(this, blockTraits);
         this.defaultBlockState = this.blockStateBase.getBaseState();
     }
@@ -221,10 +218,6 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, A
         this.blockSoundGroup = blockSoundGroup;
     }
 
-    public ExtendedBlockStateProvider getExtendedBlockStateProvider() {
-        return this.extendedBlockStateProvider;
-    }
-
     void setPropertyProviderCollection(PropertyProviderCollection propertyProviderCollection) {
         this.propertyProviderCollection = propertyProviderCollection;
     }
@@ -246,4 +239,5 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, A
     void setCollisionBoxesProvider(@Nullable ObjectProvider<Collection<AABB>> boundingBoxProvider) {
         this.collisionBoxesProvider = boundingBoxProvider;
     }
+
 }

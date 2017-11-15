@@ -48,6 +48,10 @@ public final class ParameterValueTypes {
     public static final ParameterValueType<String> STRING = new ParameterValueType<>(ByteBuffer::writeString);
     public static final ParameterValueType<Text> TEXT = new ParameterValueType<>(
             (ctx, buf, value) -> ctx.write(buf, ContextualValueTypes.TEXT, value));
+    public static final ParameterValueType<Optional<Text>> OPTIONAL_TEXT = new ParameterValueType<>((ctx, buf, value) -> {
+        buf.writeBoolean(value.isPresent());
+        value.ifPresent(text -> ctx.write(buf, ContextualValueTypes.TEXT, text));
+    });
     public static final ParameterValueType<ItemStack> ITEM_STACK = new ParameterValueType<>(
             (ctx, buf, value) -> ctx.write(buf, ContextualValueTypes.ITEM_STACK, value));
     public static final ParameterValueType<Boolean> BOOLEAN = new ParameterValueType<>(ByteBuffer::writeBoolean);
@@ -64,7 +68,8 @@ public final class ParameterValueTypes {
         value.ifPresent(buf::writeUniqueId);
     });
     public static final ParameterValueType<Optional<BlockState>> OPTIONAL_BLOCK_STATE = new ParameterValueType<>(
-            (buf, value) -> buf.writeVarInt(value.map(v -> BlockRegistryModule.get().getStateInternalId(v)).orElse((short) 0)));
+            (buf, value) -> buf.writeVarInt(value.map(v -> BlockRegistryModule.get().getStateInternalId(v)).orElse(0)));
     public static final ParameterValueType<Optional<DataView>> NBT_TAG = new ParameterValueType<>(
             (buf, value) -> buf.writeDataView(value.orElse(null)));
+    // TODO: Another parameter type, particle type based?
 }

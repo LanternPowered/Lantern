@@ -125,7 +125,7 @@ public class LanternCraftingRecipeRegistry extends AbstractRecipeRegistry<Crafti
     public void registerDefaults() {
         try {
             ReflectionHelper.setField(Ingredient.class.getField("NONE"), null,
-                    IIngredient.builder().with(ItemStack::isEmpty).withDisplay(ItemTypes.NONE).build());
+                    IIngredient.builder().with(ItemStack::isEmpty).withDisplay(ItemTypes.AIR).build());
         } catch (Throwable e) {
             throw UncheckedThrowables.throwUnchecked(e);
         }
@@ -136,7 +136,7 @@ public class LanternCraftingRecipeRegistry extends AbstractRecipeRegistry<Crafti
             frame.pushCause(Lantern.getMinecraftPlugin());
             register(ICraftingRecipe.shapedBuilder()
                     .aisle("x", "x")
-                    .where('x', Ingredient.of(ItemTypes.PLANKS))
+                    .where('x', Ingredient.of(ItemTypes.OAK_PLANKS))
                     .result(ItemStack.of(ItemTypes.STICK, 4))
                     .id("stick")
                     .build());

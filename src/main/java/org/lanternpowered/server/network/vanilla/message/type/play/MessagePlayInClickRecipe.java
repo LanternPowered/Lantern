@@ -30,10 +30,10 @@ import org.lanternpowered.server.network.message.Message;
 public final class MessagePlayInClickRecipe implements Message {
 
     private final int windowId;
-    private final int recipeId;
+    private final String recipeId;
     private final boolean shift;
 
-    public MessagePlayInClickRecipe(int windowId, int recipeId, boolean shift) {
+    public MessagePlayInClickRecipe(int windowId, String recipeId, boolean shift) {
         this.windowId = windowId;
         this.recipeId = recipeId;
         this.shift = shift;
@@ -43,7 +43,7 @@ public final class MessagePlayInClickRecipe implements Message {
         return this.windowId;
     }
 
-    public int getRecipeId() {
+    public String getRecipeId() {
         return this.recipeId;
     }
 

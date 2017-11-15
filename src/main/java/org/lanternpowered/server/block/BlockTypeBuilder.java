@@ -67,8 +67,6 @@ public interface BlockTypeBuilder {
 
     BlockTypeBuilder defaultState(Function<BlockState, BlockState> function);
 
-    BlockTypeBuilder extendedStateProvider(ExtendedBlockStateProvider extendedBlockStateProvider);
-
     BlockTypeBuilder properties(PropertyProviderCollection collection);
 
     BlockTypeBuilder properties(Consumer<PropertyProviderCollection.Builder> consumer);

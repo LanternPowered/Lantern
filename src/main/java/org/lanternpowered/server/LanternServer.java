@@ -27,7 +27,6 @@ package org.lanternpowered.server;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -51,12 +50,10 @@ import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.CloseableService;
-import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
 import org.lanternpowered.server.util.SyncLanternThread;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
@@ -72,10 +69,9 @@ import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePacks;
+import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.ProviderRegistration;
-import org.spongepowered.api.service.ServiceManager;
-import org.spongepowered.api.service.SimpleServiceManager;
 import org.spongepowered.api.service.rcon.RconService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -87,7 +83,6 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -628,22 +623,7 @@ public final class LanternServer implements Server {
         // Stop the async scheduler
         this.game.getScheduler().shutdownAsyncScheduler(10, TimeUnit.SECONDS);
 
-        final Collection<ProviderRegistration<?>> serviceRegistrations;
-        try {
-            final ServiceManager serviceManager = this.game.getServiceManager();
-            checkState(serviceManager instanceof SimpleServiceManager || serviceManager instanceof LanternServiceManager);
-
-            final Field field = (serviceManager instanceof SimpleServiceManager ? SimpleServiceManager.class :
-                    LanternServiceManager.class).getDeclaredField("providers");
-            field.setAccessible(true);
-
-            //noinspection unchecked
-            final Map<Class<?>, ProviderRegistration<?>> map = (Map<Class<?>, ProviderRegistration<?>>) field.get(serviceManager);
-            serviceRegistrations = map.values();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
-        }
-
+        final Collection<ProviderRegistration<?>> serviceRegistrations = this.game.getServiceManager().getProviderRegistrations();
         // Close all the services if possible
         serviceRegistrations.forEach(provider -> {
             final Object service = provider.getProvider();
@@ -712,7 +692,12 @@ public final class LanternServer implements Server {
     }
 
     @Override
-    public boolean isMainThread() {
+    public Scheduler getScheduler() {
+        return this.game.getScheduler();
+    }
+
+    @Override
+    public boolean onMainThread() {
         return Thread.currentThread() instanceof SyncLanternThread;
     }
 

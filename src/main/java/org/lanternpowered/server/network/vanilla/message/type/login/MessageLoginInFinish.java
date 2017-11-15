@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.login;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.profile.LanternGameProfile;
 
@@ -33,7 +35,7 @@ public final class MessageLoginInFinish implements Message {
     private final LanternGameProfile gameProfile;
 
     public MessageLoginInFinish(LanternGameProfile gameProfile) {
-        this.gameProfile = gameProfile;
+        this.gameProfile = checkNotNull(gameProfile, "gameProfile");
     }
 
     public LanternGameProfile getGameProfile() {

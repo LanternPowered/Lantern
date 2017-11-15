@@ -694,5 +694,269 @@
     {
         "version": 340,
         "name": "1.12.2"
+    },
+    {
+        "version": 341,
+        "name": "17w43a"
+    },
+    {
+        "version": 342,
+        "name": "17w43b"
+    },
+    {
+        "version": 343,
+        "name": "17w45a"
+    },
+    {
+        "version": 344,
+        "name": "17w45b"
+    },
+    {
+        "version": 345,
+        "name": "17w46a"
+    },
+    {
+        "version": 346,
+        "name": "17w47a"
+    },
+    {
+        "version": 347,
+        "name": "17w47b"
+    },
+    {
+        "version": 348,
+        "name": "17w48a"
+    },
+    {
+        "version": 349,
+        "name": "17w49a"
+    },
+    {
+        "version": 350,
+        "name": "17w49b"
+    },
+    {
+        "version": 351,
+        "name": "17w50a"
+    },
+    {
+        "version": 352,
+        "name": "18w01a"
+    },
+    {
+        "version": 353,
+        "name": "18w02a"
+    },
+    {
+        "version": 354,
+        "name": "18w03a"
+    },
+    {
+        "version": 355,
+        "name": "18w03b"
+    },
+    {
+        "version": 356,
+        "name": "18w05a"
+    },
+    {
+        "version": 357,
+        "name": "18w06a"
+    },
+    {
+        "version": 358,
+        "name": "18w07a"
+    },
+    {
+        "version": 359,
+        "name": "18w07b"
+    },
+    {
+        "version": 360,
+        "name": "18w07c"
+    },
+    {
+        "version": 361,
+        "name": "18w08a"
+    },
+    {
+        "version": 362,
+        "name": "18w08b"
+    },
+    {
+        "version": 363,
+        "name": "18w09a"
+    },
+    {
+        "version": 364,
+        "name": "18w10a"
+    },
+    {
+        "version": 365,
+        "name": "18w10b"
+    },
+    {
+        "version": 366,
+        "name": "18w10c"
+    },
+    {
+        "version": 367,
+        "name": "18w10d"
+    },
+    {
+        "version": 368,
+        "name": "18w11a"
+    },
+    {
+        "version": 369,
+        "name": "18w14a"
+    },
+    {
+        "version": 370,
+        "name": "18w14b"
+    },
+    {
+        "version": 371,
+        "name": "18w15a"
+    },
+    {
+        "version": 372,
+        "name": "18w16a"
+    },
+    {
+        "version": 373,
+        "name": "18w19a"
+    },
+    {
+        "version": 374,
+        "name": "18w19b"
+    },
+    {
+        "version": 375,
+        "name": "18w20a"
+    },
+    {
+        "version": 376,
+        "name": "18w20b"
+    },
+    {
+        "version": 377,
+        "name": "18w20c"
+    },
+    {
+        "version": 378,
+        "name": "18w21a"
+    },
+    {
+        "version": 379,
+        "name": "18w21b"
+    },
+    {
+        "version": 380,
+        "name": "18w22a"
+    },
+    {
+        "version": 381,
+        "name": "18w22b"
+    },
+    {
+        "version": 382,
+        "name": "18w22c"
+    },
+    {
+        "version": 383,
+        "name": "1.13-pre1"
+    },
+    {
+        "version": 384,
+        "name": "1.13-pre2"
+    },
+    {
+        "version": 385,
+        "name": "1.13-pre3"
+    },
+    {
+        "version": 386,
+        "name": "1.13-pre4"
+    },
+    {
+        "version": 387,
+        "name": "1.13-pre5"
+    },
+    {
+        "version": 388,
+        "name": "1.13-pre6"
+    },
+    {
+        "version": 389,
+        "name": "1.13-pre7"
+    },
+    {
+        "version": 390,
+        "name": "1.13-pre8"
+    },
+    {
+        "version": 391,
+        "name": "1.13-pre9"
+    },
+    {
+        "version": 392,
+        "name": "1.13-pre10"
+    },
+    {
+        "version": 393,
+        "name": "1.13"
+    },
+    {
+        "version": 394,
+        "name": "18w30a"
+    },
+    {
+        "version": 395,
+        "name": "18w30b"
+    },
+    {
+        "version": 396,
+        "name": "18w31a"
+    },
+    {
+        "version": 397,
+        "name": "18w32a"
+    },
+    {
+        "version": 398,
+        "name": "18w33a"
+    },
+    {
+        "version": 399,
+        "name": "1.13.1-pre1"
+    },
+    {
+        "version": 400,
+        "name": "1.13.1-pre2"
+    },
+    {
+        "version": 401,
+        "name": "1.13.1"
+    },
+    {
+        "version": 402,
+        "name": "1.13.2-pre1"
+    },
+    {
+        "version": 403,
+        "name": "1.13.2-pre2"
+    },
+    {
+        "version": 404,
+        "name": "1.13.2"
+    },
+    {
+        "version": 440,
+        "name": "18w43a"
+    },
+    {
+        "version": 441,
+        "name": "18w44b"
     }
 ]

@@ -113,7 +113,7 @@ public class AdvancementTest {
         // Create the advancement tree
         this.advancementTree = AdvancementTree.builder()
                 .rootAdvancement(this.rootAdvancement)
-                .background("minecraft:textures/blocks/dirt.png")
+                .background("minecraft:textures/block/dirt.png")
                 .id("dirt")
                 .build();
         event.register(this.advancementTree);

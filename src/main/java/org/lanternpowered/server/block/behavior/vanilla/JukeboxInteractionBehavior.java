@@ -35,8 +35,8 @@ import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.item.RecordProperty;
-import org.spongepowered.api.effect.sound.record.RecordType;
+import org.spongepowered.api.data.property.item.MusicDiscProperty;
+import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -68,8 +68,8 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
                 final Optional<ItemStack> optItemStack = context.getContext(ContextKeys.USED_ITEM_STACK);
                 if (optItemStack.isPresent()) {
                     final ItemStack itemStack = optItemStack.get();
-                    final RecordProperty property = itemStack.getProperty(RecordProperty.class).orElse(null);
-                    final RecordType recordType = property == null ? null : property.getValue();
+                    final MusicDiscProperty property = itemStack.getProperty(MusicDiscProperty.class).orElse(null);
+                    final MusicDisc recordType = property == null ? null : property.getValue();
                     if (recordType != null) {
                         final ItemStackSnapshot oldSnapshot = itemStack.createSnapshot();
                         itemStack.setQuantity(itemStack.getQuantity() - 1);
@@ -81,8 +81,8 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
                             }
                         });
                         itemStack.setQuantity(1);
-                        jukebox.insertRecord(itemStack);
-                        jukebox.playRecord();
+                        jukebox.insert(itemStack);
+                        jukebox.play();
                         success = true;
                     }
                 }

@@ -42,9 +42,10 @@ public abstract class MessagePlayOutBossBar implements Message {
         private final float health;
         private final boolean darkenSky;
         private final boolean endMusic;
+        private final boolean createFog;
 
         public Add(UUID uniqueId, Text title, BossBarColor color, BossBarOverlay overlay, float health,
-                boolean darkenSky, boolean endMusic) {
+                boolean darkenSky, boolean endMusic, boolean createFog) {
             super(uniqueId);
             this.title = title;
             this.color = color;
@@ -52,6 +53,7 @@ public abstract class MessagePlayOutBossBar implements Message {
             this.health = health;
             this.darkenSky = darkenSky;
             this.endMusic = endMusic;
+            this.createFog = createFog;
         }
 
         public Text getTitle() {
@@ -72,6 +74,10 @@ public abstract class MessagePlayOutBossBar implements Message {
 
         public boolean isEndMusic() {
             return this.endMusic;
+        }
+
+        public boolean shouldCreateFog() {
+            return this.createFog;
         }
 
         public float getHealth() {
@@ -138,11 +144,13 @@ public abstract class MessagePlayOutBossBar implements Message {
 
         private final boolean darkenSky;
         private final boolean endMusic;
+        private final boolean createFog;
 
-        public UpdateMisc(UUID uniqueId, boolean darkenSky, boolean endMusic) {
+        public UpdateMisc(UUID uniqueId, boolean darkenSky, boolean endMusic, boolean createFog) {
             super(uniqueId);
             this.darkenSky = darkenSky;
             this.endMusic = endMusic;
+            this.createFog = createFog;
         }
 
         public boolean isDarkenSky() {
@@ -151,6 +159,10 @@ public abstract class MessagePlayOutBossBar implements Message {
 
         public boolean isEndMusic() {
             return this.endMusic;
+        }
+
+        public boolean shouldCreateFog() {
+            return this.createFog;
         }
     }
 

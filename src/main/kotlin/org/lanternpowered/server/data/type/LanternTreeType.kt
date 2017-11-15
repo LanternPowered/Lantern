@@ -25,25 +25,10 @@
  */
 package org.lanternpowered.server.data.type
 
-import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
-import org.lanternpowered.server.catalog.asString
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.data.type.TreeType
 import org.spongepowered.api.text.translation.Translatable
 
-enum class LanternTreeType(id: String, val translationKeyBase: String) :
-        TreeType, CatalogType by DefaultCatalogType.minecraft(id), InternalCatalogType.EnumOrdinal,
-        Translatable by Translated("tree.$translationKeyBase") {
-
-    OAK         ("oak", "oak"),
-    SPRUCE      ("spruce", "spruce"),
-    BIRCH       ("birch", "birch"),
-    JUNGLE      ("jungle", "jungle"),
-    ACACIA      ("acacia", "acacia"),
-    DARK_OAK    ("dark_oak", "big_oak"),
-    ;
-
-    override fun toString(): String = asString()
-}
+class LanternTreeType(key: CatalogKey, translationKey: String) : DefaultCatalogType(key), TreeType, Translatable by Translated(translationKey)

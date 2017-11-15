@@ -25,34 +25,23 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.network.message.Message;
-
-import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public final class MessagePlayInTabComplete implements Message {
 
-    private final String text;
-    private final boolean assumeCommand;
-    private final Optional<Vector3i> blockPosition;
+    private final String input;
+    private final int id;
 
-    public MessagePlayInTabComplete(String text, boolean assumeCommand, @Nullable Vector3i blockPosition) {
-        this.blockPosition = Optional.ofNullable(blockPosition);
-        this.assumeCommand = assumeCommand;
-        this.text = text;
+    public MessagePlayInTabComplete(String input, int id) {
+        this.input = input;
+        this.id = id;
     }
 
-    public Optional<Vector3i> getBlockPosition() {
-        return this.blockPosition;
+    public String getInput() {
+        return this.input;
     }
 
-    public boolean getAssumeCommand() {
-        return this.assumeCommand;
-    }
-
-    public String getText() {
-        return this.text;
+    public int getId() {
+        return this.id;
     }
 }

@@ -65,6 +65,7 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceListeners;
+import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
@@ -151,7 +152,7 @@ public class LanternGame implements Game {
     @Inject private LanternEventManager eventManager;
 
     // The service manager
-    @Inject private ServiceManager serviceManager;
+    @Inject private LanternServiceManager serviceManager;
 
     // The game registry
     @Inject private LanternGameRegistry gameRegistry;
@@ -469,7 +470,7 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public ServiceManager getServiceManager() {
+    public LanternServiceManager getServiceManager() {
         return this.serviceManager;
     }
 
@@ -493,7 +494,6 @@ public class LanternGame implements Game {
         return true;
     }
 
-    @Override
     public LanternScheduler getScheduler() {
         return this.scheduler;
     }

@@ -27,6 +27,11 @@ package org.lanternpowered.server.network.buffer.contextual;
 
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterListContextualValueType;
+import org.lanternpowered.server.network.item.ItemStackContextualValueType;
+import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
+import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementContextualValueType;
+import org.lanternpowered.server.network.vanilla.recipe.NetworkRecipe;
+import org.lanternpowered.server.network.vanilla.recipe.NetworkRecipeContextualValueType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
@@ -50,6 +55,16 @@ public final class ContextualValueTypes {
      * A serializer for {@link ParameterList} objects.
      */
     public static final ContextualValueType<ParameterList> PARAMETER_LIST = new ParameterListContextualValueType();
+
+    /**
+     * A serializer for {@link NetworkRecipe} objects.
+     */
+    public static final ContextualValueType<NetworkRecipe> RECIPE = new NetworkRecipeContextualValueType();
+
+    /**
+     * A serializer for {@link NetworkAdvancement} objects.
+     */
+    public static final ContextualValueType<NetworkAdvancement> ADVANCEMENT = new NetworkAdvancementContextualValueType();
 
     private ContextualValueTypes() {
     }

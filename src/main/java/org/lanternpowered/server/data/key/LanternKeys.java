@@ -34,14 +34,17 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
+import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.inventory.InventorySnapshot;
+import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
@@ -82,8 +85,6 @@ public final class LanternKeys {
             makeValueKey(Double.class, DataQuery.of("GravityFactor"), "gravity_factor");
     public static final Key<Value<LanternDoorHalf>> DOOR_HALF =
             makeValueKey(LanternDoorHalf.class, DataQuery.of("DoorHalf"), "door_half");
-    public static final Key<Value<Boolean>> CHECK_DECAY =
-            makeValueKey(Boolean.class, DataQuery.of("CheckDecay"), "check_decay");
     public static final Key<Value<LanternBedPart>> BED_PART =
             makeValueKey(LanternBedPart.class, DataQuery.of("BedPart"), "bed_part");
     public static final Key<Value<Boolean>> ENABLED =
@@ -120,27 +121,50 @@ public final class LanternKeys {
             makeMutableBoundedValueKey(Double.class, DataQuery.of("MaxExhaustion"), "max_exhaustion");
     public static final Key<MutableBoundedValue<Integer>> MAX_FOOD_LEVEL =
             makeMutableBoundedValueKey(Integer.class, DataQuery.of("MaxFoodLevel"), "max_food_level");
-    public static final Key<Value<Boolean>> RECIPE_BOOK_GUI_OPEN =
-            makeValueKey(Boolean.class, DataQuery.of("RecipeBookGUIOpen"), "recipe_book_gui_open");
-    public static final Key<Value<Boolean>> RECIPE_BOOK_FILTER_ACTIVE =
-            makeValueKey(Boolean.class, DataQuery.of("RecipeBookFilterActive"), "recipe_book_filter_active");
+    public static final Key<Value<RecipeBookState>> CRAFTING_RECIPE_BOOK_STATE =
+            makeValueKey(RecipeBookState.class, DataQuery.of("CraftingRecipeBookState"), "crafting_recipe_book_state");
+    public static final Key<Value<RecipeBookState>> SMELTING_RECIPE_BOOK_STATE =
+            makeValueKey(RecipeBookState.class, DataQuery.of("SmeltingRecipeBookState"), "smelting_recipe_book_state");
     public static final Key<ListValue<Accessory>> ACCESSORIES =
             makeListKey(Accessory.class, DataQuery.of("Accessories"), "accessories");
     public static final Key<OptionalValue<AdvancementTree>> OPEN_ADVANCEMENT_TREE =
             makeOptionalKey(AdvancementTree.class, DataQuery.of("OpenAdvancementTree"), "open_advancement_tree");
     public static final Key<Value<Boolean>> ARE_PLAYING =
             makeValueKey(Boolean.class, DataQuery.of("ArePlaying"), "are_playing");
-    public static final Key<Value<Boolean>> HAS_RECORD =
-            makeValueKey(Boolean.class, DataQuery.of("HasRecord"), "has_record");
+    public static final Key<Value<Boolean>> HAS_MUSIC_DISC =
+            makeValueKey(Boolean.class, DataQuery.of("HasMusicDisc"), "has_music_disc");
     public static final Key<Value<Double>> FIELD_OF_VIEW_MODIFIER =
             makeValueKey(Double.class, DataQuery.of("FieldOfViewModifier"), "field_of_view_modifier");
     public static final Key<Value<Boolean>> HAS_CHEST =
             makeValueKey(Boolean.class, DataQuery.of("HasChest"), "has_chest");
     public static final Key<Value<Integer>> FINE_ROTATION =
             makeValueKey(Integer.class, DataQuery.of("FineRotation"), "fine_rotation");
+    public static final Key<Value<Boolean>> WATERLOGGED =
+            makeValueKey(Boolean.class, DataQuery.of("Waterlogged"), "waterlogged");
 
     public static final Key<Value<Boolean>> DUMMY =
             makeValueKey(Boolean.class, DataQuery.of("Dummy"), "dummy");
+
+    public static final Key<Value<InstrumentType>> INSTRUMENT_TYPE =
+            makeValueKey(InstrumentType.class, DataQuery.of("InstrumentType"), "instrument_type");
+
+    public static final Key<Value<RedstoneConnectionType>> REDSTONE_NORTH_CONNECTION =
+            makeValueKey(RedstoneConnectionType.class, DataQuery.of("RedstoneNorthConnection"), "redstone_north_connection");
+    public static final Key<Value<RedstoneConnectionType>> REDSTONE_SOUTH_CONNECTION =
+            makeValueKey(RedstoneConnectionType.class, DataQuery.of("RedstoneSouthConnection"), "redstone_south_connection");
+    public static final Key<Value<RedstoneConnectionType>> REDSTONE_EAST_CONNECTION =
+            makeValueKey(RedstoneConnectionType.class, DataQuery.of("RedstoneEastConnection"), "redstone_east_connection");
+    public static final Key<Value<RedstoneConnectionType>> REDSTONE_WEST_CONNECTION =
+            makeValueKey(RedstoneConnectionType.class, DataQuery.of("RedstoneWestConnection"), "redstone_west_connection");
+
+    public static final Key<Value<Boolean>> CONNECTED_NORTH =
+            makeValueKey(Boolean.class, DataQuery.of("ConnectedNorth"), "connected_north");
+    public static final Key<Value<Boolean>> CONNECTED_SOUTH =
+            makeValueKey(Boolean.class, DataQuery.of("ConnectedSouth"), "connected_south");
+    public static final Key<Value<Boolean>> CONNECTED_EAST =
+            makeValueKey(Boolean.class, DataQuery.of("ConnectedEast"), "connected_east");
+    public static final Key<Value<Boolean>> CONNECTED_WEST =
+            makeValueKey(Boolean.class, DataQuery.of("ConnectedWest"), "connected_west");
 
     private LanternKeys() {
     }

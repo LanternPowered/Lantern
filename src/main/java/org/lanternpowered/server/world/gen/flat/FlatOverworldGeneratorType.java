@@ -43,7 +43,7 @@ public final class FlatOverworldGeneratorType extends AbstractFlatGeneratorType 
         final List<FlatLayer> layers = new ArrayList<>(3);
         layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
         layers.add(new FlatLayer(BlockTypes.DIRT, 2));
-        layers.add(new FlatLayer(BlockTypes.GRASS, 1));
+        layers.add(new FlatLayer(BlockTypes.GRASS_BLOCK, 1));
         return new FlatGeneratorSettings(BiomeTypes.PLAINS, layers);
     }
 }

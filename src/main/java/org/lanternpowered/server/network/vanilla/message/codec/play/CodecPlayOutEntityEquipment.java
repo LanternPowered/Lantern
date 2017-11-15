@@ -29,9 +29,9 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
+import org.lanternpowered.server.network.item.RawItemStack;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
 import org.spongepowered.api.item.inventory.ItemStack;
 

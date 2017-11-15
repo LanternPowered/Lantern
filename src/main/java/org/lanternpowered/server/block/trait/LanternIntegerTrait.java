@@ -36,86 +36,156 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.Optional;
 
-public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implements IntegerTrait {
+import javax.annotation.Nullable;
 
-    private LanternIntegerTrait(CatalogKey key, Key<? extends Value<Integer>> valueKey, ImmutableSet<Integer> possibleValues) {
-        super(key, valueKey, Integer.class, possibleValues);
+@SuppressWarnings("unchecked")
+public final class LanternIntegerTrait<V> extends LanternBlockTrait<Integer, V> implements IntegerTrait {
+
+    private LanternIntegerTrait(CatalogKey key, Key<? extends Value<V>> valueKey, ImmutableSet<Integer> possibleValues,
+            @Nullable KeyTraitValueTransformer<Integer, V> keyTraitValueTransformer) {
+        super(key, valueKey, Integer.class, possibleValues, keyTraitValueTransformer);
     }
 
     /**
      * Creates a new integer trait with the specified name and the possible values.
-     * 
+     *
      * <p>The possible values array may not be empty.</p>
-     * 
-     * @param key the key
-     * @param valueKey the value key that should be attached to the trait
+     *
+     * @param key The key
+     * @param valueKey The value key that should be attached to the trait
      * @param possibleValues the possible values
      * @return the integer trait
      */
-    public static IntegerTrait of(CatalogKey key, Key<? extends Value<Integer>> valueKey, int... possibleValues) {
+    public static LanternIntegerTrait<Integer> of(CatalogKey key, Key<? extends Value<Integer>> valueKey, int... possibleValues) {
+        return ofTransformed(key, valueKey, null, possibleValues);
+    }
+
+    public static LanternIntegerTrait<Integer> minecraft(String id, Key<? extends Value<Integer>> valueKey, int... possibleValues) {
+        return of(CatalogKey.minecraft(id), valueKey, possibleValues);
+    }
+
+    /**
+     * Creates a new integer trait with the specified name and the possible values.
+     *
+     * <p>The possible values array may not be empty.</p>
+     *
+     * @param key The key
+     * @param valueKey The value key that should be attached to the trait
+     * @param keyTraitValueTransformer The key trait value transformer
+     * @param possibleValues the possible values
+     * @return the integer trait
+     */
+    public static <V> LanternIntegerTrait<V> ofTransformed(CatalogKey key, Key<? extends Value<V>> valueKey,
+            @Nullable KeyTraitValueTransformer<Integer, V> keyTraitValueTransformer, int... possibleValues) {
         checkNotNull(key, "key");
         checkNotNull(possibleValues, "possibleValues");
         checkNotNull(valueKey, "valueKey");
         checkState(possibleValues.length != 0, "possibleValues may not be empty");
-        ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
+        final ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
         for (int possibleValue : possibleValues) {
             builder.add(possibleValue);
         }
-        return new LanternIntegerTrait(key, valueKey, builder.build());
+        return new LanternIntegerTrait<>(key, valueKey, builder.build(), keyTraitValueTransformer);
     }
 
-    public static IntegerTrait minecraft(String id, Key<? extends Value<Integer>> valueKey, int... possibleValues) {
+    public static <V> LanternIntegerTrait<V> minecraftTransformed(String id, Key<? extends Value<V>> valueKey,
+            @Nullable KeyTraitValueTransformer<Integer, V> keyTraitValueTransformer, int... possibleValues) {
+        return ofTransformed(CatalogKey.minecraft(id), valueKey, keyTraitValueTransformer, possibleValues);
+    }
+
+    /**
+     * Creates a new integer trait with the specified name and the possible values.
+     *
+     * <p>The possible values array may not be empty.</p>
+     *
+     * @param key The key
+     * @param valueKey The value key that should be attached to the trait
+     * @param possibleValues the possible values
+     * @return the integer trait
+     */
+    public static <V> LanternIntegerTrait<V> of(CatalogKey key, Key<? extends Value<V>> valueKey, Iterable<Integer> possibleValues) {
+        return ofTransformed(key, valueKey, null, possibleValues);
+    }
+
+    public static <V> LanternIntegerTrait<V> minecraft(String id, Key<? extends Value<V>> valueKey, Iterable<Integer> possibleValues) {
         return of(CatalogKey.minecraft(id), valueKey, possibleValues);
     }
 
     /**
      * Creates a new integer trait with the specified name and the possible values.
-     * 
+     *
      * <p>The possible values array may not be empty.</p>
-     * 
-     * @param key the key
-     * @param valueKey the value key that should be attached to the trait
+     *
+     * @param key The key
+     * @param valueKey The value key that should be attached to the trait
+     * @param keyTraitValueTransformer The key trait value transformer
      * @param possibleValues the possible values
      * @return the integer trait
      */
-    public static IntegerTrait of(CatalogKey key, Key<? extends Value<Integer>> valueKey, Iterable<Integer> possibleValues) {
+    public static <V> LanternIntegerTrait<V> ofTransformed(CatalogKey key, Key<? extends Value<V>> valueKey,
+            @Nullable KeyTraitValueTransformer<Integer, V> keyTraitValueTransformer, Iterable<Integer> possibleValues) {
         checkNotNull(key, "key");
         checkNotNull(possibleValues, "possibleValues");
         checkNotNull(valueKey, "valueKey");
         checkState(possibleValues.iterator().hasNext(), "possibleValues may not be empty");
-        return new LanternIntegerTrait(key, valueKey, ImmutableSet.copyOf(possibleValues));
+        return new LanternIntegerTrait<>(key, valueKey, ImmutableSet.copyOf(possibleValues), keyTraitValueTransformer);
     }
 
-    public static IntegerTrait of(String id, Key<? extends Value<Integer>> valueKey, Iterable<Integer> possibleValues) {
-        return of(CatalogKey.minecraft(id), valueKey, possibleValues);
+    public static <V> LanternIntegerTrait<V> minecraftTransformed(String id, Key<? extends Value<V>> valueKey,
+            @Nullable KeyTraitValueTransformer<Integer, V> keyTraitValueTransformer, Iterable<Integer> possibleValues) {
+        return ofTransformed(CatalogKey.minecraft(id), valueKey, keyTraitValueTransformer, possibleValues);
     }
 
     /**
      * Creates a new integer trait with the specified name and the values between
      * the minimum (inclusive) and the maximum (exclusive) value.
-     * 
+     *
      * <p>The difference between the minimum and the maximum value must
      * be greater then zero.</p>
-     * 
-     * @param key the key
-     * @param valueKey the value key that should be attached to the trait
-     * @param min the minimum value
-     * @param max the maximum value
-     * @return the integer trait
+     *
+     * @param key The key
+     * @param valueKey The value key that should be attached to the trait
+     * @param min The minimum value
+     * @param max The maximum value
+     * @return The integer trait
      */
-    public static IntegerTrait ofRange(CatalogKey key, Key<? extends Value<Integer>> valueKey, int min, int max) {
+    public static LanternIntegerTrait<Integer> ofRange(CatalogKey key, Key<? extends Value<Integer>> valueKey, int min, int max) {
+        return ofRangeTransformed(key, valueKey, null, min, max);
+    }
+
+    public static LanternIntegerTrait<Integer> minecraftRange(String id, Key<? extends Value<Integer>> valueKey, int min, int max) {
+        return ofRangeTransformed(CatalogKey.minecraft(id), valueKey, null, min, max);
+    }
+
+    /**
+     * Creates a new integer trait with the specified name and the values between
+     * the minimum (inclusive) and the maximum (exclusive) value.
+     *
+     * <p>The difference between the minimum and the maximum value must
+     * be greater then zero.</p>
+     *
+     * @param key The name
+     * @param valueKey The value key that should be attached to the trait
+     * @param keyTraitValueTransformer The key trait value transformer
+     * @param min The minimum value
+     * @param max The maximum value
+     * @return The integer trait
+     */
+    public static <V> LanternIntegerTrait<V> ofRangeTransformed(CatalogKey key, Key<? extends Value<V>> valueKey,
+            @Nullable KeyTraitValueTransformer<Integer, V> keyTraitValueTransformer, int min, int max) {
         checkNotNull(key, "key");
-        checkNotNull(valueKey, "key");
+        checkNotNull(valueKey, "valueKey");
         checkState(max - min > 0, "difference between min and max must be greater then zero");
-        ImmutableSet.Builder<Integer> set = ImmutableSet.builder();
+        final ImmutableSet.Builder<Integer> set = ImmutableSet.builder();
         for (int i = min; i <= max; i++) {
             set.add(i);
         }
-        return new LanternIntegerTrait(key, valueKey, set.build());
+        return new LanternIntegerTrait<>(key, valueKey, set.build(), keyTraitValueTransformer);
     }
 
-    public static IntegerTrait minecraftRange(String id, Key<? extends Value<Integer>> valueKey, int min, int max) {
-        return ofRange(CatalogKey.minecraft(id), valueKey, min, max);
+    public static <V> LanternIntegerTrait<V> minecraftRangeTransformed(String id, Key<? extends Value<V>> valueKey,
+            @Nullable KeyTraitValueTransformer<Integer, V> keyTraitValueTransformer, int min, int max) {
+        return ofRangeTransformed(CatalogKey.minecraft(id), valueKey, keyTraitValueTransformer, min, max);
     }
 
     @Override

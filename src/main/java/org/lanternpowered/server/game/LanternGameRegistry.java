@@ -75,18 +75,14 @@ import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
 import org.lanternpowered.server.data.key.LanternKeyBuilder;
-import org.lanternpowered.server.data.type.LanternBigMushroomType;
-import org.lanternpowered.server.data.type.LanternBrickType;
+import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.data.type.LanternComparatorType;
-import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
-import org.lanternpowered.server.data.type.LanternDoublePlantType;
 import org.lanternpowered.server.data.type.LanternHinge;
-import org.lanternpowered.server.data.type.LanternLogAxis;
-import org.lanternpowered.server.data.type.LanternPistonType;
+import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPortionType;
-import org.lanternpowered.server.data.type.LanternPrismarineType;
-import org.lanternpowered.server.data.type.LanternWallType;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
+import org.lanternpowered.server.data.type.LanternSurface;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectType;
@@ -141,33 +137,21 @@ import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
 import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseStyleRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.LlamaVariantRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RailDirectionRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.RecordTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
@@ -329,23 +313,12 @@ import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.BannerPatternShape;
-import org.spongepowered.api.data.type.BigMushroomType;
-import org.spongepowered.api.data.type.BigMushroomTypes;
-import org.spongepowered.api.data.type.BrickType;
-import org.spongepowered.api.data.type.BrickTypes;
 import org.spongepowered.api.data.type.Career;
-import org.spongepowered.api.data.type.CoalType;
+import org.spongepowered.api.data.type.ChestAttachmentType;
+import org.spongepowered.api.data.type.ChestAttachmentTypes;
 import org.spongepowered.api.data.type.ComparatorType;
 import org.spongepowered.api.data.type.ComparatorTypes;
-import org.spongepowered.api.data.type.CookedFish;
-import org.spongepowered.api.data.type.DirtType;
-import org.spongepowered.api.data.type.DisguisedBlockType;
-import org.spongepowered.api.data.type.DisguisedBlockTypes;
-import org.spongepowered.api.data.type.DoublePlantType;
-import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.data.type.Fish;
-import org.spongepowered.api.data.type.GoldenApple;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.Hinge;
@@ -353,34 +326,23 @@ import org.spongepowered.api.data.type.Hinges;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.InstrumentType;
+import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.LlamaVariant;
-import org.spongepowered.api.data.type.LogAxes;
-import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.PickupRule;
-import org.spongepowered.api.data.type.PistonType;
-import org.spongepowered.api.data.type.PistonTypes;
-import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
-import org.spongepowered.api.data.type.PrismarineType;
-import org.spongepowered.api.data.type.PrismarineTypes;
 import org.spongepowered.api.data.type.Profession;
-import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RailDirection;
-import org.spongepowered.api.data.type.SandType;
-import org.spongepowered.api.data.type.SandstoneType;
-import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.SkinPart;
-import org.spongepowered.api.data.type.SkullType;
-import org.spongepowered.api.data.type.SlabType;
-import org.spongepowered.api.data.type.StoneType;
+import org.spongepowered.api.data.type.SlabPortion;
+import org.spongepowered.api.data.type.SlabPortions;
+import org.spongepowered.api.data.type.Surface;
+import org.spongepowered.api.data.type.Surfaces;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.TreeType;
-import org.spongepowered.api.data.type.WallType;
-import org.spongepowered.api.data.type.WallTypes;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOption;
@@ -389,7 +351,7 @@ import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.record.RecordType;
+import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.ai.task.AITaskType;
 import org.spongepowered.api.entity.ai.task.AbstractAITask;
@@ -672,32 +634,27 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(TeleportType.class, new TeleportTypeRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
-                .registerModule(BigMushroomType.class,
-                        new EnumValueRegistryModule<BigMushroomType>(LanternBigMushroomType.class, BigMushroomTypes.class) {})
-                .registerModule(BrickType.class,
-                        new EnumValueRegistryModule<BrickType>(LanternBrickType.class, BrickTypes.class) {})
                 .registerModule(ComparatorType.class,
                         new EnumValueRegistryModule<ComparatorType>(LanternComparatorType.class, ComparatorTypes.class) {})
-                .registerModule(DirtType.class, DirtTypeRegistryModule.get())
-                .registerModule(DisguisedBlockType.class,
-                        new EnumValueRegistryModule<DisguisedBlockType>(LanternDisguisedBlockType.class, DisguisedBlockTypes.class) {})
+                .registerModule(ChestAttachmentType.class,
+                        new EnumValueRegistryModule<ChestAttachmentType>(LanternChestAttachment.class, ChestAttachmentTypes.class) {})
                 .registerModule(LanternDoorHalf.class,
                         new EnumValueRegistryModule<LanternDoorHalf>(LanternDoorHalf.class, null) {})
-                .registerModule(DoublePlantType.class,
-                        new EnumValueRegistryModule<DoublePlantType>(LanternDoublePlantType.class, DoublePlantTypes.class) {})
+                .registerModule(InstrumentType.class,
+                        new EnumValueRegistryModule<InstrumentType>(LanternInstrumentType.class, InstrumentTypes.class) {})
                 .registerModule(Art.class, new ArtRegistryModule())
                 .registerModule(Career.class, new CareerRegistryModule())
                 .registerModule(HandType.class, new HandTypeRegistryModule())
                 .registerModule(HandPreference.class, new HandPreferenceRegistryModule())
                 .registerModule(HorseColor.class, new HorseColorRegistryModule())
                 .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
-                .registerModule(InstrumentType.class, new InstrumentTypeRegistryModule())
+                .registerModule(Surface.class,
+                        new EnumValueRegistryModule<Surface>(LanternSurface.class, Surfaces.class) {})
                 .registerModule(Hinge.class,
                         new EnumValueRegistryModule<Hinge>(LanternHinge.class, Hinges.class) {})
                 .registerModule(Key.class, KeyRegistryModule.get())
                 .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
-                .registerModule(LogAxis.class,
-                        new EnumValueRegistryModule<LogAxis>(LanternLogAxis.class, LogAxes.class) {})
+                .registerModule(SlabPortion.class, new EnumValueRegistryModule<SlabPortion>(LanternSlabPortion.class, SlabPortions.class) {})
                 .registerModule(NotePitch.class, NotePitchRegistryModule.get())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
                 .registerModule(LlamaVariant.class, new LlamaVariantRegistryModule())
@@ -705,20 +662,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
                 .registerModule(ToolType.class, new ToolTypeRegistryModule())
                 .registerModule(ArmorType.class, new ArmorTypeRegistryModule())
-                .registerModule(PistonType.class,
-                        new EnumValueRegistryModule<PistonType>(LanternPistonType.class, PistonTypes.class) {})
-                .registerModule(PlantType.class, PlantTypeRegistryModule.get())
-                .registerModule(PrismarineType.class,
-                        new EnumValueRegistryModule<PrismarineType>(LanternPrismarineType.class, PrismarineTypes.class) {})
-                .registerModule(QuartzType.class, QuartzTypeRegistryModule.get())
-                .registerModule(SandstoneType.class, SandstoneTypeRegistryModule.get())
-                .registerModule(SandType.class, SandTypeRegistryModule.get())
-                .registerModule(ShrubType.class, ShrubTypeRegistryModule.get())
-                .registerModule(StoneType.class, StoneTypeRegistryModule.get())
-                .registerModule(SlabType.class, SlabTypeRegistryModule.get())
-                .registerModule(TreeType.class, TreeTypeRegistryModule.get())
-                .registerModule(WallType.class,
-                        new EnumValueRegistryModule<WallType>(LanternWallType.class, WallTypes.class) {})
+                .registerModule(TreeType.class, TreeTypeRegistryModule.INSTANCE)
                 .registerModule(SkinPart.class, new SkinPartRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
@@ -765,21 +709,16 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(QueryOperationType.class, new QueryOperationRegistryModule())
                 .registerModule(new InventoryTransformationRegistryModule())
                 .registerModule(GuiId.class, ClientContainerRegistryModule.get())
-                .registerModule(GoldenApple.class, GoldenAppleRegistryModule.get())
-                .registerModule(CoalType.class, CoalTypeRegistryModule.get())
-                .registerModule(Fish.class, FishRegistryModule.get())
-                .registerModule(CookedFish.class, CookedFishRegistryModule.get())
                 .registerModule(DyeColor.class, DyeColorRegistryModule.get())
                 .registerModule(PickupRule.class, PickupRuleRegistryModule.get())
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())
                 .registerModule(EnchantmentType.class, EnchantmentTypeRegistryModule.get())
-                .registerModule(SkullType.class, SkullTypeRegistryModule.get())
                 .registerModule(PotionType.class, PotionTypeRegistryModule.get())
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
                 .registerModule(DataRegistration.class, (AdditionalPluginCatalogRegistryModule) DataRegistrationRegistryModule.INSTANCE)
-                .registerModule(RecordType.class, RecordTypeRegistryModule.get())
+                .registerModule(MusicDisc.class, MusicDiscRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 .registerModule(EventContextKey.class, (AdditionalPluginCatalogRegistryModule) EventContextKeysModule.get())
                 .registerModule(new BlockChangeFlagRegistryModule())

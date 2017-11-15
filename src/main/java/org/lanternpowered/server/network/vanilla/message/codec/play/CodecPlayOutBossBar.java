@@ -48,7 +48,7 @@ public final class CodecPlayOutBossBar implements Codec<MessagePlayOutBossBar> {
             buf.writeFloat(message0.getHealth());
             buf.writeVarInt(((LanternBossBarColor) message0.getColor()).getInternalId());
             buf.writeVarInt(((LanternBossBarOverlay) message0.getOverlay()).getInternalId());
-            buf.writeByte(toFlags(message0.isDarkenSky(), message0.isEndMusic()));
+            buf.writeByte(toFlags(message0.isDarkenSky(), message0.isEndMusic(), message0.shouldCreateFog()));
         } else if (message instanceof MessagePlayOutBossBar.Remove) {
             buf.writeVarInt(1);
         } else if (message instanceof MessagePlayOutBossBar.UpdatePercent) {
@@ -65,20 +65,23 @@ public final class CodecPlayOutBossBar implements Codec<MessagePlayOutBossBar> {
         } else if (message instanceof MessagePlayOutBossBar.UpdateMisc) {
             final MessagePlayOutBossBar.UpdateMisc message0 = (MessagePlayOutBossBar.UpdateMisc) message;
             buf.writeVarInt(5);
-            buf.writeByte(toFlags(message0.isDarkenSky(), message0.isEndMusic()));
+            buf.writeByte(toFlags(message0.isDarkenSky(), message0.isEndMusic(), message0.shouldCreateFog()));
         } else {
             throw new EncoderException("Unsupported message type: " + message.getClass().getName());
         }
         return buf;
     }
 
-    private static byte toFlags(boolean darkenSky, boolean endMusic) {
+    private static byte toFlags(boolean darkenSky, boolean endMusic, boolean createFog) {
         byte flags = 0;
         if (darkenSky) {
             flags |= 0x1;
         }
         if (endMusic) {
             flags |= 0x2;
+        }
+        if (createFog) {
+            flags |= 0x4;
         }
         return flags;
     }

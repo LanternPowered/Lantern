@@ -41,9 +41,9 @@ public final class MessagePlayOutChunkData implements Message {
     private final int z;
 
     private final Section[] sections;
-    @Nullable private final byte[] biomes;
+    @Nullable private final int[] biomes;
 
-    public MessagePlayOutChunkData(int x, int z, boolean skylight, Section[] sections, @Nullable byte[] biomes) {
+    public MessagePlayOutChunkData(int x, int z, boolean skylight, Section[] sections, @Nullable int[] biomes) {
         checkNotNull(sections, "sections");
         for (Section section : sections) {
             if (section != null) {
@@ -70,7 +70,7 @@ public final class MessagePlayOutChunkData implements Message {
     }
 
     @Nullable
-    public byte[] getBiomes() {
+    public int[] getBiomes() {
         return this.biomes;
     }
 

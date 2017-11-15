@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
-import org.lanternpowered.server.data.type.LanternRecordType;
+import org.lanternpowered.server.data.type.LanternMusicDisc;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -50,8 +50,8 @@ public final class CodecPlayOutEffect implements Codec<Message> {
             final MessagePlayOutRecord message1 = (MessagePlayOutRecord) message;
             buf.writeInteger(1010);
             buf.writeVector3i(message1.getPosition());
-            buf.writeInteger(message1.getRecord()
-                    .map(type -> 2256 + ((LanternRecordType) type).getInternalId()).orElse(0));
+            buf.writeInteger(message1.getMusicDisc()
+                    .map(type -> 2256 + ((LanternMusicDisc) type).getInternalId()).orElse(0));
             buf.writeBoolean(false);
         } else {
             throw new EncoderException("Unsupported message type: " + message.getClass().getName());

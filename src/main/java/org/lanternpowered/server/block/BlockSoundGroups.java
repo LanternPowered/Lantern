@@ -34,8 +34,6 @@ public final class BlockSoundGroups {
 
     public static final BlockSoundGroup ANVIL = DummyObjectProvider.createFor(BlockSoundGroup.class, "ANVIL");
 
-    public static final BlockSoundGroup CLOTH = DummyObjectProvider.createFor(BlockSoundGroup.class, "CLOTH");
-
     public static final BlockSoundGroup GLASS = DummyObjectProvider.createFor(BlockSoundGroup.class, "GLASS");
 
     public static final BlockSoundGroup GRASS = DummyObjectProvider.createFor(BlockSoundGroup.class, "GRASS");
@@ -55,6 +53,8 @@ public final class BlockSoundGroups {
     public static final BlockSoundGroup STONE = DummyObjectProvider.createFor(BlockSoundGroup.class, "STONE");
 
     public static final BlockSoundGroup WOOD = DummyObjectProvider.createFor(BlockSoundGroup.class, "WOOD");
+
+    public static final BlockSoundGroup WOOL = DummyObjectProvider.createFor(BlockSoundGroup.class, "WOOL");
 
     // SORTFIELDS:OFF
 

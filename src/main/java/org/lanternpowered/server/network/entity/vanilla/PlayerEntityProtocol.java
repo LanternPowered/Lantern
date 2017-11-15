@@ -36,14 +36,12 @@ import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.extra.accessory.TopHat;
-import org.lanternpowered.server.extra.accessory.TopHats;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
@@ -55,13 +53,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemTypes;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -168,6 +164,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     private void sendHat(EntityProtocolUpdateContext context, TopHat hat) {
+        /*
         final LanternItemStack paneItem;
         final LanternItemStack blockItem;
 
@@ -196,6 +193,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             throw new IllegalStateException();
         }
 
+        // TODO: Update
         byte flags = 0x20;
         if (getEntity().get(Keys.GLOWING).get()) {
             flags |= 0x40;
@@ -223,7 +221,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
         sendPassengers(context, 8, 10);
         sendPassengers(context, 9, 11);
-
+*/
         /*
         final LanternItemStack boneItem = new LanternItemStack(ItemTypes.BONE);
 
@@ -346,7 +344,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.elytraRocketId));
             } else if (elytraFlying && elytraSpeedBoost) {
                 // Create the fireworks data item
-                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORKS);
+                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORK_ROCKET);
 
                 // Write the item to a parameter list
                 final DefaultParameterList parameterList = new DefaultParameterList();

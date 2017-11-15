@@ -31,13 +31,13 @@ import org.lanternpowered.server.network.message.Message;
 // and stops. It is only send when the recipe book is opened.
 public final class MessagePlayInDisplayedRecipe implements Message {
 
-    private final int id;
+    private final String recipeId;
 
-    public MessagePlayInDisplayedRecipe(int id) {
-        this.id = id;
+    public MessagePlayInDisplayedRecipe(String recipeId) {
+        this.recipeId = recipeId;
     }
 
-    public int getId() {
-        return this.id;
+    public String getRecipeId() {
+        return this.recipeId;
     }
 }

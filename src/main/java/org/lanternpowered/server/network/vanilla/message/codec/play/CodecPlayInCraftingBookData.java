@@ -26,13 +26,14 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRecipeBookStates;
 
 public final class CodecPlayInCraftingBookData implements Codec<Message> {
 
@@ -40,12 +41,16 @@ public final class CodecPlayInCraftingBookData implements Codec<Message> {
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         final int type = buf.readVarInt();
         if (type == 0) {
-            final int id = buf.readInteger();
+            final String id = buf.readString();
             return new MessagePlayInDisplayedRecipe(id);
         } else if (type == 1) {
-            final boolean open = buf.readBoolean();
-            final boolean filter = buf.readBoolean();
-            return new MessagePlayInCraftingBookState(open, filter);
+            boolean open = buf.readBoolean();
+            boolean filter = buf.readBoolean();
+            final RecipeBookState crafting = new RecipeBookState(open, filter);
+            open = buf.readBoolean();
+            filter = buf.readBoolean();
+            final RecipeBookState smelting = new RecipeBookState(open, filter);
+            return new MessagePlayInRecipeBookStates(crafting, smelting);
         }
         return UnknownMessage.INSTANCE;
     }

@@ -51,8 +51,8 @@ object TranslationManagerRegistryModule : RegistryModule {
         this.translationManager.addManager(MinecraftTranslationManager())
         val lanternTranslationManager = LanternTranslationManager()
         // Add the lantern languages
-        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/en_us.properties").get(), Locales.EN_US)
-        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/nl_nl.properties").get(), Locales.NL_NL)
+        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/en_us.json").get(), Locales.EN_US)
+        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/nl_nl.json").get(), Locales.NL_NL)
         this.translationManager.addManager(lanternTranslationManager)
         this.translationManager.setDelegateManager(lanternTranslationManager)
     }

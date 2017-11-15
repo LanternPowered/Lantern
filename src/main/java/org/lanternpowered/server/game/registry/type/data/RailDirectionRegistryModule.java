@@ -26,11 +26,11 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternRailDirection;
-import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
+import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.spongepowered.api.data.type.RailDirection;
 import org.spongepowered.api.data.type.RailDirections;
 
-public class RailDirectionRegistryModule extends InternalEnumValueRegistryModule<RailDirection> {
+public class RailDirectionRegistryModule extends EnumValueRegistryModule<RailDirection> {
 
     private static final RailDirectionRegistryModule INSTANCE = new RailDirectionRegistryModule();
 

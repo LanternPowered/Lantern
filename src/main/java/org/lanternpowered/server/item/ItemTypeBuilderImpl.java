@@ -137,11 +137,7 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
         }
         TranslationProvider translationProvider = this.translationProvider;
         if (translationProvider == null) {
-            String path = "tile." + name + ".name";
-            if (!pluginId.equals("minecraft")) {
-                path = pluginId + '.' + path;
-            }
-            translationProvider = TranslationProvider.of(tr(path));
+            translationProvider = TranslationProvider.of(tr("item." + pluginId + "." + name));
         }
         PropertyProviderCollection properties;
         if (this.propertiesBuilder != null) {

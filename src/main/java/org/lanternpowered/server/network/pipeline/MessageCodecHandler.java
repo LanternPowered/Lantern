@@ -51,6 +51,9 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineCommands;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 
 import java.util.List;
 import java.util.Optional;

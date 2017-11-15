@@ -34,14 +34,15 @@ import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E> implements EnumTrait<E> {
+public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E, E> implements EnumTrait<E> {
 
     private LanternEnumTrait(CatalogKey key, Class<E> valueClass, Key<? extends Value<E>> valueKey, ImmutableSet<E> possibleValues) {
-        super(key, valueKey, valueClass, possibleValues);
+        super(key, valueKey, valueClass, possibleValues, null);
     }
 
     /**
@@ -106,8 +107,8 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
         checkNotNull(enumClass, "enumClass");
         checkNotNull(valueKey, "valueKey");
         checkState(enumClass.getEnumConstants().length != 0, "enumClass must contain values");
-        return new LanternEnumTrait<>(key, enumClass, valueKey, ImmutableSet.copyOf(enumClass.getEnumConstants())
-                .stream().filter(predicate).collect(ImmutableSet.toImmutableSet()));
+        return new LanternEnumTrait<>(key, enumClass, valueKey, Arrays.stream(enumClass.getEnumConstants())
+                .filter(predicate).collect(ImmutableSet.toImmutableSet()));
     }
 
     public static <E extends Enum<E>> EnumTrait<E> minecraft(String id, Key<? extends Value<E>> valueKey,

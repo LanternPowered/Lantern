@@ -129,7 +129,7 @@ public abstract class FancyTopBottomGridViewContainer extends PlayerTopBottomCon
         clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(this));
         clientContainer.setTitle(TextTranslation.toText(getOpenInventory().getName()));
 
-        final ItemStack dummy = ItemStack.of(ItemTypes.STAINED_GLASS_PANE, 1);
+        final ItemStack dummy = ItemStack.of(ItemTypes.WHITE_STAINED_GLASS_PANE, 1);
         dummy.offer(Keys.DISPLAY_NAME, Text.of());
 
         final TopContainerPart topContainerPart = clientContainer.getTop();

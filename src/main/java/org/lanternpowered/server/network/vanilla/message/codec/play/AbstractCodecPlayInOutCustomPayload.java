@@ -65,10 +65,10 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             channel = channelPayload.getChannel();
         } else if (message instanceof MessagePlayInOutRegisterChannels) {
             content = encodeChannels(((MessagePlayInOutRegisterChannels) message).getChannels());
-            channel = "REGISTER";
+            channel = "minecraft:register";
         } else if (message instanceof MessagePlayInOutUnregisterChannels) {
             content = encodeChannels(((MessagePlayInOutUnregisterChannels) message).getChannels());
-            channel = "UNREGISTER";
+            channel = "minecraft:unregister";
         } else {
             final MessageResult result = encode0(context, message);
             channel = result.channel;
@@ -102,13 +102,13 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
     }
 
     private Message decode0(CodecContext context, ByteBuffer content, String channel) {
-        if ("REGISTER".equals(channel)) {
+        if ("minecraft:register".equals(channel)) {
             final Set<String> channels = decodeChannels(content);
             channels.removeIf(c -> c.startsWith("FML"));
             if (!channels.isEmpty()) {
                 return new MessagePlayInOutRegisterChannels(channels);
             }
-        } else if ("UNREGISTER".equals(channel)) {
+        } else if ("minecraft:unregister".equals(channel)) {
             final Set<String> channels = decodeChannels(content);
             channels.removeIf(c -> c.startsWith("FML"));
             if (!channels.isEmpty()) {

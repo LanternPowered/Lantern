@@ -27,11 +27,11 @@ package org.lanternpowered.server.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.api.cause.CauseStack;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -40,19 +40,11 @@ import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.ProvisioningException;
 import org.spongepowered.api.service.ServiceManager;
-import org.spongepowered.api.service.SimpleServiceManager;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * The default implementation of {@link ServiceManager}.
- * <p>
- * Almost identical to the {@link SimpleServiceManager} with the difference that
- * the {@link EventManager} is also being injected. This is required due the fact
- * that the instance is required earlier then {@link Sponge#getEventManager()}
- * can provide.
- */
 @Singleton
 public class LanternServiceManager implements ServiceManager {
 
@@ -74,6 +66,10 @@ public class LanternServiceManager implements ServiceManager {
         checkNotNull(eventManager, "eventManager");
         this.pluginManager = pluginManager;
         this.eventManager = eventManager;
+    }
+
+    public Collection<ProviderRegistration<?>> getProviderRegistrations() {
+        return ImmutableList.copyOf(this.providers.values());
     }
 
     @Override

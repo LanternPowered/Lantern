@@ -26,11 +26,10 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInModifyBook;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -38,12 +37,11 @@ import org.spongepowered.api.text.Text;
 
 import java.util.stream.Collectors;
 
-public class HandlerPlayInSignBook implements Handler<MessagePlayInSignBook> {
+public class HandlerPlayInSignBook implements Handler<MessagePlayInModifyBook.Sign> {
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInSignBook message) {
+    public void handle(NetworkContext context, MessagePlayInModifyBook.Sign message) {
         final LanternPlayer player = context.getSession().getPlayer();
-        final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
         LanternItemStack itemStack = slot.peek();
         if (itemStack.isFilled() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {

@@ -27,17 +27,15 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import org.lanternpowered.server.advancement.LanternAdvancementType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvancements> {
 
@@ -45,50 +43,10 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
     public ByteBuffer encode(CodecContext context, MessagePlayOutAdvancements message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeBoolean(message.getClear());
-        final List<MessagePlayOutAdvancements.AdvStruct> addedAdvStructs = message.getAddedAdvStructs();
-        buf.writeVarInt(addedAdvStructs.size());
-        for (MessagePlayOutAdvancements.AdvStruct struct : addedAdvStructs) {
-            buf.writeString(struct.getId());
-            final Optional<String> optParent = struct.getParentId();
-            buf.writeBoolean(optParent.isPresent());
-            optParent.ifPresent(buf::writeString);
-            final Optional<MessagePlayOutAdvancements.AdvStruct.Display> optDisplay = struct.getDisplay();
-            buf.writeBoolean(optDisplay.isPresent());
-            if (optDisplay.isPresent()) {
-                final MessagePlayOutAdvancements.AdvStruct.Display display = optDisplay.get();
-                context.write(buf, ContextualValueTypes.TEXT, display.getTitle());
-                context.write(buf, ContextualValueTypes.TEXT, display.getDescription());
-                context.write(buf, ContextualValueTypes.ITEM_STACK, display.getIcon().createStack());
-                buf.writeVarInt(((LanternAdvancementType) display.getType()).getInternalId());
-                final Optional<String> optBackground = display.getBackground();
-                int flags = 0;
-                if (optBackground.isPresent()) {
-                    flags |= 0x1;
-                }
-                if (display.doesShowToast()) {
-                    flags |= 0x2;
-                }
-                if (display.isHidden()) {
-                    flags |= 0x4;
-                }
-                buf.writeInteger(flags);
-                optBackground.ifPresent(buf::writeString);
-                buf.writeFloat((float) display.getX());
-                buf.writeFloat((float) display.getY());
-            }
-            final Collection<String> criteria = struct.getCriteria();
-            buf.writeVarInt(criteria.size());
-            criteria.forEach(buf::writeString);
-            final String[][] requirements = struct.getRequirements();
-            buf.writeVarInt(requirements.length);
-            for (String[] requirements1 : requirements) {
-                buf.writeVarInt(requirements1.length);
-                for (String requirement : requirements1) {
-                    buf.writeString(requirement);
-                }
-            }
-        }
-        final List<String> removed = message.getRemovedAdvs();
+        final List<NetworkAdvancement> added = message.getAdded();
+        buf.writeVarInt(added.size());
+        added.forEach(advancement -> context.write(buf, ContextualValueTypes.ADVANCEMENT, advancement));
+        final List<String> removed = message.getRemoved();
         buf.writeVarInt(removed.size());
         removed.forEach(buf::writeString);
         final Map<String, Object2LongMap<String>> progress = message.getProgress();

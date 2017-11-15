@@ -34,8 +34,6 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
-import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
@@ -51,12 +49,16 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTileEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
 import org.lanternpowered.server.util.collect.array.VariableValueArray;
+import org.lanternpowered.server.util.palette.Palette;
+import org.lanternpowered.server.util.palette.PaletteType;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.WorldEventListener;
+import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
@@ -172,6 +174,11 @@ public final class ObservedChunkManager implements WorldEventListener {
         return chunk.getTileEntities().stream().collect(Collectors.toMap(
                 tileEntity -> tileEntity.getLocation().getBlockPosition(),
                 tileEntity -> (LanternTileEntity) tileEntity));
+    }
+
+    private static int getStateId(Chunk chunk, Vector3i coords) {
+        final BlockState blockState = chunk.getBlock(coords);
+        return BlockRegistryModule.get().getStateInternalId(blockState);
     }
 
     private class ObservedChunk {
@@ -295,11 +302,11 @@ public final class ObservedChunkManager implements WorldEventListener {
                                 this.coords.getX(), this.coords.getY(), changes.stream().map(coords -> {
                             final int x = coords.getX() & 0xf;
                             final int z = coords.getZ() & 0xf;
-                            return new MessagePlayOutBlockChange(new Vector3i(x, coords.getY(), z), chunk.getType(coords));
+                            return new MessagePlayOutBlockChange(new Vector3i(x, coords.getY(), z), getStateId(chunk, coords));
                         }).collect(Collectors.toList())));
                     } else {
                         dirtyBlock = changes.iterator().next();
-                        messages.add(new MessagePlayOutBlockChange(dirtyBlock, chunk.getType(dirtyBlock)));
+                        messages.add(new MessagePlayOutBlockChange(dirtyBlock, getStateId(chunk, dirtyBlock)));
                     }
                     final TileEntityUpdateContext initContext = new TileEntityUpdateContext(messages);
                     mappedTileEntities = getMappedTileEntities(chunk);
@@ -393,54 +400,19 @@ public final class ObservedChunkManager implements WorldEventListener {
             for (int i = 0; i < sections.length; i++) {
                 if (sections[i] != null) {
                     final LanternChunk.ChunkSectionSnapshot section = sections[i];
-                    // The size of the palette
-                    int paletteSize = section.typesCountMap.size();
-                    // The amount of bits for every block state
-                    int bitsPerValue = Integer.highestOneBit(paletteSize);
-                    // The palette that will be send to the client
-                    int[] palette;
-                    // The lookup for global to local palette id
-                    Short2ShortMap globalToLocalPalette;
-                    // There seems to be a weird issue, some blocks are not rendered
-                    // on the client (bedrock with the flat generator) and it cannot
-                    // be placed in creative
-                    if (bitsPerValue <= 8) {
-                        // The vanilla client/server will not go lower then 4 bits
-                        if (bitsPerValue < 4) {
-                            bitsPerValue = 4;
-                        }
-                        globalToLocalPalette = new Short2ShortOpenHashMap(paletteSize);
-                        palette = new int[paletteSize];
-                        short currentId = 0;
-                        for (short type : section.typesCountMap.keySet().toShortArray()) {
-                            globalToLocalPalette.put(type, currentId);
-                            palette[currentId] = type;
-                            currentId++;
-                        }
-                    } else {
-                        // int statesCount = Registries.getBlockRegistry().getBlockStatesCount();
-                        // bitsPerValue = Integer.highestOneBit(statesCount);
-                        // The value should be the amount of bits per value of
-                        // the CLIENT palette, it will otherwise not work.
-                        // This is sadly enough hardcoded in the client
-                        bitsPerValue = 13;
-                        globalToLocalPalette = null;
-                        palette = null;
+                    final ChunkBlockStateArray blockStates = section.blockStates;
+                    final Palette<BlockState> palette = blockStates.getPalette();
+                    int[] intPalette = null;
+                    if (palette.getType() != PaletteType.GLOBAL) {
+                        intPalette = palette.getEntries().stream()
+                                .mapToInt(state -> BlockRegistryModule.get().getStateInternalId(state))
+                                .toArray();
                     }
-                    final short[] types = section.types;
-                    final VariableValueArray array = new VariableValueArray(bitsPerValue, types.length);
-                    if (globalToLocalPalette != null) {
-                        for (int j = 0; j < types.length; j++) {
-                            array.set(j, globalToLocalPalette.get(types[j]));
-                        }
-                    } else {
-                        for (int j = 0; j < types.length; j++) {
-                            array.set(j, types[j]);
-                        }
-                    }
+
                     final Short2ObjectMap<DataView> tileEntityInitData = new Short2ObjectOpenHashMap<>();
                     final TileEntityChunkInitContext initContext = new TileEntityChunkInitContext(
                             messages, tileEntityInitData, chunk.getX(), chunk.getZ(), i);
+                    // Serialize the tile entities
                     for (Short2ObjectMap.Entry<LanternTileEntity> tileEntityEntry : section.tileEntities.short2ObjectEntrySet()) {
                         if (!tileEntityEntry.getValue().isValid()) { // Ignore invalid tile entities
                             continue;
@@ -451,7 +423,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                             TileEntityProtocolHelper.init(protocol, initContext);
                         }
                     }
-                    msgSections[i] = new MessagePlayOutChunkData.Section(array, palette,
+                    msgSections[i] = new MessagePlayOutChunkData.Section(blockStates.getBacking(), intPalette,
                             section.lightFromBlock, section.lightFromSky, tileEntityInitData);
                 // The insert entry setting is used to send a "null" chunk
                 // after the chunk is already send to the client
@@ -461,14 +433,10 @@ public final class ObservedChunkManager implements WorldEventListener {
                 }
             }
 
-            byte[] biomesArray = null;
+            int[] biomesArray = null;
             if (biomes) {
-                short[] biomesArray0 = chunk.getBiomes();
-                biomesArray = new byte[biomesArray0.length];
-                for (int i = 0; i < biomesArray0.length; i++) {
-                    // TODO: Only allow non-custom biome types to be send and maybe the ones supported by forge mods?
-                    biomesArray[i] = (byte) (biomesArray0[i] & 0xff);
-                }
+                biomesArray = chunk.getBiomes();
+                // TODO: Only allow non-custom biome types to be send and maybe the ones supported by forge mods?
             }
 
             messages.add(0, new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), skyLight, msgSections, biomesArray));

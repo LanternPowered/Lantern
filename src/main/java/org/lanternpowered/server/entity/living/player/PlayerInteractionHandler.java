@@ -39,6 +39,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
@@ -55,6 +56,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
@@ -297,6 +299,19 @@ public final class PlayerInteractionHandler {
     }
 
     public void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
+        handleBlockPlacing0(message);
+
+        // Send some updates to the client
+        Vector3i position = message.getPosition();
+        final World world = this.player.getWorld();
+        this.player.getConnection().send(new MessagePlayOutBlockChange(position,
+                BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
+        position = position.add(message.getFace().asBlockOffset());
+        this.player.getConnection().send(new MessagePlayOutBlockChange(position,
+                BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
+    }
+
+    private void handleBlockPlacing0(MessagePlayInPlayerBlockPlacement message) {
         final HandType handType = message.getHandType();
         // Ignore the off hand interaction type for now, a main hand message
         // will always be send before this message. So we will only listen for

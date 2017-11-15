@@ -36,9 +36,9 @@ public class LightningSoundEffect extends AbstractEntityEffect {
 
     @Override
     protected void play(LanternEntity entity, Vector3d position, Random random) {
-        entity.playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER,
+        entity.playSound(SoundTypes.ENTITY_LIGHTNING_BOLT_THUNDER,
                 10000.0, 0.8 + random.nextDouble() * 0.2);
-        entity.playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT,
+        entity.playSound(SoundTypes.ENTITY_LIGHTNING_BOLT_IMPACT,
                 2.0, 0.5 + random.nextDouble() * 0.2);
     }
 }

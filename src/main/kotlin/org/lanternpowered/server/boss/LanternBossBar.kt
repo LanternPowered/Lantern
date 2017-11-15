@@ -129,7 +129,7 @@ data class LanternBossBar internal constructor(
     }
 
     private fun sendMiscUpdate() {
-        sendToViewers { MessagePlayOutBossBar.UpdateMisc(this.uniqueId, this.darkenSky, this.playEndBossMusic || this.createFog) }
+        sendToViewers { MessagePlayOutBossBar.UpdateMisc(this.uniqueId, this.darkenSky, this.createFog, this.createFog) }
     }
 
     override fun setVisible(visible: Boolean): LanternBossBar = apply {
@@ -169,6 +169,6 @@ data class LanternBossBar internal constructor(
 
     private fun createAddMessage(): MessagePlayOutBossBar.Add {
         return MessagePlayOutBossBar.Add(this.uniqueId, this.name,
-                this.color, this.overlay, this.percent, this.darkenSky, this.playEndBossMusic)
+                this.color, this.overlay, this.percent, this.darkenSky, this.playEndBossMusic, this.createFog)
     }
 }

@@ -81,7 +81,7 @@ public class LanternItemStackBuilder extends AbstractDataBuilder<ItemStack> impl
 
     @Override
     public ItemType getCurrentItem() {
-        return this.itemTypeSet ? itemStack(null).getType() : ItemTypes.NONE;
+        return this.itemTypeSet ? itemStack(null).getType() : ItemTypes.AIR;
     }
 
     @Override

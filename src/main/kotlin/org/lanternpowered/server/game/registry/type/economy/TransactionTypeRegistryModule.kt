@@ -34,7 +34,8 @@ import org.spongepowered.api.service.economy.transaction.TransactionTypes
 class TransactionTypeRegistryModule : AdditionalPluginCatalogRegistryModule<TransactionType>(TransactionTypes::class) {
 
     override fun registerDefaults() {
-        val register = { id: String -> register(LanternTransactionType(CatalogKey.sponge(id))) }
+        fun register(id: String) = register(LanternTransactionType(CatalogKey.sponge(id)))
+
         register("deposit")
         register("withdraw")
         register("transfer")

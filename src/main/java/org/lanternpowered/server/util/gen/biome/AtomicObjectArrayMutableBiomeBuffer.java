@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 /**
  * Mutable view of a {@link BiomeType} array.
  *
- * <p>Normally, the {@link AtomicShortArrayMutableBiomeBuffer} class uses memory more
+ * <p>Normally, the {@link AtomicIntArrayMutableBiomeBuffer} class uses memory more
  * efficiently, but when the {@link BiomeType} array is already created (for
  * example for a contract specified by Minecraft) this implementation becomes
  * more efficient.</p>

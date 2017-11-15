@@ -41,8 +41,10 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.SkinPart;
+import org.spongepowered.api.text.Text;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -129,9 +131,9 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
     }
 
     @Override
-    String getCustomName() {
+    Optional<Text> getCustomName() {
         // The display doesn't have to be updated through
         // the parameters for humanoids
-        return "";
+        return Optional.empty();
     }
 }

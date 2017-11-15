@@ -56,12 +56,12 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.util.ThreadHelper;
+import org.lanternpowered.server.util.gen.biome.IntArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayImmutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
-import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
-import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
-import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.AtomicIntArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.IntArrayImmutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.IntArrayMutableBlockBuffer;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.extent.ExtentBufferHelper;
@@ -1044,7 +1044,9 @@ public final class LanternChunkManager {
         for (int sy = 0; sy < CHUNK_SECTIONS; sy++) {
             final int nonAirCount = blockBuffer.nonAirCount[sy];
             if (nonAirCount > 0) {
-                sections[sy] = new ChunkSection(blockBuffer.types[sy]);
+                final ChunkBlockStateArray blockStateArray =
+                        new ChunkBlockStateArray(blockBuffer.types[sy]);
+                sections[sy] = new ChunkSection(blockStateArray);
             }
         }
 
@@ -1063,7 +1065,7 @@ public final class LanternChunkManager {
      * A biome buffer that also holds a backing array with all the biome
      * type objects to allow faster access to all the used biome types.
      */
-    private final class ChunkBiomeBuffer extends ShortArrayMutableBiomeBuffer {
+    private final class ChunkBiomeBuffer extends IntArrayMutableBiomeBuffer {
 
         private final BiomeType[] biomeTypes;
 
@@ -1111,7 +1113,7 @@ public final class LanternChunkManager {
      */
     private final class ChunkBlockBuffer extends AbstractMutableBlockBuffer {
 
-        private final short[][] types = new short[CHUNK_SECTIONS][CHUNK_SECTION_VOLUME];
+        private final int[][] types = new int[CHUNK_SECTIONS][CHUNK_SECTION_VOLUME];
         private final int[] nonAirCount = new int[CHUNK_SECTIONS];
 
         ChunkBlockBuffer() {
@@ -1133,8 +1135,8 @@ public final class LanternChunkManager {
             checkRange(x, y, z);
             final int sy = y >> 4;
             final int index = ((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf;
-            final short[] types = this.types[sy];
-            final short type = BlockRegistryModule.get().getStateInternalIdAndData(block);
+            final int[] types = this.types[sy];
+            final int type = BlockRegistryModule.get().getStateInternalId(block);
             if (type == 0 && types[index] != 0) {
                 this.nonAirCount[sy]--;
             } else if (type != 0 && types[index] == 0) {
@@ -1147,7 +1149,7 @@ public final class LanternChunkManager {
         @Override
         public BlockState getBlock(int x, int y, int z) {
             checkRange(x, y, z);
-            return BlockRegistryModule.get().getStateByInternalIdAndData(this.types[y >> 4][((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf])
+            return BlockRegistryModule.get().getStateByInternalId(this.types[y >> 4][((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf])
                     .orElse(BlockTypes.AIR.getDefaultState());
         }
 
@@ -1156,10 +1158,10 @@ public final class LanternChunkManager {
             checkNotNull(type, "storageType");
             switch (type) {
                 case STANDARD:
-                    return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
+                    return new IntArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                             this, this.start, this.end, this.size), this.start, this.size);
                 case THREAD_SAFE:
-                    return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
+                    return new AtomicIntArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                             this, this.start, this.end, this.size), this.start, this.size);
                 default:
                     throw new UnsupportedOperationException(type.name());
@@ -1168,7 +1170,7 @@ public final class LanternChunkManager {
 
         @Override
         public ImmutableBlockVolume getImmutableBlockCopy() {
-            return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(
+            return IntArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(
                     this, this.start, this.end, this.size), this.start, this.size);
         }
     }

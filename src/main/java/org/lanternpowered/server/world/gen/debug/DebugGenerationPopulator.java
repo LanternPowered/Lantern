@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.block.state.LanternBlockState;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -41,7 +40,6 @@ import org.spongepowered.api.world.gen.GenerationPopulator;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class DebugGenerationPopulator implements GenerationPopulator {
 
@@ -61,9 +59,7 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
         checkNotNull(registry, "registry");
         final Set<BlockState> blockStates = Sets.newLinkedHashSet();
         for (BlockType blockType : registry.getAllOf(BlockType.class)) {
-            blockStates.addAll(blockType.getAllBlockStates().stream()
-                    .filter(state -> !((LanternBlockState) state).isExtended())
-                    .collect(Collectors.toList()));
+            blockStates.addAll(blockType.getAllBlockStates());
         }
         this.blockStateCache = blockStates.toArray(new BlockState[blockStates.size()]);
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));

@@ -34,7 +34,6 @@ import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternFurnace;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
-import org.lanternpowered.server.block.tile.vanilla.LanternNote;
 import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
 import org.lanternpowered.server.block.tile.vanilla.LanternSign;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
@@ -86,16 +85,7 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
         register(LanternTileEntityType.of(CatalogKey.minecraft("ender_chest"), LanternEnderChest::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("furnace"), LanternFurnace::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("jukebox"), LanternJukebox::new));
-        register(LanternTileEntityType.of(CatalogKey.minecraft("noteblock"), LanternNote::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("shulker_box"), LanternShulkerBox::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("sign"), LanternSign::new));
-    }
-
-    @Override
-    public Map<String, TileEntityType> provideCatalogMap() {
-        final Map<String, TileEntityType> map = new HashMap<>(super.provideCatalogMap());
-        // Because they had to give the mapping a different name
-        map.putIfAbsent("note", get(CatalogKey.minecraft("noteblock")).get());
-        return map;
     }
 }

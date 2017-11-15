@@ -27,7 +27,6 @@ package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2d;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,6 +38,8 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
+import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
+import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementDisplay;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
@@ -64,7 +65,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -285,7 +285,7 @@ public class LanternPlayerAdvancements {
         if (!init && this.dirtyProgress.isEmpty()) {
             return null;
         }
-        final List<MessagePlayOutAdvancements.AdvStruct> added = new ArrayList<>();
+        final List<NetworkAdvancement> added = new ArrayList<>();
         final Map<String, Object2LongMap<String>> progressMap = new HashMap<>();
         final List<String> removed;
         if (init) {
@@ -317,7 +317,7 @@ public class LanternPlayerAdvancements {
     }
 
     private void update(LanternAdvancementProgress progress,
-            @Nullable List<MessagePlayOutAdvancements.AdvStruct> added,
+            @Nullable List<NetworkAdvancement> added,
             @Nullable List<String> removed,
             @Nullable Map<String, Object2LongMap<String>> progressMap,
             boolean force) {
@@ -431,13 +431,8 @@ public class LanternPlayerAdvancements {
         return new Tuple<>(criteria, names.toArray(new String[names.size()][]));
     }
 
-    private MessagePlayOutAdvancements.AdvStruct createAdvancement(Advancement advancement) {
-        return createAdvancement(this.player.getLocale(), advancement);
-    }
-
     @SuppressWarnings("ConstantConditions")
-    private static MessagePlayOutAdvancements.AdvStruct createAdvancement(
-            Locale locale, Advancement advancement) {
+    private static NetworkAdvancement createAdvancement(Advancement advancement) {
         final String parentId = advancement.getParent().map(Advancement::getKey).map(CatalogKey::toString).orElse(null);
         final String background = parentId == null ? advancement.getTree().get().getBackgroundPath() : null;
         final DisplayInfo displayInfo = advancement.getDisplayInfo().orElse(null);
@@ -447,20 +442,14 @@ public class LanternPlayerAdvancements {
         for (String[] array : criteriaRequirements) {
             Collections.addAll(criteria, array);
         }
-        return new MessagePlayOutAdvancements.AdvStruct(advancement.getKey().toString(), parentId,
-                displayInfo == null ? null : createDisplay(locale, displayInfo, layoutElement, background),
-                criteria, criteriaRequirements);
+        final NetworkAdvancementDisplay display = displayInfo == null ? null :
+                createDisplay(displayInfo, layoutElement, background);
+        return new NetworkAdvancement(advancement.getKey().toString(), parentId, display, criteria, criteriaRequirements);
     }
 
-    private static MessagePlayOutAdvancements.AdvStruct.Display createDisplay(
-            Locale locale, DisplayInfo displayInfo, TreeLayoutElement layoutElement, @Nullable String background) {
-        final Vector2d position = layoutElement.getPosition();
-        return new MessagePlayOutAdvancements.AdvStruct.Display(
-                displayInfo.getTitle(),
-                displayInfo.getDescription(),
-                displayInfo.getIcon(), displayInfo.getType(),
-                background, position.getX(), position.getY(),
-                displayInfo.doesShowToast(),
-                displayInfo.isHidden());
+    private static NetworkAdvancementDisplay createDisplay(
+            DisplayInfo displayInfo, TreeLayoutElement layoutElement, @Nullable String background) {
+        return new NetworkAdvancementDisplay(displayInfo.getTitle(), displayInfo.getDescription(), displayInfo.getIcon(),
+                displayInfo.getType(), background, layoutElement.getPosition(), displayInfo.doesShowToast(), displayInfo.isHidden());
     }
 }

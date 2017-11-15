@@ -88,8 +88,8 @@ public class ScoreboardIO {
     private final static DataQuery NAME_TAG_VISIBILITY = DataQuery.of("NameTagVisibility");
     private final static DataQuery DEATH_MESSAGE_VISIBILITY = DataQuery.of("DeathMessageVisibility");
     private final static DataQuery COLLISION_RULE = DataQuery.of("CollisionRule");
-    private final static DataQuery PREFIX = DataQuery.of("Prefix");
     private final static DataQuery SUFFIX = DataQuery.of("Suffix");
+    private final static DataQuery PREFIX = DataQuery.of("Prefix");
     private final static DataQuery TEAM_COLOR = DataQuery.of("TeamColor");
     private final static DataQuery MEMBERS = DataQuery.of("Players");
     private final static DataQuery TEAMS = DataQuery.of("Teams");

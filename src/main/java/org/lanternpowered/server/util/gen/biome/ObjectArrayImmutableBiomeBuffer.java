@@ -33,7 +33,7 @@ import org.spongepowered.api.world.extent.StorageType;
 /**
  * Mutable view of a {@link BiomeType} array.
  *
- * <p>Normally, the {@link ShortArrayMutableBiomeBuffer} class uses memory more
+ * <p>Normally, the {@link IntArrayMutableBiomeBuffer} class uses memory more
  * efficiently, but when the {@link BiomeType} array is already created (for
  * example for a contract specified by Minecraft) this implementation becomes
  * more efficient.</p>

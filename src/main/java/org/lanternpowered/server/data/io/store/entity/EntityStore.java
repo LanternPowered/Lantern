@@ -76,7 +76,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     private static final DataQuery PORTAL_COOLDOWN_TICKS = DataQuery.of("PortalCooldown");
     private static final DataQuery ON_GROUND = DataQuery.of("OnGround");
     private static final DataQuery NO_AI = DataQuery.of("NoAI");
-    private static final DataQuery PERSISTS = DataQuery.of("PersistenceRequired");
+    private static final DataQuery PERSISTENT = DataQuery.of("PersistenceRequired");
     private static final DataQuery CAN_GRIEF = DataQuery.of("CanGrief");
     private static final DataQuery ABSORPTION_AMOUNT = DataQuery.of("AbsorptionAmount");
     private static final DataQuery CAN_PICK_UP_LOOT = DataQuery.of("CanPickUpLoot");
@@ -176,7 +176,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.INVULNERABLE).ifPresent(v -> dataView.set(INVULNERABLE, (byte) (v ? 1 : 0)));
         valueContainer.remove(LanternKeys.PORTAL_COOLDOWN_TICKS).ifPresent(v -> dataView.set(PORTAL_COOLDOWN_TICKS, v));
         valueContainer.remove(Keys.AI_ENABLED).ifPresent(v -> dataView.set(NO_AI, (byte) (v ? 0 : 1)));
-        valueContainer.remove(Keys.PERSISTS).ifPresent(v -> dataView.set(PERSISTS, (byte) (v ? 1 : 0)));
+        valueContainer.remove(Keys.PERSISTENT).ifPresent(v -> dataView.set(PERSISTENT, (byte) (v ? 1 : 0)));
         valueContainer.remove(LanternKeys.CAN_PICK_UP_LOOT).ifPresent(v -> dataView.set(CAN_PICK_UP_LOOT, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataView.set(CUSTOM_NAME, LanternTexts.toLegacy(v)));
         valueContainer.remove(Keys.POTION_EFFECTS).ifPresent(v -> {
@@ -216,7 +216,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         dataView.getInt(INVULNERABLE).ifPresent(v -> valueContainer.set(Keys.INVULNERABLE, v > 0));
         dataView.getInt(PORTAL_COOLDOWN_TICKS).ifPresent(v -> valueContainer.set(LanternKeys.PORTAL_COOLDOWN_TICKS, v));
         dataView.getInt(NO_AI).ifPresent(v -> valueContainer.set(Keys.AI_ENABLED, v == 0));
-        dataView.getInt(PERSISTS).ifPresent(v -> valueContainer.set(Keys.PERSISTS, v > 0));
+        dataView.getInt(PERSISTENT).ifPresent(v -> valueContainer.set(Keys.PERSISTENT, v > 0));
         dataView.getView(SPONGE_DATA).ifPresent(view -> {
             view.getInt(MAX_AIR).ifPresent(v -> valueContainer.set(Keys.MAX_AIR, v));
             view.getInt(CAN_GRIEF).ifPresent(v -> valueContainer.set(Keys.CAN_GRIEF, v > 0));

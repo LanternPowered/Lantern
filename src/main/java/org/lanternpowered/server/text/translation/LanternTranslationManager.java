@@ -32,9 +32,11 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonSyntaxException;
 import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.asset.ReloadListener;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.JsonResourceBundle;
 import org.spongepowered.api.text.translation.ResourceBundleTranslation;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.text.translation.locale.Locales;
@@ -42,7 +44,6 @@ import org.spongepowered.api.text.translation.locale.Locales;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -108,28 +109,34 @@ public final class LanternTranslationManager implements TranslationManager, Relo
     }
 
     private void loadAssetBundle(Asset asset, Locale locale, boolean refresh) {
-        try {
-            final InputStream inputStream = asset.getUrl().openStream();
+        try (InputStream inputStream = asset.getUrl().openStream()) {
+            ResourceBundle bundle;
             try {
-                final ResourceBundle bundle = new PropertyResourceBundle(inputStream);
-                this.bundles.computeIfAbsent(locale, locale0 -> Sets.newConcurrentHashSet()).add(bundle);
-                if (refresh) {
-                    final Set<ResourceKey> refreshKeys = new HashSet<>();
-                    for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
-                        Locale locale1 = key.locale == null ? Locales.DEFAULT : key.locale;
-                        if (locale1.equals(locale) && bundle.containsKey(key.name)) {
-                            refreshKeys.add(key);
-                        }
-                    }
-                    if (!refreshKeys.isEmpty()) {
-                        this.resourceBundlesCache.invalidateAll(refreshKeys);
+                // Try to parse the json first
+                bundle = JsonResourceBundle.loadFrom(inputStream);
+            } catch (JsonSyntaxException e) {
+                // It failed, open a new stream and try again as properties
+                inputStream.close();
+                try (InputStream inputStream1 = asset.getUrl().openStream()) {
+                    bundle = new PropertyResourceBundle(inputStream1);
+                }
+            }
+
+            this.bundles.computeIfAbsent(locale, locale0 -> Sets.newConcurrentHashSet()).add(bundle);
+            if (refresh) {
+                final Set<ResourceKey> refreshKeys = Sets.newHashSet();
+                for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
+                    final Locale locale1 = key.locale == null ? Locales.DEFAULT : key.locale;
+                    if (locale1.equals(locale) && bundle.containsKey(key.name)) {
+                        refreshKeys.add(key);
                     }
                 }
-            } catch (IOException e) {
-                Lantern.getLogger().warn("Unable to create the resource bundle for: " + asset.getId(), e);
+                if (!refreshKeys.isEmpty()) {
+                    this.resourceBundlesCache.invalidateAll(refreshKeys);
+                }
             }
         } catch (IOException e) {
-            Lantern.getLogger().warn("Unable to open the asset stream for: " + asset.getId(), e);
+            Lantern.getLogger().warn("Unable to create the resource bundle for: " + asset.getId(), e);
         }
     }
 

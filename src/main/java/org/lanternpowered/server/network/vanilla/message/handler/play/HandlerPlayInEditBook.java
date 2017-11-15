@@ -26,28 +26,26 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInModifyBook;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
 import java.util.stream.Collectors;
 
-public class HandlerPlayInEditBook implements Handler<MessagePlayInEditBook> {
+public class HandlerPlayInEditBook implements Handler<MessagePlayInModifyBook.Edit> {
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInEditBook message) {
+    public void handle(NetworkContext context, MessagePlayInModifyBook.Edit message) {
         final LanternPlayer player = context.getSession().getPlayer();
-        final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
-        final LanternItemStack itemStack = slot.peek();
-        if (itemStack.isFilled() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
+        final ItemStack itemStack = player.getItemInHand(message.getHand());
+        if (itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
             itemStack.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));
-            slot.set(itemStack);
+            player.setItemInHand(message.getHand(), itemStack);
         }
     }
 }

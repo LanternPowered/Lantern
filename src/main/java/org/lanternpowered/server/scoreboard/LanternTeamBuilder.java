@@ -47,9 +47,9 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Nullable private String name;
     @Nullable private Text displayName;
-    private TextColor color;
     private Text prefix;
     private Text suffix;
+    private TextColor color;
     private boolean allowFriendlyFire;
     private boolean showFriendlyInvisibles;
     private Visibility nameTagVisibility;
@@ -87,16 +87,14 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Override
     public LanternTeamBuilder prefix(Text prefix) {
-        final int length = prefix.toPlain().length();
-        checkArgument(length <= 16, "Prefix is %s characters long! It must be at most 16.", length);
+        checkNotNull(prefix, "prefix");
         this.prefix = prefix;
         return this;
     }
 
     @Override
     public LanternTeamBuilder suffix(Text suffix) {
-        final int length = suffix.toPlain().length();
-        checkArgument(length <= 16, "Suffix is %s characters long! It must be at most 16.", length);
+        checkNotNull(suffix, "suffix");
         this.suffix = suffix;
         return this;
     }
@@ -141,11 +139,9 @@ public class LanternTeamBuilder implements Team.Builder {
     public LanternTeamBuilder from(Team value) {
         return name(value.getName())
                 .displayName(value.getDisplayName())
-                .prefix(value.getPrefix())
                 .color(value.getColor())
                 .allowFriendlyFire(value.allowFriendlyFire())
                 .canSeeFriendlyInvisibles(value.canSeeFriendlyInvisibles())
-                .suffix(value.getSuffix())
                 .nameTagVisibility(value.getNameTagVisibility())
                 .deathTextVisibility(value.getDeathMessageVisibility())
                 .members(value.getMembers());
@@ -155,9 +151,9 @@ public class LanternTeamBuilder implements Team.Builder {
     public LanternTeamBuilder reset() {
         this.name = null;
         this.displayName = null;
-        this.color = TextColors.NONE;
         this.prefix = Text.of();
         this.suffix = Text.of();
+        this.color = TextColors.NONE;
         this.allowFriendlyFire = false;
         this.showFriendlyInvisibles = false;
         this.nameTagVisibility = Visibilities.ALWAYS;
@@ -169,7 +165,8 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Override
     public Team build() throws IllegalStateException {
-        checkState(this.name != null, "name is not set");
+        checkState(this.name != null, "name must be set");
+
         Text displayName = this.displayName;
         if (displayName == null) {
             displayName = Text.of(this.name);

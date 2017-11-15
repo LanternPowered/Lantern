@@ -26,7 +26,9 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
+import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
@@ -37,7 +39,6 @@ public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpaw
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnParticle message) throws CodecException {
-        final int[] extra = message.getExtra();
         final ByteBuffer buf = context.byteBufAlloc().buffer(BASE_LENGTH);
         buf.writeInteger(message.getParticleId());
         buf.writeBoolean(message.isLongDistance());
@@ -45,8 +46,22 @@ public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpaw
         buf.writeVector3f(message.getOffset());
         buf.writeFloat(message.getData());
         buf.writeInteger(message.getCount());
-        for (int value : extra) {
-            buf.writeVarInt(value);
+        final MessagePlayOutSpawnParticle.Data extra = message.getExtra();
+        if (extra != null) {
+            if (extra instanceof MessagePlayOutSpawnParticle.ItemData) {
+                context.write(buf, ContextualValueTypes.ITEM_STACK,
+                        ((MessagePlayOutSpawnParticle.ItemData) extra).getItemStack());
+            } else if (extra instanceof MessagePlayOutSpawnParticle.BlockData) {
+                buf.writeVarInt(((MessagePlayOutSpawnParticle.BlockData) extra).getBlockState());
+            } else if (extra instanceof MessagePlayOutSpawnParticle.DustData) {
+                final MessagePlayOutSpawnParticle.DustData data = (MessagePlayOutSpawnParticle.DustData) extra;
+                buf.writeFloat(data.getRed());
+                buf.writeFloat(data.getGreen());
+                buf.writeFloat(data.getBlue());
+                buf.writeFloat(data.getScale());
+            } else {
+                throw new EncoderException("Unsupported extra data type: " + extra.getClass().getName());
+            }
         }
         return buf;
     }

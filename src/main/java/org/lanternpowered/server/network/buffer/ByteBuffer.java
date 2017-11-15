@@ -30,7 +30,7 @@ import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.ReferenceCounted;
-import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.item.RawItemStack;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
@@ -354,4 +354,6 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
     ByteBuffer ensureWritable(int minWritableBytes);
 
     ByteBuffer copy();
+
+    int readableBytes();
 }

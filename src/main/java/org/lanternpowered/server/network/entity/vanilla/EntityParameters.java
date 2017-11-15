@@ -31,6 +31,7 @@ import org.lanternpowered.server.network.entity.parameter.ParameterTypeCollectio
 import org.lanternpowered.server.network.entity.parameter.ParameterValueTypes;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -61,7 +62,7 @@ public final class EntityParameters {
         /**
          * The custom name of the entity.
          */
-        public static final ParameterType<String> CUSTOM_NAME = PARAMETERS.newParameterType(ParameterValueTypes.STRING);
+        public static final ParameterType<Optional<Text>> CUSTOM_NAME = PARAMETERS.newParameterType(ParameterValueTypes.OPTIONAL_TEXT);
 
         /**
          * Whether the custom name is always visible.

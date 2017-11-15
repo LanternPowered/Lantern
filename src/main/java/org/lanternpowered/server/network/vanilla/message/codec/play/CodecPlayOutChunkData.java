@@ -41,10 +41,11 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
     private final static DataQuery Y = DataQuery.of("y");
     private final static DataQuery Z = DataQuery.of("z");
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutChunkData message) throws CodecException {
         final MessagePlayOutChunkData.Section[] sections = message.getSections();
-        final byte[] biomes = message.getBiomes();
+        final int[] biomes = message.getBiomes();
         final int x = message.getX();
         final int z = message.getZ();
 
@@ -74,9 +75,6 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
                 for (int value : palette) {
                     dataBuf.writeVarInt(value);
                 }
-            } else {
-                // Using global palette
-                dataBuf.writeVarInt(0);
             }
             final long[] backing = types.getBacking();
             dataBuf.writeVarInt(backing.length);
@@ -93,7 +91,7 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             }
             final Short2ObjectMap<DataView> tileEntities = section.getTileEntities();
             if (!tileEntities.isEmpty() && tileEntitiesBuf == null) {
-                tileEntitiesBuf  = context.byteBufAlloc().buffer();
+                tileEntitiesBuf = context.byteBufAlloc().buffer();
             }
             for (Short2ObjectMap.Entry<DataView> tileEntityEntry : tileEntities.short2ObjectEntrySet()) {
                 tileEntitiesCount++;
@@ -102,13 +100,15 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
                 dataView.set(X, x * 16 + (index & 0xf));
                 dataView.set(Y, i << 4 | index >> 8);
                 dataView.set(Z, z * 16 + ((index >> 4) & 0xf));
-                //noinspection ConstantConditions
                 tileEntitiesBuf.writeDataView(dataView);
             }
         }
 
         if (biomes != null) {
-            dataBuf.writeBytes(biomes);
+            dataBuf.ensureWritable(biomes.length * Integer.BYTES);
+            for (int value : biomes) {
+                dataBuf.writeInteger(value);
+            }
         }
 
         buf.writeVarInt(sectionBitmask);

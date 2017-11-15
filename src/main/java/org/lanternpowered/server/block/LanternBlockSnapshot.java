@@ -69,36 +69,29 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
 
     @Nullable final WeakWorldReferencedLocation location;
     private final BlockState state;
-    @Nullable private final BlockState extendedState;
     @Nullable private final UUID notifier;
     @Nullable private final UUID creator;
     @Nullable final LanternTileEntity tileEntity;
 
-    public LanternBlockSnapshot(Location<World> location, BlockState blockState, @Nullable BlockState extendedState,
+    public LanternBlockSnapshot(Location<World> location, BlockState blockState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
-        this(new WeakWorldReferencedLocation(checkNotNull(location, "location")), blockState, extendedState, creator, notifier, tileEntity);
+        this(new WeakWorldReferencedLocation(checkNotNull(location, "location")), blockState, creator, notifier, tileEntity);
     }
 
-    public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState, @Nullable BlockState extendedState,
+    public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
-        this(new WeakWorldReferencedLocation(worldUUID, position), blockState, extendedState, creator, notifier, tileEntity);
+        this(new WeakWorldReferencedLocation(worldUUID, position), blockState, creator, notifier, tileEntity);
     }
 
-    public LanternBlockSnapshot(BlockState blockState, @Nullable BlockState extendedState,
-            @Nullable UUID notifier, @Nullable UUID creator, @Nullable TileEntity tileEntity) {
-        this((WeakWorldReferencedLocation) null, blockState, extendedState, creator, notifier, tileEntity);
+    public LanternBlockSnapshot(BlockState blockState, @Nullable UUID notifier,
+            @Nullable UUID creator, @Nullable TileEntity tileEntity) {
+        this((WeakWorldReferencedLocation) null, blockState, creator, notifier, tileEntity);
     }
 
     public LanternBlockSnapshot(@Nullable WeakWorldReferencedLocation location, BlockState blockState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
-        this(location, blockState, null, creator, notifier, tileEntity);
-    }
-
-    LanternBlockSnapshot(@Nullable WeakWorldReferencedLocation location, BlockState blockState, @Nullable BlockState extendedState,
-            @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
         this.state = checkNotNull(blockState, "blockState");
         this.tileEntity = (LanternTileEntity) tileEntity;
-        this.extendedState = extendedState;
         this.location = location;
         this.notifier = notifier;
         this.creator = creator;
@@ -141,12 +134,14 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
     }
 
     @Override
-    public BlockState getExtendedState() {
-        return this.extendedState == null ? this.state : this.extendedState;
+    public BlockState getState() {
+        return this.state;
     }
 
     @Override
-    public BlockState getState() {
+    public BlockState getExtendedState() {
+        // Extended block states are no more, got removed
+        // in 1.13, all states are now server side.
         return this.state;
     }
 
@@ -204,7 +199,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (!newTileEntity.transformFast(key, function)) {
             return Optional.empty();
         }
-        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity));
     }
 
@@ -221,7 +216,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (!newTileEntity.offerFast(key, value)) {
             return Optional.empty();
         }
-        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity));
     }
 
@@ -238,7 +233,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (!newTileEntity.offerFast(value)) {
             return Optional.empty();
         }
-        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity));
     }
 
@@ -259,7 +254,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (!newTileEntity.offerFast(valueContainer.asMutable())) {
             return Optional.empty();
         }
-        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity));
     }
 
@@ -278,7 +273,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
                 .collect(Collectors.toList()))) {
             return Optional.empty();
         }
-        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity));
     }
 
@@ -296,7 +291,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (!newTileEntity.removeFast(optRegistration.get().getManipulatorClass())) {
             return Optional.empty();
         }
-        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity));
     }
 
@@ -316,7 +311,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         }
         final LanternTileEntity newTileEntity = copy(that0.tileEntity);
         newTileEntity.copyFrom(this.tileEntity, function);
-        return new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+        return new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity);
     }
 
@@ -368,7 +363,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
     @Override
     public BlockSnapshot withState(BlockState blockState) {
         if (blockState.getType() == this.state.getType()) {
-            return new LanternBlockSnapshot(this.location, blockState, this.extendedState,
+            return new LanternBlockSnapshot(this.location, blockState,
                     this.creator, this.notifier, this.tileEntity);
         }
         final LanternTileEntity tileEntity = (LanternTileEntity) ((LanternBlockType) blockState.getType()).getTileEntityProvider()
@@ -380,7 +375,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
                 tileEntity.copyFromFastNoEvents(this.tileEntity);
             }
         }
-        return new LanternBlockSnapshot(this.location, blockState, this.extendedState,
+        return new LanternBlockSnapshot(this.location, blockState,
                 this.creator, this.notifier, tileEntity);
     }
 
@@ -414,7 +409,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
     @Override
     public BlockSnapshot withLocation(Location<World> location) {
         checkNotNull(location, "location");
-        return new LanternBlockSnapshot(location, this.state, this.extendedState,
+        return new LanternBlockSnapshot(location, this.state,
                 this.creator, this.notifier, this.tileEntity);
     }
 

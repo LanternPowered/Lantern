@@ -25,6 +25,13 @@
  */
 package org.lanternpowered.server.util.collect.array;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Arrays;
+
+import javax.annotation.Nullable;
+
 public final class VariableValueArray {
 
     private final long[] backing;
@@ -33,16 +40,25 @@ public final class VariableValueArray {
     private final long valueMask;
 
     public VariableValueArray(int bitsPerValue, int capacity) {
-        if (capacity < 0) {
-            throw new IllegalArgumentException(String.format("capacity (%s) must not be negative", capacity));
+        this(null, bitsPerValue, capacity);
+    }
+
+    public VariableValueArray(int bitsPerValue, int capacity, long[] backing) {
+        this(checkNotNull(backing), bitsPerValue, capacity);
+    }
+
+    private VariableValueArray(@Nullable long[] backing, int bitsPerValue, int capacity) {
+        checkArgument(capacity > 0, "capacity (%s) may not be negative", capacity);
+        checkArgument(bitsPerValue >= 1, "bitsPerValue (%s) may not be smaller then 1", bitsPerValue);
+        checkArgument(bitsPerValue <= 64, "bitsPerValue (%s) may not be greater then 64", bitsPerValue);
+        final int backingSize = (int) Math.ceil((bitsPerValue * capacity) / 64.0);
+        if (backing == null) {
+            this.backing = new long[backingSize];
+        } else {
+            checkArgument(backingSize == backing.length,
+                    "expected backing size of %s, but got %s", backingSize, backing.length);
+            this.backing = backing;
         }
-        if (bitsPerValue < 1) {
-            throw new IllegalArgumentException(String.format("bitsPerValue (%s) must not be smaller then 1", bitsPerValue));
-        }
-        if (bitsPerValue > 64) {
-            throw new IllegalArgumentException(String.format("bitsPerValue (%s) must not be greater then 64", bitsPerValue));
-        }
-        this.backing = new long[(int) Math.ceil((bitsPerValue * capacity) / 64.0)];
         this.bitsPerValue = bitsPerValue;
         this.valueMask = (1L << bitsPerValue) - 1L;
         this.capacity = capacity;
@@ -61,7 +77,7 @@ public final class VariableValueArray {
     }
 
     public int get(int index) {
-        this.checkIndex(index);
+        checkIndex(index);
 
         index *= this.bitsPerValue;
         int i0 = index >> 6;
@@ -78,7 +94,7 @@ public final class VariableValueArray {
     }
 
     public void set(int index, int value) {
-        this.checkIndex(index);
+        checkIndex(index);
 
         if (value < 0) {
             throw new IllegalArgumentException(String.format("value (%s) must not be negative", value));
@@ -98,6 +114,10 @@ public final class VariableValueArray {
             i0++;
             this.backing[i0] = this.backing[i0] & ~((1L << (i2 - 64)) - 1L) | value >> (64 - i1);
         }
+    }
+
+    public VariableValueArray copy() {
+        return new VariableValueArray(Arrays.copyOf(this.backing, this.backing.length), this.bitsPerValue, this.capacity);
     }
 
     private void checkIndex(int index) {

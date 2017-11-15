@@ -28,11 +28,9 @@ package org.lanternpowered.server.data.io.store.tile;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.IInventory;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
@@ -44,12 +42,13 @@ public class JukeboxTileEntitySerializer<T extends LanternJukebox> extends TileE
     @Override
     public void deserializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
         super.deserializeValues(object, valueContainer, dataView);
-        final Optional<DataView> optRecordItem = dataView.getView(RECORD_ITEM);
-        if (optRecordItem.isPresent()) {
-            object.insertRecord(ItemStackStore.INSTANCE.deserialize(optRecordItem.get()));
-        } else {
+        final Optional<DataView> optMusicDisc = dataView.getView(RECORD_ITEM);
+        if (optMusicDisc.isPresent()) {
+            object.insert(ItemStackStore.INSTANCE.deserialize(optMusicDisc.get()));
+        } else {/*
             dataView.getInt(RECORD).ifPresent(record -> ItemRegistryModule.get().getTypeByInternalId(record)
-                    .ifPresent(itemType -> object.insertRecord(ItemStack.of(itemType, 1))));
+                    .ifPresent(itemType -> object.insertRecord(ItemStack.of(itemType, 1))));*/
+            //TODO:Update
         }
     }
 

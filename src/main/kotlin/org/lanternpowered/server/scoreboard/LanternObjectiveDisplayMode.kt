@@ -27,6 +27,7 @@ package org.lanternpowered.server.scoreboard
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
+import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode
 
-class LanternObjectiveDisplayMode(key: CatalogKey) : DefaultCatalogType(key), ObjectiveDisplayMode
+class LanternObjectiveDisplayMode(key: CatalogKey, override val internalId: Int) : DefaultCatalogType(key), ObjectiveDisplayMode, InternalCatalogType

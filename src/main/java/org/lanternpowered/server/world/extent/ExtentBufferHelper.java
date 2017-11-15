@@ -34,14 +34,14 @@ import org.spongepowered.api.world.extent.BlockVolume;
 
 public final class ExtentBufferHelper {
 
-    public static short[] copyToBiomeArray(BiomeVolume area, Vector3i min, Vector3i max, Vector3i size) {
+    public static int[] copyToBiomeArray(BiomeVolume area, Vector3i min, Vector3i max, Vector3i size) {
         // Check if the volume has more biomes than can be stored in an array
         final long memory = (long) size.getX() * (long) size.getY() * (long) size.getZ();
         // Leave 8 bytes for a header used in some JVMs
         if (memory > Integer.MAX_VALUE - 8) {
             throw new OutOfMemoryError("Cannot copy the biomes to an array because the size limit was reached!");
         }
-        final short[] copy = new short[(int) memory];
+        final int[] copy = new int[(int) memory];
         int i = 0;
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
@@ -72,19 +72,19 @@ public final class ExtentBufferHelper {
         return copy;
     }
 
-    public static short[] copyToBlockArray(BlockVolume volume, Vector3i min, Vector3i max, Vector3i size) {
+    public static int[] copyToBlockArray(BlockVolume volume, Vector3i min, Vector3i max, Vector3i size) {
         // Check if the volume has more blocks than can be stored in an array
         final long memory = (long) size.getX() * (long) size.getY() * (long) size.getZ();
         // Leave 8 bytes for a header used in some JVMs
         if (memory > Integer.MAX_VALUE - 8) {
             throw new OutOfMemoryError("Cannot copy the blocks to an array because the size limit was reached!");
         }
-        final short[] copy = new short[(int) memory];
+        final int[] copy = new int[(int) memory];
         int i = 0;
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
                 for (int y = min.getY(); y <= max.getY(); y++) {
-                    copy[i++] = BlockRegistryModule.get().getStateInternalIdAndData(volume.getBlock(x, y, z));
+                    copy[i++] = BlockRegistryModule.get().getStateInternalId(volume.getBlock(x, y, z));
                 }
             }
         }

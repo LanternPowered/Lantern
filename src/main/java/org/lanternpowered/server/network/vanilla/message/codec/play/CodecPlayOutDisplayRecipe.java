@@ -37,7 +37,7 @@ public final class CodecPlayOutDisplayRecipe implements Codec<MessagePlayOutDisp
     public ByteBuffer encode(CodecContext context, MessagePlayOutDisplayRecipe message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeByte((byte) message.getWindowId());
-        buf.writeVarInt(message.getRecipeId());
+        buf.writeString(message.getRecipeId());
         return buf;
     }
 }

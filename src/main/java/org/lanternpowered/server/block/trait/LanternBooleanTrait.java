@@ -36,12 +36,12 @@ import org.spongepowered.api.util.OptBool;
 
 import java.util.Optional;
 
-public final class LanternBooleanTrait extends LanternBlockTrait<Boolean> implements BooleanTrait {
+public final class LanternBooleanTrait extends LanternBlockTrait<Boolean, Boolean> implements BooleanTrait {
 
     private final static ImmutableSet<Boolean> STATES = ImmutableSet.of(true, false);
 
     private LanternBooleanTrait(CatalogKey key, Key<? extends Value<Boolean>> valueKey) {
-        super(key, valueKey, Boolean.class, STATES);
+        super(key, valueKey, Boolean.class, STATES, null);
     }
 
     /**

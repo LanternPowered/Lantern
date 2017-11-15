@@ -34,26 +34,25 @@ import org.spongepowered.api.data.type.DyeColor
 import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.util.Color
 
-enum class LanternDyeColor(id: String, val translationPart: String, rgb: Int) :
-        DyeColor, CatalogType by DefaultCatalogType.minecraft(id), InternalCatalogType.EnumOrdinal,
-        Translatable by Translated("color.$translationPart.name") {
+enum class LanternDyeColor(id: String, rgb: Int) : DyeColor, CatalogType by DefaultCatalogType.minecraft(id),
+        InternalCatalogType.EnumOrdinal, Translatable by Translated("color.$id.name") {
 
-    WHITE       ("white", "white", 16777215),
-    ORANGE      ("orange", "orange", 14188339),
-    MAGENTA     ("magenta", "magenta", 11685080),
-    LIGHT_BLUE  ("light_blue", "lightBlue", 6724056),
-    YELLOW      ("yellow", "yellow", 15066419),
-    LIME        ("lime", "lime", 8375321),
-    PINK        ("pink", "pink", 15892389),
-    GRAY        ("gray", "gray", 5000268),
-    SILVER      ("silver", "silver", 10066329),
-    CYAN        ("cyan", "cyan", 5013401),
-    PURPLE      ("purple", "purple", 8339378),
-    BLUE        ("blue", "blue", 3361970),
-    BROWN       ("brown", "brown", 6704179),
-    GREEN       ("green", "green", 6717235),
-    RED         ("red", "red", 10040115),
-    BLACK       ("black", "black", 1644825),
+    WHITE       ("white", 16777215),
+    ORANGE      ("orange", 14188339),
+    MAGENTA     ("magenta", 11685080),
+    LIGHT_BLUE  ("light_blue", 6724056),
+    YELLOW      ("yellow", 15066419),
+    LIME        ("lime", 8375321),
+    PINK        ("pink", 15892389),
+    GRAY        ("gray", 5000268),
+    LIGHT_GRAY  ("light_gray", 10066329),
+    CYAN        ("cyan", 5013401),
+    PURPLE      ("purple", 8339378),
+    BLUE        ("blue", 3361970),
+    BROWN       ("brown", 6704179),
+    GREEN       ("green", 6717235),
+    RED         ("red", 10040115),
+    BLACK       ("black", 1644825),
     ;
 
     private val color = Color.ofRgb(rgb)

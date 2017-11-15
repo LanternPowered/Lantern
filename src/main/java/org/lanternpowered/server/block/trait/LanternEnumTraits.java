@@ -25,109 +25,74 @@
  */
 package org.lanternpowered.server.block.trait;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
-import org.lanternpowered.server.data.type.LanternDirtType;
-import org.lanternpowered.server.data.type.LanternDyeColor;
-import org.lanternpowered.server.data.type.LanternLogAxis;
-import org.lanternpowered.server.data.type.LanternPlantType;
+import org.lanternpowered.server.data.type.LanternChestAttachment;
+import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPortionType;
-import org.lanternpowered.server.data.type.LanternQuartzType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
-import org.lanternpowered.server.data.type.LanternSandType;
-import org.lanternpowered.server.data.type.LanternSandstoneType;
-import org.lanternpowered.server.data.type.LanternShrubType;
-import org.lanternpowered.server.data.type.LanternSlabType;
-import org.lanternpowered.server.data.type.LanternStoneType;
-import org.lanternpowered.server.data.type.LanternTreeType;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
+import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Direction;
 
 @SuppressWarnings("unchecked")
 public final class LanternEnumTraits {
 
-    public static final EnumTrait<LanternLogAxis> LOG_AXIS =
-            LanternEnumTrait.minecraft("axis", (Key) Keys.LOG_AXIS, LanternLogAxis.class);
-
-    public static final EnumTrait<LanternTreeType> LOG1_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.TREE_TYPE,
-                    LanternTreeType.OAK, LanternTreeType.SPRUCE, LanternTreeType.BIRCH, LanternTreeType.JUNGLE);
-
-    public static final EnumTrait<LanternTreeType> LOG2_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.TREE_TYPE,
-                    LanternTreeType.ACACIA, LanternTreeType.DARK_OAK);
-
-    public static final EnumTrait<LanternTreeType> LEAVES1_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.TREE_TYPE,
-                    LanternTreeType.OAK, LanternTreeType.SPRUCE, LanternTreeType.BIRCH, LanternTreeType.JUNGLE);
-
-    public static final EnumTrait<LanternTreeType> LEAVES2_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.TREE_TYPE,
-                    LanternTreeType.ACACIA, LanternTreeType.DARK_OAK);
-
-    public static final EnumTrait<LanternStoneType> STONE_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.STONE_TYPE, LanternStoneType.class);
-
-    public static final EnumTrait<LanternDirtType> DIRT_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.DIRT_TYPE, LanternDirtType.class);
-
-    public static final EnumTrait<LanternTreeType> TREE_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.TREE_TYPE, LanternTreeType.class);
-
-    public static final EnumTrait<LanternSandType> SAND_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.SAND_TYPE, LanternSandType.class);
-
-    public static final EnumTrait<LanternSandstoneType> SANDSTONE_TYPE =
-            LanternEnumTrait.minecraft("type", (Key) Keys.SANDSTONE_TYPE, LanternSandstoneType.class);
-
-    public static final EnumTrait<LanternQuartzType> QUARTZ_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.QUARTZ_TYPE, LanternQuartzType.class);
-
     public static final EnumTrait<LanternBedPart> BED_PART =
-            LanternEnumTrait.minecraft("type", (Key) Keys.SANDSTONE_TYPE, LanternBedPart.class);
+            LanternEnumTrait.minecraft("type", (Key) LanternKeys.BED_PART, LanternBedPart.class);
 
     public static final EnumTrait<Direction> HORIZONTAL_FACING =
-            LanternEnumTrait.minecraft("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
+            LanternEnumTrait.minecraft("facing", (Key) Keys.DIRECTION,
+                    Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST);
 
     public static final EnumTrait<Direction> FACING =
-            LanternEnumTrait.minecraft("facing", (Key) Keys.DIRECTION, Direction.DOWN, Direction.UP,
-                    Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
+            LanternEnumTrait.minecraft("facing", Keys.DIRECTION,
+                    Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
 
     public static final EnumTrait<LanternPortionType> PORTION_TYPE =
             LanternEnumTrait.minecraft("half", (Key) Keys.PORTION_TYPE, LanternPortionType.class);
 
-    public static final EnumTrait<LanternSlabType> STONE_SLAB1_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.SLAB_TYPE, LanternSlabType.class, type -> type.ordinal() < 8);
-
-    public static final EnumTrait<LanternSlabType> STONE_SLAB2_TYPE =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.SLAB_TYPE, LanternSlabType.class, type -> type.ordinal() >= 8 && type.ordinal() < 16);
-
     public static final EnumTrait<Direction> HOPPER_FACING =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.DIRECTION, Direction.DOWN, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
+            LanternEnumTrait.minecraft("variant", (Key) Keys.DIRECTION,
+                    Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST);
 
-    public static final EnumTrait<LanternDyeColor> DYE_COLOR =
-            LanternEnumTrait.minecraft("variant", (Key) Keys.DYE_COLOR, LanternDyeColor.class);
+    public static final EnumTrait<Axis> AXIS = LanternEnumTrait.minecraft("axis", Keys.AXIS, Axis.class);
+
+    public static final EnumTrait<LanternSlabPortion> SLAB_PORTION =
+            LanternEnumTrait.minecraft("type", (Key) Keys.SLAB_PORTION, LanternSlabPortion.class);
 
     public static final EnumTrait<LanternRailDirection> STRAIGHT_RAIL_DIRECTION =
             LanternEnumTrait.minecraft("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class, type ->
                     type != LanternRailDirection.NORTH_EAST && type != LanternRailDirection.NORTH_WEST &&
                             type != LanternRailDirection.SOUTH_EAST && type != LanternRailDirection.SOUTH_WEST);
 
+    public static final EnumTrait<LanternChestAttachment> CHEST_ATTACHMENT =
+            LanternEnumTrait.minecraft("type", (Key) Keys.CHEST_ATTACHMENT, LanternChestAttachment.class);
+
     public static final EnumTrait<LanternRailDirection> RAIL_DIRECTION =
             LanternEnumTrait.minecraft("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class);
 
-    public static final EnumTrait<LanternShrubType> SHRUB_TYPE =
-            LanternEnumTrait.minecraft("type", (Key) Keys.SHRUB_TYPE, LanternShrubType.class);
-
-    public static final EnumTrait<LanternPlantType> YELLOW_FLOWER_TYPE =
-            LanternEnumTrait.minecraft("type", (Key) Keys.PLANT_TYPE, LanternPlantType.class, type -> type.getInternalId() < 16);
-
-    public static final EnumTrait<LanternPlantType> RED_FLOWER_TYPE =
-            LanternEnumTrait.minecraft("type", (Key) Keys.PLANT_TYPE, LanternPlantType.class, type -> type.getInternalId() >= 16);
-
     public static final EnumTrait<Direction> TORCH_FACING =
             LanternEnumTrait.minecraft("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_NORTH_CONNECTION =
+            LanternEnumTrait.minecraft("north", (Key) LanternKeys.REDSTONE_NORTH_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_SOUTH_CONNECTION =
+            LanternEnumTrait.minecraft("south", (Key) LanternKeys.REDSTONE_SOUTH_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_EAST_CONNECTION =
+            LanternEnumTrait.minecraft("east", (Key) LanternKeys.REDSTONE_EAST_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_WEST_CONNECTION =
+            LanternEnumTrait.minecraft("west", (Key) LanternKeys.REDSTONE_WEST_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<LanternInstrumentType> INSTRUMENT =
+            LanternEnumTrait.minecraft("instrument", (Key) LanternKeys.INSTRUMENT_TYPE, LanternInstrumentType.class);
 
     private LanternEnumTraits() {
     }

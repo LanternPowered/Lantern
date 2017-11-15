@@ -30,6 +30,7 @@ import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.data.ValueCollection;
 import org.spongepowered.api.CatalogKey;
+import org.lanternpowered.server.item.appearance.ItemAppearance;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
@@ -48,6 +49,7 @@ public class LanternItemType extends DefaultCatalogType implements ItemType {
     private final Consumer<ValueCollection> keysProvider;
 
     @Nullable private final BlockType blockType;
+    @Nullable private final ItemAppearance itemAppearance = null; // TODO: When custom item types get implemented
 
     private final int maxStackQuantity;
 
@@ -99,5 +101,9 @@ public class LanternItemType extends DefaultCatalogType implements ItemType {
 
     public PropertyProviderCollection getPropertyProviderCollection() {
         return this.propertyProviderCollection;
+    }
+
+    public Optional<ItemAppearance> getAppearance() {
+        return Optional.ofNullable(this.itemAppearance);
     }
 }

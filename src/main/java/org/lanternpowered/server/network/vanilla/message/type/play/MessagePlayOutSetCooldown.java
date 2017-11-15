@@ -26,18 +26,19 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.item.ItemType;
 
 public final class MessagePlayOutSetCooldown implements Message {
 
-    private final int itemType;
+    private final ItemType itemType;
     private final int cooldownTicks;
 
-    public MessagePlayOutSetCooldown(int itemType, int cooldownTicks) {
+    public MessagePlayOutSetCooldown(ItemType itemType, int cooldownTicks) {
         this.cooldownTicks = cooldownTicks;
         this.itemType = itemType;
     }
 
-    public int getItemType() {
+    public ItemType getItemType() {
         return this.itemType;
     }
 

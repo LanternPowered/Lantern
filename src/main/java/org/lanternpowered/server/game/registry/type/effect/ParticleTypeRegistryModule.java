@@ -57,100 +57,103 @@ import java.util.OptionalInt;
         ItemRegistryModule.class, PotionEffectTypeRegistryModule.class, FireworkShapeRegistryModule.class })
 public final class ParticleTypeRegistryModule extends DefaultCatalogRegistryModule<ParticleType> {
 
+    private int internalId;
+
     public ParticleTypeRegistryModule() {
         super(ParticleTypes.class);
     }
 
     @Override
     public void registerDefaults() {
-        registerParticle(16, "ambient_mob_spell", false, ImmutableMap.of(
+        registerParticle("ambient_entity_effect", false, ImmutableMap.of(
                 ParticleOptions.COLOR, Color.BLACK));
-        registerParticle(20, "angry_villager", false);
-        registerParticle(35, "barrier", false);
-        registerParticle(37, "block_crack", true, ImmutableMap.of(
+        registerParticle("angry_villager", false);
+        registerParticle("barrier", false);
+        registerParticle("block", true, ImmutableMap.of(
                 ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
                 ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
-        registerParticle(38, "block_dust", true, ImmutableMap.of(
+        registerParticle("bubble", true);
+        registerParticle("cloud", true);
+        registerParticle("critical_hit", true);
+        registerParticle("damage_indicator", true);
+        registerParticle("dragon_breath", true);
+        registerParticle("dripping_lava", false);
+        registerParticle("dripping_water", false);
+        registerParticle("dust", true, ImmutableMap.of(
+                ParticleOptions.COLOR, Color.RED,
+                ParticleOptions.SCALE, 1.0));
+        registerParticle("effect", true, ImmutableMap.of(
+                ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
+        registerParticle("elder_guardian", false);
+        registerParticle("enchanted_hit", true);
+        registerParticle("enchanting_glyphs", true);
+        registerParticle("end_rod", true);
+        registerParticle("entity_effect", false, ImmutableMap.of(
+                ParticleOptions.COLOR, Color.BLACK));
+        registerParticle("explosion_emitter", true);
+        registerParticle("explosion", false, ImmutableMap.of(
+                ParticleOptions.SCALE, 1.0));
+        registerParticle("falling_dust", true, ImmutableMap.of(
                 ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
                 ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
+        registerParticle("fireworks_spark", true);
+        registerParticle("fishing", true);
+        registerParticle("flame", true);
+        registerParticle("happy_villager", true);
+        registerParticle("heart", false);
+        registerParticle("instant_effect", true, ImmutableMap.of(
+                ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
+        registerParticle("item", true, ImmutableMap.of(
+                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
+        registerParticle("item_slime", false);
+        registerParticle("item_snowball", false);
+        registerParticle("large_smoke", true);
+        registerParticle("lava", false);
+        registerParticle("mycelium", false);
+        registerParticle("note", false, ImmutableMap.of(
+                ParticleOptions.NOTE, NotePitches.F_SHARP0));
+        registerParticle("snowball_poof", true);
+        registerParticle("portal", true);
+        registerParticle("rain_splash", true);
+        registerParticle("smoke", true);
+        registerParticle("spit", true);
+        registerParticle("squid_ink", true);
+        registerParticle("sweep_attack", false, ImmutableMap.of(
+                ParticleOptions.SCALE, 1.0));
+        registerParticle("totem_of_undying", true);
+        registerParticle("underwater", false);
+        registerParticle("water_splash", false);
+        registerParticle("witch_magic", true, ImmutableMap.of(
+                ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
+        registerParticle("bubble_pop", true);
+        registerParticle("current_down", false);
+        registerParticle("bubble_column_up", true);
+        registerParticle("nautilus", true);
+        registerParticle("dolphin_speed", false);
+
+        // Extra effect types
         registerEffect("break_block", ImmutableMap.of(
                 ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
                 ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
-        registerParticle(29, "cloud", true);
-        registerParticle(9, "critical_hit", true);
-        registerParticle(44, "damage_indicator", true);
-        registerParticle(42, "dragon_breath", true);
+        registerEffect("break_eye_of_ender", ImmutableMap.of());
+        registerEffect("break_splash_potion", ImmutableMap.of(
+                ParticleOptions.POTION_EFFECT_TYPE, PotionEffectTypes.NIGHT_VISION));
         registerEffect("dragon_breath_attack", ImmutableMap.of());
-        registerParticle(19, "drip_lava", false);
-        registerParticle(18, "drip_water", false);
-        registerParticle(25, "enchanting_glyphs", true);
-        registerParticle(43, "end_rod", true);
-        registerEffect("ender_teleport", ImmutableMap.of());
-        registerParticle(0, "explosion", true);
-        registerParticle(46, "falling_dust", false, ImmutableMap.of(
-                ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
-                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
         registerEffect("fertilizer", ImmutableMap.of(
                 ParticleOptions.QUANTITY, 15));
-        registerParticle(3, "fireworks_spark", true);
         registerEffect("fireworks", ImmutableMap.of(
                 ParticleOptions.FIREWORK_EFFECTS, ImmutableList.of(
                         FireworkEffect.builder().color(Color.BLACK).build())));
         registerEffect("fire_smoke", ImmutableMap.of(
                 ParticleOptions.DIRECTION, Direction.UP));
-        registerParticle(26, "flame", true);
-        registerParticle(28, "footstep", false);
-        registerParticle(41, "guardian_appearance", false);
-        registerParticle(21, "happy_villager", true);
-        registerParticle(34, "heart", false);
-        registerParticle(2, "huge_explosion", false);
-        registerParticle(14, "instant_spell", true, ImmutableMap.of(
-                ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
-        registerParticle(36, "item_crack", true, ImmutableMap.of(
-                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
-        registerParticle(1, "large_explosion", false, ImmutableMap.of(
-                ParticleOptions.SCALE, 1.0));
-        registerParticle(12, "large_smoke", true);
-        registerParticle(27, "lava", false);
-        registerParticle(10, "magic_critical_hit", true);
         registerEffect("mobspawner_flames", ImmutableMap.of());
-        registerParticle(15, "mob_spell", false, ImmutableMap.of(
-                ParticleOptions.COLOR, Color.BLACK));
-        registerParticle(23, "note", false, ImmutableMap.of(
-                ParticleOptions.NOTE, NotePitches.F_SHARP0));
-        registerParticle(24, "portal", true);
-        registerParticle(30, "redstone_dust", false, ImmutableMap.of(
-                ParticleOptions.COLOR, Color.RED));
-        registerParticle(33, "slime", false);
-        registerParticle(11, "smoke", true);
-        registerParticle(31, "snowball", false);
-        registerParticle(32, "snow_shovel", true);
-        registerParticle(13, "spell", true, ImmutableMap.of(
-                ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
-        registerParticle(48, "spit", true);
-        registerEffect("splash_potion", ImmutableMap.of(
-                ParticleOptions.POTION_EFFECT_TYPE, PotionEffectTypes.NIGHT_VISION));
-        registerParticle(7, "suspended", false);
-        registerParticle(8, "suspended_depth", false);
-        registerParticle(45, "sweep_attack", false, ImmutableMap.of(
-                ParticleOptions.SCALE, 1.0));
-        registerParticle(47, "totem", true);
-        registerParticle(22, "town_aura", true);
-        registerParticle(4, "water_bubble", true);
-        registerParticle(39, "water_drop", false);
-        registerParticle(4, "water_splash", true);
-        registerParticle(5, "water_wake", true);
-        registerParticle(17, "witch_spell", true, ImmutableMap.of(
-                ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
-        // Is not exposed in the api, since it doesn't do anything
-        registerParticle(40, "item_take", false);
     }
 
-    private void registerParticle(int internalType, String id, boolean velocity) {
-        registerParticle(internalType, id, velocity, Collections.emptyMap());
+    private void registerParticle(String id, boolean velocity) {
+        registerParticle(id, velocity, Collections.emptyMap());
     }
 
-    private void registerParticle(int internalType, String id, boolean velocity,
+    private void registerParticle(String id, boolean velocity,
             Map<ParticleOption<?>, Object> extraOptions) {
         final ImmutableMap.Builder<ParticleOption<?>, Object> options = ImmutableMap.builder();
         options.put(ParticleOptions.OFFSET, Vector3d.ZERO);
@@ -159,7 +162,7 @@ public final class ParticleTypeRegistryModule extends DefaultCatalogRegistryModu
             options.put(ParticleOptions.VELOCITY, Vector3d.ZERO);
         }
         options.putAll(extraOptions);
-        registerEffect(id, OptionalInt.of(internalType), options.build());
+        registerEffect(id, OptionalInt.of(this.internalId++), options.build());
     }
 
     private void registerEffect(String id, Map<ParticleOption<?>, Object> options) {

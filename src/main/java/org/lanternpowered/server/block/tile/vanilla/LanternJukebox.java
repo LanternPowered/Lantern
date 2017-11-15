@@ -39,8 +39,8 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.item.RecordProperty;
-import org.spongepowered.api.effect.sound.record.RecordType;
+import org.spongepowered.api.data.property.item.MusicDiscProperty;
+import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -60,39 +60,39 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
     private boolean playing;
 
     @Override
-    public void playRecord() {
+    public void play() {
         final ItemStack recordItem = this.inventory.getRawItemStack();
         if (recordItem == null) {
             return;
         }
         this.playing = true;
         final Location<World> location = getLocation();
-        final RecordProperty property = recordItem.getProperty(RecordProperty.class).orElse(null);
-        final RecordType recordType = property == null ? null : property.getValue();
-        if (recordType != null) {
-            location.getExtent().playRecord(location.getBlockPosition(), recordType);
+        final MusicDiscProperty property = recordItem.getProperty(MusicDiscProperty.class).orElse(null);
+        final MusicDisc musicDisc = property == null ? null : property.getValue();
+        if (musicDisc != null) {
+            location.getExtent().playMusicDisc(location.getBlockPosition(), musicDisc);
         }
     }
 
     @Override
-    public void stopRecord() {
+    public void stop() {
         if (!this.playing) {
             return;
         }
         this.playing = false;
         final Location<World> location = getLocation();
-        location.getExtent().stopRecord(location.getBlockPosition());
+        location.getExtent().stopMusicDisc(location.getBlockPosition());
     }
 
     @Override
-    public void ejectRecord() {
+    public void eject() {
         ejectRecordItem().ifPresent(entity -> entity.getWorld().spawnEntity(entity));
     }
 
     private void updateBlockState() {
         final Location<World> location = getLocation();
         final BlockState block = location.getBlock();
-        location.setBlock(block.withTrait(LanternBooleanTraits.HAS_RECORD, this.inventory.getRawItemStack() != null).orElse(block));
+        location.setBlock(block.withTrait(LanternBooleanTraits.HAS_MUSIC_DISC, this.inventory.getRawItemStack() != null).orElse(block));
     }
 
     /**
@@ -106,7 +106,7 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
         if (recordItem == null) {
             return Optional.empty();
         }
-        stopRecord();
+        stop();
         final Location<World> location = getLocation();
         final Vector3d entityPosition = location.getBlockPosition().toDouble().add(0.5, 0.9, 0.5);
         final Entity item = location.getExtent().createEntity(EntityTypes.ITEM, entityPosition);
@@ -118,9 +118,9 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
     }
 
     @Override
-    public void insertRecord(ItemStack record) {
+    public void insert(ItemStack record) {
         checkNotNull(record, "record");
-        ejectRecord();
+        eject();
         checkState(this.inventory.set(record).getType() == InventoryTransactionResult.Type.SUCCESS,
                 "Invalid record item stack: " + record);
         updateBlockState();

@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
@@ -48,13 +49,7 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
         if (message instanceof MessagePlayOutTeams.CreateOrUpdate) {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Create ? 0 : 2));
             final MessagePlayOutTeams.CreateOrUpdate message1 = (MessagePlayOutTeams.CreateOrUpdate) message;
-            try (TranslationContext ignored = TranslationContext.enter()
-                    .locale(context.getSession().getLocale())
-                    .enableForcedTranslations()) {
-                buf.writeString(LanternTexts.toLegacy(message1.getDisplayName()));
-                buf.writeString(LanternTexts.toLegacy(message1.getPrefix()));
-                buf.writeString(LanternTexts.toLegacy(message1.getSuffix()));
-            }
+            context.write(buf, ContextualValueTypes.TEXT, message1.getDisplayName());
             int flags = 0;
             if (message1.getFriendlyFire()) {
                 flags |= 0x01;
@@ -66,8 +61,10 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
             buf.writeString(message1.getNameTagVisibility().getKey().toString());
             buf.writeString(message1.getCollisionRule().getName());
             final TextColor c = message1.getColor();
-            buf.writeByte((byte) (c == TextColors.NONE || c == TextColors.RESET ? -1 :
+            buf.writeByte((byte) (c == TextColors.NONE || c == TextColors.RESET ? 21 :
                             LanternFormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(c)));
+            context.write(buf, ContextualValueTypes.TEXT, message1.getPrefix());
+            context.write(buf, ContextualValueTypes.TEXT, message1.getSuffix());
         } else {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Remove ? 1 :
                     message instanceof MessagePlayOutTeams.AddMembers ? 3 : 4));

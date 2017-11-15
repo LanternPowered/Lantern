@@ -38,6 +38,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
+import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.statistic.StatisticMap;
 import org.lanternpowered.server.world.LanternWorld;
@@ -138,8 +139,8 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
         c.registerNonRemovable(LanternKeys.CAN_DUAL_WIELD, false);
         c.registerNonRemovable(LanternKeys.SCORE, 0);
         c.registerNonRemovable(LanternKeys.ACTIVE_HAND, Optional.empty());
-        c.registerNonRemovable(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, false);
-        c.registerNonRemovable(LanternKeys.RECIPE_BOOK_GUI_OPEN, false);
+        c.registerNonRemovable(LanternKeys.SMELTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
+        c.registerNonRemovable(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
         c.registerProcessor(Keys.STATISTICS).add(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
                     this.statisticMap.setStatisticValues(map);

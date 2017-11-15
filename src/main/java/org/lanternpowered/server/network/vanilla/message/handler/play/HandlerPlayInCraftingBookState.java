@@ -29,14 +29,14 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRecipeBookStates;
 
-public final class HandlerPlayInCraftingBookState implements Handler<MessagePlayInCraftingBookState> {
+public final class HandlerPlayInCraftingBookState implements Handler<MessagePlayInRecipeBookStates> {
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInCraftingBookState message) {
+    public void handle(NetworkContext context, MessagePlayInRecipeBookStates message) {
         final LanternPlayer player = context.getSession().getPlayer();
-        player.offer(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, message.hasFilter());
-        player.offer(LanternKeys.RECIPE_BOOK_GUI_OPEN, message.isCurrentlyOpen());
+        player.offer(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, message.getCraftingRecipeBookState());
+        player.offer(LanternKeys.SMELTING_RECIPE_BOOK_STATE, message.getSmeltingRecipeBookState());
     }
 }

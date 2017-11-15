@@ -25,42 +25,33 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.StringUtils;
-import org.lanternpowered.server.command.LanternCommandManager;
+import com.google.common.collect.Lists;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
-import org.spongepowered.api.event.command.TabCompleteEvent;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.spongepowered.api.text.Text;
 
 public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabComplete> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInTabComplete message) {
-        final String text = message.getText();
+        final String text = message.getInput();
+        final LanternPlayer player = context.getSession().getPlayer();
+        player.sendMessage(Text.of("Received tab completion (" + message.getId() + "): " + text));
+        player.getConnection().send(new MessagePlayOutTabComplete(Lists.newArrayList(
+                new MessagePlayOutTabComplete.Match("Avalue", null),
+                new MessagePlayOutTabComplete.Match("Btest", null),
+                new MessagePlayOutTabComplete.Match("Cwhy", null)), message.getId(), 0, 20));
+
+        /*
         // The content with normalized spaces, the spaces are trimmed
-        // from the ends and there are never two spaces directly after eachother
+        // from the ends and there are never two spaces directly after each other
         final String textNormalized = StringUtils.normalizeSpace(text);
 
-        final Player player = context.getSession().getPlayer();
-        final Location<World> targetBlock = message.getBlockPosition()
-                .map(pos -> new Location<>(player.getWorld(), pos)).orElse(null);
-
         final boolean hasPrefix = textNormalized.startsWith("/");
-        if (hasPrefix || message.getAssumeCommand()) {
+        if (hasPrefix) {
             String command = textNormalized;
 
             // Don't include the '/'
@@ -75,10 +66,10 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
 
             // Get the suggestions
             List<String> suggestions = ((LanternCommandManager) Sponge.getCommandManager())
-                    .getSuggestions(player, command, targetBlock, message.getAssumeCommand());
+                    .getCustomSuggestions(player, command, null, false);
 
             // If the suggestions are for the command and there was a prefix, then append the prefix
-            if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
+            if (command.split(" ").length == 1 && !command.endsWith(" ")) {
                 suggestions = suggestions.stream()
                         .map(suggestion -> '/' + suggestion)
                         .collect(ImmutableList.toImmutableList());
@@ -105,10 +96,10 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                     .collect(Collectors.toList());
             final Cause cause = Cause.of(EventContext.empty(), context.getSession().getPlayer());
             final TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(
-                    cause, ImmutableList.copyOf(suggestions), suggestions, text, Optional.ofNullable(targetBlock), false);
+                    cause, ImmutableList.copyOf(suggestions), suggestions, text, Optional.empty(), false);
             if (!Sponge.getEventManager().post(event)) {
                 context.getSession().send(new MessagePlayOutTabComplete(suggestions));
             }
-        }
+        }*/
     }
 }

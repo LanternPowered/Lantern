@@ -73,8 +73,17 @@ import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
-import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.item.RawItemStack;
+import org.lanternpowered.server.network.vanilla.command.ArgumentNode;
+import org.lanternpowered.server.network.vanilla.command.LiteralNode;
+import org.lanternpowered.server.network.vanilla.command.RootNode;
+import org.lanternpowered.server.network.vanilla.command.SuggestionTypes;
+import org.lanternpowered.server.network.vanilla.command.argument.ArgumentAndType;
+import org.lanternpowered.server.network.vanilla.command.argument.ArgumentTypes;
+import org.lanternpowered.server.network.vanilla.command.argument.StringArgument;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineCommands;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -85,6 +94,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
@@ -115,7 +125,7 @@ import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.effect.sound.record.RecordType;
+import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -448,6 +458,14 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 this.session.getServer().addPlayer(this);
                 this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
+                // Send the server brand
+                this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
+                // We just have to send this to prevent the client from crashing in some
+                // occasions, for example when clicking a furnace fuel slot.
+                // It's not used for anything else, so there aren't any arguments.
+                // Two messages, because only one does not work, it crashes the client...
+                this.session.send(new MessagePlayOutTags());
+                this.session.send(new MessagePlayOutTags());
                 // Send the player list
                 final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
                 final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);
@@ -460,18 +478,32 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 }
                 this.tabList.init(tabListEntries);
                 this.advancementsProgress.initClient();
+
                 this.session.send(new MessagePlayOutSelectAdvancementTree(get(LanternKeys.OPEN_ADVANCEMENT_TREE).get()
                         .map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
+                /*
+                this.session.send(new MessagePlayOutRegisterCommands(new RootNode(
+                        Collections.singletonList(new LiteralNode(Collections.emptyList(), "test", null, "test")),
+                        null, null)));*/
+                final ArgumentNode argumentNode = new ArgumentNode(Collections.emptyList(), "my-argument",
+                        ArgumentAndType.of(ArgumentTypes.STRING, new StringArgument(StringArgument.Type.GREEDY_PHRASE)),
+                        null, null, SuggestionTypes.ASK_SERVER);
+                this.session.send(new MessagePlayOutDefineCommands(new RootNode(
+                        Collections.singletonList(
+                                new LiteralNode(Collections.singletonList(argumentNode), "test", null, "test")),
+                        null, null)));
+
+                /*
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
                 // TODO: the readable ids still has to be made
                 final int[] recipes = new int[435];
                 for (int i = 0; i < recipes.length; i++) {
                     recipes[i] = i;
-                }
+                }*/
                 this.session.send(new MessagePlayOutUnlockRecipes.Add(
-                        get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
-                        get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
-                        new IntArrayList(recipes)));
+                        get(LanternKeys.CRAFTING_RECIPE_BOOK_STATE).get(),
+                        get(LanternKeys.SMELTING_RECIPE_BOOK_STATE).get(),
+                        new ArrayList<>()));
             } else {
                 if (oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();
@@ -961,18 +993,18 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public void playRecord(Vector3i position, RecordType recordType) {
-        playOrStopRecord(position, checkNotNull(recordType, "recordType"));
+    public void playMusicDisc(Vector3i position, MusicDisc musicDisc) {
+        playOrStopMusicDisc(position, checkNotNull(musicDisc, "musicDisc"));
     }
 
     @Override
-    public void stopRecord(Vector3i position) {
-        playOrStopRecord(position, null);
+    public void stopMusicDisc(Vector3i position) {
+        playOrStopMusicDisc(position, null);
     }
 
-    private void playOrStopRecord(Vector3i position, @Nullable RecordType recordType) {
+    private void playOrStopMusicDisc(Vector3i position, @Nullable MusicDisc musicDisc) {
         checkNotNull(position, "position");
-        getConnection().send(new MessagePlayOutRecord(position, recordType));
+        getConnection().send(new MessagePlayOutRecord(position, musicDisc));
     }
 
     @Override
@@ -989,7 +1021,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         WrittenBookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);
 
         // Written book internal id
-        final RawItemStack rawItemStack = new RawItemStack(387, 0, 1, dataView);
+        final RawItemStack rawItemStack = new RawItemStack("minecraft:written_book", 1, dataView);
         final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
         this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, rawItemStack));
         this.session.send(new MessagePlayOutOpenBook(HandTypes.MAIN_HAND));
@@ -1000,7 +1032,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     public void sendBlockChange(Vector3i position, BlockState state) {
         checkNotNull(state, "state");
         checkNotNull(position, "position");
-        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalIdAndData(state)));
+        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(state)));
     }
 
     @Override
@@ -1015,7 +1047,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (world == null) {
             return;
         }
-        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalIdAndData(world.getBlock(position))));
+        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
     }
 
     @Override

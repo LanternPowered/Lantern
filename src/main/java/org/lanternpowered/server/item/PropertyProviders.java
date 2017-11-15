@@ -38,14 +38,14 @@ import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
 import org.spongepowered.api.data.property.item.FoodRestorationProperty;
-import org.spongepowered.api.data.property.item.RecordProperty;
+import org.spongepowered.api.data.property.item.MusicDiscProperty;
 import org.spongepowered.api.data.property.item.SaturationProperty;
 import org.spongepowered.api.data.property.item.ToolTypeProperty;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.effect.potion.PotionEffect;
-import org.spongepowered.api.effect.sound.record.RecordType;
+import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 
 import java.util.Collection;
@@ -248,10 +248,10 @@ public final class PropertyProviders {
                 .build();
     }
 
-    public static PropertyProviderCollection recordType(RecordType recordType) {
-        final RecordProperty property = new RecordProperty(recordType);
+    public static PropertyProviderCollection musicDisc(MusicDisc musicDisc) {
+        final MusicDiscProperty property = new MusicDiscProperty(musicDisc);
         return PropertyProviderCollection.builder()
-                .add(RecordProperty.class, (itemType, itemStack) -> property)
+                .add(MusicDiscProperty.class, (itemType, itemStack) -> property)
                 .build();
     }
 

@@ -27,11 +27,11 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
-import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.text.translation.TranslationContext;
+import org.lanternpowered.server.scoreboard.LanternObjectiveDisplayMode;
 
 public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayOutScoreboardObjective> {
 
@@ -43,12 +43,8 @@ public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayO
             buf.writeByte((byte) (message instanceof MessagePlayOutScoreboardObjective.Create ? 0 : 2));
             final MessagePlayOutScoreboardObjective.CreateOrUpdate message0 =
                     (MessagePlayOutScoreboardObjective.CreateOrUpdate) message;
-            try (TranslationContext ignored = TranslationContext.enter()
-                    .locale(context.getSession().getLocale())
-                    .enableForcedTranslations()) {
-                buf.writeString(LanternTexts.toLegacy(message0.getDisplayName()));
-            }
-            buf.writeString(message0.getDisplayMode().getKey().toString());
+            context.write(buf, ContextualValueTypes.TEXT, message0.getDisplayName());
+            buf.writeVarInt(((LanternObjectiveDisplayMode) message0.getDisplayMode()).getInternalId());
         } else {
             buf.writeByte((byte) 1);
         }

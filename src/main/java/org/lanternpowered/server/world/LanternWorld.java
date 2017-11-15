@@ -110,7 +110,7 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.record.RecordType;
+import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
@@ -1066,18 +1066,18 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public void playRecord(Vector3i position, RecordType recordType) {
-        playOrStopRecord(position, checkNotNull(recordType, "recordType"));
+    public void playMusicDisc(Vector3i position, MusicDisc musicDisc) {
+        playOrStopMusicDisc(position, checkNotNull(musicDisc, "musicDisc"));
     }
 
     @Override
-    public void stopRecord(Vector3i position) {
-        playOrStopRecord(position, null);
+    public void stopMusicDisc(Vector3i position) {
+        playOrStopMusicDisc(position, null);
     }
 
-    private void playOrStopRecord(Vector3i position, @Nullable RecordType recordType) {
+    private void playOrStopMusicDisc(Vector3i position, @Nullable MusicDisc musicDisc) {
         checkNotNull(position, "position");
-        broadcast(() -> new MessagePlayOutRecord(position, recordType));
+        broadcast(() -> new MessagePlayOutRecord(position, musicDisc));
     }
 
     private void spawnParticles(Iterator<LanternPlayer> players, ParticleEffect particleEffect, Vector3d position) {

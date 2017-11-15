@@ -35,6 +35,7 @@ public class HandlerPlayInRequestStatistics implements Handler<MessagePlayInRequ
     @Override
     public void handle(NetworkContext context, MessagePlayInRequestStatistics message) {
         final NetworkSession session = context.getSession();
-        session.send(session.getPlayer().getStatisticMap().createStatisticsMessage());
+        // TODO: Update statistics protocol
+        // session.send(session.getPlayer().getStatisticMap().createStatisticsMessage());
     }
 }

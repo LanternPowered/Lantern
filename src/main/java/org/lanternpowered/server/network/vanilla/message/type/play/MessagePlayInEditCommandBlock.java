@@ -77,31 +77,23 @@ public abstract class MessagePlayInEditCommandBlock implements Message {
         }
     }
 
-    public static class Block extends MessagePlayInEditCommandBlock {
+    public static final class Block extends MessagePlayInEditCommandBlock {
 
         private final Vector3i position;
-
-        public Block(Vector3i position, String command, boolean shouldTrackOutput) {
-            super(command, shouldTrackOutput);
-            this.position = checkNotNull(position, "position");
-        }
-
-        public Vector3i getBlockPosition() {
-            return this.position;
-        }
-    }
-
-    public static final class AdvancedBlock extends Block {
-
         private final Mode mode;
         private final boolean conditional;
         private final boolean automatic;
 
-        public AdvancedBlock(Vector3i position, String command, boolean shouldTrackOutput, Mode mode, boolean conditional, boolean automatic) {
-            super(position, command, shouldTrackOutput);
+        public Block(Vector3i position, String command, boolean shouldTrackOutput, Mode mode, boolean conditional, boolean automatic) {
+            super(command, shouldTrackOutput);
+            this.position = checkNotNull(position, "position");
             this.mode = checkNotNull(mode, "mode");
             this.conditional = conditional;
             this.automatic = automatic;
+        }
+
+        public Vector3i getBlockPosition() {
+            return this.position;
         }
 
         public Mode getMode() {

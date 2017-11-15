@@ -26,40 +26,44 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.base.MoreObjects;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntLists;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.network.message.Message;
 
-import java.util.Arrays;
+import java.util.List;
 
 public abstract class MessagePlayOutUnlockRecipes implements Message {
 
-    private final boolean openRecipeBook;
-    private final boolean craftingFilter;
-    private final IntList recipeIds;
+    private final RecipeBookState craftingRecipeBookState;
+    private final RecipeBookState smeltingRecipeBookState;
+    private final List<String> recipeIds;
 
-    private MessagePlayOutUnlockRecipes(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds) {
-        this.recipeIds = IntLists.unmodifiable(recipeIds);
-        this.openRecipeBook = openRecipeBook;
-        this.craftingFilter = craftingFilter;
+    private MessagePlayOutUnlockRecipes(
+            RecipeBookState craftingRecipeBookState,
+            RecipeBookState smeltingRecipeBookState,
+            List<String> recipeIds) {
+        this.craftingRecipeBookState = craftingRecipeBookState;
+        this.smeltingRecipeBookState = smeltingRecipeBookState;
+        this.recipeIds = ImmutableList.copyOf(recipeIds);
     }
 
-    public boolean hasOpenCraftingBook() {
-        return this.openRecipeBook;
+    public RecipeBookState getCraftingRecipeBookState() {
+        return this.craftingRecipeBookState;
     }
 
-    public boolean hasCraftingFilter() {
-        return this.craftingFilter;
+    public RecipeBookState getSmeltingRecipeBookState() {
+        return this.smeltingRecipeBookState;
     }
 
     public MoreObjects.ToStringHelper toStringHelper() {
         return MoreObjects.toStringHelper(getClass().getSuperclass().getSimpleName() + "." + getClass().getSimpleName())
-                .add("openRecipeBook", this.openRecipeBook)
-                .add("craftingFilter", this.craftingFilter)
-                .add("recipeIds", Arrays.toString(this.recipeIds.toIntArray()));
+                .add("craftingRecipeBookState", this.craftingRecipeBookState)
+                .add("smeltingRecipeBookState", this.smeltingRecipeBookState)
+                .add("recipeIds", Iterables.toString(this.recipeIds));
     }
 
-    public IntList getRecipeIds() {
+    public List<String> getRecipeIds() {
         return this.recipeIds;
     }
 
@@ -70,35 +74,44 @@ public abstract class MessagePlayOutUnlockRecipes implements Message {
 
     public final static class Remove extends MessagePlayOutUnlockRecipes {
 
-        public Remove(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds) {
-            super(openRecipeBook, craftingFilter, recipeIds);
+        public Remove(
+                RecipeBookState craftingRecipeBookState,
+                RecipeBookState smeltingRecipeBookState,
+                List<String> recipeIds) {
+            super(craftingRecipeBookState, smeltingRecipeBookState, recipeIds);
         }
     }
 
     public final static class Init extends MessagePlayOutUnlockRecipes {
 
-        private final IntList recipeIdsToBeDisplayed;
+        private final List<String> recipeIdsToBeDisplayed;
 
-        public Init(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds, IntList recipeIdsToBeDisplayed) {
-            super(openRecipeBook, craftingFilter, recipeIds);
-            this.recipeIdsToBeDisplayed = IntLists.unmodifiable(recipeIdsToBeDisplayed);
+        public Init(
+                RecipeBookState craftingRecipeBookState,
+                RecipeBookState smeltingRecipeBookState,
+                List<String> recipeIds, List<String> recipeIdsToBeDisplayed) {
+            super(craftingRecipeBookState, smeltingRecipeBookState, recipeIds);
+            this.recipeIdsToBeDisplayed = ImmutableList.copyOf(recipeIdsToBeDisplayed);
         }
 
-        public IntList getRecipeIdsToBeDisplayed() {
+        public List<String> getRecipeIdsToBeDisplayed() {
             return this.recipeIdsToBeDisplayed;
         }
 
         @Override
         public MoreObjects.ToStringHelper toStringHelper() {
             return super.toStringHelper()
-                    .add("recipeIdsToBeDisplayed", Arrays.toString(this.recipeIdsToBeDisplayed.toIntArray()));
+                    .add("recipeIdsToBeDisplayed", Iterables.toString(this.recipeIdsToBeDisplayed));
         }
     }
 
     public final static class Add extends MessagePlayOutUnlockRecipes {
 
-        public Add(boolean openRecipeBook, boolean craftingFilter, IntList recipeIds) {
-            super(openRecipeBook, craftingFilter, recipeIds);
+        public Add(
+                RecipeBookState craftingRecipeBookState,
+                RecipeBookState smeltingRecipeBookState,
+                List<String> recipeIds) {
+            super(craftingRecipeBookState, smeltingRecipeBookState, recipeIds);
         }
     }
 }

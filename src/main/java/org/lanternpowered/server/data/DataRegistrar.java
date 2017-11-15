@@ -144,6 +144,48 @@ public class DataRegistrar {
         dataManager.registerBuilder(GameProfile.class, new LanternGameProfileBuilder());
 
         final LanternValueFactory valueFactory = LanternValueFactory.get();
+        valueFactory.registerKey(Keys.BIG_MUSHROOM_PORES).add(builder -> builder
+                .applicableTester(valueContainer ->
+                        valueContainer.supports(Keys.BIG_MUSHROOM_PORES_UP) || valueContainer.supports(Keys.BIG_MUSHROOM_PORES_WEST) ||
+                                valueContainer.supports(Keys.BIG_MUSHROOM_PORES_SOUTH) || valueContainer.supports(Keys.BIG_MUSHROOM_PORES_NORTH) ||
+                                valueContainer.supports(Keys.BIG_MUSHROOM_PORES_EAST) || valueContainer.supports(Keys.BIG_MUSHROOM_PORES_DOWN))
+                .retrieveHandler((valueContainer, key)  -> {
+                    final Set<Direction> directions = new HashSet<>();
+                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_WEST).orElse(false)) {
+                        directions.add(Direction.WEST);
+                    }
+                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_EAST).orElse(false)) {
+                        directions.add(Direction.EAST);
+                    }
+                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_SOUTH).orElse(false)) {
+                        directions.add(Direction.SOUTH);
+                    }
+                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_NORTH).orElse(false)) {
+                        directions.add(Direction.NORTH);
+                    }
+                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_UP).orElse(false)) {
+                        directions.add(Direction.UP);
+                    }
+                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_DOWN).orElse(false)) {
+                        directions.add(Direction.DOWN);
+                    }
+                    return Optional.of(directions);
+                })
+                .offerHandler((valueContainer, key, directions) -> {
+                    if (valueContainer instanceof CompositeValueStore) {
+                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
+                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
+                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_WEST, directions.contains(Direction.WEST)));
+                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_EAST, directions.contains(Direction.EAST)));
+                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_SOUTH, directions.contains(Direction.SOUTH)));
+                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_NORTH, directions.contains(Direction.NORTH)));
+                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_UP, directions.contains(Direction.UP)));
+                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_DOWN, directions.contains(Direction.DOWN)));
+                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
+                    }
+                    return DataTransactionResult.successNoData();
+                })
+                .failAlwaysRemoveHandler());
         valueFactory.registerKey(Keys.CONNECTED_DIRECTIONS).add(builder -> builder
                 .applicableTester(valueContainer ->
                         valueContainer.supports(Keys.CONNECTED_WEST) || valueContainer.supports(Keys.CONNECTED_EAST) ||

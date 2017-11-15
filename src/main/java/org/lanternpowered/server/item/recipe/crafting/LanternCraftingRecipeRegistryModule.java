@@ -55,14 +55,14 @@ public class LanternCraftingRecipeRegistryModule extends LanternRecipeRegistryMo
     public void registerDefaults() {
         try {
             ReflectionHelper.setField(Ingredient.class.getField("NONE"), null,
-                    IIngredient.builder().with(ItemStack::isEmpty).withDisplay(ItemTypes.NONE).build());
+                    IIngredient.builder().with(ItemStack::isEmpty).withDisplay(ItemTypes.AIR).build());
         } catch (Throwable e) {
             throw UncheckedThrowables.throwUnchecked(e);
         }
         PluginContainer plugin = Lantern.getMinecraftPlugin();
         register(ICraftingRecipe.shapedBuilder()
                 .aisle("x", "x")
-                .where('x', Ingredient.of(ItemTypes.PLANKS))
+                .where('x', Ingredient.of(ItemTypes.OAK_PLANKS))
                 .result(ItemStack.of(ItemTypes.STICK, 4))
                 .build("stick", plugin));
 

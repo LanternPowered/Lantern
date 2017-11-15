@@ -29,6 +29,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
@@ -43,14 +44,14 @@ import javax.annotation.Nullable;
 public final class MessagePlayOutAdvancements implements Message {
 
     private final boolean clear;
-    private final List<AdvStruct> addedAdvStructs;
-    private final List<String> removedAdvs;
+    private final List<NetworkAdvancement> added;
+    private final List<String> removed;
     private final Map<String, Object2LongMap<String>> progress;
 
-    public MessagePlayOutAdvancements(boolean clear, List<AdvStruct> addedAdvStructs, List<String> removedAdvs,
+    public MessagePlayOutAdvancements(boolean clear, List<NetworkAdvancement> added, List<String> removed,
             Map<String, Object2LongMap<String>> progress) {
-        this.addedAdvStructs = addedAdvStructs;
-        this.removedAdvs = removedAdvs;
+        this.added = added;
+        this.removed = removed;
         this.progress = progress;
         this.clear = clear;
     }
@@ -59,12 +60,12 @@ public final class MessagePlayOutAdvancements implements Message {
         return this.clear;
     }
 
-    public List<AdvStruct> getAddedAdvStructs() {
-        return this.addedAdvStructs;
+    public List<NetworkAdvancement> getAdded() {
+        return this.added;
     }
 
-    public List<String> getRemovedAdvs() {
-        return this.removedAdvs;
+    public List<String> getRemoved() {
+        return this.removed;
     }
 
     public Map<String, Object2LongMap<String>> getProgress() {
@@ -82,8 +83,8 @@ public final class MessagePlayOutAdvancements implements Message {
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
                 .add("clear", this.clear)
-                .add("addedAdvStructs", Iterables.toString(this.addedAdvStructs))
-                .add("removedAdvs", Iterables.toString(this.removedAdvs))
+                .add("added", Iterables.toString(this.added))
+                .add("removed", Iterables.toString(this.removed))
                 .add("progress", progress.toString())
                 .toString();
     }

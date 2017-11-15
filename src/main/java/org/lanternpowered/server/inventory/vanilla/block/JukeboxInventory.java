@@ -37,6 +37,6 @@ public class JukeboxInventory extends LanternFilteringSlot implements ITileEntit
         // Stop the record if it's already playing,
         // don't eject the current one, who's interacting
         // with the inventory should handle that
-        getCarrierAs(Jukebox.class).ifPresent(Jukebox::stopRecord);
+        getCarrierAs(Jukebox.class).ifPresent(Jukebox::stop);
     }
 }

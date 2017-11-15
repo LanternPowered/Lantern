@@ -44,7 +44,7 @@ import java.util.List;
 public final class AccessoryRegistryModule extends DefaultCatalogRegistryModule<Accessory> {
 
     public AccessoryRegistryModule() {
-        super();
+        super(TopHats.class);
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class AccessoryRegistryModule extends DefaultCatalogRegistryModule<
         register(new LanternTopHat(CatalogKeys.lantern("pink_top_hat"), DyeColors.PINK));
         register(new LanternTopHat(CatalogKeys.lantern("purple_top_hat"), DyeColors.PURPLE));
         register(new LanternTopHat(CatalogKeys.lantern("red_top_hat"), DyeColors.RED));
-        register(new LanternTopHat(CatalogKeys.lantern("silver_top_hat"), DyeColors.SILVER));
+        register(new LanternTopHat(CatalogKeys.lantern("light_gray_top_hat"), DyeColors.LIGHT_GRAY));
         register(new LanternTopHat(CatalogKeys.lantern("snow_top_hat")));
         register(new LanternTopHat(CatalogKeys.lantern("stone_top_hat")));
         register(new LanternTopHat(CatalogKeys.lantern("white_top_hat"), DyeColors.WHITE));

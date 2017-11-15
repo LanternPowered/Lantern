@@ -315,7 +315,7 @@ public class LanternCommandManager implements CommandManager {
             frame.pushCause(source);
             final List<String> suggestions;
             final String[] argSplit = arguments.split(" ", 2);
-            // TODO: Fix this in the SimpleDispatcher -> in 'getSuggestions' add after
+            // TODO: Fix this in the SimpleDispatcher -> in 'getCustomSuggestions' add after
             // 'argSplit.length == 1' the check '&& !arguments.endsWith(" ")'
             if (argSplit.length == 1 && !arguments.endsWith(" ")) {
                 suggestions = this.dispatcher.getSuggestions(source, arguments, targetPosition);

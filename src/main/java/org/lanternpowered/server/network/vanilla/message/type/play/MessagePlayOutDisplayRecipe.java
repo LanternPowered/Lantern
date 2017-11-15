@@ -30,9 +30,9 @@ import org.lanternpowered.server.network.message.Message;
 public final class MessagePlayOutDisplayRecipe implements Message {
 
     private final int windowId;
-    private final int recipeId;
+    private final String recipeId;
 
-    public MessagePlayOutDisplayRecipe(int windowId, int recipeId) {
+    public MessagePlayOutDisplayRecipe(int windowId, String recipeId) {
         this.windowId = windowId;
         this.recipeId = recipeId;
     }
@@ -41,7 +41,7 @@ public final class MessagePlayOutDisplayRecipe implements Message {
         return this.windowId;
     }
 
-    public int getRecipeId() {
+    public String getRecipeId() {
         return this.recipeId;
     }
 }

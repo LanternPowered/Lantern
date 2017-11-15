@@ -36,7 +36,7 @@ public class CodecPlayInClickRecipe implements Codec<MessagePlayInClickRecipe> {
     @Override
     public MessagePlayInClickRecipe decode(CodecContext context, ByteBuffer buf) throws CodecException {
         final int windowId = buf.readByte() & 0xff;
-        final int recipe = buf.readVarInt();
+        final String recipe = buf.readString();
         final boolean shift = buf.readBoolean();
         return new MessagePlayInClickRecipe(windowId, recipe, shift);
     }

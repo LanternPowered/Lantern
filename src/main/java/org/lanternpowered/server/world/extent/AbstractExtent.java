@@ -32,11 +32,11 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.IntArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
-import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
-import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.AtomicIntArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.IntArrayImmutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.IntArrayMutableBlockBuffer;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -142,7 +142,7 @@ public interface AbstractExtent extends IExtent {
 
     @Override
     default ImmutableBiomeVolume getImmutableBiomeCopy() {
-        return ShortArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBiomeArray(this, getBiomeMin(),
+        return IntArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBiomeArray(this, getBiomeMin(),
                 getBiomeMax(), getBiomeSize()), getBiomeMin(), getBiomeSize());
     }
 
@@ -171,10 +171,10 @@ public interface AbstractExtent extends IExtent {
     default MutableBlockVolume getBlockCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(this, getBlockMin(),
+                return new IntArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(this, getBlockMin(),
                         getBlockMax(), getBlockSize()), getBlockMin(), getBlockSize());
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(this, getBlockMin(),
+                return new AtomicIntArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(this, getBlockMin(),
                         getBlockMax(), getBlockSize()), getBlockMin(), getBlockSize());
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -183,7 +183,7 @@ public interface AbstractExtent extends IExtent {
 
     @Override
     default ImmutableBlockVolume getImmutableBlockCopy() {
-        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(this, getBlockMin(),
+        return IntArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(this, getBlockMin(),
                 getBlockMax(), getBlockSize()), getBlockMin(), getBlockSize());
     }
 }

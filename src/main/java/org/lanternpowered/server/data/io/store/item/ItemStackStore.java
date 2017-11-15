@@ -32,20 +32,6 @@ import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -53,17 +39,12 @@ import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.data.type.SandstoneType;
-import org.spongepowered.api.data.type.SlabType;
-import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -85,9 +66,8 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
 
     public static final ItemStackStore INSTANCE = new ItemStackStore();
 
-    private static final DataQuery IDENTIFIER = DataQuery.of("id");
+    public static final DataQuery IDENTIFIER = DataQuery.of("id");
     public static final DataQuery QUANTITY = DataQuery.of("Count");
-    public static final DataQuery DATA = DataQuery.of("Damage");
     public static final DataQuery TAG = DataQuery.of("tag");
 
     public static final DataQuery DISPLAY = DataQuery.of("display");
@@ -103,75 +83,6 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
     {
-        final DataValueItemTypeObjectSerializer<TreeType> treeTypeSerializer =
-                new DataValueItemTypeObjectSerializer<>(Keys.TREE_TYPE, TreeTypeRegistryModule.get());
-        add(BlockTypes.LOG, treeTypeSerializer);
-        add(BlockTypes.WOODEN_SLAB, treeTypeSerializer);
-        add(BlockTypes.DOUBLE_WOODEN_SLAB, treeTypeSerializer);
-        add(BlockTypes.PLANKS, treeTypeSerializer);
-        add(BlockTypes.LEAVES, treeTypeSerializer);
-        add(BlockTypes.SAPLING, treeTypeSerializer);
-        final DataValueItemTypeObjectSerializer<TreeType> treeType2Serializer =
-                new DataValueItemTypeObjectSerializer<>(Keys.TREE_TYPE, TreeTypeRegistryModule.get(),
-                        dataValue -> dataValue + 4, internalId -> internalId - 4);
-        add(BlockTypes.LOG2, treeType2Serializer);
-        add(BlockTypes.LEAVES2, treeType2Serializer);
-        final DataValueItemTypeObjectSerializer<SlabType> stoneSlab1Serializer =
-                new DataValueItemTypeObjectSerializer<>(Keys.SLAB_TYPE, SlabTypeRegistryModule.get());
-        add(BlockTypes.STONE_SLAB, stoneSlab1Serializer);
-        add(BlockTypes.DOUBLE_STONE_SLAB, stoneSlab1Serializer);
-        final DataValueItemTypeObjectSerializer<SlabType> stoneSlab2Serializer =
-                new DataValueItemTypeObjectSerializer<>(Keys.SLAB_TYPE, SlabTypeRegistryModule.get(),
-                        dataValue -> dataValue + 8, internalId -> internalId - 8);
-        add(BlockTypes.STONE_SLAB2, stoneSlab2Serializer);
-        add(BlockTypes.DOUBLE_STONE_SLAB2, stoneSlab2Serializer);
-        add(BlockTypes.QUARTZ_BLOCK, new QuartzItemTypeSerializer());
-        final DataValueItemTypeObjectSerializer<SandstoneType> sandstoneTypeSerializer =
-                new DataValueItemTypeObjectSerializer<>(Keys.SANDSTONE_TYPE, SandstoneTypeRegistryModule.get());
-        add(BlockTypes.SANDSTONE, sandstoneTypeSerializer);
-        add(BlockTypes.RED_SANDSTONE, sandstoneTypeSerializer);
-        final DataValueItemTypeObjectSerializer<DyeColor> dyeColorSerializer =
-                new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get());
-        add(BlockTypes.WOOL, dyeColorSerializer);
-        add(BlockTypes.CARPET, dyeColorSerializer);
-        add(BlockTypes.STAINED_HARDENED_CLAY, dyeColorSerializer);
-        add(BlockTypes.STAINED_GLASS, dyeColorSerializer);
-        add(BlockTypes.STAINED_GLASS_PANE, dyeColorSerializer);
-        final ShulkerBoxItemObjectSerializer shulkerBoxSerializer = new ShulkerBoxItemObjectSerializer();
-        add(BlockTypes.BLACK_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.BLUE_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.BROWN_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.CYAN_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.GRAY_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.GREEN_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.LIGHT_BLUE_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.LIME_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.MAGENTA_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.ORANGE_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.PINK_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.PURPLE_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.RED_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.SILVER_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.WHITE_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.YELLOW_SHULKER_BOX, shulkerBoxSerializer);
-        add(BlockTypes.DIRT, new DataValueItemTypeObjectSerializer<>(Keys.DIRT_TYPE, DirtTypeRegistryModule.get()));
-        add(BlockTypes.STONE, new DataValueItemTypeObjectSerializer<>(Keys.STONE_TYPE, StoneTypeRegistryModule.get()));
-        add(BlockTypes.SAND, new DataValueItemTypeObjectSerializer<>(Keys.SAND_TYPE, SandTypeRegistryModule.get()));
-        add(BlockTypes.SPONGE, new SpongeItemTypeObjectSerializer());
-        add(BlockTypes.TALLGRASS, new DataValueItemTypeObjectSerializer<>(Keys.SHRUB_TYPE, ShrubTypeRegistryModule.get()));
-        add(BlockTypes.YELLOW_FLOWER, new DataValueItemTypeObjectSerializer<>(Keys.PLANT_TYPE, PlantTypeRegistryModule.get()));
-        add(BlockTypes.RED_FLOWER, new DataValueItemTypeObjectSerializer<>(Keys.PLANT_TYPE, PlantTypeRegistryModule.get(),
-                dataValue -> dataValue + 16, internalId -> internalId - 16));
-
-        add(ItemTypes.COAL, new DataValueItemTypeObjectSerializer<>(Keys.COAL_TYPE, CoalTypeRegistryModule.get()));
-        add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());
-        add(ItemTypes.FIREWORKS, new FireworksItemTypeObjectSerializer());
-        add(ItemTypes.GOLDEN_APPLE, new DataValueItemTypeObjectSerializer<>(Keys.GOLDEN_APPLE_TYPE, GoldenAppleRegistryModule.get()));
-        add(ItemTypes.FISH, new DataValueItemTypeObjectSerializer<>(Keys.FISH_TYPE, FishRegistryModule.get()));
-        add(ItemTypes.COOKED_FISH, new DataValueItemTypeObjectSerializer<>(Keys.COOKED_FISH, CookedFishRegistryModule.get()));
-        add(ItemTypes.DYE, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
-                dataValue -> 15 - dataValue, internalId -> 15 - internalId));
-        add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));
         add(ItemTypes.WRITABLE_BOOK, new WritableBookItemTypeObjectSerializer());
         add(ItemTypes.WRITTEN_BOOK, new WrittenBookItemTypeObjectSerializer());
         final PotionEffectsItemTypeObjectSerializer potionEffectsSerializer = new PotionEffectsItemTypeObjectSerializer();
@@ -232,7 +143,19 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         add(ItemTypes.LEATHER_CHESTPLATE, leatherSerializer);
         add(ItemTypes.LEATHER_HELMET, leatherSerializer);
         add(ItemTypes.LEATHER_LEGGINGS, leatherSerializer);
-        add(ItemTypes.BANNER, new BannerItemTypeSerializer());
+
+        final BannerItemTypeSerializer bannerSerializer = new BannerItemTypeSerializer();
+        final ShulkerBoxItemObjectSerializer shulkerBoxSerializer = new ShulkerBoxItemObjectSerializer();
+        for (ItemType itemType : ItemRegistryModule.get().getAll()) {
+            if (itemType.getKey().getValue().equals(CatalogKey.MINECRAFT_NAMESPACE)) {
+                final String value = itemType.getKey().getValue();
+                if (value.endsWith("shulker_box")) {
+                    add(itemType, shulkerBoxSerializer);
+                } else if (value.endsWith("banner")) {
+                    add(itemType, bannerSerializer);
+                }
+            }
+        }
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {
@@ -266,7 +189,6 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         object.setQuantity(dataView.getInt(QUANTITY).get());
         // All the extra data we will handle will be stored in the tag
         final DataView tag = dataView.getView(TAG).orElseGet(() -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED));
-        tag.set(ItemTypeObjectSerializer.DATA_VALUE, dataView.getShort(DATA).get());
         super.deserialize(object, tag);
     }
 
@@ -275,7 +197,6 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         dataView.set(QUANTITY, (byte) object.getQuantity());
         final DataView tag = dataView.createView(TAG);
         super.serialize(object, tag);
-        dataView.set(DATA, tag.getShort(ItemTypeObjectSerializer.DATA_VALUE).orElse((short) 0));
         tag.remove(ItemTypeObjectSerializer.DATA_VALUE);
         if (tag.isEmpty()) {
             dataView.remove(TAG);

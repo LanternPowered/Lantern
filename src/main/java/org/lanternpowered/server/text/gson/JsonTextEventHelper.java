@@ -31,7 +31,7 @@ import com.google.gson.JsonParseException;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.network.buffer.contextual.ItemStackContextualValueType;
+import org.lanternpowered.server.network.item.ItemStackContextualValueType;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.lanternpowered.server.text.translation.TranslationContext;
@@ -126,7 +126,7 @@ final class JsonTextEventHelper {
                 } catch (IOException e) {
                     throw new JsonParseException("Failed to parse the item data container", e);
                 }
-                ItemStackContextualValueType.deserializeTextFromNetwork(dataView);
+                ItemStackContextualValueType.deserializeFromNetwork(dataView);
                 final ItemStack itemStack = ItemStackStore.INSTANCE.deserialize(dataView);
                 return TextActions.showItem(itemStack.createSnapshot());
             case "show_entity":
@@ -195,9 +195,11 @@ final class JsonTextEventHelper {
             final ItemStackSnapshot itemStackSnapshot = ((HoverAction.ShowItem) hoverAction).getResult();
             final LanternItemStack itemStack = (LanternItemStack) itemStackSnapshot.createStack();
             final TranslationContext ctx = TranslationContext.current();
-            final DataView dataView = ItemStackStore.INSTANCE.serialize(itemStack);
+            final DataView dataView;
             if (ctx.forcesTranslations()) {
-                ItemStackContextualValueType.serializeTextForNetwork(dataView, itemStack);
+                dataView = ItemStackContextualValueType.serializeForNetwork(itemStack);
+            } else {
+                dataView = ItemStackStore.INSTANCE.serialize(itemStack);
             }
             try {
                 return new RawAction("show_item", JsonDataFormat.writeAsString(dataView));

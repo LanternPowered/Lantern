@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.base.Objects;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -55,7 +56,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
-import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
@@ -67,6 +68,8 @@ import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.Text;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -113,7 +116,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private short lastAirLevel;
     private boolean lastCustomNameVisible;
 
-    @Nullable private String lastCustomName;
+    @Nullable private Optional<Text> lastCustomName;
 
     protected IntSet lastPassengers = IntSets.EMPTY_SET;
 
@@ -338,8 +341,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         return this.entity.get(Keys.CUSTOM_NAME_VISIBLE).orElse(true);
     }
 
-    String getCustomName() {
-        return this.entity.get(Keys.DISPLAY_NAME).map(LanternTexts::toLegacy).orElse("");
+    Optional<Text> getCustomName() {
+        return this.entity.get(Keys.DISPLAY_NAME);
     }
 
     boolean isSilent() {
@@ -400,8 +403,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             parameterList.add(EntityParameters.Base.CUSTOM_NAME_VISIBLE, customNameVisible);
             this.lastCustomNameVisible = customNameVisible;
         }
-        final String customName = getCustomName();
-        if (!customName.equals(this.lastCustomName)) {
+        final Optional<Text> customName = getCustomName();
+        if (!Objects.equal(customName, this.lastCustomName)) {
             parameterList.add(EntityParameters.Base.CUSTOM_NAME, customName);
             this.lastCustomName = customName;
         }
@@ -419,6 +422,9 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
      * @param parameterList The parameter list to fill
      */
     protected void updateTranslations(ParameterList parameterList) {
+        final Optional<Text> customName = getCustomName();
+        customName.filter(TranslationHelper::containsNonMinecraftTranslation).ifPresent(text ->
+                parameterList.add(EntityParameters.Base.CUSTOM_NAME, customName));
     }
 
     /**

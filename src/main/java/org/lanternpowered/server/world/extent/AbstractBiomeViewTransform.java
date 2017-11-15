@@ -27,8 +27,8 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.IntArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeVolume;
@@ -101,7 +101,7 @@ public abstract class AbstractBiomeViewTransform<V extends BiomeVolume> implemen
 
     @Override
     public ImmutableBiomeVolume getImmutableBiomeCopy() {
-        return ShortArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBiomeArray(
+        return IntArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBiomeArray(
                 this, this.min, this.max, this.size), this.min, this.size);
     }
 }

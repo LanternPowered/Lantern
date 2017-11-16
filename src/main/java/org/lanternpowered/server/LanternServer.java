@@ -596,14 +596,14 @@ public final class LanternServer implements Server {
         }
         this.shuttingDown = true;
 
+        // Stop the console
+        this.consoleManager.shutdown();
+
         final Cause gameCause = Cause.of(EventContext.empty(), this.game);
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppingServerEvent(gameCause));
 
         // Debug a message
         this.logger.info("Stopping the server... ({})", LanternTexts.toLegacy(kickMessage));
-
-        // Stop the console
-        this.consoleManager.shutdown();
 
         // Kick all the online players
         getOnlinePlayers().forEach(player -> ((LanternPlayer) player).getConnection().disconnect(kickMessage));

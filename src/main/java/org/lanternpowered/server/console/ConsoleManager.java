@@ -60,15 +60,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("ConstantConditions")
 @Singleton
 public final class ConsoleManager {
 
     static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(
             PrintStream.class.getName(), LoggerPrintStream.class.getName(), PrettyPrinter.class.getName());
     static final Set<String> IGNORE_FQCNS = new HashSet<>();
-    static final String REDIRECT_ERR = "STDERR";
-    static final String REDIRECT_OUT = "STDOUT";
-    static volatile boolean active;
+    private static final String REDIRECT_ERR = "STDERR";
+    private static final String REDIRECT_OUT = "STDOUT";
+    private static volatile boolean active;
 
     private static final String HISTORY_FILE_NAME = "console_history.txt";
 
@@ -129,6 +130,15 @@ public final class ConsoleManager {
     public void shutdown() {
         active = false;
         saveHistory();
+        if (TerminalConsoleAppender.getReader() != null) {
+            TerminalConsoleAppender.setReader(null);
+
+            // Write a nice new line
+            final Terminal terminal = TerminalConsoleAppender.getTerminal();
+            if (terminal != null) {
+                terminal.writer().println();
+            }
+        }
     }
 
     private void saveHistory() {
@@ -148,13 +158,12 @@ public final class ConsoleManager {
      */
     private void readCommandTask() {
         final LineReader lineReader = TerminalConsoleAppender.getReader();
+        final SpongeExecutorService executor = this.scheduler.createSyncExecutor(this.pluginContainer);
         try {
             String command;
-            final SpongeExecutorService executor = this.scheduler.createSyncExecutor(this.pluginContainer);
 
             while (active) {
                 try {
-                    //noinspection ConstantConditions
                     command = lineReader.readLine("> ");
                 } catch (EndOfFileException ignored) {
                     continue;
@@ -168,9 +177,12 @@ public final class ConsoleManager {
                 }
             }
         } catch (UserInterruptException e) {
-            Lantern.getServer().shutdown();
-        } finally {
+            // Already set the reader to null, to avoid printing a new line
             TerminalConsoleAppender.setReader(null);
+
+            // When a user interrupts the console, for example Ctrl-C
+            // Shutdown the server
+            executor.execute(() -> Lantern.getServer().shutdown());
         }
     }
 }

@@ -39,8 +39,7 @@ public class VersionCheckingMain {
 
     public static void main(String[] args) throws Exception {
         final String current = System.getProperty("java.version");
-        if (!current.equals("9-ea") &&
-                getVersionValue(current) < getVersionValue(REQUIRED_VERSION)) {
+        if (getVersionValue(current) < getVersionValue(REQUIRED_VERSION)) {
             final String error = String.format(ERROR_MESSAGE, current, REQUIRED_VERSION);
             if (!GraphicsEnvironment.isHeadless()) {
                 JOptionPane.showMessageDialog(null, error, "PEBKACException!", JOptionPane.ERROR_MESSAGE);
@@ -64,6 +63,11 @@ public class VersionCheckingMain {
         }
         // Replace underscores with periods for easier String splitting
         version = version.replace('_', '.');
+        // Ignore the '1.' in the version string since it no longer has any
+        // meaning because it got removed in Java 9+
+        if (version.startsWith("1.")) {
+            version = version.substring(2);
+        }
         // Split the version up into parts
         final String[] versionParts = version.split("\\.");
         double versionValue = 0;

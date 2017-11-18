@@ -356,8 +356,6 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
                 parameterList.add(EntityParameters.Fireworks.ELYTRA_BOOST_PLAYER, getRootEntityId());
 
-                parameterList.getByteBuffer().ifPresent(ByteBuffer::retain);
-
                 context.sendToAll(() -> new MessagePlayOutSpawnObject(this.elytraRocketId, UUID.randomUUID(), 76, 0,
                         this.entity.getPosition(), 0, 0, Vector3d.ZERO));
                 context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.elytraRocketId, parameterList));

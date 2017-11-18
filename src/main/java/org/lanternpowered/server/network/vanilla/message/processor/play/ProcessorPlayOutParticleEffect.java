@@ -203,8 +203,6 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 final ByteBufParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
 
-                parameterList.getByteBuffer().ifPresent(ByteBuffer::retain);
-
                 return new CachedFireworksMessage(new MessagePlayOutEntityMetadata(CachedFireworksMessage.ENTITY_ID, parameterList));
             } else if (type == ParticleTypes.FERTILIZER) {
                 final int quantity = effect.getOptionOrDefault(ParticleOptions.QUANTITY).get();

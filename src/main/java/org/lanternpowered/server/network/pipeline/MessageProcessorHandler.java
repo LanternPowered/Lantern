@@ -56,11 +56,9 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
         final List<Object> messages = this.messages.get();
-        this.messages.remove();
         if (messages != null) {
+            this.messages.remove();
             output.addAll(messages);
-        } else {
-            throw new IllegalStateException();
         }
     }
 
@@ -89,8 +87,8 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
             }
             if (!messages.isEmpty()) {
                 this.messages.set(messages);
-                return true;
             }
+            return true;
         }
         return false;
     }

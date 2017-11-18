@@ -38,6 +38,7 @@ import javax.annotation.Nullable;
  * cannot be overwritten by calling the method again, this will
  * result in an {@link IllegalStateException}.
  */
+@SuppressWarnings("ConstantConditions")
 public class ByteBufParameterList extends AbstractParameterList {
 
     private final ByteBufferAllocator byteBufAllocator;
@@ -67,35 +68,30 @@ public class ByteBufParameterList extends AbstractParameterList {
     @Override
     public <T> void add(ParameterType<T> type, T value) {
         writeValueHeader(type);
-        //noinspection ConstantConditions
         type.getValueType().serialize(this.buf, value);
     }
 
     @Override
     public void add(ParameterType<Byte> type, byte value) {
         writeValueHeader(type);
-        //noinspection ConstantConditions
         this.buf.writeByte(value);
     }
 
     @Override
     public void add(ParameterType<Integer> type, int value) {
         writeValueHeader(type);
-        //noinspection ConstantConditions
         this.buf.writeVarInt(value);
     }
 
     @Override
     public void add(ParameterType<Float> type, float value) {
         writeValueHeader(type);
-        //noinspection ConstantConditions
         this.buf.writeFloat(value);
     }
 
     @Override
     public void add(ParameterType<Boolean> type, boolean value) {
         writeValueHeader(type);
-        //noinspection ConstantConditions
         this.buf.writeBoolean(value);
     }
 

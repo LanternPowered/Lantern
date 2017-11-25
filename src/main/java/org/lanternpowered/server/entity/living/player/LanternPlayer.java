@@ -117,6 +117,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.ban.BanService;
@@ -236,8 +237,12 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     private final AdvancementsProgress advancementsProgress = new AdvancementsProgress();
 
+    // The game profile of this player
+    private final GameProfile gameProfile;
+
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super((ProxyUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gameProfile));
+        this.gameProfile = gameProfile;
         this.interactionHandler = new PlayerInteractionHandler(this);
         this.inventory = new LanternPlayerInventory(null, null, this);
         this.inventoryContainer = new PlayerInventoryContainer(this.inventory);
@@ -251,6 +256,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     public Set<LanternBossBar> getBossBars() {
         return this.bossBars;
+    }
+
+    @Override
+    public GameProfile getProfile() {
+        return this.gameProfile;
     }
 
     @Override

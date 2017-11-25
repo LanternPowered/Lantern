@@ -59,7 +59,7 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
         final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get();
         Location<World> location = optLocation.get();
         if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
-            location = location.add(blockFace.getOpposite().asBlockOffset());
+            location = location.add(blockFace.asBlockOffset());
         }
         context.addContext(ContextKeys.BLOCK_LOCATION, location);
 

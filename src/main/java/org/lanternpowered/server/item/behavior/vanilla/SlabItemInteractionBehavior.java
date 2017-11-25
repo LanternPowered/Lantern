@@ -75,7 +75,7 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
         final BlockType doubleSlabType = this.doubleSlabType.get();
 
         Location<World> location = optLocation.get();
-        final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get();
+        final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get().getOpposite();
 
         final LanternBlockType blockType = (LanternBlockType) context.getContext(ContextKeys.ITEM_TYPE).get().getBlock().get();
         if (blockType != halfSlabType) {

@@ -297,10 +297,6 @@ public final class PlayerInteractionHandler {
             return;
         }
 
-        // Try the action of the hotbar item first
-        final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
-        final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
-
         // The offset can round up to 1, causing
         // an incorrect clicked block location
         final Vector3d pos2 = message.getClickOffset();

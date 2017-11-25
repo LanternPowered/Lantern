@@ -46,8 +46,8 @@ public class TorchPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
-        if (face == Direction.UP) {
+        Direction face = context.requireContext(ContextKeys.INTERACTION_FACE).getOpposite();
+        if (face == Direction.DOWN) {
             return BehaviorResult.PASS;
         }
         final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)

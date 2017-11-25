@@ -38,12 +38,12 @@ public class HopperPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        Direction facing = context.requireContext(ContextKeys.INTERACTION_FACE);
-        if (facing == Direction.UP) {
-            facing = Direction.DOWN;
+        Direction face = context.requireContext(ContextKeys.INTERACTION_FACE).getOpposite();
+        if (face == Direction.UP) {
+            face = Direction.DOWN;
         }
-        final Direction facing1 = facing;
-        context.transformBlockChanges((snapshot, builder) -> builder.add(Keys.DIRECTION, facing1));
+        final Direction face1 = face;
+        context.transformBlockChanges((snapshot, builder) -> builder.add(Keys.DIRECTION, face1));
         return BehaviorResult.CONTINUE;
     }
 }

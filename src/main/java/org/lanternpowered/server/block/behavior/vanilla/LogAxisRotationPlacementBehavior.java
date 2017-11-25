@@ -40,7 +40,7 @@ public class LogAxisRotationPlacementBehavior implements PlaceBlockBehavior {
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         context.getContext(ContextKeys.INTERACTION_FACE).ifPresent(face -> {
-            final LogAxis axis = LanternLogAxis.fromDirection(face);
+            final LogAxis axis = LanternLogAxis.fromDirection(face.getOpposite());
             context.transformBlockChanges((original, builder) -> builder.add(Keys.LOG_AXIS, axis));
         });
         return BehaviorResult.CONTINUE;

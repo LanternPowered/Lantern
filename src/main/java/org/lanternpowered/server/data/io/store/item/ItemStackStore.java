@@ -47,10 +47,10 @@ import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.item.enchantment.LanternEnchantment;
+import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockType;
@@ -60,16 +60,16 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.format.TextColors;
@@ -365,35 +365,36 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         super.deserializeValues(object, valueContainer, dataView);
     }
 
-    private void serializeEnchantments(DataView dataView, DataQuery query, List<ItemEnchantment> enchantments) {
+    private void serializeEnchantments(DataView dataView, DataQuery query, List<Enchantment> enchantments) {
         if (enchantments.isEmpty()) {
             return;
         }
         final List<DataView> dataViews = new ArrayList<>();
-        for (ItemEnchantment enchantment : enchantments) {
+        for (Enchantment enchantment : enchantments) {
             final DataView enchantmentView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-            enchantmentView.set(ENCHANTMENT_ID, (short) ((LanternEnchantment) enchantment.getEnchantment()).getInternalId());
+            enchantmentView.set(ENCHANTMENT_ID, (short) ((LanternEnchantmentType) enchantment.getType()).getInternalId());
             enchantmentView.set(ENCHANTMENT_LEVEL, (short) enchantment.getLevel());
             dataViews.add(enchantmentView);
         }
         dataView.set(query, dataViews);
     }
 
-    private void deserializeEnchantments(DataView dataView, DataQuery query, Key<ListValue<ItemEnchantment>> key,
+    private void deserializeEnchantments(DataView dataView, DataQuery query, Key<ListValue<Enchantment>> key,
             SimpleValueContainer valueContainer) {
         dataView.getViewList(query).ifPresent(views -> {
             if (!views.isEmpty()) {
-                final List<ItemEnchantment> itemEnchantments = new ArrayList<>();
+                final List<Enchantment> enchantments = new ArrayList<>();
                 views.forEach(view -> {
-                    final Optional<Enchantment> enchantment = EnchantmentRegistryModule.get().getByInternalId(view.getInt(ENCHANTMENT_ID).get());
-                    if (enchantment.isPresent()) {
+                    final Optional<EnchantmentType> enchantmentType = EnchantmentTypeRegistryModule.get()
+                            .getByInternalId(view.getInt(ENCHANTMENT_ID).get());
+                    if (enchantmentType.isPresent()) {
                         final int level = view.getInt(ENCHANTMENT_LEVEL).get();
-                        itemEnchantments.add(new ItemEnchantment(enchantment.get(), level));
+                        enchantments.add(Enchantment.of(enchantmentType.get(), level));
                     } else {
                         Lantern.getLogger().warn("Attempted to deserialize a enchantment with unknown id: {}", view.getInt(ENCHANTMENT_ID).get());
                     }
                 });
-                valueContainer.set(key, itemEnchantments);
+                valueContainer.set(key, enchantments);
             }
         });
     }

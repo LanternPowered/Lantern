@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
-import org.lanternpowered.server.item.CooldownTracker;
+import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown;
 
-public class PlayerCooldownTracker extends CooldownTracker {
+public class PlayerCooldownTracker extends LanternCooldownTracker {
 
     private final LanternPlayer player;
 
-    public PlayerCooldownTracker(LanternPlayer player) {
+    PlayerCooldownTracker(LanternPlayer player) {
         this.player = player;
     }
 

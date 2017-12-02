@@ -27,7 +27,7 @@ package org.lanternpowered.server.inventory.client;
 
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.effect.potion.PotionEffectType;
-import org.spongepowered.api.item.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentType;
 
 import java.util.Optional;
 
@@ -74,14 +74,14 @@ public final class ContainerProperties {
 
     public static final ContainerProperty<Integer> ENCHANTMENT_SEED = new ContainerProperty<>(TypeToken.of(Integer.class));
 
-    public static final ContainerProperty<Optional<Enchantment>> SHOWN_ENCHANTMENT_1 =
-            new ContainerProperty<>(new TypeToken<Optional<Enchantment>>() {});
+    public static final ContainerProperty<Optional<EnchantmentType>> SHOWN_ENCHANTMENT_1 =
+            new ContainerProperty<>(new TypeToken<Optional<EnchantmentType>>() {});
 
-    public static final ContainerProperty<Optional<Enchantment>> SHOWN_ENCHANTMENT_2 =
-            new ContainerProperty<>(new TypeToken<Optional<Enchantment>>() {});
+    public static final ContainerProperty<Optional<EnchantmentType>> SHOWN_ENCHANTMENT_2 =
+            new ContainerProperty<>(new TypeToken<Optional<EnchantmentType>>() {});
 
-    public static final ContainerProperty<Optional<Enchantment>> SHOWN_ENCHANTMENT_3 =
-            new ContainerProperty<>(new TypeToken<Optional<Enchantment>>() {});
+    public static final ContainerProperty<Optional<EnchantmentType>> SHOWN_ENCHANTMENT_3 =
+            new ContainerProperty<>(new TypeToken<Optional<EnchantmentType>>() {});
 
     public static final ContainerProperty<Integer> SHOWN_ENCHANTMENT_LEVEL_1 = new ContainerProperty<>(TypeToken.of(Integer.class));
 

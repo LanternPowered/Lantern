@@ -37,8 +37,11 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 public class LanternChest extends LanternContainerTile<TileChestInventory> implements Chest {
 
@@ -80,6 +83,26 @@ public class LanternChest extends LanternContainerTile<TileChestInventory> imple
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Set<Chest> getConnectedChests() {
+        if (!isValid()) {
+            return Collections.emptySet();
+        }
+        final Location<World> location = getLocation();
+        final Set<Chest> chests = new HashSet<>();
+        for (Direction directionToCheck : HORIZONTAL_DIRECTIONS) {
+            final Location<World> loc = location.getRelative(directionToCheck);
+            if (loc.getBlock().getType() != getBlock().getType()) {
+                continue;
+            }
+            final Optional<TileEntity> optTileEntity = location.getRelative(directionToCheck).getTileEntity();
+            if (optTileEntity.isPresent() && optTileEntity.get() instanceof LanternChest) {
+                chests.add((Chest) optTileEntity.get());
+            }
+        }
+        return Collections.unmodifiableSet(chests);
     }
 
     @Override

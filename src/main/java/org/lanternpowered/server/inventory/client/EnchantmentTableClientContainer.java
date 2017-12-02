@@ -26,10 +26,10 @@
 package org.lanternpowered.server.inventory.client;
 
 import org.lanternpowered.server.inventory.behavior.event.EnchantButtonEvent;
-import org.lanternpowered.server.item.enchantment.LanternEnchantment;
+import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
-import org.spongepowered.api.item.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
@@ -81,9 +81,9 @@ public class EnchantmentTableClientContainer extends ClientContainer {
                 index = 6;
             }
             if (index != -1) {
-                final Supplier<Optional<Enchantment>> supplier1 = (Supplier<Optional<Enchantment>>) supplier;
+                final Supplier<Optional<EnchantmentType>> supplier1 = (Supplier<Optional<EnchantmentType>>) supplier;
                 bindInternalProperty(index, () -> supplier1.get()
-                        .map(enchantment -> ((LanternEnchantment) enchantment).getInternalId()).orElse(-1));
+                        .map(enchantment -> ((LanternEnchantmentType) enchantment).getInternalId()).orElse(-1));
             }
         }
     }

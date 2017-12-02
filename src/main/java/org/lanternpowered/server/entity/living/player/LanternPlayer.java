@@ -60,7 +60,7 @@ import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.lanternpowered.server.item.CooldownTracker;
+import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
@@ -219,7 +219,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     /**
      * The item cooldown tracker of this {@link Player}.
      */
-    private final CooldownTracker cooldownTracker = new PlayerCooldownTracker(this);
+    private final LanternCooldownTracker cooldownTracker = new PlayerCooldownTracker(this);
 
     /**
      * The last time that the player was active.
@@ -1071,6 +1071,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         return this.inventory;
     }
 
+    @Override
+    public LanternCooldownTracker getCooldownTracker() {
+        return this.cooldownTracker;
+    }
+
     /**
      * Gets the {@link PlayerContainerSession}.
      *
@@ -1098,10 +1103,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             return;
         }
         offer(LanternKeys.IS_ELYTRA_FLYING, true);
-    }
-
-    public CooldownTracker getCooldownTracker() {
-        return this.cooldownTracker;
     }
 
     public AdvancementsProgress getAdvancementsProgress() {

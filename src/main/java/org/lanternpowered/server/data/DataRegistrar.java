@@ -41,11 +41,10 @@ import org.lanternpowered.server.data.property.item.SmeltablePropertyStore;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.item.enchantment.ItemEnchantmentDataBuilder;
+import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
@@ -59,6 +58,7 @@ import org.spongepowered.api.data.type.WireAttachmentType;
 import org.spongepowered.api.data.type.WireAttachmentTypes;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.BookViewDataBuilder;
@@ -106,7 +106,7 @@ public class DataRegistrar {
         dataManager.registerBuilder(BookView.class, new BookViewDataBuilder());
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
-        dataManager.registerBuilder(ItemEnchantment.class, new ItemEnchantmentDataBuilder());
+        dataManager.registerBuilder(Enchantment.class, new LanternEnchantmentBuilder());
 
         final LanternValueFactory valueFactory = LanternValueFactory.get();
         valueFactory.registerKey(Keys.CONNECTED_DIRECTIONS).add(builder -> builder

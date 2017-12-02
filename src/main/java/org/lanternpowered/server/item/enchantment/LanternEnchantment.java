@@ -25,71 +25,60 @@
  */
 package org.lanternpowered.server.item.enchantment;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.item.Enchantment;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.Queries;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentType;
 
-public class LanternEnchantment extends PluginCatalogType.Base.Translatable.Internal implements Enchantment {
+import java.util.Objects;
 
-    public LanternEnchantment(String pluginId, String name, String translation, int internalId) {
-        super(pluginId, name, translation, internalId);
-    }
+public final class LanternEnchantment implements Enchantment {
 
-    public LanternEnchantment(String pluginId, String name, Translation translation, int internalId) {
-        super(pluginId, name, translation, internalId);
-    }
+    private final EnchantmentType enchantmentType;
+    private final int level;
 
-    public LanternEnchantment(String pluginId, String id, String name, String translation, int internalId) {
-        super(pluginId, id, name, translation, internalId);
-    }
-
-    public LanternEnchantment(String pluginId, String id, String name, Translation translation, int internalId) {
-        super(pluginId, id, name, translation, internalId);
+    LanternEnchantment(EnchantmentType enchantmentType, int level) {
+        this.enchantmentType = enchantmentType;
+        this.level = level;
     }
 
     @Override
-    public int getWeight() {
-        return 0;
+    public EnchantmentType getType() {
+        return this.enchantmentType;
     }
 
     @Override
-    public int getMinimumLevel() {
-        return 0;
+    public int getLevel() {
+        return this.level;
     }
 
     @Override
-    public int getMaximumLevel() {
-        return 0;
+    public int getContentVersion() {
+        return 1;
     }
 
     @Override
-    public int getMinimumEnchantabilityForLevel(int level) {
-        return 0;
+    public DataContainer toContainer() {
+        return DataContainer.createNew()
+                .set(Queries.CONTENT_VERSION, getContentVersion())
+                .set(Queries.ENCHANTMENT_ID, this.enchantmentType.getId())
+                .set(Queries.LEVEL, this.level);
     }
 
     @Override
-    public int getMaximumEnchantabilityForLevel(int level) {
-        return 0;
+    public int hashCode() {
+        return Objects.hash(this.enchantmentType, this.level);
     }
 
     @Override
-    public boolean canBeAppliedToStack(ItemStack stack) {
-        return false;
-    }
-
-    @Override
-    public boolean canBeAppliedByTable(ItemStack stack) {
-        return false;
-    }
-
-    @Override
-    public boolean isCompatibleWith(Enchantment ench) {
-        return false;
-    }
-
-    @Override
-    public boolean isTreasure() {
-        return false;
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        final LanternEnchantment other = (LanternEnchantment) object;
+        return Objects.equals(this.enchantmentType, other.enchantmentType) && Objects.equals(this.level, other.level);
     }
 }

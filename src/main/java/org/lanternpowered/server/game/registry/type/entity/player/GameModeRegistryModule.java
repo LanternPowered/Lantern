@@ -52,24 +52,24 @@ public final class GameModeRegistryModule extends AdditionalInternalPluginCatalo
                 player -> {
                     player.offer(Keys.CAN_FLY, false);
                     player.offer(Keys.IS_FLYING, false);
-                    player.offer(LanternKeys.INVULNERABLE, false);
+                    player.offer(Keys.INVULNERABLE, false);
                 }));
         register(new LanternGameMode("minecraft", "creative", "gameMode.creative", 1,
                 player -> {
                     player.offer(Keys.CAN_FLY, true);
-                    player.offer(LanternKeys.INVULNERABLE, true);
+                    player.offer(Keys.INVULNERABLE, true);
                 }));
         register(new LanternGameMode("minecraft", "adventure", "gameMode.adventure", 2,
                 player -> {
                     player.offer(Keys.CAN_FLY, false);
                     player.offer(Keys.IS_FLYING, false);
-                    player.offer(LanternKeys.INVULNERABLE, false);
+                    player.offer(Keys.INVULNERABLE, false);
                 }));
         register(new LanternGameMode("minecraft", "spectator", "gameMode.spectator", 3,
                 player -> {
                     player.offer(Keys.CAN_FLY, true);
                     player.offer(Keys.IS_FLYING, true);
-                    player.offer(LanternKeys.INVULNERABLE, true);
+                    player.offer(Keys.INVULNERABLE, true);
                 }));
     }
 }

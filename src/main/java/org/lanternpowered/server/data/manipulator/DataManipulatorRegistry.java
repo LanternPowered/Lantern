@@ -156,6 +156,7 @@ import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableHealthSc
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableHorseData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableIgniteableData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableInvisibilityData;
+import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableInvulnerabilityData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableJoinData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableKnockbackData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableMinecartBlockData;
@@ -314,6 +315,7 @@ import org.spongepowered.api.data.manipulator.mutable.entity.HealthScalingData;
 import org.spongepowered.api.data.manipulator.mutable.entity.HorseData;
 import org.spongepowered.api.data.manipulator.mutable.entity.IgniteableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.InvisibilityData;
+import org.spongepowered.api.data.manipulator.mutable.entity.InvulnerabilityData;
 import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
 import org.spongepowered.api.data.manipulator.mutable.entity.KnockbackData;
 import org.spongepowered.api.data.manipulator.mutable.entity.MinecartBlockData;
@@ -789,6 +791,11 @@ public class DataManipulatorRegistry {
                 });
         register(VelocityData.class, ImmutableVelocityData.class,
                 c -> c.register(Keys.VELOCITY, Vector3d.ZERO));
+        register(InvulnerabilityData.class, ImmutableInvulnerabilityData.class,
+                c -> {
+                    c.register(Keys.INVULNERABILITY_TICKS, 0);
+                    c.register(Keys.INVULNERABLE, false);
+                });
 
         /// variant containers
         registerVariant(ArtData.class, ImmutableArtData.class, Keys.ART, Arts.AZTEC);

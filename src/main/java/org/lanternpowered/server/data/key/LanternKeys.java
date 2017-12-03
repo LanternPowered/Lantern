@@ -60,8 +60,6 @@ public final class LanternKeys {
     public static final Key<Value<DataView>> FAILED_DATA_VALUES =
             makeValueKey(DataView.class, DataQuery.of("FailedDataValues"), "lantern:failed_data_values");
 
-    public static final Key<Value<Boolean>> INVULNERABLE =
-            makeValueKey(Boolean.class, DataQuery.of("Invulnerable"), "lantern:invulnerability");
     public static final Key<Value<Integer>> PORTAL_COOLDOWN_TICKS =
             makeValueKey(Integer.class, DataQuery.of("PortalCooldownTicks"), "lantern:portal_cooldown_ticks");
     public static final Key<Value<Integer>> SCORE =

@@ -170,7 +170,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.CAN_GRIEF).ifPresent(v -> spongeView.set(CAN_GRIEF, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataView.set(DISPLAY_NAME, LanternTexts.toLegacy(v)));
         valueContainer.remove(Keys.CUSTOM_NAME_VISIBLE).ifPresent(v -> dataView.set(CUSTOM_NAME_VISIBLE, (byte) (v ? 1 : 0)));
-        valueContainer.remove(LanternKeys.INVULNERABLE).ifPresent(v -> dataView.set(INVULNERABLE, (byte) (v ? 1 : 0)));
+        valueContainer.remove(Keys.INVULNERABLE).ifPresent(v -> dataView.set(INVULNERABLE, (byte) (v ? 1 : 0)));
         valueContainer.remove(LanternKeys.PORTAL_COOLDOWN_TICKS).ifPresent(v -> dataView.set(PORTAL_COOLDOWN_TICKS, v));
         valueContainer.remove(Keys.AI_ENABLED).ifPresent(v -> dataView.set(NO_AI, (byte) (v ? 0 : 1)));
         valueContainer.remove(Keys.PERSISTS).ifPresent(v -> dataView.set(PERSISTS, (byte) (v ? 1 : 0)));
@@ -208,7 +208,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         health.ifPresent(v -> valueContainer.set(Keys.HEALTH, v));
         dataView.getString(DISPLAY_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));
         dataView.getInt(CUSTOM_NAME_VISIBLE).ifPresent(v -> valueContainer.set(Keys.CUSTOM_NAME_VISIBLE, v > 0));
-        dataView.getInt(INVULNERABLE).ifPresent(v -> valueContainer.set(LanternKeys.INVULNERABLE, v > 0));
+        dataView.getInt(INVULNERABLE).ifPresent(v -> valueContainer.set(Keys.INVULNERABLE, v > 0));
         dataView.getInt(PORTAL_COOLDOWN_TICKS).ifPresent(v -> valueContainer.set(LanternKeys.PORTAL_COOLDOWN_TICKS, v));
         dataView.getInt(NO_AI).ifPresent(v -> valueContainer.set(Keys.AI_ENABLED, v == 0));
         dataView.getInt(PERSISTS).ifPresent(v -> valueContainer.set(Keys.PERSISTS, v > 0));

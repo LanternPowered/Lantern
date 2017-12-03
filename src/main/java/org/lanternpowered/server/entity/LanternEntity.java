@@ -208,7 +208,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         c.registerNonRemovable(Keys.FALL_DISTANCE, 0f);
         c.registerNonRemovable(Keys.GLOWING, false);
         c.registerNonRemovable(Keys.INVISIBLE, false);
-        c.registerNonRemovable(LanternKeys.INVULNERABLE, false);
+        c.registerNonRemovable(Keys.INVULNERABLE, false);
         c.registerNonRemovable(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
     }
 

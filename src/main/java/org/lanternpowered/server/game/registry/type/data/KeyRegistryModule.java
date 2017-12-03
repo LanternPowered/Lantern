@@ -158,8 +158,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Double.class, DataQuery.of("AreaEffectCloudRadius"), "sponge:area_effect_cloud_radius"));
         register(makeMutableBoundedValueKey(Double.class, DataQuery.of("AreaEffectCloudRadiusOnUse"), "sponge:area_effect_cloud_radius_on_use"));
         register(makeMutableBoundedValueKey(Double.class, DataQuery.of("AreaEffectCloudRadiusPerTick"), "sponge:area_effect_cloud_radius_per_tick"));
-        register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudRadiusReapplicationDelay"),
-                "sponge:area_effect_cloud_reapplication_delay"));
+        register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudRadiusReapplicationDelay"), "sponge:area_effect_cloud_reapplication_delay"));
         register(makeMutableBoundedValueKey(Integer.class, DataQuery.of("AreaEffectCloudWaitTime"), "sponge:area_effect_cloud_wait_time"));
         register(makeValueKey(Boolean.class, of("ArmorStandHasArms"), "sponge:armor_stand_has_arms"));
         register(makeValueKey(Boolean.class, of("ArmorStandHasBasePlate"), "sponge:armor_stand_has_base_plate"));
@@ -271,6 +270,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("InvisibilityPreventsTargeting"), "sponge:invisibility_prevents_targeting"));
         register(makeValueKey(Boolean.class, of("Invisible"), "sponge:invisible"));
         register(makeMutableBoundedValueKey(Integer.class, of("InvulnerabilityTicks"), "sponge:invulnerability_ticks"));
+        register(makeValueKey(Boolean.class, of("Invulnerable"), "sponge:invulnerable"));
         register(makeValueKey(Boolean.class, of("InWall"), "sponge:in_wall"));
         register(makeValueKey(Boolean.class, of("IsAdult"), "sponge:is_adult"));
         register(makeValueKey(Boolean.class, of("IsAflame"), "sponge:is_aflame"));

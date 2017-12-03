@@ -186,6 +186,7 @@ public class LanternItem extends LanternEntity implements Item {
             remove();
             return;
         }
+        // TODO: Call pre pickup event
         for (Entity entity : entities) {
             // Ignore dead entities
             if (entity instanceof LanternLiving && ((LanternLiving) entity).isDead()) {
@@ -206,8 +207,7 @@ public class LanternItem extends LanternEntity implements Item {
                     frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, rest);
                 }
 
-                event = SpongeEventFactory.createChangeInventoryEventPickup(causeStack.getCurrentCause(),
-                        this, inventory, result.getTransactions());
+                event = SpongeEventFactory.createChangeInventoryEventPickup(causeStack.getCurrentCause(), inventory, result.getTransactions());
                 event.setCancelled(!result.getOfferResult().isSuccess());
 
                 Sponge.getEventManager().post(event);

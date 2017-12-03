@@ -27,7 +27,6 @@ package org.lanternpowered.server.block.provider.property;
 
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
-import org.lanternpowered.server.block.property.InstrumentProperty;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.data.Property;
@@ -35,6 +34,7 @@ import org.spongepowered.api.data.property.block.BlastResistanceProperty;
 import org.spongepowered.api.data.property.block.FlammableProperty;
 import org.spongepowered.api.data.property.block.GravityAffectedProperty;
 import org.spongepowered.api.data.property.block.HardnessProperty;
+import org.spongepowered.api.data.property.block.InstrumentProperty;
 import org.spongepowered.api.data.property.block.LightEmissionProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;

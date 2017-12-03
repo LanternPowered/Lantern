@@ -26,15 +26,14 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.block.action.vanilla.NoteAction;
-import org.lanternpowered.server.block.property.InstrumentProperty;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Note;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.block.InstrumentProperty;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.NotePitch;
@@ -73,7 +72,7 @@ public class LanternNote extends LanternTileEntity implements Note {
         // Calculate the pitch value based on the note pitch
         double pitch = (double) ((LanternNotePitch) notePitch).getInternalId();
         pitch = Math.pow(2.0, (pitch - 12.0) / 12.0);
-        location.getExtent().playSound(((LanternInstrumentType) instrumentType).getSound(), SoundCategories.BLOCK,
+        location.getExtent().playSound(instrumentType.getSound(), SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 3.0, pitch);
     }
 

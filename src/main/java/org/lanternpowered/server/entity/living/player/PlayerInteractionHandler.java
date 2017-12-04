@@ -332,8 +332,25 @@ public final class PlayerInteractionHandler {
 
                 BehaviorContext.Snapshot snapshot1 = context.pushSnapshot();
 
-                final BehaviorResult result = context.process(blockType.getPipeline().pipeline(InteractWithBlockBehavior.class),
+                // Try first with the main hand
+                hotbarSlot.peek().ifPresent(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
+                frame.addContext(ContextKeys.USED_SLOT, hotbarSlot);
+                frame.addContext(ContextKeys.INTERACTION_HAND, HandTypes.MAIN_HAND);
+
+                BehaviorResult result = context.process(blockType.getPipeline().pipeline(InteractWithBlockBehavior.class),
                         (ctx, behavior) -> behavior.tryInteract(blockType.getPipeline(), ctx));
+                if (!result.isSuccess()) {
+                    context.popSnapshot(snapshot1);
+                    snapshot1 = context.pushSnapshot();
+
+                    // Try again with the off hand
+                    offHandSlot.peek().ifPresent(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
+                    frame.addContext(ContextKeys.USED_SLOT, offHandSlot);
+                    frame.addContext(ContextKeys.INTERACTION_HAND, HandTypes.OFF_HAND);
+
+                    result = context.process(blockType.getPipeline().pipeline(InteractWithBlockBehavior.class),
+                            (ctx, behavior) -> behavior.tryInteract(blockType.getPipeline(), ctx));
+                }
                 if (result.isSuccess()) {
                     snapshot1 = context.pushSnapshot();
                     // We can still continue, doing other operations

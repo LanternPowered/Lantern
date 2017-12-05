@@ -25,11 +25,22 @@
  */
 package org.lanternpowered.server.block.behavior.vanilla;
 
+import org.lanternpowered.server.behavior.BehaviorContext;
+import org.lanternpowered.server.block.BlockSnapshotBuilder;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.carrier.Chest;
+import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class ChestInteractionBehavior extends OpenableContainerInteractionBehavior {
 
@@ -42,5 +53,50 @@ public class ChestInteractionBehavior extends OpenableContainerInteractionBehavi
             }
         }
         return super.getInventoryFrom(tileEntity);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    protected boolean validateOpenableSpace(BehaviorContext context, Location<World> location, List<Runnable> tasks) {
+        final TileEntity tileEntity = location.getTileEntity().get();
+        if (tileEntity instanceof Chest) {
+            final Set<Chest> chests = new HashSet<>(((Chest) tileEntity).getConnectedChests());
+            chests.add((Chest) tileEntity);
+            for (Chest chest : chests) {
+                final Location<World> loc = chest.getLocation();
+                if (!validateOpenableChestSpace(context, loc, tasks)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    static boolean validateOpenableChestSpace(BehaviorContext context, Location<World> loc, List<Runnable> tasks) {
+        final Location<World> relLoc = loc.getBlockRelative(Direction.UP);
+        final AABB relAabb = relLoc.getExtent().getBlockSelectionBox(
+                relLoc.getBlockPosition()).orElse(null);
+        if (relAabb != null) {
+            AABB aabb = loc.getExtent().getBlockSelectionBox(
+                    loc.getBlockPosition()).get();
+            aabb = aabb.offset(0, 1, 0);
+            aabb = new AABB(aabb.getMin(), aabb.getMax().mul(1, 0, 1)
+                    .add(0, aabb.getMin().getY() + 0.43, 0));
+            if (aabb.intersects(relAabb)) {
+                final ReplaceableProperty replaceableProperty = relLoc
+                        .getProperty(ReplaceableProperty.class).orElse(null);
+                // Replaceable blocks will be replaced when opened
+                if (replaceableProperty != null && replaceableProperty.getValue()) {
+                    tasks.add(() -> context.addBlockChange(BlockSnapshotBuilder.create()
+                            .location(relLoc)
+                            .blockState(BlockTypes.AIR.getDefaultState())
+                            .build()));
+                    // TODO: Use break block pipeline instead
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

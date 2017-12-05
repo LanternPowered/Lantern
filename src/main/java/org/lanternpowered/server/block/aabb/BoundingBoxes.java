@@ -29,9 +29,7 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -127,7 +125,7 @@ public class BoundingBoxes {
 
     public static AABB slab(BlockState blockState) {
         final LanternPortionType portionType = (LanternPortionType) blockState.get(Keys.PORTION_TYPE).get();
-        return portionType == PortionTypes.TOP ? Slab.TOP : Slab.BOTTOM;
+        return portionType == LanternPortionType.TOP ? Slab.TOP : Slab.BOTTOM;
     }
 
     private final static class Bush {

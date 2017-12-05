@@ -38,6 +38,8 @@ import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class EnderChestInteractionBehavior implements InteractWithBlockBehavior {
@@ -48,6 +50,11 @@ public class EnderChestInteractionBehavior implements InteractWithBlockBehavior 
         if (player == null) {
             return BehaviorResult.CONTINUE;
         }
+        final List<Runnable> tasks = new ArrayList<>();
+        if (!ChestInteractionBehavior.validateOpenableChestSpace(context,
+                context.requireContext(ContextKeys.BLOCK_LOCATION), tasks)) {
+            return BehaviorResult.CONTINUE;
+        }
         final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final AbstractInventory inventory = player.getEnderChestInventory();
         final Optional<TileEntity> optTileEntity = location.getTileEntity();
@@ -55,6 +62,7 @@ public class EnderChestInteractionBehavior implements InteractWithBlockBehavior 
             inventory.addViewListener((InventoryViewerListener) optTileEntity.get());
         }
         if (!player.openInventory(inventory).isPresent()) {
+            tasks.forEach(Runnable::run);
             return BehaviorResult.CONTINUE;
         }
         return BehaviorResult.SUCCESS;

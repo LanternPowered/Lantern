@@ -66,6 +66,7 @@ import org.lanternpowered.server.block.behavior.vanilla.OpenableContainerInterac
 import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.ShulkerBoxInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
@@ -1683,7 +1684,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new SimplePlacementBehavior())
                         .add(new OppositeFaceDirectionalPlacementBehavior())
-                        .add(new OpenableContainerInteractionBehavior())
+                        .add(new ShulkerBoxInteractionBehavior())
                         .add(new SimpleBreakBehavior()));
         // TODO: Item drops?
     }

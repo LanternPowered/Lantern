@@ -38,6 +38,8 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class OpenableContainerInteractionBehavior implements InteractWithBlockBehavior {
@@ -49,6 +51,10 @@ public class OpenableContainerInteractionBehavior implements InteractWithBlockBe
         if (!optTileEntity.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
+        final List<Runnable> tasks = new ArrayList<>();
+        if (!validateOpenableSpace(context, location, tasks)) {
+            return BehaviorResult.CONTINUE;
+        }
         final Optional<Inventory> optInventory = getInventoryFrom(optTileEntity.get());
         if (!optInventory.isPresent()) {
             return BehaviorResult.CONTINUE;
@@ -57,7 +63,15 @@ public class OpenableContainerInteractionBehavior implements InteractWithBlockBe
         if (player == null) {
             return BehaviorResult.CONTINUE;
         }
-        return player.openInventory(optInventory.get()).isPresent() ? BehaviorResult.SUCCESS : BehaviorResult.CONTINUE;
+        if (player.openInventory(optInventory.get()).isPresent()) {
+            tasks.forEach(Runnable::run);
+            return BehaviorResult.SUCCESS;
+        }
+        return BehaviorResult.CONTINUE;
+    }
+
+    protected boolean validateOpenableSpace(BehaviorContext context, Location<World> location, List<Runnable> task) {
+        return true;
     }
 
     protected Optional<Inventory> getInventoryFrom(TileEntity tileEntity) {

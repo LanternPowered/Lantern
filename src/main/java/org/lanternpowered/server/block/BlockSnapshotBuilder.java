@@ -86,14 +86,15 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
      * @return This builder, for chaining
      */
     public BlockSnapshotBuilder location(Location<World> location) {
-        this.worldUUID = location == null ? null : location.getExtent().getProperties().getUniqueId();
-        this.position = location == null ? null : location.getBlockPosition();
+        checkNotNull(location, "location");
+        this.worldUUID = location.getExtent().getProperties().getUniqueId();
+        this.position = location.getBlockPosition();
         return this;
     }
 
     @Override
     public BlockSnapshotBuilder world(WorldProperties worldProperties) {
-        this.worldUUID = worldProperties == null ? null : worldProperties.getUniqueId();
+        this.worldUUID = worldProperties.getUniqueId();
         return this;
     }
 

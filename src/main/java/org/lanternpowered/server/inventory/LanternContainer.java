@@ -37,7 +37,6 @@ import org.lanternpowered.server.inventory.client.ClientContainerType;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -97,7 +96,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
                 slots.add(containerSlot);
             }
         }
-        initWithSlots((List) inventories, (List) slots, null);
+        initWithSlots((List) inventories, slots, null);
     }
 
     @Override
@@ -145,16 +144,14 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
     }
 
     @Override
-    public void open(Player viewer, Cause cause) {
+    public void open(Player viewer) {
         checkNotNull(viewer, "viewer");
-        checkNotNull(cause, "cause");
         ((LanternPlayer) viewer).getContainerSession().setOpenContainer(this);
     }
 
     @Override
-    public void close(Player viewer, Cause cause) {
+    public void close(Player viewer) {
         checkNotNull(viewer, "viewer");
-        checkNotNull(cause, "cause");
         final PlayerContainerSession session = ((LanternPlayer) viewer).getContainerSession();
         if (session.getOpenContainer() == this) {
             session.setOpenContainer(null);

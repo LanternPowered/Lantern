@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.inventory.type;
 
-import com.flowpowered.math.vector.Vector2i;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.AbstractOrderedInventory;
@@ -33,14 +32,9 @@ import org.lanternpowered.server.inventory.CarrierReference;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.inventory.property.SlotPos;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
-import org.spongepowered.api.item.inventory.type.InventoryColumn;
-import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
@@ -120,94 +114,5 @@ public class LanternCraftingInventory extends AbstractOrderedInventory implement
     @Override
     public CraftingOutput getResult() {
         return this.output;
-    }
-
-    // The CraftingInventory shouldn't be a grid..., just forward
-    // all the methods to the actual grid
-    // Throw an exception instead?
-
-    @Override
-    public int getColumns() {
-        return this.grid.getColumns();
-    }
-
-    @Override
-    public int getRows() {
-        return this.grid.getRows();
-    }
-
-    @Override
-    public Vector2i getDimensions() {
-        return this.grid.getDimensions();
-    }
-
-    @Override
-    public Optional<ItemStack> poll(int x, int y) {
-        return this.grid.poll(x, y);
-    }
-
-    @Override
-    public Optional<ItemStack> poll(int x, int y, int limit) {
-        return this.grid.poll(x, y, limit);
-    }
-
-    @Override
-    public Optional<ItemStack> peek(int x, int y) {
-        return this.grid.peek(x, y);
-    }
-
-    @Override
-    public Optional<ItemStack> peek(int x, int y, int limit) {
-        return this.grid.peek(x, y, limit);
-    }
-
-    @Override
-    public InventoryTransactionResult set(int x, int y, ItemStack stack) {
-        return this.grid.set(x, y, stack);
-    }
-
-    @Override
-    public Optional<Slot> getSlot(int x, int y) {
-        return this.grid.getSlot(x, y);
-    }
-
-    @Override
-    public Optional<InventoryRow> getRow(int y) {
-        return this.grid.getRow(y);
-    }
-
-    @Override
-    public Optional<InventoryColumn> getColumn(int x) {
-        return this.grid.getColumn(x);
-    }
-
-    @Override
-    public Optional<ItemStack> poll(SlotPos pos) {
-        return this.grid.poll(pos);
-    }
-
-    @Override
-    public Optional<ItemStack> poll(SlotPos pos, int limit) {
-        return this.grid.poll(pos, limit);
-    }
-
-    @Override
-    public Optional<ItemStack> peek(SlotPos pos) {
-        return this.grid.peek(pos);
-    }
-
-    @Override
-    public Optional<ItemStack> peek(SlotPos pos, int limit) {
-        return this.grid.peek(pos, limit);
-    }
-
-    @Override
-    public InventoryTransactionResult set(SlotPos pos, ItemStack stack) {
-        return this.grid.set(pos, stack);
-    }
-
-    @Override
-    public Optional<Slot> getSlot(SlotPos pos) {
-        return this.grid.getSlot(pos);
     }
 }

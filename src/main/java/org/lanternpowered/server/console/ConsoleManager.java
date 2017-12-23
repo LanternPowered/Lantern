@@ -53,12 +53,15 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @SuppressWarnings("ConstantConditions")
 @Singleton
@@ -105,7 +108,6 @@ public final class ConsoleManager {
 
     public void start() {
         final Terminal terminal = TerminalConsoleAppender.getTerminal();
-
         if (terminal != null) {
             final LineReader reader = LineReaderBuilder.builder()
                     .appName(this.pluginContainer.getName())
@@ -116,15 +118,16 @@ public final class ConsoleManager {
             reader.setVariable(LineReader.HISTORY_FILE, this.consoleHistoryFile);
 
             TerminalConsoleAppender.setReader(reader);
-            active = true;
-
-            final Thread thread = new Thread(this::readCommandTask, "console");
-            thread.setDaemon(true);
-            thread.start();
-
-            this.scheduler.createAsyncExecutor(this.pluginContainer).scheduleAtFixedRate(
-                    this::saveHistory, 120, 120, TimeUnit.SECONDS);
         }
+
+        active = true;
+
+        final Thread thread = new Thread(this::readCommandTask, "console");
+        thread.setDaemon(true);
+        thread.start();
+
+        this.scheduler.createAsyncExecutor(this.pluginContainer).scheduleAtFixedRate(
+                this::saveHistory, 120, 120, TimeUnit.SECONDS);
     }
 
     public void shutdown() {
@@ -158,16 +161,31 @@ public final class ConsoleManager {
      */
     private void readCommandTask() {
         final LineReader lineReader = TerminalConsoleAppender.getReader();
+        final Supplier<String> consoleReader;
+        if (lineReader != null) {
+            consoleReader = () -> {
+                try {
+                    return lineReader.readLine("> ");
+                } catch (EndOfFileException e) {
+                    return null;
+                }
+            };
+        } else {
+            this.logger.info("Falling back to non jline console.");
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            consoleReader = () -> {
+                try {
+                    return reader.readLine();
+                } catch (IOException e) {
+                    return null;
+                }
+            };
+        }
         final SpongeExecutorService executor = this.scheduler.createSyncExecutor(this.pluginContainer);
         try {
             String command;
-
             while (active) {
-                try {
-                    command = lineReader.readLine("> ");
-                } catch (EndOfFileException ignored) {
-                    continue;
-                }
+                command = consoleReader.get();
                 if (command != null) {
                     command = command.trim();
                     if (!command.isEmpty()) {

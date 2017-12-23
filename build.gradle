@@ -101,7 +101,6 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-iostreams:2.8.1'
 
     // Console
-    compile 'org.jline:jline-terminal-jna:3.4.0'
     compile 'net.java.dev.jna:jna:4.4.0'
     compile 'net.minecrell:terminalconsoleappender:1.0.0-SNAPSHOT'
 

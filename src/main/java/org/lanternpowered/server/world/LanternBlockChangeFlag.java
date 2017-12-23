@@ -83,17 +83,17 @@ public final class LanternBlockChangeFlag implements BlockChangeFlag {
 
     @Override
     public LanternBlockChangeFlag withUpdateNeighbors(boolean updateNeighbors) {
-        return updateNeighbors ? andNotFlag(MASK_NEIGHBOR) : andNotFlag(MASK_NEIGHBOR);
+        return updateNeighbors ? andFlag(MASK_NEIGHBOR) : andNotFlag(MASK_NEIGHBOR);
     }
 
     @Override
     public LanternBlockChangeFlag withPhysics(boolean performBlockPhysics) {
-        return performBlockPhysics ? andNotFlag(MASK_PHYSICS) : andNotFlag(MASK_PHYSICS);
+        return performBlockPhysics ? andFlag(MASK_PHYSICS) : andNotFlag(MASK_PHYSICS);
     }
 
     @Override
     public LanternBlockChangeFlag withNotifyObservers(boolean notifyObservers) {
-        return notifyObservers ? andNotFlag(MASK_OBSERVER) : andNotFlag(MASK_OBSERVER);
+        return notifyObservers ? andFlag(MASK_OBSERVER) : andNotFlag(MASK_OBSERVER);
     }
 
     @Override

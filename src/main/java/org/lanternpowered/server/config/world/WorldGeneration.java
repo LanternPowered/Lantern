@@ -57,9 +57,6 @@ public final class WorldGeneration {
     @Setting(value = "settings")
     private DataContainer generatorSettings = DataContainer.createNew();
 
-    @Setting(value = "view-distance")
-    private int viewDistance = 10;
-
     public List<String> getGenerationModifiers() {
         return this.generationModifiers;
     }
@@ -78,10 +75,6 @@ public final class WorldGeneration {
 
     public void setGenerateSpawnOnLoad(boolean state) {
         this.generateSpawnOnLoad = state;
-    }
-
-    public int getViewDistance() {
-        return this.viewDistance;
     }
 
     public GeneratorType getGeneratorType() {

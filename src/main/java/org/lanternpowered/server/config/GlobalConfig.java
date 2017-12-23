@@ -26,8 +26,11 @@
 package org.lanternpowered.server.config;
 
 import static org.lanternpowered.server.config.ConfigConstants.ENABLED;
+import static org.lanternpowered.server.config.world.WorldConfig.MAX_VIEW_DISTANCE;
+import static org.lanternpowered.server.config.world.WorldConfig.MIN_VIEW_DISTANCE;
 import static org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage.URL_ARGUMENT;
 
+import com.flowpowered.math.GenericMath;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -267,6 +270,13 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+
+        @Setting(
+                value = "view-distance",
+                comment = "The view distance."
+                        + "\nThe value must be greater than or equal to " + MIN_VIEW_DISTANCE + " and less than or equal to " + MAX_VIEW_DISTANCE
+        )
+        private int viewDistance = 10;
     }
 
     @Override
@@ -278,6 +288,16 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
             this.chat.urls = new Chat.Urls();
         }
         super.load();
+        // Clamp the view distance
+        setViewDistance(getViewDistance());
+    }
+
+    public int getViewDistance() {
+        return this.worlds.viewDistance;
+    }
+
+    public void setViewDistance(int viewDistance) {
+        this.worlds.viewDistance = GenericMath.clamp(viewDistance, MIN_VIEW_DISTANCE, MAX_VIEW_DISTANCE);
     }
 
     public Chat getChat() {

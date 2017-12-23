@@ -49,6 +49,7 @@ import org.spongepowered.api.event.cause.EventContextKey;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -376,7 +377,7 @@ public class BehaviorContextImpl implements BehaviorContext {
 
     public void accept() {
         for (Map.Entry<Location<World>, BlockSnapshot> entry : this.blockSnapshots.entrySet()) {
-            entry.getValue().restore(true, BlockChangeFlag.ALL);
+            entry.getValue().restore(true, BlockChangeFlags.ALL);
         }
         for (SlotTransaction slotTransaction : this.slotTransactions) {
             slotTransaction.getSlot().set(LanternItemStack.toNullable(slotTransaction.getFinal()));

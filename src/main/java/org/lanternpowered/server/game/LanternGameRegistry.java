@@ -178,6 +178,7 @@ import org.lanternpowered.server.game.registry.type.text.TextStyleRegistryModule
 import org.lanternpowered.server.game.registry.type.text.TranslationManagerRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.BanTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.RotationRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.BlockChangeFlagRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.DefaultGameRulesRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.DimensionTypeRegistryModule;
@@ -644,6 +645,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 .registerModule(EventContextKey.class, new EventContextKeysModule())
+                .registerModule(new BlockChangeFlagRegistryModule())
                 // Recipes
                 .registerModule(CraftingRecipe.class, this.craftingRecipeRegistry.getRegistryModule())
                 .registerModule(ISmeltingRecipe.class, this.smeltingRecipeRegistry.getRegistryModule())

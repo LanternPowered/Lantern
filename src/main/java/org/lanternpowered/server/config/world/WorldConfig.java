@@ -27,6 +27,7 @@ package org.lanternpowered.server.config.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.GenericMath;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.ConfigBase;
@@ -96,6 +97,18 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "game-mode", comment = "The game mode settings of this world.")
     private WorldGameMode gameMode = new WorldGameMode();
 
+    public static final int USE_SERVER_VIEW_DISTANCE = -1;
+    public static final int MAX_VIEW_DISTANCE = 32;
+    public static final int MIN_VIEW_DISTANCE = 3;
+
+    @Setting(
+            value = "view-distance",
+            comment = "The view distance."
+                    + "\nThe value must be greater than or equal to " + MIN_VIEW_DISTANCE + " and less than or equal to " + MAX_VIEW_DISTANCE
+                    + "\nThe server-wide view distance will be used when the value is " + USE_SERVER_VIEW_DISTANCE + "."
+    )
+    private int viewDistance = USE_SERVER_VIEW_DISTANCE;
+
     @ConfigSerializable
     private static class WorldGameMode {
 
@@ -119,6 +132,22 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
             return this.chunks.chunkLoading.getChunkLoadingTickets(plugin);
         }
         return this.globalConfig.getChunkLoadingTickets(plugin);
+    }
+
+    @Override
+    public void load() throws IOException {
+        super.load();
+        // Clamp the view distance
+        setViewDistance(getViewDistance());
+    }
+
+    public int getViewDistance() {
+        return this.viewDistance;
+    }
+
+    public void setViewDistance(int viewDistance) {
+        this.viewDistance = viewDistance == USE_SERVER_VIEW_DISTANCE ? viewDistance :
+                GenericMath.clamp(viewDistance, MIN_VIEW_DISTANCE, MAX_VIEW_DISTANCE);
     }
 
     public int getChunkClumpingThreshold() {

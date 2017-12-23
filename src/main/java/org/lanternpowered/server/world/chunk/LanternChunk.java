@@ -97,6 +97,7 @@ import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -861,7 +862,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockState block) {
-        return setBlock(x, y, z, block, BlockChangeFlag.ALL);
+        return setBlock(x, y, z, block, BlockChangeFlags.ALL);
     }
 
     @Override

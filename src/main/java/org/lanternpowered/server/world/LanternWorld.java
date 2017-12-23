@@ -483,6 +483,21 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
+    public int getViewDistance() {
+        return this.worldConfig.getViewDistance();
+    }
+
+    @Override
+    public void setViewDistance(int viewDistance) {
+        this.worldConfig.setViewDistance(viewDistance);
+    }
+
+    @Override
+    public void resetViewDistance() {
+        this.worldConfig.setViewDistance(WorldConfig.USE_SERVER_VIEW_DISTANCE);
+    }
+
+    @Override
     public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
         final LanternChunk chunk = getChunkManager().getChunkIfLoaded(x >> 4, z >> 4);
         return chunk == null ? Optional.empty() : chunk.getBlockSelectionBox(x, y, z);

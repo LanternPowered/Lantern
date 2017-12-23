@@ -38,6 +38,7 @@ import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
 import org.lanternpowered.server.advancement.TestAdvancementTree;
 import org.lanternpowered.server.boss.LanternBossBar;
+import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.element.ElementKeyRegistration;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
@@ -684,8 +685,13 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         this.lastChunkPos = new Vector2i(centralX, centralZ);
 
         // Get the radius of visible chunks
-        int radius = Math.min(world.getProperties().getConfig().getGeneration().getViewDistance(),
-                this.viewDistance == -1 ? Integer.MAX_VALUE : this.viewDistance + 1);
+        int radius = world.getProperties().getConfig().getViewDistance();
+        if (radius == WorldConfig.USE_SERVER_VIEW_DISTANCE) {
+            radius = Lantern.getGame().getGlobalConfig().getViewDistance();
+        }
+        if (this.viewDistance != -1) {
+            radius = Math.min(radius, this.viewDistance + 1);
+        }
 
         final Set<Vector2i> previousChunks = new HashSet<>(this.knownChunks);
         final List<Vector2i> newChunks = new ArrayList<>();

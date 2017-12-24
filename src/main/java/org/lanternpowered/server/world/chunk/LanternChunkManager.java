@@ -1042,7 +1042,7 @@ public final class LanternChunkManager {
         for (int sy = 0; sy < CHUNK_SECTIONS; sy++) {
             final int nonAirCount = blockBuffer.nonAirCount[sy];
             if (nonAirCount > 0) {
-                sections[sy] = new ChunkSection(blockBuffer.types[sy], nonAirCount);
+                sections[sy] = new ChunkSection(blockBuffer.types[sy]);
             }
         }
 

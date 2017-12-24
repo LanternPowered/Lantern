@@ -198,28 +198,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
         int nonAirCount;
 
         ChunkSection() {
-            this(null, null);
+            this(null);
         }
 
-        ChunkSection(short[] types) {
-            this(checkNotNull(types, "types"), null);
-        }
-
-        ChunkSection(short[] types, int nonAirCount) {
-            this(checkNotNull(types, "types"), (Integer) nonAirCount);
-        }
-
-        private ChunkSection(@Nullable short[] types, @Nullable Integer nonAirCount) {
+        ChunkSection(@Nullable short[] types) {
             if (types != null) {
                 checkArgument(types.length == CHUNK_SECTION_VOLUME, "Type array length mismatch: Got "
                         + types.length + ", but expected " + CHUNK_SECTION_VOLUME);
                 this.types = new short[CHUNK_SECTION_VOLUME];
                 System.arraycopy(types, 0, this.types, 0, CHUNK_SECTION_VOLUME);
-                if (nonAirCount == null) {
-                    this.recountTypes();
-                } else {
-                    this.nonAirCount = nonAirCount;
-                }
+                recountTypes();
             } else {
                 this.types = new short[CHUNK_SECTION_VOLUME];
             }

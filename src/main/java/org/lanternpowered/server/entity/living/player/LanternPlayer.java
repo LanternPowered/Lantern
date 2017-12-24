@@ -711,7 +711,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         }
 
         // Sort chunks by distance from player - closer chunks sent/forced first
-        Collections.sort(newChunks, (a, b) -> {
+        newChunks.sort((a, b) -> {
             double dx = 16 * a.getX() + 8 - xPos;
             double dz = 16 * a.getY() + 8 - zPos;
             double da = dx * dx + dz * dz;

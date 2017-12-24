@@ -25,33 +25,55 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("ConstantConditions")
 public final class HandlerPlayInSwapHandItems implements Handler<MessagePlayInSwapHandItems> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInSwapHandItems message) {
-        final LanternPlayerInventory inventory = context.getSession().getPlayer().getInventory();
+        final LanternPlayer player = context.getSession().getPlayer();
+        final LanternPlayerInventory inventory = player.getInventory();
 
         final AbstractSlot hotbarSlot = inventory.getHotbar().getSelectedSlot();
-        final Slot offHandSlot = inventory.getOffhand();
+        final AbstractSlot offHandSlot = inventory.getOffhand();
 
-        final ItemStack hotbarItem = hotbarSlot.peek().orElse(null);
-        final ItemStack offHandItem = offHandSlot.peek().orElse(null);
+        final ItemStackSnapshot hotbarItem = hotbarSlot.peek().map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE);
+        final ItemStackSnapshot offHandItem = offHandSlot.peek().map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE);
 
-        if (hotbarItem != null || offHandItem != null) {
-            hotbarSlot.set(offHandItem);
-            offHandSlot.set(hotbarItem);
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        transactions.add(new SlotTransaction(hotbarSlot, hotbarItem, offHandItem));
+        transactions.add(new SlotTransaction(offHandSlot, offHandItem, hotbarItem));
 
-            if (hotbarItem != null) {
+        try (CauseStack.Frame frame = CauseStack.current().pushCauseFrame()) {
+            frame.addContext(EventContextKeys.PLAYER, player);
+            frame.pushCause(player);
+
+            final ChangeInventoryEvent.SwapHand event = SpongeEventFactory.createChangeInventoryEventSwapHand(
+                    frame.getCurrentCause(), inventory, transactions);
+            Sponge.getEventManager().post(event);
+            if (!event.isCancelled()) {
+                transactions.stream().filter(Transaction::isValid).forEach(
+                        transaction -> transaction.getSlot().set(transaction.getFinal().createStack()));
+
                 final PlayerInventoryContainer inventoryContainer = context.getSession().getPlayer().getInventoryContainer();
                 inventoryContainer.getClientContainer().queueSilentSlotChange(hotbarSlot);
             }

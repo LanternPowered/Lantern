@@ -20,6 +20,16 @@ __Note:__ If you do not have [Gradle] installed then use ./gradlew for Unix syst
 
 In order to build LanternServer you simply need to run the `gradle build` command. You can find the compiled JAR file in `./build/libs` labeled similarly to 'lanternserver-x.x.x-SNAPSHOT.jar'.
 
+### Troubleshooting
+
+If you are seeing errors from Gradle similar to this:
+
+    Could not get unknown property 'javadoc' for task set of type org.gradle.api.internal.tasks.DefaultTaskContainer.
+
+then you forgot to use `clone --recursive` and are missing the _SpongeAPI_ sobmodule, and need to do:
+
+    git submodule init; git submodule update
+
 ## IDE Setup
 __Note:__ If you do not have [Gradle] installed then use ./gradlew for Unix systems or Git Bash and gradlew.bat for Windows systems in place of any 'gradle' command.
 

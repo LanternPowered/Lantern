@@ -235,6 +235,7 @@ import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.LanguageUtil;
+import org.lanternpowered.server.util.graph.CyclicGraphException;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
 import org.lanternpowered.server.world.LanternWorldArchetypeBuilder;
@@ -837,17 +838,32 @@ public class LanternGameRegistry implements GameRegistry {
             if (!this.classMap.containsKey(aModule.getClass())) {
                 this.classMap.put(aModule.getClass(), aModule);
             }
-            this.addToGraph(aModule, graph);
+            addToGraph(aModule, graph);
         }
         // Now we need ot do the catalog ones
         for (CatalogRegistryModule<?> aModule : this.catalogRegistryMap.values()) {
             if (!this.classMap.containsKey(aModule.getClass())) {
                 this.classMap.put(aModule.getClass(), aModule);
             }
-            this.addToGraph(aModule, graph);
+            addToGraph(aModule, graph);
         }
         this.orderedModules.clear();
-        this.orderedModules.addAll(TopologicalOrder.createOrderedLoad(graph));
+        try {
+            this.orderedModules.addAll(TopologicalOrder.createOrderedLoad(graph));
+        } catch (CyclicGraphException e) {
+            final StringBuilder msg = new StringBuilder();
+            msg.append("Registry module dependencies are cyclical!\n");
+            msg.append("Dependency loops are:\n");
+            for (DirectedGraph.DataNode<?>[] cycle : e.getCycles()) {
+                msg.append("[");
+                for (DirectedGraph.DataNode<?> node : cycle) {
+                    msg.append(node.getData().toString()).append(" ");
+                }
+                msg.append("]\n");
+            }
+            this.game.getLog4jLogger().fatal(msg.toString());
+            throw new RuntimeException("Registry modules dependencies error.");
+        }
         this.modulesSynced = true;
     }
 

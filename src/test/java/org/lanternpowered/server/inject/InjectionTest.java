@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inject;
 
+import static org.junit.Assert.assertEquals;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -39,14 +41,18 @@ public class InjectionTest {
 
         @Inject @Option("my-option") private int myOption;
 
+        private double myOtherOption;
+
         @Inject
         public void testOtherOption(@Option("my-other-option") double myOtherOption) {
-            System.out.println("MyOtherOptionValue: " + myOtherOption);
+            this.myOtherOption = myOtherOption;
         }
     }
 
     @Test
     public void test() {
+        final double valueA = 10.684;
+        final int valueB = 500;
         final AbstractModule module = new AbstractModule() {
             @Override
             protected void configure() {
@@ -56,7 +62,10 @@ public class InjectionTest {
                 install(new OptionModule() {
                     @Override
                     protected void configure0() {
-                        bindArguments().toInstance(new String[]{"--my-option=500", "--my-other-option=10.684"});
+                        bindArguments().toInstance(new String[] {
+                                "--my-option=" + valueB,
+                                "--my-other-option=" + valueA
+                        });
                         bindParser().toInstance(optionParser);
                     }
                 });
@@ -64,6 +73,7 @@ public class InjectionTest {
         };
         final Injector injector = Guice.createInjector(module);
         final TestObject testObject = injector.getInstance(TestObject.class);
-        System.out.println("MyOptionValue: " + testObject.myOption);
+        assertEquals(testObject.myOtherOption, valueA);
+        assertEquals(testObject.myOption, valueB);
     }
 }

@@ -275,6 +275,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("IsAdult"), "sponge:is_adult"));
         register(makeValueKey(Boolean.class, of("IsAflame"), "sponge:is_aflame"));
         register(makeValueKey(Boolean.class, of("IsFlying"), "sponge:is_flying"));
+        register(makeValueKey(Boolean.class, of("IsJohnny"), "sponge:is_johnny"));
         register(makeValueKey(Boolean.class, of("IsPlaying"), "sponge:is_playing"));
         register(makeValueKey(Boolean.class, of("IsScreaming"), "sponge:is_screaming"));
         register(makeValueKey(Boolean.class, of("IsSheared"), "sponge:is_sheared"));

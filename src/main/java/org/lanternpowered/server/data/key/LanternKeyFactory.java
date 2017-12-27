@@ -29,9 +29,6 @@ import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
-import org.spongepowered.api.data.meta.PatternLayer;
-import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
@@ -41,12 +38,6 @@ import org.spongepowered.api.data.value.mutable.PatternListValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
-import org.spongepowered.api.util.weighted.WeightedTable;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public final class LanternKeyFactory {
 
@@ -54,7 +45,7 @@ public final class LanternKeyFactory {
             DataQuery query, String id, String name) {
         final TypeToken<Value<E>> valueToken = new TypeToken<Value<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
-        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static <E> Key<Value<E>> makeValueKey(TypeToken<E> elementToken,
@@ -76,7 +67,7 @@ public final class LanternKeyFactory {
             DataQuery query, String id, String name) {
         final TypeToken<MutableBoundedValue<E>> valueToken = new TypeToken<MutableBoundedValue<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
-        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(TypeToken<E> elementToken,
@@ -98,7 +89,7 @@ public final class LanternKeyFactory {
             DataQuery query, String id, String name) {
         final TypeToken<ImmutableBoundedValue<E>> valueToken = new TypeToken<ImmutableBoundedValue<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
-        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(TypeToken<E> elementToken,
@@ -116,43 +107,11 @@ public final class LanternKeyFactory {
         return makeImmutableBoundedValueKey(TypeToken.of(elementType), query, id, query.last().toString());
     }
 
-    public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(TypeToken<E> elementToken, TypeToken<V> valueToken,
-            DataQuery query, String id, String name) {
-        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
-    }
-
-    public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(TypeToken<E> elementToken, TypeToken<V> valueToken,
-            DataQuery query, String id) {
-        return makeSingleKey(elementToken, valueToken, query, id, query.last().toString());
-    }
-
-    public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(Class<E> elementType, TypeToken<V> valueToken,
-            DataQuery query, String id, String name) {
-        return makeSingleKey(TypeToken.of(elementType), valueToken, query, id, name);
-    }
-
-    public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(Class<E> elementType, TypeToken<V> valueToken,
-            DataQuery query, String id) {
-        return makeSingleKey(TypeToken.of(elementType), valueToken, query, id, query.last().toString());
-    }
-
-    public static <E> Key<ListValue<E>> makeListKey(TypeToken<? extends List<E>> elementToken, TypeToken<ListValue<E>> valueToken,
-            DataQuery query, String id, String name) {
-        return KeyFactory.makeListKey(elementToken, valueToken, query, id, name);
-    }
-
-    public static <E> Key<ListValue<E>> makeListKey(TypeToken<? extends List<E>> elementToken, TypeToken<ListValue<E>> valueToken,
-            DataQuery query, String id) {
-        return makeListKey(elementToken, valueToken, query, id, query.last().toString());
-    }
-
     public static <E> Key<ListValue<E>> makeListKey(TypeToken<E> elementToken,
             DataQuery query, String id, String name) {
-        final TypeToken<? extends List<E>> elementToken0 = new TypeToken<List<E>>() {}
-                .where(new TypeParameter<E>() {}, elementToken);
         final TypeToken<ListValue<E>> valueToken = new TypeToken<ListValue<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
-        return makeListKey(elementToken0, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static <E> Key<ListValue<E>> makeListKey(TypeToken<E> elementToken,
@@ -171,32 +130,19 @@ public final class LanternKeyFactory {
     }
 
     public static Key<PatternListValue> makePatternListKey(DataQuery query, String id, String name) {
-        final TypeToken<List<PatternLayer>> elementToken = new TypeToken<List<PatternLayer>>() {};
         final TypeToken<PatternListValue> valueToken = new TypeToken<PatternListValue>() {};
-        return makeSingleKey(elementToken, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static Key<PatternListValue> makePatternListKey(DataQuery query, String id) {
         return makePatternListKey(query, id, query.last().toString());
     }
 
-    public static <E> Key<SetValue<E>> makeSetKey(TypeToken<? extends Set<E>> elementToken, TypeToken<SetValue<E>> valueToken,
-            DataQuery query, String id, String name) {
-        return KeyFactory.makeSetKey(elementToken, valueToken, query, id, name);
-    }
-
-    public static <E> Key<SetValue<E>> makeSetKey(TypeToken<? extends Set<E>> elementToken, TypeToken<SetValue<E>> valueToken,
-            DataQuery query, String id) {
-        return makeSetKey(elementToken, valueToken, query, id, query.last().toString());
-    }
-
     public static <E> Key<SetValue<E>> makeSetKey(TypeToken<E> elementToken,
             DataQuery query, String id, String name) {
-        final TypeToken<? extends Set<E>> elementToken0 = new TypeToken<Set<E>>() {}
-                .where(new TypeParameter<E>() {}, elementToken);
         final TypeToken<SetValue<E>> valueToken = new TypeToken<SetValue<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
-        return makeSetKey(elementToken0, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static <E> Key<SetValue<E>> makeSetKey(TypeToken<E> elementToken,
@@ -216,11 +162,9 @@ public final class LanternKeyFactory {
 
     public static <E> Key<OptionalValue<E>> makeOptionalKey(TypeToken<E> elementToken,
             DataQuery query, String id, String name) {
-        final TypeToken<Optional<E>> elementToken0 = new TypeToken<Optional<E>>() {}
-                .where(new TypeParameter<E>() {}, elementToken);
         final TypeToken<OptionalValue<E>> valueToken = new TypeToken<OptionalValue<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
-        return KeyFactory.makeOptionalKey(elementToken0, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static <E> Key<OptionalValue<E>> makeOptionalKey(TypeToken<E> elementToken,
@@ -238,25 +182,12 @@ public final class LanternKeyFactory {
         return makeOptionalKey(TypeToken.of(elementType), query, id);
     }
 
-    public static <K, V> Key<MapValue<K, V>> makeMapKey(TypeToken<Map<K, V>> elementToken, TypeToken<MapValue<K, V>> valueToken,
-            DataQuery query, String id, String name) {
-        return KeyFactory.makeMapKey(elementToken, valueToken, query, id, name);
-    }
-
-    public static <K, V> Key<MapValue<K, V>> makeMapKey(TypeToken<Map<K, V>> elementToken, TypeToken<MapValue<K, V>> valueToken,
-            DataQuery query, String id) {
-        return makeMapKey(elementToken, valueToken, query, id, query.last().toString());
-    }
-
     public static <K, V> Key<MapValue<K, V>> makeMapKeyWithKeyAndValue(TypeToken<K> keyToken, TypeToken<V> valueToken,
             DataQuery query, String id, String name) {
-        final TypeToken<Map<K, V>> elementToken = new TypeToken<Map<K, V>>() {}
-                .where(new TypeParameter<K>() {}, keyToken)
-                .where(new TypeParameter<V>() {}, valueToken);
         final TypeToken<MapValue<K, V>> valueToken0 = new TypeToken<MapValue<K, V>>() {}
                 .where(new TypeParameter<K>() {}, keyToken)
                 .where(new TypeParameter<V>() {}, valueToken);
-        return makeMapKey(elementToken, valueToken0, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken0).query(query).id(id).name(name).build();
     }
 
     public static <K, V> Key<MapValue<K, V>> makeMapKeyWithKeyAndValue(TypeToken<K> keyToken, TypeToken<V> valueToken,
@@ -276,11 +207,9 @@ public final class LanternKeyFactory {
 
     public static <E> Key<WeightedCollectionValue<E>> makeWeightedCollectionKey(TypeToken<E> elementToken,
             DataQuery query, String id, String name) {
-        final TypeToken<WeightedTable<E>> elementToken0 = new TypeToken<WeightedTable<E>>() {}
-                .where(new TypeParameter<E>() {}, elementToken);
         final TypeToken<WeightedCollectionValue<E>> valueToken = new TypeToken<WeightedCollectionValue<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
-        return makeSingleKey(elementToken0, valueToken, query, id, name);
+        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
     public static <E> Key<WeightedCollectionValue<E>> makeWeightedCollectionKey(TypeToken<E> elementToken,

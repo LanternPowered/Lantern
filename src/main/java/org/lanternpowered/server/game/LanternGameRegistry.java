@@ -58,6 +58,7 @@ import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSourc
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
+import org.lanternpowered.server.data.key.LanternKeyBuilder;
 import org.lanternpowered.server.data.type.LanternBigMushroomType;
 import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternComparatorType;
@@ -507,6 +508,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(ItemStack.Builder.class, LanternItemStackBuilder::new)
                 .registerBuilderSupplier(EventContextKey.Builder.class, LanternEventContextKeyBuilder::new)
                 .registerBuilderSupplier(Enchantment.Builder.class, LanternEnchantmentBuilder::new)
+                .registerBuilderSupplier(Key.Builder.class, LanternKeyBuilder::new)
                 // Recipes
                 .registerBuilderSupplier(ShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
                 .registerBuilderSupplier(IShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)

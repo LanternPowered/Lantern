@@ -27,6 +27,7 @@ package org.lanternpowered.server.inject;
 
 import static org.junit.Assert.assertEquals;
 
+import com.flowpowered.math.GenericMath;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -73,7 +74,7 @@ public class InjectionTest {
         };
         final Injector injector = Guice.createInjector(module);
         final TestObject testObject = injector.getInstance(TestObject.class);
-        assertEquals(testObject.myOtherOption, valueA);
+        assertEquals(testObject.myOtherOption, valueA, GenericMath.DBL_EPSILON);
         assertEquals(testObject.myOption, valueB);
     }
 }

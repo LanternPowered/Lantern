@@ -157,6 +157,7 @@ import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableHorseDat
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableIgniteableData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableInvisibilityData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableInvulnerabilityData;
+import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableJohnnyData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableJoinData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableKnockbackData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableMinecartBlockData;
@@ -316,6 +317,7 @@ import org.spongepowered.api.data.manipulator.mutable.entity.HorseData;
 import org.spongepowered.api.data.manipulator.mutable.entity.IgniteableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.InvisibilityData;
 import org.spongepowered.api.data.manipulator.mutable.entity.InvulnerabilityData;
+import org.spongepowered.api.data.manipulator.mutable.entity.JohnnyData;
 import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
 import org.spongepowered.api.data.manipulator.mutable.entity.KnockbackData;
 import org.spongepowered.api.data.manipulator.mutable.entity.MinecartBlockData;
@@ -796,6 +798,8 @@ public class DataManipulatorRegistry {
                     c.register(Keys.INVULNERABILITY_TICKS, 0);
                     c.register(Keys.INVULNERABLE, false);
                 });
+        register(JohnnyData.class, ImmutableJohnnyData.class,
+                c -> c.register(Keys.IS_JOHNNY, false));
 
         /// variant containers
         registerVariant(ArtData.class, ImmutableArtData.class, Keys.ART, Arts.AZTEC);

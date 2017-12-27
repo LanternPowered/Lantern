@@ -217,6 +217,7 @@ task fastutilJar(type: ShadowJar) {
         filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2IntOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectArrayMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntArraySet.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectMaps.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectLinkedOpenHashMap.class'
         filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap.class'

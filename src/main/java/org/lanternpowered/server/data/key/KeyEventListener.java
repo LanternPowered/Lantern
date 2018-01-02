@@ -23,41 +23,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.fluid;
+package org.lanternpowered.server.data.key;
 
+import org.lanternpowered.server.event.LanternEventListener;
+import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
+import org.spongepowered.api.event.EventListener;
+import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 
-public final class LanternFluidStackSnapshotBuilder extends AbstractFluidStackBuilder<FluidStackSnapshot, FluidStackSnapshot.Builder>
-        implements FluidStackSnapshot.Builder {
+import java.util.function.Predicate;
 
-    public LanternFluidStackSnapshotBuilder() {
-        super(FluidStackSnapshot.class);
+public class KeyEventListener implements LanternEventListener<ChangeDataHolderEvent.ValueChange> {
+
+    private final EventListener<ChangeDataHolderEvent.ValueChange> listener;
+    private final Predicate<DataHolder> dataHolderPredicate;
+    private final Key<?> key;
+
+    KeyEventListener(EventListener<ChangeDataHolderEvent.ValueChange> listener,
+            Predicate<DataHolder> dataHolderPredicate, Key<?> key) {
+        this.dataHolderPredicate = dataHolderPredicate;
+        this.listener = listener;
+        this.key = key;
     }
 
     @Override
-    public FluidStackSnapshot.Builder add(DataManipulator<?, ?> manipulator) {
-        fluidStack(null).offerFastNoEvents(manipulator, MergeFunction.IGNORE_ALL);
-        return this;
+    public Object getHandle() {
+        return this.listener;
     }
 
     @Override
-    public FluidStackSnapshot.Builder add(ImmutableDataManipulator<?, ?> manipulator) {
-        return add(manipulator.asMutable());
+    public void handle(ChangeDataHolderEvent.ValueChange event) throws Exception {
+        this.listener.handle(event);
     }
 
-    @Override
-    public <V> FluidStackSnapshot.Builder add(Key<? extends BaseValue<V>> key, V value) {
-        fluidStack(null).offerFastNoEvents(key, value);
-        return this;
+    public Predicate<DataHolder> getDataHolderPredicate() {
+        return this.dataHolderPredicate;
     }
 
-    @Override
-    public FluidStackSnapshot build() {
-        return new LanternFluidStackSnapshot(buildStack());
+    public Key<?> getKey() {
+        return this.key;
     }
 }

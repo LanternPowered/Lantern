@@ -191,7 +191,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     @Override
     public ItemStackSnapshot merge(ItemStackSnapshot that, MergeFunction function) {
         final LanternItemStack copy = this.itemStack.copy();
-        copy.copyFrom(((LanternItemStackSnapshot) that).itemStack, function);
+        copy.copyFromNoEvents(((LanternItemStackSnapshot) that).itemStack, function);
         return new LanternItemStackSnapshot(copy);
     }
 

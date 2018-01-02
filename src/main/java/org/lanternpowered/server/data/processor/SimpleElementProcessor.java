@@ -120,7 +120,7 @@ class SimpleElementProcessor<V extends BaseValue<E>, E> extends AbstractProcesso
 
     @Override
     public void addListener(ElementListener<E> listener) {
-        checkNotNull("listener");
+        checkNotNull(listener, "listener");
         if (this.listeners == null) {
             this.listeners = new ArrayList<>();
         }

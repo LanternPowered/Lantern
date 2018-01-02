@@ -29,7 +29,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.POP;
 
-import org.lanternpowered.server.data.CompositeValueStoreHelper;
+import org.lanternpowered.server.data.FastCompositeValueStoreHelper;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Handle;
@@ -44,12 +44,13 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 final class FastValueContainerMethodVisitor extends MethodVisitor {
 
     private static final Map<String, String[]> entries = new HashMap<>();
 
     static {
-        for (Method method : CompositeValueStoreHelper.class.getDeclaredMethods()) {
+        for (Method method : FastCompositeValueStoreHelper.class.getDeclaredMethods()) {
             final int modifiers = method.getModifiers();
             if (!Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) {
                 continue;

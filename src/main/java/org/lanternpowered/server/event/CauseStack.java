@@ -30,9 +30,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.EventContextKeys;
 
 import java.util.Optional;
 

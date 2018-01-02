@@ -142,7 +142,7 @@ public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutable
     @Override
     public FluidStackSnapshot merge(FluidStackSnapshot that, MergeFunction function) {
         final LanternFluidStack copy = this.fluidStack.copy();
-        copy.copyFrom(((LanternFluidStackSnapshot) that).fluidStack, function);
+        copy.copyFromNoEvents(((LanternFluidStackSnapshot) that).fluidStack, function);
         return new LanternFluidStackSnapshot(copy);
     }
 

@@ -31,8 +31,11 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.CoalType;
 import org.spongepowered.api.data.type.TreeTypes;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -47,6 +50,10 @@ import org.spongepowered.api.item.inventory.property.GuiIds;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Plugin(id = "inventory_test")
 public class TestInventoryPlugin {
@@ -78,5 +85,33 @@ public class TestInventoryPlugin {
                     return CommandResult.success();
                 })
                 .build(), "test-a-inv");
+        Keys.COAL_TYPE.registerEvent(ItemStack.class, event1 -> {
+            final DataTransactionResult result = event1.getEndResult();
+            final List<ImmutableValue<?>> newSuccessfulData = new ArrayList<>(result.getSuccessfulData());
+            Iterator<ImmutableValue<?>> it = newSuccessfulData.iterator();
+            while (it.hasNext()) {
+                final ImmutableValue<?> value = it.next();
+                if (value.getKey() == Keys.COAL_TYPE) {
+                    System.out.println("Changed coal type to: " + ((CoalType) value.get()).getId() + ", but this not allowed");
+                    it.remove();
+                    break;
+                }
+            }
+            final List<ImmutableValue<?>> newReplacedData = new ArrayList<>(result.getReplacedData());
+            it = newSuccessfulData.iterator();
+            while (it.hasNext()) {
+                final ImmutableValue<?> value = it.next();
+                if (value.getKey() == Keys.COAL_TYPE) {
+                    it.remove();
+                    break;
+                }
+            }
+            event1.proposeChanges(DataTransactionResult.builder()
+                    .result(result.getType())
+                    .reject(result.getRejectedData())
+                    .replace(newReplacedData)
+                    .success(newSuccessfulData)
+                    .build());
+        });
     }
 }

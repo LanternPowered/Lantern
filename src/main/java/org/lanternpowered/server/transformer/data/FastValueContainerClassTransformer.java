@@ -26,7 +26,7 @@
 package org.lanternpowered.server.transformer.data;
 
 import org.lanternpowered.launch.transformer.ClassTransformer;
-import org.lanternpowered.server.data.CompositeValueStoreHelper;
+import org.lanternpowered.server.data.FastCompositeValueStoreHelper;
 import org.lanternpowered.server.data.ICompositeValueStore;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.objectweb.asm.ClassReader;
@@ -61,7 +61,7 @@ import org.spongepowered.api.entity.Entity;
  * CompositeValueStoreHelper.offer(entity, Keys.HEALTH, 2.0);
  * }
  * </pre>
- * A helper class ({@link CompositeValueStoreHelper}) is here used to check if the {@link Entity} the
+ * A helper class ({@link FastCompositeValueStoreHelper}) is here used to check if the {@link Entity} the
  * {@link ICompositeValueStore} value extends and then calls the fast method, otherwise it will fall
  * back to the original method. The helper class makes it easy to transform the code, without adding
  * extra lines in it, only the method call has to be modified.
@@ -104,6 +104,7 @@ import org.spongepowered.api.entity.Entity;
  * }
  * </pre>
  */
+@SuppressWarnings("deprecation")
 public final class FastValueContainerClassTransformer implements ClassTransformer {
 
     @Override

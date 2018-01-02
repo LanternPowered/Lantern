@@ -25,12 +25,25 @@
  */
 package org.lanternpowered.server.data.key;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.RegisteredListener;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.event.EventListener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.data.ChangeDataHolderEvent;
+import org.spongepowered.api.plugin.PluginContainer;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class LanternKey<V extends BaseValue<?>> implements Key<V> {
@@ -40,6 +53,8 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
     private final String name;
     private final DataQuery query;
     private final TypeToken<?> elementToken;
+    private final List<RegisteredListener<ChangeDataHolderEvent.ValueChange>> listeners = new ArrayList<>();
+    private final List<RegisteredListener<ChangeDataHolderEvent.ValueChange>> unmodifiableListeners = Collections.unmodifiableList(this.listeners);
 
     LanternKey(LanternKeyBuilder<?, V> builder) {
         this.valueToken = builder.valueToken;
@@ -62,6 +77,27 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
     @Override
     public DataQuery getQuery() {
         return this.query;
+    }
+
+    @Override
+    public <E extends DataHolder> void registerEvent(Class<E> holderFilter,
+            EventListener<ChangeDataHolderEvent.ValueChange> listener) {
+        checkNotNull(holderFilter, "holderFilter");
+        checkNotNull(listener, "listener");
+        final KeyEventListener keyEventListener = new KeyEventListener(listener, holderFilter::isInstance, this);
+        final PluginContainer plugin = CauseStack.current().first(PluginContainer.class).get();
+        final RegisteredListener<ChangeDataHolderEvent.ValueChange> registeredListener = Lantern.getGame().getEventManager().register(
+                plugin, ChangeDataHolderEvent.ValueChange.class, Order.DEFAULT, keyEventListener);
+        this.listeners.add(registeredListener);
+    }
+
+    /**
+     * Gets all the {@link KeyEventListener}s.
+     *
+     * @return The listener entries
+     */
+    public List<RegisteredListener<ChangeDataHolderEvent.ValueChange>> getListeners() {
+        return this.unmodifiableListeners;
     }
 
     @Override

@@ -33,6 +33,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
+import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
@@ -63,7 +64,7 @@ public class LanternItemStackBuilder extends AbstractDataBuilder<ItemStack> impl
                 final LanternItemStack old = this.itemStack;
                 this.itemStack = new LanternItemStack(itemType);
                 this.itemStack.setQuantity(old.getQuantity());
-                this.itemStack.copyFrom(old);
+                this.itemStack.copyFromNoEvents(old, MergeFunction.IGNORE_ALL);
             }
             this.itemTypeSet = true;
         } else if (this.itemStack == null) {
@@ -90,25 +91,20 @@ public class LanternItemStackBuilder extends AbstractDataBuilder<ItemStack> impl
     }
 
     @Override
-    public <E> ItemStack.Builder keyValue(Key<? extends BaseValue<E>> key, E value) {
-        return add(key, value);
-    }
-
-    @Override
     public ItemStack.Builder itemData(DataManipulator<?, ?> itemData) throws IllegalArgumentException {
-        itemStack(null).offerFast(itemData);
+        itemStack(null).offerFastNoEvents(itemData, MergeFunction.IGNORE_ALL);
         return this;
     }
 
     @Override
     public ItemStack.Builder itemData(ImmutableDataManipulator<?, ?> itemData) throws IllegalArgumentException {
-        itemStack(null).offerFast(itemData.asMutable());
+        itemStack(null).offerFastNoEvents(itemData.asMutable(), MergeFunction.IGNORE_ALL);
         return this;
     }
 
     @Override
     public <V> ItemStack.Builder add(Key<? extends BaseValue<V>> key, V value) throws IllegalArgumentException {
-        itemStack(null).offerFast(key, value);
+        itemStack(null).offerFastNoEvents(key, value);
         return this;
     }
 

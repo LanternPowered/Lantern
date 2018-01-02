@@ -70,16 +70,19 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
         return dataContainer;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     default DataTransactionResult copyFrom(DataHolder that, MergeFunction function) {
+        return DataHolderHelper.copyFrom(this, that, function);
+    }
+
+    default DataTransactionResult copyFromNoEvents(DataHolder that, MergeFunction function) {
         final Collection<DataManipulator<?, ?>> containers = that.getContainers();
         final DataTransactionResult.Builder builder = DataTransactionResult.builder();
         boolean success = false;
         for (DataManipulator<?, ?> thatContainer : containers) {
             final DataManipulator<?, ?> thisContainer = get(thatContainer.getClass()).orElse(null);
             final DataManipulator<?, ?> merged = function.merge(thisContainer, thatContainer);
-            final DataTransactionResult result = offer(merged);
+            final DataTransactionResult result = offerNoEvents(merged, MergeFunction.IGNORE_ALL);
             builder.absorbResult(result);
             if (!result.getSuccessfulData().isEmpty()) {
                 success = true;
@@ -88,6 +91,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
         return builder.result(success ? DataTransactionResult.Type.SUCCESS : DataTransactionResult.Type.FAILURE).build();
     }
 
+    // TODO: Support event? Would require special handling to restore the container
     @Override
     default boolean removeFast(Class<? extends DataManipulator<?,?>> containerClass) {
         checkNotNull(containerClass, "containerClass");
@@ -109,6 +113,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
         return false;
     }
 
+    // TODO: Support event? Would require special handling to restore the container
     @Override
     default DataTransactionResult remove(Class<? extends DataManipulator<?,?>> containerClass) {
         checkNotNull(containerClass, "containerClass");

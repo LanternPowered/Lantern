@@ -54,7 +54,7 @@ public class LanternFluidStack implements FluidStack, AbstractPropertyHolder, IA
         this(fluidType, volume, ValueCollection.create(ValueCollection.Mode.NORMAL), AdditionalContainerCollection.create());
     }
 
-    public LanternFluidStack(FluidType fluidType, int volume,
+    private LanternFluidStack(FluidType fluidType, int volume,
             ValueCollection valueCollection, AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers) {
         this.valueCollection = valueCollection;
         this.additionalContainers = additionalContainers;

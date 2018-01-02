@@ -49,6 +49,7 @@ import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternCauseStack;
+import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.game.version.MinecraftVersionCache;
 import org.lanternpowered.server.inject.Option;
@@ -147,7 +148,7 @@ public class LanternGame implements Game {
     @Inject private LanternPluginManager pluginManager;
 
     // The event manager
-    @Inject private EventManager eventManager;
+    @Inject private LanternEventManager eventManager;
 
     // The service manager
     @Inject private ServiceManager serviceManager;
@@ -440,7 +441,7 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public EventManager getEventManager() {
+    public LanternEventManager getEventManager() {
         return this.eventManager;
     }
 

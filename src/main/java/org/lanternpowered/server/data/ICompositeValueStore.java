@@ -46,7 +46,6 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
-import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -79,6 +78,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
      * @return Whether the offer was successful
      */
     default <E> boolean offerFast(Key<? extends BaseValue<E>> key, E element) {
+        return CompositeValueStoreHelper.offerFast(this, key, element);
+    }
+
+    default <E> boolean offerFastNoEvents(Key<? extends BaseValue<E>> key, E element) {
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -98,7 +101,7 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
             for (H valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
                     if (valueContainer instanceof ICompositeValueStore) {
-                        return ((ICompositeValueStore) valueContainer).offerFast(key, element);
+                        return ((ICompositeValueStore) valueContainer).offerFastNoEvents(key, element);
                     } else if (valueContainer instanceof CompositeValueStore) {
                         return ((CompositeValueStore) valueContainer).offer(key, element).isSuccessful();
                     } else if (valueContainer instanceof DataManipulator) {
@@ -116,6 +119,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
 
     @Override
     default <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E element) {
+        return CompositeValueStoreHelper.offer(this, key, element);
+    }
+
+    default <E> DataTransactionResult offerNoEvents(Key<? extends BaseValue<E>> key, E element) {
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -134,7 +141,9 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
             final AdditionalContainerCollection<H> containers = ((AdditionalContainerHolder<H>) this).getAdditionalContainers();
             for (H valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
-                    if (valueContainer instanceof CompositeValueStore) {
+                    if (valueContainer instanceof ICompositeValueStore) {
+                        return ((ICompositeValueStore) valueContainer).offerNoEvents(key, element);
+                    } else if (valueContainer instanceof CompositeValueStore) {
                         return ((CompositeValueStore) valueContainer).offer(key, element);
                     } else if (valueContainer instanceof DataManipulator) {
                         final ImmutableValue oldImmutableValue = (ImmutableValue) valueContainer.getValue((Key) key)
@@ -173,6 +182,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
      * @return Whether the offer was successful
      */
     default <E> boolean offerFast(BaseValue<E> value) {
+        return CompositeValueStoreHelper.offerFast(this, value);
+    }
+
+    default <E> boolean offerFastNoEvents(BaseValue<E> value) {
         checkNotNull(value, "value");
         final Key<? extends BaseValue<E>> key = value.getKey();
 
@@ -195,7 +208,7 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
             for (H valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
                     if (valueContainer instanceof ICompositeValueStore) {
-                        return ((ICompositeValueStore) valueContainer).offerFast(value);
+                        return ((ICompositeValueStore) valueContainer).offerFastNoEvents(value);
                     } else if (valueContainer instanceof CompositeValueStore) {
                         return ((CompositeValueStore) valueContainer).offer(value).isSuccessful();
                     } else if (valueContainer instanceof DataManipulator) {
@@ -214,6 +227,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
 
     @Override
     default <E> DataTransactionResult offer(BaseValue<E> value) {
+        return CompositeValueStoreHelper.offer(this, value);
+    }
+
+    default <E> DataTransactionResult offerNoEvents(BaseValue<E> value) {
         checkNotNull(value, "value");
         final Key<? extends BaseValue<E>> key = value.getKey();
 
@@ -294,8 +311,11 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
      * @return Whether the removal was successful
      */
     default boolean removeFast(Key<?> key) {
-        checkNotNull(key, "key");
+        return CompositeValueStoreHelper.removeFast(this, key);
+    }
 
+    default boolean removeFastNoEvents(Key<?> key) {
+        checkNotNull(key, "key");
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -315,7 +335,7 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
             for (H valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
                     if (valueContainer instanceof ICompositeValueStore) {
-                        return ((ICompositeValueStore) valueContainer).removeFast(key);
+                        return ((ICompositeValueStore) valueContainer).removeFastNoEvents(key);
                     } else if (valueContainer instanceof CompositeValueStore) {
                         return ((CompositeValueStore) valueContainer).remove(key).isSuccessful();
                     } else if (valueContainer instanceof DataManipulator ||
@@ -332,6 +352,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
 
     @Override
     default DataTransactionResult remove(Key<?> key) {
+        return CompositeValueStoreHelper.remove(this, key);
+    }
+
+    default DataTransactionResult removeNoEvents(Key<?> key) {
         checkNotNull(key, "key");
 
         // Check the local key registration
@@ -352,11 +376,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
             final AdditionalContainerCollection<H> containers = ((AdditionalContainerHolder<H>) this).getAdditionalContainers();
             for (H valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
-                    if (valueContainer instanceof CompositeValueStore) {
+                    if (valueContainer instanceof ICompositeValueStore) {
+                        return ((ICompositeValueStore) valueContainer).removeNoEvents(key);
+                    } else if (valueContainer instanceof CompositeValueStore) {
                         return ((CompositeValueStore) valueContainer).remove(key);
-                    } else if (valueContainer instanceof DataManipulator ||
-                            valueContainer instanceof ImmutableDataManipulator) {
-                        return DataTransactionResult.successNoData();
                     }
                     return DataTransactionResult.failNoData();
                 }
@@ -385,27 +408,35 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
      * @return Whether the removal was successful
      */
     default boolean undoFast(DataTransactionResult result) {
+        return CompositeValueStoreHelper.undoFast(this, result);
+    }
+
+    default boolean undoFastNoEvents(DataTransactionResult result) {
         if (result.getReplacedData().isEmpty() &&
                 result.getSuccessfulData().isEmpty()) {
             return true;
         }
-        result.getReplacedData().forEach(this::offerFast);
-        result.getSuccessfulData().forEach(this::removeFast);
+        result.getSuccessfulData().forEach(value -> removeFastNoEvents(value.getKey()));
+        result.getReplacedData().forEach(value -> offerFastNoEvents((Key) value.getKey(), value.get()));
         return true;
     }
 
     @Override
     default DataTransactionResult undo(DataTransactionResult result) {
+        return CompositeValueStoreHelper.undo(this, result);
+    }
+
+    default DataTransactionResult undoNoEvents(DataTransactionResult result) {
         if (result.getReplacedData().isEmpty() &&
                 result.getSuccessfulData().isEmpty()) {
             return DataTransactionResult.successNoData();
         }
         final DataTransactionResult.Builder builder = DataTransactionResult.builder();
         for (ImmutableValue<?> replaced : result.getReplacedData()) {
-            builder.absorbResult(offer(replaced));
+            builder.absorbResult(offerNoEvents(replaced));
         }
         for (ImmutableValue<?> successful : result.getSuccessfulData()) {
-            builder.absorbResult(remove(successful));
+            builder.absorbResult(removeNoEvents(successful.getKey()));
         }
         return builder.result(DataTransactionResult.Type.SUCCESS).build();
     }
@@ -430,6 +461,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
      * @return Whether the removal was successful
      */
     default boolean offerFast(H valueContainer, MergeFunction function) {
+        return CompositeValueStoreHelper.offerFast(this, valueContainer, function);
+    }
+
+    default boolean offerFastNoEvents(H valueContainer, MergeFunction function) {
         if (valueContainer instanceof IDataManipulatorBase) {
             // Offer all the default key values as long if they are supported
             final Optional<DataManipulatorRegistration> optRegistration =
@@ -468,18 +503,16 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
 
     @Override
     default DataTransactionResult offer(H valueContainer, MergeFunction function) {
+        return CompositeValueStoreHelper.offer(this, valueContainer, function);
+    }
+
+    default DataTransactionResult offerNoEvents(H valueContainer, MergeFunction function) {
         if (valueContainer instanceof IDataManipulatorBase) {
             // Offer all the default key values as long if they are supported
             final Optional<DataManipulatorRegistration> optRegistration =
                     DataManipulatorRegistry.get().getByMutable(((IDataManipulatorBase) valueContainer).getMutableType());
             if (optRegistration.isPresent()) {
-                if (function == MergeFunction.FORCE_NOTHING) {
-                    final DataTransactionResult.Builder builder = DataTransactionResult.builder();
-                    for (ImmutableValue value : valueContainer.getValues()) {
-                        getValue(value.getKey()).ifPresent(value1 -> builder.replace(((Value) value1).asImmutable()));
-                    }
-                    return builder.result(DataTransactionResult.Type.SUCCESS).build();
-                } else if (function != MergeFunction.IGNORE_ALL) {
+                if (function != MergeFunction.IGNORE_ALL) {
                     ValueContainer old = DataHelper.create(this, optRegistration.get());
                     if (valueContainer instanceof IImmutableDataManipulator && old != null) {
                         old = ((DataManipulator) old).asImmutable();
@@ -489,7 +522,7 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
                 final DataTransactionResult.Builder builder = DataTransactionResult.builder();
                 boolean success = false;
                 for (ImmutableValue value : valueContainer.getValues()) {
-                    final DataTransactionResult result = offer(value);
+                    final DataTransactionResult result = offerNoEvents(value);
                     if (result.isSuccessful()) {
                         builder.success(value);
                         builder.replace(result.getReplacedData());
@@ -544,13 +577,30 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
      * @return Whether the offer was successful
      */
     default boolean offerFast(Iterable<H> valueContainers, MergeFunction function) {
+        return CompositeValueStoreHelper.offerFast(this, valueContainers, function);
+    }
+
+    default boolean offerFastNoEvents(Iterable<H> valueContainers, MergeFunction function) {
         boolean success = false;
         for (H valueContainer : valueContainers) {
-            if (offerFast(valueContainer, function)) {
+            if (offerFastNoEvents(valueContainer, function)) {
                 success = true;
             }
         }
         return success;
+    }
+
+    @Override
+    default DataTransactionResult offer(Iterable<H> valueContainers, MergeFunction function) {
+        return CompositeValueStoreHelper.offer(this, valueContainers, function);
+    }
+
+    default DataTransactionResult offerNoEvents(Iterable<H> valueContainers, MergeFunction function) {
+        final DataTransactionResult.Builder builder = DataTransactionResult.builder();
+        for (H valueContainer : valueContainers) {
+            builder.absorbResult(offerNoEvents(valueContainer, function));
+        }
+        return builder.build();
     }
 
     /**
@@ -584,7 +634,6 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     default Collection<H> getContainers() {
         // Try the additional manipulators if they are supported
@@ -594,7 +643,6 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
             containers.getAll().forEach(container -> builder.add(Copyable.copy(container).orElse(container)));
             return builder.build();
         }
-
         return ImmutableList.of();
     }
 

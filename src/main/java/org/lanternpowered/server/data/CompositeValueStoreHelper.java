@@ -25,102 +25,221 @@
  */
 package org.lanternpowered.server.data;
 
-import org.lanternpowered.server.transformer.data.FastValueContainerClassTransformer;
+import org.lanternpowered.server.data.key.KeyEventListener;
+import org.lanternpowered.server.data.key.LanternKey;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.event.RegisteredListener;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 
-import java.util.function.Function;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
-/**
- * This helper class will attempt to use fast {@link CompositeValueStore} methods
- * if they are available for the given {@link CompositeValueStore}.
- * <p>
- * WARNING: DO NOT MODIFY THE METHOD SIGNATURES UNLESS YOU KNOW WHAT YOU ARE DOING,
- * they are closely linked to the {@link FastValueContainerClassTransformer}, modifying
- * these may break the class transformer.
- */
 @SuppressWarnings("unchecked")
 public final class CompositeValueStoreHelper {
 
-    public static <E> boolean transform(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).transformFast(key, function) :
-                store.transform(key, function).isSuccessful();
+    protected static Set<Key<?>> getKeys(DataTransactionResult result) {
+        final Set<Key<?>> keys = new HashSet<>();
+        result.getReplacedData().forEach(value -> keys.add(value.getKey()));
+        result.getSuccessfulData().forEach(value -> keys.add(value.getKey()));
+        // We don't need the rejected keys, they didn't modify any values
+        return keys;
     }
 
-    public static <E> boolean offer(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, E element) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).offerFast(key, element) :
-                store.offer(key, element).isSuccessful();
+    protected static boolean hasListeners(ICompositeValueStore store, Key<?> key) {
+        return hasListeners(store, Collections.singleton(key));
     }
 
-    public static <E> boolean offer(CompositeValueStore<?,?> store, BaseValue<E> value) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).offerFast(value) :
-                store.offer(value).isSuccessful();
+    protected static boolean hasListeners(ICompositeValueStore store, Iterable<Key<?>> keys) {
+        if (!(store instanceof DataHolder)) {
+            return false;
+        }
+        for (Key<?> key : keys) {
+            final DataHolder dataHolder = (DataHolder) store;
+            final List<RegisteredListener<ChangeDataHolderEvent.ValueChange>> listeners = ((LanternKey) key).getListeners();
+            for (RegisteredListener<ChangeDataHolderEvent.ValueChange> listener : listeners) {
+                if (((KeyEventListener) listener.getHandler()).getDataHolderPredicate().test(dataHolder)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, E value) throws IllegalArgumentException {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).tryOfferFast(key, value) :
-                store.tryOffer(key, value).isSuccessful();
+    protected static DataTransactionResult processDataTransactionResult(ICompositeValueStore store,
+            DataTransactionResult result, BooleanSupplier hasListeners) {
+        if (!(store instanceof DataHolder) || !result.isSuccessful() || !hasListeners.getAsBoolean()) {
+            return result;
+        }
+        final Cause cause = CauseStack.currentOrEmpty().getCurrentCause();
+        final ChangeDataHolderEvent.ValueChange event = SpongeEventFactory.createChangeDataHolderEventValueChange(cause, result, (DataHolder) store);
+        Lantern.getGame().getEventManager().post(event);
+        // Nothing is allowed to change, revert everything fast
+        if (event.isCancelled()) {
+            store.undoFastNoEvents(result);
+            return DataTransactionResult.failNoData();
+        }
+        final DataTransactionResult original = result;
+        result = event.getEndResult();
+        // Check if something actually changed
+        if (result != original) {
+            final Map<Key<?>, ImmutableValue<?>> success = new HashMap<>();
+            for (ImmutableValue<?> value : original.getSuccessfulData()) {
+                success.put(value.getKey(), value);
+            }
+            for (ImmutableValue<?> value : result.getSuccessfulData()) {
+                final ImmutableValue<?> value1 = success.remove(value.getKey());
+                if (value1 == null || value1.get() != value.get()) {
+                    store.offerNoEvents(value);
+                }
+            }
+            // A previously successful offering got removed, revert this
+            if (!success.isEmpty()) {
+                for (ImmutableValue<?> value : original.getReplacedData()) {
+                    if (success.containsKey(value.getKey())) {
+                        store.offerNoEvents(value);
+                    }
+                }
+            }
+        }
+        return event.getEndResult();
     }
 
-    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, BaseValue<E> value) throws IllegalArgumentException {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).tryOfferFast(value) :
-                store.tryOffer(value).isSuccessful();
+    protected static <E, H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store, Key<? extends BaseValue<E>> key, E element) {
+        final boolean hasListeners = hasListeners(store, key);
+        if (hasListeners) {
+            return offer(store, key, element, () -> true).isSuccessful();
+        }
+        return store.offerFastNoEvents(key, element);
     }
 
-    public static boolean remove(CompositeValueStore<?,?> store, Key<?> key) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).removeFast(key) :
-                store.remove(key).isSuccessful();
+    protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
+            Key<? extends BaseValue<E>> key, E element) {
+        return offer(store, key, element, () -> hasListeners(store, key));
     }
 
-    public static boolean remove(CompositeValueStore<?,?> store, BaseValue<?> value) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).removeFast(value) :
-                store.remove(value).isSuccessful();
+    protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
+            Key<? extends BaseValue<E>> key, E element, BooleanSupplier hasListeners) {
+        return processDataTransactionResult(store, store.offerNoEvents(key, element), hasListeners);
     }
 
-    public static boolean undo(CompositeValueStore<?,?> store, DataTransactionResult result) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).undoFast(result) :
-                store.undo(result).isSuccessful();
+    protected static <E, H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store, BaseValue<E> value) {
+        final boolean hasListeners = hasListeners(store, value.getKey());
+        if (hasListeners) {
+            return offer(store, value, () -> true).isSuccessful();
+        }
+        return store.offerFastNoEvents(value);
     }
 
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, H valueContainer, MergeFunction function) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainer, function) :
-                store.offer(valueContainer, function).isSuccessful();
+    protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store, BaseValue<E> value) {
+        return offer(store, value, () -> hasListeners(store, value.getKey()));
     }
 
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, H valueContainer) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainer) :
-                store.offer(valueContainer).isSuccessful();
+    protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
+            BaseValue<E> value, BooleanSupplier hasListeners) {
+        return processDataTransactionResult(store, store.offerNoEvents(value), hasListeners);
     }
 
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, Iterable<H> valueContainers) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainers) :
-                store.offer(valueContainers).isSuccessful();
+    protected static <H extends ValueContainer<?>> boolean removeFast(ICompositeValueStore<?, H> store, Key<?> key) {
+        final boolean hasListeners = hasListeners(store, key);
+        if (hasListeners) {
+            return remove(store, key, () -> true).isSuccessful();
+        }
+        return store.removeFastNoEvents(key);
     }
 
-    public static <H extends ValueContainer<?>> boolean offer(CompositeValueStore<?, H> store, Iterable<H> valueContainers,
-            MergeFunction function) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).offerFast(valueContainers, function) :
-                store.offer(valueContainers, function).isSuccessful();
+    protected static <H extends ValueContainer<?>> DataTransactionResult remove(ICompositeValueStore<?, H> store, Key<?> key) {
+        return remove(store, key, () -> hasListeners(store, key));
     }
 
-    public static <H extends ValueContainer<?>> boolean tryOffer(CompositeValueStore<?, H> store, H valueContainer) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).tryOfferFast(valueContainer) :
-                store.tryOffer(valueContainer).isSuccessful();
+    protected static <H extends ValueContainer<?>> DataTransactionResult remove(ICompositeValueStore<?, H> store,
+            Key<?> key, BooleanSupplier hasListeners) {
+        return processDataTransactionResult(store, store.removeNoEvents(key), hasListeners);
     }
 
-    public static <H extends ValueContainer<?>> boolean tryOffer(CompositeValueStore<?, H> store, H valueContainer,
-            MergeFunction function) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).tryOfferFast(valueContainer, function) :
-                store.tryOffer(valueContainer, function).isSuccessful();
+    protected static <H extends ValueContainer<?>> boolean undoFast(ICompositeValueStore<?, H> store, DataTransactionResult result) {
+        final boolean hasListeners = hasListeners(store, getKeys(result));
+        if (hasListeners) {
+            return undo(store, result, () -> true).isSuccessful();
+        }
+        return store.undoFastNoEvents(result);
     }
 
-    public static <H extends ValueContainer<?>> boolean remove(CompositeValueStore<?, H> store, Class<? extends H> containerClass) {
-        return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?, H>) store).removeFast(containerClass) :
-                store.remove(containerClass).isSuccessful();
+    protected static <H extends ValueContainer<?>> DataTransactionResult undo(ICompositeValueStore<?, H> store, DataTransactionResult result) {
+        return undo(store, result, () -> hasListeners(store, getKeys(result)));
+    }
+
+    protected static <H extends ValueContainer<?>> DataTransactionResult undo(ICompositeValueStore<?, H> store,
+            DataTransactionResult result, BooleanSupplier hasListeners) {
+        return processDataTransactionResult(store, store.undoNoEvents(result), hasListeners);
+    }
+
+    protected static <H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store, H valueContainer, MergeFunction function) {
+        final CompositeValueStore store1 = store; // Leave this, the compiler complains
+        if (store1 instanceof DataHolder) {
+            final boolean hasListeners = hasListeners(store, store.getKeys());
+            if (hasListeners) {
+                return offer(store, valueContainer, function, () -> true).isSuccessful();
+            }
+        }
+        return store.offerFastNoEvents(valueContainer, function);
+    }
+
+    protected static <H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
+            H valueContainer, MergeFunction function) {
+        return offer(store, valueContainer, function, () -> hasListeners(store, valueContainer.getKeys()));
+    }
+
+    protected static <H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
+            H valueContainer, MergeFunction function, BooleanSupplier hasListeners) {
+        return processDataTransactionResult(store, store.offerNoEvents(valueContainer, function), hasListeners);
+    }
+
+    protected static <H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store,
+            Iterable<H> valueContainers, MergeFunction function) {
+        final CompositeValueStore store1 = store; // Leave this, the compiler complains
+        if (store1 instanceof DataHolder) {
+            final Set<Key<?>> keys = new HashSet<>();
+            for (H valueContainer : valueContainers) {
+                keys.addAll(valueContainer.getKeys());
+            }
+            final boolean hasListeners = hasListeners(store, keys);
+            if (hasListeners) {
+                return offer(store, valueContainers, function, () -> true).isSuccessful();
+            }
+        }
+        return store.offerFastNoEvents(valueContainers, function);
+    }
+
+    protected static <H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
+            Iterable<H> valueContainers, MergeFunction function) {
+        return offer(store, valueContainers, function, () -> {
+            final Set<Key<?>> keys = new HashSet<>();
+            for (H valueContainer : valueContainers) {
+                keys.addAll(valueContainer.getKeys());
+            }
+            return hasListeners(store, keys);
+        });
+    }
+
+    protected static <H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
+            Iterable<H> valueContainers, MergeFunction function, BooleanSupplier hasListeners) {
+        return processDataTransactionResult(store, store.offerNoEvents(valueContainers, function), hasListeners);
     }
 
     private CompositeValueStoreHelper() {

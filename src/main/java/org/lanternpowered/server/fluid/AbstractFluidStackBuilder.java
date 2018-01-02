@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -60,7 +61,7 @@ abstract class AbstractFluidStackBuilder<T extends DataSerializable, B extends D
                 final FluidStack old = this.fluidStack;
                 this.fluidStack = new LanternFluidStack(fluidType, 0);
                 this.fluidStack.setVolume(old.getVolume());
-                this.fluidStack.copyFrom(old);
+                this.fluidStack.copyFromNoEvents(old, MergeFunction.IGNORE_ALL);
             }
             this.fluidTypeSet = true;
         } else if (this.fluidStack == null) {

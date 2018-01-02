@@ -25,15 +25,13 @@
  */
 package org.lanternpowered.server.event;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.plugin.PluginContainer;
 
-final class RegisteredListener<T extends Event> implements LanternEventListener<T>, Comparable<RegisteredListener<?>> {
+public final class RegisteredListener<T extends Event> implements LanternEventListener<T>, Comparable<RegisteredListener<?>> {
 
     private final PluginContainer plugin;
     private final EventListener<? super T> handler;
@@ -42,10 +40,10 @@ final class RegisteredListener<T extends Event> implements LanternEventListener<
     private final Order order;
 
     RegisteredListener(PluginContainer plugin, Class<T> eventClass, Order order, EventListener<? super T> handler) {
-        this.plugin = checkNotNull(plugin, "plugin");
-        this.eventClass = checkNotNull(eventClass, "eventClass");
-        this.order = checkNotNull(order, "order");
-        this.handler = checkNotNull(handler, "handler");
+        this.plugin = plugin;
+        this.eventClass = eventClass;
+        this.order = order;
+        this.handler = handler;
     }
 
     public PluginContainer getPlugin() {
@@ -58,6 +56,10 @@ final class RegisteredListener<T extends Event> implements LanternEventListener<
 
     public Order getOrder() {
         return this.order;
+    }
+
+    public EventListener<? super T> getHandler() {
+        return this.handler;
     }
 
     @Override

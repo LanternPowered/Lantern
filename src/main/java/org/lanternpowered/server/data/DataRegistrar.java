@@ -130,13 +130,13 @@ public class DataRegistrar {
                     return Optional.of(directions);
                 })
                 .offerHandler((valueContainer, key, directions) -> {
-                    if (valueContainer instanceof CompositeValueStore) {
-                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
+                    if (valueContainer instanceof ICompositeValueStore) {
+                        final ICompositeValueStore store = (ICompositeValueStore) valueContainer;
                         final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_WEST, directions.contains(Direction.WEST)));
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_EAST, directions.contains(Direction.EAST)));
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_SOUTH, directions.contains(Direction.SOUTH)));
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_NORTH, directions.contains(Direction.NORTH)));
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_WEST, directions.contains(Direction.WEST)));
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_EAST, directions.contains(Direction.EAST)));
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_SOUTH, directions.contains(Direction.SOUTH)));
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_NORTH, directions.contains(Direction.NORTH)));
                         return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
                     }
                     return DataTransactionResult.successNoData();
@@ -155,20 +155,20 @@ public class DataRegistrar {
                     return Optional.of(attachments);
                 })
                 .offerHandler((key, valueContainer, attachments) -> {
-                    if (valueContainer instanceof CompositeValueStore) {
-                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
+                    if (valueContainer instanceof ICompositeValueStore) {
+                        final ICompositeValueStore store = (ICompositeValueStore) valueContainer;
                         final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
                         WireAttachmentType type = attachments.get(Direction.WEST);
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_WEST,
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_WEST,
                                 type == null ? WireAttachmentTypes.NONE : type));
                         type = attachments.get(Direction.EAST);
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_EAST,
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_EAST,
                                 type == null ? WireAttachmentTypes.NONE : type));
                         type = attachments.get(Direction.SOUTH);
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_SOUTH,
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_SOUTH,
                                 type == null ? WireAttachmentTypes.NONE : type));
                         type = attachments.get(Direction.NORTH);
-                        resultBuilder.absorbResult(store.offer(Keys.CONNECTED_NORTH,
+                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_NORTH,
                                 type == null ? WireAttachmentTypes.NONE : type));
                         return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
                     }
@@ -192,26 +192,26 @@ public class DataRegistrar {
                 })
                 .offerHandler((key, valueContainer, rotations) -> {
                     if (valueContainer instanceof CompositeValueStore) {
-                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
+                        final ICompositeValueStore store = (ICompositeValueStore) valueContainer;
                         final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
                         Vector3d rot;
                         if ((rot = rotations.get(BodyParts.RIGHT_ARM)) != null) {
-                            resultBuilder.absorbResult(store.offer(Keys.RIGHT_ARM_ROTATION, rot));
+                            resultBuilder.absorbResult(store.offerNoEvents(Keys.RIGHT_ARM_ROTATION, rot));
                         }
                         if ((rot = rotations.get(BodyParts.RIGHT_LEG)) != null) {
-                            resultBuilder.absorbResult(store.offer(Keys.RIGHT_LEG_ROTATION, rot));
+                            resultBuilder.absorbResult(store.offerNoEvents(Keys.RIGHT_LEG_ROTATION, rot));
                         }
                         if ((rot = rotations.get(BodyParts.LEFT_ARM)) != null) {
-                            resultBuilder.absorbResult(store.offer(Keys.LEFT_ARM_ROTATION, rot));
+                            resultBuilder.absorbResult(store.offerNoEvents(Keys.LEFT_ARM_ROTATION, rot));
                         }
                         if ((rot = rotations.get(BodyParts.LEFT_LEG)) != null) {
-                            resultBuilder.absorbResult(store.offer(Keys.LEFT_LEG_ROTATION, rot));
+                            resultBuilder.absorbResult(store.offerNoEvents(Keys.LEFT_LEG_ROTATION, rot));
                         }
                         if ((rot = rotations.get(BodyParts.HEAD)) != null) {
-                            resultBuilder.absorbResult(store.offer(Keys.HEAD_ROTATION, rot));
+                            resultBuilder.absorbResult(store.offerNoEvents(Keys.HEAD_ROTATION, rot));
                         }
                         if ((rot = rotations.get(BodyParts.CHEST)) != null) {
-                            resultBuilder.absorbResult(store.offer(Keys.CHEST_ROTATION, rot));
+                            resultBuilder.absorbResult(store.offerNoEvents(Keys.CHEST_ROTATION, rot));
                         }
                         return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
                     }

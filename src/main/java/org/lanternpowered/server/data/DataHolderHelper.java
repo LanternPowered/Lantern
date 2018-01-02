@@ -23,41 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.fluid;
+package org.lanternpowered.server.data;
 
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
+import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
 
-public final class LanternFluidStackSnapshotBuilder extends AbstractFluidStackBuilder<FluidStackSnapshot, FluidStackSnapshot.Builder>
-        implements FluidStackSnapshot.Builder {
+public final class DataHolderHelper {
 
-    public LanternFluidStackSnapshotBuilder() {
-        super(FluidStackSnapshot.class);
+    protected static <T extends IDataHolder> DataTransactionResult copyFrom(T holder, DataHolder that, MergeFunction function) {
+        // Assume that there are listeners for this kind of data transfer
+        // TODO: Improve this?
+        return CompositeValueStoreHelper.processDataTransactionResult(holder, holder.copyFromNoEvents(that, function), () -> true);
     }
 
-    @Override
-    public FluidStackSnapshot.Builder add(DataManipulator<?, ?> manipulator) {
-        fluidStack(null).offerFastNoEvents(manipulator, MergeFunction.IGNORE_ALL);
-        return this;
-    }
-
-    @Override
-    public FluidStackSnapshot.Builder add(ImmutableDataManipulator<?, ?> manipulator) {
-        return add(manipulator.asMutable());
-    }
-
-    @Override
-    public <V> FluidStackSnapshot.Builder add(Key<? extends BaseValue<V>> key, V value) {
-        fluidStack(null).offerFastNoEvents(key, value);
-        return this;
-    }
-
-    @Override
-    public FluidStackSnapshot build() {
-        return new LanternFluidStackSnapshot(buildStack());
+    private DataHolderHelper() {
     }
 }

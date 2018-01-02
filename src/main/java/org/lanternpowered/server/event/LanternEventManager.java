@@ -35,22 +35,29 @@ import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.util.DefineableClassLoader;
+import org.lanternpowered.server.util.functions.ThrowableConsumer;
 import org.slf4j.Logger;
+import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.impl.AbstractEvent;
+import org.spongepowered.api.event.impl.AbstractValueChangeEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,9 +67,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings({"unchecked", "ConstantConditions"})
 @Singleton
 public class LanternEventManager implements EventManager {
 
@@ -122,6 +131,10 @@ public class LanternEventManager implements EventManager {
         return handlers;
     }
 
+    private void invalidateCache(Set<Class<?>> types) {
+        this.listenersCache.invalidateAll(types);
+    }
+
     @Nullable
     private static String getHandlerErrorOrNull(Method method) {
         final int modifiers = method.getModifiers();
@@ -151,28 +164,39 @@ public class LanternEventManager implements EventManager {
         return String.join(", ", errors);
     }
 
-    private void register(RegisteredListener<?> listener) {
-        register(Collections.singletonList(listener));
-    }
+    private final Set<Class<?>> keyEventTypes = TypeToken.of(ChangeDataHolderEvent.ValueChange.class).getTypes().rawTypes().stream()
+            .filter(Event.class::isAssignableFrom).collect(Collectors.toSet());
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void register(List<RegisteredListener<?>> listeners) {
-        final Set<Class<?>> types = new HashSet<>();
         synchronized (this.lock) {
-            listeners.stream()
+            listeners = listeners.stream()
                     .filter(listener -> this.listenersByEvent.put(listener.getEventClass(), listener))
-                    .forEach(listener -> types.addAll(TypeToken.of(listener.getEventClass()).getTypes().rawTypes()));
+                    .collect(Collectors.toList());
         }
+
+        final Set<Class<?>> types = new HashSet<>();
+        for (RegisteredListener<?> listener : listeners) {
+            types.addAll(TypeToken.of(listener.getEventClass()).getTypes().rawTypes().stream()
+                    .filter(Event.class::isAssignableFrom).collect(Collectors.toSet()));
+            // Check if somebody has been naughty, this will show a warning
+            // if there is a listener directly listening to a ChangeDataHolderEvent.ValueChange
+            // event, it's a bad idea, the Key#registerEvent should be used instead
+            // This would spam the server, just stop this before damage is done
+            if (!(listener.getHandler() instanceof KeyEventListener) && this.keyEventTypes.contains(listener.getEventClass())) {
+                this.logger.warn("Plugin {} attempted to register a listener ({}) that directly listens to ChangeDataHolderEvent.ValueChange, "
+                        + "this is not allowed because it could destroy server performance. Key#registerEvent is the proper way to handle "
+                        + "this event.",
+                        listener.getPlugin().getId(), listener.getHandle().getClass().getName());
+            }
+        }
+
         if (!types.isEmpty()) {
-            this.listenersCache.invalidateAll(types);
+            invalidateCache(types);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void register(PluginContainer plugin, Object listener) {
-        checkNotNull(plugin, "plugin");
-        checkNotNull(listener, "listener");
-
+    private void registerListenerInstance(PluginContainer plugin, Object listener) {
         synchronized (this.registeredListeners) {
             if (this.registeredListeners.contains(listener)) {
                 this.logger.warn("Plugin {} attempted to register an already registered listener ({})",
@@ -182,6 +206,15 @@ public class LanternEventManager implements EventManager {
                 this.registeredListeners.add(listener);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void registerListeners(Object plugin, Object listener) {
+        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+        checkNotNull(listener, "listener");
+
+        registerListenerInstance(pluginContainer, listener);
 
         final List<RegisteredListener<?>> handlers = new ArrayList<>();
         final Map<Method, String> methodErrors = new HashMap<>();
@@ -202,7 +235,7 @@ public class LanternEventManager implements EventManager {
                         continue;
                     }
 
-                    handlers.add(createRegistration(plugin, eventClass, subscribe, handler));
+                    handlers.add(new RegisteredListener<>(pluginContainer, eventClass, subscribe.order(), handler));
                 } else {
                     methodErrors.put(method, error);
                 }
@@ -230,21 +263,6 @@ public class LanternEventManager implements EventManager {
         register(handlers);
     }
 
-    private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
-            Listener subscribe, EventListener<? super T> listener) {
-        return createRegistration(plugin, eventClass, subscribe.order(), listener);
-    }
-
-    private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
-            Order order, EventListener<? super T> listener) {
-        return new RegisteredListener<>(plugin, eventClass, order, listener);
-    }
-
-    @Override
-    public void registerListeners(Object plugin, Object listener) {
-        register(checkPlugin(plugin, "plugin"), checkNotNull(listener, "listener"));
-    }
-
     @Override
     public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, boolean beforeModifications,
             EventListener<? super T> listener) {
@@ -259,11 +277,18 @@ public class LanternEventManager implements EventManager {
 
     @Override
     public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, EventListener<? super T> listener) {
-        final PluginContainer container = checkPlugin(plugin, "plugin");
+        register(plugin, eventClass, order, listener);
+    }
+
+    public <T extends Event> RegisteredListener<T> register(Object plugin, Class<T> eventClass, Order order, EventListener<? super T> listener) {
+        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
         checkNotNull(eventClass, "eventClass");
         checkNotNull(order, "order");
         checkNotNull(listener, "listener");
-        register(createRegistration(container, eventClass, order, listener));
+        registerListenerInstance(pluginContainer, listener);
+        final RegisteredListener<T> registeredListener = new RegisteredListener<>(pluginContainer, eventClass, order, listener);
+        register(Collections.singletonList(registeredListener));
+        return registeredListener;
     }
 
     private void unregister(Predicate<RegisteredListener<?>> unregister) {
@@ -283,7 +308,7 @@ public class LanternEventManager implements EventManager {
             }
         }
         if (!types.isEmpty()) {
-            this.listenersCache.invalidateAll(types);
+            invalidateCache(types);
         }
     }
 
@@ -299,19 +324,71 @@ public class LanternEventManager implements EventManager {
         unregister(handler -> plugin.equals(handler.getPlugin()));
     }
 
+    private static final class TempDataEventData {
+
+        @Nullable Set<Key<?>> baseKeys;
+        @Nullable Set<Key<?>> keys;
+        @Nullable DataTransactionResult lastResult;
+    }
+
     @SuppressWarnings({"unchecked", "ConstantConditions"})
     @Override
     public boolean post(Event event) {
+        final List<RegisteredListener<?>> listeners = this.listenersCache.get(event.getClass());
+        // Special case
+        if (event instanceof AbstractValueChangeEvent) {
+            final AbstractValueChangeEvent event1 = (AbstractValueChangeEvent) event;
+            final TempDataEventData temp = new TempDataEventData();
+            temp.lastResult = event1.getEndResult();
+            return post(event, listeners, listener -> {
+                if (listener.getHandler() instanceof KeyEventListener) {
+                    final KeyEventListener keyEventListener = (KeyEventListener) listener.getHandler();
+                    if (keyEventListener.getDataHolderPredicate().test(event1.getTargetHolder())) {
+                        final DataTransactionResult newResult = event1.getEndResult();
+                        // We need the keys, only regenerate if changed
+                        if (temp.keys == null || temp.lastResult != newResult) {
+                            // Ignore rejected data, nothing changed for those keys
+                            if (temp.baseKeys == null) {
+                                temp.baseKeys = new HashSet<>();
+                                final DataTransactionResult original = event1.getOriginalChanges();
+                                original.getSuccessfulData().forEach(value -> temp.baseKeys.add(value.getKey()));
+                                original.getReplacedData().forEach(value -> temp.baseKeys.add(value.getKey()));
+                            }
+                            if (event1.getOriginalChanges() == newResult) {
+                                temp.keys = temp.baseKeys;
+                            } else {
+                                temp.keys = new HashSet<>();
+                                temp.keys.addAll(temp.baseKeys);
+                                newResult.getSuccessfulData().forEach(value -> temp.keys.add(value.getKey()));
+                                newResult.getReplacedData().forEach(value -> temp.keys.add(value.getKey()));
+                            }
+                        }
+                        if (temp.keys.contains(keyEventListener.getKey())) {
+                            listener.handle(event);
+                        }
+                    }
+                }
+            });
+        }
+        return post(event, listeners);
+    }
+
+    private boolean post(Event event, Collection<RegisteredListener<?>> listeners) {
+        return post(event, listeners, listener -> listener.handle(event));
+    }
+
+    private boolean post(Event event, Collection<RegisteredListener<?>> listeners,
+            ThrowableConsumer<RegisteredListener, Exception> handler) {
         checkNotNull(event, "event");
         final CauseStack causeStack = CauseStack.currentOrEmpty();
-        for (RegisteredListener listener : this.listenersCache.get(event.getClass())) {
+        for (RegisteredListener listener : listeners) {
             // Add the calling plugin to the cause stack
             causeStack.pushCause(listener.getPlugin());
-            try {
+            try (CauseStack.Frame ignored = causeStack.pushCauseFrame()) {
                 if (event instanceof AbstractEvent) {
                     ((AbstractEvent) event).currentOrder = listener.getOrder();
                 }
-                listener.handle(event);
+                handler.accept(listener);
             } catch (Throwable e) {
                 this.logger.error("Could not pass {} to {}", event.getClass().getSimpleName(),
                         listener.getPlugin(), e);

@@ -223,7 +223,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     /**
      * The item cooldown tracker of this {@link Player}.
      */
-    private final LanternCooldownTracker cooldownTracker = new PlayerCooldownTracker(this);
+    private final LanternCooldownTracker cooldownTracker = new LanternCooldownTracker(this);
 
     /**
      * The last time that the player was active.
@@ -642,6 +642,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 offer(LanternKeys.ELYTRA_SPEED_BOOST, get(Keys.IS_SPRINTING).get());
             }
         }
+
+        this.cooldownTracker.process();
     }
 
     /**

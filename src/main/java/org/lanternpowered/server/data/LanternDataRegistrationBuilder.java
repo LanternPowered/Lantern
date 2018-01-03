@@ -42,7 +42,9 @@ public final class LanternDataRegistrationBuilder<M extends DataManipulator<M, I
         implements DataRegistration.Builder<M, I> {
 
     @Nullable Class<M> manipulatorClass;
+    @Nullable Class<? extends M> implementationClass;
     @Nullable Class<I> immutableClass;
+    @Nullable Class<? extends I> immutableImplementationClass;
     @Nullable DataManipulatorBuilder<M, I> manipulatorBuilder;
     @Nullable String id;
     @Nullable PluginContainer plugin;
@@ -51,14 +53,36 @@ public final class LanternDataRegistrationBuilder<M extends DataManipulator<M, I
     @SuppressWarnings("unchecked")
     @Override
     public  <D extends DataManipulator<D, C>, C extends ImmutableDataManipulator<C, D>> LanternDataRegistrationBuilder<D, C> dataClass(Class<D> manipulatorClass) {
-        this.manipulatorClass = (Class<M>) checkNotNull(manipulatorClass, "DataManipulator class cannot be null!");
+        this.manipulatorClass = (Class<M>) checkNotNull(manipulatorClass,
+                "DataManipulator class cannot be null!");
         return (LanternDataRegistrationBuilder<D, C>) this;
     }
 
     @Override
     public LanternDataRegistrationBuilder<M, I> immutableClass(Class<I> immutableDataClass) {
-        checkState(this.manipulatorClass != null, "DataManipulator class must be set prior to setting the immutable variant!");
-        this.immutableClass = checkNotNull(immutableDataClass, "ImmutableDataManipulator class cannot be null!");
+        checkState(this.manipulatorClass != null,
+                "DataManipulator class must be set prior to setting the immutable variant!");
+        this.immutableClass = checkNotNull(immutableDataClass,
+                "ImmutableDataManipulator class cannot be null!");
+        return this;
+    }
+
+    @Override
+    public LanternDataRegistrationBuilder<M, I> dataImplementation(Class<? extends M> implementationClass) throws IllegalStateException {
+        checkState(this.manipulatorClass != null,
+                "DataManipulator class must be set prior to setting the implementation!");
+        this.implementationClass = checkNotNull(implementationClass,
+                "DataManipulator implementation class cannot be null!");
+        return this;
+    }
+
+    @Override
+    public LanternDataRegistrationBuilder<M, I> immutableImplementation(Class<? extends I> immutableImplementationClass)
+            throws IllegalStateException {
+        checkState(this.immutableClass != null,
+                "ImmutableDataManipulator class must be set prior to setting the implementation!");
+        this.immutableImplementationClass = checkNotNull(immutableImplementationClass,
+                "ImmutableDataManipulator implementation class cannot be null!");
         return this;
     }
 

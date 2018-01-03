@@ -93,6 +93,8 @@ import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.AdvancementProgress;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -144,6 +146,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -1096,6 +1099,16 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public LanternCooldownTracker getCooldownTracker() {
         return this.cooldownTracker;
+    }
+
+    @Override
+    public AdvancementProgress getProgress(Advancement advancement) {
+        return null; // TODO
+    }
+
+    @Override
+    public Collection<org.spongepowered.api.advancement.AdvancementTree> getUnlockedAdvancementTrees() {
+        return null; // TODO
     }
 
     /**

@@ -36,12 +36,12 @@ public final class RegisteredListener<T extends Event> implements LanternEventLi
     private final PluginContainer plugin;
     private final EventListener<? super T> handler;
 
-    private final Class<T> eventClass;
+    private final EventType<T> eventType;
     private final Order order;
 
-    RegisteredListener(PluginContainer plugin, Class<T> eventClass, Order order, EventListener<? super T> handler) {
+    RegisteredListener(PluginContainer plugin, EventType<T> eventType, Order order, EventListener<? super T> handler) {
         this.plugin = plugin;
-        this.eventClass = eventClass;
+        this.eventType = eventType;
         this.order = order;
         this.handler = handler;
     }
@@ -50,8 +50,8 @@ public final class RegisteredListener<T extends Event> implements LanternEventLi
         return this.plugin;
     }
 
-    public Class<T> getEventClass() {
-        return this.eventClass;
+    public EventType<T> getEventType() {
+        return this.eventType;
     }
 
     public Order getOrder() {
@@ -84,7 +84,7 @@ public final class RegisteredListener<T extends Event> implements LanternEventLi
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("plugin", this.plugin.getId())
-                .add("eventType", this.eventClass.getName())
+                .add("eventType", this.eventType)
                 .add("order", this.order.toString())
                 .toString();
     }

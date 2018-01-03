@@ -77,7 +77,9 @@ import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventContextKeyBuilder;
+import org.lanternpowered.server.event.registry.LanternGameRegistryRegisterEvent;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.fluid.LanternFluidStackBuilder;
 import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder;
@@ -236,6 +238,7 @@ import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.LanguageUtil;
+import org.lanternpowered.server.util.PrettyPrinter;
 import org.lanternpowered.server.util.graph.CyclicGraphException;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
@@ -246,6 +249,7 @@ import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -818,10 +822,20 @@ public class LanternGameRegistry implements GameRegistry {
         registerModulePhase();
     }
 
+    @SuppressWarnings("unchecked")
     public void init() {
         DataRegistrar.setupRegistrations(this.game);
         this.phase = RegistrationPhase.INIT;
         registerModulePhase();
+        // Throw the registry module events for the registries that should be loaded once
+        for (Map.Entry<Class<? extends CatalogType>, CatalogRegistryModule<?>> entry : this.catalogRegistryMap.entrySet()) {
+            final CatalogRegistryModule module = entry.getValue();
+            if (module instanceof AdditionalCatalogRegistryModule &&
+                    module.getClass().getAnnotation(CustomRegistrationPhase.class) == null) {
+                this.game.getEventManager().post(new LanternGameRegistryRegisterEvent(CauseStack.current().getCurrentCause(),
+                        entry.getKey(), (AdditionalCatalogRegistryModule) module));
+            }
+        }
     }
 
     public void postInit() {
@@ -973,6 +987,7 @@ public class LanternGameRegistry implements GameRegistry {
                         + moduleClass + " is required but seems to be missing.");
             }
             tryModulePhaseRegistration(this.classMap.get(moduleClass));
+
         }
         registerAdditionalPhase();
     }
@@ -1182,5 +1197,4 @@ public class LanternGameRegistry implements GameRegistry {
     public Locale getLocale(String locale) {
         return LanguageUtil.get(locale);
     }
-
 }

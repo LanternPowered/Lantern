@@ -43,6 +43,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractDataManipulatorRegistration<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>>
         extends LanternDataRegistration<M, I> implements DataManipulatorRegistration<M, I> {
 
@@ -71,7 +72,7 @@ public abstract class AbstractDataManipulatorRegistration<M extends DataManipula
         final M manipulator = createMutable();
         checkArgument(manipulator instanceof IDataManipulator,
                 "The mutable manipulator implementation must implement IDataManipulator.");
-        //noinspection unchecked
+        this.implementationClass = (Class<? extends M>) manipulator.getClass();
         final Class<M> manipulatorType1 = ((IDataManipulator<M, I>) manipulator).getMutableType();
         checkArgument(manipulatorType1 == getManipulatorClass(),
                 "The mutable data manipulator returns a different manipulator type, expected %s, but got %s",
@@ -79,7 +80,7 @@ public abstract class AbstractDataManipulatorRegistration<M extends DataManipula
         final I immutableManipulator = createImmutable();
         checkArgument(immutableManipulator instanceof IImmutableDataManipulator,
                 "The immutable manipulator implementation must implement IImmutableData.");
-        //noinspection unchecked
+        this.immutableImplementationClass = (Class<? extends I>) immutableManipulator.getClass();
         final Class<I> immutableManipulatorType1 = ((IImmutableDataManipulator<I, M>) immutableManipulator).getImmutableType();
         checkArgument(immutableManipulatorType1 == getImmutableManipulatorClass(),
                 "The immutable data manipulator returns a different manipulator type, expected %s, but got %s",

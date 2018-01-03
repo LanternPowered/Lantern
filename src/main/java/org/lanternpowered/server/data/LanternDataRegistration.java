@@ -58,6 +58,8 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
     private final Class<I> immutableClass;
     private final DataManipulatorBuilder<M, I> manipulatorBuilder;
     private final PluginContainer plugin;
+    protected Class<? extends M> implementationClass;
+    protected Class<? extends I> immutableImplementationClass;
 
     protected LanternDataRegistration(PluginContainer plugin, String id, String name, Class<M> manipulatorClass, Class<I> immutableClass,
             @Nullable DataManipulatorBuilder<M, I> manipulatorBuilder) {
@@ -75,6 +77,8 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
         this.manipulatorClass = checkNotNull(builder.manipulatorClass, "DataManipulator class is null!");
         this.immutableClass = checkNotNull(builder.immutableClass, "ImmutableDataManipulator class is null!");
         this.manipulatorBuilder = checkNotNull(builder.manipulatorBuilder, "DataManipulatorBuilder is null!");
+        this.implementationClass = builder.implementationClass == null ? this.manipulatorClass : builder.implementationClass;
+        this.immutableImplementationClass = builder.immutableImplementationClass == null ? this.immutableClass : builder.immutableImplementationClass;
         this.plugin = builder.plugin;
     }
 
@@ -96,8 +100,18 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
     }
 
     @Override
+    public Class<? extends M> getImplementationClass() {
+        return this.implementationClass;
+    }
+
+    @Override
     public Class<I> getImmutableManipulatorClass() {
         return this.immutableClass;
+    }
+
+    @Override
+    public Class<? extends I> getImmutableImplementationClass() {
+        return this.immutableImplementationClass;
     }
 
     @Override
@@ -120,6 +134,7 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
         }
         final LanternDataRegistration<?, ?> that = (LanternDataRegistration<?, ?>) o;
         return Objects.equal(this.manipulatorClass, that.manipulatorClass)
+                && Objects.equal(this.manipulatorClass, that.manipulatorClass)
                 && Objects.equal(this.immutableClass, that.immutableClass)
                 && Objects.equal(this.manipulatorBuilder, that.manipulatorBuilder)
                 && Objects.equal(this.plugin, that.plugin)

@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.ValueHelper;
 import org.lanternpowered.server.util.copy.Copyable;
@@ -88,11 +89,8 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
     private static boolean initialized;
 
     static {
-        final Key<Value<Boolean>> key = makeValueKey(TypeToken.of(Boolean.class), DataQuery.of("Dummy"), "lantern:dummy");
-
-        DEFAULT = (SimpleElementProcessor) new SimpleElementProcessorBuilder(key).build();
-        NON_REMOVABLE = (SimpleElementProcessor) new SimpleElementProcessorBuilder(key).failAlwaysRemoveHandler().build();
-
+        DEFAULT = (SimpleElementProcessor) new SimpleElementProcessorBuilder(LanternKeys.DUMMY).build();
+        NON_REMOVABLE = (SimpleElementProcessor) new SimpleElementProcessorBuilder(LanternKeys.DUMMY).failAlwaysRemoveHandler().build();
         initialized = true;
     }
 

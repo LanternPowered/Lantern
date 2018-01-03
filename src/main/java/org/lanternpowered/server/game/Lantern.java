@@ -51,6 +51,10 @@ public class Lantern {
         return LanternGame.game.getImplementationPlugin();
     }
 
+    public static PluginContainer getSpongePlugin() {
+        return LanternGame.game.getSpongePlugin();
+    }
+
     public static AssetRepository getAssetRepository() {
         return LanternGame.game.getAssetManager().getRepository();
     }

@@ -23,27 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.advancement.AdvancementType;
+import org.spongepowered.api.text.format.TextFormat;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+public final class LanternAdvancementType extends PluginCatalogType.Base.Internal implements AdvancementType {
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+    private final TextFormat textFormat;
+
+    public LanternAdvancementType(String pluginId, String name, int internalId, TextFormat textFormat) {
+        super(pluginId, name, internalId);
+        this.textFormat = textFormat;
     }
 
     @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    public TextFormat getTextFormat() {
+        return this.textFormat;
     }
 }

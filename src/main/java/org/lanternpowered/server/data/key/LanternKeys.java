@@ -32,7 +32,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.advancement.AdvancementTree;
+import org.lanternpowered.server.advancement.old.AdvancementTree;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.effect.potion.PotionType;

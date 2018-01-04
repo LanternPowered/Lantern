@@ -23,27 +23,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import static com.google.common.base.Preconditions.checkState;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+public class ScoreAdvancementCriterion extends AdvancementCriterion {
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+    private final int goal;
+    final String[] ids;
+
+    /**
+     * Creates a new {@link ScoreAdvancementCriterion} with the target goal value
+     * that should be achieved to trigger this criterion.
+     *
+     * @param goal The goal value
+     */
+    public ScoreAdvancementCriterion(String name, int goal) {
+        super("score", String.format("%s{goal=%s}", name, goal));
+        checkState(goal > 0, "The goal must be greater then 0");
+        this.goal = goal;
+        this.ids = new String[goal];
+        for (int i = 0; i < goal; i++) {
+            this.ids[i] = newIdentifier();
+        }
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    /**
+     * Gets the goal value.
+     *
+     * @return The goal value
+     */
+    public int getGoal() {
+        return this.goal;
     }
 }

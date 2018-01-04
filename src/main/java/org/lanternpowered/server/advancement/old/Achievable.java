@@ -23,27 +23,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+import java.util.OptionalLong;
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+public abstract class Achievable {
+
+    static final long INVALID_TIME = -1L;
+
+    /**
+     * Gets whether this {@link Achievable} is achieved.
+     *
+     * @return Is achieved
+     */
+    public boolean achieved() {
+        return get().isPresent();
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
-    }
+    /**
+     * Gets the time that the {@link Achievable} was achieved if present.
+     *
+     * @return The achieving time
+     */
+    public abstract OptionalLong get();
+
+    /**
+     * Achieves this {@link Achievable}, if achieved before
+     * that time will be returned.
+     *
+     * @return The achieving time
+     */
+    public abstract long set();
+
+    /**
+     * Revokes the {@link Achievable} status. The time that the {@link Achievable}
+     * was achieved before will be returned if present.
+     *
+     * @return The previous achieving time
+     */
+    public abstract OptionalLong revoke();
+
+    abstract void resetDirtyState();
+
+    abstract void fillDirtyProgress(Object2LongMap<String> progress);
+
+    abstract void fillProgress(Object2LongMap<String> progress);
 }

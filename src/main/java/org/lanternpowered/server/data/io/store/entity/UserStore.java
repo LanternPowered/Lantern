@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.io.store.entity;
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.advancement.AdvancementTrees;
+import org.lanternpowered.server.advancement.old.AdvancementTrees;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;

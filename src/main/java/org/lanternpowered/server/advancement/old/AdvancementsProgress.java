@@ -23,27 +23,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+import java.util.HashMap;
+import java.util.Map;
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+import javax.annotation.Nullable;
+
+public final class AdvancementsProgress {
+
+    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
+
+    /**
+     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
+     *
+     * @param advancement The advancement
+     * @return The advancement progress
+     */
+    public AdvancementProgress get(Advancement advancement) {
+        checkNotNull(advancement, "advancement");
+        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    @Nullable
+    AdvancementProgress getOrNull(Advancement advancement) {
+        checkNotNull(advancement, "advancement");
+        return this.progresses.get(advancement);
+    }
+
+    void resetDirtyState() {
+        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
     }
 }

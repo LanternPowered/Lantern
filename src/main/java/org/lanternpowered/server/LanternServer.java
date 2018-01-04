@@ -36,7 +36,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import org.lanternpowered.server.advancement.AdvancementTrees;
+import org.lanternpowered.server.advancement.old.AdvancementTrees;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;

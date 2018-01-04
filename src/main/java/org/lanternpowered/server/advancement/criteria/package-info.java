@@ -23,27 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
-
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
-
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
-
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
-    }
-
-    @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.advancement.criteria;

@@ -23,27 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import java.util.OptionalLong;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+final class AndCriterionProgress extends MultiCriterionProgress {
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+    AndCriterionProgress(AdvancementProgress progress, AdvancementCriterion.And criterion) {
+        super(progress, criterion);
     }
 
     @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    public AdvancementCriterion.And getCriterion() {
+        return (AdvancementCriterion.And) super.getCriterion();
+    }
+
+    @Override
+    public OptionalLong get() {
+        OptionalLong time = OptionalLong.empty();
+        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
+            final OptionalLong time1 = getProgress().get(criterion).get().get();
+            if (!time1.isPresent()) {
+                return OptionalLong.empty();
+            } else if (!time.isPresent() || time1.getAsLong() > time.getAsLong()) {
+                time = time1;
+            }
+        }
+        return time;
     }
 }

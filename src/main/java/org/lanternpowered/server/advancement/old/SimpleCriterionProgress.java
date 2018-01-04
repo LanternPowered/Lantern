@@ -23,27 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+final class SimpleCriterionProgress extends AbstractCriterionProgress {
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+    private long lastAchievingTime = INVALID_TIME;
+
+    SimpleCriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
+        super(progress, criterion);
     }
 
     @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    void resetDirtyState() {
+        this.lastAchievingTime = this.achievingTime;
+    }
+
+    @Override
+    void fillDirtyProgress(Object2LongMap<String> progress) {
+        if (this.lastAchievingTime != this.achievingTime) {
+            progress.put(getCriterion().id, this.achievingTime);
+        }
+    }
+
+    @Override
+    void fillProgress(Object2LongMap<String> progress) {
+        progress.put(getCriterion().id, this.achievingTime);
     }
 }

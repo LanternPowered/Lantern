@@ -23,27 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import org.lanternpowered.server.advancement.LanternAdvancementType;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+/**
+ * An enumeration of all the available {@link LanternAdvancementType}s in minecraft.
+ */
+public final class FrameTypes {
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
-    }
+    public static final LanternAdvancementType CHALLENGE = new LanternAdvancementType("minecraft", "challenge", 1, textFormat);
 
-    @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    public static final LanternAdvancementType GOAL = new LanternAdvancementType("minecraft", "goal", 2, textFormat);
+
+    public static final LanternAdvancementType TASK = new LanternAdvancementType("minecraft", "task", 0, textFormat);
+
+    private FrameTypes() {
     }
 }

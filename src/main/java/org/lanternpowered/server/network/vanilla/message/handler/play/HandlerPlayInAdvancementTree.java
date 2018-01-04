@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.advancement.AdvancementTrees;
+import org.lanternpowered.server.advancement.old.AdvancementTrees;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;

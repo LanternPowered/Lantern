@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.base.MoreObjects;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import org.lanternpowered.server.advancement.FrameType;
+import org.lanternpowered.server.advancement.LanternAdvancementType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.util.collect.Collections3;
@@ -140,14 +140,14 @@ public final class MessagePlayOutAdvancements implements Message {
             private final LocalizedText title;
             private final LocalizedText description;
             private final ItemStackSnapshot icon;
-            private final FrameType frameType;
+            private final LanternAdvancementType frameType;
             @Nullable private final String background;
             private final double x;
             private final double y;
             private final boolean showToast;
             private final boolean hidden;
 
-            public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, FrameType frameType,
+            public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, LanternAdvancementType frameType,
                     @Nullable String background, double x, double y, boolean showToast, boolean hidden) {
                 this.description = description;
                 this.background = background;
@@ -176,7 +176,7 @@ public final class MessagePlayOutAdvancements implements Message {
                 return this.icon;
             }
 
-            public FrameType getFrameType() {
+            public LanternAdvancementType getFrameType() {
                 return this.frameType;
             }
 

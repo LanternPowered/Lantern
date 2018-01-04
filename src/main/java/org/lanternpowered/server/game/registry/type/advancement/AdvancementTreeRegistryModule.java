@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.advancement.TestAdvancementTree;
+import org.lanternpowered.server.advancement.old.TestAdvancementTree;
 import org.spongepowered.api.registry.RegistrationPhase;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.DelayedRegistration;

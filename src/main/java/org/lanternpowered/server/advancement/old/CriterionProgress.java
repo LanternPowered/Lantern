@@ -23,27 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+public abstract class CriterionProgress extends Achievable {
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+    private final AdvancementProgress progress;
+    private final AdvancementCriterion criterion;
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+    CriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
+        this.progress = progress;
+        this.criterion = criterion;
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    /**
+     * Gets the {@link AdvancementProgress}.
+     *
+     * @return The advancement progress
+     */
+    public AdvancementProgress getProgress() {
+        return this.progress;
+    }
+
+    /**
+     * Gets the {@link AdvancementCriterion}.
+     *
+     * @return The criterion
+     */
+    public AdvancementCriterion getCriterion() {
+        return this.criterion;
     }
 }

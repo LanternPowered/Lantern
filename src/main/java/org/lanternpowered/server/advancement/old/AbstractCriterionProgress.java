@@ -23,27 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.bossbar;
+package org.lanternpowered.server.advancement.old;
 
-import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarColors;
+import java.util.OptionalLong;
 
-public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
+public abstract class AbstractCriterionProgress extends CriterionProgress {
 
-    public BossBarColorRegistryModule() {
-        super(BossBarColors.class);
+    long achievingTime = INVALID_TIME;
+
+    AbstractCriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
+        super(progress, criterion);
     }
 
     @Override
-    public void registerDefaults() {
-        register(new LanternBossBarColor("minecraft", "pink", 0));
-        register(new LanternBossBarColor("minecraft", "blue", 1));
-        register(new LanternBossBarColor("minecraft", "red", 2));
-        register(new LanternBossBarColor("minecraft", "green", 3));
-        register(new LanternBossBarColor("minecraft", "yellow", 4));
-        register(new LanternBossBarColor("minecraft", "purple", 5));
-        register(new LanternBossBarColor("minecraft", "white", 6));
+    public OptionalLong get() {
+        return this.achievingTime == INVALID_TIME ? OptionalLong.empty() : OptionalLong.of(this.achievingTime);
+    }
+
+    @Override
+    public long set() {
+        if (this.achievingTime == INVALID_TIME) {
+            this.achievingTime = System.currentTimeMillis();
+            getProgress().updateAchievedState(this.achievingTime);
+        }
+        return this.achievingTime;
+    }
+
+    @Override
+    public OptionalLong revoke() {
+        if (this.achievingTime == INVALID_TIME) {
+            return OptionalLong.empty();
+        }
+        try {
+            return OptionalLong.of(this.achievingTime);
+        } finally {
+            this.achievingTime = INVALID_TIME;
+            getProgress().updateAchievedState(INVALID_TIME);
+        }
     }
 }

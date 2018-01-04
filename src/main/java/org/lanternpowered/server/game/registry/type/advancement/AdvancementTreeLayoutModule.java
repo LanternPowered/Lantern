@@ -23,24 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import org.lanternpowered.server.advancement.layout.LanternTreeLayout;
+import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.registry.RegistrationPhase;
+import org.spongepowered.api.registry.RegistryModule;
+import org.spongepowered.api.registry.util.DelayedRegistration;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+@RegistrationDependency(AdvancementTreeRegistryModule.class)
+public class AdvancementTreeLayoutModule implements RegistryModule {
 
+    @DelayedRegistration(RegistrationPhase.INIT)
     @Override
-    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
-        if (message instanceof MessagePlayInAdvancementTree.Open) {
-            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
-            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
-        } else {
-            // Do we need the close event?
+    public void registerDefaults() {
+        for (AdvancementTree tree : AdvancementTreeRegistryModule.get().getAll()) {
+            final LanternTreeLayout layout = new LanternTreeLayout(tree);
+            layout.generate();
         }
     }
 }

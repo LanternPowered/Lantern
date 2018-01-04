@@ -23,39 +23,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.text;
+package org.lanternpowered.server.advancement.criteria;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.SafeTextSerializer;
-import org.spongepowered.api.text.serializer.TextParseException;
-import org.spongepowered.api.text.translation.locale.Locales;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 
-import java.util.Locale;
+import javax.annotation.Nullable;
 
-public final class PlainTextSerializer extends PluginCatalogType.Base implements SafeTextSerializer, LanternTextSerializer {
+@SuppressWarnings({"unchecked", "NullableProblems", "ConstantConditions"})
+public abstract class AbstractCriterionBuilder<T extends AdvancementCriterion, B extends AdvancementCriterion.BaseBuilder<T, B>>
+        implements AdvancementCriterion.BaseBuilder<T, B> {
 
-    public PlainTextSerializer(String pluginId, String name) {
-        super(pluginId, name);
+    @Nullable FilteredTrigger trigger;
+    String name;
+
+    @Override
+    public B trigger(FilteredTrigger<?> trigger) {
+        checkNotNull(trigger, "trigger");
+        this.trigger = trigger;
+        return (B) this;
     }
 
     @Override
-    public String serialize(Text text) {
-        return serialize(text, Locales.DEFAULT);
+    public B name(String name) {
+        checkNotNull(name, "name");
+        this.name = name;
+        return (B) this;
     }
 
     @Override
-    public String serialize(Text text, Locale locale) {
-        checkNotNull(text, "text");
-        checkNotNull(locale, "locale");
-        return LegacyTexts.toLegacy(locale, text, (char) 0);
+    public T build() {
+        checkState(this.name != null, "The name must be set");
+        return build0();
+    }
+
+    abstract T build0();
+
+    @Override
+    public B from(T value) {
+        this.trigger = value.getTrigger().orElse(null);
+        this.name = value.getName();
+        return (B) this;
     }
 
     @Override
-    public Text deserialize(String input) throws TextParseException {
-        return Text.of(input);
+    public B reset() {
+        this.trigger = null;
+        this.name = null;
+        return (B) this;
     }
-
 }

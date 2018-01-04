@@ -23,24 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import org.lanternpowered.server.advancement.criteria.EmptyCriterion;
+import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder;
+import org.lanternpowered.server.util.ReflectionHelper;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.registry.RegistryModule;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+public class AdvancementCriterionModule implements RegistryModule {
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
-        if (message instanceof MessagePlayInAdvancementTree.Open) {
-            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
-            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
-        } else {
-            // Do we need the close event?
+    public void registerDefaults() {
+        try {
+            ReflectionHelper.setField(AdvancementCriterion.class.getDeclaredField("EMPTY"),
+                    null, EmptyCriterion.INSTANCE);
+            ReflectionHelper.setField(AdvancementCriterion.class.getDeclaredField("DUMMY"),
+                    null, new LanternCriterionBuilder().name("dummy").build());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
     }
 }

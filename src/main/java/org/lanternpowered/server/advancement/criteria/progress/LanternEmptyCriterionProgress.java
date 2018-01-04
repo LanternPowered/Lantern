@@ -23,24 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.advancement.criteria.progress;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import org.lanternpowered.server.advancement.LanternAdvancementProgress;
+import org.lanternpowered.server.advancement.criteria.EmptyCriterion;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+import java.time.Instant;
+import java.util.Optional;
+
+public class LanternEmptyCriterionProgress extends AbstractCriterionProgress<EmptyCriterion> {
+
+    private final Instant now = Instant.now();
+
+    public LanternEmptyCriterionProgress(EmptyCriterion criterion, LanternAdvancementProgress progress) {
+        super(criterion, progress);
+    }
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
-        if (message instanceof MessagePlayInAdvancementTree.Open) {
-            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
-            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
-        } else {
-            // Do we need the close event?
-        }
+    public boolean achieved() {
+        return true;
+    }
+
+    @Override
+    Optional<Instant> grant(Runnable invalidator) {
+        return Optional.of(this.now);
+    }
+
+    @Override
+    Optional<Instant> revoke(Runnable invalidator) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Instant> get() {
+        return Optional.of(this.now);
+    }
+
+    @Override
+    public void fillProgress(Object2LongMap<String> progress) {
+        progress.put(getCriterion().getName(), this.now.toEpochMilli());
     }
 }

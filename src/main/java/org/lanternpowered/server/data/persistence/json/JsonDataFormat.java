@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.persistence.json;
 
+import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
@@ -106,6 +107,12 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         try (JsonReader reader = new JsonReader(new StringReader(input))) {
             return readContainer(reader);
         }
+    }
+
+    public static DataContainer serialize(Gson gson, Object o) throws IOException {
+        final DataViewJsonWriter writer = new DataViewJsonWriter();
+        gson.toJson(o, o.getClass(), writer);
+        return writer.getResult();
     }
 
     /**

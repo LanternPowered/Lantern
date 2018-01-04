@@ -26,11 +26,11 @@
 package org.lanternpowered.server.game.registry.type.bossbar;
 
 import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarColors;
 
-public final class BossBarColorRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<BossBarColor> {
+public final class BossBarColorRegistryModule extends PluginCatalogRegistryModule<BossBarColor> {
 
     public BossBarColorRegistryModule() {
         super(BossBarColors.class);

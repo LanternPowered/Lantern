@@ -28,7 +28,6 @@ package org.lanternpowered.server.data.io.store.entity;
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
@@ -37,6 +36,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.AbstractUser;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -244,7 +244,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             view.getInt(RECIPE_BOOK_GUI_OPEN).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_GUI_OPEN, v > 0));
         });
         dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> valueContainer
-                .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTrees.INSTANCE.get(id)));
+                .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTreeRegistryModule.get().getById(id)));
 
         super.deserializeValues(player, valueContainer, dataView);
     }

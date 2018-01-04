@@ -150,7 +150,6 @@ abstract class JsonTextBaseSerializer {
             final RawAction raw = LanternTextHelper.raw(clickAction);
 
             final JsonObject jsonEvent = new JsonObject();
-            //noinspection ConstantConditions
             jsonEvent.addProperty(EVENT_ACTION, raw.getAction());
             jsonEvent.addProperty(EVENT_VALUE, raw.getValueAsString());
 

@@ -35,6 +35,7 @@ import org.spongepowered.api.advancement.AdvancementTypes;
 import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTriggerConfiguration;
 import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -85,7 +86,7 @@ public class AdvancementTest {
     public static class MyTriggerConfig implements FilteredTriggerConfiguration {
 
         @Setting("chance")
-        private float chance;
+        private float chance = 0.5f;
     }
 
     @Listener
@@ -162,6 +163,24 @@ public class AdvancementTest {
                 .build();
         event.register(this.cookDirtAdvancement);
 
+        event.register(Advancement.builder()
+                .parent(this.breakDirtAdvancement)
+                .criterion(ScoreAdvancementCriterion.builder()
+                        .goal(5)
+                        .name("logins")
+                        .trigger(FilteredTrigger.builder()
+                                .type(this.trigger)
+                                .config(new MyTriggerConfig())
+                                .build())
+                        .build())
+                .displayInfo(DisplayInfo.builder()
+                        .icon(ItemTypes.GOLDEN_APPLE)
+                        .title(Text.of("Random login success"))
+                        .type(AdvancementTypes.GOAL)
+                        .build())
+                .id("random_login")
+                .build());
+
         this.suicidalAdvancement = null;
         event.getRegistryModule().getById("minecraft:adventure_root").ifPresent(parent -> {
             // Create the suicidal advancement
@@ -187,6 +206,7 @@ public class AdvancementTest {
         event.getTargetEntity().getProgress(this.rootAdvancement).grant();
         // Do this here for now, no block break event
         event.getTargetEntity().getProgress(this.breakDirtAdvancement).get(this.breakDirtCriterion).get().add(1);
+        this.trigger.trigger(event.getTargetEntity());
     }
 
     @Listener

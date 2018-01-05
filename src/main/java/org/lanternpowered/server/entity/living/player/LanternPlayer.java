@@ -428,6 +428,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         } else {
             // Load the advancements
             this.advancementsProgress.save();
+            this.advancementsProgress.cleanup();
             if (this.worldBorder != null) {
                 this.worldBorder.removePlayer(this);
             }

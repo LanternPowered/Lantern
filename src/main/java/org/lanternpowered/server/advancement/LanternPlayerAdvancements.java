@@ -33,7 +33,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
@@ -153,9 +152,7 @@ public class LanternPlayerAdvancements {
     }
 
     private void init0() {
-        // Clear all the current progress
-        this.dirtyProgress.clear();
-        this.progress.clear();
+        cleanup();
 
         // Load all the advancements into this progress tracker
         final AdvancementRegistryModule registryModule = AdvancementRegistryModule.get();
@@ -172,6 +169,13 @@ public class LanternPlayerAdvancements {
         if (advancementsMessage != null) {
             this.player.getConnection().send(advancementsMessage);
         }
+    }
+
+    public void cleanup() {
+        // Clear all the current progress
+        this.dirtyProgress.clear();
+        this.progress.values().forEach(LanternAdvancementProgress::cleanup);
+        this.progress.clear();
     }
 
     /**
@@ -280,10 +284,11 @@ public class LanternPlayerAdvancements {
                 if (progress.visible) {
                     // Add the advancement
                     added.add(createAdvancement(progress.getAdvancement()));
-                    // Fill the progress map
-                    final Object2LongMap<String> progressMap1 = new Object2LongOpenHashMap<>();
-                    progress.fillProgress(progressMap1);
-                    progressMap.put(progress.getAdvancement().getId(), progressMap1);
+                    final Object2LongMap<String> progressMap1 = progress.collectProgress();
+                    if (!progressMap1.isEmpty()) {
+                        // Fill the progress map
+                        progressMap.put(progress.getAdvancement().getId(), progressMap1);
+                    }
                 }
             }
         } else {
@@ -305,18 +310,18 @@ public class LanternPlayerAdvancements {
         final Advancement advancement = progress.getAdvancement();
         boolean updateParentAndChildren = false;
         if (progress.dirtyVisibility || force) {
-            final boolean current = progress.visible;
             final boolean visible = shouldBeVisible(advancement);
             progress.dirtyVisibility = false;
-            if (current != visible) {
+            if (progress.visible != visible) {
                 progress.visible = visible;
                 if (visible && added != null) {
                     added.add(createAdvancement(advancement));
                     // The progress is now visible, send the complete data
                     if (progressMap != null) {
-                        final Object2LongMap<String> progressMap1 = new Object2LongOpenHashMap<>();
-                        progress.fillProgress(progressMap1);
-                        progressMap.put(advancement.getId(), progressMap1);
+                        final Object2LongMap<String> progressMap1 = progress.collectProgress();
+                        if (!progressMap1.isEmpty()) {
+                            progressMap.put(advancement.getId(), progressMap1);
+                        }
                         // The progress is already updated, prevent from doing it again
                         progress.dirtyProgress = false;
                     }
@@ -326,13 +331,11 @@ public class LanternPlayerAdvancements {
                 updateParentAndChildren = true;
             }
         }
-        if (progress.dirtyProgress && progressMap != null) {
-            final Object2LongMap<String> progressMap1 = new Object2LongOpenHashMap<>();
-            progress.fillDirtyProgress(progressMap1);
-            progressMap.put(advancement.getId(), progressMap1);
+        if (progress.visible && progress.dirtyProgress && progressMap != null) {
+            progressMap.put(advancement.getId(), progress.collectProgress());
         }
         // Reset dirty state, even if nothing changed
-        progress.resetDirtyState();
+        progress.dirtyProgress = false;
         if (updateParentAndChildren) {
             for (Advancement child : advancement.getChildren()) {
                 update(get(child), added, removed, progressMap, true);

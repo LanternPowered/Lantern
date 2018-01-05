@@ -39,17 +39,6 @@ public final class LanternOrCriterionProgress extends AbstractOperatorCriterionP
     }
 
     @Override
-    public boolean achieved() {
-        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
-            final Optional<Instant> time = this.progress.get(criterion).get().get();
-            if (time.isPresent()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public Optional<Instant> get0() {
         Optional<Instant> time = Optional.empty();
         for (AdvancementCriterion criterion : getCriterion().getCriteria()) {

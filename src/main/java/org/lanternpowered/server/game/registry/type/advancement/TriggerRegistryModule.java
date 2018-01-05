@@ -26,25 +26,23 @@
 package org.lanternpowered.server.game.registry.type.advancement;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
-import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
-@RegistrationDependency({ AdvancementTypeRegistryModule.class, AdvancementCriterionModule.class,
-        ItemRegistryModule.class, TriggerRegistryModule.class })
-public final class AdvancementRegistryModule extends AdditionalPluginCatalogRegistryModule<Advancement> {
+public final class TriggerRegistryModule extends AdditionalPluginCatalogRegistryModule<Trigger> {
 
-    private static final AdvancementRegistryModule instance = new AdvancementRegistryModule();
+    private static final TriggerRegistryModule instance = new TriggerRegistryModule();
 
     /**
-     * Gets the {@link AdvancementRegistryModule}.
+     * Gets the {@link TriggerRegistryModule}.
      *
      * @return The advancement tree registry module
      */
-    public static AdvancementRegistryModule get() {
+    public static TriggerRegistryModule get() {
         return instance;
     }
 
-    private AdvancementRegistryModule() {
+    private TriggerRegistryModule() {
     }
 }

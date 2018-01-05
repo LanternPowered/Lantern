@@ -26,11 +26,20 @@
 package org.lanternpowered.server.advancement.criteria.trigger;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonObject;
+import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
+import org.lanternpowered.server.advancement.criteria.progress.AbstractCriterionProgress;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.ScoreCriterionProgress;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTriggerConfiguration;
 import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.entity.living.player.Player;
@@ -39,6 +48,8 @@ import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -51,6 +62,9 @@ public class LanternTrigger<C extends FilteredTriggerConfiguration> extends Plug
     private final Function<JsonObject, C> configConstructor;
     @Nullable private final Consumer<CriterionEvent.Trigger<C>> eventHandler;
     private final TypeToken<C> configTypeToken;
+
+    // All the criteria progress that could be triggered by this trigger
+    private final Multimap<LanternPlayerAdvancements, AbstractCriterionProgress> progress = HashMultimap.create();
 
     LanternTrigger(LanternTriggerBuilder<C> builder) {
         super(CauseStack.current().first(PluginContainer.class).get().getId(), builder.id,
@@ -76,11 +90,42 @@ public class LanternTrigger<C extends FilteredTriggerConfiguration> extends Plug
         players.forEach(this::trigger);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void trigger(Player player) {
-        final Cause cause = CauseStack.current().getCurrentCause();
+        final LanternPlayerAdvancements playerAdvancements = ((LanternPlayer) player).getAdvancementsProgress();
+        final Collection<AbstractCriterionProgress> collection = this.progress.get(playerAdvancements);
+        if (!collection.isEmpty()) {
+            final Cause cause = CauseStack.current().getCurrentCause();
+            for (AbstractCriterionProgress progress : new ArrayList<>(this.progress.get(playerAdvancements))) {
+                final Advancement advancement = progress.getAdvancementProgress().getAdvancement();
+                final AdvancementCriterion criterion = progress.getCriterion();
+                final FilteredTrigger filteredTrigger = criterion.getTrigger().get();
 
-        // SpongeEventFactory.createCriterionEventTrigger()
+                final CriterionEvent.Trigger event = SpongeEventFactory.createCriterionEventTrigger(cause, advancement, criterion,
+                        this.configTypeToken, player, filteredTrigger, this.eventHandler != null);
+                if (this.eventHandler != null) {
+                    this.eventHandler.accept(event);
+                }
+                Sponge.getEventManager().post(event);
+
+                if (event.getResult()) {
+                    if (progress instanceof ScoreCriterionProgress) {
+                        ((ScoreCriterionProgress) progress).add(1);
+                    } else {
+                        progress.grant();
+                    }
+                }
+            }
+        }
+    }
+
+    public void add(LanternPlayerAdvancements playerAdvancements, AbstractCriterionProgress criterionProgress) {
+        this.progress.put(playerAdvancements, criterionProgress);
+    }
+
+    public void remove(LanternPlayerAdvancements playerAdvancements, AbstractCriterionProgress criterionProgress) {
+        this.progress.remove(playerAdvancements, criterionProgress);
     }
 
     public Function<JsonObject, C> getConfigConstructor() {

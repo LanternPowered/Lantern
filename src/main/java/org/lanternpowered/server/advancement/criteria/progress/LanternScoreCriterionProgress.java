@@ -47,7 +47,6 @@ import java.util.Optional;
 public class LanternScoreCriterionProgress extends LanternCriterionProgressBase<LanternScoreCriterion> implements ScoreCriterionProgress {
 
     private int score = 0;
-    private int dirtyIndex = 0;
 
     public LanternScoreCriterionProgress(LanternScoreCriterion criterion, LanternAdvancementProgress progress) {
         super(criterion, progress);
@@ -100,11 +99,12 @@ public class LanternScoreCriterionProgress extends LanternCriterionProgressBase<
         this.score = score;
         if (event instanceof CriterionEvent.Grant) {
             this.achievingTime = ((CriterionEvent.Grant) event).getTime();
-            invalidator.run();
+            detachTrigger();
         } else if (event instanceof CriterionEvent.Revoke) {
             this.achievingTime = null;
-            invalidator.run();
+            attachTrigger();
         }
+        invalidator.run();
         return Optional.ofNullable(this.achievingTime);
     }
 
@@ -118,28 +118,6 @@ public class LanternScoreCriterionProgress extends LanternCriterionProgressBase<
     public Optional<Instant> remove(int score) {
         checkArgument(score >= 0, "Score to remove may not be negative");
         return set(Math.max(getScore() - score, getGoal()));
-    }
-
-    @Override
-    public void resetDirtyState() {
-        this.dirtyIndex = this.score;
-    }
-
-    @Override
-    public void fillDirtyProgress(Object2LongMap<String> progress) {
-        if (this.dirtyIndex != this.score) {
-            if (this.dirtyIndex < this.score) {
-                long now = -1L;
-                for (int i = this.dirtyIndex; i < this.score; i++) {
-                    progress.put(getCriterion().getIds()[i], this.achievingTime != null ? this.achievingTime.toEpochMilli() :
-                            now == -1L ? (now = System.currentTimeMillis()) : now);
-                }
-            } else {
-                for (int i = Math.max(0, this.score - 1); i < this.dirtyIndex; i++) {
-                    progress.put(getCriterion().getIds()[i], INVALID_TIME);
-                }
-            }
-        }
     }
 
     @Override

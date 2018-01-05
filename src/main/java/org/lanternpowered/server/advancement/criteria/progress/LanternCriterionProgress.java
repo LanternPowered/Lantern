@@ -37,14 +37,9 @@ import org.spongepowered.api.event.cause.Cause;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 public class LanternCriterionProgress extends LanternCriterionProgressBase<AbstractCriterion> {
-
-    @Nullable private Instant lastAchievingTime;
 
     public LanternCriterionProgress(AbstractCriterion criterion, LanternAdvancementProgress progress) {
         super(criterion, progress);
@@ -64,6 +59,7 @@ public class LanternCriterionProgress extends LanternCriterionProgressBase<Abstr
             return Optional.empty();
         }
         this.achievingTime = event.getTime();
+        detachTrigger();
         invalidator.run();
         return Optional.of(this.achievingTime);
     }
@@ -83,20 +79,9 @@ public class LanternCriterionProgress extends LanternCriterionProgressBase<Abstr
         }
         final Instant achievingTime = this.achievingTime;
         this.achievingTime = null;
+        attachTrigger();
         invalidator.run();
         return Optional.of(achievingTime);
-    }
-
-    @Override
-    public void resetDirtyState() {
-        this.lastAchievingTime = this.achievingTime;
-    }
-
-    @Override
-    public void fillDirtyProgress(Object2LongMap<String> progress) {
-        if (!Objects.equals(this.lastAchievingTime, this.achievingTime)) {
-            progress.put(getCriterion().getName(), this.achievingTime == null ? INVALID_TIME : this.achievingTime.toEpochMilli());
-        }
     }
 
     @Override

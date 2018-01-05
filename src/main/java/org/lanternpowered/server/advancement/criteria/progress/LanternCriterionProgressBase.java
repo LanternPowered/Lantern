@@ -27,6 +27,7 @@ package org.lanternpowered.server.advancement.criteria.progress;
 
 import org.lanternpowered.server.advancement.LanternAdvancementProgress;
 import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
+import org.lanternpowered.server.advancement.criteria.trigger.LanternTrigger;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -36,6 +37,7 @@ import javax.annotation.Nullable;
 abstract class LanternCriterionProgressBase<T extends AbstractCriterion> extends AbstractCriterionProgress<T> {
 
     @Nullable Instant achievingTime;
+    private boolean attached = false;
 
     LanternCriterionProgressBase(T criterion, LanternAdvancementProgress progress) {
         super(criterion, progress);
@@ -49,5 +51,29 @@ abstract class LanternCriterionProgressBase<T extends AbstractCriterion> extends
     @Override
     public Optional<Instant> get() {
         return Optional.ofNullable(this.achievingTime);
+    }
+
+    @Override
+    public void attachTrigger() {
+        this.criterion.getTrigger().ifPresent(trigger -> {
+            // Only attach once
+            if (this.attached) {
+                return;
+            }
+            this.attached = true;
+            ((LanternTrigger) trigger.getType()).add(getAdvancementProgress().getPlayerAdvancements(), this);
+        });
+    }
+
+    @Override
+    public void detachTrigger() {
+        this.criterion.getTrigger().ifPresent(trigger -> {
+            // Only detach once
+            if (!this.attached) {
+                return;
+            }
+            this.attached = false;
+            ((LanternTrigger) trigger.getType()).remove(getAdvancementProgress().getPlayerAdvancements(), this);
+        });
     }
 }

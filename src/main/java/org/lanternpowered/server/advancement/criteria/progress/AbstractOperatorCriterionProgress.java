@@ -101,18 +101,6 @@ public abstract class AbstractOperatorCriterionProgress<T extends AbstractOperat
     }
 
     @Override
-    public void resetDirtyState() {
-        this.lastAchievingTime = get().orElse(null);
-    }
-
-    @Override
-    public void fillDirtyProgress(Object2LongMap<String> progress) {
-        if (!Objects.equals(this.lastAchievingTime, get().orElse(null))) {
-            fillProgress(progress);
-        }
-    }
-
-    @Override
     public void fillProgress(Object2LongMap<String> progress) {
         final Instant achievingTime = get().orElse(null);
         progress.put(getCriterion().getName(), achievingTime == null ? INVALID_TIME : achievingTime.toEpochMilli());

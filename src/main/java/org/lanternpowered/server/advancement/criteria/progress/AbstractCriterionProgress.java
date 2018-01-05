@@ -36,7 +36,7 @@ import java.util.Optional;
 
 public abstract class AbstractCriterionProgress<T extends AbstractCriterion> implements CriterionProgress {
 
-    public static final int INVALID_TIME = -1;
+    static final int INVALID_TIME = -1;
 
     final T criterion;
     final LanternAdvancementProgress progress;
@@ -44,6 +44,10 @@ public abstract class AbstractCriterionProgress<T extends AbstractCriterion> imp
     AbstractCriterionProgress(T criterion, LanternAdvancementProgress progress) {
         this.criterion = criterion;
         this.progress = progress;
+    }
+
+    public LanternAdvancementProgress getAdvancementProgress() {
+        return this.progress;
     }
 
     @Override
@@ -65,16 +69,16 @@ public abstract class AbstractCriterionProgress<T extends AbstractCriterion> imp
 
     abstract Optional<Instant> revoke(Runnable invalidator);
 
+    public void attachTrigger() {
+    }
+
+    public void detachTrigger() {
+    }
+
     public void saveProgress(Map<String, Instant> progress) {
     }
 
     public void loadProgress(Map<String, Instant> progress) {
-    }
-
-    public void resetDirtyState() {
-    }
-
-    public void fillDirtyProgress(Object2LongMap<String> progress) {
     }
 
     public void fillProgress(Object2LongMap<String> progress) {

@@ -28,6 +28,7 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
 import org.lanternpowered.server.advancement.criteria.EmptyCriterion;
 import org.lanternpowered.server.advancement.criteria.LanternAndCriterion;
@@ -59,7 +60,7 @@ public class LanternAdvancementProgress implements AdvancementProgress {
 
     private final Map<AdvancementCriterion, AbstractCriterionProgress> progress = new HashMap<>();
 
-    private Optional<Instant> achievedState = Optional.empty();
+    private boolean achievedState;
 
     // Whether the progress of the advancement should be updated
     boolean dirtyProgress;
@@ -88,7 +89,14 @@ public class LanternAdvancementProgress implements AdvancementProgress {
             } else {
                 throw new IllegalStateException("Unsupported criterion: " + criterion);
             }
+            progress.attachTrigger();
             this.progress.put(criterion, progress);
+        }
+    }
+
+    void cleanup() {
+        for (AbstractCriterionProgress progress : this.progress.values()) {
+            progress.detachTrigger();
         }
     }
 
@@ -96,6 +104,14 @@ public class LanternAdvancementProgress implements AdvancementProgress {
         for (AbstractCriterionProgress progress : this.progress.values()) {
             progress.loadProgress(progressMap);
         }
+        for (AbstractCriterionProgress progress : this.progress.values()) {
+            if (progress.achieved()) {
+                progress.detachTrigger();
+            } else {
+                progress.attachTrigger();
+            }
+        }
+        this.achievedState = achieved();
     }
 
     Map<String, Instant> saveProgress() {
@@ -150,13 +166,21 @@ public class LanternAdvancementProgress implements AdvancementProgress {
         // Invalidate the achieved state of all the criteria progress
         this.progress.values().forEach(AbstractCriterionProgress::invalidateAchievedState);
         // Get the new achieved state
-        final Optional<Instant> achievedState = get();
-        if (!this.achievedState.isPresent() && achievedState.isPresent()) {
+        final boolean achievedState = achieved();
+        if (!this.achievedState && achievedState) {
             // The advancement got granted
             this.dirtyVisibility = true;
-        } else if (this.achievedState.isPresent() && !achievedState.isPresent()) {
+            for (AbstractCriterionProgress progress : this.progress.values()) {
+                progress.detachTrigger();
+            }
+        } else if (this.achievedState && !achievedState) {
             // The advancement got revoked
             this.dirtyVisibility = true;
+            for (AbstractCriterionProgress progress : this.progress.values()) {
+                if (!progress.achieved()) {
+                    progress.attachTrigger();
+                }
+            }
         }
         this.achievedState = achievedState;
         // The progress should be updated
@@ -164,17 +188,9 @@ public class LanternAdvancementProgress implements AdvancementProgress {
         this.playerAdvancements.dirtyProgress.add(this);
     }
 
-    void resetDirtyState() {
-        this.dirtyProgress = false;
-        // Reset the dirty states of the progress
-        this.advancement.clientCriteria.getFirst().forEach(criterion -> this.progress.get(criterion).resetDirtyState());
-    }
-
-    void fillDirtyProgress(Object2LongMap<String> progress) {
-        this.advancement.clientCriteria.getFirst().forEach(criterion -> this.progress.get(criterion).fillDirtyProgress(progress));
-    }
-
-    void fillProgress(Object2LongMap<String> progress) {
+    Object2LongMap<String> collectProgress() {
+        final Object2LongMap<String> progress = new Object2LongOpenHashMap<>();
         this.advancement.clientCriteria.getFirst().forEach(criterion -> this.progress.get(criterion).fillProgress(progress));
+        return progress;
     }
 }

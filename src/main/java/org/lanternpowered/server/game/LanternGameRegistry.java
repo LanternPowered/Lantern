@@ -41,7 +41,6 @@ import org.lanternpowered.api.script.function.value.FloatValueProviderType;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
 import org.lanternpowered.server.advancement.LanternAdvancementBuilder;
 import org.lanternpowered.server.advancement.LanternAdvancementTreeBuilder;
-import org.lanternpowered.server.advancement.LanternDisplayInfo;
 import org.lanternpowered.server.advancement.LanternDisplayInfoBuilder;
 import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder;
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterionBuilder;
@@ -102,6 +101,7 @@ import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegis
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeLayoutModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.TriggerRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
@@ -250,7 +250,6 @@ import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.LanguageUtil;
-import org.lanternpowered.server.util.PrettyPrinter;
 import org.lanternpowered.server.util.graph.CyclicGraphException;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
@@ -261,7 +260,6 @@ import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.AdvancementType;
@@ -684,6 +682,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
                 .registerModule(Advancement.class, AdvancementRegistryModule.get())
                 .registerModule(AdvancementType.class, new AdvancementTypeRegistryModule())
+                .registerModule(Trigger.class, TriggerRegistryModule.get())
                 .registerModule(new AdvancementTreeLayoutModule())
                 .registerModule(new AdvancementCriterionModule())
                 // Recipes

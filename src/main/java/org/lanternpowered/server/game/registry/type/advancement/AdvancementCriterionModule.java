@@ -25,26 +25,23 @@
  */
 package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
-import org.spongepowered.api.advancement.Advancement;
+import org.lanternpowered.server.advancement.criteria.EmptyCriterion;
+import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder;
+import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
-import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.registry.RegistryModule;
 
-@RegistrationDependency({ AdvancementTypeRegistryModule.class, AdvancementCriterionModule.class, ItemRegistryModule.class })
-public final class AdvancementRegistryModule extends AdditionalPluginCatalogRegistryModule<Advancement> {
+public class AdvancementCriterionModule implements RegistryModule {
 
-    private static final AdvancementRegistryModule instance = new AdvancementRegistryModule();
-
-    /**
-     * Gets the {@link AdvancementRegistryModule}.
-     *
-     * @return The advancement tree registry module
-     */
-    public static AdvancementRegistryModule get() {
-        return instance;
-    }
-
-    private AdvancementRegistryModule() {
+    @Override
+    public void registerDefaults() {
+        try {
+            ReflectionHelper.setField(AdvancementCriterion.class.getDeclaredField("EMPTY"),
+                    null, EmptyCriterion.INSTANCE);
+            ReflectionHelper.setField(AdvancementCriterion.class.getDeclaredField("DUMMY"),
+                    null, new LanternCriterionBuilder().name("dummy").build());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

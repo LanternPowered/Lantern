@@ -25,26 +25,22 @@
  */
 package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
-import org.spongepowered.api.advancement.Advancement;
-import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.lanternpowered.server.advancement.layout.LanternTreeLayout;
+import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.registry.RegistrationPhase;
+import org.spongepowered.api.registry.RegistryModule;
+import org.spongepowered.api.registry.util.DelayedRegistration;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
-@RegistrationDependency({ AdvancementTypeRegistryModule.class, AdvancementCriterionModule.class, ItemRegistryModule.class })
-public final class AdvancementRegistryModule extends AdditionalPluginCatalogRegistryModule<Advancement> {
+@RegistrationDependency(AdvancementTreeRegistryModule.class)
+public class AdvancementTreeLayoutModule implements RegistryModule {
 
-    private static final AdvancementRegistryModule instance = new AdvancementRegistryModule();
-
-    /**
-     * Gets the {@link AdvancementRegistryModule}.
-     *
-     * @return The advancement tree registry module
-     */
-    public static AdvancementRegistryModule get() {
-        return instance;
-    }
-
-    private AdvancementRegistryModule() {
+    @DelayedRegistration(RegistrationPhase.INIT)
+    @Override
+    public void registerDefaults() {
+        for (AdvancementTree tree : AdvancementTreeRegistryModule.get().getAll()) {
+            final LanternTreeLayout layout = new LanternTreeLayout(tree);
+            layout.generate();
+        }
     }
 }

@@ -34,6 +34,7 @@ import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings({"NullableProblems", "ConstantConditions"})
 public class LanternAdvancementBuilder implements Advancement.Builder {
 
     @Nullable Advancement parent;

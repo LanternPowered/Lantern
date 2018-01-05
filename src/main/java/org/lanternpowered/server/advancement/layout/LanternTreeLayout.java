@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.advancement.layout;
 
-import com.flowpowered.math.vector.Vector2d;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.advancement.LanternAdvancement;
@@ -156,25 +155,14 @@ public class LanternTreeLayout implements TreeLayout {
      * Q---Q---Q
      */
     private static void firstProcess(TreeNode treeNode) {
-        treeNode.layout.setPosition(treeNode.x, treeNode.offset);
-        if (treeNode.children.isEmpty()) {
-            treeNode.offset += VERTICAL_OFFSET;
-        } else {
-            // Set the start offset of the walk
-            if (treeNode.parent != null) {
-                treeNode.offset = treeNode.parent.offset;
-            }
-            // First process the children
-            for (TreeNode childNode : treeNode.children) {
-                firstProcess(childNode);
-            }
-            // Increase the offset
-            if (treeNode.parent != null) {
-                treeNode.parent.offset = treeNode.offset;
-            }
+        for (TreeNode childNode : treeNode.children) {
+            firstProcess(childNode);
         }
+        if (treeNode.parent != null) {
+            treeNode.offset = (treeNode.parent.offset += VERTICAL_OFFSET);
+        }
+        treeNode.layout.setPosition(treeNode.x, treeNode.offset);
     }
-
 
     /**
      * The following layout will be generated in this process.

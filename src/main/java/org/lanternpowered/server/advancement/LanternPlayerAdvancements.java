@@ -28,12 +28,19 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2d;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
+import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.TreeLayoutElement;
@@ -41,8 +48,18 @@ import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.AndCriterion;
 import org.spongepowered.api.util.Tuple;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,10 +67,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 public class LanternPlayerAdvancements {
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final SimpleDateFormat DATE_TIME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
     private final LanternPlayer player;
     private final Map<Advancement, LanternAdvancementProgress> progress = new HashMap<>();
@@ -70,6 +91,90 @@ public class LanternPlayerAdvancements {
     }
 
     /**
+     * Gets the {@link Path} of the save file.
+     *
+     * @return The path
+     */
+    private Path getSavePath() {
+        return Lantern.getGame().getSavesDirectory()
+                .resolve("advancements")
+                .resolve(this.player.getUniqueId().toString().toLowerCase() + ".json");
+    }
+
+    public void init() {
+        init0();
+
+        // Load progress from the file
+        final Path file = getSavePath();
+        if (Files.exists(file)) {
+            try (BufferedReader reader = Files.newBufferedReader(file)) {
+                loadProgressFromJson(GSON.fromJson(reader, JsonObject.class));
+            } catch (IOException e) {
+                Lantern.getLogger().error("Failed to load the advancements progress for the player: " + this.player.getUniqueId(), e);
+            }
+        }
+    }
+
+    public void initClient() {
+        this.player.getConnection().send(createUpdateMessage(true));
+    }
+
+    public void save() {
+        final Path file = getSavePath();
+
+        try {
+            // Make sure the parent directory exists
+            final Path parent = file.getParent();
+            if (!Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+            // Save the advancements
+            try (BufferedWriter writer = Files.newBufferedWriter(file)) {
+                GSON.toJson(saveProgressToJson(), writer);
+            }
+        } catch (IOException e) {
+            Lantern.getLogger().error("Failed to save the advancements progress for the player: " + this.player.getUniqueId(), e);
+        }
+    }
+
+    /**
+     * Reloads the progress. This should be called when the
+     * {@link Advancement}s are getting reloaded.
+     */
+    public void reload() {
+        // Save the progress
+        final Map<String, Map<String, Instant>> progressMap = saveProgress();
+        // Initialize the new advancements
+        init0();
+        // Load the progress again
+        loadProgress(progressMap);
+        // Resend the advancements to the player
+        initClient();
+    }
+
+    private void init0() {
+        // Clear all the current progress
+        this.dirtyProgress.clear();
+        this.progress.clear();
+
+        // Load all the advancements into this progress tracker
+        final AdvancementRegistryModule registryModule = AdvancementRegistryModule.get();
+        for (Advancement advancement : registryModule.getAll()) {
+            final LanternAdvancementProgress progress = get(advancement);
+            // Update the visibility
+            progress.dirtyVisibility = true;
+            this.dirtyProgress.add(progress);
+        }
+    }
+
+    public void pulse() {
+        final MessagePlayOutAdvancements advancementsMessage = createUpdateMessage(false);
+        if (advancementsMessage != null) {
+            this.player.getConnection().send(advancementsMessage);
+        }
+    }
+
+    /**
      * Gets the {@link LanternAdvancementProgress} for the specified {@link Advancement}.
      *
      * @param advancement The advancement
@@ -81,8 +186,84 @@ public class LanternPlayerAdvancements {
                 this, (LanternAdvancement) advancement1));
     }
 
+    private void loadProgress(Map<String, Map<String, Instant>> progressMap) {
+        for (Advancement advancement : AdvancementRegistryModule.get().getAll()) {
+            final Map<String, Instant> entry = progressMap.get(advancement.getId());
+            if (entry != null) {
+                get(advancement).loadProgress(entry);
+            }
+        }
+    }
+
+    private Map<String, Map<String, Instant>> saveProgress() {
+        final Map<String, Map<String, Instant>> progressMap = new HashMap<>();
+        for (LanternAdvancementProgress entry : this.progress.values()) {
+            final Map<String, Instant> entryProgress = entry.saveProgress();
+            if (!entryProgress.isEmpty()) {
+                progressMap.put(entry.getAdvancement().getId(), entryProgress);
+            }
+        }
+        return progressMap;
+    }
+
+    private void loadProgressFromJson(JsonObject json) {
+        for (Advancement advancement : AdvancementRegistryModule.get().getAll()) {
+            final JsonObject entry = json.getAsJsonObject(advancement.getId());
+            if (entry != null) {
+                loadAdvancementProgressFromJson(get(advancement), entry);
+            }
+        }
+    }
+
+    private JsonObject saveProgressToJson() {
+        final JsonObject json = new JsonObject();
+        for (LanternAdvancementProgress entry : this.progress.values()) {
+            final JsonObject entryJson = saveAdvancementProgressToJson(entry);
+            if (entryJson != null) {
+                json.add(entry.getAdvancement().getId(), entryJson);
+            }
+        }
+        return json;
+    }
+
+    private void loadAdvancementProgressFromJson(LanternAdvancementProgress progress, JsonObject json) {
+        if (!json.has("criteria")) {
+            return;
+        }
+        final Map<String, Instant> progressMap = new HashMap<>();
+        // Convert all the string instants
+        for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("criteria").entrySet()) {
+            try {
+                progressMap.put(entry.getKey(), Instant.ofEpochMilli(DATE_TIME_FORMATTER.parse(entry.getValue().getAsString()).getTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                progressMap.put(entry.getKey(), Instant.now());
+            }
+        }
+        progress.loadProgress(progressMap);
+    }
+
     @Nullable
-    public MessagePlayOutAdvancements createUpdateMessage(boolean init) {
+    private JsonObject saveAdvancementProgressToJson(LanternAdvancementProgress progress) {
+        final Map<String, Instant> progressMap = progress.saveProgress();
+        final boolean done = progress.achieved();
+        if (progressMap.isEmpty() && !done) {
+            return null;
+        }
+        final JsonObject json = new JsonObject();
+        json.addProperty("done", done);
+        if (!progressMap.isEmpty()) {
+            final JsonObject progressJson = new JsonObject();
+            for (Map.Entry<String, Instant> entry : progressMap.entrySet()) {
+                progressJson.addProperty(entry.getKey(), DATE_TIME_FORMATTER.format(new Date(entry.getValue().toEpochMilli())));
+            }
+            json.add("criteria", progressJson);
+        }
+        return json;
+    }
+
+    @Nullable
+    private MessagePlayOutAdvancements createUpdateMessage(boolean init) {
         if (!init && this.dirtyProgress.isEmpty()) {
             return null;
         }
@@ -93,9 +274,7 @@ public class LanternPlayerAdvancements {
             removed = Collections.emptyList();
             for (LanternAdvancementProgress progress : this.dirtyProgress) {
                 // Update the visibility
-                update(progress, null, null, null);
-                // Reset the dirty state of the progress
-                progress.resetDirtyState();
+                update(progress, null, null, null, true);
             }
             for (LanternAdvancementProgress progress : this.progress.values()) {
                 if (progress.visible) {
@@ -110,7 +289,7 @@ public class LanternPlayerAdvancements {
         } else {
             removed = new ArrayList<>();
             for (LanternAdvancementProgress progress : this.dirtyProgress) {
-                update(progress, added, removed, progressMap);
+                update(progress, added, removed, progressMap, false);
             }
         }
         // Clear the dirty progress
@@ -121,16 +300,16 @@ public class LanternPlayerAdvancements {
     private void update(LanternAdvancementProgress progress,
             @Nullable List<MessagePlayOutAdvancements.AdvStruct> added,
             @Nullable List<String> removed,
-            @Nullable Map<String, Object2LongMap<String>> progressMap) {
+            @Nullable Map<String, Object2LongMap<String>> progressMap,
+            boolean force) {
         final Advancement advancement = progress.getAdvancement();
-        boolean updateProgress = true;
         boolean updateParentAndChildren = false;
-        if (progress.dirtyVisibility) {
+        if (progress.dirtyVisibility || force) {
             final boolean current = progress.visible;
             final boolean visible = shouldBeVisible(advancement);
+            progress.dirtyVisibility = false;
             if (current != visible) {
                 progress.visible = visible;
-                progress.dirtyVisibility = false;
                 if (visible && added != null) {
                     added.add(createAdvancement(advancement));
                     // The progress is now visible, send the complete data
@@ -139,7 +318,7 @@ public class LanternPlayerAdvancements {
                         progress.fillProgress(progressMap1);
                         progressMap.put(advancement.getId(), progressMap1);
                         // The progress is already updated, prevent from doing it again
-                        updateProgress = false;
+                        progress.dirtyProgress = false;
                     }
                 } else if (removed != null) {
                     removed.add(advancement.getId());
@@ -147,21 +326,19 @@ public class LanternPlayerAdvancements {
                 updateParentAndChildren = true;
             }
         }
-        if (progress.dirtyProgress) {
-            if (updateProgress && progressMap != null) {
-                final Object2LongMap<String> progressMap1 = new Object2LongOpenHashMap<>();
-                progress.fillDirtyProgress(progressMap1);
-                progressMap.put(advancement.getId(), progressMap1);
-            }
-            // Reset dirty state, even if nothing changed
-            progress.resetDirtyState();
+        if (progress.dirtyProgress && progressMap != null) {
+            final Object2LongMap<String> progressMap1 = new Object2LongOpenHashMap<>();
+            progress.fillDirtyProgress(progressMap1);
+            progressMap.put(advancement.getId(), progressMap1);
         }
+        // Reset dirty state, even if nothing changed
+        progress.resetDirtyState();
         if (updateParentAndChildren) {
             for (Advancement child : advancement.getChildren()) {
-                update(get(child), added, removed, progressMap);
+                update(get(child), added, removed, progressMap, true);
             }
             advancement.getParent().ifPresent(parent ->
-                    update(get(parent), added, removed, progressMap));
+                    update(get(parent), added, removed, progressMap, true));
         }
     }
 
@@ -172,6 +349,9 @@ public class LanternPlayerAdvancements {
      * @return Whether it should be visible
      */
     private boolean shouldBeVisible(Advancement advancement) {
+        if (!advancement.getTree().isPresent()) {
+            return false;
+        }
         if (shouldBeVisible0(advancement)) {
             return true;
         }
@@ -209,8 +389,8 @@ public class LanternPlayerAdvancements {
 
     static Tuple<List<AdvancementCriterion>, String[][]> createCriteria(AdvancementCriterion criterion) {
         final List<AdvancementCriterion> criteria = new ArrayList<>();
+        final List<String[]> names = new ArrayList<>();
         if (criterion instanceof AndCriterion) {
-            final List<String[]> names = new ArrayList<>();
             for (AdvancementCriterion child : ((AndCriterion) criterion).getCriteria()) {
                 if (child instanceof LanternScoreCriterion) {
                     for (String id : ((LanternScoreCriterion) child).getIds()) {
@@ -221,11 +401,18 @@ public class LanternPlayerAdvancements {
                 }
                 criteria.add(child);
             }
-            return new Tuple<>(criteria, names.toArray(new String[names.size()][]));
         } else {
+            if (criterion instanceof LanternScoreCriterion) {
+                for (String id : ((LanternScoreCriterion) criterion).getIds()) {
+                    names.add(new String[] { id });
+                }
+            } else {
+                names.add(new String[] { criterion.getName() });
+            }
             criteria.add(criterion);
-            return new Tuple<>(criteria, new String[][] {{ criterion.getName() }});
         }
+        System.out.println(Collections3.toString(names.stream().map(Arrays::toString).collect(Collectors.toList())));
+        return new Tuple<>(criteria, names.toArray(new String[names.size()][]));
     }
 
     private MessagePlayOutAdvancements.AdvStruct createAdvancement(Advancement advancement) {

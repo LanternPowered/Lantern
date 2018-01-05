@@ -40,8 +40,10 @@ import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
+@SuppressWarnings("ConstantConditions")
 public class LanternScoreCriterionProgress extends LanternCriterionProgressBase<LanternScoreCriterion> implements ScoreCriterionProgress {
 
     private int score = 0;
@@ -123,14 +125,14 @@ public class LanternScoreCriterionProgress extends LanternCriterionProgressBase<
         this.dirtyIndex = this.score;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void fillDirtyProgress(Object2LongMap<String> progress) {
         if (this.dirtyIndex != this.score) {
             if (this.dirtyIndex < this.score) {
+                long now = -1L;
                 for (int i = this.dirtyIndex; i < this.score; i++) {
-                    progress.put(getCriterion().getIds()[i],
-                            i == getGoal() - 1 ? this.achievingTime.toEpochMilli() : System.currentTimeMillis());
+                    progress.put(getCriterion().getIds()[i], this.achievingTime != null ? this.achievingTime.toEpochMilli() :
+                            now == -1L ? (now = System.currentTimeMillis()) : now);
                 }
             } else {
                 for (int i = Math.max(0, this.score - 1); i < this.dirtyIndex; i++) {
@@ -140,12 +142,47 @@ public class LanternScoreCriterionProgress extends LanternCriterionProgressBase<
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void fillProgress(Object2LongMap<String> progress) {
+        long now = -1L;
         for (int i = 0; i < this.score; i++) {
-            progress.put(getCriterion().getIds()[i],
-                    i == getGoal() - 1 ? this.achievingTime.toEpochMilli() : System.currentTimeMillis());
+            progress.put(getCriterion().getIds()[i], this.achievingTime != null ? this.achievingTime.toEpochMilli() :
+                    now == -1L ? (now = System.currentTimeMillis()) : now);
+        }
+    }
+
+    @Override
+    public void saveProgress(Map<String, Instant> progress) {
+        Instant now = null;
+        for (int i = 0; i < this.score; i++) {
+            progress.put(getCriterion().getIds()[i], this.achievingTime != null ? this.achievingTime :
+                    now == null ? (now = Instant.now()) : now);
+        }
+        if (this.achievingTime != null) {
+            progress.put(getCriterion().getName(), this.achievingTime);
+        }
+    }
+
+    @Override
+    public void loadProgress(Map<String, Instant> progress) {
+        this.achievingTime = progress.get(getCriterion().getName());
+        if (this.achievingTime == null) {
+            this.score = 0;
+            Instant lastTime = null;
+            for (int i = 0; i < getGoal(); i++) {
+                final Instant time = progress.get(getCriterion().getIds()[i]);
+                if (time != null) {
+                    this.score++;
+                    if (lastTime == null || time.isAfter(lastTime)) {
+                        lastTime = time;
+                    }
+                }
+            }
+            if (this.score == getGoal()) {
+                this.achievingTime = lastTime;
+            }
+        } else {
+            this.score = getGoal();
         }
     }
 }

@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
+import org.lanternpowered.server.advancement.criteria.EmptyCriterion;
 import org.lanternpowered.server.advancement.criteria.LanternAndCriterion;
 import org.lanternpowered.server.advancement.criteria.LanternCriterion;
 import org.lanternpowered.server.advancement.criteria.LanternOrCriterion;
@@ -82,11 +83,27 @@ public class LanternAdvancementProgress implements AdvancementProgress {
                 progress = new LanternScoreCriterionProgress((LanternScoreCriterion) criterion, this);
             } else if (criterion instanceof LanternCriterion) {
                 progress = new LanternCriterionProgress((LanternCriterion) criterion, this);
+            } else if (criterion == EmptyCriterion.INSTANCE) {
+                continue;
             } else {
                 throw new IllegalStateException("Unsupported criterion: " + criterion);
             }
             this.progress.put(criterion, progress);
         }
+    }
+
+    void loadProgress(Map<String, Instant> progressMap) {
+        for (AbstractCriterionProgress progress : this.progress.values()) {
+            progress.loadProgress(progressMap);
+        }
+    }
+
+    Map<String, Instant> saveProgress() {
+        final Map<String, Instant> progressMap = new HashMap<>();
+        for (Map.Entry<AdvancementCriterion, AbstractCriterionProgress> entry : this.progress.entrySet()) {
+            entry.getValue().saveProgress(progressMap);
+        }
+        return progressMap;
     }
 
     @Override

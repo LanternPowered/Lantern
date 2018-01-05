@@ -135,6 +135,7 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.ban.Ban;
@@ -171,7 +172,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     // The (client) locale of the player
-    private Locale locale = Locale.ENGLISH;
+    private Locale locale = Locale.US;
 
     // The (client) render distance of the player
     // When specified -1, the render distance will match the server one
@@ -263,6 +264,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         .build(Lantern.getMinecraftPlugin()));
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
+        // Load the advancements
+        this.advancementsProgress.init();
         resetIdleTimeoutCounter();
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         // Attach this player to the proxy user and load player data
@@ -373,7 +376,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     }
                 }
                 this.tabList.init(tabListEntries);
-                this.session.send(this.advancementsProgress.createUpdateMessage(true));
+                this.advancementsProgress.initClient();
                 this.session.send(new MessagePlayOutSelectAdvancementTree(
                         get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getId).orElse(null)));
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
@@ -423,6 +426,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 world.addPlayer(this);
             }
         } else {
+            // Load the advancements
+            this.advancementsProgress.save();
             if (this.worldBorder != null) {
                 this.worldBorder.removePlayer(this);
             }
@@ -431,6 +436,29 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             this.tabList.clear();
             // Remove this player from the global tab list
             GlobalTabList.getInstance().get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
+        }
+    }
+
+    @Override
+    public Locale getLocale() {
+        return this.locale;
+    }
+
+    /**
+     * Sets the {@link Locale} of this {@link LanternPlayer}. Will
+     * update translatable components on the client.
+     *
+     * @param locale The locale
+     */
+    public void setLocale(Locale locale) {
+        checkNotNull(locale, "locale");
+        if (!locale.equals(this.locale)) {
+            this.locale = locale;
+            // World may not be null
+            if (getWorld() != null) {
+                // Update the advancements
+                this.advancementsProgress.initClient();
+            }
         }
     }
 
@@ -642,11 +670,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         }
 
         this.cooldownTracker.process();
-
-        final MessagePlayOutAdvancements advancementsMessage = this.advancementsProgress.createUpdateMessage(false);
-        if (advancementsMessage != null) {
-            this.session.send(advancementsMessage);
-        }
+        this.advancementsProgress.pulse();
     }
 
     /**
@@ -885,15 +909,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public void resetBlockChange(int x, int y, int z) {
         this.resetBlockChange(new Vector3i(x, y, z));
-    }
-
-    @Override
-    public Locale getLocale() {
-        return this.locale;
-    }
-
-    public void setLocale(Locale locale) {
-        this.locale = checkNotNull(locale, "locale");
     }
 
     @Override

@@ -34,6 +34,7 @@ import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 
+@SuppressWarnings({"NullableProblems", "ConstantConditions"})
 public final class LanternDisplayInfoBuilder implements DisplayInfo.Builder {
 
     AdvancementType advancementType;

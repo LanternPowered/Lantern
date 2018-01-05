@@ -31,6 +31,7 @@ import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
 import org.spongepowered.api.advancement.criteria.CriterionProgress;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 public abstract class AbstractCriterionProgress<T extends AbstractCriterion> implements CriterionProgress {
@@ -63,6 +64,12 @@ public abstract class AbstractCriterionProgress<T extends AbstractCriterion> imp
     }
 
     abstract Optional<Instant> revoke(Runnable invalidator);
+
+    public void saveProgress(Map<String, Instant> progress) {
+    }
+
+    public void loadProgress(Map<String, Instant> progress) {
+    }
 
     public void resetDirtyState() {
     }

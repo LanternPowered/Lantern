@@ -36,6 +36,7 @@ import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -94,12 +95,26 @@ public class LanternCriterionProgress extends LanternCriterionProgressBase<Abstr
     @Override
     public void fillDirtyProgress(Object2LongMap<String> progress) {
         if (!Objects.equals(this.lastAchievingTime, this.achievingTime)) {
-            fillProgress(progress);
+            progress.put(getCriterion().getName(), this.achievingTime == null ? INVALID_TIME : this.achievingTime.toEpochMilli());
         }
     }
 
     @Override
     public void fillProgress(Object2LongMap<String> progress) {
-        progress.put(getCriterion().getName(), this.achievingTime == null ? INVALID_TIME : this.achievingTime.toEpochMilli());
+        if (this.achievingTime != null) {
+            progress.put(getCriterion().getName(), this.achievingTime.toEpochMilli());
+        }
+    }
+
+    @Override
+    public void saveProgress(Map<String, Instant> progress) {
+        if (this.achievingTime != null) {
+            progress.put(getCriterion().getName(), this.achievingTime);
+        }
+    }
+
+    @Override
+    public void loadProgress(Map<String, Instant> progress) {
+        this.achievingTime = progress.get(getCriterion().getName());
     }
 }

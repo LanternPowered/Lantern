@@ -27,7 +27,9 @@ package org.lanternpowered.server.game.registry.type.advancement;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
+@RegistrationDependency(AdvancementRegistryModule.class)
 public final class AdvancementTreeRegistryModule extends AdditionalPluginCatalogRegistryModule<AdvancementTree> {
 
     private static final AdvancementTreeRegistryModule instance = new AdvancementTreeRegistryModule();

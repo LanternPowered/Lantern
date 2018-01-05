@@ -26,6 +26,7 @@
 package org.lanternpowered.server.advancement.criteria.trigger;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.event.CauseStack;
@@ -33,7 +34,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTriggerConfiguration;
 import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.advancement.CriterionEvent;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.function.Consumer;
@@ -47,10 +50,12 @@ public class LanternTrigger<C extends FilteredTriggerConfiguration> extends Plug
     private final Class<C> configType;
     private final Function<JsonObject, C> configConstructor;
     @Nullable private final Consumer<CriterionEvent.Trigger<C>> eventHandler;
+    private final TypeToken<C> configTypeToken;
 
     LanternTrigger(LanternTriggerBuilder<C> builder) {
         super(CauseStack.current().first(PluginContainer.class).get().getId(), builder.id,
                 builder.name == null ? builder.id : builder.name);
+        this.configTypeToken = TypeToken.of(builder.configType);
         this.configType = builder.configType;
         this.configConstructor = builder.constructor;
         this.eventHandler = builder.eventHandler;
@@ -73,6 +78,9 @@ public class LanternTrigger<C extends FilteredTriggerConfiguration> extends Plug
 
     @Override
     public void trigger(Player player) {
+        final Cause cause = CauseStack.current().getCurrentCause();
+
+        // SpongeEventFactory.createCriterionEventTrigger()
     }
 
     public Function<JsonObject, C> getConfigConstructor() {

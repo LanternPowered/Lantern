@@ -23,33 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
+package org.lanternpowered.server.advancement.criteria.progress;
 
-public abstract class CriterionProgress extends Achievable {
+import org.lanternpowered.server.advancement.LanternAdvancementProgress;
+import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
 
-    private final AdvancementProgress progress;
-    private final AdvancementCriterion criterion;
+import java.time.Instant;
+import java.util.Optional;
 
-    CriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
-        this.progress = progress;
-        this.criterion = criterion;
+import javax.annotation.Nullable;
+
+abstract class LanternCriterionProgressBase<T extends AbstractCriterion> extends AbstractCriterionProgress<T> {
+
+    @Nullable Instant achievingTime;
+
+    LanternCriterionProgressBase(T criterion, LanternAdvancementProgress progress) {
+        super(criterion, progress);
     }
 
-    /**
-     * Gets the {@link AdvancementProgress}.
-     *
-     * @return The advancement progress
-     */
-    public AdvancementProgress getProgress() {
-        return this.progress;
+    @Override
+    public boolean achieved() {
+        return this.achievingTime != null;
     }
 
-    /**
-     * Gets the {@link AdvancementCriterion}.
-     *
-     * @return The criterion
-     */
-    public AdvancementCriterion getCriterion() {
-        return this.criterion;
+    @Override
+    public Optional<Instant> get() {
+        return Optional.ofNullable(this.achievingTime);
     }
 }

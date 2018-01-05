@@ -23,51 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
-
-import it.unimi.dsi.fastutil.objects.Object2LongMap;
-
-import java.util.OptionalLong;
-
-public abstract class Achievable {
-
-    static final long INVALID_TIME = -1L;
-
-    /**
-     * Gets whether this {@link Achievable} is achieved.
-     *
-     * @return Is achieved
-     */
-    public boolean achieved() {
-        return get().isPresent();
-    }
-
-    /**
-     * Gets the time that the {@link Achievable} was achieved if present.
-     *
-     * @return The achieving time
-     */
-    public abstract OptionalLong get();
-
-    /**
-     * Achieves this {@link Achievable}, if achieved before
-     * that time will be returned.
-     *
-     * @return The achieving time
-     */
-    public abstract long set();
-
-    /**
-     * Revokes the {@link Achievable} status. The time that the {@link Achievable}
-     * was achieved before will be returned if present.
-     *
-     * @return The previous achieving time
-     */
-    public abstract OptionalLong revoke();
-
-    abstract void resetDirtyState();
-
-    abstract void fillDirtyProgress(Object2LongMap<String> progress);
-
-    abstract void fillProgress(Object2LongMap<String> progress);
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.advancement.layout;

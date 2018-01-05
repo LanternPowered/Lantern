@@ -32,12 +32,12 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.advancement.old.AdvancementTree;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.inventory.InventorySnapshot;
+import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;

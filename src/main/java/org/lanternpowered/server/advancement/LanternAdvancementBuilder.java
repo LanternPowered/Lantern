@@ -23,56 +23,75 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.criteria;
+package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
-import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings({"unchecked", "NullableProblems", "ConstantConditions"})
-public abstract class AbstractCriterionBuilder<T extends AdvancementCriterion, B extends AdvancementCriterion.BaseBuilder<T, B>>
-        implements AdvancementCriterion.BaseBuilder<T, B> {
+public class LanternAdvancementBuilder implements Advancement.Builder {
 
-    @Nullable FilteredTrigger trigger;
-    String name;
+    @Nullable Advancement parent;
+    AdvancementCriterion criterion;
+    @Nullable DisplayInfo displayInfo;
+    String id;
+    @Nullable String name;
 
-    @Override
-    public B trigger(FilteredTrigger<?> trigger) {
-        checkNotNull(trigger, "trigger");
-        this.trigger = trigger;
-        return (B) this;
+    public LanternAdvancementBuilder() {
+        reset();
     }
 
     @Override
-    public B name(String name) {
+    public Advancement.Builder parent(@Nullable Advancement parent) {
+        this.parent = parent;
+        return this;
+    }
+
+    @Override
+    public Advancement.Builder criterion(AdvancementCriterion criterion) {
+        checkNotNull(criterion, "criterion");
+        this.criterion = criterion;
+        return this;
+    }
+
+    @Override
+    public Advancement.Builder displayInfo(@Nullable DisplayInfo displayInfo) {
+        this.displayInfo = displayInfo;
+        return this;
+    }
+
+    @Override
+    public Advancement.Builder id(String id) {
+        checkNotNull(id, "id");
+        this.id = id;
+        return this;
+    }
+
+    @Override
+    public Advancement.Builder name(String name) {
         checkNotNull(name, "name");
         this.name = name;
-        return (B) this;
+        return this;
     }
 
     @Override
-    public T build() {
-        checkState(this.name != null, "The name must be set");
-        return build0();
-    }
-
-    abstract T build0();
-
-    @Override
-    public B from(T value) {
-        this.trigger = value.getTrigger().orElse(null);
-        this.name = value.getName();
-        return (B) this;
+    public Advancement build() {
+        checkState(this.id != null, "The id must be set");
+        return new LanternAdvancement(this);
     }
 
     @Override
-    public B reset() {
-        this.trigger = null;
+    public Advancement.Builder reset() {
+        this.criterion = AdvancementCriterion.EMPTY;
+        this.displayInfo = null;
+        this.parent = null;
+        this.id = null;
         this.name = null;
-        return (B) this;
+        return this;
     }
 }

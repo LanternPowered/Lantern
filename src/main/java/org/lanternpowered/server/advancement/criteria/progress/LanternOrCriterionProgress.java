@@ -23,29 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
+package org.lanternpowered.server.advancement.criteria.progress;
 
-import java.util.OptionalLong;
+import org.lanternpowered.server.advancement.LanternAdvancementProgress;
+import org.lanternpowered.server.advancement.criteria.LanternOrCriterion;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 
-final class AndCriterionProgress extends MultiCriterionProgress {
+import java.time.Instant;
+import java.util.Optional;
 
-    AndCriterionProgress(AdvancementProgress progress, AdvancementCriterion.And criterion) {
-        super(progress, criterion);
+public final class LanternOrCriterionProgress extends AbstractOperatorCriterionProgress<LanternOrCriterion> {
+
+    public LanternOrCriterionProgress(LanternOrCriterion criterion, LanternAdvancementProgress progress) {
+        super(criterion, progress);
     }
 
     @Override
-    public AdvancementCriterion.And getCriterion() {
-        return (AdvancementCriterion.And) super.getCriterion();
-    }
-
-    @Override
-    public OptionalLong get() {
-        OptionalLong time = OptionalLong.empty();
+    public boolean achieved() {
         for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
-            final OptionalLong time1 = getProgress().get(criterion).get().get();
-            if (!time1.isPresent()) {
-                return OptionalLong.empty();
-            } else if (!time.isPresent() || time1.getAsLong() > time.getAsLong()) {
+            final Optional<Instant> time = this.progress.get(criterion).get().get();
+            if (time.isPresent()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Optional<Instant> get0() {
+        Optional<Instant> time = Optional.empty();
+        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
+            final Optional<Instant> time1 = this.progress.get(criterion).get().get();
+            if (time1.isPresent() && (!time.isPresent() || time1.get().isAfter(time.get()))) {
                 time = time1;
             }
         }

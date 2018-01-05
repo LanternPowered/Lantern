@@ -33,10 +33,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.lanternpowered.server.advancement.old.AdvancementTree;
-import org.lanternpowered.server.advancement.old.AdvancementTrees;
-import org.lanternpowered.server.advancement.old.AdvancementsProgress;
-import org.lanternpowered.server.advancement.old.TestAdvancementTree;
+import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.ValueCollection;
@@ -69,6 +66,7 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -95,6 +93,7 @@ import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
+import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -242,7 +241,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     // border of the world the player is located in
     @Nullable private LanternWorldBorder worldBorder;
 
-    private final AdvancementsProgress advancementsProgress = new AdvancementsProgress();
+    private final LanternPlayerAdvancements advancementsProgress = new LanternPlayerAdvancements(this);
 
     // The game profile of this player
     private final GameProfile gameProfile;
@@ -312,7 +311,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         ((ElementKeyRegistration<?, Optional<AdvancementTree>>) c.get(LanternKeys.OPEN_ADVANCEMENT_TREE).get())
                 .addListener((oldElement, newElement) -> {
                     if (getWorld() != null) {
-                        this.session.send(new MessagePlayOutSelectAdvancementTree(newElement.map(AdvancementTree::getInternalId).orElse(null)));
+                        this.session.send(new MessagePlayOutSelectAdvancementTree(newElement.map(AdvancementTree::getId).orElse(null)));
                     }
                 });
     }
@@ -374,13 +373,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     }
                 }
                 this.tabList.init(tabListEntries);
-                TestAdvancementTree.A.addRawTracker(this);
-                TestAdvancementTree.B.addRawTracker(this);
-                AdvancementTrees.INSTANCE.initialize(this);
-                getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
-                        .tryGet(TestAdvancementTree.DIG_DIRT_CRITERION).set(4);
+                this.session.send(this.advancementsProgress.createUpdateMessage(true));
                 this.session.send(new MessagePlayOutSelectAdvancementTree(
-                        get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
+                        get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getId).orElse(null)));
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
                 // TODO: the readable ids still has to be made
                 final int[] recipes = new int[435];
@@ -431,7 +426,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             if (this.worldBorder != null) {
                 this.worldBorder.removePlayer(this);
             }
-            AdvancementTrees.INSTANCE.removeTracker(this);
             this.session.getServer().removePlayer(this);
             this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));
             this.tabList.clear();
@@ -648,6 +642,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         }
 
         this.cooldownTracker.process();
+
+        final MessagePlayOutAdvancements advancementsMessage = this.advancementsProgress.createUpdateMessage(false);
+        if (advancementsMessage != null) {
+            this.session.send(advancementsMessage);
+        }
     }
 
     /**
@@ -1104,11 +1103,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     @Override
     public AdvancementProgress getProgress(Advancement advancement) {
-        return null; // TODO
+        return this.advancementsProgress.get(advancement);
     }
 
     @Override
-    public Collection<org.spongepowered.api.advancement.AdvancementTree> getUnlockedAdvancementTrees() {
+    public Collection<AdvancementTree> getUnlockedAdvancementTrees() {
         return null; // TODO
     }
 
@@ -1141,7 +1140,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         offer(LanternKeys.IS_ELYTRA_FLYING, true);
     }
 
-    public AdvancementsProgress getAdvancementsProgress() {
+    public LanternPlayerAdvancements getAdvancementsProgress() {
         return this.advancementsProgress;
     }
 }

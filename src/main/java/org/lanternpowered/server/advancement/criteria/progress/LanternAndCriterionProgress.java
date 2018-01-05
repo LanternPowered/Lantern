@@ -23,21 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
+package org.lanternpowered.server.advancement.criteria.progress;
 
-import org.lanternpowered.server.advancement.LanternAdvancementType;
+import org.lanternpowered.server.advancement.LanternAdvancementProgress;
+import org.lanternpowered.server.advancement.criteria.LanternAndCriterion;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 
-/**
- * An enumeration of all the available {@link LanternAdvancementType}s in minecraft.
- */
-public final class FrameTypes {
+import java.time.Instant;
+import java.util.Optional;
 
-    public static final LanternAdvancementType CHALLENGE = new LanternAdvancementType("minecraft", "challenge", 1, textFormat);
+public class LanternAndCriterionProgress extends AbstractOperatorCriterionProgress<LanternAndCriterion> {
 
-    public static final LanternAdvancementType GOAL = new LanternAdvancementType("minecraft", "goal", 2, textFormat);
+    public LanternAndCriterionProgress(LanternAndCriterion criterion, LanternAdvancementProgress progress) {
+        super(criterion, progress);
+    }
 
-    public static final LanternAdvancementType TASK = new LanternAdvancementType("minecraft", "task", 0, textFormat);
-
-    private FrameTypes() {
+    @Override
+    public Optional<Instant> get0() {
+        Optional<Instant> time = Optional.empty();
+        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
+            final Optional<Instant> time1 = this.progress.get(criterion).get().get();
+            if (!time1.isPresent()) {
+                return Optional.empty();
+            } else if (!time.isPresent() || time1.get().isAfter(time.get())) {
+                time = time1;
+            }
+        }
+        return time;
     }
 }

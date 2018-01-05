@@ -39,6 +39,12 @@ import org.lanternpowered.api.script.function.condition.ConditionType;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
 import org.lanternpowered.api.script.function.value.FloatValueProviderType;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
+import org.lanternpowered.server.advancement.LanternAdvancementBuilder;
+import org.lanternpowered.server.advancement.LanternAdvancementTreeBuilder;
+import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder;
+import org.lanternpowered.server.advancement.criteria.LanternScoreCriterionBuilder;
+import org.lanternpowered.server.advancement.criteria.trigger.LanternFilteredTriggerBuilder;
+import org.lanternpowered.server.advancement.criteria.trigger.LanternTriggerBuilder;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
@@ -89,7 +95,9 @@ import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.factory.TimingsFactoryRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
@@ -250,6 +258,13 @@ import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.advancement.AdvancementType;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
+import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -513,6 +528,13 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EventContextKey.Builder.class, LanternEventContextKeyBuilder::new)
                 .registerBuilderSupplier(Enchantment.Builder.class, LanternEnchantmentBuilder::new)
                 .registerBuilderSupplier(Key.Builder.class, LanternKeyBuilder::new)
+                // Advancements
+                .registerBuilderSupplier(Advancement.Builder.class, LanternAdvancementBuilder::new)
+                .registerBuilderSupplier(AdvancementTree.Builder.class, LanternAdvancementTreeBuilder::new)
+                .registerBuilderSupplier(AdvancementCriterion.Builder.class, LanternCriterionBuilder::new)
+                .registerBuilderSupplier(ScoreAdvancementCriterion.Builder.class, LanternScoreCriterionBuilder::new)
+                .registerBuilderSupplier(Trigger.Builder.class, LanternTriggerBuilder::new)
+                .registerBuilderSupplier(FilteredTrigger.Builder.class, LanternFilteredTriggerBuilder::new)
                 // Recipes
                 .registerBuilderSupplier(ShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
                 .registerBuilderSupplier(IShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
@@ -647,7 +669,9 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
-                .registerModule(new AdvancementTreeRegistryModule())
+                .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
+                .registerModule(Advancement.class, AdvancementRegistryModule.get())
+                .registerModule(AdvancementType.class, new AdvancementTypeRegistryModule())
                 .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())

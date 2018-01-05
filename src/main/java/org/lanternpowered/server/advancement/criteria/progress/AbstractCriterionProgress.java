@@ -23,56 +23,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
+package org.lanternpowered.server.advancement.criteria.progress;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import org.lanternpowered.server.advancement.LanternAdvancementProgress;
+import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
+import org.spongepowered.api.advancement.criteria.CriterionProgress;
 
-import java.util.OptionalLong;
+import java.time.Instant;
+import java.util.Optional;
 
-abstract class MultiCriterionProgress extends CriterionProgress {
+public abstract class AbstractCriterionProgress<T extends AbstractCriterion> implements CriterionProgress {
 
-    MultiCriterionProgress(AdvancementProgress progress, AdvancementCriterion.Multi criterion) {
-        super(progress, criterion);
+    public static final int INVALID_TIME = -1;
+
+    final T criterion;
+    final LanternAdvancementProgress progress;
+
+    AbstractCriterionProgress(T criterion, LanternAdvancementProgress progress) {
+        this.criterion = criterion;
+        this.progress = progress;
     }
 
     @Override
-    public AdvancementCriterion.Multi getCriterion() {
-        return (AdvancementCriterion.Multi) super.getCriterion();
+    public T getCriterion() {
+        return this.criterion;
     }
 
     @Override
-    public long set() {
-        long time = -1L;
-        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
-            final long time1 = getProgress().get(criterion).get().set();
-            if (time1 > time) {
-                time = time1;
-            }
-        }
-        return time;
+    public Instant grant() { // TODO: Return optional
+        return grant(this.progress::invalidateAchievedState).orElse(Instant.MIN);
     }
 
-    @Override
-    public OptionalLong revoke() {
-        OptionalLong time = OptionalLong.empty();
-        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
-            final OptionalLong time1 = getProgress().get(criterion).get().revoke();
-            if (time1.isPresent() && (!time.isPresent() || time1.getAsLong() > time.getAsLong())) {
-                time = time1;
-            }
-        }
-        return time;
-    }
+    abstract Optional<Instant> grant(Runnable invalidator);
 
     @Override
-    void resetDirtyState() {
+    public Optional<Instant> revoke() {
+        return revoke(this.progress::invalidateAchievedState);
     }
 
-    @Override
-    void fillDirtyProgress(Object2LongMap<String> progress) {
+    abstract Optional<Instant> revoke(Runnable invalidator);
+
+    public void resetDirtyState() {
     }
 
-    @Override
-    void fillProgress(Object2LongMap<String> progress) {
+    public void fillDirtyProgress(Object2LongMap<String> progress) {
+    }
+
+    public void fillProgress(Object2LongMap<String> progress) {
+    }
+
+    public void invalidateAchievedState() {
     }
 }

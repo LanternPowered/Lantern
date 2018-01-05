@@ -23,37 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
+package org.lanternpowered.server.game.registry.type.advancement;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.spongepowered.api.advancement.Advancement;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class AdvancementRegistryModule extends AdditionalPluginCatalogRegistryModule<Advancement> {
 
-import javax.annotation.Nullable;
-
-public final class AdvancementsProgress {
-
-    private final Map<Advancement, AdvancementProgress> progresses = new HashMap<>();
+    private static final AdvancementRegistryModule instance = new AdvancementRegistryModule();
 
     /**
-     * Gets the {@link AdvancementProgress} for the specified {@link Advancement}.
+     * Gets the {@link AdvancementRegistryModule}.
      *
-     * @param advancement The advancement
-     * @return The advancement progress
+     * @return The advancement tree registry module
      */
-    public AdvancementProgress get(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.computeIfAbsent(advancement, AdvancementProgress::new);
+    public static AdvancementRegistryModule get() {
+        return instance;
     }
 
-    @Nullable
-    AdvancementProgress getOrNull(Advancement advancement) {
-        checkNotNull(advancement, "advancement");
-        return this.progresses.get(advancement);
-    }
-
-    void resetDirtyState() {
-        this.progresses.values().forEach(AdvancementProgress::resetDirtyState);
+    private AdvancementRegistryModule() {
     }
 }

@@ -23,42 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
-
-import java.util.OptionalLong;
-
-public abstract class AbstractCriterionProgress extends CriterionProgress {
-
-    long achievingTime = INVALID_TIME;
-
-    AbstractCriterionProgress(AdvancementProgress progress, AdvancementCriterion criterion) {
-        super(progress, criterion);
-    }
-
-    @Override
-    public OptionalLong get() {
-        return this.achievingTime == INVALID_TIME ? OptionalLong.empty() : OptionalLong.of(this.achievingTime);
-    }
-
-    @Override
-    public long set() {
-        if (this.achievingTime == INVALID_TIME) {
-            this.achievingTime = System.currentTimeMillis();
-            getProgress().updateAchievedState(this.achievingTime);
-        }
-        return this.achievingTime;
-    }
-
-    @Override
-    public OptionalLong revoke() {
-        if (this.achievingTime == INVALID_TIME) {
-            return OptionalLong.empty();
-        }
-        try {
-            return OptionalLong.of(this.achievingTime);
-        } finally {
-            this.achievingTime = INVALID_TIME;
-            getProgress().updateAchievedState(INVALID_TIME);
-        }
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.advancement.criteria.progress;

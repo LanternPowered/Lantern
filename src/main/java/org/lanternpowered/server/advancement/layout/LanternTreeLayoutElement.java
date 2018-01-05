@@ -23,41 +23,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.advancement.old;
+package org.lanternpowered.server.advancement.layout;
 
-import java.util.OptionalLong;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-final class OrCriterionProgress extends MultiCriterionProgress {
+import com.flowpowered.math.vector.Vector2d;
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.TreeLayoutElement;
 
-    OrCriterionProgress(AdvancementProgress progress, AdvancementCriterion.Or criterion) {
-        super(progress, criterion);
+public class LanternTreeLayoutElement implements TreeLayoutElement {
+
+    private final Advancement advancement;
+    private Vector2d position = Vector2d.ZERO;
+
+    public LanternTreeLayoutElement(Advancement advancement) {
+        this.advancement = advancement;
     }
 
     @Override
-    public AdvancementCriterion.Or getCriterion() {
-        return (AdvancementCriterion.Or) super.getCriterion();
+    public Advancement getAdvancement() {
+        return this.advancement;
     }
 
     @Override
-    public boolean achieved() {
-        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
-            final OptionalLong time1 = getProgress().get(criterion).get().get();
-            if (time1.isPresent()) {
-                return true;
-            }
-        }
-        return false;
+    public Vector2d getPosition() {
+        return this.position;
     }
 
     @Override
-    public OptionalLong get() {
-        OptionalLong time = OptionalLong.empty();
-        for (AdvancementCriterion criterion : getCriterion().getCriteria()) {
-            final OptionalLong time1 = getProgress().get(criterion).get().get();
-            if (time1.isPresent() && (!time.isPresent() || time1.getAsLong() > time.getAsLong())) {
-                time = time1;
-            }
-        }
-        return time;
+    public void setPosition(double x, double y) {
+        this.position = new Vector2d(x, y);
+    }
+
+    @Override
+    public void setPosition(Vector2d position) {
+        checkNotNull(position, "position");
+        this.position = position;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("advancement", this.advancement.getId())
+                .add("position", this.position)
+                .toString();
     }
 }

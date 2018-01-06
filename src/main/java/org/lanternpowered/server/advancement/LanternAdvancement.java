@@ -25,16 +25,23 @@
  */
 package org.lanternpowered.server.advancement;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.advancement.layout.LanternTreeLayoutElement;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.TreeLayoutElement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.util.Tuple;
 
 import java.util.ArrayList;
@@ -55,6 +62,9 @@ public class LanternAdvancement extends PluginCatalogType.Base implements Advanc
     private final List<Advancement> children = new ArrayList<>();
     private final List<Advancement> unmodifiableChildren = Collections.unmodifiableList(this.children);
 
+    private final Text text;
+    private final List<Text> toast;
+
     // Criteria data that will be used to sync criteria with the client
     final Tuple<List<AdvancementCriterion>, String[][]> clientCriteria;
 
@@ -71,6 +81,31 @@ public class LanternAdvancement extends PluginCatalogType.Base implements Advanc
         }
         // Cache the client criteria
         this.clientCriteria = LanternPlayerAdvancements.createCriteria(builder.criterion);
+        final ImmutableList.Builder<Text> toastBuilder = ImmutableList.builder();
+        if (builder.displayInfo == null) {
+            this.text = Text.of(getName());
+            toastBuilder.add(Text.of("Achieved: ", this.text));
+        } else {
+            final AdvancementType type = builder.displayInfo.getType();
+            final TextFormat format = type.getTextFormat();
+            toastBuilder.add(Text.builder(tr("advancements.toast." + type.getName().toLowerCase()))
+                    .format(format).build());
+            final Text title = builder.displayInfo.getTitle();
+            toastBuilder.add(title);
+            final Text description = builder.displayInfo.getDescription();
+            final Text.Builder hoverBuilder = Text.builder()
+                    .append(title.toBuilder().format(format).build());
+            if (!description.isEmpty()) {
+                hoverBuilder.append(Text.NEW_LINE, description);
+            }
+            this.text = Text.builder()
+                    .append(Text.of("["))
+                    .append(Text.of(title.toBuilder().onHover(TextActions.showText(hoverBuilder.build()))))
+                    .append(Text.of("]"))
+                    .format(format)
+                    .build();
+        }
+        this.toast = toastBuilder.build();
     }
 
     void setTree(AdvancementTree advancementTree) {
@@ -104,16 +139,27 @@ public class LanternAdvancement extends PluginCatalogType.Base implements Advanc
 
     @Override
     public List<Text> toToastText() {
-        return null;
+        return this.toast;
     }
 
     @Override
     public Text toText() {
-        return null;
+        return this.text;
     }
 
     @Nullable
     public TreeLayoutElement getLayoutElement() {
         return this.layoutElement;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("tree", this.advancementTree == null ? null : this.advancementTree.getId())
+                .add("parent", this.parent == null ? null : this.parent.getId())
+                .add("displayInfo", this.displayInfo)
+                .add("layoutElement", this.layoutElement)
+                .add("criterion", this.criterion)
+                .omitNullValues();
     }
 }

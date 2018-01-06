@@ -27,33 +27,24 @@ package org.lanternpowered.server.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2CharMap;
 import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.text.format.FormattingCodeHolder;
 import org.spongepowered.api.text.LiteralText;
-import org.spongepowered.api.text.ScoreText;
-import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextParseException;
-import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -142,7 +133,9 @@ public class FormattingCodeTextSerializer extends PluginCatalogType.Base
 
     @Override
     public String serialize(Text text, Locale locale) {
-        return to(checkNotNull(text, "text"), checkNotNull(locale, "locale"), new StringBuilder(), this.formattingCode).toString();
+        checkNotNull(text, "text");
+        checkNotNull(locale, "locale");
+        return LegacyTexts.toLegacy(locale, text, this.formattingCode);
     }
 
     @Override
@@ -213,134 +206,6 @@ public class FormattingCodeTextSerializer extends PluginCatalogType.Base
                 builder.color((TextColor) format);
             }
             return true;
-        }
-    }
-
-    static StringBuilder to(Text text, Locale locale, StringBuilder builder, @Nullable Character colorCode) {
-        return to(text, locale, builder, colorCode, null);
-    }
-
-    private static StringBuilder to(Text text, Locale locale, StringBuilder builder, @Nullable Character colorCode,
-            @Nullable ResolvedChatStyle current) {
-        ResolvedChatStyle style = null;
-
-        if (colorCode != null) {
-            style = resolve(current, text.getFormat());
-
-            if (current == null || (current.color != style.color) || (current.bold && !style.bold) ||
-                    (current.italic && !style.italic) || (current.underlined && !style.underlined) ||
-                    (current.strikethrough && !style.strikethrough) || (current.obfuscated && !style.obfuscated)) {
-                if (style.color != null) {
-                    apply(builder, colorCode, ((FormattingCodeHolder) style.color).getCode());
-                } else if (current != null) {
-                    apply(builder, colorCode, TextConstants.RESET);
-                }
-
-                apply(builder, colorCode, TextConstants.BOLD, style.bold);
-                apply(builder, colorCode, TextConstants.ITALIC, style.italic);
-                apply(builder, colorCode, TextConstants.UNDERLINE, style.underlined);
-                apply(builder, colorCode, TextConstants.STRIKETHROUGH, style.strikethrough);
-                apply(builder, colorCode, TextConstants.OBFUSCATED, style.obfuscated);
-            } else {
-                apply(builder, colorCode, TextConstants.BOLD, current.bold != style.bold);
-                apply(builder, colorCode, TextConstants.ITALIC, current.italic != style.italic);
-                apply(builder, colorCode, TextConstants.UNDERLINE, current.underlined != style.underlined);
-                apply(builder, colorCode, TextConstants.STRIKETHROUGH, current.strikethrough != style.strikethrough);
-                apply(builder, colorCode, TextConstants.OBFUSCATED, current.obfuscated != style.obfuscated);
-            }
-        }
-
-        if (text instanceof LiteralText) {
-            builder.append(((LiteralText) text).getContent());
-        } else if (text instanceof SelectorText) {
-            builder.append(((SelectorText) text).getSelector().toPlain());
-        } else if (text instanceof TranslatableText) {
-            TranslatableText text0 = (TranslatableText) text;
-
-            Translation translation = text0.getTranslation();
-            ImmutableList<Object> args = text0.getArguments();
-
-            Object[] args0 = new Object[args.size()];
-            for (int i = 0; i < args0.length; i++) {
-                Object object = args.get(i);
-                if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
-                    if (object instanceof Text) {
-                        // Ignore
-                    } else if (object instanceof Text.Builder) {
-                        object = ((Text.Builder) object).build();
-                    } else {
-                        object = ((TextRepresentable) object).toText();
-                    }
-                    args0[i] = to((Text) object, locale, new StringBuilder(), colorCode).toString();
-                } else {
-                    args0[i] = object;
-                }
-            }
-
-            builder.append(translation.get(locale, args0));
-        } else if (text instanceof ScoreText) {
-            ScoreText text0 = (ScoreText) text;
-
-            Optional<String> override = text0.getOverride();
-            if (override.isPresent()) {
-                builder.append(override.get());
-            } else {
-                builder.append(text0.getScore().getScore());
-            }
-        }
-
-        for (Text child : text.getChildren()) {
-            to(child, locale, builder, colorCode, style);
-        }
-
-        return builder;
-    }
-
-    private static void apply(StringBuilder builder, char code, char formattingCode) {
-        builder.append(code).append(formattingCode);
-    }
-    
-    private static void apply(StringBuilder builder, char code, char formattingCode, boolean state) {
-        if (state) {
-            apply(builder, code, formattingCode);
-        }
-    }
-
-    private static ResolvedChatStyle resolve(@Nullable ResolvedChatStyle current, TextFormat format) {
-        TextColor color = format.getColor();
-        TextStyle style = format.getStyle();
-        if (current == null) {
-            if (color == TextColors.NONE) {
-                color = null;
-            }
-            return new ResolvedChatStyle(color, style.isBold().orElse(false), style.isItalic().orElse(false),
-                    style.hasUnderline().orElse(false), style.hasStrikethrough().orElse(false), style.isObfuscated().orElse(false));
-        }
-        if (color == TextColors.NONE) {
-            color = current.color;
-        }
-        return new ResolvedChatStyle(color, style.isBold().orElse(current.bold), style.isItalic().orElse(current.italic),
-                style.hasUnderline().orElse(current.underlined), style.hasStrikethrough().orElse(current.strikethrough),
-                style.isObfuscated().orElse(current.obfuscated));
-    }
-
-    private static class ResolvedChatStyle {
-
-        @Nullable public final TextColor color;
-        public final boolean bold;
-        public final boolean italic;
-        public final boolean underlined;
-        public final boolean strikethrough;
-        public final boolean obfuscated;
-
-        public ResolvedChatStyle(@Nullable TextColor color, boolean bold, boolean italic,
-                boolean underlined, boolean strikethrough, boolean obfuscated) {
-            this.color = color;
-            this.bold = bold;
-            this.italic = italic;
-            this.underlined = underlined;
-            this.strikethrough = strikethrough;
-            this.obfuscated = obfuscated;
         }
     }
 

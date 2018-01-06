@@ -48,7 +48,9 @@ public final class PlainTextSerializer extends PluginCatalogType.Base implements
 
     @Override
     public String serialize(Text text, Locale locale) {
-        return FormattingCodeTextSerializer.to(checkNotNull(text, "text"), checkNotNull(locale, "locale"), new StringBuilder(), null).toString();
+        checkNotNull(text, "text");
+        checkNotNull(locale, "locale");
+        return LegacyTexts.toLegacy(locale, text, (char) 0);
     }
 
     @Override

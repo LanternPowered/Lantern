@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.test;
 
+import com.flowpowered.math.vector.Vector2d;
 import com.google.inject.Inject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -33,6 +34,7 @@ import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.AdvancementTypes;
 import org.spongepowered.api.advancement.DisplayInfo;
+import org.spongepowered.api.advancement.TreeLayoutElement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
@@ -60,6 +62,8 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -207,6 +211,7 @@ public class AdvancementTest {
         // Do this here for now, no block break event
         event.getTargetEntity().getProgress(this.breakDirtAdvancement).get(this.breakDirtCriterion).get().add(1);
         this.trigger.trigger(event.getTargetEntity());
+        event.getTargetEntity().sendMessage(Text.of("Login a few times and you will achieve: ", this.breakDirtAdvancement));
     }
 
     @Listener
@@ -225,7 +230,6 @@ public class AdvancementTest {
         // x -|- y
         //    |- z
         //    |- w
-        /*
         final Map<Double, Double> values = new HashMap<>();
         for (TreeLayoutElement element : event.getLayout().getElements()) {
             final Vector2d pos = element.getPosition();
@@ -236,7 +240,7 @@ public class AdvancementTest {
         for (TreeLayoutElement element : event.getLayout().getElements()) {
             final Vector2d pos = element.getPosition();
             element.setPosition(pos.getX(), pos.getY() - values.get(pos.getX()));
-        }*/
+        }
         /*
         // Rotate the advancement tree
         // The lines are currently drawn wrongly, that might be something

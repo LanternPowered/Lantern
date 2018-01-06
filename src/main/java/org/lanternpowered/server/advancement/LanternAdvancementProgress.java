@@ -26,6 +26,7 @@
 package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -41,12 +42,23 @@ import org.lanternpowered.server.advancement.criteria.progress.LanternCriterionP
 import org.lanternpowered.server.advancement.criteria.progress.LanternOrCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternScoreCriterionProgress;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.world.rules.RuleTypes;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
+import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.CriterionProgress;
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.ScoreCriterionProgress;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.advancement.AdvancementEvent;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -173,6 +185,22 @@ public class LanternAdvancementProgress implements AdvancementProgress {
             for (AbstractCriterionProgress progress : this.progress.values()) {
                 progress.detachTrigger();
             }
+            final Optional<DisplayInfo> optDisplay = this.advancement.getDisplayInfo();
+            final boolean sendMessage = getPlayer().getWorld().getOrCreateRule(RuleTypes.ANNOUNCE_ADVANCEMENTS).getValue() &&
+                    optDisplay.map(DisplayInfo::doesAnnounceToChat).orElse(false);
+            final Text message = optDisplay.<Text>map(display -> {
+                final Translation translation = tr("chat.type.advancement." + display.getType().getName().toLowerCase());
+                return Text.of(translation, getPlayer().getName(), this.advancement.toText());
+            }).orElseGet(() -> Text.of(getPlayer().getName() + " achieved ", this.advancement.toText()));
+            final MessageEvent.MessageFormatter formatter = new MessageEvent.MessageFormatter(message);
+            final Cause cause = CauseStack.current().getCurrentCause();
+            final Instant instant = get().orElseThrow(() -> new IllegalStateException("Something funky happened"));
+            final AdvancementEvent.Grant event = SpongeEventFactory.createAdvancementEventGrant(cause, MessageChannel.TO_ALL,
+                    Optional.of(MessageChannel.TO_ALL), this.advancement, formatter, getPlayer(), instant, !sendMessage);
+            Sponge.getEventManager().post(event);
+            if (!event.isMessageCancelled()) {
+                event.getChannel().ifPresent(channel -> channel.send(event.getMessage()));
+            }
         } else if (this.achievedState && !achievedState) {
             // The advancement got revoked
             this.dirtyVisibility = true;
@@ -181,6 +209,10 @@ public class LanternAdvancementProgress implements AdvancementProgress {
                     progress.attachTrigger();
                 }
             }
+            final Cause cause = CauseStack.current().getCurrentCause();
+            final AdvancementEvent.Revoke event = SpongeEventFactory.createAdvancementEventRevoke(
+                    cause, this.advancement, getPlayer());
+            Sponge.getEventManager().post(event);
         }
         this.achievedState = achievedState;
         // The progress should be updated

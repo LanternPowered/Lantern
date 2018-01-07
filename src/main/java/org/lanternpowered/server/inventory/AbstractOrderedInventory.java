@@ -149,7 +149,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (property == SlotIndex.class && child instanceof Slot) {
-            final int index = getSlotsToIndexMap().getInt(child);
+            final int index = getSlotIndex((Slot) child);
             return index == INVALID_INDEX ? Optional.empty() : Optional.of(property.cast(SlotIndex.of(index)));
         }
         return super.tryGetProperty(child, property, key);
@@ -159,7 +159,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
         final List<T> properties = super.tryGetProperties(child, property);
         if (property == SlotIndex.class && child instanceof Slot) {
-            final int index = getSlotsToIndexMap().getInt(child);
+            final int index = getSlotIndex((Slot) child);
             if (index != INVALID_INDEX) {
                 properties.add(property.cast(SlotIndex.of(index)));
             }

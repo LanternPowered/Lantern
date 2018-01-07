@@ -30,6 +30,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
@@ -40,6 +43,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.GuiId;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -73,6 +77,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
     }
 
     private final Map<Player, ClientContainer> viewers = new HashMap<>();
+    private final Object2IntMap<AbstractSlot> transformedSlotsToIndex;
 
     final AbstractOrderedInventory openInventory;
     final LanternPlayerInventory playerInventory;
@@ -88,14 +93,19 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
         this.openInventory = openInventory;
         final List<AbstractOrderedInventory> inventories = ImmutableList.of(openInventory, playerInventory.getMain());
         final List<AbstractContainerSlot> slots = new ArrayList<>();
+        final Object2IntMap<AbstractSlot> transformedSlotsToIndex = new Object2IntOpenHashMap<>();
+        transformedSlotsToIndex.defaultReturnValue(INVALID_INDEX);
+        int index = 0;
         for (AbstractOrderedInventory inventory : inventories) {
             for (AbstractSlot slot : inventory.getIndexedSlotInventories()) {
+                transformedSlotsToIndex.put(slot, index++);
                 final AbstractContainerSlot containerSlot = ((AbstractInventorySlot) slot).constructContainerSlot();
                 containerSlot.slot = (AbstractInventorySlot) slot;
                 containerSlot.setParent(this);
                 slots.add(containerSlot);
             }
         }
+        this.transformedSlotsToIndex = Object2IntMaps.unmodifiable(transformedSlotsToIndex);
         initWithSlots((List) inventories, slots, null);
         // Apply the name of the open inventory
         setName(openInventory.getName());
@@ -104,6 +114,12 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
     @Override
     public EmptyInventory empty() {
         return super.empty();
+    }
+
+    @Override
+    public int getSlotIndex(Slot slot) {
+        final int index = super.getSlotIndex(slot);
+        return index != INVALID_INDEX ? index : this.transformedSlotsToIndex.getInt(slot);
     }
 
     /**

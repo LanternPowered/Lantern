@@ -97,6 +97,8 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
             }
         }
         initWithSlots((List) inventories, slots, null);
+        // Apply the name of the open inventory
+        setName(openInventory.getName());
     }
 
     @Override

@@ -255,6 +255,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 .withCarrier(this).build(Lantern.getMinecraftPlugin());
         this.inventoryContainer = new PlayerInventoryContainer(this.inventory,
                 AbstractOrderedInventory.viewBuilder()
+                        .title(this.inventory.getName())
                         .inventory(VanillaInventoryArchetypes.CRAFTING.builder()
                                 .build(Lantern.getMinecraftPlugin()))
                         .inventory(this.inventory.getEquipment())

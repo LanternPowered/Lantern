@@ -567,9 +567,11 @@ public final class VanillaInventoryArchetypes {
                         .addLast(OFF_HAND_SLOT)
                         .addLast(PLAYER_MAIN);
         USER = userInventoryBuilder
+                .title(tr("inventory.user.name"))
                 .type(LanternUserInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "user");
         PLAYER = userInventoryBuilder
+                .title(tr("inventory.player.name"))
                 .type(LanternPlayerInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "player");
 

@@ -66,7 +66,6 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -135,7 +134,6 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
-import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.ban.Ban;
@@ -1124,7 +1122,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     @Override
     public Collection<AdvancementTree> getUnlockedAdvancementTrees() {
-        return null; // TODO
+        return this.advancementsProgress.getUnlockedAdvancementTrees();
     }
 
     /**

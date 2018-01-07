@@ -28,6 +28,7 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2d;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -37,10 +38,12 @@ import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.TreeLayoutElement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
@@ -57,6 +60,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -188,6 +192,19 @@ public class LanternPlayerAdvancements {
         checkNotNull(advancement, "advancement");
         return this.progress.computeIfAbsent(advancement, advancement1 -> new LanternAdvancementProgress(
                 this, (LanternAdvancement) advancement1));
+    }
+
+    public Collection<AdvancementTree> getUnlockedAdvancementTrees() {
+        final ImmutableList.Builder<AdvancementTree> builder = ImmutableList.builder();
+        for (AdvancementTree tree : AdvancementTreeRegistryModule.get().getAll()) {
+            final Advancement advancement = tree.getRootAdvancement();
+            final LanternAdvancementProgress progress = get(advancement);
+            if ((!progress.dirtyVisibility && progress.visible) ||
+                    (progress.dirtyVisibility && shouldBeVisible(advancement))) {
+                builder.add(tree);
+            }
+        }
+        return builder.build();
     }
 
     private void loadProgress(Map<String, Map<String, Instant>> progressMap) {

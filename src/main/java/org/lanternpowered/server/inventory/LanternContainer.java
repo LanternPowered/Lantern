@@ -29,10 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMaps;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
@@ -43,9 +41,11 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.GuiId;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import java.util.ArrayList;
@@ -59,6 +59,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("SuspiciousMethodCalls")
 public class LanternContainer extends AbstractOrderedInventory implements Container {
 
     /**
@@ -77,7 +78,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
     }
 
     private final Map<Player, ClientContainer> viewers = new HashMap<>();
-    private final Object2IntMap<AbstractSlot> transformedSlotsToIndex;
+    private final Map<AbstractSlot, AbstractContainerSlot> slotsToContainerSlot;
 
     final AbstractOrderedInventory openInventory;
     final LanternPlayerInventory playerInventory;
@@ -93,19 +94,17 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
         this.openInventory = openInventory;
         final List<AbstractOrderedInventory> inventories = ImmutableList.of(openInventory, playerInventory.getMain());
         final List<AbstractContainerSlot> slots = new ArrayList<>();
-        final Object2IntMap<AbstractSlot> transformedSlotsToIndex = new Object2IntOpenHashMap<>();
-        transformedSlotsToIndex.defaultReturnValue(INVALID_INDEX);
-        int index = 0;
+        final ImmutableMap.Builder<AbstractSlot, AbstractContainerSlot> slotsToContainerSlot = ImmutableMap.builder();
         for (AbstractOrderedInventory inventory : inventories) {
             for (AbstractSlot slot : inventory.getIndexedSlotInventories()) {
-                transformedSlotsToIndex.put(slot, index++);
                 final AbstractContainerSlot containerSlot = ((AbstractInventorySlot) slot).constructContainerSlot();
                 containerSlot.slot = (AbstractInventorySlot) slot;
                 containerSlot.setParent(this);
                 slots.add(containerSlot);
+                slotsToContainerSlot.put(slot, containerSlot);
             }
         }
-        this.transformedSlotsToIndex = Object2IntMaps.unmodifiable(transformedSlotsToIndex);
+        this.slotsToContainerSlot = slotsToContainerSlot.build();
         initWithSlots((List) inventories, slots, null);
         // Apply the name of the open inventory
         setName(openInventory.getName());
@@ -118,8 +117,57 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
 
     @Override
     public int getSlotIndex(Slot slot) {
-        final int index = super.getSlotIndex(slot);
-        return index != INVALID_INDEX ? index : this.transformedSlotsToIndex.getInt(slot);
+        // Lookup the index using it's container variant if present
+        if (!(slot instanceof AbstractContainerSlot)) {
+            slot = this.slotsToContainerSlot.get(slot);
+            if (slot == null) {
+                return INVALID_INDEX;
+            }
+        }
+        return super.getSlotIndex(slot);
+    }
+
+    private Slot transformSlot(Slot slot) {
+        if (!(slot instanceof AbstractContainerSlot)) {
+            slot = this.slotsToContainerSlot.get(slot);
+            checkState(slot != null, "A unknown slot appears?");
+        }
+        return slot;
+    }
+
+    private PeekedPollTransactionResult transformSlots(PeekedPollTransactionResult result) {
+        return new PeekedPollTransactionResult(
+                transformSlots(result.getTransactions()), result.getPolledItem());
+    }
+
+    private PeekedOfferTransactionResult transformSlots(PeekedOfferTransactionResult result) {
+        return new PeekedOfferTransactionResult(result.getType(), transformSlots(result.getTransactions()),
+                result.getRejectedItem().orElse(null));
+    }
+
+    public ImmutableList<SlotTransaction> transformSlots(List<SlotTransaction> transactions) {
+        return transactions.stream()
+                .map(transaction -> {
+                    final Slot slot = transformSlot(transaction.getSlot());
+                    return slot == transaction.getSlot() ? transaction : new SlotTransaction(
+                            transformSlot(transaction.getSlot()), transaction.getOriginal(), transaction.getFinal());
+                })
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher) {
+        return super.peekPoll(matcher).map(this::transformSlots);
+    }
+
+    @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher) {
+        return super.peekPoll(limit, matcher).map(this::transformSlots);
+    }
+
+    @Override
+    public PeekedOfferTransactionResult peekOffer(ItemStack itemStack) {
+        return transformSlots(super.peekOffer(itemStack));
     }
 
     /**

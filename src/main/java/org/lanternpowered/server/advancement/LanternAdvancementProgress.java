@@ -39,6 +39,7 @@ import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion;
 import org.lanternpowered.server.advancement.criteria.progress.AbstractCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternAndCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternCriterionProgress;
+import org.lanternpowered.server.advancement.criteria.progress.LanternEmptyCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternOrCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternScoreCriterionProgress;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -96,8 +97,8 @@ public class LanternAdvancementProgress implements AdvancementProgress {
                 progress = new LanternScoreCriterionProgress((LanternScoreCriterion) criterion, this);
             } else if (criterion instanceof LanternCriterion) {
                 progress = new LanternCriterionProgress((LanternCriterion) criterion, this);
-            } else if (criterion == EmptyCriterion.INSTANCE) {
-                continue;
+            } else if (criterion instanceof EmptyCriterion) {
+                progress = new LanternEmptyCriterionProgress((EmptyCriterion) criterion, this);
             } else {
                 throw new IllegalStateException("Unsupported criterion: " + criterion);
             }

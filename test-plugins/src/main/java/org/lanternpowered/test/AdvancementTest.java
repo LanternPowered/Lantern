@@ -44,6 +44,7 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.Furnace;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.advancement.AdvancementTreeEvent;
@@ -62,6 +63,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -76,8 +78,12 @@ public class AdvancementTest {
     private AdvancementTree advancementTree;
     private Advancement rootAdvancement;
 
-    private ScoreAdvancementCriterion breakDirtCriterion;
-    private Advancement breakDirtAdvancement;
+    private ScoreAdvancementCriterion loginAFewTimesCriterion;
+    private Advancement loginAFewTimesAdvancement;
+
+    private Advancement firstTimeAdvancement;
+    private Advancement secondTimeAdvancement;
+    private Advancement testAdvancement;
 
     private Advancement cookDirtAdvancement;
     @Nullable private Advancement suicidalAdvancement;
@@ -95,7 +101,6 @@ public class AdvancementTest {
 
     @Listener
     public void onRegisterTriggers(GameRegistryEvent.Register<Trigger> event) {
-        this.logger.info("Advancements test source: " + this.pluginContainer.getSource().orElse(null));
         this.trigger = Trigger.builder()
                 .typeSerializableConfig(MyTriggerConfig.class)
                 .listener(triggerEvent -> {
@@ -103,7 +108,6 @@ public class AdvancementTest {
                     final float value = random.nextFloat();
                     final float chance = triggerEvent.getTrigger().getConfiguration().chance;
                     triggerEvent.setResult(value < chance);
-                    triggerEvent.getTargetEntity().sendMessage(Text.of(value + " < " + chance + " -> " + triggerEvent.getResult()));
                 })
                 .id("my_trigger")
                 .build();
@@ -112,7 +116,6 @@ public class AdvancementTest {
 
     @Listener
     public void onRegisterAdvancementTrees(GameRegistryEvent.Register<AdvancementTree> event) {
-        this.logger.info("Loading advancement trees...");
         // Create the advancement tree
         this.advancementTree = AdvancementTree.builder()
                 .rootAdvancement(this.rootAdvancement)
@@ -124,36 +127,68 @@ public class AdvancementTest {
 
     @Listener
     public void onRegisterAdvancements(GameRegistryEvent.Register<Advancement> event) {
-        this.logger.info("Loading advancements...");
         // Create the root advancement
         this.rootAdvancement = Advancement.builder()
                 .displayInfo(DisplayInfo.builder()
                         .icon(ItemTypes.DIRT)
-                        .title(Text.of("Dirt? Dirt!"))
-                        .announceToChat(true)
+                        .title(Text.of("Random advancements!"))
+                        .description(Text.of("Some random and useless advancements."))
                         .build())
-                .criterion(AdvancementCriterion.DUMMY)
-                .id("dirt")
+                .criterion(AdvancementCriterion.EMPTY)
+                .id("random_root")
                 .build();
         event.register(this.rootAdvancement);
 
-        // Create the break dirt advancement and criterion
-        this.breakDirtCriterion = ScoreAdvancementCriterion.builder()
-                .goal(10)
-                .name("broken_dirt")
-                .build();
-        this.breakDirtAdvancement = Advancement.builder()
+        this.testAdvancement = Advancement.builder()
                 .parent(this.rootAdvancement)
                 .displayInfo(DisplayInfo.builder()
-                        .icon(ItemTypes.STONE_SHOVEL)
-                        .title(Text.of("Digger"))
-                        .announceToChat(true)
-                        .description(Text.of("Start digging."))
+                        .icon(ItemTypes.BARRIER)
+                        .title(Text.of("Test?"))
                         .build())
-                .criterion(this.breakDirtCriterion)
-                .id("dirt_digger")
+                .criterion(AdvancementCriterion.DUMMY)
+                .id("random_test")
                 .build();
-        event.register(this.breakDirtAdvancement);
+        event.register(this.testAdvancement);
+
+        this.firstTimeAdvancement = Advancement.builder()
+                .parent(this.rootAdvancement)
+                .displayInfo(DisplayInfo.builder()
+                        .icon(ItemTypes.APPLE)
+                        .title(Text.of("First time?"))
+                        .description(Text.of("Login for the first time"))
+                        .build())
+                .criterion(AdvancementCriterion.DUMMY)
+                .id("random_first_login")
+                .build();
+        event.register(this.firstTimeAdvancement);
+        this.secondTimeAdvancement = Advancement.builder()
+                .parent(this.firstTimeAdvancement)
+                .displayInfo(DisplayInfo.builder()
+                        .icon(ItemTypes.GOLDEN_APPLE)
+                        .title(Text.of("Welcome back?"))
+                        .description(Text.of("Login for the second time"))
+                        .build())
+                .criterion(AdvancementCriterion.DUMMY)
+                .id("random_second_login")
+                .build();
+        event.register(this.secondTimeAdvancement);
+
+        // Create the break dirt advancement and criterion
+        this.loginAFewTimesCriterion = ScoreAdvancementCriterion.builder()
+                .goal(10)
+                .name("times")
+                .build();
+        this.loginAFewTimesAdvancement = Advancement.builder()
+                .parent(this.secondTimeAdvancement)
+                .displayInfo(DisplayInfo.builder()
+                        .icon(ItemTypes.NETHER_STAR)
+                        .title(Text.of("Login a few times"))
+                        .announceToChat(true)
+                        .build())
+                .criterion(this.loginAFewTimesCriterion)
+                .id("random_login_a_few_times")
+                .build();
+        event.register(this.loginAFewTimesAdvancement);
 
         // Create the cook dirt advancement
         this.cookDirtAdvancement = Advancement.builder()
@@ -171,19 +206,20 @@ public class AdvancementTest {
         event.register(this.cookDirtAdvancement);
 
         event.register(Advancement.builder()
-                .parent(this.breakDirtAdvancement)
+                .parent(this.secondTimeAdvancement)
                 .criterion(ScoreAdvancementCriterion.builder()
                         .goal(5)
-                        .name("logins")
+                        .name("times")
                         .trigger(FilteredTrigger.builder()
                                 .type(this.trigger)
                                 .config(new MyTriggerConfig())
                                 .build())
                         .build())
                 .displayInfo(DisplayInfo.builder()
-                        .icon(ItemTypes.GOLDEN_APPLE)
+                        .icon(ItemTypes.END_CRYSTAL)
                         .announceToChat(true)
-                        .title(Text.of("Random login success"))
+                        .title(Text.of("Hope for the best"))
+                        .description(Text.of("Login a few times, hope for the best"))
                         .type(AdvancementTypes.GOAL)
                         .build())
                 .id("random_login")
@@ -210,12 +246,17 @@ public class AdvancementTest {
 
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event) {
-        event.getTargetEntity().sendMessage(Text.of("Joined!"));
-        event.getTargetEntity().getProgress(this.rootAdvancement).grant();
+        final Player player = event.getTargetEntity();
         // Do this here for now, no block break event
-        event.getTargetEntity().getProgress(this.breakDirtAdvancement).get(this.breakDirtCriterion).get().add(1);
-        this.trigger.trigger(event.getTargetEntity());
-        event.getTargetEntity().sendMessage(Text.of("Login a few times and you will achieve: ", this.breakDirtAdvancement));
+        player.getProgress(this.loginAFewTimesAdvancement).get(this.loginAFewTimesCriterion).get().add(1);
+        this.trigger.trigger(player);
+
+        player.getProgress(this.testAdvancement).grant();
+        if (player.getProgress(this.firstTimeAdvancement).achieved()) {
+            player.getProgress(this.secondTimeAdvancement).grant();
+        } else {
+            player.getProgress(this.firstTimeAdvancement).grant();
+        }
     }
 
     @Listener
@@ -260,44 +301,25 @@ public class AdvancementTest {
         */
     }
 
-    @Listener
-    public void onChangeBlock(ChangeBlockEvent.Break event, @First Player player) {
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            if (transaction.getFinal().getState().getType() == BlockTypes.AIR &&
-                    (transaction.getOriginal().getState().getType() == BlockTypes.DIRT ||
-                            transaction.getOriginal().getState().getType() == BlockTypes.GRASS)) {
-                player.getProgress(this.breakDirtAdvancement).get(this.breakDirtCriterion).get().add(1);
-            } else if (transaction.getFinal().getState().getType() == BlockTypes.AIR &&
-                    (transaction.getOriginal().getState().getType() == BlockTypes.LEAVES ||
-                            transaction.getOriginal().getState().getType() == BlockTypes.LEAVES2)) {
-                this.trigger.trigger(player);
-            }
-        }
-    }
-
     @SuppressWarnings("ConstantConditions")
     @Listener
     public void onChangeInventory(ChangeInventoryEvent event, @First Player player,
             @Getter("getTargetInventory") CarriedInventory<?> container) {
-        System.out.println("onChangeInventory: A: " + container.getName().get());
         if (!container.getName().get().equals("Furnace")) {
             return;
         }
-        System.out.println("onChangeInventory: B");
         final Carrier carrier = container.getCarrier().orElse(null);
         if (!(carrier instanceof Furnace)) {
             return;
         }
-        System.out.println("onChangeInventory: C");
         final Furnace furnace = (Furnace) carrier;
         final int passed = furnace.passedBurnTime().get();
         final int max = furnace.maxBurnTime().get();
         if (max <= 0 || passed >= max) {
             return;
         }
-        System.out.println("onChangeInventory: D");
         for (SlotTransaction transaction : event.getTransactions()) {
-            if (transaction.getSlot().getInventoryProperty(SlotIndex.class).get().getValue() == 0) {
+            if (container.getInventoryProperty(transaction.getSlot(), SlotIndex.class).get().getValue() == 0) {
                 if (transaction.getFinal().getType() == ItemTypes.DIRT) {
                     player.getProgress(this.cookDirtAdvancement).grant();
                 } else if (this.suicidalAdvancement != null && (transaction.getFinal().getType() == ItemTypes.TNT ||

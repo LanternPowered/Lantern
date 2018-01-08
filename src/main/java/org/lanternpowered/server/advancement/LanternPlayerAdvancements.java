@@ -41,7 +41,6 @@ import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegis
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
-import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.DisplayInfo;
@@ -59,7 +58,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -70,7 +68,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -431,7 +428,6 @@ public class LanternPlayerAdvancements {
             }
             criteria.add(criterion);
         }
-        System.out.println(Collections3.toString(names.stream().map(Arrays::toString).collect(Collectors.toList())));
         return new Tuple<>(criteria, names.toArray(new String[names.size()][]));
     }
 

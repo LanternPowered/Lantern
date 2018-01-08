@@ -155,11 +155,17 @@ public class LanternTreeLayout implements TreeLayout {
      * Q---Q---Q
      */
     private static void firstProcess(TreeNode treeNode) {
+        if (treeNode.parent != null) {
+            treeNode.offset = treeNode.parent.offset;
+        }
         for (TreeNode childNode : treeNode.children) {
             firstProcess(childNode);
         }
         if (treeNode.parent != null) {
-            treeNode.offset = (treeNode.parent.offset += VERTICAL_OFFSET);
+            if (treeNode.children.isEmpty()) {
+                treeNode.offset += VERTICAL_OFFSET;
+            }
+            treeNode.parent.offset = treeNode.offset;
         }
         treeNode.layout.setPosition(treeNode.x, treeNode.offset);
     }
@@ -187,6 +193,7 @@ public class LanternTreeLayout implements TreeLayout {
             y += node.offset;
         }
         y /= (double) treeNode.children.size();
+        treeNode.offset = y;
         treeNode.layout.setPosition(treeNode.x, y);
     }
 

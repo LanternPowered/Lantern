@@ -31,6 +31,7 @@ import org.spongepowered.api.Sponge;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;

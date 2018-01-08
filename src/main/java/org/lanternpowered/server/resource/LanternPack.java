@@ -23,57 +23,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.resource;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.resource.Pack;
+import org.spongepowered.api.resource.Resource;
+import org.spongepowered.api.text.Text;
 
-import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class InternalPluginsInfo {
+public abstract class LanternPack implements Pack, IResourceProvider {
 
-    public static final List<String> IDENTIFIERS = ImmutableList.of(
-            Minecraft.IDENTIFIER, SpongePlatform.IDENTIFIER, Api.IDENTIFIER, Implementation.IDENTIFIER);
+    private final Text name;
+    @Nullable private final DataView metadata;
+    @Nullable final PluginContainer plugin;
 
-    public static final class Api {
+    // Whether the pack is currently active
+    private boolean active;
 
-        public static final String IDENTIFIER = Platform.API_ID;
-        @Nullable public static final String VERSION = Platform.class.getPackage().getSpecificationVersion();
-
-        private Api() {
-        }
+    LanternPack(Text name, @Nullable DataView metadata,
+            @Nullable PluginContainer plugin) {
+        this.metadata = metadata;
+        this.plugin = plugin;
+        this.name = name;
     }
 
-    public static final class SpongePlatform {
-
-        public static final String IDENTIFIER = "sponge";
-        @Nullable public static final String VERSION = Api.VERSION;
-
-        private SpongePlatform() {
-        }
+    boolean isActive() {
+        return this.active;
     }
 
-    public static final class Implementation {
-
-        public static final String IDENTIFIER = "lantern";
-        @Nullable public static final String VERSION = Platform.class.getPackage().getImplementationVersion();
-
-        private Implementation() {
-        }
+    void setActive(boolean active) {
+        this.active = active;
     }
 
-    public static final class Minecraft {
-
-        public static final String IDENTIFIER = "minecraft";
-        public static final String VERSION = "1.12.2";
-
-        private Minecraft() {
-        }
+    @Override
+    public Text getName() {
+        return this.name;
     }
 
-    private InternalPluginsInfo() {
+    @Override
+    public Optional<DataView> getMetadata() {
+        return Optional.ofNullable(this.metadata);
     }
+
+    /**
+     * Reloads all the {@link Resource}s within
+     * this pack file system.
+     */
+    abstract void reload();
 }

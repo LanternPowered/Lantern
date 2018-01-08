@@ -174,9 +174,11 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
         checkRange(position.getX(), position.getY(), position.getZ());
     }
 
-    private void checkRange(double x, double y, double z) {
+    @Override
+    public void checkRange(double x, double y, double z) {
         if (!VecHelper.inBounds(x, y, z, this.hardBlockMin, this.hardBlockMax)) {
-            throw new PositionOutOfBoundsException(new Vector3d(x, y, z), this.hardBlockMin.toDouble(), this.hardBlockMax.toDouble());
+            throw new PositionOutOfBoundsException(new Vector3d(x, y, z),
+                    this.hardBlockMin.toDouble(), this.hardBlockMax.toDouble());
         }
     }
 
@@ -184,9 +186,11 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
         checkRange(position.getX(), position.getY(), position.getZ());
     }
 
-    private void checkRange(int x, int y, int z) {
+    @Override
+    public void checkRange(int x, int y, int z) {
         if (!VecHelper.inBounds(x, y, z, this.hardBlockMin, this.hardBlockMax)) {
-            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.hardBlockMin, this.hardBlockMax);
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z),
+                    this.hardBlockMin, this.hardBlockMax);
         }
     }
 
@@ -453,9 +457,12 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities) {
-        // TODO 1.9 gabizou this is for you
-        return false;
+    public Collection<Entity> spawnEntities(Iterable<? extends Entity> entities) {
+        for (Entity entity : entities) {
+            final Vector3d pos = entity.getLocation().getPosition();
+            checkRange(pos.getX(), pos.getY(), pos.getZ());
+        }
+        return this.extent.spawnEntities(entities);
     }
 
     @Override
@@ -486,8 +493,8 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     @Override
     public Optional<Entity> getEntity(UUID uuid) {
-        // TODO 1.9 gabizou this is for you
-        return null;
+        return this.extent.getEntity(uuid).filter(entity -> VecHelper.inBounds(
+                entity.getLocation().getPosition(), getBlockMin(), getBlockMax()));
     }
 
     @Override

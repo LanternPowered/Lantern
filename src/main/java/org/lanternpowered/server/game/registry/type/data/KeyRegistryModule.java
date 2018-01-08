@@ -296,7 +296,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeListKey(Text.class, of("ItemLore"), "item_lore"));
         register(makeValueKey(Boolean.class, of("JohnnyVindicator"), "johnny_vindicator"));
         register(makeMutableBoundedValueKey(Integer.class, of("KnockbackStrength"), "knockback_strength"));
-        register(makeOptionalKey(Living.class, of("LastAttacker"), "last_attacker"));
+        register(makeOptionalKey(EntitySnapshot.class, of("LastAttacker"), "last_attacker"));
         register(makeOptionalKey(Text.class, of("LastCommandOutput"), "last_command_output"));
         register(makeOptionalKey(Double.class, of("LastDamage"), "last_damage"));
         register(makeValueKey(Instant.class, of("LastDatePlayed"), "last_date_played"));

@@ -228,18 +228,6 @@ public class ExtentViewDownsize implements AbstractExtent {
         return VecHelper.inBounds(x, y, z, this.blockMin, this.blockMax);
     }
 
-    private void checkRange(double x, double y, double z) {
-        if (!VecHelper.inBounds(x, y, z, this.blockMin, this.blockMax)) {
-            throw new PositionOutOfBoundsException(new Vector3d(x, y, z), this.blockMin.toDouble(), this.blockMax.toDouble());
-        }
-    }
-
-    private void checkRange(int x, int y, int z) {
-        if (!VecHelper.inBounds(x, y, z, this.blockMin, this.blockMax)) {
-            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.blockMin, this.blockMax);
-        }
-    }
-
     @Override
     public BlockType getBlockType(int x, int y, int z) {
         return this.getBlock(x, y, z).getType();
@@ -301,7 +289,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities) {
+    public Collection<Entity> spawnEntities(Iterable<? extends Entity> entities) {
         for (Entity entity : entities) {
             final Vector3d pos = entity.getLocation().getPosition();
             checkRange(pos.getX(), pos.getY(), pos.getZ());

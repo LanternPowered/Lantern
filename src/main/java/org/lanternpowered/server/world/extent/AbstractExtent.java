@@ -28,7 +28,9 @@ package org.lanternpowered.server.world.extent;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
@@ -70,6 +72,20 @@ public interface AbstractExtent extends Extent {
 
     default void checkVolumeBounds(Vector3i position) {
         checkVolumeBounds(position.getX(), position.getY(), position.getZ());
+    }
+
+    default void checkRange(double x, double y, double z) {
+        if (!VecHelper.inBounds(x, y, z, getBlockMin(), getBlockMax())) {
+            throw new PositionOutOfBoundsException(new Vector3d(x, y, z),
+                    getBlockMin().toDouble(), getBlockMax().toDouble());
+        }
+    }
+
+    default void checkRange(int x, int y, int z) {
+        if (!VecHelper.inBounds(x, y, z, getBlockMin(), getBlockMax())) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z),
+                    getBlockMin(), getBlockMax());
+        }
     }
 
     @Override

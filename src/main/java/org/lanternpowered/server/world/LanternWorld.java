@@ -1203,16 +1203,18 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
      *
      * @param event The event
      */
-    public static boolean finishSpawnEntityEvent(SpawnEntityEvent event) {
+    public static Collection<Entity> finishSpawnEntityEvent(SpawnEntityEvent event) {
         if (event.isCancelled()) {
-            return false;
+            return Collections.emptyList();
         }
-        boolean success = false;
+        final ImmutableList.Builder<Entity> builder = ImmutableList.builder();
         for (Entity entity : event.getEntities()) {
             final LanternWorld world = (LanternWorld) entity.getWorld();
-            success |= world.spawnEntity0(entity);
+            if (world.spawnEntity0(entity)) {
+                builder.add(entity);
+            }
         }
-        return success;
+        return builder.build();
     }
 
     public static void handleEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
@@ -1277,11 +1279,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         final SpawnEntityEvent.Custom event = SpongeEventFactory.createSpawnEntityEventCustom(
                 causeStack.getCurrentCause(), Lists.newArrayList(entity));
         Sponge.getEventManager().post(event);
-        return finishSpawnEntityEvent(event);
+        return !finishSpawnEntityEvent(event).isEmpty();
     }
 
     @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities) {
+    public Collection<Entity> spawnEntities(Iterable<? extends Entity> entities) {
         for (Entity entity : entities) {
             checkNotNull(entity, "entity");
             checkArgument(!entity.isRemoved(), "The entity may not be removed.");
@@ -1309,7 +1311,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         final Vector3i chunkPos = new Vector3i(position.getX() >> 4, fixEntityYSection(position.getY() >> 4), position.getZ() >> 4);
         final LanternChunk chunk = (LanternChunk) loadChunk(chunkPos.getX(), 0, chunkPos.getZ(), true).get();
         chunk.addEntity(entity2, chunkPos.getY());
-        return false;
+        return true;
     }
 
     public void addEntities(Iterable<Entity> entities) {
@@ -1320,7 +1322,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     @Nullable
     private LanternEntity addEntity(LanternEntity entity) {
-        LanternEntity entity1 = this.entitiesByUniqueId.putIfAbsent(entity.getUniqueId(), entity);
+        final LanternEntity entity1 = this.entitiesByUniqueId.putIfAbsent(entity.getUniqueId(), entity);
         if (entity1 != null) {
             return entity1;
         }

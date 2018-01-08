@@ -63,6 +63,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.VecHelper;
+import org.lanternpowered.server.util.collect.Collections3;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.TrackerIdAllocator;
@@ -1046,28 +1047,33 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public boolean spawnEntity(Entity entity) {
-        // TODO Auto-generated method stub
-        return false;
+        final Vector3d pos = entity.getLocation().getPosition();
+        checkRange(pos.getX(), pos.getY(), pos.getZ());
+        return this.world.spawnEntity(entity);
     }
 
     @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities) {
-        return false;
+    public Collection<Entity> spawnEntities(Iterable<? extends Entity> entities) {
+        for (Entity entity : entities) {
+            final Vector3d pos = entity.getLocation().getPosition();
+            checkRange(pos.getX(), pos.getY(), pos.getZ());
+        }
+        return this.world.spawnEntities(entities);
     }
 
     @Override
     public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d end, Predicate<EntityHit> filter) {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
     public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d direction, double distance, Predicate<EntityHit> filter) {
-        return null;
+        return Collections.emptySet();
     }
 
     public PriorityBlockingQueue<LanternScheduledBlockUpdate> getScheduledBlockUpdateQueue() {

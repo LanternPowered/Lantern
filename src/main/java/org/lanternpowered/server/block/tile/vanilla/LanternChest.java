@@ -40,13 +40,13 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.property.GuiIds;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -54,14 +54,6 @@ import java.util.Random;
 import java.util.Set;
 
 public class LanternChest extends LanternContainerTile<ChestInventory> implements Chest {
-
-    public static final class DoubleChestInventory extends ChestInventory {
-
-        @Override
-        public InventoryArchetype getArchetype() {
-            return VanillaInventoryArchetypes.DOUBLE_CHEST;
-        }
-    }
 
     private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 
@@ -78,6 +70,11 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
         return VanillaInventoryArchetypes.CHEST.builder()
                 .withCarrier(this)
                 .build(Lantern.getMinecraftPlugin());
+    }
+
+    @Override
+    public Inventory getInventory(Direction from) {
+        return getDoubleChestInventory().orElse(super.getInventory(from));
     }
 
     @Override
@@ -98,15 +95,18 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
                         .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
                         .title(tr("container.chestDouble"))
                         .property(new GuiIdProperty(GuiIds.CHEST))
-                        .type(DoubleChestInventory.class);
+                        .type(DoubleChestInventory.class)
+                        .withCarrier(new DoubleChestBlockCarrier(Arrays.asList(this, otherChest)));
                 if (directionToCheck != Direction.WEST && directionToCheck != Direction.NORTH) {
                     doubleChestBuilder
                             .grid(0, this.inventory)
-                            .grid(3, otherChest.inventory);
+                            .grid(3, otherChest.inventory)
+                            .withCarrier(new DoubleChestBlockCarrier(Arrays.asList(this, otherChest)));
                 } else {
                     doubleChestBuilder
                             .grid(0, otherChest.inventory)
-                            .grid(3, this.inventory);
+                            .grid(3, this.inventory)
+                            .withCarrier(new DoubleChestBlockCarrier(Arrays.asList(otherChest, this)));
                 }
                 final DoubleChestInventory doubleChestInventory = doubleChestBuilder.build();
                 doubleChestInventory.addViewListener(this);

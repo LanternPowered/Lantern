@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
+import org.lanternpowered.server.block.tile.ITileEntityCarrier;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
@@ -44,16 +45,18 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.Furnace;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
+import org.spongepowered.api.util.Direction;
 
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior {
+public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior, ITileEntityCarrier {
 
     // The inventory of the furnace
     private final FurnaceInventory inventory;
@@ -279,5 +282,23 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
     @Override
     public TileEntityInventory<TileEntityCarrier> getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public Inventory getInventory(Direction from) {
+        switch (from) {
+            case EAST:
+            case WEST:
+            case SOUTH:
+            case NORTH:
+                return this.inventory.getFuelSlot();
+            case UP:
+                return this.inventory.getInputSlot();
+            case DOWN:
+                // TODO: Limited access to the fuel slot to pull out empty buckets?
+                return this.inventory.getOutputSlot();
+            default:
+                return ITileEntityCarrier.super.getInventory(from);
+        }
     }
 }

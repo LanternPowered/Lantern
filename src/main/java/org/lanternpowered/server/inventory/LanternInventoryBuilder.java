@@ -41,6 +41,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -208,7 +209,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
             mutableInventory.setCarrier0(this.carrier);
         }
         if (this.carrier instanceof AbstractCarrier) {
-            ((AbstractCarrier) this.carrier).setInventory(inventory);
+            ((AbstractCarrier) this.carrier).setInventory((CarriedInventory<?>) inventory);
         }
         if (!this.listeners.isEmpty()) {
             final List<InventoryListeners> listenersList = new ArrayList<>();

@@ -23,37 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.block.tile.vanilla;
 
-import static com.google.common.base.Preconditions.checkState;
+import org.lanternpowered.server.inventory.carrier.LanternMultiBlockCarrier;
+import org.spongepowered.api.item.inventory.BlockCarrier;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.util.Direction;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import java.util.List;
 
-import javax.annotation.Nullable;
+public class DoubleChestBlockCarrier extends LanternMultiBlockCarrier<DoubleChestInventory> {
 
-@SuppressWarnings("unchecked")
-public abstract class AbstractCarrier<T extends CarriedInventory<?>> implements Carrier {
-
-    @Nullable private T inventory;
-
-    void setInventory(T inventory) {
-        this.inventory = inventory;
+    public DoubleChestBlockCarrier(List<BlockCarrier> carriers) {
+        super(carriers);
     }
 
     @Override
-    public T getInventory() {
-        checkState(this.inventory != null, "The inventory is not initialized yet");
-        return this.inventory;
-    }
-
-    @Override
-    public String toString() {
-        return toStringHelper().toString();
-    }
-
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return MoreObjects.toStringHelper(this);
+    public Inventory getInventory(Direction from) {
+        return getInventory();
     }
 }

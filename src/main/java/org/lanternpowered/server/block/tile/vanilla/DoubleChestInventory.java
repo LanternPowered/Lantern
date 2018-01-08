@@ -23,35 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.carrier;
+package org.lanternpowered.server.block.tile.vanilla;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.inventory.AbstractCarrier;
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
-import org.spongepowered.api.world.Locatable;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-public class LocatableCarrier<T extends AbstractInventory & CarriedInventory<AbstractCarrier<T>>> extends AbstractCarrier<T> implements Locatable {
-
-    private final Location<World> location;
-
-    public LocatableCarrier(Location<World> location) {
-        checkNotNull(location, "location");
-        this.location = location;
-    }
+public class DoubleChestInventory extends ChestInventory {
 
     @Override
-    public Location<World> getLocation() {
-        return this.location;
-    }
-
-    @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper()
-                .add("location", this.location);
+    public InventoryArchetype getArchetype() {
+        return VanillaInventoryArchetypes.DOUBLE_CHEST;
     }
 }

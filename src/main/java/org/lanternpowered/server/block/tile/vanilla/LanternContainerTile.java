@@ -25,12 +25,15 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
+import org.lanternpowered.server.block.tile.ITileEntityCarrier;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.util.Direction;
 
 public abstract class LanternContainerTile<I extends AbstractInventory & TileEntityInventory<TileEntityCarrier>>
-        extends LanternContainerTileBase implements TileEntityCarrier {
+        extends LanternContainerTileBase implements ITileEntityCarrier {
 
     protected final I inventory;
 
@@ -43,6 +46,11 @@ public abstract class LanternContainerTile<I extends AbstractInventory & TileEnt
 
     @Override
     public I getInventory() {
+        return this.inventory;
+    }
+
+    @Override
+    public Inventory getInventory(Direction from) {
         return this.inventory;
     }
 }

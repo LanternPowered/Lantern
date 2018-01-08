@@ -23,37 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.carrier;
 
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import org.spongepowered.api.item.inventory.Carrier;
+import org.lanternpowered.server.inventory.AbstractCarrier;
+import org.lanternpowered.server.inventory.LanternEmptyCarriedInventory;
+import org.spongepowered.api.item.inventory.BlockCarrier;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import javax.annotation.Nullable;
+public class LanternBlockCarrier<T extends CarriedInventory<?>> extends AbstractCarrier<T>
+        implements Locatable, BlockCarrier {
 
-@SuppressWarnings("unchecked")
-public abstract class AbstractCarrier<T extends CarriedInventory<?>> implements Carrier {
+    private final Location<World> location;
 
-    @Nullable private T inventory;
-
-    void setInventory(T inventory) {
-        this.inventory = inventory;
+    public LanternBlockCarrier(Location<World> location) {
+        checkNotNull(location, "location");
+        this.location = location;
     }
 
     @Override
-    public T getInventory() {
-        checkState(this.inventory != null, "The inventory is not initialized yet");
-        return this.inventory;
+    public Location<World> getLocation() {
+        return this.location;
     }
 
     @Override
-    public String toString() {
-        return toStringHelper().toString();
+    public Inventory getInventory(Direction from) {
+        checkNotNull(from, "from");
+        return new LanternEmptyCarriedInventory(this);
     }
 
+    @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
-        return MoreObjects.toStringHelper(this);
+        return super.toStringHelper()
+                .add("location", this.location);
     }
 }

@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.block.tile.ITileEntityCarrier;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.game.Lantern;
@@ -43,16 +44,18 @@ import org.spongepowered.api.data.property.item.RecordProperty;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public final class LanternJukebox extends LanternTileEntity implements Jukebox, TileEntityCarrier {
+public final class LanternJukebox extends LanternTileEntity implements Jukebox, ITileEntityCarrier {
 
     // The internal inventory of the jukebox
     private JukeboxInventory inventory = VanillaInventoryArchetypes.JUKEBOX.builder()

@@ -32,7 +32,7 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.carrier.LocatableCarrier;
+import org.lanternpowered.server.inventory.carrier.LanternBlockCarrier;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.CraftingTableInventory;
 import org.spongepowered.api.entity.living.player.Player;
@@ -47,7 +47,7 @@ public class CraftingTableInteractionBehavior implements InteractWithBlockBehavi
         final Optional<Player> optPlayer = context.getContext(ContextKeys.PLAYER);
         if (optPlayer.isPresent()) {
             final CraftingTableInventory craftingTableInventory = VanillaInventoryArchetypes.CRAFTING_TABLE.builder()
-                    .withCarrier(new LocatableCarrier(context.requireContext(ContextKeys.BLOCK_LOCATION)))
+                    .withCarrier(new LanternBlockCarrier(context.requireContext(ContextKeys.BLOCK_LOCATION)))
                     .build(Lantern.getMinecraftPlugin());
             final Optional<Container> optContainer = optPlayer.get().openInventory(craftingTableInventory);
             if (optContainer.isPresent()) {

@@ -26,11 +26,11 @@
 package org.lanternpowered.server.game.registry.type.bossbar;
 
 import org.lanternpowered.server.boss.LanternBossBarOverlay;
-import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.BossBarOverlays;
 
-public final class BossBarOverlayRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<BossBarOverlay> {
+public final class BossBarOverlayRegistryModule extends PluginCatalogRegistryModule<BossBarOverlay> {
 
     public BossBarOverlayRegistryModule() {
         super(BossBarOverlays.class);

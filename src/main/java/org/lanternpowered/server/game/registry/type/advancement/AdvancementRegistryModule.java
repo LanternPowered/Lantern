@@ -23,24 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+@RegistrationDependency({ AdvancementTypeRegistryModule.class, AdvancementCriterionModule.class,
+        ItemRegistryModule.class, TriggerRegistryModule.class })
+public final class AdvancementRegistryModule extends AdditionalPluginCatalogRegistryModule<Advancement> {
 
-    @Override
-    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
-        if (message instanceof MessagePlayInAdvancementTree.Open) {
-            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
-            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
-        } else {
-            // Do we need the close event?
-        }
+    private static final AdvancementRegistryModule instance = new AdvancementRegistryModule();
+
+    /**
+     * Gets the {@link AdvancementRegistryModule}.
+     *
+     * @return The advancement tree registry module
+     */
+    public static AdvancementRegistryModule get() {
+        return instance;
+    }
+
+    private AdvancementRegistryModule() {
     }
 }

@@ -41,7 +41,17 @@ public final class CodecPlayInClientSettings implements Codec<MessagePlayInClien
 
     @Override
     public MessagePlayInClientSettings decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final Locale locale = Locale.forLanguageTag(buf.readLimitedString(16));
+        // The locale is lowercase, this is not allowed
+        final String localeName = buf.readLimitedString(16);
+        final String[] parts = localeName.split("_", 3);
+        Locale locale;
+        if (parts.length == 3) {
+            locale = new Locale(parts[0].toLowerCase(), parts[1].toUpperCase(), parts[2]);
+        } else if (parts.length == 2) {
+            locale = new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
+        } else {
+            locale = new Locale(parts[0]);
+        }
         final int viewDistance = buf.readByte();
         final ChatVisibility visibility = ChatVisibilityRegistryModule.get().getByInternalId(buf.readByte()).get();
         final boolean enableColors = buf.readBoolean();

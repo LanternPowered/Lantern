@@ -23,24 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.advancement.criteria;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+import javax.annotation.Nullable;
+
+public class LanternScoreCriterion extends LanternCriterion implements ScoreAdvancementCriterion {
+
+    private final int goal;
+    private final String[] ids;
+
+    LanternScoreCriterion(String name, @Nullable FilteredTrigger<?> trigger, int goal) {
+        super(name, trigger);
+        this.goal = goal;
+        this.ids = new String[goal];
+        for (int i = 0; i < goal; i++) {
+            this.ids[i] = name + "&score_index=" + i;
+        }
+    }
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
-        if (message instanceof MessagePlayInAdvancementTree.Open) {
-            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
-            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
-        } else {
-            // Do we need the close event?
-        }
+    public int getGoal() {
+        return this.goal;
+    }
+
+    @Override
+    MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("goal", this.goal);
+    }
+
+    /**
+     * Gets the internal ids of this {@link LanternScoreCriterion}.
+     *
+     * @return The ids
+     */
+    public String[] getIds() {
+        return this.ids;
     }
 }

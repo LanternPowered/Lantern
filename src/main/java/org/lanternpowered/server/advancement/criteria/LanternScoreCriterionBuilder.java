@@ -23,24 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.advancement.criteria;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import static com.google.common.base.Preconditions.checkState;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
+
+public class LanternScoreCriterionBuilder extends AbstractCriterionBuilder<ScoreAdvancementCriterion, ScoreAdvancementCriterion.Builder>
+        implements ScoreAdvancementCriterion.Builder {
+
+    private int goal;
+
+    public LanternScoreCriterionBuilder() {
+        reset();
+    }
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
-        if (message instanceof MessagePlayInAdvancementTree.Open) {
-            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
-            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
-        } else {
-            // Do we need the close event?
-        }
+    ScoreAdvancementCriterion build0() {
+        return new LanternScoreCriterion(this.name, this.trigger, this.goal);
+    }
+
+    @Override
+    public ScoreAdvancementCriterion.Builder from(ScoreAdvancementCriterion value) {
+        this.goal = value.getGoal();
+        return super.from(value);
+    }
+
+    @Override
+    public ScoreAdvancementCriterion.Builder reset() {
+        this.goal = 1;
+        return super.reset();
+    }
+
+    @Override
+    public ScoreAdvancementCriterion.Builder goal(int goal) {
+        checkState(goal > 0, "The goal must be greater than zero.");
+        this.goal = goal;
+        return this;
     }
 }

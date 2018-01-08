@@ -33,10 +33,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.lanternpowered.server.advancement.AdvancementTree;
-import org.lanternpowered.server.advancement.AdvancementTrees;
-import org.lanternpowered.server.advancement.AdvancementsProgress;
-import org.lanternpowered.server.advancement.TestAdvancementTree;
+import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.ValueCollection;
@@ -95,6 +92,7 @@ import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
+import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -172,7 +170,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     // The (client) locale of the player
-    private Locale locale = Locale.ENGLISH;
+    private Locale locale = Locale.US;
 
     // The (client) render distance of the player
     // When specified -1, the render distance will match the server one
@@ -242,7 +240,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     // border of the world the player is located in
     @Nullable private LanternWorldBorder worldBorder;
 
-    private final AdvancementsProgress advancementsProgress = new AdvancementsProgress();
+    private final LanternPlayerAdvancements advancementsProgress = new LanternPlayerAdvancements(this);
 
     // The game profile of this player
     private final GameProfile gameProfile;
@@ -264,6 +262,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         .build(Lantern.getMinecraftPlugin()));
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
+        // Load the advancements
+        this.advancementsProgress.init();
         resetIdleTimeoutCounter();
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         // Attach this player to the proxy user and load player data
@@ -312,7 +312,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         ((ElementKeyRegistration<?, Optional<AdvancementTree>>) c.get(LanternKeys.OPEN_ADVANCEMENT_TREE).get())
                 .addListener((oldElement, newElement) -> {
                     if (getWorld() != null) {
-                        this.session.send(new MessagePlayOutSelectAdvancementTree(newElement.map(AdvancementTree::getInternalId).orElse(null)));
+                        this.session.send(new MessagePlayOutSelectAdvancementTree(newElement.map(AdvancementTree::getId).orElse(null)));
                     }
                 });
     }
@@ -374,13 +374,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     }
                 }
                 this.tabList.init(tabListEntries);
-                TestAdvancementTree.A.addRawTracker(this);
-                TestAdvancementTree.B.addRawTracker(this);
-                AdvancementTrees.INSTANCE.initialize(this);
-                getAdvancementsProgress().get(TestAdvancementTree.DIG_DIRT)
-                        .tryGet(TestAdvancementTree.DIG_DIRT_CRITERION).set(4);
+                this.advancementsProgress.initClient();
                 this.session.send(new MessagePlayOutSelectAdvancementTree(
-                        get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
+                        get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getId).orElse(null)));
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
                 // TODO: the readable ids still has to be made
                 final int[] recipes = new int[435];
@@ -428,15 +424,40 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 world.addPlayer(this);
             }
         } else {
+            // Load the advancements
+            this.advancementsProgress.save();
+            this.advancementsProgress.cleanup();
             if (this.worldBorder != null) {
                 this.worldBorder.removePlayer(this);
             }
-            AdvancementTrees.INSTANCE.removeTracker(this);
             this.session.getServer().removePlayer(this);
             this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));
             this.tabList.clear();
             // Remove this player from the global tab list
             GlobalTabList.getInstance().get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
+        }
+    }
+
+    @Override
+    public Locale getLocale() {
+        return this.locale;
+    }
+
+    /**
+     * Sets the {@link Locale} of this {@link LanternPlayer}. Will
+     * update translatable components on the client.
+     *
+     * @param locale The locale
+     */
+    public void setLocale(Locale locale) {
+        checkNotNull(locale, "locale");
+        if (!locale.equals(this.locale)) {
+            this.locale = locale;
+            // World may not be null
+            if (getWorld() != null) {
+                // Update the advancements
+                this.advancementsProgress.initClient();
+            }
         }
     }
 
@@ -648,6 +669,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         }
 
         this.cooldownTracker.process();
+        this.advancementsProgress.pulse();
     }
 
     /**
@@ -889,15 +911,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public Locale getLocale() {
-        return this.locale;
-    }
-
-    public void setLocale(Locale locale) {
-        this.locale = checkNotNull(locale, "locale");
-    }
-
-    @Override
     public boolean isViewingInventory() {
         return false;
     }
@@ -1104,12 +1117,12 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     @Override
     public AdvancementProgress getProgress(Advancement advancement) {
-        return null; // TODO
+        return this.advancementsProgress.get(advancement);
     }
 
     @Override
-    public Collection<org.spongepowered.api.advancement.AdvancementTree> getUnlockedAdvancementTrees() {
-        return null; // TODO
+    public Collection<AdvancementTree> getUnlockedAdvancementTrees() {
+        return this.advancementsProgress.getUnlockedAdvancementTrees();
     }
 
     /**
@@ -1141,7 +1154,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         offer(LanternKeys.IS_ELYTRA_FLYING, true);
     }
 
-    public AdvancementsProgress getAdvancementsProgress() {
+    public LanternPlayerAdvancements getAdvancementsProgress() {
         return this.advancementsProgress;
     }
 }

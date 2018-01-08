@@ -27,12 +27,14 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import org.lanternpowered.server.advancement.LanternAdvancementType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,7 +59,7 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
                 buf.write(Types.LOCALIZED_TEXT, display.getTitle());
                 buf.write(Types.LOCALIZED_TEXT, display.getDescription());
                 buf.write(Types.ITEM_STACK, display.getIcon().createStack());
-                buf.writeVarInt(display.getFrameType().getInternalId());
+                buf.writeVarInt(((LanternAdvancementType) display.getType()).getInternalId());
                 final Optional<String> optBackground = display.getBackground();
                 int flags = 0;
                 if (optBackground.isPresent()) {
@@ -74,14 +76,16 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
                 buf.writeFloat((float) display.getX());
                 buf.writeFloat((float) display.getY());
             }
-            final List<String> criteria = struct.getCriteria();
+            final Collection<String> criteria = struct.getCriteria();
             buf.writeVarInt(criteria.size());
             criteria.forEach(buf::writeString);
-            final List<List<String>> requirements = struct.getRequirements();
-            buf.writeVarInt(requirements.size());
-            for (List<String> requirements1 : requirements) {
-                buf.writeVarInt(requirements1.size());
-                requirements1.forEach(buf::writeString);
+            final String[][] requirements = struct.getRequirements();
+            buf.writeVarInt(requirements.length);
+            for (String[] requirements1 : requirements) {
+                buf.writeVarInt(requirements1.length);
+                for (String requirement : requirements1) {
+                    buf.writeString(requirement);
+                }
             }
         }
         final List<String> removed = message.getRemovedAdvs();

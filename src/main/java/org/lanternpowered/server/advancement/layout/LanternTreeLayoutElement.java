@@ -23,24 +23,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.advancement.layout;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+import com.flowpowered.math.vector.Vector2d;
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.TreeLayoutElement;
+
+public class LanternTreeLayoutElement implements TreeLayoutElement {
+
+    private final Advancement advancement;
+    private Vector2d position = Vector2d.ZERO;
+
+    public LanternTreeLayoutElement(Advancement advancement) {
+        this.advancement = advancement;
+    }
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {
-        if (message instanceof MessagePlayInAdvancementTree.Open) {
-            final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
-            context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
-        } else {
-            // Do we need the close event?
-        }
+    public Advancement getAdvancement() {
+        return this.advancement;
+    }
+
+    @Override
+    public Vector2d getPosition() {
+        return this.position;
+    }
+
+    @Override
+    public void setPosition(double x, double y) {
+        this.position = new Vector2d(x, y);
+    }
+
+    @Override
+    public void setPosition(Vector2d position) {
+        checkNotNull(position, "position");
+        this.position = position;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("advancement", this.advancement.getId())
+                .add("position", this.position)
+                .toString();
     }
 }

@@ -39,6 +39,13 @@ import org.lanternpowered.api.script.function.condition.ConditionType;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
 import org.lanternpowered.api.script.function.value.FloatValueProviderType;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
+import org.lanternpowered.server.advancement.LanternAdvancementBuilder;
+import org.lanternpowered.server.advancement.LanternAdvancementTreeBuilder;
+import org.lanternpowered.server.advancement.LanternDisplayInfoBuilder;
+import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder;
+import org.lanternpowered.server.advancement.criteria.LanternScoreCriterionBuilder;
+import org.lanternpowered.server.advancement.criteria.trigger.LanternFilteredTriggerBuilder;
+import org.lanternpowered.server.advancement.criteria.trigger.LanternTriggerBuilder;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
@@ -89,7 +96,12 @@ import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.factory.TimingsFactoryRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementCriterionModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeLayoutModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.AdvancementTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.advancement.TriggerRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
@@ -238,7 +250,6 @@ import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.LanguageUtil;
-import org.lanternpowered.server.util.PrettyPrinter;
 import org.lanternpowered.server.util.graph.CyclicGraphException;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
@@ -249,7 +260,14 @@ import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.advancement.AdvancementType;
+import org.spongepowered.api.advancement.DisplayInfo;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
+import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -513,6 +531,14 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EventContextKey.Builder.class, LanternEventContextKeyBuilder::new)
                 .registerBuilderSupplier(Enchantment.Builder.class, LanternEnchantmentBuilder::new)
                 .registerBuilderSupplier(Key.Builder.class, LanternKeyBuilder::new)
+                // Advancements
+                .registerBuilderSupplier(Advancement.Builder.class, LanternAdvancementBuilder::new)
+                .registerBuilderSupplier(AdvancementTree.Builder.class, LanternAdvancementTreeBuilder::new)
+                .registerBuilderSupplier(AdvancementCriterion.Builder.class, LanternCriterionBuilder::new)
+                .registerBuilderSupplier(ScoreAdvancementCriterion.Builder.class, LanternScoreCriterionBuilder::new)
+                .registerBuilderSupplier(Trigger.Builder.class, LanternTriggerBuilder::new)
+                .registerBuilderSupplier(FilteredTrigger.Builder.class, LanternFilteredTriggerBuilder::new)
+                .registerBuilderSupplier(DisplayInfo.Builder.class, LanternDisplayInfoBuilder::new)
                 // Recipes
                 .registerBuilderSupplier(ShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
                 .registerBuilderSupplier(IShapedCraftingRecipe.Builder.class, LanternShapedCraftingRecipeBuilder::new)
@@ -647,12 +673,18 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
-                .registerModule(new AdvancementTreeRegistryModule())
                 .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 .registerModule(EventContextKey.class, new EventContextKeysModule())
                 .registerModule(new BlockChangeFlagRegistryModule())
+                // Advancements
+                .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
+                .registerModule(Advancement.class, AdvancementRegistryModule.get())
+                .registerModule(AdvancementType.class, new AdvancementTypeRegistryModule())
+                .registerModule(Trigger.class, TriggerRegistryModule.get())
+                .registerModule(new AdvancementTreeLayoutModule())
+                .registerModule(new AdvancementCriterionModule())
                 // Recipes
                 .registerModule(CraftingRecipe.class, this.craftingRecipeRegistry.getRegistryModule())
                 .registerModule(ISmeltingRecipe.class, this.smeltingRecipeRegistry.getRegistryModule())
@@ -827,15 +859,6 @@ public class LanternGameRegistry implements GameRegistry {
         DataRegistrar.setupRegistrations(this.game);
         this.phase = RegistrationPhase.INIT;
         registerModulePhase();
-        // Throw the registry module events for the registries that should be loaded once
-        for (Map.Entry<Class<? extends CatalogType>, CatalogRegistryModule<?>> entry : this.catalogRegistryMap.entrySet()) {
-            final CatalogRegistryModule module = entry.getValue();
-            if (module instanceof AdditionalCatalogRegistryModule &&
-                    module.getClass().getAnnotation(CustomRegistrationPhase.class) == null) {
-                this.game.getEventManager().post(new LanternGameRegistryRegisterEvent(CauseStack.current().getCurrentCause(),
-                        entry.getKey(), (AdditionalCatalogRegistryModule) module));
-            }
-        }
     }
 
     public void postInit() {
@@ -979,6 +1002,7 @@ public class LanternGameRegistry implements GameRegistry {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void registerModulePhase() {
         syncModules();
         for (Class<? extends RegistryModule> moduleClass : this.orderedModules) {
@@ -987,7 +1011,24 @@ public class LanternGameRegistry implements GameRegistry {
                         + moduleClass + " is required but seems to be missing.");
             }
             tryModulePhaseRegistration(this.classMap.get(moduleClass));
-
+            if (this.phase == RegistrationPhase.INIT) {
+                Map.Entry<Class<? extends CatalogType>, CatalogRegistryModule<?>> selectedEntry = null;
+                for (Map.Entry<Class<? extends CatalogType>, CatalogRegistryModule<?>> entry : this.catalogRegistryMap.entrySet()) {
+                    if (entry.getValue().getClass() == moduleClass) {
+                        selectedEntry = entry;
+                        break;
+                    }
+                }
+                if (selectedEntry == null) {
+                    continue;
+                }
+                final CatalogRegistryModule module = selectedEntry.getValue();
+                if (module instanceof AdditionalCatalogRegistryModule &&
+                        module.getClass().getAnnotation(CustomRegistrationPhase.class) == null) {
+                    this.game.getEventManager().post(new LanternGameRegistryRegisterEvent(CauseStack.current().getCurrentCause(),
+                            selectedEntry.getKey(), (AdditionalCatalogRegistryModule) module));
+                }
+            }
         }
         registerAdditionalPhase();
     }

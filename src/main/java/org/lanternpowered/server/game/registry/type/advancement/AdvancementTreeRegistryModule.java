@@ -25,16 +25,24 @@
  */
 package org.lanternpowered.server.game.registry.type.advancement;
 
-import org.lanternpowered.server.advancement.TestAdvancementTree;
-import org.spongepowered.api.registry.RegistrationPhase;
-import org.spongepowered.api.registry.RegistryModule;
-import org.spongepowered.api.registry.util.DelayedRegistration;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
-public class AdvancementTreeRegistryModule implements RegistryModule {
+@RegistrationDependency(AdvancementRegistryModule.class)
+public final class AdvancementTreeRegistryModule extends AdditionalPluginCatalogRegistryModule<AdvancementTree> {
 
-    @DelayedRegistration(RegistrationPhase.POST_INIT)
-    @Override
-    public void registerDefaults() {
-        TestAdvancementTree.init();
+    private static final AdvancementTreeRegistryModule instance = new AdvancementTreeRegistryModule();
+
+    /**
+     * Gets the {@link AdvancementTreeRegistryModule}.
+     *
+     * @return The advancement tree registry module
+     */
+    public static AdvancementTreeRegistryModule get() {
+        return instance;
+    }
+
+    private AdvancementTreeRegistryModule() {
     }
 }

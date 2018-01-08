@@ -852,7 +852,7 @@ public final class LanternWorldManager {
      * All the directories that should be ignored while loading worlds. We will
      * also add the nether and the end manually.
      */
-    private final Set<String> ignoredDirectoryNames = Sets.newHashSet("data", "playerdata", "region", "stats");
+    private final Set<String> ignoredDirectoryNames = Sets.newHashSet("data", "playerdata", "region", "stats", "advancements");
 
     /**
      * Initializes the root world and the dimension id map.

@@ -27,12 +27,13 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.base.MoreObjects;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import org.lanternpowered.server.advancement.FrameType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.util.collect.Collections3;
+import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -92,11 +93,11 @@ public final class MessagePlayOutAdvancements implements Message {
         private final String id;
         @Nullable private final String parentId;
         @Nullable private final Display display;
-        private final List<String> criteria;
-        private final List<List<String>> requirements;
+        private final Collection<String> criteria;
+        private final String[][] requirements;
 
         public AdvStruct(String id, @Nullable String parentId, @Nullable Display display,
-                List<String> criteria, List<List<String>> requirements) {
+                Collection<String> criteria, String[][] requirements) {
             this.requirements = requirements;
             this.parentId = parentId;
             this.criteria = criteria;
@@ -116,11 +117,11 @@ public final class MessagePlayOutAdvancements implements Message {
             return Optional.ofNullable(this.display);
         }
 
-        public List<String> getCriteria() {
+        public Collection<String> getCriteria() {
             return this.criteria;
         }
 
-        public List<List<String>> getRequirements() {
+        public String[][] getRequirements() {
             return this.requirements;
         }
 
@@ -140,14 +141,14 @@ public final class MessagePlayOutAdvancements implements Message {
             private final LocalizedText title;
             private final LocalizedText description;
             private final ItemStackSnapshot icon;
-            private final FrameType frameType;
+            private final AdvancementType frameType;
             @Nullable private final String background;
             private final double x;
             private final double y;
             private final boolean showToast;
             private final boolean hidden;
 
-            public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, FrameType frameType,
+            public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, AdvancementType frameType,
                     @Nullable String background, double x, double y, boolean showToast, boolean hidden) {
                 this.description = description;
                 this.background = background;
@@ -176,7 +177,7 @@ public final class MessagePlayOutAdvancements implements Message {
                 return this.icon;
             }
 
-            public FrameType getFrameType() {
+            public AdvancementType getType() {
                 return this.frameType;
             }
 
@@ -203,7 +204,7 @@ public final class MessagePlayOutAdvancements implements Message {
                         .add("icon", this.icon)
                         .add("title", this.title.getText())
                         .add("description", this.description.getText())
-                        .add("frameType", this.frameType.getId())
+                        .add("type", this.frameType.getId())
                         .add("background", this.background)
                         .add("showToast", this.showToast)
                         .add("x", this.x)

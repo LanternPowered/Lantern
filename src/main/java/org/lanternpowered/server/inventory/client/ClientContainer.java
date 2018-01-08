@@ -27,25 +27,20 @@ package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
-import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
@@ -58,7 +53,6 @@ import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1205,12 +1199,15 @@ public abstract class ClientContainer implements ContainerBase {
             if ((flags[i] & FLAG_DISABLE_SHIFT_INSERTION) != 0) {
                 continue;
             }
-            final boolean main1 = (flags[i] & FLAG_MAIN_INVENTORY) != 0;
-            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
+            // final boolean main1 = (flags[i] & FLAG_MAIN_INVENTORY) != 0;
+            // final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
             // Only attempt to move from bottom to top or from top to bottom inventory
+            // Disable the following fix, allows glitches when rapidly shift clicking
+            /*
             if (main == main1 && hotbar == hotbar1) {
                 continue;
             }
+            */
             final BaseClientSlot slot1 = this.slots[i];
             final ItemStack itemStack1 = slot1.getRaw();
             // Get the amount of items that can be put in the stack

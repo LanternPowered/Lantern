@@ -28,8 +28,10 @@ package org.lanternpowered.server.cause.entity.damage.source;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSourceBuilder;
 
-public class LanternDamageSourceBuilder extends AbstractDamageSourceBuilder<DamageSource, DamageSource.Builder, LanternDamageSourceBuilder>
+@SuppressWarnings({"ConstantConditions", "NullableProblems"})
+public class LanternDamageSourceBuilder extends AbstractDamageSourceBuilder<DamageSource, DamageSource.Builder>
         implements DamageSource.Builder {
 
     @Override

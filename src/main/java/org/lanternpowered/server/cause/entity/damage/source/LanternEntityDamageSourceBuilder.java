@@ -29,8 +29,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 
+@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 public class LanternEntityDamageSourceBuilder extends AbstractEntityDamageSourceBuilder<
-        EntityDamageSource, EntityDamageSource.Builder, LanternEntityDamageSourceBuilder> implements EntityDamageSource.Builder {
+        EntityDamageSource, EntityDamageSource.Builder> implements EntityDamageSource.Builder {
 
     @Override
     public EntityDamageSource build() throws IllegalStateException {

@@ -32,7 +32,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.cause.entity.damage.source.IDamageSource;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
@@ -741,10 +740,8 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
             if (damage > 0) {
                 offer(Keys.HEALTH, Math.max(optHealth.get() - damage, 0));
             }
-            if (damageSource instanceof IDamageSource) {
-                final double exhaustion = ((IDamageSource) damageSource).getExhaustion();
-                getValue(Keys.EXHAUSTION).ifPresent(value -> offer(Keys.EXHAUSTION, Math.min(value.getMaxValue(), value.get() + exhaustion)));
-            }
+            final double exhaustion = damageSource.getExhaustion();
+            getValue(Keys.EXHAUSTION).ifPresent(value -> offer(Keys.EXHAUSTION, Math.min(value.getMaxValue(), value.get() + exhaustion)));
         }
         triggerEvent(DamagedEntityEvent.of());
         return true;

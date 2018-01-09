@@ -30,14 +30,16 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSourceBuilder;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-public class LanternBlockDamageSourceBuilder extends AbstractDamageSourceBuilder<BlockDamageSource, BlockDamageSource.Builder, LanternBlockDamageSourceBuilder>
+@SuppressWarnings({"ConstantConditions", "NullableProblems"})
+public class LanternBlockDamageSourceBuilder extends AbstractDamageSourceBuilder<BlockDamageSource, BlockDamageSource.Builder>
         implements BlockDamageSource.Builder {
 
-    protected Location<World> location;
-    protected BlockSnapshot blockSnapshot;
+    Location<World> location;
+    BlockSnapshot blockSnapshot;
 
     @Override
     public LanternBlockDamageSourceBuilder block(Location<World> location) {
@@ -62,9 +64,9 @@ public class LanternBlockDamageSourceBuilder extends AbstractDamageSourceBuilder
         Location<World> location = this.location;
         BlockSnapshot blockSnapshot = this.blockSnapshot;
         if (location == null && blockSnapshot != null) {
-            this.location = blockSnapshot.getLocation().orElse(null);
+            location = blockSnapshot.getLocation().orElse(null);
         } else if (location != null && blockSnapshot == null) {
-            this.blockSnapshot = location.createSnapshot();
+            blockSnapshot = location.createSnapshot();
         }
         checkState(location != null, "The location must be set");
         checkState(blockSnapshot != null, "The block snapshot must be set");

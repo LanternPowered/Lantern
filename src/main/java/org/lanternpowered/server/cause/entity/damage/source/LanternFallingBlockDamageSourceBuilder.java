@@ -36,16 +36,17 @@ import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamage
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 public class LanternFallingBlockDamageSourceBuilder extends AbstractEntityDamageSourceBuilder<FallingBlockDamageSource,
-        FallingBlockDamageSource.Builder, LanternFallingBlockDamageSourceBuilder> implements FallingBlockDamageSource.Builder {
+        FallingBlockDamageSource.Builder> implements FallingBlockDamageSource.Builder {
 
-    @Nullable protected ImmutableFallingBlockData fallingBlockData;
+    @Nullable ImmutableFallingBlockData fallingBlockData;
 
     @Override
     public LanternFallingBlockDamageSourceBuilder entity(Entity entity) {
         checkNotNull(entity, "Entity source cannot be null!");
         checkArgument(entity instanceof FallingBlock, "Entity source must be a falling block!");
-        return super.entity(entity);
+        return (LanternFallingBlockDamageSourceBuilder) super.entity(entity);
     }
 
     @Override

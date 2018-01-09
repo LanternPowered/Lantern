@@ -31,10 +31,11 @@ import static com.google.common.base.Preconditions.checkState;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 
+@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 public class LanternIndirectEntityDamageSourceBuilder extends AbstractEntityDamageSourceBuilder<IndirectEntityDamageSource,
-        IndirectEntityDamageSource.Builder, LanternIndirectEntityDamageSourceBuilder> implements IndirectEntityDamageSource.Builder {
+        IndirectEntityDamageSource.Builder> implements IndirectEntityDamageSource.Builder {
 
-    protected Entity indirect;
+    Entity indirect;
 
     @Override
     public IndirectEntityDamageSource build() throws IllegalStateException {

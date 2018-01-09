@@ -62,6 +62,7 @@ public class QueryOperationRegistryModule extends PluginCatalogRegistryModule<Qu
         register(new LanternQueryOperationType<Predicate<ItemStack>>("sponge", "item_stack_custom",
                 (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek().orElse(ItemStack.empty()))));
         register(new LanternQueryOperationType<Class<? extends Inventory>>("sponge", "inventory_type", Class::isInstance));
+        register(new LanternQueryOperationType<Class<?>>("sponge", "type", Class::isInstance));
         register(new LanternQueryOperationType<Translation>("sponge", "inventory_translation",
                 (arg, inventory) -> inventory.getName().equals(arg)));
         register(new LanternQueryOperationType<InventoryProperty<?,?>>("sponge", "inventory_property",

@@ -23,41 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.vanilla;
+package org.lanternpowered.server.inventory.query;
 
-import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.inventory.AbstractInventory;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.query.QueryOperationType;
 
-public class LanternMainPlayerInventory extends AbstractGridInventory implements MainPlayerInventory {
+@SuppressWarnings("unchecked")
+public final class LanternQueryOperation<T> implements QueryOperation<T> {
 
-    private static final class Holder {
+    private final LanternQueryOperationType<T> type;
+    private final T arg;
 
-        private static final QueryOperation<?> GRID_INVENTORY_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(AbstractGridInventory.class);
-        private static final QueryOperation<?> HOTBAR_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(LanternHotbarInventory.class);
-    }
-
-    private LanternHotbarInventory hotbar;
-    private AbstractGridInventory grid;
-
-    @Override
-    protected void init() {
-        super.init();
-
-        this.grid = query(Holder.GRID_INVENTORY_OPERATION).first();
-        this.hotbar = query(Holder.HOTBAR_OPERATION).first();
+    LanternQueryOperation(LanternQueryOperationType<T> type, T arg) {
+        this.type = type;
+        this.arg = arg;
     }
 
     @Override
-    public LanternHotbarInventory getHotbar() {
-        return this.hotbar;
+    public QueryOperationType<T> getType() {
+        return this.type;
     }
 
     @Override
-    public AbstractGridInventory getGrid() {
-        return this.grid;
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("type", this.type.getId())
+                .add("arg", this.arg)
+                .toString();
+    }
+
+    public boolean test(AbstractInventory inventory) {
+        return this.type.queryOperator.test(this.arg, inventory);
     }
 }

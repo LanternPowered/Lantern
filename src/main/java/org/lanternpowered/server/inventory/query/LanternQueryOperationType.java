@@ -23,41 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.vanilla;
+package org.lanternpowered.server.inventory.query;
 
-import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.query.QueryOperationType;
 
-public class LanternMainPlayerInventory extends AbstractGridInventory implements MainPlayerInventory {
+public final class LanternQueryOperationType<T> extends PluginCatalogType.Base implements QueryOperationType<T> {
 
-    private static final class Holder {
+    final QueryOperator queryOperator;
 
-        private static final QueryOperation<?> GRID_INVENTORY_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(AbstractGridInventory.class);
-        private static final QueryOperation<?> HOTBAR_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(LanternHotbarInventory.class);
-    }
-
-    private LanternHotbarInventory hotbar;
-    private AbstractGridInventory grid;
-
-    @Override
-    protected void init() {
-        super.init();
-
-        this.grid = query(Holder.GRID_INVENTORY_OPERATION).first();
-        this.hotbar = query(Holder.HOTBAR_OPERATION).first();
+    public LanternQueryOperationType(String pluginId, String name,
+            QueryOperator<T> queryOperator) {
+        super(pluginId, name);
+        this.queryOperator = queryOperator;
     }
 
     @Override
-    public LanternHotbarInventory getHotbar() {
-        return this.hotbar;
-    }
-
-    @Override
-    public AbstractGridInventory getGrid() {
-        return this.grid;
+    public QueryOperation<T> of(T arg) {
+        checkNotNull(arg, "arg");
+        return new LanternQueryOperation<>(this, arg);
     }
 }

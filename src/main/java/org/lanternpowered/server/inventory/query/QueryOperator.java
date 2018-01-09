@@ -23,41 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.vanilla;
+package org.lanternpowered.server.inventory.query;
 
-import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
-import org.spongepowered.api.item.inventory.query.QueryOperation;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.lanternpowered.server.inventory.AbstractInventory;
 
-public class LanternMainPlayerInventory extends AbstractGridInventory implements MainPlayerInventory {
+@FunctionalInterface
+public interface QueryOperator<T> {
 
-    private static final class Holder {
-
-        private static final QueryOperation<?> GRID_INVENTORY_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(AbstractGridInventory.class);
-        private static final QueryOperation<?> HOTBAR_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(LanternHotbarInventory.class);
-    }
-
-    private LanternHotbarInventory hotbar;
-    private AbstractGridInventory grid;
-
-    @Override
-    protected void init() {
-        super.init();
-
-        this.grid = query(Holder.GRID_INVENTORY_OPERATION).first();
-        this.hotbar = query(Holder.HOTBAR_OPERATION).first();
-    }
-
-    @Override
-    public LanternHotbarInventory getHotbar() {
-        return this.hotbar;
-    }
-
-    @Override
-    public AbstractGridInventory getGrid() {
-        return this.grid;
-    }
+    boolean test(T arg, AbstractInventory inventory);
 }

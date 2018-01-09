@@ -128,8 +128,6 @@ public interface IInventory extends Inventory {
      */
     boolean isValidItem(ItemStack stack);
 
-    <T extends Inventory> T queryNot(Class<?>... types);
-
     @Override
     IInventory intersect(Inventory inventory);
 

@@ -35,6 +35,8 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
@@ -45,6 +47,14 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 public class LanternCraftingInventory extends AbstractOrderedInventory implements CraftingInventory {
+
+    private static final class Holder {
+
+        private static final QueryOperation<?> CRAFTING_OUTPUT_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(CraftingOutput.class);
+        private static final QueryOperation<?> CRAFTING_GRID_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(CraftingGridInventory.class);
+    }
 
     protected final CarrierReference<?> carrierReference;
 
@@ -64,8 +74,8 @@ public class LanternCraftingInventory extends AbstractOrderedInventory implement
         super.init();
 
         // Search for the underlying inventories
-        this.output = query(CraftingOutput.class).first();
-        this.grid = query(CraftingGridInventory.class).first();
+        this.output = query(Holder.CRAFTING_OUTPUT_OPERATION).first();
+        this.grid = query(Holder.CRAFTING_GRID_OPERATION).first();
 
         // Add a change listener to update the output slot
         ((AbstractInventory) this.grid).addChangeListener(slot -> {

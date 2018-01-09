@@ -29,27 +29,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import org.lanternpowered.server.data.property.PropertyHelper;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
+import org.lanternpowered.server.inventory.query.LanternQueryOperation;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
-import org.spongepowered.api.item.inventory.property.ArmorSlotType;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.translation.Translation;
@@ -262,211 +257,14 @@ public abstract class AbstractInventory implements IInventory {
     static final class UnorderedChildrenInventoryQuery extends AbstractUnorderedChildrenInventory {
     }
 
-    /**
-     * Queries for specific {@link AbstractSlot}s.
-     *
-     * @param predicate The predicate
-     * @param <T> The inventory type
-     * @return The slots query inventory
-     */
-    protected <T extends Inventory> T querySlots(Predicate<AbstractSlot> predicate) {
-        List<AbstractSlot> slots = getSlotInventories();
-        if (slots.isEmpty()) { // Fail fast
-            return genericEmpty();
-        }
-        slots = slots.stream().filter(predicate).collect(ImmutableList.toImmutableList());
-        if (slots.isEmpty()) {
-            return genericEmpty();
-        }
-        // Construct the result inventory
-        final UnorderedChildrenInventoryQuery result = new UnorderedChildrenInventoryQuery();
-        result.init(slots, slots);
-        return (T) result;
-    }
-
     protected abstract <T extends Inventory> T queryInventories(Predicate<AbstractMutableInventory> predicate);
 
     @Override
-    public <T extends Inventory> T query(ItemType... types) {
-        checkNotNull(types, "types");
-        return querySlots(slot -> {
-            for (ItemType type : types) {
-                if (slot.contains(type)) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T query(ItemStack... types) {
-        checkNotNull(types, "types");
-        return querySlots(slot -> {
-            for (ItemStack type : types) {
-                if (slot.contains(type)) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T queryAny(ItemStack... types) {
-        checkNotNull(types, "types");
-        return querySlots(slot -> {
-            for (ItemStack type : types) {
-                if (slot.containsAny(type)) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T queryNot(Class<?>... types) {
-        checkNotNull(types, "types");
+    public <T extends Inventory> T query(QueryOperation<?>... operations) {
         return queryInventories(inventory -> {
-            for (Class<?> type : types) {
-                if (type.isInstance(inventory)) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T query(Class<?>... types) {
-        checkNotNull(types, "types");
-        return queryInventories(inventory -> {
-            for (Class<?> type : types) {
-                if (type.isInstance(inventory)) {
+            for (QueryOperation operation : operations) {
+                if (((LanternQueryOperation) operation).test(inventory)) {
                     return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T query(InventoryProperty<?, ?>... props) {
-        checkNotNull(props, "props");
-        return queryInventories(inventory -> {
-            for (InventoryProperty<?,?> prop : props) {
-                // Equipment slot types are a special case, because
-                // they can be grouped
-                if (prop instanceof EquipmentSlotType) {
-                    for (EquipmentSlotType property : Iterables.concat(
-                            getProperties(inventory, EquipmentSlotType.class),
-                            getProperties(inventory, ArmorSlotType.class))) {
-                        if (((LanternEquipmentType) ((EquipmentSlotType) prop).getValue()).isChild(property.getValue())) {
-                            return true;
-                        }
-                    }
-                    continue;
-                }
-                final Optional<InventoryProperty<?,?>> optProperty = getProperty(inventory,
-                        (Class) prop.getClass(), prop.getKey());
-                if (optProperty.isPresent()) {
-                    final InventoryProperty<?,?> prop2 = optProperty.get();
-                    if (PropertyHelper.matches(prop, prop2)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T query(Translation... names) {
-        checkNotNull(names, "names");
-        return queryInventories(inventory -> {
-            for (Translation name : names) {
-                if (inventory.getName().equals(name)) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T query(String... names) {
-        checkNotNull(names, "names");
-        return queryInventories(inventory -> {
-            final String plainName = inventory.getName().get();
-            for (String name : names) {
-                if (plainName.equals(name)) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public <T extends Inventory> T query(Object... args) {
-        checkNotNull(args, "args");
-        return queryInventories(inventory -> {
-            for (Object arg : args) {
-                if (arg instanceof Inventory) {
-                    if (inventory.equals(arg)) {
-                        return true;
-                    }
-                } else if (arg instanceof InventoryArchetype) {
-                    if (inventory.getArchetype().equals(arg)) {
-                        return true;
-                    }
-                } else if (arg instanceof ItemStack) {
-                    if (inventory.contains((ItemStack) arg)) {
-                        return true;
-                    }
-                } else if (arg instanceof Translation) {
-                    if (inventory.getName().equals(arg)) {
-                        return true;
-                    }
-                } else if (arg instanceof ItemType) {
-                    if (inventory.contains((ItemType) arg)) {
-                        return true;
-                    }
-                } else if (arg instanceof EquipmentType) {
-                    for (EquipmentSlotType property : Iterables.concat(
-                            getProperties(inventory, EquipmentSlotType.class),
-                            getProperties(inventory, ArmorSlotType.class))) {
-                        if (((LanternEquipmentType) arg).isChild(property.getValue())) {
-                            return true;
-                        }
-                    }
-                } else if (arg instanceof EquipmentSlotType) {
-                    for (EquipmentSlotType property : Iterables.concat(
-                            getProperties(inventory, EquipmentSlotType.class),
-                            getProperties(inventory, ArmorSlotType.class))) {
-                        if (((LanternEquipmentType) ((EquipmentSlotType) arg).getValue()).isChild(property.getValue())) {
-                            return true;
-                        }
-                    }
-                } else if (arg instanceof InventoryProperty<?,?>) {
-                    final InventoryProperty<?,?> prop = (InventoryProperty<?, ?>) arg;
-                    final Optional<InventoryProperty<?,?>> optProperty = getProperty(
-                            inventory, (Class) prop.getClass(), prop.getKey());
-                    if (optProperty.isPresent() && PropertyHelper.matches(prop, optProperty.get())) {
-                        return true;
-                    }
-                } else if (arg instanceof Class<?>) {
-                    final Class<?> clazz = (Class<?>) arg;
-                    if (InventoryProperty.class.isAssignableFrom(clazz)) {
-                        if (getProperty(inventory, (Class) clazz, "none").isPresent()) {
-                            return true;
-                        }
-                    } else if (Inventory.class.isAssignableFrom(clazz)) {
-                        if (clazz.isInstance(inventory)) {
-                            return true;
-                        }
-                    }
                 }
             }
             return false;

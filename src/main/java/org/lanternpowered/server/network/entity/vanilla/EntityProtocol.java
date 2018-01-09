@@ -66,6 +66,9 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 
 import javax.annotation.Nullable;
 
@@ -82,6 +85,16 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                         EquipmentTypes.CHESTPLATE,
                         EquipmentTypes.HEADWEAR
                 };
+
+        private final static QueryOperation<?>[] EQUIPMENT_QUERIES;
+
+        static {
+            EQUIPMENT_QUERIES = new QueryOperation[EQUIPMENT_TYPES.length];
+            for (int i = 0; i < EQUIPMENT_QUERIES.length; i++) {
+                EQUIPMENT_QUERIES[i] = QueryOperationTypes.INVENTORY_PROPERTY.of(
+                        EquipmentSlotType.of(EQUIPMENT_TYPES[i]));
+            }
+        }
     }
 
     private long lastX;
@@ -121,8 +134,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (hasEquipment() && this.entity instanceof Carrier) {
             final Inventory inventory = ((Carrier) this.entity).getInventory();
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
-                final EquipmentType equipmentType = Holder.EQUIPMENT_TYPES[i];
-                final ItemStack itemStack = inventory.query(equipmentType).first().peek().orElse(null);
+                final ItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek().orElse(null);
                 final int slotIndex = i;
                 if (itemStack != null) {
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
@@ -222,8 +234,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (hasEquipment() && this.entity instanceof Carrier) {
             final Inventory inventory = ((Carrier) this.entity).getInventory();
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
-                final EquipmentType equipmentType = Holder.EQUIPMENT_TYPES[i];
-                final ItemStack itemStack = inventory.query(equipmentType).first().peek().orElse(null);
+                final ItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek().orElse(null);
                 final ItemStack oldItemStack = this.lastEquipment.get(i);
                 if (!LanternItemStack.areSimilar(itemStack, oldItemStack)) {
                     this.lastEquipment.put(i, itemStack);

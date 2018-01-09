@@ -37,10 +37,22 @@ import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 
 import java.util.Optional;
 
 public class FurnaceInventory extends AbstractOrderedInventory implements ITileEntityInventory {
+
+    private static final class Holder {
+
+        private static final QueryOperation<?> INPUT_SLOT_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(LanternInputSlot.class);
+        private static final QueryOperation<?> FUEL_SLOT_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(LanternFuelSlot.class);
+        private static final QueryOperation<?> OUTPUT_SLOT_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(LanternOutputSlot.class);
+    }
 
     private final CarrierReference<Carrier> carrierReference = CarrierReference.of(Carrier.class);
 
@@ -79,9 +91,9 @@ public class FurnaceInventory extends AbstractOrderedInventory implements ITileE
         super.init();
 
         resetCachedProgress();
-        this.inputSlot = query(LanternInputSlot.class).first();
-        this.fuelSlot = query(LanternFuelSlot.class).first();
-        this.outputSlot = query(LanternOutputSlot.class).first();
+        this.inputSlot = query(Holder.INPUT_SLOT_OPERATION).first();
+        this.fuelSlot = query(Holder.FUEL_SLOT_OPERATION).first();
+        this.outputSlot = query(Holder.OUTPUT_SLOT_OPERATION).first();
     }
 
     @Override

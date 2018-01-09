@@ -34,6 +34,8 @@ import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.Optional;
@@ -43,6 +45,12 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public interface AbstractEquipable extends Equipable {
 
+    class Holder {
+
+        private static final QueryOperation<?> EQUIPMENT_INVENTORY_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(IEquipmentInventory.class);
+    }
+
     @Override
     default boolean canEquip(EquipmentType type) {
         return canEquip(type, null);
@@ -51,7 +59,7 @@ public interface AbstractEquipable extends Equipable {
     @Override
     default boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
         checkNotNull(type, "type");
-        final Inventory inventory = getInventory().query(IEquipmentInventory.class);
+        final Inventory inventory = getInventory().query(Holder.EQUIPMENT_INVENTORY_OPERATION);
         if (inventory instanceof EmptyInventory) {
             return false;
         }
@@ -62,7 +70,7 @@ public interface AbstractEquipable extends Equipable {
     @Override
     default Optional<ItemStack> getEquipped(EquipmentType type) {
         checkNotNull(type, "type");
-        final Inventory inventory = getInventory().query(IEquipmentInventory.class);
+        final Inventory inventory = getInventory().query(Holder.EQUIPMENT_INVENTORY_OPERATION);
         if (inventory instanceof EmptyInventory) {
             return Optional.empty();
         }
@@ -72,7 +80,7 @@ public interface AbstractEquipable extends Equipable {
     @Override
     default boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
         checkNotNull(type, "type");
-        final Inventory inventory = getInventory().query(IEquipmentInventory.class);
+        final Inventory inventory = getInventory().query(Holder.EQUIPMENT_INVENTORY_OPERATION);
         if (inventory instanceof EmptyInventory) {
             return false;
         }

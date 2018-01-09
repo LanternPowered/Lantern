@@ -39,6 +39,7 @@ import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
@@ -469,7 +470,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
         checkNotNull(itemStack, "itemStack");
         final PeekedOfferTransactionResult peekResult;
         final Set<Inventory> processed = new HashSet<>();
-        final Inventory inventory = queryAny(itemStack);
+        final Inventory inventory = query(QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY.of(itemStack));
         if (inventory instanceof AbstractChildrenInventory) {
             peekResult = ((AbstractChildrenInventory) inventory).peekOffer(itemStack, processed, true);
             if (peekResult.isSuccess()) {
@@ -499,7 +500,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
     public FastOfferResult offerFast(ItemStack stack) {
         checkNotNull(stack, "stack");
         final Set<Inventory> processed = new HashSet<>();
-        final Inventory inventory = queryAny(stack);
+        final Inventory inventory = query(QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY.of(stack));
         if (inventory instanceof AbstractChildrenInventory) {
             final FastOfferResult offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
             final Optional<ItemStack> rejectedItem = offerResult.getRejectedItem();

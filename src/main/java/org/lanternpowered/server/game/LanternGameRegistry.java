@@ -172,6 +172,7 @@ import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryMo
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.inventory.QueryOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CollisionRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistryModule;
@@ -375,6 +376,7 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.GuiId;
+import org.spongepowered.api.item.inventory.query.QueryOperationType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -659,6 +661,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
+                .registerModule(QueryOperationType.class, new QueryOperationRegistryModule())
                 .registerModule(GuiId.class, ClientContainerRegistryModule.get())
                 .registerModule(GoldenApple.class, GoldenAppleRegistryModule.get())
                 .registerModule(CoalType.class, CoalTypeRegistryModule.get())
@@ -806,6 +809,7 @@ public class LanternGameRegistry implements GameRegistry {
         return (T) this.builderSupplierMap.get(builderClass).get();
     }
 
+    @Deprecated
     @Override
     public <T extends CatalogType> T register(Class<T> type, T obj) throws IllegalArgumentException, UnsupportedOperationException {
         final CatalogRegistryModule<T> registryModule = getCatalogRegistryModule(type).orElse(null);

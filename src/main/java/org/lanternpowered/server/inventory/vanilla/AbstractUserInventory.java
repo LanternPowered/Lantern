@@ -40,6 +40,8 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.UserInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -47,6 +49,16 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractUserInventory<T extends User> extends AbstractOrderedInventory implements UserInventory<T> {
+
+    private static final class Holder {
+
+        private static final QueryOperation<?> MAIN_INVENTORY_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(LanternMainPlayerInventory.class);
+        private static final QueryOperation<?> EQUIPMENT_INVENTORY_OPERATION =
+                QueryOperationTypes.INVENTORY_TYPE.of(LanternPlayerEquipmentInventory.class);
+        private static final QueryOperation<?> OFF_HAND_OPERATION =
+                QueryOperationTypes.INVENTORY_PROPERTY.of(EquipmentSlotType.of(EquipmentTypes.OFF_HAND));
+    }
 
     private final CarrierReference<T> carrierReference;
 
@@ -94,9 +106,9 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractOrde
         super.init();
 
         // Search the the inventories for the helper methods
-        this.mainInventory = query(LanternMainPlayerInventory.class).first();
-        this.equipmentInventory = query(LanternPlayerEquipmentInventory.class).first();
-        this.offhandSlot = query(new EquipmentSlotType(EquipmentTypes.OFF_HAND)).first();
+        this.mainInventory = query(Holder.MAIN_INVENTORY_OPERATION).first();
+        this.equipmentInventory = query(Holder.EQUIPMENT_INVENTORY_OPERATION).first();
+        this.offhandSlot = query(Holder.OFF_HAND_OPERATION).first();
 
         // Construct the inventory views
 

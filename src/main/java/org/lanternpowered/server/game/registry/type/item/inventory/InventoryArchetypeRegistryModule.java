@@ -43,7 +43,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-@RegistrationDependency({ ClientContainerRegistryModule.class, EquipmentTypeRegistryModule.class, ItemRegistryModule.class })
+@RegistrationDependency({ ClientContainerRegistryModule.class, EquipmentTypeRegistryModule.class, ItemRegistryModule.class,
+        QueryOperationRegistryModule.class })
 public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModule<InventoryArchetype> {
 
     public InventoryArchetypeRegistryModule() {

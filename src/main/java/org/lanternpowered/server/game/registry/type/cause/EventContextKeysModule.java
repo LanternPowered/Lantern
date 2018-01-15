@@ -57,7 +57,18 @@ import org.spongepowered.api.world.World;
 
 public final class EventContextKeysModule extends AdditionalPluginCatalogRegistryModule<EventContextKey> {
 
-    public EventContextKeysModule() {
+    private static final EventContextKeysModule instance = new EventContextKeysModule();
+
+    /**
+     * Gets the {@link EventContextKeysModule}.
+     *
+     * @return The event context keys registry module
+     */
+    public static EventContextKeysModule get() {
+        return instance;
+    }
+
+    private EventContextKeysModule() {
         super(EventContextKeys.class, LanternEventContextKeys.class, ContextKeys.class);
     }
 

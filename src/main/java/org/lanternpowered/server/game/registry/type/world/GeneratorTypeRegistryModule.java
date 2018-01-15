@@ -39,7 +39,6 @@ import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatOverworldGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatNetherGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatTheEndGeneratorType;
-import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
 import org.lanternpowered.server.world.gen.thevoid.TheVoidGeneratorType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
@@ -91,7 +90,6 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
         register(new DelegateGeneratorType("minecraft", "the_end", flatTheEnd));
 
         // Sponge
-        register(new SkylandsGeneratorType("sponge", "skylands"));
         register(new TheVoidGeneratorType("sponge", "void"));
     }
 

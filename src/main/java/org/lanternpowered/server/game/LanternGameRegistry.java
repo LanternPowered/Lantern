@@ -679,7 +679,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
-                .registerModule(EventContextKey.class, new EventContextKeysModule())
+                .registerModule(EventContextKey.class, EventContextKeysModule.get())
                 .registerModule(new BlockChangeFlagRegistryModule())
                 // Advancements
                 .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
@@ -807,21 +807,6 @@ public class LanternGameRegistry implements GameRegistry {
         checkArgument(this.builderSupplierMap.containsKey(builderClass), "Could not find a Supplier for the provided class: " +
                 builderClass.getCanonicalName());
         return (T) this.builderSupplierMap.get(builderClass).get();
-    }
-
-    @Deprecated
-    @Override
-    public <T extends CatalogType> T register(Class<T> type, T obj) throws IllegalArgumentException, UnsupportedOperationException {
-        final CatalogRegistryModule<T> registryModule = getCatalogRegistryModule(type).orElse(null);
-        if (registryModule == null) {
-            throw new UnsupportedOperationException("Failed to find a RegistryModule for that type.");
-        } else {
-            if (registryModule instanceof AdditionalCatalogRegistryModule) {
-                ((AdditionalCatalogRegistryModule<T>) registryModule).registerAdditionalCatalog(obj);
-                return obj;
-            }
-            throw new UnsupportedOperationException("This catalog type does not support additional registration");
-        }
     }
 
     @Override

@@ -26,9 +26,7 @@
 package org.lanternpowered.server.game.registry.type.advancement;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.criteria.trigger.Trigger;
-import org.spongepowered.api.registry.util.RegistrationDependency;
 
 public final class TriggerRegistryModule extends AdditionalPluginCatalogRegistryModule<Trigger> {
 

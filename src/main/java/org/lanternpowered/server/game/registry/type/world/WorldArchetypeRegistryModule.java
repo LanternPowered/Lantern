@@ -78,10 +78,6 @@ public final class WorldArchetypeRegistryModule extends AdditionalPluginCatalogR
                 .build("minecraft:the_end", "The End"));
         register(WorldArchetype.builder()
                 .from(overworld)
-                .generatorModifiers(WorldGeneratorModifiers.SKYLANDS)
-                .build("sponge:the_skylands", "The Skylands"));
-        register(WorldArchetype.builder()
-                .from(overworld)
                 .generatorModifiers(WorldGeneratorModifiers.VOID)
                 .build("sponge:the_void", "The Void"));
     }

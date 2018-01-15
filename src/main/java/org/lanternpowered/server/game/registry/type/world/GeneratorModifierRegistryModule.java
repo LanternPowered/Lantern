@@ -27,7 +27,6 @@ package org.lanternpowered.server.game.registry.type.world;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.extra.modifier.empty.VoidWorldGeneratorModifier;
-import org.spongepowered.api.extra.modifier.skylands.SkylandsWorldGeneratorModifier;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.gen.WorldGeneratorModifiers;
 
@@ -39,7 +38,6 @@ public final class GeneratorModifierRegistryModule extends AdditionalPluginCatal
 
     @Override
     public void registerDefaults() {
-        register(new SkylandsWorldGeneratorModifier());
         register(new VoidWorldGeneratorModifier());
     }
 }

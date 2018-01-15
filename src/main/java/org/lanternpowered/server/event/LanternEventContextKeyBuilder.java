@@ -31,6 +31,7 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule;
 import org.spongepowered.api.event.cause.EventContextKey;
 
 import javax.annotation.Nullable;
@@ -73,7 +74,7 @@ public final class LanternEventContextKeyBuilder<T> implements EventContextKey.B
         final String id = this.id.substring(index + 1);
         final String name = this.name == null ? id : this.name;
         final LanternEventContextKey<T> contextKey = new LanternEventContextKey<>(pluginId, id, name, this.typeToken);
-        Lantern.getGame().getRegistry().register(EventContextKey.class, contextKey);
+        EventContextKeysModule.get().registerAdditionalCatalog(contextKey);
         return contextKey;
     }
 

@@ -261,6 +261,17 @@ class MemoryDataView implements DataView {
             copyDataView(path, valueContainer);
         } else if (value instanceof CatalogType) {
             return set(path, ((CatalogType) value).getId());
+        } else if (value instanceof Integer ||
+                value instanceof Byte ||
+                value instanceof Short ||
+                value instanceof Float ||
+                value instanceof Double ||
+                value instanceof Long ||
+                value instanceof String ||
+                value instanceof Character ||
+                value instanceof Boolean) {
+            this.map.put(key, value);
+            return this;
         } else if ((optDataTypeSerializer = manager.getTypeSerializer(typeToken = TypeToken.of(value.getClass()))).isPresent()) {
             final DataTypeSerializer serializer = optDataTypeSerializer.get();
             final Object serialized = serializer.serialize(typeToken, manager.getTypeSerializerContext(), value);
@@ -270,7 +281,7 @@ class MemoryDataView implements DataView {
                 // see above for why this is copied
                 copyDataView(path, container);
             } else {
-                set(path, serialized);
+                this.map.put(key, serialized);
             }
         } else if (value instanceof Collection) {
             setCollection(key, (Collection) value);

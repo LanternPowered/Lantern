@@ -210,7 +210,6 @@ import org.spongepowered.api.data.manipulator.immutable.item.ImmutableSpawnableD
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableStoredEnchantmentData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBannerData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBeaconData;
-import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBedData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBrewingStandData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableCooldownData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableEndGatewayData;
@@ -370,7 +369,6 @@ import org.spongepowered.api.data.manipulator.mutable.item.SpawnableData;
 import org.spongepowered.api.data.manipulator.mutable.item.StoredEnchantmentData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.BannerData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.BeaconData;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.BedData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.BrewingStandData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.CooldownData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.EndGatewayData;
@@ -900,8 +898,6 @@ public class DataManipulatorRegistry {
                     c.register(Keys.BEACON_PRIMARY_EFFECT, Optional.empty());
                     c.register(Keys.BEACON_SECONDARY_EFFECT, Optional.empty());
                 });
-        register(BedData.class, ImmutableBedData.class,
-                c -> c.register(Keys.DYE_COLOR, DyeColors.WHITE));
         register(BrewingStandData.class, ImmutableBrewingStandData.class,
                 c -> c.register(Keys.REMAINING_BREW_TIME, 0, 0, Integer.MAX_VALUE));
         register(CooldownData.class, ImmutableCooldownData.class,

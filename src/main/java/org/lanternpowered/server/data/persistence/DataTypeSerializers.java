@@ -232,10 +232,14 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public List<Object> serialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<?> obj) throws InvalidDataException {
-            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
-            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
-                    .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
-            return obj.stream().map(object -> elementSerial.serialize(elementType, ctx, object)).collect(Collectors.toList());
+            return obj.stream()
+                    .map(object -> {
+                        final DataTypeSerializer serializer = ctx.getSerializers().getTypeSerializer(object.getClass())
+                                .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " +
+                                        object.getClass().toString()));
+                        return serializer.serialize(TypeToken.of(object.getClass()), ctx, object);
+                    })
+                    .collect(Collectors.toList());
         }
     }
 
@@ -257,10 +261,14 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public List<Object> serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Set<?> obj) throws InvalidDataException {
-            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
-            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
-                    .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
-            return obj.stream().map(object -> elementSerial.serialize(elementType, ctx, object)).collect(Collectors.toList());
+            return obj.stream()
+                    .map(object -> {
+                        final DataTypeSerializer serializer = ctx.getSerializers().getTypeSerializer(object.getClass())
+                                .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " +
+                                        object.getClass().toString()));
+                        return serializer.serialize(TypeToken.of(object.getClass()), ctx, object);
+                    })
+                    .collect(Collectors.toList());
         }
     }
 
@@ -282,10 +290,13 @@ public final class DataTypeSerializers {
         @SuppressWarnings({"unchecked", "OptionalUsedAsFieldOrParameterType"})
         @Override
         public Object serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Optional<?> obj) throws InvalidDataException {
-            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
-            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
-                    .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
-            return obj.isPresent() ? elementSerial.serialize(elementType, ctx, obj.get()) : EMPTY;
+            return obj
+                    .map(object -> {
+                        final DataTypeSerializer serializer = ctx.getSerializers().getTypeSerializer(object.getClass())
+                                .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " +
+                                        object.getClass().toString()));
+                        return serializer.serialize(TypeToken.of(object.getClass()), ctx, object);
+                    }).orElse(EMPTY);
         }
     }
 

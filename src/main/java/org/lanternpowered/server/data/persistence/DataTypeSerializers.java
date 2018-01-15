@@ -70,6 +70,20 @@ public final class DataTypeSerializers {
         dataManager.registerTypeSerializer(TypeToken.of(String.class), new StringSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(Boolean.class), new BooleanSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(DataSerializable.class), new DataSerializableSerializer());
+        dataManager.registerTypeSerializer(TypeToken.of(DataView.class), new DataViewSerializer());
+    }
+
+    private static class DataViewSerializer implements DataViewTypeSerializer<DataView> {
+
+        @Override
+        public DataView deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView data) throws InvalidDataException {
+            return data;
+        }
+
+        @Override
+        public DataView serialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView obj) throws InvalidDataException {
+            return obj;
+        }
     }
 
     private static class DataSerializableSerializer implements DataViewTypeSerializer<DataSerializable> {

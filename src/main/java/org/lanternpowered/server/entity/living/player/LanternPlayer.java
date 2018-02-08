@@ -473,8 +473,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (!harvestEvent.isCancelled()) {
             final List<ItemStackSnapshot> drops = new ArrayList<>();
             if (!harvestEvent.keepsInventory()) {
+                // Make a copy of all the items in the players inventory, and put them in the drops
                 getInventory().<AbstractSlot>slots().forEach(slot ->
-                        slot.poll().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
+                        slot.peek().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
             }
             if (!harvestEvent.keepsLevel()) {
                 offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());

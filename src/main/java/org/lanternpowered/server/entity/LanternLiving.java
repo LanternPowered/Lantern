@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.collect.Lists2;
@@ -62,6 +63,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.HarvestEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -137,9 +139,13 @@ public class LanternLiving extends LanternEntity implements Living {
         setDead(true);
         final CauseStack causeStack = CauseStack.current();
 
+        // Only players can keep their inventory
+        final boolean keepsInventory = this instanceof LanternPlayer &&
+                getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
+
         // Post the entity destruction event
-        final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
-                MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, false);
+        final DestructEntityEvent.Death event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
+                MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, keepsInventory, false);
         postDestructEvent(event);
 
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
@@ -148,6 +154,11 @@ public class LanternLiving extends LanternEntity implements Living {
             frame.pushCause(event);
             // Post the harvest event
             handleDeath(causeStack);
+        }
+
+        // Clear the inventory, if keepsInventory is false in the thrown Death event
+        if (!event.getKeepInventory() && this instanceof Carrier) {
+            ((Carrier) this).getInventory().clear();
         }
     }
 

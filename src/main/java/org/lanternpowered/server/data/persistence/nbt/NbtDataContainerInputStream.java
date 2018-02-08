@@ -43,6 +43,7 @@ import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.SHORT;
 import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.STRING;
 
 import com.google.common.collect.Lists;
+import org.lanternpowered.server.data.MemoryDataContainer;
 import org.lanternpowered.server.data.persistence.DataContainerInput;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -177,7 +178,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return array;
         } else if (type == COMPOUND) {
             if (container == null) {
-                container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
+                container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
             }
             Entry entry;
             final int depth1 = depth + 1;

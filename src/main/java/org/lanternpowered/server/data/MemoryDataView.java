@@ -70,6 +70,12 @@ import javax.annotation.Nullable;
 @SuppressWarnings("Duplicates")
 class MemoryDataView implements DataView {
 
+    @Nullable
+    private static LanternDataManager getDataManager() {
+        // Tests...
+        return Lantern.getGame() == null ? null : Lantern.getGame().getDataManager();
+    }
+
     protected final Map<String, Object> map = new LinkedHashMap<>();
     private final DataContainer container;
     private final DataView parent;
@@ -231,7 +237,7 @@ class MemoryDataView implements DataView {
         checkNotNull(path, "path");
         checkNotNull(value, "value");
 
-        final LanternDataManager manager = Lantern.getGame().getDataManager();
+        final LanternDataManager manager = getDataManager();
         final List<String> parts = path.getParts();
         final String key = parts.get(0);
         if (parts.size() > 1) {
@@ -272,7 +278,8 @@ class MemoryDataView implements DataView {
                 value instanceof Boolean) {
             this.map.put(key, value);
             return this;
-        } else if ((optDataTypeSerializer = manager.getTypeSerializer(typeToken = TypeToken.of(value.getClass()))).isPresent()) {
+        } else if (manager != null && (optDataTypeSerializer =
+                manager.getTypeSerializer(typeToken = TypeToken.of(value.getClass()))).isPresent()) {
             final DataTypeSerializer serializer = optDataTypeSerializer.get();
             final Object serialized = serializer.serialize(typeToken, manager.getTypeSerializerContext(), value);
             if (serialized instanceof DataContainer) {
@@ -323,7 +330,7 @@ class MemoryDataView implements DataView {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void setCollection(String key, Collection<?> value) {
         final ImmutableList.Builder<Object> builder = ImmutableList.builder();
-        final LanternDataManager manager = Lantern.getGame().getDataManager();
+        final LanternDataManager manager = getDataManager();
 
         for (Object object : value) {
             if (object instanceof DataSerializable) {
@@ -347,7 +354,8 @@ class MemoryDataView implements DataView {
                 builder.add(ensureSerialization((Collection) object));
             } else {
                 final TypeToken<?> typeToken = TypeToken.of(object.getClass());
-                final DataTypeSerializer serializer = manager.getTypeSerializer(typeToken).orElse(null);
+                final DataTypeSerializer serializer = manager == null ? null :
+                        manager.getTypeSerializer(typeToken).orElse(null);
                 if (serializer != null) {
                     final Object result = serializer.serialize(typeToken, manager.getTypeSerializerContext(), object);
                     checkArgument(!result.equals(this), "Cannot insert self-referencing Objects!");

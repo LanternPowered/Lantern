@@ -84,15 +84,14 @@ public final class LanternPermissionService implements PermissionService {
     @Inject
     private LanternPermissionService(Game game) {
         this.game = game;
+        this.defaultData = new OpLevelCollection.OpLevelSubject(this, 0);
         this.subjects.put(SUBJECTS_DEFAULT, this.defaultCollection = newCollection(SUBJECTS_DEFAULT));
         this.subjects.put(SUBJECTS_USER, new UserCollection(this));
         this.subjects.put(SUBJECTS_GROUP, new OpLevelCollection(this));
-
         this.subjects.put(SUBJECTS_COMMAND_BLOCK, new DataFactoryCollection(SUBJECTS_COMMAND_BLOCK, this,
-                s -> new FixedParentMemorySubjectData(this, getGroupForOpLevel(2).asSubjectReference()), NO_COMMAND_SOURCE));
-
+                s -> new FixedParentMemorySubjectData(this.defaultData, getGroupForOpLevel(2).asSubjectReference()), NO_COMMAND_SOURCE));
         this.subjects.put(SUBJECTS_SYSTEM, new DataFactoryCollection(SUBJECTS_SYSTEM, this,
-                s -> new FixedParentMemorySubjectData(this, getGroupForOpLevel(4).asSubjectReference()),
+                s -> new FixedParentMemorySubjectData(this.defaultData, getGroupForOpLevel(4).asSubjectReference()),
                 s -> {
                     if (s.equals(LanternConsoleSource.NAME)) {
                         return Sponge.getServer().getConsole();
@@ -108,8 +107,6 @@ public final class LanternPermissionService implements PermissionService {
                     }
                     return null;
                 }));
-
-        this.defaultData = getDefaultCollection().get(SUBJECTS_DEFAULT);
     }
 
     public Subject getGroupForOpLevel(int level) {
@@ -128,7 +125,8 @@ public final class LanternPermissionService implements PermissionService {
 
     private LanternSubjectCollection newCollection(String identifier) {
         checkNotNull(identifier, "identifier");
-        return new DataFactoryCollection(identifier, this, s -> new GlobalMemorySubjectData(LanternPermissionService.this), NO_COMMAND_SOURCE);
+        return new DataFactoryCollection(identifier, this,
+                s -> new GlobalMemorySubjectData(this.defaultData), NO_COMMAND_SOURCE);
     }
 
     public LanternSubjectCollection get(String identifier) {

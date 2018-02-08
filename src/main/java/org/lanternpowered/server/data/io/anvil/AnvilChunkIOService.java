@@ -310,7 +310,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         levelDataView.set(TERRAIN_POPULATED, (byte) (chunk.isPopulated() ? 1 : 0));
         levelDataView.set(LIGHT_POPULATED, (byte) (chunk.isLightPopulated() ? 1 : 0));
         levelDataView.set(LAST_UPDATE, 0L);
-        levelDataView.set(INHABITED_TIME, chunk.getInhabitedTime());
+        levelDataView.set(INHABITED_TIME, chunk.getLongInhabitedTime());
 
         // Chunk sections
         final ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(true);

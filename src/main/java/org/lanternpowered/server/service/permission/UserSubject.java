@@ -56,7 +56,7 @@ final class UserSubject extends LanternSubject {
     UserSubject(GameProfile player, UserCollection users) {
         this.player = player;
         this.collection = users;
-        this.data = new SingleParentMemorySubjectData(users.getService()) {
+        this.data = new SingleParentMemorySubjectData(this) {
 
             @Override
             public SubjectReference getParent() {

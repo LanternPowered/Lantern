@@ -26,7 +26,7 @@
 package org.lanternpowered.server.service.permission.base;
 
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 
 import java.util.Collections;
@@ -43,10 +43,10 @@ public class SingleParentMemorySubjectData extends GlobalMemorySubjectData {
     /**
      * Creates a new subject data instance, using the provided service to request instances of permission subjects.
      *
-     * @param service The service to request subject references from
+     * @param subject The subject
      */
-    public SingleParentMemorySubjectData(PermissionService service) {
-        super(service);
+    public SingleParentMemorySubjectData(Subject subject) {
+        super(subject);
     }
 
     @Override

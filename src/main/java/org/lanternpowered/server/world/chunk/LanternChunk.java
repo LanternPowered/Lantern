@@ -1855,13 +1855,18 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return false;
     }
 
-    // Typo
+    @Deprecated
     @Override
     public int getInhabittedTime() {
+        return getInhabitedTime();
+    }
+
+    @Override
+    public int getInhabitedTime() {
         return (int) Math.min(Integer.MAX_VALUE, this.inhabitedTime);
     }
 
-    public long getInhabitedTime() {
+    public long getLongInhabitedTime() {
         return this.inhabitedTime;
     }
 

@@ -36,7 +36,7 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
+import org.lanternpowered.server.entity.event.SwingHandEntityShardevent;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.AbstractSlot;
@@ -382,11 +382,16 @@ public final class PlayerInteractionHandler {
         }
     }
 
+    static class SwingHandEntityShardevents {
+        static final SwingHandEntityShardevent MAIN_HAND = new SwingHandEntityShardevent(HandTypes.MAIN_HAND);
+        static final SwingHandEntityShardevent OFF_HAND = new SwingHandEntityShardevent(HandTypes.OFF_HAND);
+    }
+
     public void handleSwingArm(MessagePlayInPlayerSwingArm message) {
         if (message.getHandType() == HandTypes.OFF_HAND) {
             return;
         }
-        this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.MAIN_HAND));
+        this.player.getShardeventBus().post(SwingHandEntityShardevents.MAIN_HAND);
     }
 
     public void handleFinishItemInteraction(MessagePlayInOutFinishUsingItem message) {
@@ -488,7 +493,7 @@ public final class PlayerInteractionHandler {
                     }
                     */
                         this.player.getConnection().send(new MessagePlayOutEntityAnimation(this.player.getNetworkId(), 3));
-                        this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.OFF_HAND));
+                        this.player.getShardeventBus().post(SwingHandEntityShardevents.OFF_HAND);
                     /*
                     final CooldownTracker cooldownTracker = this.player.getCooldownTracker();
                     cooldownTracker.set(handItem.get().getType(), 15);

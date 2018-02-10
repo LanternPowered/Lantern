@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
+import org.lanternpowered.server.entity.event.RequestPlayerAbilitiesRefreshShardevent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -40,6 +40,8 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayerAbilities> {
+
+    private static final RequestPlayerAbilitiesRefreshShardevent ABILITIES_REFRESH_SHARDEVENT = new RequestPlayerAbilitiesRefreshShardevent();
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerAbilities message) {
@@ -94,7 +96,7 @@ public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayer
                     }
                 }
             }
-            player.triggerEvent(RefreshAbilitiesPlayerEvent.of());
+            player.getShardeventBus().post(ABILITIES_REFRESH_SHARDEVENT);
         }
     }
 }

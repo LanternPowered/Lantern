@@ -34,12 +34,13 @@ import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.EntityEvent;
-import org.lanternpowered.server.entity.event.EntityEventType;
+import org.lanternpowered.server.entity.shards.NetworkShard;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.shards.event.Shardevent;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.Tuple;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,20 +75,15 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     private int entityId = INVALID_ENTITY_ID;
 
     /**
-     * The amount of ticks between every update.
+     * The {@link NetworkShard} will provide
+     * settings related to tracking range and update rate.
      */
-    private int tickRate = 4;
-
-    /**
-     * The tracking range of the entity.
-     */
-    private double trackingRange = 64;
+    NetworkShard networkComponent;
 
     private int tickCounter = 0;
 
     final Object2LongMap<Player> playerInteractTimes = new Object2LongOpenHashMap<>();
-
-    final List<EntityEvent> entityEvents = new ArrayList<>();
+    final List<Tuple<Shardevent, EntityProtocolShardeventType>> entityEvents = new ArrayList<>();
 
     public AbstractEntityProtocol(E entity) {
         this.entity = entity;
@@ -165,40 +161,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         return this.entityId;
     }
 
-    /**
-     * Sets the tick rate of this entity protocol.
-     *
-     * @param tickRate The tick rate
-     */
-    public void setTickRate(int tickRate) {
-        this.tickRate = tickRate;
-    }
-
-    /**
-     * Gets the tick rate of this entity protocol.
-     *
-     * @return The tick rate
-     */
-    public int getTickRate() {
-        return this.tickRate;
-    }
-
-    /**
-     * Gets the tracking range of the entity.
-     *
-     * @return The tracking range
-     */
-    public double getTrackingRange() {
-        return this.trackingRange;
-    }
-
-    /**
-     * Sets the tracking range of the entity.
-     *
-     * @param trackingRange The tracking range
-     */
-    public void setTrackingRange(double trackingRange) {
-        this.trackingRange = trackingRange;
+    protected NetworkShard getNetworkComponent() {
+        return this.networkComponent;
     }
 
     /**
@@ -214,7 +178,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
             final TempEvents events = processEvents(true, true);
             ctx.trackers = this.trackers;
             if (events != null && events.deathOrAlive != null) {
-                events.deathOrAlive.forEach(event -> handleEvent(ctx, event));
+                events.deathOrAlive.forEach(entry -> handleEvent(ctx, entry.getFirst()));
             }
             destroy(ctx);
             this.trackers.clear();
@@ -299,7 +263,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
             }
         }
 
-        boolean flag0 = this.tickCounter++ % this.tickRate == 0 && !this.trackers.isEmpty();
+        boolean flag0 = this.tickCounter++ % this.networkComponent.getTrackingUpdateRate() == 0 && !this.trackers.isEmpty();
         boolean flag1 = !added.isEmpty();
         boolean flag2 = !removed.isEmpty();
 
@@ -327,7 +291,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         if (contextData.removed != null) {
             ctx.trackers = contextData.removed;
             if (events != null && events.deathOrAlive != null) {
-                events.deathOrAlive.forEach(event -> handleEvent(ctx, event));
+                events.deathOrAlive.forEach(entry -> handleEvent(ctx, entry.getFirst()));
             }
             destroy(ctx);
             synchronized (this.playerInteractTimes) {
@@ -355,7 +319,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         }
         if (trackers != null) {
             ctx.trackers = trackers;
-            events.alive.forEach(event -> handleEvent(ctx, event));
+            events.alive.forEach(entry -> handleEvent(ctx, entry.getFirst()));
         }
     }
 
@@ -370,10 +334,11 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
     private final class TempEvents {
 
-        @Nullable private final List<EntityEvent> deathOrAlive;
-        private final List<EntityEvent> alive;
+        @Nullable private final List<Tuple<Shardevent, EntityProtocolShardeventType>> deathOrAlive;
+        private final List<Tuple<Shardevent, EntityProtocolShardeventType>> alive;
 
-        private TempEvents(@Nullable List<EntityEvent> deathOrAlive, List<EntityEvent> alive) {
+        private TempEvents(@Nullable List<Tuple<Shardevent, EntityProtocolShardeventType>> deathOrAlive,
+                List<Tuple<Shardevent, EntityProtocolShardeventType>> alive) {
             this.deathOrAlive = deathOrAlive;
             this.alive = alive;
         }
@@ -384,7 +349,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         if (!death && !alive) {
             return null;
         }
-        List<EntityEvent> aliveList = null;
+        List<Tuple<Shardevent, EntityProtocolShardeventType>> aliveList = null;
         synchronized (this.entityEvents) {
             if (!this.entityEvents.isEmpty()) {
                 aliveList = new ArrayList<>(this.entityEvents);
@@ -394,10 +359,10 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         if (aliveList == null) {
             return null;
         }
-        List<EntityEvent> deathOrAliveList = null;
+        List<Tuple<Shardevent, EntityProtocolShardeventType>> deathOrAliveList = null;
         if (death) {
-            for (EntityEvent event : aliveList) {
-                if (event.type() == EntityEventType.DEATH_OR_ALIVE) {
+            for (Tuple<Shardevent, EntityProtocolShardeventType> event : aliveList) {
+                if (event.getSecond() == EntityProtocolShardeventType.DEATH_OR_ALIVE) {
                     if (deathOrAliveList == null) {
                         deathOrAliveList = new ArrayList<>();
                     }
@@ -421,7 +386,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     }
 
     private boolean isVisible(Vector3d pos, LanternPlayer tracker) {
-        return pos.distanceSquared(tracker.getPosition()) < this.trackingRange * this.trackingRange && isVisible(tracker);
+        final double trackingRange = this.networkComponent.getTrackingRange();
+        return pos.distanceSquared(tracker.getPosition()) < trackingRange * trackingRange && isVisible(tracker);
     }
 
     /**
@@ -462,7 +428,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      */
     protected abstract void updateTranslations(EntityProtocolUpdateContext context);
 
-    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
+    protected void handleEvent(EntityProtocolUpdateContext context, Shardevent event) {
     }
 
     /**
@@ -502,5 +468,18 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      * @param entityId The entity id the player attacked
      */
     protected void playerAttack(LanternPlayer player, int entityId) {
+    }
+
+    /**
+     * Adds a {@link Shardevent} that will
+     * be handled within the new protocol update.
+     *
+     * @param event The event
+     * @param type The type
+     */
+    public void addEvent(Shardevent event, EntityProtocolShardeventType type) {
+        synchronized (this.entityEvents) {
+            this.entityEvents.add(new Tuple<>(event, type));
+        }
     }
 }

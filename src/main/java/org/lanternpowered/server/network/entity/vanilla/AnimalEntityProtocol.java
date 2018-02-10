@@ -26,10 +26,10 @@
 package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.EntityEvent;
-import org.lanternpowered.server.entity.event.LoveModeEntityEvent;
+import org.lanternpowered.server.entity.event.LoveModeEntityShardvent;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
+import org.lanternpowered.server.shards.event.Shardevent;
 
 public abstract class AnimalEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
 
@@ -38,8 +38,8 @@ public abstract class AnimalEntityProtocol<E extends LanternEntity> extends Agea
     }
 
     @Override
-    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
-        if (event instanceof LoveModeEntityEvent) {
+    protected void handleEvent(EntityProtocolUpdateContext context, Shardevent event) {
+        if (event instanceof LoveModeEntityShardvent) {
             context.sendToAll(() -> new MessagePlayOutEntityStatus(getRootEntityId(), 18));
         } else {
             super.handleEvent(context, event);

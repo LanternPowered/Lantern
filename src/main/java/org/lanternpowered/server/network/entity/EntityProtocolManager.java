@@ -34,7 +34,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.EntityEvent;
+import org.lanternpowered.server.entity.shards.NetworkShard;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.text.Text;
@@ -255,28 +255,21 @@ public final class EntityProtocolManager {
     }
 
     /**
-     * Adds the {@link Entity} to be tracked.
-     *
-     * @param entity The entity
-     */
-    public void add(LanternEntity entity) {
-        //noinspection ConstantConditions,unchecked
-        add(entity, (EntityProtocolType) entity.getEntityProtocolType());
-    }
-
-    /**
      * Adds the {@link Entity} to be tracked with a specific {@link EntityProtocolType}.
      *
      * <p>This method forces the entity protocol to be refreshed, even if the entity
      * already a protocol.<p/>
      *
      * @param entity The entity
-     * @param protocolType The protocol type
+     * @param networkComponent The network component
      */
-    public <E extends LanternEntity> void add(E entity, EntityProtocolType<E> protocolType) {
+    @SuppressWarnings("unchecked")
+    public <E extends LanternEntity> AbstractEntityProtocol<E> add(E entity, NetworkShard networkComponent) {
         checkNotNull(entity, "entity");
-        checkNotNull(protocolType, "protocolType");
-        final AbstractEntityProtocol<E> entityProtocol = protocolType.getSupplier().apply(entity);
+        checkNotNull(networkComponent, "networkComponent");
+        final AbstractEntityProtocol<E> entityProtocol =
+                ((LanternEntityProtocolType<E>) networkComponent.getEntityProtocolType()).getSupplier().apply(entity);
+        entityProtocol.networkComponent = networkComponent;
         entityProtocol.entityProtocolManager = this;
         final AbstractEntityProtocol<?> removed = this.entityProtocols.put(entity, entityProtocol);
         if (removed != null) {
@@ -291,6 +284,7 @@ public final class EntityProtocolManager {
                 allocatorLock.unlockWrite(stamp);
             }
         }
+        return entityProtocol;
     }
 
     /**
@@ -312,6 +306,7 @@ public final class EntityProtocolManager {
      *
      * @param players The players
      */
+    @SuppressWarnings("unchecked")
     public void updateTrackers(Set<LanternPlayer> players) {
         // TODO: Sync the updates in a different thread?
         if (this.pulseCounter++ % UPDATE_RATE != 0) {
@@ -330,7 +325,6 @@ public final class EntityProtocolManager {
             synchronized (protocol.trackers) {
                 final AbstractEntityProtocol.TrackerUpdateContextData contextData = protocol.buildUpdateContextData(players);
                 if (contextData != null) {
-                    //noinspection unchecked
                     protocol.updateTrackers(contextData);
                     updateContextDataList.add(contextData);
                 }
@@ -380,14 +374,6 @@ public final class EntityProtocolManager {
                     entityProtocolConsumer.accept(entityProtocol);
                     entityProtocol.playerInteractTimes.put(player, current);
                 }
-            }
-        });
-    }
-
-    public void triggerEvent(LanternEntity entity, EntityEvent event) {
-        getEntityProtocolByEntity(entity).ifPresent(entityProtocol -> {
-            synchronized (entityProtocol.entityEvents) {
-                entityProtocol.entityEvents.add(event);
             }
         });
     }

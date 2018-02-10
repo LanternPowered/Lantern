@@ -27,6 +27,10 @@ package org.lanternpowered.server.util;
 
 public class DefineableClassLoader extends ClassLoader {
 
+    static {
+        ClassLoader.registerAsParallelCapable();
+    }
+
     public DefineableClassLoader(ClassLoader parent) {
         super(parent);
     }

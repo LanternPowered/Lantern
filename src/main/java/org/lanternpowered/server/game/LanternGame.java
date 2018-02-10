@@ -53,6 +53,7 @@ import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
+import org.lanternpowered.server.entity.shards.BossShard;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.game.version.MinecraftVersionCache;
@@ -70,6 +71,7 @@ import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
+import org.lanternpowered.server.shards.internal.ComponentType;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -259,6 +261,8 @@ public class LanternGame implements Game {
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while loading the plugins.", e);
         }
+
+        System.out.println("BOSS COMPONENT: " + ComponentType.get(BossShard.class));
 
         this.gameRegistry.registerDefaults();
         this.gameRegistry.earlyRegistry();

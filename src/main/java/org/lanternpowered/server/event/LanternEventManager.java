@@ -37,6 +37,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.DefineableClassLoader;
 import org.lanternpowered.server.util.TypeTokenHelper;
 import org.lanternpowered.server.util.functions.ThrowableConsumer;
@@ -78,6 +79,9 @@ import javax.annotation.Nullable;
 @Singleton
 public class LanternEventManager implements EventManager {
 
+    private static final boolean SHOULD_FIRE_ALL_TRUE =
+            Boolean.parseBoolean(System.getProperty("sponge.shouldFireAll", "").toLowerCase());
+
     private static final TypeVariable<?> GENERIC_EVENT_TYPE = GenericEvent.class.getTypeParameters()[0];
 
     private final Logger logger;
@@ -93,6 +97,35 @@ public class LanternEventManager implements EventManager {
      */
     private final LoadingCache<EventType<?>, List<RegisteredListener<?>>> listenersCache =
             Caffeine.newBuilder().initialCapacity(150).build(this::bakeHandlers);
+
+    private final Map<Class<?>, ShouldFireField> shouldFireFields = new HashMap<>();
+
+    private static final class ShouldFireField {
+
+        private final Class<? extends Event> eventClass;
+        private final Field field;
+        private boolean state;
+
+        private ShouldFireField(Class<? extends Event> eventClass, Field field) {
+            this.eventClass = eventClass;
+            this.field = field;
+            field.setAccessible(true);
+        }
+
+        public void setState(boolean state) {
+            if (this.state == state) {
+                return;
+            }
+            Lantern.getLogger().debug("Updating ShouldFire field for class {} with value {}",
+                    this.eventClass.getName(), state);
+            this.state = state;
+            try {
+                this.field.set(null, state);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 
     @Inject
     public LanternEventManager(Logger logger) {
@@ -119,6 +152,43 @@ public class LanternEventManager implements EventManager {
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             this.logger.warn("Failed to set event cache backing array, type was " + this.listenersCache.getClass().getName());
             this.logger.warn("  Caused by: " + e.getClass().getName() + ": " + e.getMessage());
+        }
+
+        // Collect the should fire fields
+        for (Field field : ShouldFire.class.getFields()) {
+            final ShouldFireTarget target = field.getAnnotation(ShouldFireTarget.class);
+            if (target == null) {
+                continue;
+            }
+            this.shouldFireFields.put(target.value(), new ShouldFireField(target.value(), field));
+        }
+
+        updateShouldFireFields();
+    }
+
+    /**
+     * Updates all the {@link ShouldFire} fields.
+     */
+    private void updateShouldFireFields() {
+        final Set<Class<?>> registeredTypes;
+        synchronized (this.lock) {
+            registeredTypes = new HashSet<>(this.listenersByEvent.keySet());
+        }
+        for (Map.Entry<Class<?>, ShouldFireField> entry : this.shouldFireFields.entrySet()) {
+            final Class<?> eventClass = entry.getKey();
+            boolean shouldFire = false;
+            if (SHOULD_FIRE_ALL_TRUE) {
+                shouldFire = true;
+            } else {
+                for (Class<?> registeredType : registeredTypes) {
+                    if (registeredType.isAssignableFrom(eventClass) || // Sub class
+                            eventClass.isAssignableFrom(registeredType)) {  // Or super class
+                        shouldFire = true; // We got a match
+                        break;
+                    }
+                }
+            }
+            entry.getValue().setState(shouldFire);
         }
     }
 
@@ -150,10 +220,6 @@ public class LanternEventManager implements EventManager {
 
         Collections.sort(handlers);
         return handlers;
-    }
-
-    private void invalidateCache(Set<Class<?>> types) {
-        this.listenersCache.invalidateAll(types);
     }
 
     @Nullable
@@ -192,28 +258,28 @@ public class LanternEventManager implements EventManager {
     private void register(List<RegisteredListener<?>> listeners) {
         synchronized (this.lock) {
             listeners = listeners.stream()
-                    .filter(listener -> this.listenersByEvent.put(listener.getEventType().getType(), listener))
+                    .filter(listener -> {
+                        if (!(listener.getHandler() instanceof KeyEventListener) &&
+                                this.keyEventTypes.contains(listener.getEventType().getType())) {
+                            // Check if somebody has been naughty, this will show a warning
+                            // if there is a listener directly listening to a ChangeDataHolderEvent.ValueChange
+                            // event, it's a bad idea, the Key#registerEvent should be used instead
+                            // This would spam the server, just stop this before damage is done
+                            this.logger.warn("Plugin {} attempted to register a listener ({}) that directly listens to"
+                                            + "ChangeDataHolderEvent.ValueChange, this is not allowed because it could destroy server performance. "
+                                            + "Key#registerEvent is the proper way to handle this event.",
+                                    listener.getPlugin().getId(), listener.getHandle().getClass().getName());
+                            return false; // Gotcha
+                        }
+                        return this.listenersByEvent.put(listener.getEventType().getType(), listener);
+                    })
                     .collect(Collectors.toList());
         }
+        if (!listeners.isEmpty()) {
+            this.listenersCache.invalidateAll();
 
-        final Set<Class<?>> types = new HashSet<>();
-        for (RegisteredListener<?> listener : listeners) {
-            types.addAll(TypeToken.of(listener.getEventType().getType()).getTypes().rawTypes().stream()
-                    .filter(Event.class::isAssignableFrom).collect(Collectors.toSet()));
-            // Check if somebody has been naughty, this will show a warning
-            // if there is a listener directly listening to a ChangeDataHolderEvent.ValueChange
-            // event, it's a bad idea, the Key#registerEvent should be used instead
-            // This would spam the server, just stop this before damage is done
-            if (!(listener.getHandler() instanceof KeyEventListener) && this.keyEventTypes.contains(listener.getEventType().getType())) {
-                this.logger.warn("Plugin {} attempted to register a listener ({}) that directly listens to ChangeDataHolderEvent.ValueChange, "
-                        + "this is not allowed because it could destroy server performance. Key#registerEvent is the proper way to handle "
-                        + "this event.",
-                        listener.getPlugin().getId(), listener.getHandle().getClass().getName());
-            }
-        }
-
-        if (!types.isEmpty()) {
-            invalidateCache(types);
+            // Update ShouldFire fields
+            updateShouldFireFields();
         }
     }
 
@@ -339,23 +405,25 @@ public class LanternEventManager implements EventManager {
     }
 
     private void unregister(Predicate<RegisteredListener<?>> unregister) {
-        final Set<Class<?>> types = new HashSet<>();
+        final Set<Class<?>> changes = new HashSet<>();
         synchronized (this.lock) {
             final Iterator<RegisteredListener<?>> it = this.listenersByEvent.values().iterator();
-
             while (it.hasNext()) {
                 final RegisteredListener<?> listener = it.next();
                 if (unregister.test(listener)) {
                     synchronized (this.registeredListeners) {
                         this.registeredListeners.remove(listener.getHandle());
                     }
-                    types.addAll(TypeToken.of(listener.getEventType().getType()).getTypes().rawTypes());
+                    changes.add(listener.getEventType().getType());
                     it.remove();
                 }
             }
+            changes.removeAll(this.listenersByEvent.keySet());
         }
-        if (!types.isEmpty()) {
-            invalidateCache(types);
+        if (!changes.isEmpty()) {
+            this.listenersCache.invalidateAll();
+            // Update ShouldFire fields
+            updateShouldFireFields();
         }
     }
 

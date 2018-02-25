@@ -34,12 +34,12 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSpec;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.lanternpowered.launch.Environment;
 import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.launch.transformer.Exclusion;
 import org.lanternpowered.server.inject.LanternModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
+import org.lanternpowered.server.transformer.FinalFieldClassTransformer;
 import org.lanternpowered.server.transformer.data.FastValueContainerClassTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,10 @@ public final class LanternServerLaunch {
 
     public void main(String[] args) {
         final LanternClassLoader classLoader = LanternClassLoader.get();
+        classLoader.addTransformerExclusion(Exclusion.forPackage("org.objectweb.asm")); // Exclude the ASM library
         classLoader.addTransformerExclusion(Exclusion.forPackage("org.lanternpowered.server.transformer"));
+        classLoader.addTransformerExclusion(Exclusion.forClass("org.lanternpowered.server.util.BytecodeUtils"));
+        classLoader.addTransformer(new FinalFieldClassTransformer());
         classLoader.addTransformer(new FastValueContainerClassTransformer());
 
         // Get the default logger

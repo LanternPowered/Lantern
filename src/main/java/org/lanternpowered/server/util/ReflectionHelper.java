@@ -28,7 +28,6 @@ package org.lanternpowered.server.util;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.ClassUtils.isAssignable;
 
-import com.google.common.base.Throwables;
 import org.lanternpowered.server.game.Lantern;
 
 import java.lang.reflect.Constructor;
@@ -43,23 +42,10 @@ import javax.annotation.Nullable;
 
 public final class ReflectionHelper {
 
-    private final static Field MODIFIERS_FIELD;
-
-    static {
-        try {
-            MODIFIERS_FIELD = Field.class.getDeclaredField("modifiers");
-            MODIFIERS_FIELD.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static void setField(Field field, @Nullable Object target, @Nullable Object object) throws Exception {
-        final int modifiers = field.getModifiers();
-        if (Modifier.isFinal(modifiers)) {
-            MODIFIERS_FIELD.set(field, modifiers & ~Modifier.FINAL);
-        }
-        field.setAccessible(true);
+        // Make the field accessible
+        FieldAccessFactory.makeAccessible(field);
+        // Set the value
         field.set(target, object);
     }
 

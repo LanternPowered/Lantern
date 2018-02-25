@@ -23,47 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.constructor;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
+import org.junit.Test;
+import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
+import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
+import org.lanternpowered.server.inventory.type.LanternGridInventory;
 
-import java.util.function.Function;
+public class CarriedInventoryTest {
 
-import javax.annotation.Nullable;
-
-public final class InventoryConstructor<T extends AbstractInventory> {
-
-    private final Class<T> inventoryType;
-    @Nullable private final Class<? extends T> carriedInventoryType;
-    private final Function<Boolean, T> constructor;
-
-    InventoryConstructor(Class<T> inventoryType, @Nullable Class<? extends T> carriedInventoryType,
-            Function<Boolean, T> constructor) {
-        this.carriedInventoryType = carriedInventoryType;
-        this.inventoryType = inventoryType;
-        this.constructor = constructor;
-    }
-
-    /**
-     * Gets the {@link AbstractInventory} type.
-     *
-     * @return The type
-     */
-    public Class<T> getType() {
-        return this.inventoryType;
-    }
-
-    public T construct() {
-        return construct(false);
-    }
-
-    /**
-     * Constructs a new {@link AbstractInventory}.
-     *
-     * @param carried Whether the inventory can be carried
-     * @return The inventory
-     */
-    public T construct(boolean carried) {
-        return this.constructor.apply(carried);
+    @Test
+    public void test() {
+        final InventoryConstructorFactory factory = InventoryConstructorFactory.get();
+        final InventoryConstructor<LanternGridInventory> constructor = factory.getConstructor(LanternGridInventory.class);
+        System.out.println(constructor.construct(false).getClass().getName());
+        System.out.println(constructor.construct(true).getClass().getName());
     }
 }

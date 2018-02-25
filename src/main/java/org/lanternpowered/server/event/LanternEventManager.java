@@ -39,6 +39,8 @@ import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.DefineableClassLoader;
+import org.lanternpowered.server.util.FieldAccessFactory;
+import org.lanternpowered.server.util.SystemProperties;
 import org.lanternpowered.server.util.TypeTokenHelper;
 import org.lanternpowered.server.util.functions.ThrowableConsumer;
 import org.slf4j.Logger;
@@ -70,7 +72,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -80,7 +84,7 @@ import javax.annotation.Nullable;
 public class LanternEventManager implements EventManager {
 
     private static final boolean SHOULD_FIRE_ALL_TRUE =
-            Boolean.parseBoolean(System.getProperty("sponge.shouldFireAll", "").toLowerCase());
+            SystemProperties.get().getBooleanProperty("sponge.shouldFireAll");
 
     private static final TypeVariable<?> GENERIC_EVENT_TYPE = GenericEvent.class.getTypeParameters()[0];
 
@@ -103,27 +107,30 @@ public class LanternEventManager implements EventManager {
     private static final class ShouldFireField {
 
         private final Class<? extends Event> eventClass;
-        private final Field field;
-        private boolean state;
+
+        /**
+         * The setter of the field.
+         */
+        private final Consumer<Boolean> setter;
+
+        /**
+         * The getter of the field.
+         */
+        private final Supplier<Boolean> getter;
 
         private ShouldFireField(Class<? extends Event> eventClass, Field field) {
+            this.setter = FieldAccessFactory.createStaticSetter(field);
+            this.getter = FieldAccessFactory.createStaticGetter(field);
             this.eventClass = eventClass;
-            this.field = field;
-            field.setAccessible(true);
         }
 
         public void setState(boolean state) {
-            if (this.state == state) {
+            if (this.getter.get() == state) {
                 return;
             }
             Lantern.getLogger().debug("Updating ShouldFire field for class {} with value {}",
                     this.eventClass.getName(), state);
-            this.state = state;
-            try {
-                this.field.set(null, state);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
+            this.setter.accept(state);
         }
     }
 

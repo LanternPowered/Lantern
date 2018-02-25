@@ -25,24 +25,17 @@
  */
 package org.lanternpowered.server.inventory.constructor;
 
-import static org.objectweb.asm.Opcodes.ACC_BRIDGE;
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_PROTECTED;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
-import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
-import static org.objectweb.asm.Opcodes.DUP;
 import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.IFEQ;
-import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V1_8;
@@ -50,19 +43,19 @@ import static org.objectweb.asm.Opcodes.V1_8;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.CarrierReference;
 import org.lanternpowered.server.util.DefineableClassLoader;
+import org.lanternpowered.server.util.LambdaFactory;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
 public final class InventoryConstructorFactory {
@@ -78,9 +71,6 @@ public final class InventoryConstructorFactory {
 
     private final static String CARRIED_INVENTORY_NAME = Type.getInternalName(CarriedInventory.class);
     private final static String CARRIED_INVENTORY_DESC = Type.getDescriptor(CarriedInventory.class);
-
-    private final static String INVENTORY_CONSTRUCTOR_NAME = Type.getInternalName(InventoryConstructor.class);
-    private final static String INVENTORY_CONSTRUCTOR_DESC = Type.getDescriptor(InventoryConstructor.class);
 
     private final static String CARRIER_NAME = Type.getInternalName(Carrier.class);
     private final static String CARRIER_DESC = Type.getDescriptor(Carrier.class);
@@ -100,97 +90,32 @@ public final class InventoryConstructorFactory {
      */
     public <T extends AbstractInventory> InventoryConstructor<T> getConstructor(Class<T> inventoryType) {
         return (InventoryConstructor<T>) this.inventoryConstructors.computeIfAbsent(inventoryType, type -> {
+            final boolean isCarried = CarriedInventory.class.isAssignableFrom(inventoryType);
+            if (Modifier.isAbstract(inventoryType.getModifiers()) ||
+                    Modifier.isInterface(inventoryType.getModifiers())) {
+                throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be abstract.");
+            }
+            if (Modifier.isFinal(inventoryType.getModifiers()) && !isCarried) {
+                throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be final.");
+            }
             try {
-                if (!Modifier.isPublic(inventoryType.getModifiers())) {
-                    throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' must be public.");
-                }
-                if (Modifier.isAbstract(inventoryType.getModifiers()) ||
-                        Modifier.isInterface(inventoryType.getModifiers())) {
-                    throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be abstract.");
-                }
-                if (Modifier.isFinal(inventoryType.getModifiers()) &&
-                        !CarriedInventory.class.isAssignableFrom(inventoryType)) {
-                    throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be final.");
-                }
-                final Constructor<?> constructor = inventoryType.getDeclaredConstructor();
-                if (!(Modifier.isPublic(constructor.getModifiers()) ||
-                        Modifier.isProtected(constructor.getModifiers()))) {
-                    throw new IllegalStateException("The constructor of the inventory type '" + inventoryType.getName() +
-                            "' must be public or protected.");
-                }
+                inventoryType.getDeclaredConstructor();
             } catch (NoSuchMethodException e) {
                 throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' must have a empty constructor.");
             }
-            final Class<? extends InventoryConstructor<?>> constructorClass = generateConstructorClass(
-                    inventoryType, CarriedInventory.class.isAssignableFrom(inventoryType) ? inventoryType :
-                            generateCarriedClass(inventoryType));
-            try {
-                return constructorClass.newInstance();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
+
+            final Supplier<T> supplier = LambdaFactory.createSupplier(inventoryType);
+            final Function<Boolean, T> constructor;
+            Class<T> carriedType = null;
+            if (!isCarried) {
+                carriedType = (Class<T>) generateCarriedClass(inventoryType);
+                final Supplier<T> carriedSupplier = LambdaFactory.createSupplier(carriedType);
+                constructor = carried -> (carried ? carriedSupplier : supplier).get();
+            } else {
+                constructor = carried -> supplier.get();
             }
+            return new InventoryConstructor<>(inventoryType, carriedType, constructor);
         });
-    }
-
-    private Class<? extends InventoryConstructor<?>> generateConstructorClass(
-            Class<? extends AbstractInventory> inventoryType, Class<? extends AbstractInventory> carriedInventoryType) {
-        final String name = inventoryType.getName() + "$$Constructor";
-        final String className = name.replace('.', '/');
-
-        // Generate the class bytecode and load it
-        final ClassWriter cw = new ClassWriter(0);
-
-        final String superInventoryName = Type.getInternalName(inventoryType);
-        final String superInventoryDesc = Type.getDescriptor(inventoryType);
-
-        final String carriedInventoryName = Type.getInternalName(carriedInventoryType);
-        final String carriedInventoryDesc = Type.getDescriptor(carriedInventoryType);
-
-        cw.visit(V1_8, ACC_PUBLIC + ACC_SUPER, className,
-                String.format("L%s<L%s;>;", INVENTORY_CONSTRUCTOR_NAME, superInventoryName), INVENTORY_CONSTRUCTOR_NAME, null);
-
-        MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
-        mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(Type.getType(superInventoryDesc));
-        mv.visitLdcInsn(Type.getType(carriedInventoryDesc));
-        mv.visitMethodInsn(INVOKESPECIAL, INVENTORY_CONSTRUCTOR_NAME, "<init>", "(Ljava/lang/Class;Ljava/lang/Class;)V", false);
-        mv.visitInsn(RETURN);
-        mv.visitMaxs(3, 1);
-        mv.visitEnd();
-
-        mv = cw.visitMethod(ACC_PUBLIC, "construct", String.format("(Z)L%s;", superInventoryName), null, null);
-        mv.visitCode();
-        if (carriedInventoryType != inventoryType) {
-            mv.visitVarInsn(ILOAD, 1);
-            final Label jumpLabel = new Label();
-            mv.visitJumpInsn(IFEQ, jumpLabel);
-            mv.visitTypeInsn(NEW, carriedInventoryName);
-            mv.visitInsn(DUP);
-            mv.visitMethodInsn(INVOKESPECIAL, carriedInventoryName, "<init>", "()V", false);
-            mv.visitInsn(ARETURN);
-            mv.visitLabel(jumpLabel);
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
-        mv.visitTypeInsn(NEW, superInventoryName);
-        mv.visitInsn(DUP);
-        mv.visitMethodInsn(INVOKESPECIAL, superInventoryName, "<init>", "()V", false);
-        mv.visitInsn(ARETURN);
-        mv.visitMaxs(2, 2);
-        mv.visitEnd();
-
-        mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE + ACC_SYNTHETIC, "construct",
-                String.format("(Z)L%s;", Type.getInternalName(AbstractInventory.class)), null, null);
-        mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitVarInsn(ILOAD, 1);
-        mv.visitMethodInsn(INVOKEVIRTUAL, className, "construct", String.format("(Z)L%s;", superInventoryName), false);
-        mv.visitInsn(ARETURN);
-        mv.visitMaxs(2, 2);
-        mv.visitEnd();
-
-        cw.visitEnd();
-        return this.classLoader.defineClass(name, cw.toByteArray());
     }
 
     /**

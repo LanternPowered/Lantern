@@ -184,7 +184,6 @@ import org.lanternpowered.server.game.registry.type.statistic.StatisticTypeRegis
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
-import org.lanternpowered.server.game.registry.type.text.LocaleRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.SelectorFactoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.SelectorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TextColorRegistryModule;
@@ -250,7 +249,7 @@ import org.lanternpowered.server.statistic.builder.StatisticBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
-import org.lanternpowered.server.util.LanguageUtil;
+import org.lanternpowered.server.util.LocaleCache;
 import org.lanternpowered.server.util.graph.CyclicGraphException;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
@@ -637,7 +636,6 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(new ArgumentTypeRegistryModule())
                 .registerModule(ChatType.class, new ChatTypeRegistryModule())
                 .registerModule(ChatVisibility.class, ChatVisibilityRegistryModule.get())
-                .registerModule(new LocaleRegistryModule())
                 .registerModule(new SelectorFactoryRegistryModule())
                 .registerModule(SelectorType.class, new SelectorTypeRegistryModule())
                 .registerModule(TextColor.class, new TextColorRegistryModule())
@@ -1225,6 +1223,6 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public Locale getLocale(String locale) {
-        return LanguageUtil.get(locale);
+        return LocaleCache.get(locale);
     }
 }

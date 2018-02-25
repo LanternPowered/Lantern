@@ -23,39 +23,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.text;
+package org.lanternpowered.server.util;
 
-import org.lanternpowered.server.game.registry.EarlyRegistration;
-import org.lanternpowered.server.util.LanguageUtil;
-import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
-public final class LocaleRegistryModule implements RegistryModule {
+public final class LocaleCache {
 
-    @EarlyRegistration
-    @Override
-    public void registerDefaults() {
-        final Field[] locales = Locales.class.getFields();
-        for (Field field : locales) {
-            final int pos = field.getName().indexOf('_');
-            if (pos < 0) {
+    private static final Map<String, Locale> cache = new HashMap<>();
+
+    static {
+        for (Field field : Locales.class.getFields()) {
+            final String name = field.getName();
+            if (name.indexOf('_') < 0) {
                 continue;
             }
-
-            final char[] c = field.getName().toCharArray();
-            for (int i = 0; i < pos; i++) {
-                c[i] = Character.toLowerCase(c[i]);
-            }
-
-            final String code = new String(c);
             try {
-                LanguageUtil.LOCALE_CACHE.put(code, (Locale) field.get(null));
-            } catch (IllegalAccessException ignored) {
+                cache.put(name.toLowerCase(Locale.ENGLISH), (Locale) field.get(null));
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(e);
             }
         }
     }
 
+    /**
+     * Gets the {@link Locale} for the given name.
+     *
+     * @param name The name
+     * @return The locale
+     */
+    public static Locale get(String name) {
+        return cache.computeIfAbsent(name.toLowerCase(Locale.ENGLISH), name1 -> {
+            final String[] parts = name1.split("_", 3);
+            final Locale locale;
+            if (parts.length == 3) {
+                locale = new Locale(parts[0].toLowerCase(), parts[1].toUpperCase(), parts[2]);
+            } else if (parts.length == 2) {
+                locale = new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
+            } else {
+                locale = new Locale(parts[0]);
+            }
+            return locale;
+        });
+    }
+
+    private LocaleCache() {
+    }
 }

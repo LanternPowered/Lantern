@@ -31,6 +31,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
+import org.lanternpowered.server.util.LocaleCache;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.text.chat.ChatVisibility;
@@ -41,17 +42,7 @@ public final class CodecPlayInClientSettings implements Codec<MessagePlayInClien
 
     @Override
     public MessagePlayInClientSettings decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        // The locale is lowercase, this is not allowed
-        final String localeName = buf.readLimitedString(16);
-        final String[] parts = localeName.split("_", 3);
-        Locale locale;
-        if (parts.length == 3) {
-            locale = new Locale(parts[0].toLowerCase(), parts[1].toUpperCase(), parts[2]);
-        } else if (parts.length == 2) {
-            locale = new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
-        } else {
-            locale = new Locale(parts[0]);
-        }
+        final Locale locale = LocaleCache.get(buf.readLimitedString(16));
         final int viewDistance = buf.readByte();
         final ChatVisibility visibility = ChatVisibilityRegistryModule.get().getByInternalId(buf.readByte()).get();
         final boolean enableColors = buf.readBoolean();

@@ -33,11 +33,9 @@ import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.MinecraftTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.registry.RegistryModule;
-import org.spongepowered.api.registry.util.RegistrationDependency;
 
 import java.util.Locale;
 
-@RegistrationDependency(LocaleRegistryModule.class)
 public final class TranslationManagerRegistryModule implements RegistryModule {
 
     private CombinedTranslationManager translationManager;

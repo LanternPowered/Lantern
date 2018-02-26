@@ -31,10 +31,10 @@ import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.server.event.CauseStack;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.service.ProviderRegistration;
@@ -92,10 +92,15 @@ public class LanternServiceManager implements ServiceManager {
         }
 
         final PluginContainer container = containerOptional.get();
-        final CauseStack causeStack = CauseStack.currentOrEmpty();
-        final ProviderRegistration<?> oldProvider = this.providers.put(service, new Provider<>(container, service, provider));
-        this.eventManager.post(SpongeEventFactory.createChangeServiceProviderEvent(causeStack.getCurrentCause(),
-                this.providers.get(service), Optional.ofNullable(oldProvider)));
+        final ProviderRegistration<T> newProvider = new Provider<>(container, service, provider);
+        final ProviderRegistration<?> oldProvider = this.providers.put(service, newProvider);
+        try (CauseStack.Frame frame = CauseStack.currentOrEmpty().pushCauseFrame()) {
+            frame.pushCause(container);
+            frame.addContext(EventContextKeys.SERVICE_MANAGER, this);
+
+            this.eventManager.post(SpongeEventFactory.createChangeServiceProviderEvent(frame.getCurrentCause(),
+                    newProvider, Optional.ofNullable(oldProvider)));
+        }
     }
 
 
@@ -103,7 +108,7 @@ public class LanternServiceManager implements ServiceManager {
     @Override
     public <T> Optional<T> provide(Class<T> service) {
         checkNotNull(service, "service");
-        final @Nullable ProviderRegistration<T> provider = (ProviderRegistration<T>) this.providers.get(service);
+        final ProviderRegistration<T> provider = (ProviderRegistration<T>) this.providers.get(service);
         return provider != null ? Optional.of(provider.getProvider()) : Optional.empty();
     }
 
@@ -117,7 +122,7 @@ public class LanternServiceManager implements ServiceManager {
     @Override
     public <T> T provideUnchecked(Class<T> service) throws ProvisioningException {
         checkNotNull(service, "service");
-        @Nullable ProviderRegistration<T> provider = (ProviderRegistration<T>) this.providers.get(service);
+        final ProviderRegistration<T> provider = (ProviderRegistration<T>) this.providers.get(service);
         if (provider == null) {
             throw new ProvisioningException("No provider is registered for the service '" + service.getName() + "'", service);
         }

@@ -37,6 +37,7 @@ import org.spongepowered.api.event.cause.EventContextKeys;
 import java.lang.reflect.Field;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public final class EventContextKeysModule extends AdditionalPluginCatalogRegistryModule<EventContextKey> {
@@ -61,12 +62,20 @@ public final class EventContextKeysModule extends AdditionalPluginCatalogRegistr
         // Sponge
         registerKeysFor("sponge", EventContextKeys.class);
 
+        // Create a filter to avoid duplicates
+        final BiPredicate<String, TypeToken<?>> skipDuplicate = (id, type) -> getById(id).map(key ->
+                !((LanternEventContextKey) key).getAllowedTypeToken().equals(type)).orElse(true);
+
         // Lantern
-        registerKeysFor("lantern", LanternEventContextKeys.class);
-        registerKeysFor("lantern", ContextKeys.class);
+        registerKeysFor("lantern", LanternEventContextKeys.class, skipDuplicate);
+        registerKeysFor("lantern", ContextKeys.class, skipDuplicate);
     }
 
     private void registerKeysFor(String pluginId, Class<?> catalogClass) {
+        registerKeysFor(pluginId, catalogClass, (id, type) -> true);
+    }
+
+    private void registerKeysFor(String pluginId, Class<?> catalogClass, BiPredicate<String, TypeToken<?>> filter) {
         final TypeVariable<?> typeVariable = EventContextKey.class.getTypeParameters()[0];
         // Sponge
         for (Field field : catalogClass.getFields()) {
@@ -78,6 +87,9 @@ public final class EventContextKeysModule extends AdditionalPluginCatalogRegistr
             final TypeToken<?> typeToken = TypeToken.of(field.getGenericType()).resolveType(typeVariable);
             // Get the plugin id, and make a nicely formatted name
             final String id = field.getName().toLowerCase();
+            if (!filter.test(id, typeToken)) {
+                continue;
+            }
             final String name = formatName(id);
             // Register the key
             register(new LanternEventContextKey<>(pluginId, id, name, typeToken));

@@ -118,7 +118,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             if (optWorld.isPresent()) {
                 player.setRawWorld(optWorld.get());
             } else {
-                player.setTempWorld(worldProperties0);
+                player.setUserWorld(worldProperties0);
             }
         });
     }
@@ -129,7 +129,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         dataView.remove(HEAD_ROTATION);
         final LanternWorld world = entity.getWorld();
         final UUID uniqueId = world != null ? world.getUniqueId() :
-                entity.getTempWorld() != null ? entity.getTempWorld().getUniqueId() : null;
+                entity.getUserWorld() != null ? entity.getUserWorld().getUniqueId() : null;
         dataView.set(DIMENSION, uniqueId == null ? 0 : Lantern.getWorldManager().getWorldDimensionId(uniqueId).orElse(0));
     }
 

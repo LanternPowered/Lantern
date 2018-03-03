@@ -25,6 +25,9 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.io.store.entity.UserStore;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -51,12 +54,14 @@ import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -77,9 +82,9 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
     /**
      * This field is for internal use only, it is used while finding a proper
      * world to spawn the player in. Used at {@link NetworkSession#initPlayer()} and
-     * {@link UserStore}.
+     * {@link UserStore}. Will also be used by {@link OfflineUser}s.
      */
-    @Nullable private LanternWorldProperties tempWorld;
+    @Nullable private LanternWorldProperties userWorld;
 
     AbstractUser(ProxyUser user) {
         super(user.getUniqueId());
@@ -146,12 +151,12 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
     }
 
     @Nullable
-    public LanternWorldProperties getTempWorld() {
-        return this.tempWorld;
+    public LanternWorldProperties getUserWorld() {
+        return this.userWorld;
     }
 
-    public void setTempWorld(@Nullable LanternWorldProperties tempTargetWorld) {
-        this.tempWorld = tempTargetWorld;
+    public void setUserWorld(@Nullable LanternWorldProperties userWorld) {
+        this.userWorld = userWorld;
     }
 
     /**
@@ -189,6 +194,24 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
      */
     public ProxyUser getProxyUser() {
         return this.user;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public Optional<UUID> getWorldUniqueId() {
+        return getWorld() != null ? Optional.of(getWorld().getUniqueId()) :
+                this.userWorld != null ? Optional.of(this.userWorld.getUniqueId()) : Optional.empty();
+    }
+
+    @Override
+    public boolean setLocation(Vector3d position, UUID worldUniqueId) {
+        checkNotNull(position, "position");
+        checkNotNull(worldUniqueId, "worldUniqueId");
+        final WorldProperties world = Lantern.getServer().getWorldManager().getWorldProperties(worldUniqueId)
+                .orElseThrow(() -> new IllegalStateException("Cannot find World with the given UUID: " + worldUniqueId));
+        this.userWorld = (LanternWorldProperties) world;
+        setRawPosition(position);
+        return true;
     }
 
     @Override

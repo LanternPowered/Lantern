@@ -822,7 +822,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         LanternWorld world = this.player.getWorld();
         if (world == null) {
-            LanternWorldProperties worldProperties = this.player.getTempWorld();
+            LanternWorldProperties worldProperties = this.player.getUserWorld();
             boolean fixSpawnLocation = false;
             if (worldProperties == null) {
                 Lantern.getLogger().warn("The player [{}] attempted to login in a non-existent world, this is not possible "
@@ -839,7 +839,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             final Optional<World> optWorld = Lantern.getWorldManager().loadWorld(worldProperties);
             // Use the raw method to avoid triggering any network messages
             this.player.setRawWorld((LanternWorld) optWorld.get());
-            this.player.setTempWorld(null);
+            this.player.setUserWorld(null);
             if (fixSpawnLocation) {
                 // TODO: Use a proper spawn position
                 this.player.setRawPosition(new Vector3d(0, 100, 0));

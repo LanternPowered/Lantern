@@ -27,6 +27,7 @@ package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Objects;
 import org.lanternpowered.server.data.io.UserIO;
 import org.lanternpowered.server.game.Lantern;
@@ -173,6 +174,31 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
             return Optional.of((Player) user);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Vector3d getPosition() {
+        return resolveUser().getPosition();
+    }
+
+    @Override
+    public Optional<UUID> getWorldUniqueId() {
+        return resolveUser().getWorldUniqueId();
+    }
+
+    @Override
+    public boolean setLocation(Vector3d position, UUID world) {
+        return resolveUser().setLocation(position, world);
+    }
+
+    @Override
+    public void setRotation(Vector3d rotation) {
+        resolveUser().setRotation(rotation);
+    }
+
+    @Override
+    public Vector3d getRotation() {
+        return resolveUser().getRotation();
     }
 
     @Override

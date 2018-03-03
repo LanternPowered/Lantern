@@ -113,8 +113,9 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
         if (this.user != null) {
             return this.user;
         }
-        // Load the offline player data, the setInternalUser method will be called
-        return new OfflineUser(this);
+        final OfflineUser offlineUser = new OfflineUser(this);
+        setInternalUser(offlineUser);
+        return offlineUser;
     }
 
     @Override

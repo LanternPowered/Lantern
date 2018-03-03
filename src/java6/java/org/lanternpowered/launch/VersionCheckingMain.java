@@ -34,7 +34,7 @@ public class VersionCheckingMain {
     private static final String REQUIRED_VERSION = "1.8.0_40";
     private static final String ERROR_MESSAGE = "We have detected that you are JRE version %s, which is out of date!\n"
             + "In order to run LanternServer, you **must** be running JRE version %s (or above).\n"
-            + "Previous builds of JRE version 1.8 will not work with the LanternServer.\n"
+            + "Previous builds of JRE version 8 will not work with the LanternServer.\n"
             + "This can be downloaded from Oracle: http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html";
 
     public static void main(String[] args) throws Exception {
@@ -74,11 +74,8 @@ public class VersionCheckingMain {
         for (int i = 0; i < versionParts.length; i++) {
             try {
                 final int part = Integer.valueOf(versionParts[i]);
-                // The value of the part of the version is related to it's proximity to the beginning
-                // Multiply by 3 to "pad" each of the parts a bit more so a higher value
-                // of a less significant version part couldn't as easily outweight the
-                // more significant version parts.
-                versionValue += part * Math.pow(10, versionParts.length - (i - 1) * 3);
+                // first value is before zero, remaining values are 3 digits each, shifted behind zero
+                versionValue += i == 0 ? part : (double) part / Math.pow(1000.0, i);
             } catch (NumberFormatException ignored) {
             }
         }

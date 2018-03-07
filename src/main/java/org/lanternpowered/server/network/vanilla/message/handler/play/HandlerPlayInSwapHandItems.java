@@ -31,7 +31,7 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("ConstantConditions")
-public final class HandlerPlayInSwapHandItems implements Handler<MessagePlayInSwapHandItems> {
+public final class HandlerPlayInSwapHandItems implements MessageHandler<MessagePlayInSwapHandItems> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInSwapHandItems message) {

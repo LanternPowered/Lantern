@@ -26,7 +26,6 @@
 package org.lanternpowered.server.network.message;
 
 import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 
 import java.util.ArrayList;
@@ -34,14 +33,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MessageRegistration<M extends Message> {
 
     private final Class<M> messageType;
     Optional<CodecRegistration<? super M, Codec<? super M>>> codecRegistration = Optional.empty();
-    private Optional<Handler<? super M>> handler = Optional.empty();
     private List<Processor<? super M>> processors = new ArrayList<>();
     private List<Processor<? super M>> unmodifiableProcessors = Collections.unmodifiableList(this.processors);
 
@@ -69,33 +65,12 @@ public final class MessageRegistration<M extends Message> {
     }
 
     /**
-     * Gets the {@link Handler} that is bound to this message registration,
-     * may be {@link Optional#empty()}.
-     *
-     * @return The handler, if present
-     */
-    public Optional<Handler<? super M>> getHandler() {
-        return this.handler;
-    }
-
-    /**
      * Gets the {@link Processor}s that are bound to this message registration.
      *
      * @return The processors
      */
     public List<Processor<? super M>> getProcessors() {
         return this.unmodifiableProcessors;
-    }
-
-    /**
-     * Binds the handler to this message registration.
-     *
-     * @param handler The handler
-     * @return This message registration, for chaining
-     */
-    public MessageRegistration<M> bindHandler(@Nullable Handler<? super M> handler) {
-        this.handler = Optional.ofNullable(handler);
-        return this;
     }
 
     /**

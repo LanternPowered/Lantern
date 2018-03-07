@@ -26,10 +26,10 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 
-public class HandlerPlayInPlayerVehicleMovement implements Handler<MessagePlayInPlayerVehicleMovement> {
+public class HandlerPlayInPlayerVehicleMovement implements MessageHandler<MessagePlayInPlayerVehicleMovement> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerVehicleMovement message) {

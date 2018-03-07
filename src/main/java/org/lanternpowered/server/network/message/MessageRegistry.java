@@ -25,23 +25,31 @@
  */
 package org.lanternpowered.server.network.message;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.HandlerBinder;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.message.processor.Processor;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@SuppressWarnings("unchecked")
 public final class MessageRegistry {
 
     private final Map<Class<? extends Message>, MessageRegistration<?>> registrationByMessageType = new HashMap<>();
     private final Int2ObjectMap<CodecRegistration<?, ?>> registrationByOpcode = new Int2ObjectOpenHashMap<>();
+    private final List<BiConsumer<NetworkSession, HandlerBinder>> handlerProviders = new ArrayList<>();
 
     private int opcodeCounter;
 
@@ -65,6 +73,27 @@ public final class MessageRegistry {
     }
 
     /**
+     * Gets a {@link List} with all the handler provider {@link BiConsumer} functions.
+     *
+     * @return The handler providers
+     */
+    public List<BiConsumer<NetworkSession, HandlerBinder>> getHandlerProviders() {
+        return Collections.unmodifiableList(this.handlerProviders);
+    }
+
+    /**
+     * Registers a handler provider {@link BiConsumer}. This consumer will be
+     * called when {@link MessageHandler}s are being collected for a specific
+     * {@link NetworkSession}.
+     *
+     * @param handlerProvider The handler provider
+     */
+    public void addHandlerProvider(BiConsumer<NetworkSession, HandlerBinder> handlerProvider) {
+        checkNotNull(handlerProvider, "handlerProvider");
+        this.handlerProviders.add(handlerProvider);
+    }
+
+    /**
      * Registers a new {@link Codec} for the next available opcode.
      *
      * @param codec The codec type
@@ -80,6 +109,22 @@ public final class MessageRegistry {
         } catch (Exception e) {
             throw new IllegalArgumentException("Unable to instantiate the codec class.", e);
         }
+    }
+
+    /**
+     * Registers a new {@link Codec} for the next available opcode.
+     *
+     * @param codec The codec type
+     * @param <M> The type of the processed message
+     */
+    @SafeVarargs
+    public final <M extends Message, C extends Codec<M>> void bind(Class<C> codec, Class<? extends M>... messageTypes) {
+        final List<MessageRegistration<? extends M>> registrations = new ArrayList<>();
+        for (Class<? extends M> messageType : messageTypes) {
+            registrations.add(checkCodecBinding(messageType));
+        }
+        final CodecRegistration<M, C> codecRegistration = bind(codec);
+        registrations.forEach(codecRegistration::bind);
     }
 
     /**
@@ -134,6 +179,22 @@ public final class MessageRegistry {
     }
 
     /**
+     * Registers a new {@link Codec} for the next available opcode.
+     *
+     * @param codec The codec type
+     * @param <M> The type of the processed message
+     */
+    @SafeVarargs
+    public final <C extends Codec<M>, M extends Message> void bind(int opcode, Class<C> codec, Class<? extends M>... messageTypes) {
+        final List<MessageRegistration<? extends M>> registrations = new ArrayList<>();
+        for (Class<? extends M> messageType : messageTypes) {
+            registrations.add(checkCodecBinding(messageType));
+        }
+        final CodecRegistration<M, C> codecRegistration = bind(opcode, codec);
+        registrations.forEach(codecRegistration::bind);
+    }
+
+    /**
      * Registers a new {@link Codec} for the specified opcode.
      *
      * @param codec The codec
@@ -179,22 +240,6 @@ public final class MessageRegistry {
 
     /**
      * Binds a {@link Message} type to this registry and
-     * attaches the {@link Handler} to it.
-     *
-     * @param messageType The message type
-     * @param handler The handler
-     * @param <M> The type of the message
-     * @param <H> The type of the handler
-     * @return The registration
-     */
-    public <M extends Message, H extends Handler<? super M>> MessageRegistration<M> bindHandler(Class<M> messageType, H handler) {
-        final MessageRegistration<M> registration = bindMessage(messageType);
-        registration.bindHandler(handler);
-        return registration;
-    }
-
-    /**
-     * Binds a {@link Message} type to this registry and
      * attaches the {@link Processor} to it.
      *
      * @param messageType The message type
@@ -220,7 +265,6 @@ public final class MessageRegistry {
     public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(C codec) {
         for (CodecRegistration<?, ?> registration : this.registrationByOpcode.values()) {
             if (codec.equals(registration.getCodec())) {
-                //noinspection unchecked
                 return Optional.of((CodecRegistration) registration);
             }
         }
@@ -238,7 +282,6 @@ public final class MessageRegistry {
     public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(Class<C> codec) {
         for (CodecRegistration<?, ?> registration : this.registrationByOpcode.values()) {
             if (codec.isInstance(registration.getCodec())) {
-                //noinspection unchecked
                 return Optional.of((CodecRegistration) registration);
             }
         }
@@ -254,7 +297,6 @@ public final class MessageRegistry {
      * @return The codec registration, if present
      */
     public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(int opcode) {
-        //noinspection unchecked
         return Optional.ofNullable((CodecRegistration) this.registrationByOpcode.get(opcode));
     }
 
@@ -266,7 +308,6 @@ public final class MessageRegistry {
      * @return The message registration
      */
     public <M extends Message> Optional<MessageRegistration<M>> findByMessageType(Class<M> messageType) {
-        //noinspection unchecked
         return Optional.ofNullable((MessageRegistration) this.registrationByMessageType.get(messageType));
     }
 
@@ -278,7 +319,6 @@ public final class MessageRegistry {
      * @return The message registration
      */
     public <M extends Message> MessageRegistration<M> bindMessage(Class<M> messageType) {
-        //noinspection unchecked
         return (MessageRegistration) this.registrationByMessageType.computeIfAbsent(messageType,
                 messageType0 -> new MessageRegistration<>(messageType));
     }

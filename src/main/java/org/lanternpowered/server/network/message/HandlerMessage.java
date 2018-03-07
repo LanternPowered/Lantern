@@ -28,14 +28,14 @@ package org.lanternpowered.server.network.message;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 
 public final class HandlerMessage<M extends Message> implements Message {
 
     private final M message;
-    private final Handler<? super M> handler;
+    private final MessageHandler<? super M> handler;
 
-    public HandlerMessage(M message, Handler<? super M> handler) {
+    public HandlerMessage(M message, MessageHandler<? super M> handler) {
         this.message = checkNotNull(message, "message");
         this.handler = checkNotNull(handler, "handler");
     }
@@ -44,7 +44,7 @@ public final class HandlerMessage<M extends Message> implements Message {
         return this.message;
     }
 
-    public Handler<? super M> getHandler() {
+    public MessageHandler<? super M> getHandler() {
         return this.handler;
     }
 

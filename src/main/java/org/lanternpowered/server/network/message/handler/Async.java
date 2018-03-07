@@ -23,19 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.network.message.handler;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public final class HandlerPlayInPlayerDigging implements Handler<MessagePlayInPlayerDigging> {
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    @Override
-    public void handle(NetworkContext context, MessagePlayInPlayerDigging message) {
-        final LanternPlayer player = context.getSession().getPlayer();
-        player.resetIdleTimeoutCounter();
-        player.getInteractionHandler().handleDigging(message);
-    }
+/**
+ * Can be used to define whether a specific {@link MessageHandler}
+ * type should be handled asynchronous. Async messages will be handled
+ * on the Netty threads, expensive operations should be executed by
+ * the {@link org.spongepowered.api.scheduler.Scheduler}.
+ */
+@Target({ TYPE, METHOD })
+@Retention(RUNTIME)
+public @interface Async {
+
 }

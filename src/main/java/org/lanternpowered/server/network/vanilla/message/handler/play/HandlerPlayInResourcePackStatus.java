@@ -29,7 +29,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -38,7 +38,7 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 
 import java.util.Optional;
 
-public final class HandlerPlayInResourcePackStatus implements Handler<MessagePlayInResourcePackStatus> {
+public final class HandlerPlayInResourcePackStatus implements MessageHandler<MessagePlayInResourcePackStatus> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInResourcePackStatus message) {

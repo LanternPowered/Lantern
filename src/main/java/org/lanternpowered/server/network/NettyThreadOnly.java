@@ -23,22 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message;
+package org.lanternpowered.server.network;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import org.lanternpowered.server.network.message.handler.Handler;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Can be used to define whether a specific {@link Message} or {@link Handler}
- * type should be handled asynchronous.
+ * A annotation that can be applied to methods and
+ * fields to mark them as only supported on Netty threads.
+ * <p>This annotation is only used for documentation
+ * purposes.
  */
-@Target(TYPE)
-@Retention(RUNTIME)
-public @interface Async {
+@Target({ METHOD, FIELD })
+@Retention(CLASS)
+public @interface NettyThreadOnly {
 
 }

@@ -39,7 +39,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.text.TextConstants;
@@ -67,7 +67,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChatMessage> {
+public final class HandlerPlayInChatMessage implements MessageHandler<MessagePlayInChatMessage> {
 
     public static final String URL_ARGUMENT = "url";
     private final static AttributeKey<ChatData> CHAT_DATA = AttributeKey.valueOf("chat-data");

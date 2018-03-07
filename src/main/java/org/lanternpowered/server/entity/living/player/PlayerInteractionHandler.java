@@ -46,6 +46,7 @@ import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
+import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
@@ -184,7 +185,10 @@ public final class PlayerInteractionHandler {
      *
      * @param message The message
      */
-    public void handleDigging(MessagePlayInPlayerDigging message) {
+    @Handler
+    private void handleDigging(MessagePlayInPlayerDigging message) {
+        this.player.resetIdleTimeoutCounter();
+
         final MessagePlayInPlayerDigging.Action action = message.getAction();
         final Vector3i blockPos = message.getPosition();
 
@@ -287,7 +291,10 @@ public final class PlayerInteractionHandler {
                 this.player.getItemInHand(HandTypes.MAIN_HAND).orElse(null));
     }
 
-    public void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
+    @Handler
+    private void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
+        this.player.resetIdleTimeoutCounter();
+
         final HandType handType = message.getHandType();
         // Ignore the off hand interaction type for now, a main hand message
         // will always be send before this message. So we will only listen for
@@ -381,14 +388,19 @@ public final class PlayerInteractionHandler {
         }
     }
 
-    public void handleSwingArm(MessagePlayInPlayerSwingArm message) {
+    @Handler
+    private void handleSwingArm(MessagePlayInPlayerSwingArm message) {
+        this.player.resetIdleTimeoutCounter();
         if (message.getHandType() == HandTypes.OFF_HAND) {
             return;
         }
         this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.MAIN_HAND));
     }
 
-    public void handleFinishItemInteraction(MessagePlayInOutFinishUsingItem message) {
+    @Handler
+    private void handleFinishItemInteraction(MessagePlayInOutFinishUsingItem message) {
+        this.player.resetIdleTimeoutCounter();
+
         final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
         // The player is already interacting
         if (!activeHand.isPresent() || this.activeHandStartTime == -1L) {
@@ -449,7 +461,10 @@ public final class PlayerInteractionHandler {
         this.player.offer(LanternKeys.ACTIVE_HAND, Optional.empty());
     }
 
-    public void handleItemInteraction(MessagePlayInPlayerUseItem message) {
+    @Handler
+    private void handleItemInteraction(MessagePlayInPlayerUseItem message) {
+        this.player.resetIdleTimeoutCounter();
+
         // Prevent duplicate messages
         final long time = System.currentTimeMillis();
         if (this.lastInteractionTime != -1L && time - this.lastInteractionTime < 40) {

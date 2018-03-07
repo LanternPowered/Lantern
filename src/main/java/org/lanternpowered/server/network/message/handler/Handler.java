@@ -25,17 +25,17 @@
  */
 package org.lanternpowered.server.network.message.handler;
 
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.Message;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public interface Handler<M extends Message> {
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    /**
-     * Handles a {@link Message} that was received.
-     *
-     * @param context the context that received the message
-     * @param message the message that was received
-     */
-    void handle(NetworkContext context, M message);
-
+/**
+ * Can be used to define a specific methods
+ * as a {@link MessageHandler}.
+ */
+@Target(METHOD)
+@Retention(RUNTIME)
+public @interface Handler {
 }

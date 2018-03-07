@@ -28,10 +28,10 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
 
-public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
+public final class HandlerPlayInAdvancementTree implements MessageHandler<MessagePlayInAdvancementTree> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInAdvancementTree message) {

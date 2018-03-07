@@ -37,14 +37,10 @@ import org.lanternpowered.server.network.forge.message.type.handshake.MessageFor
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutReset;
-import org.lanternpowered.server.network.message.CodecRegistration;
-import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
+import org.lanternpowered.server.network.vanilla.message.handler.ChannelMessagesHandler;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
@@ -59,38 +55,47 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 final class ProtocolForgeHandshake extends ProtocolBase {
 
     ProtocolForgeHandshake() {
+        ////////////////////////
+        /// Inbound Messages ///
+        ////////////////////////
+
         final MessageRegistry inbound = inbound();
+
+        inbound.bind(0x0b, CodecInOutKeepAlive.class);
+        inbound.bind(0x09, CodecPlayInOutCustomPayload.class);
+
+        // Register handlers
+        inbound.addHandlerProvider((session, binder) -> {
+            binder.bind(new ChannelMessagesHandler());
+            // Don't put all these handlers together just yet, there is a PR open that touches these files
+            binder.bind(MessageForgeHandshakeInOutAck.class, new HandlerForgeHandshakeInAck());
+            binder.bind(MessageForgeHandshakeInOutHello.class, new HandlerForgeHandshakeInHello());
+            binder.bind(MessageForgeHandshakeInOutModList.class, new HandlerForgeHandshakeInModList());
+            binder.bind(MessageForgeHandshakeInStart.class, new HandlerForgeHandshakeInStart());
+        });
+
+        /////////////////////////
+        /// Outbound Messages ///
+        /////////////////////////
+
         final MessageRegistry outbound = outbound();
 
-        inbound.bind(0x0b, CodecInOutKeepAlive.class, MessageInOutKeepAlive.class);
-        final CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayInCustomPayloadRegistration =
-                inbound.bind(0x09, CodecPlayInOutCustomPayload.class);
-        codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class)
-                .bindHandler(new HandlerPlayInChannelPayload());
-        codecPlayInCustomPayloadRegistration.bind(MessageForgeHandshakeInOutAck.class)
-                .bindHandler(new HandlerForgeHandshakeInAck());
-        codecPlayInCustomPayloadRegistration.bind(MessageForgeHandshakeInOutHello.class)
-                .bindHandler(new HandlerForgeHandshakeInHello());
-        codecPlayInCustomPayloadRegistration.bind(MessageForgeHandshakeInOutModList.class)
-                .bindHandler(new HandlerForgeHandshakeInModList());
-        codecPlayInCustomPayloadRegistration.bind(MessageForgeHandshakeInStart.class)
-                .bindHandler(new HandlerForgeHandshakeInStart());
-        codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutRegisterChannels.class)
-                .bindHandler(new HandlerPlayInRegisterChannels());
-        codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutUnregisterChannels.class)
-                .bindHandler(new HandlerPlayInUnregisterChannels());
+        outbound.bindProcessor(MessageForgeHandshakeOutRegistryData.class,
+                new ProcessorForgeHandshakeOutRegistryData());
 
-        outbound.bind(0x1f, CodecInOutKeepAlive.class, MessageInOutKeepAlive.class);
-        final CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayOutCustomPayloadRegistration =
-                outbound.bind(0x18, CodecPlayInOutCustomPayload.class);
-        codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class);
-        codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeInOutAck.class);
-        codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeInOutHello.class);
-        codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeInOutModList.class);
-        codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeOutReset.class);
-        codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutRegisterChannels.class);
-        codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutUnregisterChannels.class);
-        outbound.bind(0x1a, CodecOutDisconnect.class, MessageOutDisconnect.class);
-        outbound.bindProcessor(MessageForgeHandshakeOutRegistryData.class, new ProcessorForgeHandshakeOutRegistryData());
+        outbound.bind(0x1f, CodecInOutKeepAlive.class,
+                MessageInOutKeepAlive.class);
+        outbound.bind(0x18, CodecPlayInOutCustomPayload.class,
+                // Forge handshake messages
+                MessageForgeHandshakeInOutAck.class,
+                MessageForgeHandshakeInOutHello.class,
+                MessageForgeHandshakeInOutModList.class,
+                MessageForgeHandshakeOutReset.class,
+                // Plugin channel messages
+                MessagePlayInOutChannelPayload.class,
+                MessagePlayInOutRegisterChannels.class,
+                MessagePlayInOutUnregisterChannels.class);
+        outbound.bind(0x1a, CodecOutDisconnect.class,
+                MessageOutDisconnect.class);
     }
 }

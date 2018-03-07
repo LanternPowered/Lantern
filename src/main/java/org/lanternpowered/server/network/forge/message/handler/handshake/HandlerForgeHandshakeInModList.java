@@ -34,11 +34,11 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutModList;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 
 import java.util.HashMap;
 
-public final class HandlerForgeHandshakeInModList implements Handler<MessageForgeHandshakeInOutModList> {
+public final class HandlerForgeHandshakeInModList implements MessageHandler<MessageForgeHandshakeInOutModList> {
 
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInOutModList message) {

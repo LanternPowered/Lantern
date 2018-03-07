@@ -46,7 +46,7 @@ public final class CodecRegistration<M extends Message, C extends Codec<? super 
     private final int opcode;
     private final C codec;
 
-    public CodecRegistration(MessageRegistry registry, int opcode, C codec) {
+    CodecRegistration(MessageRegistry registry, int opcode, C codec) {
         this.registry = registry;
         this.opcode = opcode;
         this.codec = codec;
@@ -75,6 +75,11 @@ public final class CodecRegistration<M extends Message, C extends Codec<? super 
         this.boundMessageTypes.add(messageType);
         registration.codecRegistration = Optional.of((CodecRegistration) this);
         return registration;
+    }
+
+    <A extends M> MessageRegistration<A> bind(MessageRegistration<A> registration)
+            throws IllegalArgumentException {
+        return bind(registration.getMessageType(), registration);
     }
 
     /**

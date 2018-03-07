@@ -31,7 +31,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.spongepowered.api.data.key.Keys;
@@ -39,7 +39,7 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayerAbilities> {
+public class HandlerPlayInPlayerAbilities implements MessageHandler<MessagePlayInPlayerAbilities> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerAbilities message) {

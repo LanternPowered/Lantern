@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.command.LanternCommandManager;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
 import org.spongepowered.api.Sponge;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabComplete> {
+public final class HandlerPlayInTabComplete implements MessageHandler<MessagePlayInTabComplete> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInTabComplete message) {

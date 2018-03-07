@@ -35,7 +35,7 @@ import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutAck;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 
@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHandshakeInOutAck> {
+public final class HandlerForgeHandshakeInAck implements MessageHandler<MessageForgeHandshakeInOutAck> {
 
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInOutAck message) {

@@ -23,28 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.network.message.handler;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.lanternpowered.server.inventory.PlayerContainerSession;
-import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.handler.Handler;
 
-import java.util.function.BiConsumer;
+public interface HandlerBinder {
 
-public class HandlerPlayInContainerSessionForwarding<M extends Message> implements Handler<M> {
+    /**
+     * Binds the provided {@link MessageHandler} to
+     * the specific {@link Message} type.
+     *
+     * @param messageType The message type
+     * @param handler The handler
+     * @param <M> The message type
+     */
+    <M extends Message> void bind(Class<M> messageType, MessageHandler<? super M> handler);
 
-    private final BiConsumer<PlayerContainerSession, M> function;
-
-    public HandlerPlayInContainerSessionForwarding(BiConsumer<PlayerContainerSession, M> function) {
-        checkNotNull(function, "function");
-        this.function = function;
-    }
-
-    @Override
-    public void handle(NetworkContext context, M message) {
-        this.function.accept(context.getSession().getPlayer().getContainerSession(), message);
-    }
+    /**
+     * Binds the object which holds methods annotated with
+     * {@link Handler}. These methods will be registered as
+     * {@link MessageHandler}s.
+     *
+     * @param object The object
+     */
+    void bind(Object object);
 }

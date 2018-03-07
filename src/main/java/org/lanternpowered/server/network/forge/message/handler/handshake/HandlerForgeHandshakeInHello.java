@@ -33,10 +33,10 @@ import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.NetworkSession;
 
-public final class HandlerForgeHandshakeInHello implements Handler<MessageForgeHandshakeInOutHello> {
+public final class HandlerForgeHandshakeInHello implements MessageHandler<MessageForgeHandshakeInOutHello> {
 
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInOutHello message) {

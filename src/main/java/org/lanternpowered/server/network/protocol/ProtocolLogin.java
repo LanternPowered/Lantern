@@ -32,12 +32,9 @@ import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginI
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutEncryptionRequest;
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutSuccess;
-import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerEncryptionResponse;
-import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginFinish;
-import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginStart;
+import org.lanternpowered.server.network.vanilla.message.handler.LoginProtocolHandler;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
@@ -46,17 +43,32 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 final class ProtocolLogin extends ProtocolBase {
 
     ProtocolLogin() {
-        final MessageRegistry inbound = this.inbound();
-        final MessageRegistry outbound = this.outbound();
+        ////////////////////////
+        /// Inbound Messages ///
+        ////////////////////////
 
-        inbound.bind(CodecLoginInStart.class, MessageLoginInStart.class).bindHandler(new HandlerLoginStart());
-        inbound.bind(CodecLoginInEncryptionResponse.class, MessageLoginInEncryptionResponse.class)
-                .bindHandler(new HandlerEncryptionResponse());
-        inbound.bindHandler(MessageLoginInFinish.class, new HandlerLoginFinish());
+        final MessageRegistry inbound = inbound();
 
-        outbound.bind(CodecOutDisconnect.class, MessageOutDisconnect.class);
-        outbound.bind(CodecLoginOutEncryptionRequest.class, MessageLoginOutEncryptionRequest.class);
-        outbound.bind(CodecLoginOutSuccess.class, MessageLoginOutSuccess.class);
-        outbound.bind(CodecLoginOutSetCompression.class, MessageLoginOutSetCompression.class);
+        inbound.bind(CodecLoginInStart.class,
+                MessageLoginInStart.class);
+        inbound.bind(CodecLoginInEncryptionResponse.class,
+                MessageLoginInEncryptionResponse.class);
+
+        inbound.addHandlerProvider((session, binder) -> binder.bind(new LoginProtocolHandler()));
+
+        /////////////////////////
+        /// Outbound Messages ///
+        /////////////////////////
+
+        final MessageRegistry outbound = outbound();
+
+        outbound.bind(CodecOutDisconnect.class,
+                MessageOutDisconnect.class);
+        outbound.bind(CodecLoginOutEncryptionRequest.class,
+                MessageLoginOutEncryptionRequest.class);
+        outbound.bind(CodecLoginOutSuccess.class,
+                MessageLoginOutSuccess.class);
+        outbound.bind(CodecLoginOutSetCompression.class,
+                MessageLoginOutSetCompression.class);
     }
 }

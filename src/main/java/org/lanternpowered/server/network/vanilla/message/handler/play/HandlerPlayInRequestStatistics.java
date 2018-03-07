@@ -27,10 +27,10 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 
-public class HandlerPlayInRequestStatistics implements Handler<MessagePlayInRequestStatistics> {
+public class HandlerPlayInRequestStatistics implements MessageHandler<MessagePlayInRequestStatistics> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInRequestStatistics message) {

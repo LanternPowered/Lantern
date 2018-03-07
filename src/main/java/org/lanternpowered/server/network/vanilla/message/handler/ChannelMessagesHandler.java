@@ -23,28 +23,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.network.vanilla.message.handler;
 
+import io.netty.channel.Channel;
 import org.lanternpowered.server.event.CauseStack;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.MessageHandler;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.message.handler.ContextInject;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Set;
 
-public final class HandlerPlayInRegisterChannels implements MessageHandler<MessagePlayInOutRegisterChannels> {
+/**
+ * A handler that manages all the "plugin" channel messages.
+ */
+public final class ChannelMessagesHandler {
 
-    @Override
-    public void handle(NetworkContext context, MessagePlayInOutRegisterChannels message) {
+    @ContextInject private NetworkSession session;
+    @ContextInject private Channel channel;
+
+    @Handler
+    private void handlePayload(MessagePlayInOutChannelPayload message) {
+        Lantern.getGame().getChannelRegistrar().handlePayload(message.getContent(),
+                message.getChannel(), this.session);
+    }
+
+    @Handler
+    private void handleUnregister(MessagePlayInOutUnregisterChannels message) {
         final Set<String> channels = message.getChannels();
-        final Set<String> registeredChannels = context.getSession().getRegisteredChannels();
+        final Set<String> registeredChannels = this.session.getRegisteredChannels();
 
         final CauseStack causeStack = CauseStack.current();
-        causeStack.pushCause(context.getSession());
-        causeStack.pushCause(context.getSession().getPlayer());
+        causeStack.pushCause(this.session);
+        causeStack.pushCause(this.session.getPlayer());
+        final Cause cause = causeStack.getCurrentCause();
+        for (String channel : channels) {
+            if (registeredChannels.remove(channel)) {
+                Sponge.getEventManager().post(SpongeEventFactory.createChannelRegistrationEventUnregister(cause, channel));
+            }
+        }
+        causeStack.popCauses(2);
+    }
+
+    @Handler
+    public void handleRegister(MessagePlayInOutRegisterChannels message) {
+        final Set<String> channels = message.getChannels();
+        final Set<String> registeredChannels = this.session.getRegisteredChannels();
+
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this.session);
+        causeStack.pushCause(this.session.getPlayer());
         final Cause cause = causeStack.getCurrentCause();
         for (String channel : channels) {
             if (registeredChannels.add(channel)) {

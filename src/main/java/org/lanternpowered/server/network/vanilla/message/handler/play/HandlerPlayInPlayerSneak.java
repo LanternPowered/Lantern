@@ -26,11 +26,11 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
 import org.spongepowered.api.data.key.Keys;
 
-public final class HandlerPlayInPlayerSneak implements Handler<MessagePlayInPlayerSneak> {
+public final class HandlerPlayInPlayerSneak implements MessageHandler<MessagePlayInPlayerSneak> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerSneak message) {

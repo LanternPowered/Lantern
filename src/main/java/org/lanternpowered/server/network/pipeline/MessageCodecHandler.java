@@ -32,7 +32,6 @@ import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.ReferenceCountUtil;
@@ -41,19 +40,17 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.LanternByteBuffer;
 import org.lanternpowered.server.network.message.BulkMessage;
 import org.lanternpowered.server.network.message.CodecRegistration;
-import org.lanternpowered.server.network.message.HandlerMessage;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -66,7 +63,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) {
         final Protocol protocol = this.codecContext.getSession().getProtocol();
         final MessageRegistration<Message> registration = (MessageRegistration<Message>) protocol.outbound()
                 .findByMessageType(message.getClass()).orElse(null);
@@ -78,14 +75,6 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         if (codecRegistration == null) {
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered to allow encoding!");
         }
-
-        /*
-        if (message instanceof MessagePlayOutWorldTime ||
-                message instanceof MessageInOutKeepAlive) {
-        } else {
-            System.out.println(message.getClass().getName());
-        }
-        */
 
         final ByteBuf opcode = ctx.alloc().buffer();
 
@@ -107,7 +96,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
     private static final Set<Integer> warnedMissingOpcodes = Sets.newConcurrentHashSet();
 
     @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
+    public void decode(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) {
         if (input.readableBytes() == 0) {
             return;
         }
@@ -143,44 +132,29 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
             content.release();
         }
 
-        /*
-        if (message instanceof MessageInOutKeepAlive ||
-                message instanceof MessagePlayInPlayerMovement) {
-        } else {
-            System.out.println(message.getClass().getName());
-        }
-        */
-
-        processMessage(message, output, protocol, state, this.codecContext);
+        processMessage(message, output, protocol);
     }
 
-    private void processMessage(Message message, List<Object> output, Protocol protocol, ProtocolState state, CodecContext context) {
+    private void processMessage(Message message, List<Object> output, Protocol protocol) {
         if (message == NullMessage.INSTANCE) {
             return;
         }
         if (message instanceof BulkMessage) {
             ((BulkMessage) message).getMessages().forEach(message1 ->
-                    processMessage(message1, output, protocol, state, context));
+                    processMessage(message1, output, protocol));
             return;
         }
-        final MessageRegistration messageRegistration = (MessageRegistration) protocol.inbound()
-                .findByMessageType(message.getClass()).orElseThrow(() -> new DecoderException(
-                        "The returned message type is not attached to the used protocol state (" + state.toString() + ")!"));
-        final List<Processor> processors = messageRegistration.getProcessors();
+        final List<Processor> processors = protocol.inbound().findByMessageType(message.getClass())
+                .map(registration -> (List) registration.getProcessors())
+                .orElse(Collections.emptyList());
         // Only process if there are processors found
         if (!processors.isEmpty()) {
             for (Processor processor : processors) {
                 // The processor should handle the output messages
-                processor.process(context, message, output);
+                processor.process(this.codecContext, message, output);
             }
         } else {
-            final Optional<Handler> optHandler = messageRegistration.getHandler();
-            if (optHandler.isPresent()) {
-                // Add the message to the output
-                output.add(new HandlerMessage(message, optHandler.get()));
-            } else {
-                output.add(message);
-            }
+            output.add(message);
         }
     }
 }

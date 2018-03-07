@@ -35,7 +35,7 @@ import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.spongepowered.api.Platform;
@@ -44,7 +44,7 @@ import org.spongepowered.api.Sponge;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeHandshakeInStart> {
+public final class HandlerForgeHandshakeInStart implements MessageHandler<MessageForgeHandshakeInStart> {
 
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInStart message) {

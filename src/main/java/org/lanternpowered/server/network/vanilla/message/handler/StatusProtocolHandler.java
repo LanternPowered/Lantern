@@ -23,26 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.status;
+package org.lanternpowered.server.network.vanilla.message.handler;
 
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.netty.channel.Channel;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
-import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.WrappedRemoteConnection;
+import org.lanternpowered.server.network.message.handler.Async;
+import org.lanternpowered.server.network.message.handler.ContextInject;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
-import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
 import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.network.status.LanternStatusClient;
 import org.lanternpowered.server.network.status.LanternStatusHelper;
 import org.lanternpowered.server.network.status.LanternStatusResponse;
+import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInOutPing;
+import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
+import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
@@ -58,20 +61,23 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 
-public final class HandlerStatusRequest implements Handler<MessageStatusInRequest> {
+public final class StatusProtocolHandler {
 
-    @Override
-    public void handle(NetworkContext context, MessageStatusInRequest message) {
-        final NetworkSession session = context.getSession();
-        final LanternServer server = session.getServer();
+    @ContextInject private NetworkSession session;
+    @ContextInject private Channel channel;
+
+    @Async
+    @Handler
+    private void handleRequest(MessageStatusInRequest message) {
+        final LanternServer server = this.session.getServer();
         final Gson gson = new Gson();
 
         final Text description = server.getMotd();
 
-        final InetSocketAddress address = session.getAddress();
-        final InetSocketAddress virtualAddress = session.getVirtualHost();
+        final InetSocketAddress address = this.session.getAddress();
+        final InetSocketAddress virtualAddress = this.session.getVirtualHost();
 
-        final int protocol = session.getProtocolVersion();
+        final int protocol = this.session.getProtocolVersion();
         final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol, false);
         if (clientVersion == LanternMinecraftVersion.UNKNOWN) {
             Lantern.getLogger().debug("Client with unknown protocol version {} pinged the server.", protocol);
@@ -82,13 +88,13 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         final LanternStatusResponse response = new LanternStatusResponse(Lantern.getGame().getPlatform().getMinecraftVersion(),
                 server.getFavicon(), description, players);
 
-        final Cause cause = Cause.of(EventContext.empty(), new WrappedRemoteConnection(session));
+        final Cause cause = Cause.of(EventContext.empty(), new WrappedRemoteConnection(this.session));
         final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(cause, client, response);
         Sponge.getEventManager().post(event);
 
         // Cancelled, we are done here
         if (event.isCancelled()) {
-            context.getChannel().close();
+            this.channel.close();
             return;
         }
 
@@ -137,6 +143,12 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         // Add the fml info
         rootObject.add("modinfo", fmlObject);
 
-        session.send(new MessageStatusOutResponse(gson.toJson(rootObject)));
+        this.session.send(new MessageStatusOutResponse(gson.toJson(rootObject)));
+    }
+
+    @Async
+    @Handler
+    private void handlePing(MessageStatusInOutPing message) {
+        this.session.send(message);
     }
 }

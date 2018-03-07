@@ -29,8 +29,7 @@ import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.status.CodecStatusInOutPing;
 import org.lanternpowered.server.network.vanilla.message.codec.status.CodecStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.codec.status.CodecStatusOutResponse;
-import org.lanternpowered.server.network.vanilla.message.handler.status.HandlerStatusPing;
-import org.lanternpowered.server.network.vanilla.message.handler.status.HandlerStatusRequest;
+import org.lanternpowered.server.network.vanilla.message.handler.StatusProtocolHandler;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
@@ -38,13 +37,22 @@ import org.lanternpowered.server.network.vanilla.message.type.status.MessageStat
 final class ProtocolStatus extends ProtocolBase {
 
     ProtocolStatus() {
-        final MessageRegistry inbound = inbound();
-        final MessageRegistry outbound = outbound();
+        ////////////////////////
+        /// Inbound Messages ///
+        ////////////////////////
 
-        inbound.bind(CodecStatusInRequest.class, MessageStatusInRequest.class)
-                .bindHandler(new HandlerStatusRequest());
-        inbound.bind(CodecStatusInOutPing.class, MessageStatusInOutPing.class)
-                .bindHandler(new HandlerStatusPing());
+        final MessageRegistry inbound = inbound();
+
+        inbound.bind(CodecStatusInRequest.class, MessageStatusInRequest.class);
+        inbound.bind(CodecStatusInOutPing.class, MessageStatusInOutPing.class);
+
+        inbound.addHandlerProvider((session, binder) -> binder.bind(new StatusProtocolHandler()));
+
+        /////////////////////////
+        /// Outbound Messages ///
+        /////////////////////////
+
+        final MessageRegistry outbound = outbound();
 
         outbound.bind(CodecStatusOutResponse.class, MessageStatusOutResponse.class);
         outbound.bind(CodecStatusInOutPing.class, MessageStatusInOutPing.class);

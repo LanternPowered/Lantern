@@ -29,7 +29,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
@@ -38,7 +38,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.stream.Collectors;
 
-public class HandlerPlayInSignBook implements Handler<MessagePlayInSignBook> {
+public class HandlerPlayInSignBook implements MessageHandler<MessagePlayInSignBook> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInSignBook message) {

@@ -27,10 +27,10 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
-public final class HandlerPlayInChannelPayload implements Handler<MessagePlayInOutChannelPayload> {
+public final class HandlerPlayInChannelPayload implements MessageHandler<MessagePlayInOutChannelPayload> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInOutChannelPayload message) {

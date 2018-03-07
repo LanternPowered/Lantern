@@ -42,7 +42,6 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.CodecException;
-import io.netty.handler.codec.DecoderException;
 import io.netty.handler.timeout.TimeoutException;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
@@ -56,13 +55,11 @@ import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.lanternpowered.server.network.message.AsyncHelper;
 import org.lanternpowered.server.network.message.BulkMessage;
 import org.lanternpowered.server.network.message.HandlerMessage;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.NullMessage;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
@@ -97,18 +94,22 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({ "ConstantConditions", "unchecked" })
 public final class NetworkSession extends SimpleChannelInboundHandler<Message> implements PlayerConnection {
 
     /**
@@ -182,7 +183,17 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     /**
      * The protocol state that is currently active.
      */
-    private volatile ProtocolState protocolState = ProtocolState.HANDSHAKE;
+    private ProtocolState protocolState;
+
+    /**
+     * A {@link List} with all the message handlers.
+     */
+    private final List<LanternMessageHandler> handlers = new ArrayList<>();
+
+    /**
+     * A {@link Map} where the handlers are mapped
+     */
+    private final Map<Class<?>, List<LanternMessageHandler>> handlersByType = new HashMap<>();
 
     /**
      * A list with all the registered channels.
@@ -218,6 +229,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.networkManager = networkManager;
         this.channel = channel;
         this.server = server;
+        // Initialize the message handlers
+        setProtocolState(ProtocolState.HANDSHAKE);
     }
 
     private static long currentTime() {
@@ -238,18 +251,18 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Message message) {
         messageReceived(message);
     }
 
     /**
-     * Handles the inbound {@link Message} with the specified {@link Handler}.
+     * Handles the inbound {@link Message} with the specified {@link MessageHandler}.
      *
      * @param handler The handler
      * @param message The message
      */
     @SuppressWarnings("unchecked")
-    private void handleMessage(Handler handler, Message message) {
+    private void handleMessage(MessageHandler handler, Message message) {
         try {
             handler.handle(this.networkContext, message);
         } catch (Throwable throwable) {
@@ -258,11 +271,39 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
+     * Queues the {@link Message} to be handled.
+     *
+     * @param message The message
+     */
+    public void queueReceivedMessage(Message message) {
+        final EventLoop eventLoop = this.channel.eventLoop();
+        if (eventLoop.inEventLoop()) {
+            messageReceived(message);
+        } else {
+            this.channel.eventLoop().execute(() -> messageReceived(message));
+        }
+    }
+
+    /**
+     * Gets a {@link List} with all the {@link LanternMessageHandler}s
+     * that are registered for the given message type.
+     *
+     * @param messageType The message type
+     * @return The message handlers
+     */
+    public List<LanternMessageHandler> getHandlers(Class<? extends Message> messageType) {
+        checkNotNull(messageType, "messageType");
+        return this.handlersByType.computeIfAbsent(messageType, messageType1 -> this.handlers.stream()
+                .filter(handler -> handler.getMessageType().isAssignableFrom(messageType))
+                .collect(Collectors.toList()));
+    }
+
+    /**
      * Called when the server received a message from the client.
      *
      * @param message The message
      */
-    @SuppressWarnings("unchecked")
+    @NettyThreadOnly
     public void messageReceived(Message message) {
         if (message instanceof MessageInOutKeepAlive) { // Special case
             handleKeepAlive((MessageInOutKeepAlive) message);
@@ -272,24 +313,20 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             ((BulkMessage) message).getMessages().forEach(this::messageReceived);
         } else if (message instanceof HandlerMessage) {
             final HandlerMessage handlerMessage = (HandlerMessage) message;
-            if (AsyncHelper.isAsyncMessage(handlerMessage.getMessage()) ||
-                    AsyncHelper.isAsyncHandler(handlerMessage.getHandler())) {
-                handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage());
+            final MessageHandler handler = handlerMessage.getHandler();
+            if (handler instanceof LanternMessageHandler &&
+                    ((LanternMessageHandler) handler).isAsync()) {
+                handleMessage(handler, handlerMessage.getMessage());
             } else {
                 this.messageQueue.add(handlerMessage);
             }
         } else {
-            final Class<? extends Message> messageClass = message.getClass();
-            final MessageRegistration registration = getProtocol().inbound().findByMessageType(messageClass).orElse(null);
-            if (registration == null) {
-                throw new DecoderException("Failed to find a message registration for " + messageClass.getName() + "!");
-            }
-            registration.getHandler().ifPresent(handler -> {
-                final Handler handler1 = (Handler) handler;
-                if (AsyncHelper.isAsyncMessage(message) || AsyncHelper.isAsyncHandler(handler1)) {
-                    handleMessage(handler1, message);
+            final List<LanternMessageHandler> handlers = getHandlers(message.getClass());
+            handlers.forEach(handler -> {
+                if (handler.isAsync()) {
+                    handleMessage(handler, message);
                 } else {
-                    this.messageQueue.add(new HandlerMessage(message, handler1));
+                    this.messageQueue.add(new HandlerMessage(message, handler));
                 }
             });
         }
@@ -322,7 +359,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }, 0, 15, TimeUnit.SECONDS);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         this.networkManager.onInactive(this);
@@ -503,6 +539,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @return The protocol
      */
+    @NettyThreadOnly
     public Protocol getProtocol() {
         return this.protocolState.getProtocol();
     }
@@ -512,6 +549,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @return The protocol state
      */
+    @NettyThreadOnly
     public ProtocolState getProtocolState() {
         return this.protocolState;
     }
@@ -521,8 +559,20 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @param state The protocol state
      */
+    @NettyThreadOnly
     public void setProtocolState(ProtocolState state) {
         this.protocolState = state;
+        // Clear all the handlers, and start collecting new ones
+        this.handlers.clear();
+        // Make sure that the player is available before collection handlers in the PLAY state
+        if (state == ProtocolState.PLAY) {
+            if (this.gameProfile == null) {
+                throw new IllegalStateException("The game profile must first be available!");
+            }
+            this.player = new LanternPlayer(this.gameProfile, this);
+        }
+        // Load the new message handlers
+        LanternMessageHandlerCollector.load(this, state, this.handlers);
     }
 
     /**
@@ -813,10 +863,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     public void initPlayer() {
         initKeepAliveTask();
-        if (this.gameProfile == null) {
-            throw new IllegalStateException("The game profile must first be available!");
-        }
-        this.player = new LanternPlayer(this.gameProfile, this);
+
         this.player.setNetworkId(EntityProtocolManager.acquireEntityId());
         this.player.setEntityProtocolType(EntityProtocolTypes.PLAYER);
 

@@ -26,7 +26,8 @@
 package org.lanternpowered.server.network.message;
 
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.Async;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public final class AsyncHelper {
      * @param handler the handler
      * @return is asynchronous
      */
-    public static boolean isAsyncHandler(Handler<?> handler) {
+    public static boolean isAsyncHandler(MessageHandler<?> handler) {
         return isAsync0(handler.getClass());
     }
 
@@ -50,7 +51,7 @@ public final class AsyncHelper {
      * @param handler the handler
      * @return is asynchronous
      */
-    public static boolean isAsyncHandler(Class<? extends Handler<?>> handler) {
+    public static boolean isAsyncHandler(Class<? extends MessageHandler<?>> handler) {
         return isAsync0(handler);
     }
 

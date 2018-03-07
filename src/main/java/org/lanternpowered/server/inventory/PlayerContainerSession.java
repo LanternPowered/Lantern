@@ -36,6 +36,7 @@ import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
+import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
@@ -131,16 +132,6 @@ public class PlayerContainerSession {
         return setRawOpenContainer(causeStack, container, false, false);
     }
 
-    public void handleWindowClose(MessagePlayInOutCloseWindow message) {
-        if (this.openContainer == null || message.getWindow() != getContainerId()) {
-            return;
-        }
-        final CauseStack causeStack = CauseStack.current();
-        causeStack.pushCause(this.player);
-        setRawOpenContainer(causeStack, null, false, true);
-        causeStack.popCause();
-    }
-
     private boolean setRawOpenContainer(CauseStack causeStack, @Nullable LanternContainer container, boolean sendClose, boolean client) {
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             if (this.openContainer != container) {
@@ -219,17 +210,9 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
-        final ClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer(this.player).get();
-        if (clientContainer instanceof PlayerClientContainer) {
-            ((PlayerClientContainer) clientContainer).handleHeldItemChange(message.getSlot());
-        }
-    }
-
-    public void handleRecipeClick(MessagePlayInClickRecipe message) {
-        final int windowId = message.getWindowId();
+    private void applyIfContainerMatches(int windowId, Runnable runnable) {
         if (this.openContainer == null) {
-            if (message.getWindowId() == 0) {
+            if (windowId == 0) {
                 openPlayerContainer();
             } else {
                 return;
@@ -237,12 +220,40 @@ public class PlayerContainerSession {
         } else if (windowId != getContainerId()) {
             return;
         }
-        // Just display the recipe for now, all the other behavior will be implemented later,
-        // this requires recipes to be added first
-        this.player.getConnection().send(new MessagePlayOutDisplayRecipe(message.getWindowId(), message.getRecipeId()));
+        runnable.run();
     }
 
-    public void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
+    @Handler
+    private void handleWindowClose(MessagePlayInOutCloseWindow message) {
+        if (this.openContainer == null || message.getWindow() != getContainerId()) {
+            return;
+        }
+        final CauseStack causeStack = CauseStack.current();
+        causeStack.pushCause(this.player);
+        setRawOpenContainer(causeStack, null, false, true);
+        causeStack.popCause();
+    }
+
+    @Handler
+    private void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
+        final ClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer(this.player).get();
+        if (clientContainer instanceof PlayerClientContainer) {
+            ((PlayerClientContainer) clientContainer).handleHeldItemChange(message.getSlot());
+        }
+    }
+
+    @Handler
+    private void handleRecipeClick(MessagePlayInClickRecipe message) {
+        applyIfContainerMatches(message.getWindowId(), () -> {
+            // Just display the recipe for now, all the other behavior will be implemented later,
+            // this requires recipes to be added first
+            this.player.getConnection().send(new MessagePlayOutDisplayRecipe(
+                    message.getWindowId(), message.getRecipeId()));
+        });
+    }
+
+    @Handler
+    private void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
         if (this.openContainer == null) {
             openPlayerContainer();
         }
@@ -250,7 +261,8 @@ public class PlayerContainerSession {
         clientContainer.handleCreativeClick(message.getSlot(), message.getItemStack());
     }
 
-    public void handleItemDrop(MessagePlayInDropHeldItem message) {
+    @Handler
+    private void handleItemDrop(MessagePlayInDropHeldItem message) {
         final AbstractSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
         final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
@@ -281,33 +293,27 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleDisplayedRecipe(MessagePlayInDisplayedRecipe message) {
+    @Handler
+    private void handleDisplayedRecipe(MessagePlayInDisplayedRecipe message) {
         if (this.openContainer == null) {
             openPlayerContainer();
         }
     }
 
-    public void handleWindowClick(MessagePlayInClickWindow message) {
-        final int windowId = message.getWindowId();
-        if (this.openContainer == null) {
-            if (message.getWindowId() == 0) {
-                openPlayerContainer();
-            } else {
-                return;
-            }
-        } else if (windowId != getContainerId()) {
-            return;
-        }
-        final ClientContainer clientContainer = getClientContainer();
-        clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
+    @Handler
+    private void handleWindowClick(MessagePlayInClickWindow message) {
+        applyIfContainerMatches(message.getWindowId(), () ->
+                getClientContainer().handleClick(message.getSlot(), message.getMode(), message.getButton()));
     }
 
-    public void handlePickItem(MessagePlayInPickItem message) {
+    @Handler
+    private void handlePickItem(MessagePlayInPickItem message) {
         final ClientContainer clientContainer = getClientContainer();
         clientContainer.handlePick(message.getSlot());
     }
 
-    public void handleAcceptBeaconEffects(MessagePlayInAcceptBeaconEffects message) {
+    @Handler
+    private void handleAcceptBeaconEffects(MessagePlayInAcceptBeaconEffects message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof BeaconClientContainer) {
             ((BeaconClientContainer) clientContainer).handleEffects(
@@ -315,21 +321,24 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleItemRename(MessagePlayInChangeItemName message) {
+    @Handler
+    private void handleItemRename(MessagePlayInChangeItemName message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof AnvilClientContainer) {
             ((AnvilClientContainer) clientContainer).handleRename(message.getName());
         }
     }
 
-    public void handleOfferChange(MessagePlayInChangeOffer message) {
+    @Handler
+    private void handleOfferChange(MessagePlayInChangeOffer message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof TradingClientContainer) {
             ((TradingClientContainer) clientContainer).handleSelectOffer(message.getIndex());
         }
     }
 
-    public void handleEnchantItem(MessagePlayInEnchantItem message) {
+    @Handler
+    private void handleEnchantItem(MessagePlayInEnchantItem message) {
         if (message.getWindowId() != getContainerId()) {
             return;
         }

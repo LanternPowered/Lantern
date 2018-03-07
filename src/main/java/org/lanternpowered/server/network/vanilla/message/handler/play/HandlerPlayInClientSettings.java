@@ -29,7 +29,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
@@ -38,7 +38,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.entity.living.humanoid.player.PlayerChangeClientSettingsEvent;
 
-public final class HandlerPlayInClientSettings implements Handler<MessagePlayInClientSettings> {
+public final class HandlerPlayInClientSettings implements MessageHandler<MessagePlayInClientSettings> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInClientSettings message) {

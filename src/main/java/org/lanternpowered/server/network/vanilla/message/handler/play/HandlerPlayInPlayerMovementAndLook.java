@@ -28,10 +28,10 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementAndLook;
 
-public class HandlerPlayInPlayerMovementAndLook implements Handler<MessagePlayInPlayerMovementAndLook> {
+public class HandlerPlayInPlayerMovementAndLook implements MessageHandler<MessagePlayInPlayerMovementAndLook> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerMovementAndLook message) {

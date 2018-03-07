@@ -23,29 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.login;
+package org.lanternpowered.server.network.message.handler;
 
-class LoginAuthData {
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.Message;
 
-    private final String username;
-    private final String sessionId;
-    private final byte[] verifyToken;
+@FunctionalInterface
+public interface MessageHandler<M extends Message> {
 
-    public LoginAuthData(String username, String sessionId, byte[] verifyToken) {
-        this.verifyToken = verifyToken;
-        this.sessionId = sessionId;
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public String getSessionId() {
-        return this.sessionId;
-    }
-
-    public byte[] getVerifyToken() {
-        return this.verifyToken;
-    }
+    /**
+     * Handles a {@link Message} that was received.
+     *
+     * @param context The context that received the message
+     * @param message The message that was received
+     */
+    void handle(NetworkContext context, M message);
 }

@@ -25,14 +25,17 @@
  */
 package org.lanternpowered.server.network.protocol;
 
+import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.handshake.CodecHandshakeIn;
-import org.lanternpowered.server.network.vanilla.message.handler.handshake.HandlerHandshakeIn;
+import org.lanternpowered.server.network.vanilla.message.handler.HandshakeProtocolHandler;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 
 final class ProtocolHandshake extends ProtocolBase {
 
     ProtocolHandshake() {
-        inbound().bind(CodecHandshakeIn.class, MessageHandshakeIn.class)
-                .bindHandler(new HandlerHandshakeIn());
+        final MessageRegistry inbound = inbound();
+
+        inbound.bind(CodecHandshakeIn.class, MessageHandshakeIn.class);
+        inbound.addHandlerProvider((session, binder) -> binder.bind(new HandshakeProtocolHandler()));
     }
 }

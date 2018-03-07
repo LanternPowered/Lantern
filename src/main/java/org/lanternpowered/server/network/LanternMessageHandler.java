@@ -23,16 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.status;
+package org.lanternpowered.server.network;
 
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInOutPing;
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.handler.MessageHandler;
 
-public final class HandlerStatusPing implements Handler<MessageStatusInOutPing> {
+public final class LanternMessageHandler<M extends Message> implements MessageHandler<M> {
+
+    private final Class<M> messageType;
+    private final MessageHandler<? super M> handler;
+    private final boolean async;
+
+    LanternMessageHandler(Class<M> messageType, MessageHandler<? super M> handler, boolean async) {
+        this.messageType = messageType;
+        this.handler = handler;
+        this.async = async;
+    }
+
+    /**
+     * Gets the message {@link Class} that
+     * will be handled by this handler.
+     *
+     * @return The message type
+     */
+    public Class<M> getMessageType() {
+        return this.messageType;
+    }
+
+    /**
+     * Gets whether this {@link MessageHandler}
+     * should be handled async.
+     *
+     * @return Is async
+     */
+    public boolean isAsync() {
+        return this.async;
+    }
 
     @Override
-    public void handle(NetworkContext context, MessageStatusInOutPing message) {
-        context.getSession().send(message);
+    public void handle(NetworkContext context, M message) {
+        this.handler.handle(context, message);
     }
 }

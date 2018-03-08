@@ -127,25 +127,15 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.handler.ChannelMessagesHandler;
+import org.lanternpowered.server.network.vanilla.message.handler.PlayProtocolMovementHandler;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClientSettings;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerAbilities;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerLook;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovement;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovementAndLook;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovementInput;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerOnGroundState;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSprint;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSignBook;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSwapHandItems;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityAttack;
@@ -170,19 +160,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPerformRespawn;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerAbilities;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementAndLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementInput;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerOnGroundState;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSprint;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
@@ -311,6 +291,7 @@ final class ProtocolPlay extends ProtocolBase {
         // Bind the handlers
         inbound.addHandlerProvider((session, binder) -> {
             binder.bind(new ChannelMessagesHandler());
+            binder.bind(new PlayProtocolMovementHandler());
 
             // TODO: Move more to new system
 
@@ -319,12 +300,6 @@ final class ProtocolPlay extends ProtocolBase {
             binder.bind(MessagePlayInChatMessage.class, new HandlerPlayInChatMessage());
             binder.bind(MessagePlayInClientSettings.class, new HandlerPlayInClientSettings());
             // TODO: Handler for MessagePlayInOutConfirmWindowTransaction
-            binder.bind(MessagePlayInPlayerOnGroundState.class, new HandlerPlayInPlayerOnGroundState());
-            binder.bind(MessagePlayInPlayerMovement.class, new HandlerPlayInPlayerMovement());
-            binder.bind(MessagePlayInPlayerMovementAndLook.class, new HandlerPlayInPlayerMovementAndLook());
-            binder.bind(MessagePlayInPlayerLook.class, new HandlerPlayInPlayerLook());
-            binder.bind(MessagePlayInPlayerVehicleMovement.class, new HandlerPlayInPlayerVehicleMovement());
-            binder.bind(MessagePlayInPlayerAbilities.class, new HandlerPlayInPlayerAbilities());
             binder.bind(MessagePlayInResourcePackStatus.class, new HandlerPlayInResourcePackStatus());
             binder.bind(MessagePlayInChangeSign.class, new HandlerPlayInChangeSign());
             // TODO: Handler for MessagePlayInSpectate
@@ -340,12 +315,7 @@ final class ProtocolPlay extends ProtocolBase {
             binder.bind(MessagePlayInPerformRespawn.class, (context, message) -> context.getSession().getPlayer().handleRespawn());
             binder.bind(MessagePlayInRequestStatistics.class, new HandlerPlayInRequestStatistics());
             // TODO: Handler for MessagePlayInLeaveBed
-            binder.bind(MessagePlayInStartElytraFlying.class, new HandlerPlayInStartElytraFlying());
-            binder.bind(MessagePlayInPlayerSneak.class, new HandlerPlayInPlayerSneak());
-            binder.bind(MessagePlayInPlayerSprint.class, new HandlerPlayInPlayerSprint());
             // TODO: Handler for MessagePlayInPlayerVehicleJump
-            binder.bind(MessagePlayInPlayerMovementInput.class, new HandlerPlayInPlayerMovementInput());
-            binder.bind(MessagePlayInCraftingBookState.class, new HandlerPlayInCraftingBookState());
             binder.bind(MessagePlayInAdvancementTree.class, new HandlerPlayInAdvancementTree());
 
             final LanternPlayer player = session.getPlayer();

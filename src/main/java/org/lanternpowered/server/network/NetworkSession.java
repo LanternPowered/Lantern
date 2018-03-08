@@ -291,6 +291,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      * @param messageType The message type
      * @return The message handlers
      */
+    @NettyThreadOnly
     public List<LanternMessageHandler> getHandlers(Class<? extends Message> messageType) {
         checkNotNull(messageType, "messageType");
         return this.handlersByType.computeIfAbsent(messageType, messageType1 -> this.handlers.stream()

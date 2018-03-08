@@ -28,7 +28,6 @@ package org.lanternpowered.server.network;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.inject.Inject;
 import io.netty.channel.Channel;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.handler.Async;

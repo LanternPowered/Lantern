@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler;
 
-import io.netty.channel.Channel;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkSession;
@@ -46,7 +45,6 @@ import java.util.Set;
 public final class ChannelMessagesHandler {
 
     @ContextInject private NetworkSession session;
-    @ContextInject private Channel channel;
 
     @Handler
     private void handlePayload(MessagePlayInOutChannelPayload message) {

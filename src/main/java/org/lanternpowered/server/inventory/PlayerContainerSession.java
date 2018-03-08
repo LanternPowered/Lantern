@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventHelper;
@@ -42,6 +43,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
@@ -221,6 +223,12 @@ public class PlayerContainerSession {
             return;
         }
         runnable.run();
+    }
+
+    @Handler
+    private void handleCraftingBookState(MessagePlayInCraftingBookState message) {
+        this.player.offer(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, message.hasFilter());
+        this.player.offer(LanternKeys.RECIPE_BOOK_GUI_OPEN, message.isCurrentlyOpen());
     }
 
     @Handler

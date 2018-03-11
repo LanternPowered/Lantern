@@ -29,7 +29,7 @@ import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.message.handler.ContextInject;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
@@ -46,13 +46,13 @@ public final class ChannelMessagesHandler {
 
     @ContextInject private NetworkSession session;
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePayload(MessagePlayInOutChannelPayload message) {
         Lantern.getGame().getChannelRegistrar().handlePayload(message.getContent(),
                 message.getChannel(), this.session);
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleUnregister(MessagePlayInOutUnregisterChannels message) {
         final Set<String> channels = message.getChannels();
         final Set<String> registeredChannels = this.session.getRegisteredChannels();
@@ -69,7 +69,7 @@ public final class ChannelMessagesHandler {
         causeStack.popCauses(2);
     }
 
-    @Handler
+    @NetworkMessageHandler
     public void handleRegister(MessagePlayInOutRegisterChannels message) {
         final Set<String> channels = message.getChannels();
         final Set<String> registeredChannels = this.session.getRegisteredChannels();

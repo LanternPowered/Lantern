@@ -46,7 +46,7 @@ import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.item.property.DualWieldProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
@@ -185,7 +185,7 @@ public final class PlayerInteractionHandler {
      *
      * @param message The message
      */
-    @Handler
+    @NetworkMessageHandler
     private void handleDigging(MessagePlayInPlayerDigging message) {
         this.player.resetIdleTimeoutCounter();
 
@@ -291,7 +291,7 @@ public final class PlayerInteractionHandler {
                 this.player.getItemInHand(HandTypes.MAIN_HAND).orElse(null));
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
         this.player.resetIdleTimeoutCounter();
 
@@ -388,7 +388,7 @@ public final class PlayerInteractionHandler {
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleSwingArm(MessagePlayInPlayerSwingArm message) {
         this.player.resetIdleTimeoutCounter();
         if (message.getHandType() == HandTypes.OFF_HAND) {
@@ -397,7 +397,7 @@ public final class PlayerInteractionHandler {
         this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.MAIN_HAND));
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleFinishItemInteraction(MessagePlayInOutFinishUsingItem message) {
         this.player.resetIdleTimeoutCounter();
 
@@ -461,7 +461,7 @@ public final class PlayerInteractionHandler {
         this.player.offer(LanternKeys.ACTIVE_HAND, Optional.empty());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleItemInteraction(MessagePlayInPlayerUseItem message) {
         this.player.resetIdleTimeoutCounter();
 

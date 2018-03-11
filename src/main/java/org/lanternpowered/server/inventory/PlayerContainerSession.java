@@ -37,7 +37,7 @@ import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
@@ -225,13 +225,13 @@ public class PlayerContainerSession {
         runnable.run();
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleCraftingBookState(MessagePlayInCraftingBookState message) {
         this.player.offer(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE, message.hasFilter());
         this.player.offer(LanternKeys.RECIPE_BOOK_GUI_OPEN, message.isCurrentlyOpen());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleWindowClose(MessagePlayInOutCloseWindow message) {
         if (this.openContainer == null || message.getWindow() != getContainerId()) {
             return;
@@ -242,7 +242,7 @@ public class PlayerContainerSession {
         causeStack.popCause();
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
         final ClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer(this.player).get();
         if (clientContainer instanceof PlayerClientContainer) {
@@ -250,7 +250,7 @@ public class PlayerContainerSession {
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleRecipeClick(MessagePlayInClickRecipe message) {
         applyIfContainerMatches(message.getWindowId(), () -> {
             // Just display the recipe for now, all the other behavior will be implemented later,
@@ -260,7 +260,7 @@ public class PlayerContainerSession {
         });
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
         if (this.openContainer == null) {
             openPlayerContainer();
@@ -269,7 +269,7 @@ public class PlayerContainerSession {
         clientContainer.handleCreativeClick(message.getSlot(), message.getItemStack());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleItemDrop(MessagePlayInDropHeldItem message) {
         final AbstractSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
         final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
@@ -301,26 +301,26 @@ public class PlayerContainerSession {
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleDisplayedRecipe(MessagePlayInDisplayedRecipe message) {
         if (this.openContainer == null) {
             openPlayerContainer();
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleWindowClick(MessagePlayInClickWindow message) {
         applyIfContainerMatches(message.getWindowId(), () ->
                 getClientContainer().handleClick(message.getSlot(), message.getMode(), message.getButton()));
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePickItem(MessagePlayInPickItem message) {
         final ClientContainer clientContainer = getClientContainer();
         clientContainer.handlePick(message.getSlot());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleAcceptBeaconEffects(MessagePlayInAcceptBeaconEffects message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof BeaconClientContainer) {
@@ -329,7 +329,7 @@ public class PlayerContainerSession {
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleItemRename(MessagePlayInChangeItemName message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof AnvilClientContainer) {
@@ -337,7 +337,7 @@ public class PlayerContainerSession {
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleOfferChange(MessagePlayInChangeOffer message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof TradingClientContainer) {
@@ -345,7 +345,7 @@ public class PlayerContainerSession {
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handleEnchantItem(MessagePlayInEnchantItem message) {
         if (message.getWindowId() != getContainerId()) {
             return;

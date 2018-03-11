@@ -41,7 +41,7 @@ public interface HandlerBinder {
 
     /**
      * Binds the object which holds methods annotated with
-     * {@link Handler}. These methods will be registered as
+     * {@link NetworkMessageHandler}. These methods will be registered as
      * {@link MessageHandler}s.
      *
      * @param object The object

@@ -37,5 +37,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(METHOD)
 @Retention(RUNTIME)
-public @interface Handler {
+public @interface NetworkMessageHandler {
 }

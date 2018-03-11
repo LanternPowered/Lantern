@@ -38,7 +38,7 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.WrappedRemoteConnection;
 import org.lanternpowered.server.network.message.handler.Async;
 import org.lanternpowered.server.network.message.handler.ContextInject;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.network.status.LanternStatusClient;
 import org.lanternpowered.server.network.status.LanternStatusHelper;
@@ -67,7 +67,7 @@ public final class StatusProtocolHandler {
     @ContextInject private Channel channel;
 
     @Async
-    @Handler
+    @NetworkMessageHandler
     private void handleRequest(MessageStatusInRequest message) {
         final LanternServer server = this.session.getServer();
         final Gson gson = new Gson();
@@ -147,7 +147,7 @@ public final class StatusProtocolHandler {
     }
 
     @Async
-    @Handler
+    @NetworkMessageHandler
     private void handlePing(MessageStatusInOutPing message) {
         this.session.send(message);
     }

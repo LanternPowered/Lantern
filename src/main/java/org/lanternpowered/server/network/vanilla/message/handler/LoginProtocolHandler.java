@@ -60,7 +60,7 @@ import org.lanternpowered.server.network.forge.message.type.handshake.MessageFor
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.handler.Async;
 import org.lanternpowered.server.network.message.handler.ContextInject;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
 import org.lanternpowered.server.network.pipeline.MessageEncryptionHandler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
@@ -132,7 +132,7 @@ public final class LoginProtocolHandler {
     private byte[] verifyToken;
 
     @Async
-    @Handler
+    @NetworkMessageHandler
     private void handleLoginStart(MessageLoginInStart message) {
         final String username = message.getUsername();
 
@@ -172,7 +172,7 @@ public final class LoginProtocolHandler {
     }
 
     @Async
-    @Handler
+    @NetworkMessageHandler
     private void handleLoginFinish(MessageLoginInFinish message) {
         final LanternGameProfile gameProfile = message.getGameProfile();
         int compressionThreshold = Lantern.getGame().getGlobalConfig().getNetworkCompressionThreshold();
@@ -199,7 +199,7 @@ public final class LoginProtocolHandler {
     }
 
     @Async
-    @Handler
+    @NetworkMessageHandler
     private void handleEncryptionResponse(MessageLoginInEncryptionResponse message) {
         final PrivateKey privateKey = this.session.getServer().getKeyPair().getPrivate();
 

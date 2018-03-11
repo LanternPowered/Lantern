@@ -32,7 +32,7 @@ import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.message.handler.ContextInject;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
@@ -53,12 +53,12 @@ public final class PlayProtocolMovementHandler {
 
     @ContextInject private NetworkSession session;
 
-    @Handler
+    @NetworkMessageHandler
     private void handleStartElytraFlying(MessagePlayInStartElytraFlying message) {
         this.session.getPlayer().handleStartElytraFlying();
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePlayerAbilities(MessagePlayInPlayerAbilities message) {
         final boolean flying = message.isFlying();
         final LanternPlayer player = this.session.getPlayer();
@@ -115,27 +115,27 @@ public final class PlayProtocolMovementHandler {
         }
     }
 
-    @Handler
+    @NetworkMessageHandler
     public void handlePlayerSprint(MessagePlayInPlayerSprint message) {
         this.session.getPlayer().offer(Keys.IS_SPRINTING, message.isSprinting());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePlayerSneak(MessagePlayInPlayerSneak message) {
         this.session.getPlayer().offer(Keys.IS_SNEAKING, message.isSneaking());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePlayerMovementInput(MessagePlayInPlayerMovementInput message) {
         // TODO
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePlayerVehicleMovement(MessagePlayInPlayerVehicleMovement message) {
         // TODO
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePlayerMovementAndLook(MessagePlayInPlayerMovementAndLook message) {
         final LanternPlayer player = this.session.getPlayer();
         player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
@@ -143,21 +143,21 @@ public final class PlayProtocolMovementHandler {
         player.handleOnGroundState(message.isOnGround());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePlayerMovement(MessagePlayInPlayerMovement message) {
         final LanternPlayer player = this.session.getPlayer();
         player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
         player.handleOnGroundState(message.isOnGround());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handlePlayerLook(MessagePlayInPlayerLook message) {
         final LanternPlayer player = this.session.getPlayer();
         player.setRawRotation(toRotation(message.getPitch(), message.getYaw()));
         player.handleOnGroundState(message.isOnGround());
     }
 
-    @Handler
+    @NetworkMessageHandler
     private void handle(MessagePlayInPlayerOnGroundState message) {
         final LanternPlayer player = this.session.getPlayer();
         player.handleOnGroundState(message.isOnGround());

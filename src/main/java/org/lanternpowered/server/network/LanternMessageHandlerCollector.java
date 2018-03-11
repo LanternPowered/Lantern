@@ -32,7 +32,7 @@ import io.netty.channel.Channel;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.handler.Async;
 import org.lanternpowered.server.network.message.handler.ContextInject;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.message.handler.HandlerBinder;
 import org.lanternpowered.server.network.message.handler.MessageHandler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
@@ -146,7 +146,7 @@ final class LanternMessageHandlerCollector {
         for (Method method : objectClass.getDeclaredMethods()) {
             // Only add entries for methods that are declared, to avoid
             // duplicate entries when methods are overridden.
-            if (method.getDeclaredAnnotation(Handler.class) == null) {
+            if (method.getDeclaredAnnotation(NetworkMessageHandler.class) == null) {
                 continue;
             }
             checkState(!Modifier.isStatic(method.getModifiers()),

@@ -39,7 +39,7 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.message.handler.Async;
 import org.lanternpowered.server.network.message.handler.ContextInject;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.handler.NetworkMessageHandler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -59,7 +59,7 @@ public final class HandshakeProtocolHandler {
     @ContextInject private NetworkSession session;
 
     @Async
-    @Handler
+    @NetworkMessageHandler
     private void handle(MessageHandshakeIn message) {
         final Optional<ProtocolState> optNextState = ProtocolState.getFromId(message.getNextState());
         if (!optNextState.isPresent()) {

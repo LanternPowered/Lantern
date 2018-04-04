@@ -34,6 +34,7 @@ import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
@@ -121,5 +122,16 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
         checkState(values.length != 0, "enumClass must contain values");
         return new LanternEnumTrait<>(name, (Class) value.getClass(), key,
                 ImmutableSet.<E>builder().add(value).add(values).build());
+    }
+
+    @Override
+    public Optional<E> parseValue(String value) {
+        checkNotNull(value);
+        for (E enumValue : getValueClass().getEnumConstants()) {
+            if (enumValue.name().equalsIgnoreCase(value)) {
+                return Optional.of(enumValue);
+            }
+        }
+        return Optional.empty();
     }
 }

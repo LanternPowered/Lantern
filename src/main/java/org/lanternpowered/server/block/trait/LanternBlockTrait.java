@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.function.Predicate;
 
 @SuppressWarnings({"unchecked","rawtypes"})
-public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T> {
+public abstract class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T> {
 
     private final Key<? extends Value<T>> key;
     private final ImmutableSet<T> possibleValues;

@@ -32,6 +32,10 @@ import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.BooleanTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.util.Coerce;
+import org.spongepowered.api.util.OptBool;
+
+import java.util.Optional;
 
 public final class LanternBooleanTrait extends LanternBlockTrait<Boolean> implements BooleanTrait {
 
@@ -52,4 +56,9 @@ public final class LanternBooleanTrait extends LanternBlockTrait<Boolean> implem
         return new LanternBooleanTrait(checkNotNullOrEmpty(name, "name"), checkNotNull(key, "key"));
     }
 
+    @Override
+    public Optional<Boolean> parseValue(String value) {
+        value = value.toLowerCase();
+        return value.equals("true") ? OptBool.TRUE : value.equals("false") ? OptBool.FALSE : Optional.empty();
+    }
 }

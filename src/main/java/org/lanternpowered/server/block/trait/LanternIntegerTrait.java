@@ -34,6 +34,8 @@ import org.spongepowered.api.block.trait.IntegerTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 
+import java.util.Optional;
+
 public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implements IntegerTrait {
 
     private LanternIntegerTrait(String name, Key<? extends Value<Integer>> key, ImmutableSet<Integer> possibleValues) {
@@ -104,4 +106,12 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
         return new LanternIntegerTrait(name, key, set.build());
     }
 
+    @Override
+    public Optional<Integer> parseValue(String value) {
+        try {
+            return Optional.of(Integer.parseInt(value));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
 }

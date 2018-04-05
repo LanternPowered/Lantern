@@ -51,19 +51,23 @@ final class AsyncScheduler extends SchedulerBase {
     private final Condition condition = this.lock.newCondition();
     // The dynamic thread pooling executor of asynchronous tasks.
     private ExecutorService executor;
-
+    // Whether the scheduler is running
     private volatile boolean running;
+
+    // Shutdown time
+    private long shutdownTimeout;
+    private TimeUnit shutdownTimeUnit;
 
     AsyncScheduler() {
         super(ScheduledTask.TaskSynchronicity.ASYNCHRONOUS);
+
+        // We are starting it
+        this.running = true;
 
         final Thread thread = new Thread(AsyncScheduler.this::mainLoop);
         thread.setName("Lantern Async Scheduler Thread");
         thread.setDaemon(true);
         thread.start();
-
-        // Whether the scheduler is running
-        this.running = true;
     }
 
     /**
@@ -74,14 +78,13 @@ final class AsyncScheduler extends SchedulerBase {
      * @param unit The time unit
      */
     void shutdown(long timeout, TimeUnit unit) {
-        this.running = false;
-        this.executor.shutdown();
-        try {
-            if (!this.executor.awaitTermination(timeout, unit)) {
-                this.executor.shutdownNow();
-            }
-        } catch (InterruptedException ignored) {
+        if (!this.running) {
+            return;
         }
+        this.shutdownTimeout = timeout;
+        this.shutdownTimeUnit = unit;
+        // Make the scheduler shutdown
+        this.running = false;
     }
 
     private void mainLoop() {
@@ -91,6 +94,13 @@ final class AsyncScheduler extends SchedulerBase {
         while (this.running) {
             recalibrateMinimumTimeout();
             runTick();
+        }
+        this.executor.shutdown();
+        try {
+            if (!this.executor.awaitTermination(this.shutdownTimeout, this.shutdownTimeUnit)) {
+                this.executor.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
         }
     }
 

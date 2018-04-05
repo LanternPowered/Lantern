@@ -624,7 +624,7 @@ public final class LanternServer implements Server {
         this.executor.shutdown();
 
         // Stop the async scheduler
-        this.game.getScheduler().shutdownAsyncScheduler(5, TimeUnit.SECONDS);
+        this.game.getScheduler().shutdownAsyncScheduler(10, TimeUnit.SECONDS);
 
         final Collection<ProviderRegistration<?>> serviceRegistrations;
         try {

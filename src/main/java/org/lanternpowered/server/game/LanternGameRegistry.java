@@ -170,6 +170,7 @@ import org.lanternpowered.server.game.registry.type.fluid.FluidTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.ItemStackComparatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.QueryOperationRegistryModule;
@@ -679,6 +680,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 .registerModule(EventContextKey.class, EventContextKeysModule.get())
                 .registerModule(new BlockChangeFlagRegistryModule())
+                .registerModule(new ItemStackComparatorRegistryModule())
                 // Advancements
                 .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
                 .registerModule(Advancement.class, AdvancementRegistryModule.get())

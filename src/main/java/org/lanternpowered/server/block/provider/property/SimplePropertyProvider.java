@@ -23,31 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.provider;
+package org.lanternpowered.server.block.provider.property;
 
+import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.data.Property;
 
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+public class SimplePropertyProvider<T extends Property<?,?>> extends SimpleObjectProvider<T> implements PropertyProvider<T> {
 
-public class SimpleObjectProvider<T> implements ObjectProvider<T> {
-
-    private final Function<BlockState, T> provider;
-
-    public SimpleObjectProvider(Function<BlockState, T> provider) {
-        this.provider = provider;
-    }
-
-    @Override
-    public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
-        return this.provider.apply(blockState);
-    }
-
-    public Function<BlockState, T> getFunction() {
-        return this.provider;
+    public SimplePropertyProvider(Function<BlockState, T> provider) {
+        super(provider);
     }
 }

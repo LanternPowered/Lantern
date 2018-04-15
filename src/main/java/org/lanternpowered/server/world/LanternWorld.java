@@ -498,6 +498,12 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
+    public Collection<AABB> getBlockCollisionBoxes(int x, int y, int z) {
+        final LanternChunk chunk = getChunkManager().getChunkIfLoaded(x >> 4, z >> 4);
+        return chunk == null ? Collections.emptySet() : chunk.getBlockCollisionBoxes(x, y, z);
+    }
+
+    @Override
     public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
         final LanternChunk chunk = getChunkManager().getChunkIfLoaded(x >> 4, z >> 4);
         return chunk == null ? Optional.empty() : chunk.getBlockSelectionBox(x, y, z);
@@ -514,14 +520,30 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         return getIntersectingBlockCollisionBoxes(box, null);
     }
 
+    @Override
+    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        checkNotNull(box, "box");
+        checkNotNull(filter, "filter");
+        final int maxX = ((int) Math.ceil(box.getMax().getX() + 2.0)) >> 4;
+        final int minX = ((int) Math.floor(box.getMin().getX() - 2.0)) >> 4;
+        final int maxZ = ((int) Math.ceil(box.getMax().getZ() + 2.0)) >> 4;
+        final int minZ = ((int) Math.floor(box.getMin().getZ() - 2.0)) >> 4;
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                final LanternChunk chunk = getChunkManager().getChunkIfLoaded(x, z);
+                if (chunk != null && chunk.hasIntersectingEntities(box, filter)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box, @Nullable Predicate<Entity> filter) {
         checkNotNull(box, "box");
         final ImmutableSet.Builder<AABB> boxes = ImmutableSet.builder();
         int minY = box.getMin().getFloorY();
         final int maxY = box.getMax().getFloorY();
-        if (minY >= LanternWorld.BLOCK_MAX.getY() || maxY < 0) {
-            return boxes.build();
-        }
         minY = Math.max(0, minY);
         final int maxX = box.getMax().getFloorX();
         final int minX = box.getMin().getFloorX();
@@ -1670,4 +1692,5 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
             chunk.addBlockAction(x, y, z, blockType, blockAction);
         }
     }
+
 }

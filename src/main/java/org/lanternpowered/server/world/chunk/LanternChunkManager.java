@@ -875,7 +875,8 @@ public final class LanternChunkManager {
         final EventManager eventManager = Sponge.getEventManager();
 
         final Vector3i min = new Vector3i(chunkX + 8, 0, chunkZ + 8);
-        final Extent volume = new SoftBufferExtentViewDownsize(chunk.getWorld(), min, min.add(15, 0, 15), min.sub(8, 0, 8), min.add(23, 0, 23));
+        final Extent volume = new SoftBufferExtentViewDownsize(chunk.getWorld(), min,
+                min.add(15, 0, 15), min.sub(8, 0, 8), min.add(23, 0, 23));
 
         // Call the pre populate event, this allows
         // modifications to the populators list

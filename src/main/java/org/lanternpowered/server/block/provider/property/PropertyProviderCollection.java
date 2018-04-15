@@ -28,6 +28,7 @@ package org.lanternpowered.server.block.provider.property;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.util.ResettableBuilder;
 
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 public final class PropertyProviderCollection {
 
@@ -74,7 +76,7 @@ public final class PropertyProviderCollection {
      * @return The property types
      */
     @SuppressWarnings("unchecked")
-    public Set<Class<? extends Property>> keys() {
+    public Set<Class<? extends Property<?,?>>> keys() {
         return (Set) this.propertyProviders.keySet();
     }
 
@@ -88,6 +90,7 @@ public final class PropertyProviderCollection {
         return new Builder().from(this);
     }
 
+    @SuppressWarnings("unchecked")
     public static final class Builder implements ResettableBuilder<PropertyProviderCollection, Builder> {
 
         private final Map<Class<?>, PropertyProvider<?>> propertyProviders = new HashMap<>();
@@ -106,7 +109,7 @@ public final class PropertyProviderCollection {
          * @return This builder for chaining
          */
         public Builder add(PropertyProviderCollection providerCollection) {
-            this.propertyProviders.putAll(providerCollection.propertyProviders);
+            providerCollection.propertyProviders.forEach((key, value) -> add((Class) key, value));
             return this;
         }
 
@@ -119,14 +122,34 @@ public final class PropertyProviderCollection {
          * @return This builder for chaining
          */
         public <T extends Property<?,?>> Builder add(Class<T> propertyType, PropertyProvider<? extends T> provider) {
-            this.propertyProviders.put(checkNotNull(propertyType, "propertyType"), checkNotNull(provider, "provider"));
+            checkNotNull(propertyType, "propertyType");
+            checkNotNull(provider, "provider");
+            if (provider instanceof CachedPropertyObjectProvider) {
+                provider = new SimplePropertyProvider<>(((CachedPropertyObjectProvider) provider).getFunction());
+            }
+            this.propertyProviders.put(propertyType, provider);
+            return this;
+        }
+
+        /**
+         * Adds a {@link PropertyProvider}.
+         *
+         * @param propertyType The property type
+         * @param provider The property provider
+         * @param <T> The property type
+         * @return This builder for chaining
+         */
+        public <T extends Property<?,?>> Builder add(Class<T> propertyType, Function<BlockState, ? extends T> provider) {
+            checkNotNull(propertyType, "propertyType");
+            checkNotNull(provider, "provider");
+            this.propertyProviders.put(propertyType, new SimplePropertyProvider<>(provider));
             return this;
         }
 
         @Override
         public Builder from(PropertyProviderCollection value) {
             this.propertyProviders.clear();
-            this.propertyProviders.putAll(value.propertyProviders);
+            add(value);
             return this;
         }
 

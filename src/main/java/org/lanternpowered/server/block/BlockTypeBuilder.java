@@ -38,6 +38,7 @@ import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -46,11 +47,23 @@ import javax.annotation.Nullable;
 
 public interface BlockTypeBuilder {
 
-    BlockTypeBuilder boundingBox(@Nullable AABB boundingBox);
+    BlockTypeBuilder selectionBox(@Nullable AABB selectionBox);
 
-    BlockTypeBuilder boundingBox(@Nullable Function<BlockState, AABB> boundingBoxProvider);
+    BlockTypeBuilder selectionBox(@Nullable Function<BlockState, AABB> selectionBoxProvider);
 
-    BlockTypeBuilder boundingBox(@Nullable ObjectProvider<AABB> boundingBoxProvider);
+    BlockTypeBuilder selectionBox(@Nullable ObjectProvider<AABB> selectionBoxProvider);
+
+    BlockTypeBuilder collisionBox(@Nullable AABB collisionBox);
+
+    BlockTypeBuilder collisionBox(@Nullable Function<BlockState, AABB> collisionBoxProvider);
+
+    BlockTypeBuilder collisionBox(@Nullable ObjectProvider<AABB> collisionBoxProvider);
+
+    BlockTypeBuilder collisionBoxes(@Nullable Collection<AABB> collisionBoxes);
+
+    BlockTypeBuilder collisionBoxes(@Nullable Function<BlockState, Collection<AABB>> collisionBoxesProvider);
+
+    BlockTypeBuilder collisionBoxes(@Nullable ObjectProvider<Collection<AABB>> collisionBoxesProvider);
 
     BlockTypeBuilder defaultState(Function<BlockState, BlockState> function);
 

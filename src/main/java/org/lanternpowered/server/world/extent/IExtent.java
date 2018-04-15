@@ -23,31 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.provider;
+package org.lanternpowered.server.world.extent;
 
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.world.extent.Extent;
 
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+public interface IExtent extends Extent {
 
-public class SimpleObjectProvider<T> implements ObjectProvider<T> {
+    /**
+     * Gets the collision boxes of the block
+     * at the given coordinates.
+     *
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @param z The z coordinate
+     * @return The collision boxes, or empty if none were found
+     */
+    Collection<AABB> getBlockCollisionBoxes(int x, int y, int z);
 
-    private final Function<BlockState, T> provider;
-
-    public SimpleObjectProvider(Function<BlockState, T> provider) {
-        this.provider = provider;
+    default boolean hasIntersectingEntities(AABB box) {
+        return hasIntersectingEntities(box, entity -> true);
     }
 
-    @Override
-    public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
-        return this.provider.apply(blockState);
-    }
-
-    public Function<BlockState, T> getFunction() {
-        return this.provider;
-    }
+    boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter);
 }

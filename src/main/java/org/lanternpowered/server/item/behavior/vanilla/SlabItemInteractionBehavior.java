@@ -147,7 +147,7 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
                     context.requireContext(ContextKeys.USED_SLOT).poll(1);
                 }
             });
-            return BehaviorResult.SUCCESS;
+            return BehaviorResult.CONTINUE;
         }
 
         return BehaviorResult.FAIL;

@@ -101,6 +101,6 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
 
         context.addBlockChange(BlockSnapshotBuilder.create().from(snapshot)
                 .location(location).add(Keys.DIRECTION, facing).build());
-        return BehaviorResult.SUCCESS;
+        return BehaviorResult.CONTINUE;
     }
 }

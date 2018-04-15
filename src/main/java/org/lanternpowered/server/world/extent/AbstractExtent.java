@@ -56,7 +56,7 @@ import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
-public interface AbstractExtent extends Extent {
+public interface AbstractExtent extends IExtent {
 
     default void checkBiomeBounds(int x, int y, int z) {
         if (!containsBiome(x, y, z)) {

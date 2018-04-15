@@ -85,7 +85,8 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
      */
     private boolean tickRandomly;
 
-    @Nullable private ObjectProvider<AABB> boundingBoxProvider;
+    @Nullable private ObjectProvider<AABB> selectionBoxProvider;
+    @Nullable private ObjectProvider<Collection<AABB>> collisionBoxesProvider;
 
     /**
      * The block sound group of this block type.
@@ -242,11 +243,20 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
     }
 
     @Nullable
-    public ObjectProvider<AABB> getBoundingBoxProvider() {
-        return this.boundingBoxProvider;
+    public ObjectProvider<AABB> getSelectionBoxProvider() {
+        return this.selectionBoxProvider;
     }
 
-    void setBoundingBoxProvider(@Nullable ObjectProvider<AABB> boundingBoxProvider) {
-        this.boundingBoxProvider = boundingBoxProvider;
+    void setSelectionBoxProvider(@Nullable ObjectProvider<AABB> selectionBoxProvider) {
+        this.selectionBoxProvider = selectionBoxProvider;
+    }
+
+    @Nullable
+    public ObjectProvider<Collection<AABB>> getCollisionBoxesProvider() {
+        return this.collisionBoxesProvider;
+    }
+
+    void setCollisionBoxesProvider(@Nullable ObjectProvider<Collection<AABB>> boundingBoxProvider) {
+        this.collisionBoxesProvider = boundingBoxProvider;
     }
 }

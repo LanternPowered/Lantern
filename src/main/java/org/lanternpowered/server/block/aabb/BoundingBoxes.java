@@ -65,11 +65,21 @@ public class BoundingBoxes {
 
         private static final AABB PRESSED = new AABB(0.0625, 0.0, 0.0625, 0.9375, 0.03125, 0.9375);
         private static final AABB UNPRESSED = new AABB(0.0625, 0.0, 0.0625, 0.9375, 0.0625, 0.9375);
+        private static final AABB PRESSURE = new AABB(0.125, 0.0D, 0.125, 0.875, 0.25, 0.875);
     }
 
     public static AABB pressurePlate(BlockState blockState) {
         return blockState.get(Keys.POWERED).orElse(false) || blockState.get(Keys.POWER).orElse(0) > 0 ?
                 PressurePlate.PRESSED : PressurePlate.UNPRESSED;
+    }
+
+    /**
+     * Gets the {@link AABB} that is used for pressure detection for entities.
+     *
+     * @return The pressure detection bounding box
+     */
+    public static AABB pressurePlatePressure() {
+        return PressurePlate.PRESSURE;
     }
 
     private final static class Torch {

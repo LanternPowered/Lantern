@@ -27,6 +27,7 @@ package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.blockSoundGroup;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.fullBlockSelectionBox;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidCube;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidSide;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
@@ -38,13 +39,18 @@ import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.property.BlockSoundGroupProperty;
+import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
+import org.lanternpowered.server.block.provider.property.CachedPropertyObjectProvider;
+import org.lanternpowered.server.block.provider.property.ConstantPropertyProvider;
+import org.lanternpowered.server.block.provider.property.PropertyConstants;
 import org.lanternpowered.server.block.provider.property.PropertyProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
+import org.lanternpowered.server.block.provider.property.SimplePropertyProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.item.ItemTypeBuilder;
@@ -56,6 +62,8 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.block.FullBlockSelectionBoxProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.data.property.block.SolidCubeProperty;
 import org.spongepowered.api.item.ItemType;
@@ -67,6 +75,8 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -75,7 +85,29 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 public class BlockTypeBuilderImpl implements BlockTypeBuilder {
+
+    private static class SingleCollisionBoxProvider implements ObjectProvider<Collection<AABB>> {
+
+        private final ObjectProvider<AABB> collisionBoxProvider;
+
+        SingleCollisionBoxProvider(
+                ObjectProvider<AABB> collisionBoxProvider) {
+            this.collisionBoxProvider = collisionBoxProvider;
+        }
+
+        @Override
+        public Collection<AABB> get(BlockState blockState,
+                @Nullable Location<World> location, @Nullable Direction face) {
+            return Collections.singletonList(this.collisionBoxProvider.get(blockState, location, face));
+        }
+    }
+
+    private static final ObjectProvider<AABB> defaultCollisionBoxProvider =
+            new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
+    private static final ObjectProvider<Collection<AABB>> defaultCollisionBoxesProvider =
+            new SingleCollisionBoxProvider(defaultCollisionBoxProvider);
 
     @Nullable private ExtendedBlockStateProvider extendedBlockStateProvider;
     @Nullable private Function<BlockState, BlockState> defaultStateProvider;
@@ -85,21 +117,54 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Nullable private TranslationProvider translationProvider;
     @Nullable private TileEntityProvider tileEntityProvider;
     @Nullable private ItemTypeBuilder itemTypeBuilder;
-    @Nullable private ObjectProvider<AABB> boundingBoxProvider = new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
+
+    @Nullable private ObjectProvider<AABB> selectionBoxProvider = null;
+    @Nullable private ObjectProvider<Collection<AABB>> collisionBoxesProvider = defaultCollisionBoxesProvider;
 
     @Override
-    public BlockTypeBuilder boundingBox(@Nullable AABB boundingBox) {
-        return boundingBox(boundingBox == null ? null : new ConstantObjectProvider<>(boundingBox));
+    public BlockTypeBuilder selectionBox(@Nullable AABB boundingBox) {
+        return selectionBox(boundingBox == null ? null : new ConstantObjectProvider<>(boundingBox));
     }
 
     @Override
-    public BlockTypeBuilder boundingBox(@Nullable Function<BlockState, AABB> boundingBoxProvider) {
-        return boundingBox(new SimpleObjectProvider<>(boundingBoxProvider));
+    public BlockTypeBuilder selectionBox(@Nullable Function<BlockState, AABB> boundingBoxProvider) {
+        return selectionBox(new SimpleObjectProvider<>(boundingBoxProvider));
     }
 
     @Override
-    public BlockTypeBuilder boundingBox(@Nullable ObjectProvider<AABB> boundingBoxProvider) {
-        this.boundingBoxProvider = boundingBoxProvider;
+    public BlockTypeBuilder selectionBox(@Nullable ObjectProvider<AABB> boundingBoxProvider) {
+        this.selectionBoxProvider = boundingBoxProvider;
+        return this;
+    }
+
+    @Override
+    public BlockTypeBuilder collisionBox(@Nullable AABB collisionBox) {
+        return collisionBox(collisionBox == null ? null : new ConstantObjectProvider<>(collisionBox));
+    }
+
+    @Override
+    public BlockTypeBuilder collisionBox(@Nullable Function<BlockState, AABB> collisionBoxProvider) {
+        return collisionBox(new SimpleObjectProvider<>(collisionBoxProvider));
+    }
+
+    @Override
+    public BlockTypeBuilder collisionBox(@Nullable ObjectProvider<AABB> collisionBoxProvider) {
+        return collisionBoxes(collisionBoxProvider == null ? null : new SingleCollisionBoxProvider(collisionBoxProvider));
+    }
+
+    @Override
+    public BlockTypeBuilder collisionBoxes(@Nullable Collection<AABB> collisionBoxes) {
+        return collisionBoxes(collisionBoxes == null ? null : new ConstantObjectProvider<>(collisionBoxes));
+    }
+
+    @Override
+    public BlockTypeBuilder collisionBoxes(@Nullable Function<BlockState, Collection<AABB>> collisionBoxesProvider) {
+        return collisionBoxes(collisionBoxesProvider == null ? null : new SimpleObjectProvider<>(collisionBoxesProvider));
+    }
+
+    @Override
+    public BlockTypeBuilder collisionBoxes(@Nullable ObjectProvider<Collection<AABB>> collisionBoxesProvider) {
+        this.collisionBoxesProvider = collisionBoxesProvider;
         return this;
     }
 
@@ -261,24 +326,37 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
         final LanternBlockType blockType = new LanternBlockType(pluginId, id, this.traits,
                 translationProvider, behaviorPipeline, this.tileEntityProvider, extendedBlockStateProvider);
         // Override the default solid cube property provider if necessary
-        final PropertyProvider<SolidCubeProperty> provider = properties.build().get(SolidCubeProperty.class).orElse(null);
-        ObjectProvider<AABB> boundingBoxProvider = this.boundingBoxProvider;
-        if (boundingBoxProvider instanceof SimpleObjectProvider) {
-            //noinspection unchecked
-            boundingBoxProvider = new CachedSimpleObjectProvider(blockType, ((SimpleObjectProvider) boundingBoxProvider).getProvider());
+        final PropertyProvider<SolidCubeProperty> solidCubeProvider = properties.build().get(SolidCubeProperty.class).orElse(null);
+        final PropertyProvider<SolidSideProperty> solidSideProvider = properties.build().get(SolidSideProperty.class).orElse(null);
+        final PropertyProvider<PassableProperty> passableProvider = properties.build().get(PassableProperty.class).orElse(null);
+        ObjectProvider<Collection<AABB>> collisionBoxesProvider0 = this.collisionBoxesProvider;
+        if (collisionBoxesProvider0 == defaultCollisionBoxesProvider) {
+            if (passableProvider instanceof ConstantObjectProvider &&
+                    passableProvider.get(null, null, null).getValue()) {
+                collisionBoxesProvider0 = null;
+            } else if (passableProvider instanceof SimpleObjectProvider) {
+                final Function<BlockState, PassableProperty> passableFunction = ((SimpleObjectProvider) passableProvider).getFunction();
+                collisionBoxesProvider0 = new SimpleObjectProvider<>(blockState -> passableFunction.apply(blockState).getValue() ?
+                        Collections.singletonList(BoundingBoxes.DEFAULT) : Collections.emptyList());
+            }
         }
-        //noinspection ConstantConditions
-        if (provider instanceof ConstantObjectProvider && provider.get(null, null, null).getValue()) {
-            if (boundingBoxProvider instanceof ConstantObjectProvider) {
-                //noinspection ConstantConditions
-                final AABB aabb = boundingBoxProvider.get(null, null, null);
-                final boolean isSolid = isSolid(aabb);
+        final ObjectProvider<Collection<AABB>> collisionBoxesProvider;
+        if (collisionBoxesProvider0 instanceof SimpleObjectProvider) {
+            collisionBoxesProvider = new CachedSimpleObjectProvider(blockType,
+                    ((SimpleObjectProvider) collisionBoxesProvider0).getFunction());
+        } else {
+            collisionBoxesProvider = collisionBoxesProvider0;
+        }
+        if (solidCubeProvider == null) {
+            if (collisionBoxesProvider instanceof ConstantObjectProvider) {
+                final Collection<AABB> collisionBoxes = collisionBoxesProvider.get(null, null, null);
+                final boolean isSolid = isSolid(collisionBoxes);
                 if (isSolid) {
                     properties.add(solidCube(true));
                     properties.add(solidSide(true));
                 } else {
                     properties.add(solidCube(false));
-                    final BitSet solidSides = compileSidePropertyBitSet(aabb);
+                    final BitSet solidSides = compileSidePropertyBitSet(collisionBoxes);
                     // Check if all the direction bits are set
                     final byte[] bytes = solidSides.toByteArray();
                     if (bytes.length == 0 || bytes[0] != (1 << DIRECTION_INDEXES) - 1) {
@@ -290,8 +368,8 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                         properties.add(solidSide(false));
                     }
                 }
-            } else if (boundingBoxProvider instanceof CachedSimpleObjectProvider) {
-                final List<AABB> values = ((CachedSimpleObjectProvider<AABB>) boundingBoxProvider).getValues();
+            } else if (collisionBoxesProvider instanceof CachedSimpleObjectProvider) {
+                final List<Collection<AABB>> values = ((CachedSimpleObjectProvider<Collection<AABB>>) collisionBoxesProvider).getValues();
                 final BitSet bitSet = new BitSet();
                 int count = 0;
                 for (int i = 0; i < values.size(); i++) {
@@ -335,13 +413,42 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                         }));
                     }
                 }
+            } else if (collisionBoxesProvider == null) {
+                properties.add(solidCube(false));
+                properties.add(solidSide(false));
             } else {
-                final ObjectProvider<AABB> boundingBoxProvider1 = boundingBoxProvider;
-                properties.add(solidCube(((blockState, location, face) -> isSolid(boundingBoxProvider1.get(blockState, location, face)))));
-                properties.add(solidSide(((blockState, location, face) -> isSideSolid(boundingBoxProvider1.get(blockState, location, face), face))));
+                properties.add(solidCube((blockState, location, face) ->
+                        isSolid(collisionBoxesProvider.get(blockState, location, face))));
+                properties.add(solidSide((blockState, location, face) ->
+                        isSideSolid(collisionBoxesProvider.get(blockState, location, face), face)));
+            }
+        } else if (solidSideProvider == null) {
+            properties.add(solidSide((blockState, location, face) ->
+                    solidCubeProvider.get(blockState, location, face).getValue()));
+        }
+        ObjectProvider<AABB> selectionBoxProvider = this.selectionBoxProvider;
+        if (selectionBoxProvider instanceof SimpleObjectProvider) {
+            selectionBoxProvider = new CachedSimpleObjectProvider(blockType, ((SimpleObjectProvider) selectionBoxProvider).getFunction());
+        } else if (selectionBoxProvider == null &&
+                collisionBoxesProvider != null) {
+            // A collision boxes provider is present, but no selection box,
+            // so generate the selection box based on the collision boxes
+            if (this.collisionBoxesProvider == defaultCollisionBoxesProvider) {
+                selectionBoxProvider = new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
+            } else if (collisionBoxesProvider instanceof ConstantObjectProvider) {
+                final Collection<AABB> collisionBoxes = collisionBoxesProvider.get(null, null, null);
+                selectionBoxProvider = new ConstantObjectProvider<>(unionAABB(collisionBoxes));
+            } else if (collisionBoxesProvider instanceof CachedSimpleObjectProvider) {
+                final Function<BlockState, Collection<AABB>> provider = ((CachedSimpleObjectProvider) collisionBoxesProvider).getFunction();
+                selectionBoxProvider = new CachedSimpleObjectProvider<>(blockType, provider.andThen(BlockTypeBuilderImpl::unionAABB));
+            } else {
+                selectionBoxProvider = (blockState, location, face) ->
+                        unionAABB(collisionBoxesProvider.get(blockState, location, face));
             }
         }
-        blockType.setBoundingBoxProvider(boundingBoxProvider);
+        blockType.setSelectionBoxProvider(selectionBoxProvider);
+        blockType.setCollisionBoxesProvider(collisionBoxesProvider);
+        blockType.setPropertyProviderCollection(properties.build());
         if (this.defaultStateProvider != null) {
             blockType.setDefaultBlockState(this.defaultStateProvider.apply(blockType.getDefaultState()));
         }
@@ -352,8 +459,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             if (blockSoundGroup != null) {
                 blockType.setSoundGroup(blockSoundGroup);
             }
-        } else if (boundingBoxProvider != null) {
-            final PropertyProvider<PassableProperty> passableProvider = properties.build().get(PassableProperty.class).orElse(null);
+        } else if (collisionBoxesProvider != null) {
             if (passableProvider instanceof ConstantObjectProvider) {
                 if (passableProvider.get(blockType.getDefaultState(), null, null).getValue()) {
                     properties.add(blockSoundGroup(null));
@@ -367,7 +473,40 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                         passableProvider.get(blockState, location, face).getValue() ? noSoundGroup : defaultSoundGroup);
             }
         }
+        PropertyProvider<FullBlockSelectionBoxProperty> fullBlockSelectionBoxProvider =
+                properties.build().get(FullBlockSelectionBoxProperty.class).orElse(null);
+        if (fullBlockSelectionBoxProvider == null) {
+            if (selectionBoxProvider instanceof ConstantPropertyProvider) {
+                properties.add(fullBlockSelectionBox(isFullBlockAABB(selectionBoxProvider.get(null, null, null))));
+            } else if (selectionBoxProvider instanceof CachedSimpleObjectProvider) {
+                final Function<BlockState, AABB> aabbFunction = ((CachedSimpleObjectProvider) selectionBoxProvider).getFunction();
+                properties.add(FullBlockSelectionBoxProperty.class, new CachedPropertyObjectProvider<>(blockType, state ->
+                        isFullBlockAABB(aabbFunction.apply(state)) ?
+                                PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE :
+                                PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE));
+            } else if (selectionBoxProvider == null) {
+                properties.add(fullBlockSelectionBox(false));
+            } else {
+                final ObjectProvider<AABB> selectionBoxProvider1 = selectionBoxProvider;
+                properties.add(FullBlockSelectionBoxProperty.class, (blockState, location, face) ->
+                        isFullBlockAABB(selectionBoxProvider1.get(blockState, location, face)) ?
+                                PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE :
+                                PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE);
+            }
+        }
         blockType.setPropertyProviderCollection(properties.build());
+        final PropertyProviderCollection propertiesCollection = properties.build();
+        final PropertyProviderCollection.Builder newProperties = PropertyProviderCollection.builder();
+        for (Class<? extends Property<?,?>> key : propertiesCollection.keys()) {
+            propertiesCollection.get(key).ifPresent(provider -> {
+                if (provider instanceof SimplePropertyProvider) {
+                    provider = new CachedPropertyObjectProvider<>(
+                            blockType, ((SimplePropertyProvider) provider).getFunction());
+                }
+                newProperties.add((Class) key, provider);
+            });
+        }
+        blockType.setPropertyProviderCollection(newProperties.build());
         if (this.itemTypeBuilder != null) {
             final ItemType itemType = this.itemTypeBuilder.blockType(blockType)
                     .behaviors(pipeline -> {
@@ -382,52 +521,104 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
         return blockType;
     }
 
-    private static boolean isSolid(AABB boundingBox) {
-        return boundingBox.getMin().equals(BoundingBoxes.DEFAULT.getMin()) && boundingBox.getMax().equals(BoundingBoxes.DEFAULT.getMax());
+    public static boolean isFullBlockAABB(AABB aabb) {
+        final Vector3d min = aabb.getMin();
+        final Vector3d max = aabb.getMax();
+        return min.getX() <= 0 && min.getY() <= 0 && min.getZ() <= 0 &&
+                max.getX() >= 1 && max.getY() >= 1 && max.getZ() >= 1;
     }
 
-    private static BitSet compileSidePropertyBitSet(AABB boundingBox) {
+    private static AABB unionAABB(Collection<AABB> aabbs) {
+        Vector3d min = null;
+        Vector3d max = null;
+        for (AABB aabb : aabbs) {
+            if (min == null) {
+                min = aabb.getMin();
+                max = aabb.getMax();
+            } else {
+                min = aabb.getMin().min(min);
+                max = aabb.getMax().max(max);
+            }
+        }
+        return new AABB(min, max);
+    }
+
+    private static boolean isSolid(Collection<AABB> collisionBoxes) {
+        if (collisionBoxes.size() != 1) {
+            return false;
+        }
+        final AABB collisionBox = collisionBoxes.iterator().next();
+        return collisionBox.getMin().equals(BoundingBoxes.DEFAULT.getMin()) &&
+                collisionBox.getMax().equals(BoundingBoxes.DEFAULT.getMax());
+    }
+
+    private static BitSet compileSidePropertyBitSet(Collection<AABB> boundingBoxes) {
         final BitSet bitSet = new BitSet(DIRECTION_INDEXES);
-        if (isSideSolid(boundingBox, Direction.DOWN)) {
+        if (isSideSolid(boundingBoxes, Direction.DOWN)) {
             bitSet.set(INDEX_DOWN);
         }
-        if (isSideSolid(boundingBox, Direction.UP)) {
+        if (isSideSolid(boundingBoxes, Direction.UP)) {
             bitSet.set(INDEX_UP);
         }
-        if (isSideSolid(boundingBox, Direction.WEST)) {
+        if (isSideSolid(boundingBoxes, Direction.WEST)) {
             bitSet.set(INDEX_WEST);
         }
-        if (isSideSolid(boundingBox, Direction.EAST)) {
+        if (isSideSolid(boundingBoxes, Direction.EAST)) {
             bitSet.set(INDEX_EAST);
         }
-        if (isSideSolid(boundingBox, Direction.NORTH)) {
+        if (isSideSolid(boundingBoxes, Direction.NORTH)) {
             bitSet.set(INDEX_NORTH);
         }
-        if (isSideSolid(boundingBox, Direction.SOUTH)) {
+        if (isSideSolid(boundingBoxes, Direction.SOUTH)) {
             bitSet.set(INDEX_SOUTH);
         }
         return bitSet;
     }
 
-    private static boolean isSideSolid(AABB boundingBox, @Nullable Direction face) {
-        final Vector3d min = boundingBox.getMin();
-        final Vector3d max = boundingBox.getMax();
+    private static boolean isSideSolid(Collection<AABB> collisionBoxes, @Nullable Direction face) {
+        // The area of the face that is covered,
+        // overlapping should never happen
+        double area = 0;
 
-        if (face == Direction.NORTH) {
-            return min.getZ() == 0.0 && min.getX() == 0.0 && min.getY() == 0.0 && max.getX() >= 1.0 && max.getY() >= 1.0;
-        } else if (face == Direction.SOUTH) {
-            return min.getZ() == 1.0 && min.getX() == 0.0 && min.getY() == 0.0 && max.getX() >= 1.0 && max.getY() >= 1.0;
-        } else if (face == Direction.WEST) {
-            return min.getZ() == 0.0 && min.getY() == 0.0 && min.getZ() == 0.0 && max.getY() >= 1.0 && max.getZ() >= 1.0;
-        } else if (face == Direction.EAST) {
-            return min.getZ() == 1.0 && min.getY() == 0.0 && min.getZ() == 0.0 && max.getY() >= 1.0 && max.getZ() >= 1.0;
-        } else if (face == Direction.DOWN) {
-            return min.getZ() == 0.0 && min.getX() == 0.0 && min.getZ() == 0.0 && max.getX() == 1.0 && max.getZ() == 1.0;
-        } else if (face == Direction.UP) {
-            return min.getZ() == 1.0 && min.getX() == 0.0 && min.getZ() == 0.0 && max.getX() == 1.0 && max.getZ() == 1.0;
-        } else {
-            return false;
+        for (AABB collisionBox : collisionBoxes) {
+            // Limit the AABB within a block position
+            final Vector3d min = collisionBox.getMin().max(Vector3d.ZERO).min(Vector3d.ONE);
+            final Vector3d max = collisionBox.getMax().min(Vector3d.ONE).max(Vector3d.ZERO);
+
+            if (face == Direction.DOWN) {
+                if (min.getY() != 0.0) {
+                    continue;
+                }
+                area += (max.getX() - min.getX()) * (max.getZ() - min.getZ());
+            } else if (face == Direction.UP) {
+                if (max.getY() != 1.0) {
+                    continue;
+                }
+                area += (max.getX() - min.getX()) * (max.getZ() - min.getZ());
+            } else if (face == Direction.NORTH) {
+                if (min.getZ() != 0.0) {
+                    continue;
+                }
+                area += (max.getX() - min.getX()) * (max.getY() - min.getY());
+            } else if (face == Direction.SOUTH) {
+                if (max.getZ() != 1.0) {
+                    continue;
+                }
+                area += (max.getX() - min.getX()) * (max.getY() - min.getY());
+            } else if (face == Direction.WEST) {
+                if (min.getX() != 0.0) {
+                    continue;
+                }
+                area += (max.getZ() - min.getZ()) * (max.getY() - min.getY());
+            } else if (face == Direction.EAST) {
+                if (max.getX() != 1.0) {
+                    continue;
+                }
+                area += (max.getZ() - min.getZ()) * (max.getY() - min.getY());
+            }
         }
+
+        return area >= 1.0;
     }
 
     private static final int DIRECTION_INDEXES = 6;

@@ -63,7 +63,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.VecHelper;
-import org.lanternpowered.server.util.collect.Collections3;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.TrackerIdAllocator;
@@ -125,6 +124,7 @@ import java.util.concurrent.locks.StampedLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -1227,18 +1227,42 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (block.getType() == BlockTypes.AIR) {
             return Optional.empty();
         }
-        final ObjectProvider<AABB> aabbObjectProvider = ((LanternBlockType) block.getType()).getBoundingBoxProvider();
+        final ObjectProvider<AABB> aabbObjectProvider = ((LanternBlockType) block.getType()).getSelectionBoxProvider();
         if (aabbObjectProvider == null) {
             return Optional.empty();
         }
         final AABB aabb;
-        if (aabbObjectProvider instanceof ConstantObjectProvider || aabbObjectProvider instanceof CachedSimpleObjectProvider
+        if (aabbObjectProvider instanceof ConstantObjectProvider
+                || aabbObjectProvider instanceof CachedSimpleObjectProvider
                 || aabbObjectProvider instanceof SimpleObjectProvider) {
             aabb = aabbObjectProvider.get(block, null, null);
         } else {
             aabb = aabbObjectProvider.get(block, new Location<>(this.world, x, y, z), null);
         }
         return aabb == null ? Optional.empty() : Optional.of(aabb.offset(x, y, z));
+    }
+
+    @Override
+    public Collection<AABB> getBlockCollisionBoxes(int x, int y, int z) {
+        final BlockState block = getBlock(x, y, z);
+        if (block.getType() == BlockTypes.AIR) {
+            return Collections.emptySet();
+        }
+        final ObjectProvider<Collection<AABB>> aabbObjectProvider = ((LanternBlockType) block.getType()).getCollisionBoxesProvider();
+        if (aabbObjectProvider == null) {
+            return Collections.emptySet();
+        }
+        final Collection<AABB> collisionBoxes;
+        if (aabbObjectProvider instanceof ConstantObjectProvider
+                || aabbObjectProvider instanceof CachedSimpleObjectProvider
+                || aabbObjectProvider instanceof SimpleObjectProvider) {
+            collisionBoxes = aabbObjectProvider.get(block, null, null);
+        } else {
+            collisionBoxes = aabbObjectProvider.get(block, new Location<>(this.world, x, y, z), null);
+        }
+        return collisionBoxes == null || collisionBoxes.isEmpty() ? Collections.emptySet() : collisionBoxes.stream()
+                .map(aabb -> aabb.offset(x, y, z))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -1258,11 +1282,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 for (int y = minY; y <= maxY; y++) {
-                    final Optional<AABB> optAABB = getBlockSelectionBox(x, y, z);
-                    if (optAABB.isPresent()) {
-                        final AABB aabb = optAABB.get();
-                        if (aabb.intersects(box)) {
-                            builder.add(box);
+                    final Collection<AABB> collisionBoxes = getBlockCollisionBoxes(x, y, z);
+                    for (AABB collisionBox : collisionBoxes) {
+                        if (collisionBox.intersects(box)) {
+                            builder.add(collisionBox);
                         }
                     }
                 }
@@ -1280,6 +1303,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final int minYSection = fixEntityYSection(((int) Math.floor(box.getMin().getY() - 2.0)) >> 4);
         for (int i = minYSection; i <= maxYSection; i++) {
             forEachEntity(i, entity -> {
+                if (entity == owner) { // Ignore the owner
+                    return;
+                }
                 final Optional<AABB> aabb = entity.getBoundingBox();
                 if (aabb.isPresent() && aabb.get().intersects(box)) {
                     collisionBoxes.add(aabb.get());
@@ -1291,14 +1317,24 @@ public class LanternChunk implements AbstractExtent, Chunk {
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int y = min.getY(); y <= max.getY(); y++) {
                 for (int z = min.getZ(); z <= max.getZ(); z++) {
-                    final Optional<AABB> aabb = getBlockSelectionBox(x, y, z);
-                    if (aabb.isPresent() && aabb.get().intersects(box)) {
-                        collisionBoxes.add(aabb.get());
+                    final Collection<AABB> blockCollisionBoxes = getBlockCollisionBoxes(x, y, z);
+                    for (AABB collisionBox : blockCollisionBoxes) {
+                        if (collisionBox.intersects(box)) {
+                            collisionBoxes.add(collisionBox);
+                        }
                     }
                 }
             }
         }
         return collisionBoxes.build();
+    }
+
+    @Override
+    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        checkNotNull(box, "box");
+        final int maxYSection = fixEntityYSection(((int) Math.ceil(box.getMax().getY() + 2.0)) >> 4);
+        final int minYSection = fixEntityYSection(((int) Math.floor(box.getMin().getY() - 2.0)) >> 4);
+        return hasIntersectingEntities(maxYSection, minYSection, box, filter);
     }
 
     @Override
@@ -1314,6 +1350,30 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     public static int fixEntityYSection(int section) {
         return section < 0 ? 0 : section >= CHUNK_SECTIONS ? CHUNK_SECTIONS - 1 : section;
+    }
+
+    public boolean hasIntersectingEntities(int maxYSection, int minYSection, AABB box, @Nullable Predicate<Entity> filter) {
+        for (int i = minYSection; i <= maxYSection; i++) {
+            final Iterator<LanternEntity> iterator = this.entities[i].iterator();
+            while (iterator.hasNext()) {
+                final LanternEntity entity = iterator.next();
+                // Only remove the entities that are "destroyed",
+                // the other ones can be resurrected after chunk loading
+                if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+                    iterator.remove();
+                } else {
+                    final Optional<AABB> aabb = entity.getBoundingBox();
+                    if (aabb.isPresent()) {
+                        if (aabb.get().intersects(box) && (filter == null || filter.test(entity))) {
+                            return true;
+                        }
+                    } else if (box.contains(entity.getPosition()) && (filter == null || filter.test(entity))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void addIntersectingEntities(ImmutableSet.Builder<Entity> builder, int maxYSection, int minYSection, AABB box, Predicate<Entity> filter) {
@@ -1828,7 +1888,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public World getWorld() {
+    public LanternWorld getWorld() {
         return this.world;
     }
 

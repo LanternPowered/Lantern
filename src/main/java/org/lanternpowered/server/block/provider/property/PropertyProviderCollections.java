@@ -54,8 +54,6 @@ public final class PropertyProviderCollections {
             .add(blastResistance(5.0))
             .add(lightEmission(0))
             .add(passable(false))
-            .add(solidCube(true))
-            .add(solidSide(true))
             .add(gravityAffected(false))
             .add(unbreakable(false))
             .add(replaceable(false))

@@ -42,8 +42,10 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class CachedSimpleObjectProvider<T> implements ObjectProvider<T> {
 
+    private final Function<BlockState, T> function;
     private final Object[] values;
 
     public CachedSimpleObjectProvider(LanternBlockType blockType, Function<BlockState, T> simpleObjectProvider) {
@@ -54,17 +56,20 @@ public class CachedSimpleObjectProvider<T> implements ObjectProvider<T> {
         for (BlockState blockState : blockStates) {
             values[((LanternBlockState) blockState).getInternalId()] = simpleObjectProvider.apply(blockState);
         }
+        this.function = simpleObjectProvider;
         this.values = values;
     }
 
     @Override
     public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
-        //noinspection unchecked
         return (T) this.values[((LanternBlockState) blockState).getInternalId()];
     }
 
     public List<T> getValues() {
-        //noinspection unchecked
         return (List) Lists.newArrayList(this.values);
+    }
+
+    public Function<BlockState, T> getFunction() {
+        return this.function;
     }
 }

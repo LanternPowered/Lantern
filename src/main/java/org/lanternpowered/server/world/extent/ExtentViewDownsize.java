@@ -74,7 +74,7 @@ import javax.annotation.Nullable;
 
 public class ExtentViewDownsize implements AbstractExtent {
 
-    private final Extent extent;
+    private final IExtent extent;
     private final Vector3i blockMin;
     private final Vector3i blockMax;
     private final Vector3i blockSize;
@@ -82,7 +82,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     private final Vector3i biomeMax;
     private final Vector3i biomeSize;
 
-    public ExtentViewDownsize(Extent extent, Vector3i blockMin, Vector3i blockMax) {
+    public ExtentViewDownsize(IExtent extent, Vector3i blockMin, Vector3i blockMax) {
         this.extent = extent;
         this.blockMin = blockMin;
         this.blockMax = blockMax;
@@ -673,6 +673,28 @@ public class ExtentViewDownsize implements AbstractExtent {
         checkRange(min.getX(), min.getY(), min.getZ());
         checkRange(max.getX(), max.getY(), max.getZ());
         return this.extent.createArchetypeVolume(min, max, origin);
+    }
+
+    @Override
+    public Collection<AABB> getBlockCollisionBoxes(int x, int y, int z) {
+        checkRange(x, y, z);
+        return this.extent.getBlockCollisionBoxes(x, y, z);
+    }
+
+    @Override
+    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        final Vector3d min = getBlockMin().toDouble().max(box.getMin());
+        final Vector3d max = getBlockMin().toDouble().min(box.getMax());
+        // Check if the AABB is within the extent
+        if (min.getX() == max.getX() ||
+                min.getY() == max.getY() ||
+                min.getZ() == max.getZ()) {
+            return false;
+        }
+        return this.extent.hasIntersectingEntities(new AABB(min, max), Functional.predicateAnd(input -> {
+            final Vector3d pos = ((LanternEntity) input).getPosition();
+            return VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax);
+        }, filter));
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {

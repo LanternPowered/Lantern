@@ -25,15 +25,38 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.FLAMMABLE_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.FLAMMABLE_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.GRAVITY_AFFECTED_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.GRAVITY_AFFECTED_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.MATTER_PROPERTIES;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.PASSABLE_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.PASSABLE_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.REPLACEABLE_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.REPLACEABLE_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_CUBE_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_CUBE_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_SIDE_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_SIDE_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.STATISTICS_TRACKED_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.STATISTICS_TRACKED_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SURROGATE_BLOCK_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SURROGATE_BLOCK_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.UNBREAKABLE_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.UNBREAKABLE_PROPERTY_TRUE;
+
 import org.lanternpowered.server.block.property.BlockSoundGroupProperty;
-import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
+import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.BlastResistanceProperty;
 import org.spongepowered.api.data.property.block.FlammableProperty;
+import org.spongepowered.api.data.property.block.FullBlockSelectionBoxProperty;
 import org.spongepowered.api.data.property.block.GravityAffectedProperty;
 import org.spongepowered.api.data.property.block.HardnessProperty;
 import org.spongepowered.api.data.property.block.InstrumentProperty;
@@ -47,45 +70,7 @@ import org.spongepowered.api.data.property.block.SurrogateBlockProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
 import org.spongepowered.api.data.type.InstrumentType;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 public final class PropertyProviders {
-
-    private static final Map<MatterProperty.Matter, MatterProperty> MATTER_PROPERTIES = new EnumMap<>(MatterProperty.Matter.class);
-
-    private static final FlammableProperty FLAMMABLE_PROPERTY_TRUE = new FlammableProperty(true);
-    private static final FlammableProperty FLAMMABLE_PROPERTY_FALSE = new FlammableProperty(false);
-
-    private static final ReplaceableProperty REPLACEABLE_PROPERTY_TRUE = new ReplaceableProperty(true);
-    private static final ReplaceableProperty REPLACEABLE_PROPERTY_FALSE = new ReplaceableProperty(false);
-
-    private static final SolidCubeProperty SOLID_CUBE_PROPERTY_TRUE = new SolidCubeProperty(true);
-    private static final SolidCubeProperty SOLID_CUBE_PROPERTY_FALSE = new SolidCubeProperty(false);
-
-    private static final SolidSideProperty SOLID_SIDE_PROPERTY_TRUE = new SolidSideProperty(true);
-    private static final SolidSideProperty SOLID_SIDE_PROPERTY_FALSE = new SolidSideProperty(false);
-
-    private static final PassableProperty PASSABLE_PROPERTY_TRUE = new PassableProperty(true);
-    private static final PassableProperty PASSABLE_PROPERTY_FALSE = new PassableProperty(false);
-
-    private static final GravityAffectedProperty GRAVITY_AFFECTED_PROPERTY_TRUE = new GravityAffectedProperty(true);
-    private static final GravityAffectedProperty GRAVITY_AFFECTED_PROPERTY_FALSE = new GravityAffectedProperty(false);
-
-    private static final UnbreakableProperty UNBREAKABLE_PROPERTY_TRUE = new UnbreakableProperty(true);
-    private static final UnbreakableProperty UNBREAKABLE_PROPERTY_FALSE = new UnbreakableProperty(false);
-
-    private static final StatisticsTrackedProperty STATISTICS_TRACKED_PROPERTY_TRUE = new StatisticsTrackedProperty(true);
-    private static final StatisticsTrackedProperty STATISTICS_TRACKED_PROPERTY_FALSE = new StatisticsTrackedProperty(false);
-
-    private static final SurrogateBlockProperty SURROGATE_BLOCK_PROPERTY_TRUE = new SurrogateBlockProperty(true);
-    private static final SurrogateBlockProperty SURROGATE_BLOCK_PROPERTY_FALSE = new SurrogateBlockProperty(false);
-
-    static {
-        for (MatterProperty.Matter matter : MatterProperty.Matter.values()) {
-            MATTER_PROPERTIES.put(matter, new MatterProperty(matter));
-        }
-    }
 
     public static PropertyProviderCollection constant(Property<?,?> property) {
         //noinspection unchecked
@@ -275,6 +260,20 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(SurrogateBlockProperty.class, (blockState, location, face) ->
                         provider.get(blockState, location, face) ? SURROGATE_BLOCK_PROPERTY_TRUE : SURROGATE_BLOCK_PROPERTY_FALSE)
+                .build();
+    }
+
+    public static PropertyProviderCollection fullBlockSelectionBox(boolean constant) {
+        final FullBlockSelectionBoxProperty property = constant ? FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE : FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE;
+        return PropertyProviderCollection.builder()
+                .add(FullBlockSelectionBoxProperty.class, new ConstantPropertyProvider<>(property))
+                .build();
+    }
+
+    public static PropertyProviderCollection fullBlockSelectionBox(ObjectProvider<Boolean> provider) {
+        return PropertyProviderCollection.builder()
+                .add(FullBlockSelectionBoxProperty.class, (blockState, location, face) ->
+                        provider.get(blockState, location, face) ? FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE : FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE)
                 .build();
     }
 

@@ -76,7 +76,7 @@ import javax.annotation.Nullable;
 
 public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
-    private final Extent extent;
+    private final IExtent extent;
     private final Vector3i blockMin;
     private final Vector3i blockMax;
     private final Vector3i blockSize;
@@ -88,7 +88,7 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     private final Vector3i hardBiomeMin;
     private final Vector3i hardBiomeMax;
 
-    public SoftBufferExtentViewDownsize(Extent extent, Vector3i blockMin, Vector3i blockMax, Vector3i hardMin, Vector3i hardMax) {
+    public SoftBufferExtentViewDownsize(IExtent extent, Vector3i blockMin, Vector3i blockMax, Vector3i hardMin, Vector3i hardMax) {
         this.extent = extent;
         this.blockMin = blockMin;
         this.blockMax = blockMax;
@@ -660,5 +660,27 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, GameProfile profile) {
         checkRange(x, y, z);
         return this.extent.getBlockDigTimeWith(x, y, z, itemStack, profile);
+    }
+
+    @Override
+    public Collection<AABB> getBlockCollisionBoxes(int x, int y, int z) {
+        checkRange(x, y, z);
+        return this.extent.getBlockCollisionBoxes(x, y, z);
+    }
+
+    @Override
+    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        final Vector3d min = getBlockMin().toDouble().max(box.getMin());
+        final Vector3d max = getBlockMin().toDouble().min(box.getMax());
+        // Check if the AABB is within the extent
+        if (min.getX() == max.getX() ||
+                min.getY() == max.getY() ||
+                min.getZ() == max.getZ()) {
+            return false;
+        }
+        return this.extent.hasIntersectingEntities(new AABB(min, max), Functional.predicateAnd(input -> {
+            final Vector3d pos = ((LanternEntity) input).getPosition();
+            return VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax);
+        }, filter));
     }
 }

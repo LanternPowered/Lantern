@@ -104,11 +104,13 @@ public abstract class ClientContainer implements ContainerBase {
      */
     protected static final int FLAG_MAIN_INVENTORY = 0x8;
 
+    protected static final int FLAG_HOTBAR_SHIFT = 4;
+
     /**
      * A flag that defines that the slot is present in the hotbar. The flag
      * uses 4 bits and this is the raw slot index. Counting from 1 to 9.
      */
-    protected static final int FLAG_HOTBAR = 0xf0;
+    protected static final int FLAG_HOTBAR = 0xf << FLAG_HOTBAR_SHIFT;
 
     /**
      * A flag that defines that only one item (item stack with quantity one)
@@ -377,6 +379,25 @@ public abstract class ClientContainer implements ContainerBase {
 
     public Optional<ContainerInteractionBehavior> getInteractionBehavior() {
         return Optional.ofNullable(this.interactionBehavior);
+    }
+
+    /**
+     * Gets the {@link ClientSlot} that is bound
+     * to the given hotbar slot index.
+     *
+     * @param hotbarSlotIndex The hotbar slot index, 0 - 8
+     * @return The hotbar slot, if found
+     */
+    public Optional<ClientSlot> getHotbarSlot(int hotbarSlotIndex) {
+        populate();
+        final int[] slotFlags = getSlotFlags();
+        for (int i = 0; i < this.slots.length; i++) {
+            final int slotIndex = ((slotFlags[i] & FLAG_HOTBAR) >> FLAG_HOTBAR_SHIFT) - 1;
+            if (slotIndex != -1 && hotbarSlotIndex == slotIndex) {
+                return Optional.of(this.slots[i]);
+            }
+        }
+        return Optional.empty();
     }
 
     /**

@@ -29,6 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.Collections2;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -43,16 +44,13 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +68,7 @@ public final class CommandHelp extends CommandProvider {
             extendedDescriptionField = CommandSpec.class.getDeclaredField("extendedDescription");
             extendedDescriptionField.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 
@@ -122,7 +120,7 @@ public final class CommandHelp extends CommandProvider {
                                     // TODO: Why is there no method :(
                                     extendedDescription = (Text) extendedDescriptionField.get(callable);
                                 } catch (IllegalAccessException e) {
-                                    throw new RuntimeException(e);
+                                    throw UncheckedExceptions.thrOw(e);
                                 }
                                 if (extendedDescription != null) {
                                     builder.append(Text.NEW_LINE, extendedDescription);

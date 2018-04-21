@@ -29,6 +29,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.server.data.ICompositeValueStore;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
@@ -93,7 +94,7 @@ class FastValueContainerCheckerClassVisitor extends ClassVisitor {
 
             return classVisitor.result;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 

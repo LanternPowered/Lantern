@@ -30,6 +30,7 @@ import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.LanternRecipeRegistryModule;
 import org.lanternpowered.server.util.ReflectionHelper;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -56,7 +57,7 @@ public class LanternCraftingRecipeRegistryModule extends LanternRecipeRegistryMo
             ReflectionHelper.setField(Ingredient.class.getField("NONE"), null,
                     IIngredient.builder().with(ItemStack::isEmpty).withDisplay(ItemTypes.NONE).build());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
         PluginContainer plugin = Lantern.getMinecraftPlugin();
         register(ICraftingRecipe.shapedBuilder()

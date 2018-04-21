@@ -58,6 +58,7 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.SecurityHelper;
+import org.lanternpowered.server.util.UncheckedExceptions;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -102,7 +103,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
                 try {
                     profile = (LanternGameProfile) Lantern.getGame().getGameProfileManager().get(username).get();
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    throw UncheckedExceptions.thrOw(e);
                 } catch (ExecutionException e) {
                     // Generate a offline id
                     final UUID uniqueId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));

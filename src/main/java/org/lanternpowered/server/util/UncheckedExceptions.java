@@ -23,33 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.text;
+package org.lanternpowered.server.util;
 
-import org.lanternpowered.server.game.registry.EarlyRegistration;
-import org.lanternpowered.server.util.ReflectionHelper;
-import org.lanternpowered.server.util.UncheckedExceptions;
-import org.spongepowered.api.registry.RegistryModule;
-import org.spongepowered.api.registry.util.RegistrationDependency;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextFormat;
-import org.spongepowered.api.text.format.TextStyles;
+public final class UncheckedExceptions {
 
-import java.lang.reflect.Field;
+    /**
+     * Throws the {@link Throwable} as an unchecked exception.
+     *
+     * @param t The throwable to throw
+     * @return A runtime exception
+     */
+    public static RuntimeException thrOw(Throwable t) {
+        throw0(t);
+        throw new AssertionError("Unreachable.");
+    }
 
-@RegistrationDependency({ TextColorRegistryModule.class, TextStyleRegistryModule.class })
-public class TextFormatRegistryModule implements RegistryModule {
+    @SuppressWarnings("unchecked")
+    private static <T extends Throwable> void throw0(Throwable t) throws T {
+        throw (T) t;
+    }
 
-    @EarlyRegistration
-    @Override
-    public void registerDefaults() {
-        try {
-            // Make sure that the color is updated properly
-            final Field colorField = TextFormat.class.getDeclaredField("color");
-            final Field styleField = TextFormat.class.getDeclaredField("style");
-            ReflectionHelper.setField(colorField, TextFormat.NONE, TextColors.NONE);
-            ReflectionHelper.setField(styleField, TextFormat.NONE, TextStyles.NONE);
-        } catch (Exception e) {
-            throw UncheckedExceptions.thrOw(e);
-        }
+    private UncheckedExceptions() {
     }
 }

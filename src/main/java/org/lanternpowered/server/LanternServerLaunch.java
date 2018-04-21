@@ -55,6 +55,7 @@ public final class LanternServerLaunch {
         classLoader.addTransformerExclusion(Exclusion.forPackage("org.objectweb.asm")); // Exclude the ASM library
         classLoader.addTransformerExclusion(Exclusion.forPackage("org.lanternpowered.server.transformer"));
         classLoader.addTransformerExclusion(Exclusion.forClass("org.lanternpowered.server.util.BytecodeUtils"));
+        classLoader.addTransformerExclusion(Exclusion.forClass("org.lanternpowered.server.util.UncheckedExceptions"));
         classLoader.addTransformer(new FinalFieldClassTransformer());
         classLoader.addTransformer(new FastValueContainerClassTransformer());
 

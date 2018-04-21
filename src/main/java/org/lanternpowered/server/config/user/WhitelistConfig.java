@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.config.user;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -35,6 +34,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.util.Reloadable;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 
@@ -81,7 +81,7 @@ public final class WhitelistConfig extends SimpleUserConfig implements Whitelist
         try {
             load();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 

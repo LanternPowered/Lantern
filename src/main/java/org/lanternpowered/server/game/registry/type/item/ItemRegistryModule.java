@@ -74,6 +74,7 @@ import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider;
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.util.ReflectionHelper;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.FoodRestorationProperty;
@@ -1727,7 +1728,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
             ReflectionHelper.setField(ItemStackSnapshot.class.getField("NONE"), null,
                     new LanternItemStack(none, 0).createSnapshot());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 

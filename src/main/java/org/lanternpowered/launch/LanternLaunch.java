@@ -35,10 +35,8 @@ public final class LanternLaunch {
             final Class<?> serverLaunchClass = classLoader.forName("org.lanternpowered.server.LanternServerLaunch", true);
             final Object serverLaunch = serverLaunchClass.newInstance();
             serverLaunchClass.getMethod("main", String[].class).invoke(serverLaunch, new Object[] { args });
-        } catch (RuntimeException e) {
-            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LanternClassLoader.sneakyThrow(e);
         }
     }
 

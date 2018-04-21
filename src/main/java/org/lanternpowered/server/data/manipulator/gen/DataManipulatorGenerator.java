@@ -35,6 +35,7 @@ import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableData;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
 import org.lanternpowered.server.util.DefineableClassLoader;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.api.data.key.Key;
@@ -87,7 +88,7 @@ public final class DataManipulatorGenerator {
             base.immutableManipulatorTypeImpl.getField(AbstractVariantDataTypeGenerator.KEY).set(null, key);
             base.immutableManipulatorTypeImpl.getField(AbstractVariantDataTypeGenerator.VALUE).set(null, defaultValue);
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
         return base.supplier.get();
     }
@@ -105,7 +106,7 @@ public final class DataManipulatorGenerator {
             base.immutableManipulatorTypeImpl.getField(AbstractListDataTypeGenerator.LIST_SUPPLIER).set(null,
                     (Supplier<List>) () -> ImmutableList.copyOf(listSupplier.get()));
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
         return base.supplier.get();
     }
@@ -139,7 +140,7 @@ public final class DataManipulatorGenerator {
 
             return registration;
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 
@@ -258,7 +259,7 @@ public final class DataManipulatorGenerator {
                         .getConstructor(PluginContainer.class, String.class, String.class)
                         .newInstance(pluginContainer, id, name);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
+                throw UncheckedExceptions.thrOw(e);
             }
         }, manipulatorTypeImpl, immutableManipulatorTypeImpl);
     }

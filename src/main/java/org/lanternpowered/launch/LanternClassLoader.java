@@ -369,14 +369,11 @@ public final class LanternClassLoader extends URLClassLoader {
         try {
             classLoader = load();
 
-            try {
-                findBootstrapClassMethod = ClassLoader.class.getDeclaredMethod("findBootstrapClassOrNull", String.class);
-                findBootstrapClassMethod.setAccessible(true);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+            findBootstrapClassMethod = ClassLoader.class.getDeclaredMethod("findBootstrapClassOrNull", String.class);
+            findBootstrapClassMethod.setAccessible(true);
+        } catch (IOException | NoSuchMethodException e) {
+            sneakyThrow(e);
+            throw new RuntimeException();
         }
     }
 
@@ -547,7 +544,8 @@ public final class LanternClassLoader extends URLClassLoader {
             try {
                 loadedClass = (Class<?>) findBootstrapClassMethod.invoke(this, className);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
+                sneakyThrow(e);
+                throw new RuntimeException();
             }
         }
         return Optional.ofNullable(loadedClass);
@@ -827,5 +825,10 @@ public final class LanternClassLoader extends URLClassLoader {
         urls.addAll(Arrays.asList(super.getURLs()));
         urls.addAll(Arrays.asList(this.libraryClassLoader.getURLs()));
         return urls.toArray(new URL[urls.size()]);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T extends Throwable> void sneakyThrow(Throwable t) throws T {
+        throw (T) t;
     }
 }

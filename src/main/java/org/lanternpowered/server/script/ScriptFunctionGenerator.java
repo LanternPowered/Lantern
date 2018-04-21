@@ -46,6 +46,7 @@ import static org.objectweb.asm.Opcodes.V1_6;
 
 import org.lanternpowered.api.script.Script;
 import org.lanternpowered.server.util.DefineableClassLoader;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -82,13 +83,13 @@ final class ScriptFunctionGenerator {
         try {
             constructor = functionClass.getConstructor(LanternScript.class);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
         return function -> {
             try {
                 return constructor.newInstance(function);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
+                throw UncheckedExceptions.thrOw(e);
             }
         };
     }

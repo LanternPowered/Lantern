@@ -49,8 +49,8 @@ package org.lanternpowered.server.data.io.anvil;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.base.Throwables;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.UncheckedExceptions;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -100,7 +100,7 @@ final class RegionFileCache {
                         try {
                             ((RegionFile) value).close();
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw UncheckedExceptions.thrOw(e);
                         }
                     }
                 })
@@ -111,7 +111,7 @@ final class RegionFileCache {
         try {
             return Files.list(this.regionDir).filter(file -> this.filePattern.matcher(file.getFileName().toString()).matches()).toArray(Path[]::new);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 
@@ -128,7 +128,7 @@ final class RegionFileCache {
                 return new RegionFile(this.regionDir.resolve("r." + regionX + "." + regionZ + "." + this.extension), regionX, regionZ);
             } catch (IOException e) {
                 Lantern.getLogger().error("Failed to load the region file (%s;%s)", regionX, regionZ);
-                throw new RuntimeException(e);
+                throw UncheckedExceptions.thrOw(e);
             }
         });
     }

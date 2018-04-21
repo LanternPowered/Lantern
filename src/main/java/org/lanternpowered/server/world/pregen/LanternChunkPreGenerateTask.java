@@ -36,6 +36,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -274,7 +275,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
         try {
             return service.exists(chunk1) && service.exists(chunk2) && service.exists(chunk3) && service.exists(chunk4);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 

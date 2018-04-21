@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
@@ -115,7 +116,7 @@ public final class LanternEntityType extends PluginCatalogType.Base.Translatable
             try {
                 return constructor.newInstance(uuid);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
+                throw UncheckedExceptions.thrOw(e);
             }
         };
     }
@@ -128,7 +129,7 @@ public final class LanternEntityType extends PluginCatalogType.Base.Translatable
             BYPASS_FIELD.set(null, false);
             return clazz;
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 
@@ -139,7 +140,7 @@ public final class LanternEntityType extends PluginCatalogType.Base.Translatable
             BYPASS_FIELD = LanternEntity.class.getDeclaredField("bypassEntityTypeLookup");
             BYPASS_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
     }
 

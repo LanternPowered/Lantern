@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
+import org.lanternpowered.server.util.UncheckedExceptions;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelBinding;
@@ -159,7 +160,7 @@ final class LanternIndexedMessageChannel extends LanternChannelBinding implement
             constructor = messageClass.getConstructor();
         } catch (NoSuchMethodException ignored) {
         } catch (SecurityException e) {
-            throw new RuntimeException(e);
+            throw UncheckedExceptions.thrOw(e);
         }
         checkState(constructor != null, "%s is missing a empty public constructor", messageClass.getName());
         final RegistrationLookup registrations = getRegistrations(Platform.Type.CLIENT);

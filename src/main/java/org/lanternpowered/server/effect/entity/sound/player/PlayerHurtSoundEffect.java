@@ -23,26 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.entity.sound;
+package org.lanternpowered.server.effect.entity.sound.player;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.effect.entity.sound.AbstractLivingSoundEffect;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 
 import java.util.Random;
 
-public class DefaultLivingSoundEffect extends AbstractLivingSoundEffect {
+public class PlayerHurtSoundEffect extends AbstractLivingSoundEffect {
 
-    private final SoundType soundType;
-
-    public DefaultLivingSoundEffect(EntityBodyPosition position, SoundType soundType) {
+    public PlayerHurtSoundEffect(EntityBodyPosition position) {
         super(position);
-        this.soundType = soundType;
     }
 
     @Override
     protected void play(LanternEntity entity, Vector3d relativePosition, Random random) {
-        entity.playSound(this.soundType, relativePosition, getVolume(entity, random), getPitch(entity, random));
+        final SoundType soundType;
+        final DamageSource damageSource = CauseStack.currentOrEmpty().first(DamageSource.class).orElse(null);
+        // Check if the player got damaged by being on fire
+        if (damageSource == DamageSources.FIRE_TICK) {
+            soundType = SoundTypes.ENTITY_PLAYER_HURT_ON_FIRE;
+        } else if (damageSource == DamageSources.DROWNING) {
+            soundType = SoundTypes.ENTITY_PLAYER_HURT_DROWN;
+        } else {
+            soundType = SoundTypes.ENTITY_PLAYER_HURT;
+        }
+        entity.playSound(soundType, relativePosition, getVolume(entity, random), getPitch(entity, random));
     }
 }

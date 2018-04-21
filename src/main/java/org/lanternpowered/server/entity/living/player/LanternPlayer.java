@@ -44,7 +44,10 @@ import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.sound.DefaultLivingFallSoundEffect;
+import org.lanternpowered.server.effect.entity.sound.DefaultLivingSoundEffect;
+import org.lanternpowered.server.effect.entity.sound.player.PlayerHurtSoundEffect;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
@@ -170,6 +173,12 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     new DefaultLivingFallSoundEffect(
                             SoundTypes.ENTITY_PLAYER_SMALL_FALL,
                             SoundTypes.ENTITY_PLAYER_BIG_FALL))
+            // Override the hurt sound
+            .replaceOrAdd(EntityEffectTypes.HURT, DefaultLivingSoundEffect.class,
+                    new PlayerHurtSoundEffect(EntityBodyPosition.HEAD))
+            // Override the death sound
+            .replaceOrAdd(EntityEffectTypes.DEATH, DefaultLivingSoundEffect.class,
+                    new DefaultLivingSoundEffect(EntityBodyPosition.HEAD, SoundTypes.ENTITY_PLAYER_DEATH))
             .build();
 
     private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -0.3), new Vector3d(0.3, 1.8, 0.3));

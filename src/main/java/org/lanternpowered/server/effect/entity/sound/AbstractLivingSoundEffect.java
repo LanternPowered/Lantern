@@ -25,24 +25,43 @@
  */
 package org.lanternpowered.server.effect.entity.sound;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.effect.entity.AbstractEntityEffect;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.data.key.Keys;
 
 import java.util.Random;
 
-public class DefaultLivingSoundEffect extends AbstractLivingSoundEffect {
+public abstract class AbstractLivingSoundEffect extends AbstractEntityEffect {
 
-    private final SoundType soundType;
-
-    public DefaultLivingSoundEffect(EntityBodyPosition position, SoundType soundType) {
+    public AbstractLivingSoundEffect(EntityBodyPosition position) {
         super(position);
-        this.soundType = soundType;
     }
 
-    @Override
-    protected void play(LanternEntity entity, Vector3d relativePosition, Random random) {
-        entity.playSound(this.soundType, relativePosition, getVolume(entity, random), getPitch(entity, random));
+    /**
+     * Gets a randomized volume value for the sound effect.
+     *
+     * @param random The random
+     * @return The volume value
+     */
+    protected double getVolume(LanternEntity entity, Random random) {
+        return 1.0;
+    }
+
+    /**
+     * Gets a randomized pitch value for the sound effect.
+     *
+     * @param random The random
+     * @return The pitch value
+     */
+    protected double getPitch(LanternEntity entity, Random random) {
+        double value = random.nextFloat() - random.nextFloat() * 0.2;
+        // Adults and children use a different pitch value
+        if (entity.get(Keys.IS_ADULT).orElse(true)) {
+            value += 1.0;
+        } else {
+            value += 1.5;
+        }
+        return value;
     }
 }

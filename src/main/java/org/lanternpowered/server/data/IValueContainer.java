@@ -29,14 +29,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.ValueHelper;
+import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
+import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
+import org.spongepowered.api.data.value.immutable.ImmutableOptionalValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.mutable.OptionalValue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -141,6 +146,12 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
     default boolean supports(Key<?> key) {
         checkNotNull(key, "key");
 
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return supports(optionalWrappedKey);
+        }
+
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -172,6 +183,12 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
     default <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
         checkNotNull(key, "key");
 
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return (Optional<E>) get(optionalWrappedKey).get();
+        }
+
         // Check the local key registration
         final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
         if (localKeyRegistration != null) {
@@ -201,6 +218,26 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
     @SuppressWarnings("unchecked")
     @Override
     default <E, V extends BaseValue<E>> Optional<V> getRawValueFor(Key<V> key) {
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            final Optional<BaseValue> optOptionalValue = getRawValueFor(optionalWrappedKey);
+            if (!optOptionalValue.isPresent()) {
+                return Optional.empty();
+            }
+            final BaseValue baseValue = optOptionalValue.get();
+            final Optional optElement = (Optional) baseValue.get();
+            if (!optElement.isPresent()) {
+                return Optional.empty();
+            }
+            final Object element = optElement.get();
+            if (baseValue instanceof OptionalValue) {
+                return Optional.of((V) new LanternValue(key, element));
+            } else {
+                return Optional.of((V) ImmutableLanternValue.cachedOf((Key) key, element, element));
+            }
+        }
+
         // Check the local key registration
         final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
         if (localKeyRegistration != null) {

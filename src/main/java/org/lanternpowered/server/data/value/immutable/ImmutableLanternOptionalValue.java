@@ -27,6 +27,7 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.value.mutable.LanternOptionalValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
@@ -39,7 +40,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "ConstantConditions"})
 public class ImmutableLanternOptionalValue<E> extends ImmutableLanternValue<Optional<E>> implements ImmutableOptionalValue<E> {
 
     public ImmutableLanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key) {
@@ -77,6 +78,6 @@ public class ImmutableLanternOptionalValue<E> extends ImmutableLanternValue<Opti
     @SuppressWarnings("unchecked")
     @Override
     public ImmutableValue<E> or(E value) {
-        return new ImmutableLanternValue<>(LanternOptionalValue.unwrap(getKey()), get().orElse(checkNotNull(value)));
+        return new ImmutableLanternValue<>(((LanternKey) getKey()).getOptionalUnwrappedKey(), get().orElse(checkNotNull(value)));
     }
 }

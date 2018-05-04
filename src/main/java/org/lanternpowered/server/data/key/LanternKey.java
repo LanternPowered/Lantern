@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.key;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.RegisteredListener;
@@ -36,19 +37,28 @@ import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 public class LanternKey<V extends BaseValue<?>> implements Key<V> {
+
+    private static final TypeVariable<Class<Optional>> optionalType = Optional.class.getTypeParameters()[0];
+    private static final TypeVariable<Class<BaseValue>> elementType = BaseValue.class.getTypeParameters()[0];
 
     private static final TypeToken<ChangeDataHolderEvent.ValueChange> valueChangeEventTypeToken =
             TypeToken.of(ChangeDataHolderEvent.ValueChange.class);
@@ -61,6 +71,16 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
     private final TypeToken<?> elementToken;
     private final List<RegisteredListener<ChangeDataHolderEvent.ValueChange>> listeners = new ArrayList<>();
     private final List<RegisteredListener<ChangeDataHolderEvent.ValueChange>> unmodifiableListeners = Collections.unmodifiableList(this.listeners);
+
+    // Optional key related
+
+    // This field will be set if this key has a Optional element,
+    // then this will be the key with the unwrapped version
+    @Nullable private LanternKey optionalUnwrappedKey;
+
+    // This field will be set if this key has originally a Optional element,
+    // then this will be the key with the original wrapped version
+    @Nullable private LanternKey optionalWrappedKey;
 
     LanternKey(LanternKeyBuilder<?, V> builder) {
         this.valueToken = builder.valueToken;
@@ -79,6 +99,44 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
                         + "current PluginContainer in the cause stack. ");
             }
         }
+        TypeToken<?> elementToken = builder.valueToken.resolveType(elementType);
+        if (Optional.class.isAssignableFrom(elementToken.getRawType())) {
+            elementToken = elementToken.resolveType(optionalType);
+            // Generate the unwrapped version
+            final LanternKeyBuilder unwrappedBuilder = new LanternKeyBuilder();
+            if (ImmutableValue.class.isAssignableFrom(builder.valueToken.getRawType())) {
+                unwrappedBuilder.valueToken = createImmutableValueToken(elementToken);
+            } else {
+                unwrappedBuilder.valueToken = createValueToken(elementToken);
+            }
+            unwrappedBuilder.id = builder.id + "_non_optional";
+            unwrappedBuilder.name = builder.name + "NonOptional";
+            final List<String> parts = new ArrayList<>(builder.query.getParts());
+            final int index = parts.size() - 1;
+            parts.set(index, parts.get(index) + "NonOptional");
+            unwrappedBuilder.query = DataQuery.of(parts);
+
+            this.optionalUnwrappedKey = unwrappedBuilder.build();
+            this.optionalUnwrappedKey.optionalWrappedKey = this;
+        }
+    }
+
+    private static <E> TypeToken<Value<E>> createValueToken(TypeToken<E> elementToken) {
+        return new TypeToken<Value<E>>() {}.where(new TypeParameter<E>() {}, elementToken);
+    }
+
+    private static <E> TypeToken<ImmutableValue<E>> createImmutableValueToken(TypeToken<E> elementToken) {
+        return new TypeToken<ImmutableValue<E>>() {}.where(new TypeParameter<E>() {}, elementToken);
+    }
+
+    @Nullable
+    public LanternKey getOptionalUnwrappedKey() {
+        return this.optionalUnwrappedKey;
+    }
+
+    @Nullable
+    public LanternKey getOptionalWrappedKey() {
+        return this.optionalWrappedKey;
     }
 
     @Override

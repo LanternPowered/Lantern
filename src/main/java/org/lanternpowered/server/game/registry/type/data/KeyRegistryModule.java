@@ -40,6 +40,7 @@ import static org.spongepowered.api.data.DataQuery.of;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
@@ -137,6 +138,10 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
     protected void register(Key key, boolean disallowInbuiltPluginIds) {
         super.register(key, disallowInbuiltPluginIds);
         this.byQuery.putIfAbsent(key.getQuery(), key);
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            register(optionalWrappedKey, disallowInbuiltPluginIds);
+        }
     }
 
     public Optional<Key> getByQuery(DataQuery query) {

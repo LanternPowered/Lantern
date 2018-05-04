@@ -26,39 +26,22 @@
 package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
-import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternOptionalValue;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableOptionalValue;
 import org.spongepowered.api.data.value.mutable.OptionalValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
-import java.lang.reflect.TypeVariable;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unchecked", "ConstantConditions"})
 public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implements OptionalValue<E> {
-
-    private static final TypeVariable<Class<Optional>> optionalType = Optional.class.getTypeParameters()[0];
-    private static final Map<Key<?>, Key<?>> nonOptionalKey = new ConcurrentHashMap<>();
-
-    @SuppressWarnings("unchecked")
-    public static <E> Key<? extends BaseValue<E>> unwrap(Key<? extends BaseValue<Optional<E>>> key) {
-        return (Key<Value<E>>) nonOptionalKey.computeIfAbsent(key, key1 -> {
-            final TypeToken newElementType = key1.getElementToken().resolveType(optionalType);
-            return makeValueKey(newElementType, DataQuery.of('.', key1.getQuery().asString('.') + "Required"),
-                    key1.getId() + "_required", key1.getName() + "Required");
-        });
-    }
 
     public LanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key) {
         this(key, Optional.empty());
@@ -97,6 +80,6 @@ public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implement
     @Override
     public Value<E> or(E defaultValue) {
         checkNotNull(defaultValue);
-        return new LanternValue<>(unwrap(getKey()), defaultValue, get().orElse(defaultValue));
+        return new LanternValue<>(((LanternKey) getKey()).getOptionalUnwrappedKey(), defaultValue, get().orElse(defaultValue));
     }
 }

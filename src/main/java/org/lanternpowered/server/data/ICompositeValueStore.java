@@ -28,6 +28,7 @@ package org.lanternpowered.server.data;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
@@ -82,6 +83,12 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
     }
 
     default <E> boolean offerFastNoEvents(Key<? extends BaseValue<E>> key, E element) {
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return offerFastNoEvents(optionalWrappedKey, Optional.of(element));
+        }
+
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -123,6 +130,12 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
     }
 
     default <E> DataTransactionResult offerNoEvents(Key<? extends BaseValue<E>> key, E element) {
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return offerNoEvents(optionalWrappedKey, Optional.of(element));
+        }
+
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -189,6 +202,12 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
         checkNotNull(value, "value");
         final Key<? extends BaseValue<E>> key = value.getKey();
 
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return offerFastNoEvents(optionalWrappedKey, value.getDirect());
+        }
+
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -233,6 +252,12 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
     default <E> DataTransactionResult offerNoEvents(BaseValue<E> value) {
         checkNotNull(value, "value");
         final Key<? extends BaseValue<E>> key = value.getKey();
+
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return offerNoEvents(optionalWrappedKey, value.getDirect());
+        }
 
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
@@ -316,6 +341,13 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
 
     default boolean removeFastNoEvents(Key<?> key) {
         checkNotNull(key, "key");
+
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return removeFastNoEvents(optionalWrappedKey);
+        }
+
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
@@ -357,6 +389,12 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
 
     default DataTransactionResult removeNoEvents(Key<?> key) {
         checkNotNull(key, "key");
+
+        // Optional unwrapped key handling
+        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
+        if (optionalWrappedKey != null) {
+            return removeNoEvents(optionalWrappedKey);
+        }
 
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);

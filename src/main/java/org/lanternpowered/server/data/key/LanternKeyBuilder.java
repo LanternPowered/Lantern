@@ -75,7 +75,7 @@ public class LanternKeyBuilder<E, V extends BaseValue<E>> implements Key.Builder
     }
 
     @Override
-    public Key<V> build() {
+    public LanternKey<V> build() {
         checkState(this.valueToken != null, "Value Token must be set!");
         checkState(this.id != null, "Key id must be set!");
         checkState(this.query != null, "DataQuery not set!");

@@ -24,4 +24,4 @@
  * THE SOFTWARE.
  */
 @org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.economy;
+package org.lanternpowered.server.service.economy;

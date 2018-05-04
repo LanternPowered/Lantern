@@ -42,7 +42,7 @@ final class ConsoleCommandCompleter implements Completer {
 
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        String buffer = line.line();
+        final String buffer = line.line();
 
         // The content with normalized spaces, the spaces are trimmed
         // from the ends and there are never two spaces directly after each other

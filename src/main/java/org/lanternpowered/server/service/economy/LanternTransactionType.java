@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.economy;
+package org.lanternpowered.server.service.economy;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.service.economy.transaction.TransactionType;

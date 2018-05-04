@@ -220,7 +220,7 @@ public class LanternGame implements Game {
     // The injector
     @Inject private Injector injector;
 
-    @Inject @Option("scanClasspath") @Nullable private Boolean scanClasspath;
+    @Inject @Option({ "scanClasspath", "scan-classpath"}) @Nullable private Boolean scanClasspath;
 
     // The current game state
     @Nullable private GameState gameState = null;

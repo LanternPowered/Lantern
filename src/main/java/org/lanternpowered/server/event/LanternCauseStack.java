@@ -31,6 +31,7 @@ import com.google.common.base.Strings;
 import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.PrettyPrinter;
+import org.lanternpowered.server.util.SystemProperties;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKey;
@@ -54,7 +55,7 @@ public final class LanternCauseStack implements CauseStack {
     /**
      * Whether the debug mode of cause frames should be enabled.
      */
-    private static final boolean DEBUG_CAUSE_FRAMES = Boolean.valueOf(System.getProperty("sponge.debugcauseframes", "false"));
+    private static final boolean DEBUG_CAUSE_FRAMES = SystemProperties.get().getBooleanProperty("sponge.debugcauseframes");
 
     private final Deque<Object> cause = new ArrayDeque<>();
     private final Deque<CauseStackFrameImpl> frames = new ArrayDeque<>();

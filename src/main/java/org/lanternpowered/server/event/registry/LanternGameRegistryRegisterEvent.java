@@ -28,11 +28,11 @@ package org.lanternpowered.server.event.registry;
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.game.GameRegistryEvent;
+import org.spongepowered.api.event.impl.AbstractGameRegistryRegisterEvent;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
-public class LanternGameRegistryRegisterEvent<T extends CatalogType> implements GameRegistryEvent.Register<T> {
+public class LanternGameRegistryRegisterEvent<T extends CatalogType> extends AbstractGameRegistryRegisterEvent<T> {
 
     private final Cause cause;
     private final Class<T> catalogType;

@@ -284,6 +284,7 @@ final class PluginScanner {
         return true;
     }
 
+    @Nullable
     private PluginCandidate scanClassFile(InputStream in, @Nullable Path source) throws IOException {
         final ClassReader reader = new ClassReader(in);
         final PluginClassVisitor visitor = new PluginClassVisitor();

@@ -58,6 +58,7 @@ import org.lanternpowered.server.event.filter.delegate.RootCauseFilterSourceDele
 import org.lanternpowered.server.event.filter.delegate.SubtypeFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.SupportsDataFilterDelegate;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.SystemProperties;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -94,7 +95,7 @@ import javax.annotation.Nullable;
 
 final class FilterGenerator {
 
-    private static final boolean FILTER_DEBUG = Boolean.parseBoolean(System.getProperty("sponge.filter.debug", "false"));
+    private static final boolean FILTER_DEBUG = SystemProperties.get().getBooleanProperty("sponge.filter.debug");
     private static final FilterGenerator instance = new FilterGenerator();
 
     static FilterGenerator get() {

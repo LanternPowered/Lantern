@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.service.sql;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalListener;
@@ -50,7 +49,6 @@ import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
@@ -72,8 +70,8 @@ public class LanternSqlService implements SqlService, CloseableService {
     private static final Map<String, BiFunction<PluginContainer, String, String>> PATH_CANONICALIZERS;
 
     static {
-        ImmutableMap.Builder<String, Properties> build = ImmutableMap.builder();
-        Properties mySqlProps = new Properties();
+        final ImmutableMap.Builder<String, Properties> build = ImmutableMap.builder();
+        final Properties mySqlProps = new Properties();
         // Config options based on:
         // http://assets.en.oreilly.com/1/event/21/Connector_J%20Performance%20Gems%20Presentation.pdf
         mySqlProps.setProperty("useConfigs", "maxPerformance");
@@ -83,14 +81,14 @@ public class LanternSqlService implements SqlService, CloseableService {
         PROTOCOL_SPECIFIC_PROPS = build.build();
         PATH_CANONICALIZERS = ImmutableMap.of("h2", (plugin, orig) -> {
             // Bleh if only h2 had a better way of supplying a base directory... oh well...
-            org.h2.engine.ConnectionInfo h2Info = new org.h2.engine.ConnectionInfo(orig);
+            final org.h2.engine.ConnectionInfo h2Info = new org.h2.engine.ConnectionInfo(orig);
             if (!h2Info.isPersistent() || h2Info.isRemote()) {
                 return orig;
             }
             if (orig.startsWith("file:")) {
                 orig = orig.substring("file:".length());
             }
-            Path origPath = Paths.get(orig);
+            final Path origPath = Paths.get(orig);
             if (origPath.isAbsolute()) {
                 return origPath.toString();
             } else {
@@ -100,28 +98,25 @@ public class LanternSqlService implements SqlService, CloseableService {
         });
     }
 
-    private final LoadingCache<ConnectionInfo, HikariDataSource> connectionCache =
-            Caffeine.newBuilder().removalListener((RemovalListener<ConnectionInfo, HikariDataSource>) (key, value, cause) -> {
+    private final LoadingCache<ConnectionInfo, HikariDataSource> connectionCache = Caffeine.newBuilder()
+            .removalListener((RemovalListener<ConnectionInfo, HikariDataSource>) (key, value, cause) -> {
                 if (value != null) {
                     value.close();
                 }
-            }).build(new CacheLoader<ConnectionInfo, HikariDataSource>() {
-
-                @Override
-                public HikariDataSource load(@Nonnull ConnectionInfo key) throws Exception {
-                    final HikariConfig config = new HikariConfig();
-                    config.setUsername(key.getUser());
-                    config.setPassword(key.getPassword());
-                    config.setDriverClassName(key.getDriverClassName());
-                    // https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing for info on pool sizing
-                    config.setMaximumPoolSize((Runtime.getRuntime().availableProcessors() * 2) + 1);
-                    final Properties driverSpecificProperties = PROTOCOL_SPECIFIC_PROPS.get(key.getDriverClassName());
-                    if (driverSpecificProperties != null) {
-                        config.setDataSourceProperties(driverSpecificProperties);
-                    }
-                    config.setJdbcUrl(key.getAuthlessUrl());
-                    return new HikariDataSource(config);
+            })
+            .build(key -> {
+                final HikariConfig config = new HikariConfig();
+                config.setUsername(key.getUser());
+                config.setPassword(key.getPassword());
+                config.setDriverClassName(key.getDriverClassName());
+                // https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing for info on pool sizing
+                config.setMaximumPoolSize((Runtime.getRuntime().availableProcessors() * 2) + 1);
+                final Properties driverSpecificProperties = PROTOCOL_SPECIFIC_PROPS.get(key.getDriverClassName());
+                if (driverSpecificProperties != null) {
+                    config.setDataSourceProperties(driverSpecificProperties);
                 }
+                config.setJdbcUrl(key.getAuthlessUrl());
+                return new HikariDataSource(config);
             });
 
     @Override

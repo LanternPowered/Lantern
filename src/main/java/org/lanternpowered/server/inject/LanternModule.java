@@ -78,7 +78,7 @@ import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.util.PathUtils;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -368,7 +368,7 @@ public class LanternModule extends PrivateModule {
                 return new LanternAssetManager(gson.fromJson(reader, AssetRepository.class));
             }
         } catch (IOException e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 

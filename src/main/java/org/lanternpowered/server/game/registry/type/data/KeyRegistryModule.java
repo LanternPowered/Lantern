@@ -45,7 +45,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataQuery;
@@ -425,7 +425,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
                 try {
                     object = field.get(null);
                 } catch (IllegalAccessException e) {
-                    throw UncheckedExceptions.thrOw(e);
+                    throw UncheckedThrowables.thrOw(e);
                 }
                 if (object instanceof Key) {
                     register((Key) object);

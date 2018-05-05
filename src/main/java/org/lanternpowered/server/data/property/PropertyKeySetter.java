@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.property;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
@@ -54,7 +54,7 @@ public final class PropertyKeySetter {
             mField.set(ABSTRACT_PROPERTY_KEY, ABSTRACT_PROPERTY_KEY.getModifiers() & ~Modifier.FINAL);
             mField.set(ABSTRACT_INVENTORY_PROPERTY_KEY, ABSTRACT_INVENTORY_PROPERTY_KEY.getModifiers() & ~Modifier.FINAL);
         } catch (Exception e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 
@@ -70,7 +70,7 @@ public final class PropertyKeySetter {
                 return;
             }
         } catch (Exception e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
         throw new IllegalArgumentException("Unsupported property type: " + property.getClass().getName());
     }

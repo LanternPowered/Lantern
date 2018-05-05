@@ -32,6 +32,7 @@ import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.util.PathUtils;
+import org.lanternpowered.server.util.UncheckedThrowables;
 
 import java.io.Closeable;
 import java.io.File;
@@ -95,7 +96,7 @@ class FileAssetRepository extends AbstractAssetRepository implements Closeable {
             // Generate a URL that targets a file inside a zip file
             return new URL("jar:" + this.fileUrl + "!/" + path);
         } catch (MalformedURLException e) {
-            throw new IllegalStateException(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 

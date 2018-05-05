@@ -148,7 +148,8 @@ public final class LanternClassLoader extends URLClassLoader {
                 return getStream(String.format("%s%s-%s-%s-%s.jar", directoryPath, name,
                         version.substring(0, index), timestamp, buildNumber));
             } catch (SAXException | ParserConfigurationException | IOException e) {
-                throw new IllegalStateException(e);
+                sneakyThrow(e);
+                throw new RuntimeException();
             }
         }
 
@@ -219,7 +220,8 @@ public final class LanternClassLoader extends URLClassLoader {
                             localRepoPath = node.getTextContent();
                         }
                     } catch (ParserConfigurationException | SAXException e) {
-                        throw new IllegalStateException(e);
+                        sneakyThrow(e);
+                        throw new RuntimeException();
                     }
                 }
             }
@@ -244,7 +246,8 @@ public final class LanternClassLoader extends URLClassLoader {
                     try {
                         return file.exists() ? file.toURL().openStream() : null;
                     } catch (IOException e) {
-                        throw new IllegalStateException(e);
+                        sneakyThrow(e);
+                        throw new RuntimeException();
                     }
                 });
             } else {

@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 import org.lanternpowered.server.util.PathUtils;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 
@@ -118,7 +118,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 
@@ -127,7 +127,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
         try {
             return fromUri(uri, true);
         } catch (IOException e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 

@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 
@@ -45,7 +45,7 @@ public final class LanternTileEntityType extends PluginCatalogType.Base implemen
             BYPASS_FIELD = LanternTileEntity.class.getDeclaredField("bypassEntityTypeLookup");
             BYPASS_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 
@@ -81,7 +81,7 @@ public final class LanternTileEntityType extends PluginCatalogType.Base implemen
             //noinspection unchecked
             return tileEntityClass;
         } catch (IllegalAccessException e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 

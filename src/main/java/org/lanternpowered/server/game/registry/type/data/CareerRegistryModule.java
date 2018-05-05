@@ -29,6 +29,7 @@ import org.lanternpowered.server.data.type.LanternCareer;
 import org.lanternpowered.server.data.type.LanternProfession;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.Careers;
 import org.spongepowered.api.data.type.Profession;
@@ -48,7 +49,7 @@ public class CareerRegistryModule extends PluginCatalogRegistryModule<Career> {
             ADD_CAREER = LanternProfession.class.getDeclaredMethod("addCareer", Career.class);
             ADD_CAREER.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 
@@ -62,7 +63,7 @@ public class CareerRegistryModule extends PluginCatalogRegistryModule<Career> {
         try {
             ADD_CAREER.invoke(catalogType.getProfession(), catalogType);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 

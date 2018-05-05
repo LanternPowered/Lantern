@@ -37,6 +37,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTriggerConfiguration;
 import org.spongepowered.api.advancement.criteria.trigger.Trigger;
@@ -92,7 +93,7 @@ public class LanternTriggerBuilder<C extends FilteredTriggerConfiguration> imple
                 final DataView dataView = JsonDataFormat.serialize(GSON, jsonObject);
                 return builder.build(dataView).get();
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                throw UncheckedThrowables.thrOw(e);
             }
         }
     }
@@ -131,7 +132,7 @@ public class LanternTriggerBuilder<C extends FilteredTriggerConfiguration> imple
                 final ConfigurationNode node = loader.load();
                 return this.typeSerializerCollection.get(this.typeToken).deserialize(this.typeToken, node);
             } catch (IOException | ObjectMappingException e) {
-                throw new IllegalStateException(e);
+                throw UncheckedThrowables.thrOw(e);
             }
         }
     }

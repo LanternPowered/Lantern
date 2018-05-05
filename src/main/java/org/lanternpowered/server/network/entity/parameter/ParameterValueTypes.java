@@ -31,7 +31,7 @@ import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -77,7 +77,7 @@ public final class ParameterValueTypes {
             try {
                 NbtStreamUtils.write(value.get(), buf.asOutputStream(), false);
             } catch (IOException e) {
-                throw UncheckedExceptions.thrOw(e);
+                throw UncheckedThrowables.thrOw(e);
             }
         } else {
             buf.writeByte((byte) 0);

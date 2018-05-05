@@ -31,6 +31,7 @@ import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
@@ -188,7 +189,7 @@ public final class LanternTextHelper {
             try {
                 return new RawAction("show_entity", JsonDataFormat.writeAsString(dataContainer));
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                throw UncheckedThrowables.thrOw(e);
             }
         } else if (hoverAction instanceof HoverAction.ShowItem) {
             final ItemStackSnapshot itemStackSnapshot = ((HoverAction.ShowItem) hoverAction).getResult();
@@ -197,7 +198,7 @@ public final class LanternTextHelper {
             try {
                 return new RawAction("show_item", JsonDataFormat.writeAsString(dataView));
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                throw UncheckedThrowables.thrOw(e);
             }
         } else {
             throw new IllegalArgumentException("Unknown hover action type: " + hoverAction.getClass().getName());

@@ -38,6 +38,7 @@ import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModule;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
@@ -497,7 +498,7 @@ final class LanternWorldPropertiesIO {
                 dataView.set(GENERATOR_OPTIONS_EXTRA, JsonDataFormat.writeAsString(
                         properties.getGeneratorSettings().copy().remove(AbstractFlatGeneratorType.SETTINGS)));
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                throw UncheckedThrowables.thrOw(e);
             }
         } else {
             dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings());

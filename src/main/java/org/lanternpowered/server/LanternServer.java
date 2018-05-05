@@ -56,6 +56,7 @@ import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
@@ -639,7 +640,7 @@ public final class LanternServer implements Server {
             final Map<Class<?>, ProviderRegistration<?>> map = (Map<Class<?>, ProviderRegistration<?>>) field.get(serviceManager);
             serviceRegistrations = map.values();
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            throw UncheckedThrowables.thrOw(e);
         }
 
         // Close all the services if possible

@@ -47,7 +47,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inject.Service;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.CloseableService;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -240,7 +240,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
         try {
             return this.userCache.get(profile.getUniqueId(), () -> new ProxyUser(profile));
         } catch (ExecutionException e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 

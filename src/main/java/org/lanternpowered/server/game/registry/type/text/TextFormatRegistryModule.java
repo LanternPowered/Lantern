@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.text;
 
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.util.ReflectionHelper;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.format.TextColors;
@@ -49,7 +49,7 @@ public class TextFormatRegistryModule implements RegistryModule {
             ReflectionHelper.setField(colorField, TextFormat.NONE, TextColors.NONE);
             ReflectionHelper.setField(styleField, TextFormat.NONE, TextStyles.NONE);
         } catch (Exception e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 }

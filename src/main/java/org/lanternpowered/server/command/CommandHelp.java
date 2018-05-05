@@ -29,7 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.Collections2;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -68,7 +68,7 @@ public final class CommandHelp extends CommandProvider {
             extendedDescriptionField = CommandSpec.class.getDeclaredField("extendedDescription");
             extendedDescriptionField.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw UncheckedExceptions.thrOw(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 
@@ -120,7 +120,7 @@ public final class CommandHelp extends CommandProvider {
                                     // TODO: Why is there no method :(
                                     extendedDescription = (Text) extendedDescriptionField.get(callable);
                                 } catch (IllegalAccessException e) {
-                                    throw UncheckedExceptions.thrOw(e);
+                                    throw UncheckedThrowables.thrOw(e);
                                 }
                                 if (extendedDescription != null) {
                                     builder.append(Text.NEW_LINE, extendedDescription);

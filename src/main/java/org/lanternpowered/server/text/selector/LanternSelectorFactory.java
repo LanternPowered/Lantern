@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.text.SelectorTypeRegistryModule;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.text.selector.Argument;
@@ -80,7 +80,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     Lantern.getLogger().debug(m + " failed with parameter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
-                    throw UncheckedExceptions.thrOw(e.getCause());
+                    throw UncheckedThrowables.thrOw(e.getCause());
                 }
             };
         } else {
@@ -94,7 +94,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     Lantern.getLogger().debug(m + " failed with parameter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
-                    throw UncheckedExceptions.thrOw(e.getCause());
+                    throw UncheckedThrowables.thrOw(e.getCause());
                 }
             };
         }

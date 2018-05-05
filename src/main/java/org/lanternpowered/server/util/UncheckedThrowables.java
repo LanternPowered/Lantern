@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.util;
 
-public final class UncheckedExceptions {
+public final class UncheckedThrowables {
 
     /**
      * Throws the {@link Throwable} as an unchecked exception.
@@ -43,6 +43,6 @@ public final class UncheckedExceptions {
         throw (T) t;
     }
 
-    private UncheckedExceptions() {
+    private UncheckedThrowables() {
     }
 }

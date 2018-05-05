@@ -28,6 +28,7 @@ package org.lanternpowered.server.game.registry.type.advancement;
 import org.lanternpowered.server.advancement.criteria.EmptyCriterion;
 import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder;
 import org.lanternpowered.server.util.ReflectionHelper;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.registry.RegistryModule;
 
@@ -41,7 +42,7 @@ public class AdvancementCriterionModule implements RegistryModule {
             ReflectionHelper.setField(AdvancementCriterion.class.getDeclaredField("DUMMY"),
                     null, new LanternCriterionBuilder().name("dummy").build());
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw UncheckedThrowables.thrOw(e);
         }
     }
 }

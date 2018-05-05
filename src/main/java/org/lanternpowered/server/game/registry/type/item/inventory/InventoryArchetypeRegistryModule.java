@@ -35,6 +35,7 @@ import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
 import org.lanternpowered.server.inventory.UnknownInventoryArchetype;
 import org.lanternpowered.server.inventory.sponge.SpongeInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
@@ -70,7 +71,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                     try {
                         register((InventoryArchetype) field.get(null));
                     } catch (IllegalAccessException e) {
-                        throw new IllegalStateException(e);
+                        throw UncheckedThrowables.thrOw(e);
                     }
                 }
             }

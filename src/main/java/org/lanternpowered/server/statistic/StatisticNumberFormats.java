@@ -26,7 +26,7 @@
 package org.lanternpowered.server.statistic;
 
 import org.apache.commons.lang3.StringUtils;
-import org.lanternpowered.server.util.UncheckedExceptions;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.functions.Long2ObjectFunction;
 import org.lanternpowered.server.util.functions.Object2LongThrowableFunction;
 
@@ -149,7 +149,7 @@ public final class StatisticNumberFormats {
                 try {
                     return parser.apply(source);
                 } catch (ParseException e) {
-                    throw UncheckedExceptions.thrOw(e);
+                    throw UncheckedThrowables.thrOw(e);
                 }
             }
         };

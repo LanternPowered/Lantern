@@ -68,6 +68,7 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.scheduler.LanternScheduler;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
@@ -495,7 +496,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                     return data;
                 } catch (IOException e) {
                     // This shouldn't happen
-                    throw new IllegalStateException(e);
+                    throw UncheckedThrowables.thrOw(e);
                 }
             }
 

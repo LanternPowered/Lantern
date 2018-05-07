@@ -139,7 +139,7 @@ final class FastValueContainerMethodVisitor extends MethodVisitor {
         if (this.store == 1) {
             // The store extends CompositeValueStore, we don't know about about ICompositeValueStore,
             // so we forward this to a helper method
-            super.visitMethodInsn(INVOKESTATIC, "org/lanternpowered/server/data/CompositeValueStoreHelper",
+            super.visitMethodInsn(INVOKESTATIC, "org/lanternpowered/server/data/FastCompositeValueStoreHelper",
                     this.name, this.entry[0], false);
         } else if (this.store == 2) {
             // The store extends ICompositeValueStore, we can use a direct method,

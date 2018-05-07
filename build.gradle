@@ -75,7 +75,7 @@ dependencies {
     compileTinyJson 'com.googlecode.json-simple:json-simple:1.1.1'
 
     // Launch Options
-    compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
+    compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
 
     // Useful libraries
     compile 'org.apache.commons:commons-lang3:3.5'
@@ -88,29 +88,31 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
 
     // Network
-    compile 'io.netty:netty-all:4.1.12.Final'
+    compile 'io.netty:netty-all:4.1.24.Final'
 
     // Logging
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'
-    compile 'org.apache.logging.log4j:log4j-core:2.8.1'
-    compile 'org.apache.logging.log4j:log4j-api:2.8.1'
-    compile 'org.apache.logging.log4j:log4j-iostreams:2.8.1'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-core:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-iostreams:2.11.0'
 
     // Console
-    compile 'net.java.dev.jna:jna:4.4.0'
+    compile 'org.jline:jline-reader:3.7.0'
+    compile 'org.jline:jline-terminal-jna:3.7.0'
+    compile 'net.java.dev.jna:jna:4.5.1'
     compile 'net.minecrell:terminalconsoleappender:1.0.0'
 
     // Fastutil
-    compile 'it.unimi.dsi:fastutil:7.1.0'
+    compile 'it.unimi.dsi:fastutil:8.1.1'
 
     // Database connectors
-    compile 'com.zaxxer:HikariCP:2.6.3'
-    compile 'org.mariadb.jdbc:mariadb-java-client:2.0.2'
-    compile 'org.xerial:sqlite-jdbc:3.19.3'
-    compile 'com.h2database:h2:1.4.196'
+    compile 'com.zaxxer:HikariCP:3.1.0'
+    compile 'org.mariadb.jdbc:mariadb-java-client:2.2.3'
+    compile 'org.xerial:sqlite-jdbc:3.21.0.1'
+    compile 'com.h2database:h2:1.4.197'
 
     // Scripting
-    compile 'org.codehaus.groovy:groovy-all:2.4.11'
+    compile 'org.codehaus.groovy:groovy-all:2.4.15'
 
     // Asm
     compile 'org.ow2.asm:asm-all:5.2'

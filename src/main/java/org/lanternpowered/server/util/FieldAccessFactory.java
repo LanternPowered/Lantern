@@ -139,6 +139,7 @@ public final class FieldAccessFactory {
         // Generate the apply method
         final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "apply",
                 "(Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+        mv.visitAnnotation("Ljava/lang/invoke/LambdaForm$Hidden;", true);
         mv.visitCode();
         final String descriptor = Type.getDescriptor(field.getType());
         final String targetName = Type.getInternalName(field.getDeclaringClass());
@@ -252,6 +253,7 @@ public final class FieldAccessFactory {
         // Generate the apply method
         final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "accept",
                 "(Ljava/lang/Object;Ljava/lang/Object;)V", null, null);
+        mv.visitAnnotation("Ljava/lang/invoke/LambdaForm$Hidden;", true);
         mv.visitCode();
         final String descriptor = Type.getDescriptor(field.getType());
         final String targetName = Type.getInternalName(field.getDeclaringClass());

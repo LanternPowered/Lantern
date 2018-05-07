@@ -33,6 +33,8 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 
+import java.util.function.IntConsumer;
+
 public final class CodecPlayOutUnlockRecipes implements Codec<MessagePlayOutUnlockRecipes> {
 
     @Override
@@ -51,11 +53,12 @@ public final class CodecPlayOutUnlockRecipes implements Codec<MessagePlayOutUnlo
         buf.writeBoolean(message.hasCraftingFilter());
         IntList recipeIds = message.getRecipeIds();
         buf.writeVarInt(recipeIds.size());
-        recipeIds.forEach(buf::writeVarInt);
+        final IntConsumer writeVarInt = buf::writeVarInt;
+        recipeIds.forEach(writeVarInt);
         if (message instanceof MessagePlayOutUnlockRecipes.Init) {
             recipeIds = ((MessagePlayOutUnlockRecipes.Init) message).getRecipeIdsToBeDisplayed();
             buf.writeVarInt(recipeIds.size());
-            recipeIds.forEach(buf::writeVarInt);
+            recipeIds.forEach(writeVarInt);
         }
         return buf;
     }

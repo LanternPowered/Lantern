@@ -131,7 +131,7 @@ public class LanternPaginationService implements PaginationService {
                 .executor(pageExecutor).build();
 
         // Fallback to page arguments
-        ChildCommandElementExecutor childDispatcher = new ChildCommandElementExecutor(pageExecutor);
+        ChildCommandElementExecutor childDispatcher = new ChildCommandElementExecutor(pageExecutor, null, true);
         childDispatcher.register(next, "next", "n");
         childDispatcher.register(prev, "prev", "p", "previous");
         childDispatcher.register(page, "page");
@@ -154,7 +154,7 @@ public class LanternPaginationService implements PaginationService {
         SourcePaginations ret = this.activePaginations.get(source);
         if (ret == null && create) {
             ret = new SourcePaginations();
-            SourcePaginations existing = this.activePaginations.putIfAbsent(source, ret);
+            final SourcePaginations existing = this.activePaginations.putIfAbsent(source, ret);
             if (existing != null) {
                 ret = existing;
             }

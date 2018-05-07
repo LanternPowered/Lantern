@@ -35,7 +35,6 @@ import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
@@ -127,7 +126,7 @@ public abstract class BanEntry implements Ban {
         if (this.commandSource != null && (source = this.commandSource.get()) != null) {
             return Optional.of(source);
         }
-        String plainSource = LanternTexts.toLegacy(this.source);
+        final String plainSource = LanternTexts.toLegacy(this.source);
         if (plainSource.equals(LanternConsoleSource.NAME)) {
             source = Sponge.getServer().getConsole();
         } else {

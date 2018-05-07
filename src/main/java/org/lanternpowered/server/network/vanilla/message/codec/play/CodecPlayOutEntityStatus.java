@@ -31,9 +31,9 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetOpLevel;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 
 public final class CodecPlayOutEntityStatus implements Codec<Message> {
 

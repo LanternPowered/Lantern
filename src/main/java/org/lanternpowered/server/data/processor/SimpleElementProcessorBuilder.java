@@ -26,19 +26,15 @@
 package org.lanternpowered.server.data.processor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
-import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.ValueHelper;
 import org.lanternpowered.server.util.copy.Copyable;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.Optional;
 

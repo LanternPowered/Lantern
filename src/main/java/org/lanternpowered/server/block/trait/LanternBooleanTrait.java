@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.BooleanTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.util.Coerce;
 import org.spongepowered.api.util.OptBool;
 
 import java.util.Optional;

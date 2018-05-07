@@ -27,11 +27,9 @@ package org.lanternpowered.server.data.manipulator.gen.dummy;
 
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableVariantData;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableDyeableData;
 import org.spongepowered.api.data.manipulator.mutable.DyeableData;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.data.value.mutable.Value;
 
 public class LanternImmutableDyeableData extends AbstractImmutableVariantData<DyeColor, ImmutableDyeableData, DyeableData>

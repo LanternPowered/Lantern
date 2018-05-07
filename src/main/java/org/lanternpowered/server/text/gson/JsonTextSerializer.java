@@ -46,7 +46,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 
 public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text>, JsonSerializer<Text> {
 

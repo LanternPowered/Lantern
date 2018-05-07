@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternEntityValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;

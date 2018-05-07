@@ -26,7 +26,6 @@
 package org.lanternpowered.server.script.transformer;
 
 import org.lanternpowered.api.script.Import;
-import org.lanternpowered.api.script.Parameter;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.world.World;
 import org.lanternpowered.server.script.LanternRandom;

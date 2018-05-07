@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.entity.player;
 
-import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.spongepowered.api.data.key.Keys;

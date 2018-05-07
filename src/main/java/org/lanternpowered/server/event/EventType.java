@@ -27,7 +27,6 @@ package org.lanternpowered.server.event;
 
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.GenericEvent;
 
 import java.util.Objects;
 

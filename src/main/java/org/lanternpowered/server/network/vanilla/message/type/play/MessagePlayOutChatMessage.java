@@ -27,7 +27,6 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
-import org.spongepowered.api.text.chat.ChatType;
 
 public final class MessagePlayOutChatMessage implements Message {
 

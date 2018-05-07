@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.command;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -34,8 +36,6 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
-
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 public final class CommandKick extends CommandProvider {
 

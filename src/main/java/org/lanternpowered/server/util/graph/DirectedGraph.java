@@ -25,8 +25,7 @@
  */
 package org.lanternpowered.server.util.graph;
 
-import com.google.common.collect.Lists;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +169,7 @@ public class DirectedGraph<D> {
      */
     public static class DataNode<D> {
 
-        private final List<DataNode<D>> adj = Lists.newArrayList();
+        private final List<DataNode<D>> adj = new ArrayList<>();
         final D data;
 
         public DataNode(D obj) {

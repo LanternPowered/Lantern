@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -101,6 +100,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -155,13 +155,13 @@ public final class LanternServer implements Server {
     private final AtomicInteger runningTimeTicks = new AtomicInteger(0);
 
     // All the players by their name
-    private final Map<String, LanternPlayer> playersByName = Maps.newConcurrentMap();
+    private final Map<String, LanternPlayer> playersByName = new ConcurrentHashMap<>();
 
     // A unmodifiable collection with all the players
     private final Collection<LanternPlayer> unmodifiablePlayers = Collections.unmodifiableCollection(this.playersByName.values());
 
     // All the players by their uniqueId
-    private final Map<UUID, LanternPlayer> playersByUUID = Maps.newConcurrentMap();
+    private final Map<UUID, LanternPlayer> playersByUUID = new ConcurrentHashMap<>();
 
     @Nullable private ResourcePack resourcePack;
     @Nullable private Favicon favicon;

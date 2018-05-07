@@ -45,8 +45,6 @@ import org.spongepowered.api.service.SimpleServiceManager;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.annotation.Nullable;
-
 /**
  * The default implementation of {@link ServiceManager}.
  * <p>

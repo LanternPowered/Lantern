@@ -41,37 +41,36 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements TypeAdapterFactory {
 
     private static final String TYPE = "type";
     private static final String DATA = "data";
 
     private final AbstractObjectTypeRegistryModule registry;
-    protected final TypeToken<V> typeToken;
+    protected final com.google.common.reflect.TypeToken<V> typeToken;
 
     public ObjectTypeAdapterFactory(AbstractObjectTypeRegistryModule<V, O> registry, TypeToken<V> type) {
+        this.typeToken = (com.google.common.reflect.TypeToken<V>) com.google.common.reflect.TypeToken.of(type.getType());
         this.registry = registry;
-        this.typeToken = type;
     }
 
     @Nullable
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-        if (!type.isAssignableFrom(this.typeToken)) {
+        if (!com.google.common.reflect.TypeToken.of(type.getType()).isSupertypeOf(this.typeToken)) {
             return null;
         }
         final TypeAdapter<JsonElement> jsonElementTypeAdapter = gson.getAdapter(JsonElement.class);
         final TypeToken theTypeToken = type;
         return new TypeAdapter<T>() {
 
-            @SuppressWarnings("unchecked")
             @Override
             public void write(JsonWriter out, T value) throws IOException {
                 final JsonElement element = serialize((TypeToken<V>) theTypeToken, (V) value, gson);
                 jsonElementTypeAdapter.write(out, element);
             }
 
-            @SuppressWarnings("unchecked")
             @Override
             public T read(JsonReader in) throws IOException {
                 final JsonElement element = jsonElementTypeAdapter.read(in);
@@ -81,15 +80,13 @@ public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements Typ
     }
 
     protected JsonElement serialize(TypeToken<V> type, V value, Gson gson) throws IOException {
-        //noinspection unchecked
-        final Optional<O> optType = this.registry.getByClass((Class) value.getClass());
+        final Optional<O> optType = this.registry.getByClass(value.getClass());
         if (!optType.isPresent()) {
             throw new IOException("Attempted to serialize a action type that is not registered: "
                     + value.getClass().getName());
         }
         final JsonObject json = new JsonObject();
         json.addProperty(TYPE, optType.get().getId());
-        //noinspection unchecked
         final TypeAdapter<V> delegateTypeAdapter = gson.getDelegateAdapter(this,
                 (TypeToken<V>) TypeToken.get(optType.get().getType()));
         json.add(DATA, delegateTypeAdapter.toJsonTree(value));
@@ -99,12 +96,10 @@ public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements Typ
     protected V deserialize(TypeToken<V> type, JsonElement element, Gson gson) {
         final JsonObject obj = element.getAsJsonObject();
         final String valueTypeId = obj.get(TYPE).getAsString();
-        //noinspection unchecked
         final Optional<O> optType = this.registry.getById(valueTypeId);
         if (!optType.isPresent()) {
             throw new IllegalStateException("Unknown type id: " + valueTypeId);
         }
-        //noinspection unchecked
         final TypeAdapter<V> delegateTypeAdapter = gson.getDelegateAdapter(this,
                 (TypeToken<V>) TypeToken.get(optType.get().getType()));
         try {

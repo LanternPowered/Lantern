@@ -30,10 +30,6 @@ import static org.lanternpowered.server.script.transformer.Transformer.SCRIPT_PR
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import org.lanternpowered.api.script.function.action.Action;
-import org.lanternpowered.api.script.function.condition.AndCondition;
-import org.lanternpowered.api.script.function.condition.Condition;
-import org.lanternpowered.api.script.function.condition.OrCondition;
 import org.lanternpowered.api.script.function.value.IntValueProvider;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
 import org.lanternpowered.server.script.AbstractObjectTypeRegistryModule;

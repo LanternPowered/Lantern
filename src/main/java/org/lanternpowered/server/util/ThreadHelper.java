@@ -25,15 +25,16 @@
  */
 package org.lanternpowered.server.util;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.util.concurrent.FastThreadLocal;
 import io.netty.util.concurrent.FastThreadLocalThread;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nullable;
 
 public final class ThreadHelper {
 

@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.network.message;
 
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.network.message.handler.Handler;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class AsyncHelper {
 
-    private static final Map<Class<?>, Boolean> map = Maps.newConcurrentMap();
+    private static final Map<Class<?>, Boolean> map = new ConcurrentHashMap<>();
 
     /**
      * Gets whether the specified handler will be handled asynchronous.

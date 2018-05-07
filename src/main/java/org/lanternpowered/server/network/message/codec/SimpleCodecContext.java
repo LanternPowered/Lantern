@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.message.codec;
 
 import io.netty.channel.Channel;
-import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 
 public class SimpleCodecContext implements CodecContext {
 

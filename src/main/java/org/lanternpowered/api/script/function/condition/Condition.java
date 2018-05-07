@@ -26,8 +26,8 @@
 package org.lanternpowered.api.script.function.condition;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.Parameter;
+import org.lanternpowered.api.script.ScriptContext;
 
 /**
  * Represents a condition that must return true in order for

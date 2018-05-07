@@ -28,8 +28,6 @@ package org.lanternpowered.server.world.gen;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.spongepowered.api.world.World;
@@ -42,15 +40,17 @@ import org.spongepowered.api.world.gen.WorldGenerator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class LanternWorldGenerator implements WorldGenerator {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...
-    private final List<GenerationPopulator> generationPopulators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
-    private final List<Populator> populators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
+    private final List<GenerationPopulator> generationPopulators = Lists2.nonNullOf(new CopyOnWriteArrayList<>());
+    private final List<Populator> populators = Lists2.nonNullOf(new CopyOnWriteArrayList<>());
 
     // The biome generation settings
-    private final Map<LanternBiomeType, BiomeGenerationSettings> biomeGenSettings = Maps.newConcurrentMap();
+    private final Map<LanternBiomeType, BiomeGenerationSettings> biomeGenSettings = new ConcurrentHashMap<>();
 
     private volatile GenerationPopulator baseGenerationPopulator;
     private volatile BiomeGenerator biomeGenerator;

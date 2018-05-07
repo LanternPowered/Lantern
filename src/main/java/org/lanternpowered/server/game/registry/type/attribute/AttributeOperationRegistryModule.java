@@ -28,8 +28,6 @@ package org.lanternpowered.server.game.registry.type.attribute;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.attribute.LanternOperations;
 import org.spongepowered.api.registry.CatalogRegistryModule;

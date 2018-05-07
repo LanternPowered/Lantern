@@ -64,7 +64,7 @@ public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCat
             if (textColor == TextColors.NONE) {
                 continue;
             }
-            final char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.get(textColor);
+            final char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(textColor);
             final String id = "below_name_" + textColor.getId();
             final String name = "sidebar.team." + textColor.getId();
             register(new LanternDisplaySlot("minecraft", id, name, textColor, 3 + character));

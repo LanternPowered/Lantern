@@ -27,7 +27,6 @@ package org.lanternpowered.server.world.weather;
 
 import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.api.script.function.value.IntValueProvider;
-import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.script.context.EmptyScriptContext;

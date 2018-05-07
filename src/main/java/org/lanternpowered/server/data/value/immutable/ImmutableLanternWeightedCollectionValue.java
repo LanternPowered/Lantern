@@ -31,8 +31,8 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableWeightedCollectionValue;
 import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
-import org.spongepowered.api.util.weighted.WeightedTable;
 import org.spongepowered.api.util.weighted.TableEntry;
+import org.spongepowered.api.util.weighted.WeightedTable;
 
 import java.util.List;
 import java.util.Random;

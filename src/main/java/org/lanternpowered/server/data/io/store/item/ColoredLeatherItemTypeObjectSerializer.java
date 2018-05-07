@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data.io.store.item;
 
-import static org.lanternpowered.server.data.io.store.item.ItemStackStore.DISPLAY;
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
+import static org.lanternpowered.server.data.io.store.item.ItemStackStore.DISPLAY;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.spongepowered.api.data.DataQuery;

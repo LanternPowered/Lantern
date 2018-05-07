@@ -27,9 +27,6 @@ package org.lanternpowered.server.data.persistence;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.data.persistence.DataTypeSerializerCollection;
-import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
-
 public class SimpleDataTypeSerializerContext implements DataTypeSerializerContext {
 
     private final DataTypeSerializerCollection serializers;

@@ -26,7 +26,6 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;

@@ -90,7 +90,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
                 this.inventoryToIndex.put(children.get(i), i);
             }
         }
-        return this.inventoryToIndex.get(inventory);
+        return this.inventoryToIndex.getInt(inventory);
     }
 
     @Override

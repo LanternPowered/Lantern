@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.text.gson;
 
+import static org.lanternpowered.server.text.gson.TextConstants.TEXT;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -39,8 +41,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.lang.reflect.Type;
-
-import static org.lanternpowered.server.text.gson.TextConstants.*;
 
 final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<LiteralText>, JsonDeserializer<LiteralText> {
 

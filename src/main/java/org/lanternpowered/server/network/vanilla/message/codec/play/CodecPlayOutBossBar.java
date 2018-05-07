@@ -30,9 +30,9 @@ import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.boss.LanternBossBarColor;
 import org.lanternpowered.server.boss.LanternBossBarOverlay;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBossBar;
 
 public final class CodecPlayOutBossBar implements Codec<MessagePlayOutBossBar> {

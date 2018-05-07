@@ -26,13 +26,6 @@
 package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.entity.ArmorEquipable;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
-
-import java.lang.ref.WeakReference;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public abstract class AbstractArmorEquipableInventory extends AbstractEquipmentInventory<ArmorEquipable> implements IArmorEquipableInventory {
 

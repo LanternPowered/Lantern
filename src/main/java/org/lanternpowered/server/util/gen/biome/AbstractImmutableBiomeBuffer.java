@@ -28,16 +28,11 @@ package org.lanternpowered.server.util.gen.biome;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewTransform;
-import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
-import org.lanternpowered.server.world.extent.UnmodifiableBiomeVolumeWrapper;
 import org.lanternpowered.server.world.extent.worker.LanternBiomeVolumeWorker;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
-import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeVolume;
 import org.spongepowered.api.world.extent.worker.BiomeVolumeWorker;
-import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 
 public abstract class AbstractImmutableBiomeBuffer extends AbstractBiomeBuffer implements ImmutableBiomeVolume {
 

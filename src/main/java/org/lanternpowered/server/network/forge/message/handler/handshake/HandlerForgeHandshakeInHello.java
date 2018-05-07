@@ -30,11 +30,11 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import io.netty.util.Attribute;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.NetworkSession;
 
 public final class HandlerForgeHandshakeInHello implements Handler<MessageForgeHandshakeInOutHello> {
 

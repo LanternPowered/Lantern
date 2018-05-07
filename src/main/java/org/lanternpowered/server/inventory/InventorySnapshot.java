@@ -37,6 +37,7 @@ import org.spongepowered.api.item.inventory.property.SlotIndex;
 import java.util.Iterator;
 import java.util.Map;
 
+@SuppressWarnings("ConstantConditions")
 public final class InventorySnapshot {
 
     public static final InventorySnapshot EMPTY = new InventorySnapshot(Int2ObjectMaps.emptyMap());
@@ -53,9 +54,8 @@ public final class InventorySnapshot {
         while (it.hasNext()) {
             final Slot slot = it.next();
             slot.peek().map(ItemStack::createSnapshot).ifPresent(itemStackSnapshot -> {
-                //noinspection ConstantConditions
-                final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, null).get();
-                itemStackSnapshots.put(index.getValue(), itemStackSnapshot);
+                final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, "slot_index").get();
+                itemStackSnapshots.put((int) index.getValue(), itemStackSnapshot);
             });
         }
         return new InventorySnapshot(itemStackSnapshots);
@@ -81,9 +81,8 @@ public final class InventorySnapshot {
 
     public void offerTo(Inventory inventory) {
         for (Slot slot : inventory.<Slot>slots()) {
-            //noinspection ConstantConditions
-            final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, null).get();
-            final ItemStackSnapshot itemStackSnapshot = this.itemStackSnapshots.get(index.getValue());
+            final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, "slot_index").get();
+            final ItemStackSnapshot itemStackSnapshot = this.itemStackSnapshots.get((int) index.getValue());
             if (itemStackSnapshot != null) {
                 slot.set(itemStackSnapshot.createStack());
             }

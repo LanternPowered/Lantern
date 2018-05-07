@@ -48,12 +48,13 @@ import org.lanternpowered.server.network.pipeline.MessageProcessorHandler;
 import org.lanternpowered.server.network.pipeline.NoopHandler;
 import org.lanternpowered.server.util.ThreadHelper;
 
-import javax.annotation.Nullable;
 import java.net.SocketAddress;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 @Singleton
 public final class NetworkManager extends ServerBase {

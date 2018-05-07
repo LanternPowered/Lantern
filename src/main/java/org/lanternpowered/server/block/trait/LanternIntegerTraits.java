@@ -26,9 +26,7 @@
 package org.lanternpowered.server.block.trait;
 
 import org.spongepowered.api.block.trait.IntegerTrait;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.util.Direction;
 
 public final class LanternIntegerTraits {
 

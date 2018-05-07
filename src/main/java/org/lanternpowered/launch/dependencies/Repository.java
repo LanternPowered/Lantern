@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.launch.dependencies;
 
-import java.net.URL;
-
 import static java.util.Objects.requireNonNull;
+
+import java.net.URL;
 
 public final class Repository {
 

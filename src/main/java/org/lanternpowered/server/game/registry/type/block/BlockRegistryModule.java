@@ -161,7 +161,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             if (((LanternBlockState) blockState).isExtended()) {
                 continue;
             }
-            byte value = checkNotNull(stateToDataConverter.apply(blockState));
+            byte value = stateToDataConverter.apply(blockState);
             if (usedValues.containsKey(value)) {
                 throw new IllegalStateException("The data value " + value + " for state '" + blockState.getId() +
                         "' is already used by '" + usedValues.get(value).getId() + "'");
@@ -183,7 +183,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 continue;
             }
             blockState = blockType.getExtendedBlockStateProvider().remove(blockState);
-            this.packedTypeByBlockState.put(blockState, checkNotNull(this.packedTypeByBlockState.get(blockState)));
+            this.packedTypeByBlockState.put(blockState, this.packedTypeByBlockState.getShort(blockState));
         }
         final BlockStateRegistryModule blockStateRegistryModule = Lantern.getRegistry()
                 .getRegistryModule(BlockStateRegistryModule.class).get();
@@ -237,7 +237,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     @Override
     public Optional<BlockState> getStateByTypeAndData(BlockType blockType, byte data) {
         return Optional.ofNullable(this.blockStateByPackedType.get(
-                (short) ((this.packedTypeByBlockState.get(blockType.getDefaultState()) & 0xfff0) | (data & 0xf))));
+                (short) ((this.packedTypeByBlockState.getShort(blockType.getDefaultState()) & 0xfff0) | (data & 0xf))));
     }
 
     @Override
@@ -247,7 +247,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     @Override
     public byte getStateData(BlockState blockState) {
-        return (byte) (this.packedTypeByBlockState.get(checkNotNull(blockState, "blockState")) & 0xf);
+        return (byte) (this.packedTypeByBlockState.getShort(checkNotNull(blockState, "blockState")) & 0xf);
     }
 
     @Override
@@ -257,7 +257,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     @Override
     public short getStateInternalIdAndData(BlockState blockState) {
-        return this.packedTypeByBlockState.get(checkNotNull(blockState, "blockState"));
+        return this.packedTypeByBlockState.getShort(checkNotNull(blockState, "blockState"));
     }
 
     @Override

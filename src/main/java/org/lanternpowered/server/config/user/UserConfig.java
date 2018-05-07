@@ -26,7 +26,6 @@
 package org.lanternpowered.server.config.user;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import ninja.leaping.configurate.ConfigurationOptions;
 import org.lanternpowered.server.config.ConfigBase;
 import org.spongepowered.api.profile.GameProfile;
@@ -38,11 +37,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class UserConfig<T extends UserEntry> extends ConfigBase implements UserStorage<T> {
 
-    private final Map<UUID, T> byUUID = Maps.newConcurrentMap();
-    private final Map<String, T> byName = Maps.newConcurrentMap();
+    private final Map<UUID, T> byUUID = new ConcurrentHashMap<>();
+    private final Map<String, T> byName = new ConcurrentHashMap<>();
 
     public UserConfig(Path path, boolean hocon) throws IOException {
         super(path, hocon);
@@ -57,9 +57,9 @@ public abstract class UserConfig<T extends UserEntry> extends ConfigBase impleme
     @Override
     public void save() throws IOException {
         synchronized (this) {
-            this.getBackingList().clear();
+            getBackingList().clear();
             for (T entry : this.byUUID.values()) {
-                this.getBackingList().add(entry);
+                getBackingList().add(entry);
             }
             super.save();
         }
@@ -71,12 +71,10 @@ public abstract class UserConfig<T extends UserEntry> extends ConfigBase impleme
             super.load();
             this.byUUID.clear();
             this.byName.clear();
-            for (T entry : this.getBackingList()) {
+            for (T entry : getBackingList()) {
                 this.byUUID.put(entry.getProfile().getUniqueId(), entry);
                 final Optional<String> optName = entry.getProfile().getName();
-                if (optName.isPresent()) {
-                    this.byName.put(optName.get().toLowerCase(), entry);
-                }
+                optName.ifPresent(s -> this.byName.put(s.toLowerCase(), entry));
             }
         }
     }
@@ -93,7 +91,7 @@ public abstract class UserConfig<T extends UserEntry> extends ConfigBase impleme
 
     @Override
     public Optional<T> getEntryByProfile(GameProfile gameProfile) {
-        return this.getEntryByUUID(gameProfile.getUniqueId());
+        return getEntryByUUID(gameProfile.getUniqueId());
     }
 
     @Override
@@ -101,9 +99,7 @@ public abstract class UserConfig<T extends UserEntry> extends ConfigBase impleme
         final GameProfile gameProfile = entry.getProfile();
         this.byUUID.put(gameProfile.getUniqueId(), entry);
         final Optional<String> optName = entry.getProfile().getName();
-        if (optName.isPresent()) {
-            this.byName.put(optName.get().toLowerCase(), entry);
-        }
+        optName.ifPresent(s -> this.byName.put(s.toLowerCase(), entry));
     }
 
     @Override
@@ -111,9 +107,7 @@ public abstract class UserConfig<T extends UserEntry> extends ConfigBase impleme
         T entry = this.byUUID.remove(uniqueId);
         if (entry != null) {
             final Optional<String> optName = entry.getProfile().getName();
-            if (optName.isPresent()) {
-                this.byName.remove(optName.get().toLowerCase());
-            }
+            optName.ifPresent(s -> this.byName.remove(s.toLowerCase()));
             return true;
         }
         return false;

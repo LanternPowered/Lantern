@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableList;

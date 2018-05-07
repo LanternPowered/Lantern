@@ -44,7 +44,6 @@ import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nullable;
 

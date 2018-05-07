@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule;
 import org.spongepowered.api.event.cause.EventContextKey;
 

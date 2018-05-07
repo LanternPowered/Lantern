@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import static org.lanternpowered.server.text.gson.TextConstants.*;
+import static org.lanternpowered.server.text.gson.TextConstants.SELECTOR;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

@@ -33,7 +33,6 @@ import org.lanternpowered.server.advancement.criteria.AbstractOperatorCriterion;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;

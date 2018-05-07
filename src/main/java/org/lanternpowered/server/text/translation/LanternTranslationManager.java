@@ -41,6 +41,7 @@ import org.spongepowered.api.text.translation.Translation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -112,7 +113,7 @@ public final class LanternTranslationManager implements TranslationManager, Relo
                 final ResourceBundle bundle = new PropertyResourceBundle(inputStream);
                 this.bundles.computeIfAbsent(locale, locale0 -> Sets.newConcurrentHashSet()).add(bundle);
                 if (refresh) {
-                    final Set<ResourceKey> refreshKeys = Sets.newHashSet();
+                    final Set<ResourceKey> refreshKeys = new HashSet<>();
                     for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
                         Locale locale1 = key.locale == null ? Locale.ENGLISH : key.locale;
                         if (locale1.equals(locale) && bundle.containsKey(key.name)) {

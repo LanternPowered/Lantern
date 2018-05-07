@@ -89,7 +89,7 @@ public final class TrackerIdAllocator {
         // acquire a read lock.
         if (stamp == 0L || !this.lock.validate(stamp)) {
             stamp = this.lock.readLock();
-            index = this.uniqueIds.get(uniqueId);
+            index = this.uniqueIds.getInt(uniqueId);
             // Check if the index is valid
             if (index == INVALID_ID) {
                 // Try to convert the read lock to a write lock

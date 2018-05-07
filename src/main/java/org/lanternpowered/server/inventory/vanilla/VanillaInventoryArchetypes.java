@@ -33,7 +33,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
 import org.lanternpowered.server.inventory.AbstractOrderedInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.CarrierBasedTransformer;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
 import org.lanternpowered.server.inventory.filter.ItemFilter;
@@ -57,16 +56,11 @@ import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.property.GuiIds;
-
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 public final class VanillaInventoryArchetypes {
 

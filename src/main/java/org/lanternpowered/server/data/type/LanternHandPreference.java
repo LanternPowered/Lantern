@@ -28,7 +28,6 @@ package org.lanternpowered.server.data.type;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.text.translation.Translation;
 

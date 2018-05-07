@@ -28,11 +28,9 @@ package org.lanternpowered.server.text.title;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
 import java.lang.ref.WeakReference;
@@ -41,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class LanternTitles {
 
@@ -84,7 +83,7 @@ public final class LanternTitles {
     private static class LocaleCacheValue extends CacheValue {
 
         private final WeakReference<Title> title;
-        private final Map<Locale, List<Message>> cache = Maps.newConcurrentMap();
+        private final Map<Locale, List<Message>> cache = new ConcurrentHashMap<>();
 
         LocaleCacheValue(List<Message> baseMessages, Title title) {
             super(baseMessages);
@@ -98,20 +97,14 @@ public final class LanternTitles {
                 if (title == null) {
                     return Collections.emptyList();
                 }
-                final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder();
+                final ImmutableList.Builder<Message> builder = ImmutableList.builder();
                 builder.addAll(this.messages);
-                Optional<Text> text = title.getTitle();
-                if (text.isPresent()) {
-                    builder.add(new MessagePlayOutTitle.SetTitle(new LocalizedText(text.get(), locale)));
-                }
-                text = title.getSubtitle();
-                if (text.isPresent()) {
-                    builder.add(new MessagePlayOutTitle.SetSubtitle(new LocalizedText(text.get(), locale)));
-                }
-                text = title.getActionBar();
-                if (text.isPresent()) {
-                    builder.add(new MessagePlayOutTitle.SetActionbarTitle(new LocalizedText(text.get(), locale)));
-                }
+                title.getTitle().ifPresent(text1 ->
+                        builder.add(new MessagePlayOutTitle.SetTitle(new LocalizedText(text1, locale))));
+                title.getSubtitle().ifPresent(text1 ->
+                        builder.add(new MessagePlayOutTitle.SetSubtitle(new LocalizedText(text1, locale))));
+                title.getActionBar().ifPresent(text1 ->
+                        builder.add(new MessagePlayOutTitle.SetActionbarTitle(new LocalizedText(text1, locale))));
                 return builder.build();
             });
         }

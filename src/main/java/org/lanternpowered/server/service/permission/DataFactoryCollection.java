@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.service.permission;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.command.CommandSource;
@@ -42,8 +44,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 final class DataFactoryCollection extends LanternSubjectCollection {
 

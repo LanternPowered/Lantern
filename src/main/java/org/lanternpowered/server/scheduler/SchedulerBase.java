@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.scheduler;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -36,11 +34,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 abstract class SchedulerBase {
 
     // The simple queue of all pending (and running) ScheduledTasks
-    private final Map<UUID, ScheduledTask> taskMap = Maps.newConcurrentMap();
+    private final Map<UUID, ScheduledTask> taskMap = new ConcurrentHashMap<>();
     private long sequenceNumber = 0L;
     private final String taskNameFmt;
 

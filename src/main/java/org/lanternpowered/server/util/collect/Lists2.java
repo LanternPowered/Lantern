@@ -27,7 +27,6 @@ package org.lanternpowered.server.util.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValueList;
 import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
@@ -35,7 +34,6 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;

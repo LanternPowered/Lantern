@@ -104,8 +104,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         @Override
         public OptionalInt getId(Entity entity) {
             checkNotNull(entity, "entity");
-            final Optional<AbstractEntityProtocol<?>> entityProtocol = entityProtocolManager.getEntityProtocolByEntity(entity);
-            return entityProtocol.isPresent() ? OptionalInt.of(entityProtocol.get().entityId) : OptionalInt.empty();
+            final Optional<AbstractEntityProtocol<?>> optProtocol = entityProtocolManager.getEntityProtocolByEntity(entity);
+            return optProtocol.map(protocol -> OptionalInt.of(protocol.entityId)).orElseGet(OptionalInt::empty);
         }
 
         @Override
@@ -325,7 +325,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
             }
             destroy(ctx);
             synchronized (this.playerInteractTimes) {
-                contextData.removed.forEach(this.playerInteractTimes::remove);
+                contextData.removed.forEach(this.playerInteractTimes::removeLong);
             }
         }
         Set<LanternPlayer> trackers = null;

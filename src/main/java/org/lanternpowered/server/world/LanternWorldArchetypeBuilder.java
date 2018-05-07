@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -52,6 +51,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -191,7 +191,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     @Override
     public LanternWorldArchetypeBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
-        final Set<WorldGeneratorModifier> entries = Sets.newHashSet();
+        final Set<WorldGeneratorModifier> entries = new HashSet<>();
         final GeneratorModifierRegistryModule registry = Lantern.getGame().getRegistry().getWorldGeneratorModifierRegistry();
         for (WorldGeneratorModifier modifier : modifiers) {
             checkNotNull(modifier, "modifier");

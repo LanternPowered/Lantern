@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.game.registry.type.economy;
 
-import org.lanternpowered.server.service.economy.LanternTransactionType;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.service.economy.LanternTransactionType;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
 import org.spongepowered.api.service.economy.transaction.TransactionTypes;
 

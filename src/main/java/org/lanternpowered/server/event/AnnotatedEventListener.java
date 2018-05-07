@@ -28,7 +28,6 @@ package org.lanternpowered.server.event;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 

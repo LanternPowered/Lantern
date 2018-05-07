@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Direction;

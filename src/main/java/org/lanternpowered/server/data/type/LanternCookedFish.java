@@ -32,7 +32,6 @@ import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.item.PropertyProviderCollection;
 import org.spongepowered.api.data.type.CookedFish;
 import org.spongepowered.api.data.type.Fish;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.function.Consumer;
 

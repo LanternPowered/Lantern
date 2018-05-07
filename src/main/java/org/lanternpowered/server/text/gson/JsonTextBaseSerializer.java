@@ -25,7 +25,18 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import static org.lanternpowered.server.text.gson.TextConstants.*;
+import static org.lanternpowered.server.text.gson.TextConstants.BOLD;
+import static org.lanternpowered.server.text.gson.TextConstants.CHILDREN;
+import static org.lanternpowered.server.text.gson.TextConstants.CLICK_EVENT;
+import static org.lanternpowered.server.text.gson.TextConstants.COLOR;
+import static org.lanternpowered.server.text.gson.TextConstants.EVENT_ACTION;
+import static org.lanternpowered.server.text.gson.TextConstants.EVENT_VALUE;
+import static org.lanternpowered.server.text.gson.TextConstants.HOVER_EVENT;
+import static org.lanternpowered.server.text.gson.TextConstants.INSERTION;
+import static org.lanternpowered.server.text.gson.TextConstants.ITALIC;
+import static org.lanternpowered.server.text.gson.TextConstants.OBFUSCATED;
+import static org.lanternpowered.server.text.gson.TextConstants.STRIKETHROUGH;
+import static org.lanternpowered.server.text.gson.TextConstants.UNDERLINE;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;

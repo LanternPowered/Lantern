@@ -26,7 +26,6 @@
 package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
 
 import javax.annotation.Nullable;
 

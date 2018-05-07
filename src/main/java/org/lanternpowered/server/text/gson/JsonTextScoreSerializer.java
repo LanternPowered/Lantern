@@ -25,7 +25,11 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import static org.lanternpowered.server.text.gson.TextConstants.*;
+import static org.lanternpowered.server.text.gson.TextConstants.SCORE_EXTRA_OBJECTIVES;
+import static org.lanternpowered.server.text.gson.TextConstants.SCORE_MAIN_OBJECTIVE;
+import static org.lanternpowered.server.text.gson.TextConstants.SCORE_NAME;
+import static org.lanternpowered.server.text.gson.TextConstants.SCORE_OVERRIDE;
+import static org.lanternpowered.server.text.gson.TextConstants.SCORE_VALUE;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;

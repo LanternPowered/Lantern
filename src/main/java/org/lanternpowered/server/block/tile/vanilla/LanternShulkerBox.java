@@ -31,8 +31,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
@@ -77,12 +75,5 @@ public class LanternShulkerBox extends LanternContainerTile<ChestInventory> {
     protected void playCloseSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
-    }
-
-    @Override
-    public BlockState getBlock() {
-        final BlockState block = getLocation().getBlock();
-        // TODO: Check the colors??
-        return block.getType().getId().contains("shulker_box") ? block : BlockTypes.WHITE_SHULKER_BOX.getDefaultState();
     }
 }

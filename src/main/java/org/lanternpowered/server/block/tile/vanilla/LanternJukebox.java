@@ -36,7 +36,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
@@ -125,12 +124,6 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
         checkState(this.inventory.set(record).getType() == InventoryTransactionResult.Type.SUCCESS,
                 "Invalid record item stack: " + record);
         updateBlockState();
-    }
-
-    @Override
-    public BlockState getBlock() {
-        final BlockState block = getLocation().getBlock();
-        return block.getType() == BlockTypes.JUKEBOX ? block : BlockTypes.JUKEBOX.getDefaultState();
     }
 
     @Override

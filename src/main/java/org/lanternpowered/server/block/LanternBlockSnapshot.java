@@ -28,9 +28,16 @@ package org.lanternpowered.server.block;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternTileEntityArchetype;
 import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.world.WeakWorldReference;
+import org.lanternpowered.server.world.WeakWorldReferencedLocation;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -46,77 +53,63 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unchecked"})
 public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHolder {
 
-    /**
-     * Represents the {@link Location} of a block.
-     */
-    static final class BlockLocation {
-
-        final WeakWorldReference world;
-        final Vector3i position;
-
-        public BlockLocation(Location<World> location) {
-            this(new WeakWorldReference(location.getExtent()), location.getBlockPosition());
-        }
-
-        public BlockLocation(World world, Vector3i position) {
-            this(new WeakWorldReference(world), position);
-        }
-
-        public BlockLocation(UUID worldUUID, Vector3i position) {
-            this(new WeakWorldReference(worldUUID), position);
-        }
-
-        private BlockLocation(WeakWorldReference world, Vector3i position) {
-            this.position = checkNotNull(position, "position");
-            this.world = world;
-        }
-    }
-
-    @Nullable final BlockLocation location;
+    @Nullable final WeakWorldReferencedLocation location;
     private final BlockState state;
     @Nullable private final BlockState extendedState;
-    private final Optional<UUID> notifier;
-    private final Optional<UUID> creator;
-    @Nullable final Map<Key<?>, Object> tileEntityData;
+    @Nullable private final UUID notifier;
+    @Nullable private final UUID creator;
+    @Nullable final LanternTileEntity tileEntity;
 
     public LanternBlockSnapshot(Location<World> location, BlockState blockState, @Nullable BlockState extendedState,
-            Optional<UUID> creator, Optional<UUID> notifier, @Nullable Map<Key<?>, Object> tileEntityData) {
-        this(new BlockLocation(checkNotNull(location, "location")), blockState, extendedState, creator, notifier, tileEntityData);
+            @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
+        this(new WeakWorldReferencedLocation(checkNotNull(location, "location")), blockState, extendedState, creator, notifier, tileEntity);
     }
 
     public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState, @Nullable BlockState extendedState,
-            Optional<UUID> creator, Optional<UUID> notifier, @Nullable Map<Key<?>, Object> tileEntityData) {
-        this(new BlockLocation(worldUUID, position), blockState, extendedState, creator, notifier, tileEntityData);
+            @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
+        this(new WeakWorldReferencedLocation(worldUUID, position), blockState, extendedState, creator, notifier, tileEntity);
     }
 
     public LanternBlockSnapshot(BlockState blockState, @Nullable BlockState extendedState,
-            Optional<UUID> notifier, Optional<UUID> creator, @Nullable Map<Key<?>, Object> tileEntityData) {
-        this((BlockLocation) null, blockState, extendedState, creator, notifier, tileEntityData);
+            @Nullable UUID notifier, @Nullable UUID creator, @Nullable TileEntity tileEntity) {
+        this((WeakWorldReferencedLocation) null, blockState, extendedState, creator, notifier, tileEntity);
     }
 
-    LanternBlockSnapshot(@Nullable BlockLocation location, BlockState blockState, @Nullable BlockState extendedState,
-            Optional<UUID> creator, Optional<UUID> notifier, @Nullable Map<Key<?>, Object> tileEntityData) {
+    public LanternBlockSnapshot(@Nullable WeakWorldReferencedLocation location, BlockState blockState,
+            @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
+        this(location, blockState, null, creator, notifier, tileEntity);
+    }
+
+    LanternBlockSnapshot(@Nullable WeakWorldReferencedLocation location, BlockState blockState, @Nullable BlockState extendedState,
+            @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
         this.extendedState = extendedState;
         this.notifier = checkNotNull(notifier, "notifier");
         this.creator = checkNotNull(creator, "creator");
         this.state = checkNotNull(blockState, "blockState");
-        this.tileEntityData = tileEntityData;
+        this.tileEntity = (LanternTileEntity) tileEntity;
         this.location = location;
     }
 
+    /**
+     * Gets whether this {@link LanternBlockSnapshot}
+     * doesn't have a {@link Location}.
+     *
+     * @return Is positionless
+     */
     public boolean isPositionless() {
         return this.location == null;
     }
@@ -129,16 +122,21 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
     @Override
     public DataContainer toContainer() {
         final DataContainer container = DataContainer.createNew()
-            .set(DataQueries.BLOCK_STATE, this.state);
+                .set(DataQueries.BLOCK_STATE, this.state);
         if (this.location != null) {
-            container.set(Queries.WORLD_ID, this.location.world.getUniqueId());
+            container.set(Queries.WORLD_ID, this.location.getWorld().getUniqueId());
             final DataView positionView = container.createView(DataQueries.SNAPSHOT_WORLD_POSITION);
-            positionView.set(Queries.POSITION_X, this.location.position.getX());
-            positionView.set(Queries.POSITION_Y, this.location.position.getY());
-            positionView.set(Queries.POSITION_Z, this.location.position.getZ());
+            final Vector3i position = this.location.getBlockPosition();
+            positionView.set(Queries.POSITION_X, position.getX());
+            positionView.set(Queries.POSITION_Y, position.getY());
+            positionView.set(Queries.POSITION_Z, position.getZ());
         }
-        this.notifier.ifPresent(notifier -> container.set(Queries.NOTIFIER_ID, notifier));
-        this.creator.ifPresent(creator -> container.set(Queries.CREATOR_ID, creator));
+        if (this.notifier != null) {
+            container.set(Queries.NOTIFIER_ID, this.notifier);
+        }
+        if (this.creator != null) {
+            container.set(Queries.CREATOR_ID, this.creator);
+        }
         return container;
     }
 
@@ -154,133 +152,247 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
 
     @Override
     public LanternBlockSnapshot copy() {
-        return new LanternBlockSnapshot(this.location, this.state, extendedState, this.creator, this.notifier, tileEntityData);
+        return this;
     }
 
     @Override
     public Optional<Location<World>> getLocation() {
-        if (this.location == null) {
-            return Optional.empty();
-        }
-        Optional<World> world = this.location.world.getWorld();
-        if (!world.isPresent()) {
-            return Optional.empty();
-        }
-        return Optional.of(new Location<>(world.get(), this.location.position));
+        return this.location == null ? Optional.empty() : this.location.asLocation();
     }
 
     @Override
     public List<ImmutableDataManipulator<?, ?>> getManipulators() {
-        // TODO Auto-generated method stub
-        return null;
+        return getContainers();
     }
 
     @Override
     public <T extends ImmutableDataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<T> optManipulator = this.state.get(containerClass);
+        if (optManipulator.isPresent() || this.tileEntity == null) {
+            return optManipulator;
+        }
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
+        return optRegistration.flatMap(registration -> this.tileEntity.get(registration.getManipulatorClass()));
     }
 
     @Override
     public <T extends ImmutableDataManipulator<?, ?>> Optional<T> getOrCreate(Class<T> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return get(containerClass);
     }
 
     @Override
     public boolean supports(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        // TODO Auto-generated method stub
-        return false;
+        if (this.state.supports(containerClass)) {
+            return true;
+        } else if (this.tileEntity == null) {
+            return false;
+        }
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
+        return (Boolean) optRegistration.map(registration -> this.tileEntity.supports(registration.getManipulatorClass())).orElse(false);
     }
 
     @Override
     public <E> Optional<BlockSnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<BlockState> optNewState = this.state.transform(key, function);
+        if (optNewState.isPresent()) {
+            return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
+                    this.creator, this.notifier, this.tileEntity));
+        } else if (this.tileEntity == null || !this.tileEntity.supports(key)) {
+            return Optional.empty();
+        }
+        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        if (!newTileEntity.transformFast(key, function)) {
+            return Optional.empty();
+        }
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+                this.creator, this.notifier, newTileEntity));
     }
 
     @Override
     public <E> Optional<BlockSnapshot> with(Key<? extends BaseValue<E>> key, E value) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<BlockState> optNewState = this.state.with(key, value);
+        if (optNewState.isPresent()) {
+            return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
+                    this.creator, this.notifier, this.tileEntity));
+        } else if (this.tileEntity == null || !this.tileEntity.supports(key)) {
+            return Optional.empty();
+        }
+        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        if (!newTileEntity.offerFast(key, value)) {
+            return Optional.empty();
+        }
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+                this.creator, this.notifier, newTileEntity));
     }
 
     @Override
     public Optional<BlockSnapshot> with(BaseValue<?> value) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<BlockState> optNewState = this.state.with(value);
+        if (optNewState.isPresent()) {
+            return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
+                    this.creator, this.notifier, this.tileEntity));
+        } else if (this.tileEntity == null || !this.tileEntity.supports(value.getKey())) {
+            return Optional.empty();
+        }
+        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        if (!newTileEntity.offerFast(value)) {
+            return Optional.empty();
+        }
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+                this.creator, this.notifier, newTileEntity));
     }
 
     @Override
     public Optional<BlockSnapshot> with(ImmutableDataManipulator<?, ?> valueContainer) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<BlockState> optNewState = this.state.with(valueContainer);
+        if (optNewState.isPresent()) {
+            return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
+                    this.creator, this.notifier, this.tileEntity));
+        } else if (this.tileEntity == null) {
+            return Optional.empty();
+        }
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(valueContainer.getClass());
+        if (!optRegistration.isPresent() || !this.tileEntity.supports(optRegistration.get().getManipulatorClass())) {
+            return Optional.empty();
+        }
+        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        if (!newTileEntity.offerFast(valueContainer.asMutable())) {
+            return Optional.empty();
+        }
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+                this.creator, this.notifier, newTileEntity));
     }
 
     @Override
     public Optional<BlockSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<BlockState> optNewState = this.state.with(valueContainers);
+        if (optNewState.isPresent()) {
+            return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
+                    this.creator, this.notifier, this.tileEntity));
+        } else if (this.tileEntity == null) {
+            return Optional.empty();
+        }
+        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        if (!newTileEntity.offerFast(Streams.stream(valueContainers)
+                .map(ImmutableDataManipulator::asMutable)
+                .collect(Collectors.toList()))) {
+            return Optional.empty();
+        }
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+                this.creator, this.notifier, newTileEntity));
     }
 
     @Override
     public Optional<BlockSnapshot> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
+        // Data cannot be removed from the state
+        if (this.tileEntity == null) {
+            return Optional.empty();
+        }
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
+        if (!optRegistration.isPresent() || !this.tileEntity.supports(optRegistration.get().getManipulatorClass())) {
+            return Optional.empty();
+        }
+        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        if (!newTileEntity.removeFast(optRegistration.get().getManipulatorClass())) {
+            return Optional.empty();
+        }
+        return Optional.of(new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+                this.creator, this.notifier, newTileEntity));
     }
 
     @Override
     public BlockSnapshot merge(BlockSnapshot that) {
-        // TODO Auto-generated method stub
-        return null;
+        checkNotNull(that, "that");
+        return merge(that, MergeFunction.IGNORE_ALL);
     }
 
     @Override
     public BlockSnapshot merge(BlockSnapshot that, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
+        checkNotNull(that, "that");
+        checkNotNull(function, "function");
+        final LanternBlockSnapshot that0 = (LanternBlockSnapshot) that;
+        if (that0.tileEntity == null || this.tileEntity == null) {
+            return that0;
+        }
+        final LanternTileEntity newTileEntity = copy(that0.tileEntity);
+        newTileEntity.copyFrom(this.tileEntity, function);
+        return new LanternBlockSnapshot(this.location, this.state, this.extendedState,
+                this.creator, this.notifier, newTileEntity);
     }
 
     @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<E> optResult = this.state.get(key);
+        if (optResult.isPresent() || this.tileEntity == null) {
+            return optResult;
+        }
+        return this.tileEntity.get(key);
     }
 
     @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        // TODO Auto-generated method stub
-        return null;
+        final Optional<V> optResult = this.state.getValue(key);
+        if (optResult.isPresent()) {
+            return optResult;
+        }
+        return this.tileEntity == null ? Optional.empty() : this.tileEntity.getValue(key);
     }
 
     @Override
     public boolean supports(Key<?> key) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.state.supports(key) || (this.tileEntity != null && this.tileEntity.supports(key));
     }
 
     @Override
     public Set<Key<?>> getKeys() {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.tileEntity == null) {
+            return this.state.getKeys();
+        }
+        final ImmutableSet.Builder<Key<?>> keys = ImmutableSet.builder();
+        keys.addAll(this.state.getKeys());
+        keys.addAll(this.tileEntity.getKeys());
+        return keys.build();
     }
 
     @Override
     public Set<ImmutableValue<?>> getValues() {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.tileEntity == null) {
+            return this.state.getValues();
+        }
+        final ImmutableSet.Builder<ImmutableValue<?>> values = ImmutableSet.builder();
+        values.addAll(this.state.getValues());
+        values.addAll(this.tileEntity.getValues());
+        return values.build();
     }
 
     @Override
     public BlockSnapshot withState(BlockState blockState) {
-        // TODO Auto-generated method stub
-        return null;
+        if (blockState.getType() == this.state.getType()) {
+            return new LanternBlockSnapshot(this.location, blockState, this.extendedState,
+                    this.creator, this.notifier, this.tileEntity);
+        }
+        final LanternTileEntity tileEntity = (LanternTileEntity) ((LanternBlockType) blockState.getType()).getTileEntityProvider()
+                .map(provider -> provider.get(blockState, null, null))
+                .orElse(null);
+        if (tileEntity != null) {
+            tileEntity.setBlock(blockState);
+            if (this.tileEntity != null) {
+                tileEntity.copyFrom(this.tileEntity);
+            }
+        }
+        return new LanternBlockSnapshot(this.location, blockState, this.extendedState,
+                this.creator, this.notifier, tileEntity);
     }
 
     @Override
     public List<ImmutableDataManipulator<?, ?>> getContainers() {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.tileEntity == null) {
+            return this.state.getManipulators();
+        }
+        final ImmutableList.Builder<ImmutableDataManipulator<?,?>> manipulators = ImmutableList.builder();
+        manipulators.addAll(this.state.getManipulators());
+        this.tileEntity.getContainers().forEach(manipulator -> manipulators.add(manipulator.asImmutable()));
+        return manipulators.build();
     }
 
     @Override
@@ -288,7 +400,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (this.location == null) {
             throw new IllegalStateException("This BlockSnapshot doesn't have a location.");
         }
-        return this.location.world.getUniqueId();
+        return this.location.getWorld().getUniqueId();
     }
 
     @Override
@@ -296,13 +408,14 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (this.location == null) {
             throw new IllegalStateException("This BlockSnapshot doesn't have a location.");
         }
-        return this.location.position;
+        return this.location.getBlockPosition();
     }
 
     @Override
     public BlockSnapshot withLocation(Location<World> location) {
         checkNotNull(location, "location");
-        return new LanternBlockSnapshot(location, this.state, extendedState, this.creator, this.notifier, tileEntityData);
+        return new LanternBlockSnapshot(location, this.state, this.extendedState,
+                this.creator, this.notifier, this.tileEntity);
     }
 
     @Override
@@ -312,22 +425,21 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
 
     @Override
     public boolean restore(boolean force, BlockChangeFlag flag) {
-        if (this.location == null) {
-            throw new IllegalStateException("This BlockSnapshot doesn't have a location.");
-        }
-        Location<World> loc = this.getLocation().orElse(null);
-        if (loc == null || (!force && loc.getBlockType() != this.state.getType())) {
+        final Location<World> loc = getLocation().orElseThrow(() -> new IllegalStateException("This BlockSnapshot doesn't have a location."));
+        return restoreAt(loc.getExtent(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), force, flag);
+    }
+
+    public boolean restoreAt(Extent extent, int x, int y, int z, boolean force, BlockChangeFlag flag) {
+        if (!force && extent.getBlockType(x, y, z) != this.state.getType()) {
             return false;
         }
-        loc.setBlock(this.state, flag);
-        final World world = loc.getExtent();
-        world.setCreator(this.location.position, this.creator.orElse(null));
-        world.setNotifier(this.location.position, this.notifier.orElse(null));
-        if (this.tileEntityData != null) {
-            final TileEntity tileEntity = loc.getTileEntity().orElse(null);
+        extent.setBlock(x, y, z, this.state, flag);
+        extent.setCreator(x, y, z, this.creator);
+        extent.setNotifier(x, y, z, this.notifier);
+        if (this.tileEntity != null) {
+            final TileEntity tileEntity = extent.getTileEntity(x, y, z).orElse(null);
             if (tileEntity != null) {
-                //noinspection unchecked
-                this.tileEntityData.forEach((key, value) -> tileEntity.offer((Key) key, value));
+                tileEntity.copyFrom(this.tileEntity);
             }
         }
         return true;
@@ -335,16 +447,21 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
 
     @Override
     public Optional<UUID> getCreator() {
-        return this.creator;
+        return Optional.ofNullable(this.creator);
     }
 
     @Override
     public Optional<UUID> getNotifier() {
-        return this.notifier;
+        return Optional.ofNullable(this.notifier);
     }
 
     @Override
     public Optional<TileEntityArchetype> createArchetype() {
-        return null;
+        return this.tileEntity == null ? Optional.empty() : Optional.of(this.tileEntity.createArchetype());
+    }
+
+    @Nullable
+    static LanternTileEntity copy(@Nullable LanternTileEntity tileEntity) {
+        return tileEntity == null ? null : LanternTileEntityArchetype.copy(tileEntity);
     }
 }

@@ -43,6 +43,7 @@ import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.item.FireworkEffect;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
@@ -67,13 +68,13 @@ public final class ParticleTypeRegistryModule extends PluginCatalogRegistryModul
         registerParticle(35, "barrier", false);
         registerParticle(37, "block_crack", true, ImmutableMap.of(
                 ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
-                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(BlockTypes.STONE).createSnapshot()));
+                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
         registerParticle(38, "block_dust", true, ImmutableMap.of(
                 ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
-                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(BlockTypes.STONE).createSnapshot()));
+                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
         registerEffect("break_block", ImmutableMap.of(
                 ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
-                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(BlockTypes.STONE).createSnapshot()));
+                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
         registerParticle(29, "cloud", true);
         registerParticle(9, "critical_hit", true);
         registerParticle(44, "damage_indicator", true);
@@ -87,7 +88,7 @@ public final class ParticleTypeRegistryModule extends PluginCatalogRegistryModul
         registerParticle(0, "explosion", true);
         registerParticle(46, "falling_dust", false, ImmutableMap.of(
                 ParticleOptions.BLOCK_STATE, BlockTypes.STONE.getDefaultState(),
-                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(BlockTypes.STONE).createSnapshot()));
+                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
         registerEffect("fertilizer", ImmutableMap.of(
                 ParticleOptions.QUANTITY, 15));
         registerParticle(3, "fireworks_spark", true);
@@ -105,7 +106,7 @@ public final class ParticleTypeRegistryModule extends PluginCatalogRegistryModul
         registerParticle(14, "instant_spell", true, ImmutableMap.of(
                 ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
         registerParticle(36, "item_crack", true, ImmutableMap.of(
-                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(BlockTypes.STONE).createSnapshot()));
+                ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(ItemTypes.STONE).createSnapshot()));
         registerParticle(1, "large_explosion", false, ImmutableMap.of(
                 ParticleOptions.SCALE, 1.0));
         registerParticle(12, "large_smoke", true);

@@ -71,19 +71,13 @@ public class LanternBlockStateBuilder extends AbstractDataBuilder<BlockState> im
 
     @Override
     public LanternBlockStateBuilder add(ImmutableDataManipulator<?, ?> manipulator) {
-        final Optional<BlockState> optional = this.blockState.with(manipulator);
-        if (optional.isPresent()) {
-            this.blockState = optional.get();
-        }
+        this.blockState.with(manipulator).ifPresent(blockState -> this.blockState = blockState);
         return this;
     }
 
     @Override
     public <V> BlockState.Builder add(Key<? extends BaseValue<V>> key, V value) {
-        final Optional<BlockState> optional = this.blockState.with(key, value);
-        if (optional.isPresent()) {
-            this.blockState = optional.get();
-        }
+        this.blockState.with(key, value).ifPresent(blockState -> this.blockState = blockState);
         return this;
     }
 

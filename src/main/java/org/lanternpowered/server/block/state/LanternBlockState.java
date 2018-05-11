@@ -35,18 +35,21 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.lanternpowered.server.catalog.AbstractCatalogType;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.data.IImmutableDataHolderBase;
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
+import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -77,6 +80,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     // The values for every attached trait
     final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
 
+    // A list with all the values of this state
+    private final ImmutableSet<ImmutableValue<?>> values;
+
     // The lookup to convert between key <--> trait
     private final ImmutableMap<Key<Value<?>>, BlockTrait<?>> keyToBlockTrait;
 
@@ -96,15 +102,22 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     // Whether this state is extended
     boolean extended;
 
+    @SuppressWarnings("RedundantCast")
     LanternBlockState(LanternBlockStateMap baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
         this.traitValues = traitValues;
         this.baseState = baseState;
 
-        ImmutableBiMap.Builder<Key<Value<?>>, BlockTrait<?>> builder = ImmutableBiMap.builder();
-        for (BlockTrait trait : traitValues.keySet()) {
-            builder.put(((LanternBlockTrait) trait).getKey(), trait);
+        final ImmutableBiMap.Builder<Key<Value<?>>, BlockTrait<?>> keyToBlockTraitBuilder = ImmutableBiMap.builder();
+        final ImmutableSet.Builder<ImmutableValue<?>> valuesBuilder = ImmutableSet.builder();
+        for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
+            final LanternBlockTrait trait = (LanternBlockTrait) entry.getKey();
+            final LanternKey key = (LanternKey) trait.getKey();
+            keyToBlockTraitBuilder.put(key, trait);
+            final BaseValue value = (BaseValue) LanternValueFactory.get().createValueForKey(key, entry.getValue());
+            valuesBuilder.add(value instanceof ImmutableValue ? (ImmutableValue) value : ((Value) value).asImmutable());
         }
-        this.keyToBlockTrait = builder.build();
+        this.keyToBlockTrait = keyToBlockTraitBuilder.build();
+        this.values = valuesBuilder.build();
 
         final StringBuilder idBuilder = new StringBuilder();
         idBuilder.append(baseState.getBlockType().getId().substring(baseState.getBlockType().getPluginId().length() + 1));
@@ -134,7 +147,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     @Override
     public DataContainer toContainer() {
         final DataContainer dataContainer = DataContainer.createNew();
-        dataContainer.set(DataQuery.of("BlockType"), this.baseState.getBlockType().getId());
+        dataContainer.set(Queries.BLOCK_TYPE, this.baseState.getBlockType().getId());
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : this.traitValues.entrySet()) {
             final Object value = entry.getValue();
             dataContainer.set(((LanternBlockTrait) entry.getKey()).getKey().getQuery(), value);
@@ -157,9 +170,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         if (!this.supports(key)) {
             return Optional.empty();
         } else {
-            E current = this.get(key).get();
+            final E current = get(key).get();
             final E newVal = checkNotNull(function.apply(current));
-            return this.with(key, newVal);
+            return with(key, newVal);
         }
     }
 
@@ -191,7 +204,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     public Optional<BlockState> with(ImmutableDataManipulator<?, ?> valueContainer) {
         Optional<BlockState> state = null;
         for (ImmutableValue<?> value : valueContainer.getValues()) {
-            state = this.with(value);
+            state = with(value);
             if (!state.isPresent()) {
                 return state;
             }
@@ -283,8 +296,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public ImmutableSet<ImmutableValue<?>> getValues() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.values;
     }
 
     @Override
@@ -296,9 +308,11 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     public BlockSnapshot snapshotFor(Location<World> location) {
         final World world = location.getExtent();
         final Vector3i pos = location.getBlockPosition();
-        // TODO: Tile entity data
+        final LanternTileEntity tileEntity = (LanternTileEntity) getType().getTileEntityProvider()
+                .map(provider -> provider.get(this, location, null))
+                .orElse(null);
         return new LanternBlockSnapshot(location, this, this,
-                world.getCreator(pos), world.getNotifier(pos), ImmutableMap.of());
+                world.getCreator(pos).orElse(null), world.getNotifier(pos).orElse(null), tileEntity);
     }
 
     /**

@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
@@ -48,7 +49,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 
 @SuppressWarnings("unchecked")
 public interface IValueContainer<C extends ValueContainer<C>> extends ValueContainer<C>, IValueHolder {
@@ -72,7 +72,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
      * @return The string
      */
     static String valuesToString(Iterable<? extends BaseValue<?>> values) {
-        return Arrays.toString(StreamSupport.stream(values.spliterator(), false)
+        return Arrays.toString(Streams.stream(values)
                 .map(e -> MoreObjects.toStringHelper("")
                         .add("key", e.getKey().getId())
                         .add("value", e.get())

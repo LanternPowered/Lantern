@@ -77,10 +77,10 @@ import javax.annotation.Nullable;
 public final class LanternWorldProperties implements WorldProperties {
 
     // The unique id of the world
-    final UUID uniqueId;
+    private final UUID uniqueId;
 
     // The world config
-    WorldConfig worldConfig;
+    private WorldConfig worldConfig;
 
     // The rules of the world
     private final Rules rules = new Rules(this);
@@ -91,7 +91,7 @@ public final class LanternWorldProperties implements WorldProperties {
     private final LanternWorldBorder worldBorder = new LanternWorldBorder();
 
     // The serialization behavior
-    SerializationBehavior serializationBehavior = SerializationBehaviors.AUTOMATIC;
+    private SerializationBehavior serializationBehavior = SerializationBehaviors.AUTOMATIC;
 
     // The extra properties
     private DataContainer additionalProperties = DataContainer.createNew();
@@ -534,18 +534,15 @@ public final class LanternWorldProperties implements WorldProperties {
         this.generateBonusChest = generateBonusChest;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Optional<String> getGameRule(String gameRule) {
         final Optional<RuleType<?>> optRuleType = RuleType.get(gameRule);
         if (!optRuleType.isPresent()) {
             return Optional.empty();
         }
-        //noinspection unchecked
         final Optional<Rule> rule = this.rules.getRule((RuleType) optRuleType.get());
-        if (!rule.isPresent()) {
-            return Optional.empty();
-        }
-        return Optional.of(rule.get().getRawValue());
+        return rule.map(Rule::getRawValue);
     }
 
     @Override
@@ -566,7 +563,7 @@ public final class LanternWorldProperties implements WorldProperties {
     @Override
     public boolean removeGameRule(String gameRule) {
         final Optional<RuleType<?>> type = RuleType.get(gameRule);
-        return type.isPresent() && this.rules.removeRule((RuleType) type.get()).isPresent();
+        return type.isPresent() && this.rules.removeRule(type.get()).isPresent();
     }
 
     @Override

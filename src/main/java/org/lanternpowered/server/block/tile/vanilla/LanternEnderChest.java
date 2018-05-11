@@ -26,8 +26,6 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.inventory.LanternContainer;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.EnderChest;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.effect.sound.SoundCategories;
@@ -40,12 +38,6 @@ import java.util.Random;
 public class LanternEnderChest extends LanternContainerTileBase implements EnderChest {
 
     private final Random random = new Random();
-
-    @Override
-    public BlockState getBlock() {
-        final BlockState block = getLocation().getBlock();
-        return block.getType() == BlockTypes.ENDER_CHEST ? block : BlockTypes.ENDER_CHEST.getDefaultState();
-    }
 
     @Override
     public void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback) {

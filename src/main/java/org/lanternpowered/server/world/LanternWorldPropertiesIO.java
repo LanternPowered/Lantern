@@ -228,7 +228,9 @@ final class LanternWorldPropertiesIO {
         final DataView spongeDataView;
         if (spongeRootDataView != null) {
             spongeDataView = spongeRootDataView.getView(DataQueries.SPONGE_DATA).orElse(null);
-            spongeDataView.remove(DataQueries.SPONGE_DATA);
+            if (spongeDataView != null) {
+                spongeDataView.remove(DataQueries.SPONGE_DATA);
+            }
         } else {
             spongeDataView = null;
         }

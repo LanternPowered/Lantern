@@ -29,7 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.world.WeakWorldReferencedLocation;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
@@ -43,7 +44,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +53,7 @@ import javax.annotation.Nullable;
 
 // Using this class directly makes intellij complain,
 // so let's just use a subclass until it's fixed.
+@SuppressWarnings("ConstantConditions")
 public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapshot> implements BlockSnapshot.Builder {
 
     public static BlockSnapshotBuilder create() {
@@ -73,10 +75,26 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
     @Nullable private UUID creator;
     @Nullable private UUID notifier;
 
-    private final Map<Key<?>, Object> tileEntityData = new HashMap<>();
+    @Nullable private LanternTileEntity tileEntity;
+    @Nullable private Map<Key, Object> tileEntityKeyData;
+    @Nullable private Map<Class<?>, DataManipulator<?,?>> tileEntityManipulatorData;
 
     BlockSnapshotBuilder() {
         super(BlockSnapshot.class, 1);
+    }
+
+    private Map<Key, Object> getTileEntityKeyData() {
+        if (this.tileEntityKeyData == null) {
+            this.tileEntityKeyData = new LinkedHashMap<>(); // Insertion order matters
+        }
+        return this.tileEntityKeyData;
+    }
+
+    private Map<Class<?>, DataManipulator<?, ?>> getTileEntityManipulatorData() {
+        if (this.tileEntityManipulatorData == null) {
+            this.tileEntityManipulatorData = new LinkedHashMap<>(); // Insertion order matters
+        }
+        return this.tileEntityManipulatorData;
     }
 
     /**
@@ -100,13 +118,15 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
 
     @Override
     public BlockSnapshotBuilder blockState(BlockState blockState) {
-        this.blockState = checkNotNull(blockState, "blockState");
+        checkNotNull(blockState, "blockState");
+        this.blockState = blockState;
         this.extendedBlockState = null;
         return this;
     }
 
     @Override
     public BlockSnapshotBuilder position(Vector3i position) {
+        checkNotNull(position, "position");
         this.position = position;
         return this;
     }
@@ -123,6 +143,9 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         final BlockState extendedState = ((LanternBlockType) this.blockState.getType())
                 .getExtendedBlockStateProvider().get(this.blockState, location, null);
         this.extendedBlockState = extendedState == this.blockState ? null : extendedState;
+        this.tileEntity = LanternBlockSnapshot.copy((LanternTileEntity) location.getTileEntity().orElse(null));
+        this.tileEntityKeyData.clear();
+        this.tileEntityManipulatorData.clear();
         return this;
     }
 
@@ -144,6 +167,11 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         final Optional<BlockState> blockState = this.blockState.with(manipulator.asImmutable());
         if (blockState.isPresent()) {
             this.blockState = blockState.get();
+        } else {
+            if (this.tileEntityKeyData != null) {
+                manipulator.getKeys().forEach(this.tileEntityKeyData::remove);
+            }
+            getTileEntityManipulatorData().put(manipulator.getClass(), manipulator.copy());
         }
         return this;
     }
@@ -154,6 +182,12 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         final Optional<BlockState> blockState = this.blockState.with(manipulator);
         if (blockState.isPresent()) {
             this.blockState = blockState.get();
+        } else {
+            if (this.tileEntityKeyData != null) {
+                manipulator.getKeys().forEach(this.tileEntityKeyData::remove);
+            }
+            final DataManipulator<?,?> mutableManipulator = manipulator.asMutable();
+            getTileEntityManipulatorData().put(mutableManipulator.getClass(), mutableManipulator);
         }
         return this;
     }
@@ -165,8 +199,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         if (blockState.isPresent()) {
             this.blockState = blockState.get();
         } else {
-            // TODO: Check if the key is supported???
-            this.tileEntityData.put(key, value);
+            getTileEntityKeyData().put(key, value);
         }
         return this;
     }
@@ -179,30 +212,41 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         this.blockState = snapshot.getState();
         final BlockState extendedState = holder.getExtendedState();
         this.extendedBlockState = extendedState == this.blockState ? null : extendedState;
-        final LanternBlockSnapshot.BlockLocation blockLocation = snapshot.location;
-        //noinspection ConstantConditions
-        this.worldUUID = blockLocation == null ? null : blockLocation.world.getUniqueId();
-        //noinspection ConstantConditions
-        this.position = blockLocation == null ? null : blockLocation.position;
-        this.tileEntityData.clear();
-        if (snapshot.tileEntityData != null) {
-            this.tileEntityData.putAll(snapshot.tileEntityData);
-        }
+        final WeakWorldReferencedLocation blockLocation = snapshot.location;
+        this.worldUUID = blockLocation == null ? null : blockLocation.getWorld().getUniqueId();
+        this.position = blockLocation == null ? null : blockLocation.getBlockPosition();
+        this.tileEntityManipulatorData.clear();
+        this.tileEntityKeyData.clear();
+        this.tileEntity = snapshot.tileEntity;
         return this;
     }
 
     @Override
     public BlockSnapshot build() {
         checkState(this.blockState != null, "The block state must be set.");
-        final LanternBlockSnapshot.BlockLocation blockLocation = this.worldUUID == null  || this.position == null ? null :
-                new LanternBlockSnapshot.BlockLocation(this.worldUUID, this.position);
-        return new LanternBlockSnapshot(blockLocation, this.blockState, this.extendedBlockState, Optional.ofNullable(this.creator),
-                Optional.ofNullable(this.notifier), ImmutableMap.copyOf(this.tileEntityData));
+        final WeakWorldReferencedLocation blockLocation = this.worldUUID == null  || this.position == null ? null :
+                new WeakWorldReferencedLocation(this.worldUUID, this.position);
+        final LanternTileEntity tileEntity = (LanternTileEntity) ((LanternBlockType) this.blockState.getType()).getTileEntityProvider()
+                .map(provider -> provider.get(this.blockState, null, null))
+                .orElse(null);
+        if (tileEntity != null) {
+            tileEntity.setBlock(this.blockState);
+            if (this.tileEntity != null) {
+                tileEntity.copyFrom(this.tileEntity);
+            }
+            if (this.tileEntityManipulatorData != null) {
+                this.tileEntityManipulatorData.forEach((key, value) -> tileEntity.offerFast(value));
+            }
+            if (this.tileEntityKeyData != null) {
+                this.tileEntityKeyData.forEach(tileEntity::offerFast);
+            }
+        }
+        return new LanternBlockSnapshot(blockLocation, this.blockState, this.extendedBlockState, this.creator, this.notifier, tileEntity);
     }
 
     @Override
     public Optional<BlockSnapshot> buildContent(DataView container) throws InvalidDataException {
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -213,7 +257,9 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         this.worldUUID = null;
         this.notifier = null;
         this.creator = null;
-        this.tileEntityData.clear();
+        this.tileEntityKeyData = null;
+        this.tileEntityManipulatorData = null;
+        this.tileEntity = null;
         return this;
     }
 }

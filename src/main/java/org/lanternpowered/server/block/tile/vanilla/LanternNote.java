@@ -29,8 +29,6 @@ import org.lanternpowered.server.block.action.vanilla.NoteAction;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Note;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.InstrumentProperty;
@@ -74,11 +72,5 @@ public class LanternNote extends LanternTileEntity implements Note {
         pitch = Math.pow(2.0, (pitch - 12.0) / 12.0);
         location.getExtent().playSound(instrumentType.getSound(), SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 3.0, pitch);
-    }
-
-    @Override
-    public BlockState getBlock() {
-        final BlockState block = getLocation().getBlock();
-        return block.getType() == BlockTypes.NOTEBLOCK ? block : BlockTypes.NOTEBLOCK.getDefaultState();
     }
 }

@@ -27,6 +27,8 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.World;
 
@@ -36,6 +38,9 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+/**
+ * Represents a weak reference to a {@link World}.
+ */
 public final class WeakWorldReference {
 
     @Nullable private WeakReference<World> world;
@@ -88,14 +93,26 @@ public final class WeakWorldReference {
         return Optional.empty();
     }
 
-    /**
-     * Creates a copy of the weak world reference.
-     * 
-     * @return the copy
-     */
-    public WeakWorldReference copy() {
-        final World world = this.world == null ? null : this.world.get();
-        return world != null ? new WeakWorldReference(world) : new WeakWorldReference(this.uniqueId);
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("uniqueId", this.uniqueId)
+                .add("name", getWorld().map(World::getName).orElse(null))
+                .toString();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof WeakWorldReference)) {
+            return false;
+        }
+        final WeakWorldReference other = (WeakWorldReference) obj;
+        return other.uniqueId.equals(this.uniqueId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.uniqueId);
+    }
 }

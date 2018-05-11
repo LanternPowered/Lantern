@@ -202,7 +202,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Override
     public BlockTypeBuilderImpl tileEntityType(Supplier<TileEntityType> tileEntityType) {
         checkNotNull(tileEntityType, "tileEntityType");
-        this.tileEntityProvider = (blockState, location, face) -> ((LanternTileEntityType) tileEntityType.get()).getTileEntityConstructor().get();
+        this.tileEntityProvider = (blockState, location, face) -> ((LanternTileEntityType) tileEntityType.get()).construct();
         return this;
     }
 

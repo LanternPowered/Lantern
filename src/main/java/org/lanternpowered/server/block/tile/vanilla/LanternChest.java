@@ -32,8 +32,6 @@ import org.lanternpowered.server.inventory.AbstractGridInventory;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.carrier.Chest;
 import org.spongepowered.api.data.key.Keys;
@@ -147,11 +145,5 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
     protected void playCloseSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_CHEST_CLOSE, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
-    }
-
-    @Override
-    public BlockState getBlock() {
-        final BlockState block = getLocation().getBlock();
-        return block.getType() == BlockTypes.CHEST || block.getType() == BlockTypes.TRAPPED_CHEST ? block : BlockTypes.CHEST.getDefaultState();
     }
 }

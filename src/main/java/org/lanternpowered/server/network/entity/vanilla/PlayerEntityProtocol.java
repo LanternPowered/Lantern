@@ -55,7 +55,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.entity.Entity;
@@ -175,25 +174,25 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
         final Optional<DyeColor> dyeColor = hat.getDyeColor();
         if (dyeColor.isPresent()) {
-            paneItem = new LanternItemStack(BlockTypes.CARPET);
+            paneItem = new LanternItemStack(ItemTypes.CARPET);
             paneItem.offer(Keys.DYE_COLOR, dyeColor.get());
-            blockItem = new LanternItemStack(BlockTypes.WOOL);
+            blockItem = new LanternItemStack(ItemTypes.WOOL);
             blockItem.offer(Keys.DYE_COLOR, dyeColor.get());
         } else if (hat == TopHats.GOLD) {
-            paneItem = new LanternItemStack(BlockTypes.LIGHT_WEIGHTED_PRESSURE_PLATE);
-            blockItem = new LanternItemStack(BlockTypes.GOLD_BLOCK);
+            paneItem = new LanternItemStack(ItemTypes.LIGHT_WEIGHTED_PRESSURE_PLATE);
+            blockItem = new LanternItemStack(ItemTypes.GOLD_BLOCK);
         } else if (hat == TopHats.IRON) {
-            paneItem = new LanternItemStack(BlockTypes.HEAVY_WEIGHTED_PRESSURE_PLATE);
-            blockItem = new LanternItemStack(BlockTypes.IRON_BLOCK);
+            paneItem = new LanternItemStack(ItemTypes.HEAVY_WEIGHTED_PRESSURE_PLATE);
+            blockItem = new LanternItemStack(ItemTypes.IRON_BLOCK);
         } else if (hat == TopHats.WOOD) {
-            paneItem = new LanternItemStack(BlockTypes.WOODEN_PRESSURE_PLATE);
-            blockItem = new LanternItemStack(BlockTypes.PLANKS);
+            paneItem = new LanternItemStack(ItemTypes.WOODEN_PRESSURE_PLATE);
+            blockItem = new LanternItemStack(ItemTypes.PLANKS);
         } else if (hat == TopHats.STONE) {
-            paneItem = new LanternItemStack(BlockTypes.STONE_PRESSURE_PLATE);
-            blockItem = new LanternItemStack(BlockTypes.STONE);
+            paneItem = new LanternItemStack(ItemTypes.STONE_PRESSURE_PLATE);
+            blockItem = new LanternItemStack(ItemTypes.STONE);
         } else if (hat == TopHats.SNOW) {
-            paneItem = new LanternItemStack(BlockTypes.SNOW_LAYER);
-            blockItem = new LanternItemStack(BlockTypes.SNOW);
+            paneItem = new LanternItemStack(ItemTypes.SNOW_LAYER);
+            blockItem = new LanternItemStack(ItemTypes.SNOW);
         } else {
             throw new IllegalStateException();
         }

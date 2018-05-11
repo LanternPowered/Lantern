@@ -30,6 +30,7 @@ import static org.spongepowered.api.command.CommandMessageFormatting.error;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Streams;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.source.ProxySource;
 import org.spongepowered.api.service.pagination.PaginationList;
@@ -40,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.annotation.Nullable;
 
@@ -107,7 +107,7 @@ final class LanternPaginationList implements PaginationList {
             realSource = ((ProxySource) realSource).getOriginalSource();
         }
         final PaginationCalculator calculator = new PaginationCalculator(this.linesPerPage);
-        Iterable<Map.Entry<Text, Integer>> counts = StreamSupport.stream(this.contents.spliterator(), false).map(input -> {
+        Iterable<Map.Entry<Text, Integer>> counts = Streams.stream(this.contents).map(input -> {
             int lines = calculator.getLines(input);
             return Maps.immutableEntry(input, lines);
         }).collect(Collectors.toList());

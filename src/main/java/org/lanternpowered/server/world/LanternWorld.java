@@ -975,7 +975,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     @Override
     public UUID getUniqueId() {
-        return this.properties.uniqueId;
+        return this.properties.getUniqueId();
     }
 
     @Override
@@ -1294,7 +1294,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     public boolean spawnEntity(Entity entity) {
         checkNotNull(entity, "entity");
         checkArgument(!entity.isRemoved(), "The entity may not be removed.");
-        checkArgument(entity.getWorld() == this, "The entity is not be located in this world.");
+        checkArgument(entity.getWorld() == this, "The entity is not located in this world.");
         final CauseStack causeStack = CauseStack.current();
         final SpawnEntityEvent.Custom event = SpongeEventFactory.createSpawnEntityEventCustom(
                 causeStack.getCurrentCause(), Lists.newArrayList(entity));
@@ -1307,7 +1307,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         for (Entity entity : entities) {
             checkNotNull(entity, "entity");
             checkArgument(!entity.isRemoved(), "The entity may not be removed.");
-            checkArgument(entity.getWorld() == this, "The entity is not be located in this world.");
+            checkArgument(entity.getWorld() == this, "The entity is not located in this world.");
         }
         final CauseStack causeStack = CauseStack.current();
         final SpawnEntityEvent.Custom event = SpongeEventFactory.createSpawnEntityEventCustom(

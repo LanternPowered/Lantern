@@ -540,11 +540,11 @@ public final class LanternWorldManager {
     private LanternWorldProperties createWorld(WorldArchetype worldArchetype, String folderName, int dimensionId) throws IOException {
         final LanternWorldArchetype settings0 = (LanternWorldArchetype) checkNotNull(worldArchetype, "worldArchetype");
         final String worldName = worldArchetype.getName();
-        WorldLookupEntry entry = this.worldByName.get(worldName);
+        final WorldLookupEntry entry = this.worldByName.get(worldName);
         if (entry != null) {
             return entry.properties;
         }
-        WorldConfigResult worldConfigResult;
+        final WorldConfigResult worldConfigResult;
         // Create a config
         try {
             worldConfigResult = getOrCreateWorldConfig(worldName);

@@ -29,64 +29,41 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.util.UncheckedThrowables;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 
-import java.lang.reflect.Field;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
+@SuppressWarnings("unchecked")
 public final class LanternTileEntityType extends PluginCatalogType.Base implements TileEntityType {
-
-    private static final Field BYPASS_FIELD;
-
-    static {
-        try {
-            BYPASS_FIELD = LanternTileEntity.class.getDeclaredField("bypassEntityTypeLookup");
-            BYPASS_FIELD.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw UncheckedThrowables.thrOw(e);
-        }
-    }
 
     public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String name,
             Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
-        //noinspection unchecked
         return new LanternTileEntityType(pluginId, name, tileEntityClass, (Supplier) tileEntitySupplier);
     }
 
     public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String id, String name,
             Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
-        //noinspection unchecked
         return new LanternTileEntityType(pluginId, id, name, tileEntityClass, (Supplier) tileEntitySupplier);
     }
 
     public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String name,
             Supplier<T> tileEntitySupplier) {
-        //noinspection unchecked
-        return new LanternTileEntityType(pluginId, name, getClass(tileEntitySupplier), (Supplier) tileEntitySupplier);
+        return new LanternTileEntityType(pluginId, name, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
     }
 
     public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String id, String name,
             Supplier<T> tileEntitySupplier) {
-        //noinspection unchecked
-        return new LanternTileEntityType(pluginId, id, name, getClass(tileEntitySupplier), (Supplier) tileEntitySupplier);
-    }
-
-    private static Class<? extends TileEntity> getClass(Supplier<? extends TileEntity> tileEntitySupplier) {
-        try {
-            BYPASS_FIELD.set(null, true);
-            final Class<? extends TileEntity> tileEntityClass = tileEntitySupplier.get().getClass();
-            BYPASS_FIELD.set(null, false);
-            //noinspection unchecked
-            return tileEntityClass;
-        } catch (IllegalAccessException e) {
-            throw UncheckedThrowables.thrOw(e);
-        }
+        return new LanternTileEntityType(pluginId, id, name, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
     }
 
     private final Class<? extends TileEntity> tileEntityClass;
     private final Supplier<TileEntity> tileEntityConstructor;
+
+    @Nullable BlockState defaultBlock;
 
     private LanternTileEntityType(String pluginId, String name, Class<? extends TileEntity> tileEntityClass,
             Supplier<TileEntity> tileEntityConstructor) {
@@ -109,10 +86,42 @@ public final class LanternTileEntityType extends PluginCatalogType.Base implemen
 
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("tileEntityClass", this.tileEntityClass);
+        return super.toStringHelper()
+                .omitNullValues()
+                .add("tileEntityClass", this.tileEntityClass)
+                .add("defaultBlock", this.defaultBlock);
     }
 
-    public Supplier<TileEntity> getTileEntityConstructor() {
-        return this.tileEntityConstructor;
+    /**
+     * Sets the default {@link BlockState} that should
+     * be used for this {@link TileEntityType}.
+     *
+     * @param defaultBlock The default block state
+     */
+    public void setDefaultBlock(BlockState defaultBlock) {
+        checkNotNull(defaultBlock, "defaultBlock");
+        this.defaultBlock = defaultBlock;
     }
+
+    /**
+     * Gets the default {@link BlockState} that should
+     * be used for this {@link TileEntityType}.
+     *
+     * @return The default block state
+     */
+    public BlockState getDefaultBlock() {
+        return checkNotNull(this.defaultBlock, "The default block isn't available.");
+    }
+
+    /**
+     * Constructs a new {@link TileEntity} for this tile entity type.
+     *
+     * @return The constructed tile entity
+     */
+    public LanternTileEntity construct() {
+        final LanternTileEntity tileEntity = (LanternTileEntity) this.tileEntityConstructor.get();
+        tileEntity.setTileEntityType(this);
+        return tileEntity;
+    }
+
 }

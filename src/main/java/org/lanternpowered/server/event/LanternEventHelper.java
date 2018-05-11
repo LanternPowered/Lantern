@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.event;
 
+import com.google.common.collect.Streams;
 import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.world.EntitySpawningEntry;
 import org.lanternpowered.server.world.LanternWorld;
@@ -40,7 +41,6 @@ import org.spongepowered.api.world.World;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public final class LanternEventHelper {
 
@@ -53,7 +53,7 @@ public final class LanternEventHelper {
     }
 
     private static List<EntitySpawningEntry> toSpawningEntries(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
-        return StreamSupport.stream(entries.spliterator(), false)
+        return Streams.stream(entries)
                 .map(tuple -> new EntitySpawningEntry(EntityTypes.ITEM, tuple.getSecond(), entity -> {
                     entity.offer(Keys.REPRESENTED_ITEM, tuple.getFirst());
                     entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);

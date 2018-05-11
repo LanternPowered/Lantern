@@ -36,7 +36,6 @@ import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.item.LanternItemType;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
@@ -50,15 +49,21 @@ import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "SimplifiableConditionalExpression"})
 public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdditionalDataHolder {
 
-    public static ItemStack orEmpty(@Nullable ItemStack itemStack) {
-        return itemStack == null ? ItemStack.empty() : itemStack;
+    /**
+     * Gets a empty {@link ItemStack} if the specified {@link ItemStack}
+     * is {@code null}. Otherwise returns the item stack itself.
+     *
+     * @param itemStack The item stack
+     * @return A empty or the provided item stack
+     */
+    public static LanternItemStack orEmpty(@Nullable ItemStack itemStack) {
+        return itemStack == null ? new LanternItemStack(ItemTypes.NONE, 0) : (LanternItemStack) itemStack;
     }
 
     private final ValueCollection valueCollection;
@@ -66,29 +71,6 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     private final ItemType itemType;
 
     private int quantity;
-
-    /**
-     * Constructs a new {@link LanternItemStack} for the specified {@link BlockType},
-     * a {@link IllegalArgumentException} will be thrown if {@link BlockType#getItem()}
-     * returns an empty {@link Optional}.
-     *
-     * @param blockType The block type
-     */
-    public LanternItemStack(BlockType blockType) {
-        this(blockType, 1);
-    }
-
-    /**
-     * Constructs a new {@link LanternItemStack} for the specified {@link BlockType},
-     * a {@link IllegalArgumentException} will be thrown if {@link BlockType#getItem()}
-     * returns an empty {@link Optional}.
-     *
-     * @param blockType The block type
-     * @param quantity The quantity
-     */
-    public LanternItemStack(BlockType blockType, int quantity) {
-        this(blockType.getItem().orElseThrow(() -> new IllegalArgumentException("That BlockType doesn't have a ItemType.")), quantity);
-    }
 
     /**
      * Constructs a new {@link LanternItemStack} for the specified {@link ItemType}.
@@ -247,25 +229,21 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     }
 
     public static boolean areSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
-        //noinspection SimplifiableConditionalExpression
         return itemStackA == itemStackB ? true : itemStackA == null || itemStackB == null ? false :
                 ((LanternItemStack) itemStackA).similarTo(itemStackB);
     }
 
     public static boolean areSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStackSnapshot itemStackB) {
-        //noinspection SimplifiableConditionalExpression
         return itemStackA == ((LanternItemStackSnapshot) itemStackB).itemStack ? true : itemStackA == null || itemStackB == null ? false :
                 ((LanternItemStack) itemStackA).similarTo(itemStackB);
     }
 
     public static boolean areSimilar(@Nullable ItemStackSnapshot itemStackA, @Nullable ItemStack itemStackB) {
-        //noinspection SimplifiableConditionalExpression
         return itemStackB == ((LanternItemStackSnapshot) itemStackA).itemStack ? true : itemStackA == null || itemStackB == null ? false :
                 ((LanternItemStack) itemStackB).similarTo(itemStackA);
     }
 
     public static boolean areSimilar(@Nullable ItemStackSnapshot itemStackA, @Nullable ItemStackSnapshot itemStackB) {
-        //noinspection SimplifiableConditionalExpression
         return ((LanternItemStackSnapshot) itemStackA).itemStack == ((LanternItemStackSnapshot) itemStackA).itemStack ? true :
                 itemStackA == null || itemStackB == null ? false : ((LanternItemStackSnapshot) itemStackB).itemStack.similarTo(itemStackA);
     }

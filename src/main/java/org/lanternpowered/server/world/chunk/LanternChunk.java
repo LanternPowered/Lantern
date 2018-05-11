@@ -35,7 +35,6 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -54,6 +53,7 @@ import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternTileEntityArchetype;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -947,9 +947,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 final LanternTileEntity newTileEntity = (LanternTileEntity) tileEntityProvider.get().get(block, location, null);
                 section.tileEntities.put((short) index, newTileEntity);
                 newTileEntity.setLocation(location);
+                newTileEntity.setBlock(block);
                 newTileEntity.setValid(true);
             } else if (remove) {
                 section.tileEntities.remove((short) index);
+            } else if (tileEntity != null) {
+                tileEntity.setBlock(block);
             }
             section.types[index] = type1;
             return section;
@@ -1034,14 +1037,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public BlockSnapshot createSnapshot(int x, int y, int z) {
         final BlockState state = getBlock(x, y, z);
         final Location<World> loc = new Location<>(this.world, x, y, z);
-        // TODO: Tile entity data
+        final LanternTileEntity tileEntity = getTileEntity(x, y, z)
+                .map(tile -> LanternTileEntityArchetype.copy((LanternTileEntity) tile))
+                .orElse(null);
         return new LanternBlockSnapshot(loc, state, ((LanternBlockType) state.getType()).getExtendedBlockStateProvider().get(state, loc, null),
-                getCreator(x, y, z), getNotifier(x, y, z), ImmutableMap.of());
+                getCreator(x, y, z).orElse(null), getNotifier(x, y, z).orElse(null), tileEntity);
     }
 
     @Override
     public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
-        return false;
+        return ((LanternBlockSnapshot) snapshot).restoreAt(this, x, y, z, force, flag);
     }
 
     @Override
@@ -1508,9 +1513,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         checkNotNull(position, "position");
         checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
         final Optional<Entity> optEntity = createEntity(entityContainer);
-        if (optEntity.isPresent()) {
-            ((LanternEntity) optEntity.get()).setPosition(position);
-        }
+        optEntity.ifPresent(entity -> ((LanternEntity) entity).setPosition(position));
         return optEntity;
     }
 

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.block.tile;
 
+import static java.util.Objects.requireNonNull;
+
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
@@ -32,36 +34,34 @@ import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
+
+@SuppressWarnings("ConstantConditions")
 public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHolder, AbstractPropertyHolder {
 
-    private static boolean bypassEntityTypeLookup;
-
-    private final TileEntityType tileEntityType;
+    private LanternTileEntityType tileEntityType;
     private final ValueCollection valueCollection = ValueCollection.create();
     private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers = AdditionalContainerCollection.createConcurrent();
-    private volatile Location<World> location;
+
+    @Nullable private volatile Location<World> location;
+    @Nullable volatile BlockState blockState;
     private volatile boolean valid;
 
     protected LanternTileEntity() {
-        if (!bypassEntityTypeLookup) {
-            this.tileEntityType = TileEntityTypeRegistryModule.get().getByClass(this.getClass()).orElseThrow(
-                    () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
-        } else {
-            //noinspection ConstantConditions
-            this.tileEntityType = null;
-        }
         registerKeys();
     }
 
@@ -105,18 +105,37 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     }
 
     @Override
-    public TileEntityType getType() {
+    public LanternTileEntityType getType() {
+        if (this.tileEntityType == null) {
+            // Load the tile entity type, if not provided earlier
+            this.tileEntityType = (LanternTileEntityType) TileEntityTypeRegistryModule.get().getByClass(getClass()).orElseThrow(
+                    () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
+        }
         return this.tileEntityType;
+    }
+
+    /**
+     * Sets the {@link TileEntityType}.
+     *
+     * @param tileEntityType The tile entity type
+     */
+    void setTileEntityType(LanternTileEntityType tileEntityType) {
+        this.tileEntityType = tileEntityType;
     }
 
     @Override
     public TileEntityArchetype createArchetype() {
-        return null;
+        return new LanternTileEntityArchetype(LanternTileEntityArchetype.copy(this));
     }
 
     @Override
     public Location<World> getLocation() {
-        return this.location;
+        return requireNonNull(this.location, "The location isn't available.");
+    }
+
+    @Override
+    public BlockState getBlock() {
+        return requireNonNull(this.blockState, "The block state isn't available.");
     }
 
     @Override
@@ -127,6 +146,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     @Override
     public DataContainer toContainer() {
         final DataContainer dataContainer = DataContainer.createNew()
+                .set(Queries.CONTENT_VERSION, getContentVersion())
                 .set(DataQueries.TILE_ENTITY_TYPE, getType())
                 .set(DataQueries.POSITION, getLocation().getBlockPosition());
         DataHelper.serializeRawData(dataContainer, this);
@@ -138,6 +158,11 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
         return this;
     }
 
+    @Override
+    public LocatableBlock getLocatableBlock() {
+        return LocatableBlock.builder().location(getLocation()).build();
+    }
+
     /**
      * Sets the {@link Location} of this tile entity.
      *
@@ -147,8 +172,17 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
         this.location = location;
     }
 
-    @Override
-    public LocatableBlock getLocatableBlock() {
-        return null;
+    /**
+     * Sets the {@link BlockState} of this tile entity.
+     *
+     * @param blockState The block state
+     */
+    public void setBlock(BlockState blockState) {
+        this.blockState = blockState;
+        final LanternTileEntityType type = getType();
+        if (type.defaultBlock == null) {
+            // Should be fine, in 1.13 ...
+            type.defaultBlock = blockState.getType().getDefaultState();
+        }
     }
 }

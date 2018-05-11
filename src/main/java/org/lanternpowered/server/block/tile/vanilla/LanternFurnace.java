@@ -84,13 +84,6 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
     }
 
     @Override
-    public BlockState getBlock() {
-        final BlockState block = getLocation().getBlock();
-        return block.getType() == BlockTypes.FURNACE || block.getType() == BlockTypes.LIT_FURNACE ? block :
-                BlockTypes.FURNACE.getDefaultState();
-    }
-
-    @Override
     public boolean shouldRefresh(BlockState oldBlockState, BlockState newBlockState) {
         final BlockType n = oldBlockState.getType();
         final BlockType o = newBlockState.getType();

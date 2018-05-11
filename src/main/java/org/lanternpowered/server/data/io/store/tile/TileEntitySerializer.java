@@ -55,7 +55,7 @@ public class TileEntitySerializer implements ObjectSerializer<LanternTileEntity>
         final ObjectStore<LanternTileEntity> store = (ObjectStore)
                 ObjectStoreRegistry.get().get(tileEntityType.getTileEntityType()).get();
         //noinspection unchecked
-        final LanternTileEntity entity = (LanternTileEntity) tileEntityType.getTileEntityConstructor().get();
+        final LanternTileEntity entity = tileEntityType.construct();
         store.deserialize(entity, dataView);
         return entity;
     }

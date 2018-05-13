@@ -100,7 +100,7 @@ public class LanternTileEntityArchetype implements TileEntityArchetype, Abstract
     public Optional<TileEntity> apply(Location<World> location) {
         checkNotNull(location, "location");
         final LanternTileEntity copy = getTileEntityType().construct();
-        copy.copyFrom(this.tileEntity);
+        copy.copyFromFastNoEvents(this.tileEntity);
         copy.setLocation(location);
         return Optional.of(copy);
     }
@@ -120,7 +120,7 @@ public class LanternTileEntityArchetype implements TileEntityArchetype, Abstract
 
     public static LanternTileEntity copy(LanternTileEntity tileEntity) {
         final LanternTileEntity copy = tileEntity.getType().construct();
-        copy.copyFrom(tileEntity);
+        copy.copyFromFastNoEvents(tileEntity);
         copy.setBlock(tileEntity.getBlock());
         return copy;
     }

@@ -236,13 +236,13 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         if (tileEntity != null) {
             tileEntity.setBlock(this.blockState);
             if (this.tileEntity != null) {
-                tileEntity.copyFrom(this.tileEntity);
+                tileEntity.copyFromFastNoEvents(this.tileEntity);
             }
             if (this.tileEntityManipulatorData != null) {
-                this.tileEntityManipulatorData.forEach((key, value) -> tileEntity.offerFast(value));
+                this.tileEntityManipulatorData.forEach((key, value) -> tileEntity.offerNoEvents(value));
             }
             if (this.tileEntityKeyData != null) {
-                this.tileEntityKeyData.forEach(tileEntity::offerFast);
+                this.tileEntityKeyData.forEach(tileEntity::offerFastNoEvents);
             }
         }
         return new LanternBlockSnapshot(blockLocation, this.blockState, this.extendedBlockState, this.creator, this.notifier, tileEntity);

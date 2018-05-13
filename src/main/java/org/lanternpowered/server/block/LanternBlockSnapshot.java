@@ -377,7 +377,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         if (tileEntity != null) {
             tileEntity.setBlock(blockState);
             if (this.tileEntity != null) {
-                tileEntity.copyFrom(this.tileEntity);
+                tileEntity.copyFromFastNoEvents(this.tileEntity);
             }
         }
         return new LanternBlockSnapshot(this.location, blockState, this.extendedState,
@@ -437,9 +437,9 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
         extent.setCreator(x, y, z, this.creator);
         extent.setNotifier(x, y, z, this.notifier);
         if (this.tileEntity != null) {
-            final TileEntity tileEntity = extent.getTileEntity(x, y, z).orElse(null);
+            final LanternTileEntity tileEntity = (LanternTileEntity) extent.getTileEntity(x, y, z).orElse(null);
             if (tileEntity != null) {
-                tileEntity.copyFrom(this.tileEntity);
+                tileEntity.copyFromFastNoEvents(this.tileEntity);
             }
         }
         return true;

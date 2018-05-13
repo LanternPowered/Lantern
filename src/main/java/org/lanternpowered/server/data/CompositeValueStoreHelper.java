@@ -244,9 +244,21 @@ public final class CompositeValueStoreHelper {
 
     protected static <S extends CompositeValueStore<S, ?>> DataTransactionResult copyFrom(
             ICompositeValueStore<S, ?> store, S that, MergeFunction function) {
+        final boolean hasListeners = hasListeners(store, Collections.emptyList());
         // Assume that there are listeners for this kind of data transfer
         // TODO: Improve this?
-        return processDataTransactionResult(store, store.copyFromNoEvents(that, function), () -> true);
+        return processDataTransactionResult(store, store.copyFromNoEvents(that, function), () -> hasListeners);
+    }
+
+    protected static <S extends CompositeValueStore<S, ?>> boolean copyFromFast(
+            ICompositeValueStore<S, ?> store, S that, MergeFunction function) {
+        final boolean hasListeners = hasListeners(store, Collections.emptyList());
+        // Assume that there are listeners for this kind of data transfer
+        // TODO: Improve this?
+        if (hasListeners) {
+            return processDataTransactionResult(store, store.copyFromNoEvents(that, function), () -> true).isSuccessful();
+        }
+        return store.copyFromFastNoEvents(that, function);
     }
 
     private CompositeValueStoreHelper() {

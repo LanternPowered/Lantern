@@ -502,6 +502,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
         return CompositeValueStoreHelper.offerFast(this, valueContainer, function);
     }
 
+    default boolean offerFastNoEvents(H valueContainer) {
+        return offerFastNoEvents(valueContainer, MergeFunction.IGNORE_ALL);
+    }
+
     default boolean offerFastNoEvents(H valueContainer, MergeFunction function) {
         if (valueContainer instanceof IDataManipulatorBase) {
             // Offer all the default key values as long if they are supported
@@ -696,48 +700,82 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
     default DataTransactionResult copyFromNoEvents(S that, MergeFunction function) {
         final DataTransactionResult.Builder builder = DataTransactionResult.builder();
         boolean success = false;
-        boolean merge = true;
-        if (function == MergeFunction.IGNORE_ALL) {
+        if (function == MergeFunction.IGNORE_ALL && that instanceof IValueContainer) {
             // Lets boost performance a bit by avoiding
             // constructing unnecessary containers
-            if (that instanceof IValueContainer) {
-                for (Key key : ((IValueContainer) that).getValueCollection().getKeys()) {
-                    final Optional optElement = that.get(key);
-                    if (optElement.isPresent()) {
-                        final DataTransactionResult result = offerNoEvents(key, optElement.get());
-                        builder.absorbResult(result);
-                        if (result.isSuccessful()) {
-                            success = true;
-                        }
+            for (Key key : ((IValueContainer) that).getValueCollection().getKeys()) {
+                final Optional optElement = that.get(key);
+                if (optElement.isPresent()) {
+                    final DataTransactionResult result = offerNoEvents(key, optElement.get());
+                    builder.absorbResult(result);
+                    if (result.isSuccessful()) {
+                        success = true;
                     }
                 }
-                if (that instanceof AdditionalContainerHolder) {
-                    final AdditionalContainerCollection<H> collection = ((AdditionalContainerHolder) that).getAdditionalContainers();
-                    for (H container : collection.getAll()) {
-                        final DataTransactionResult result = offerNoEvents(container);
-                        builder.absorbResult(result);
-                        if (result.isSuccessful()) {
-                            success = true;
-                        }
-                    }
-                }
-                return builder.result(success ? DataTransactionResult.Type.SUCCESS : DataTransactionResult.Type.FAILURE).build();
             }
-            // Ignore all just overrides the original containers, so
-            // no need to copy the current one for the merge function
-            merge = false;
+            if (that instanceof AdditionalContainerHolder) {
+                final AdditionalContainerCollection<H> collection = ((AdditionalContainerHolder) that).getAdditionalContainers();
+                for (H container : collection.getAll()) {
+                    final DataTransactionResult result = offerNoEvents(container);
+                    builder.absorbResult(result);
+                    if (result.isSuccessful()) {
+                        success = true;
+                    }
+                }
+            }
+            return builder.result(success ? DataTransactionResult.Type.SUCCESS : DataTransactionResult.Type.FAILURE).build();
         }
         final Collection<H> containers = that.getContainers();
         for (H thatContainer : containers) {
-            final H thisContainer = merge ? get((Class<H>) thatContainer.getClass()).orElse(null) : null;
-            final H merged = function.merge(thisContainer, thatContainer);
-            final DataTransactionResult result = offerNoEvents(merged);
+            final DataTransactionResult result = offerNoEvents(thatContainer, function);
             builder.absorbResult(result);
-            if (!result.getSuccessfulData().isEmpty()) {
+            if (result.isSuccessful()) {
                 success = true;
             }
         }
         return builder.result(success ? DataTransactionResult.Type.SUCCESS : DataTransactionResult.Type.FAILURE).build();
+    }
+
+    default boolean copyFromFast(S that) {
+        return copyFromFast(that, MergeFunction.IGNORE_ALL);
+    }
+
+    default boolean copyFromFast(S that, MergeFunction function) {
+        return CompositeValueStoreHelper.copyFromFast(this, that, function);
+    }
+
+    default boolean copyFromFastNoEvents(S that) {
+        return copyFromFastNoEvents(that, MergeFunction.IGNORE_ALL);
+    }
+
+    default boolean copyFromFastNoEvents(S that, MergeFunction function) {
+        boolean success = false;
+        if (function == MergeFunction.IGNORE_ALL && that instanceof IValueContainer) {
+            // Lets boost performance a bit by avoiding
+            // constructing unnecessary containers
+            for (Key key : ((IValueContainer) that).getValueCollection().getKeys()) {
+                final Optional optElement = that.get(key);
+                if (optElement.isPresent() && offerFastNoEvents(key, optElement.get())) {
+                    success = true;
+                }
+            }
+            if (that instanceof AdditionalContainerHolder) {
+                final AdditionalContainerCollection<H> collection = ((AdditionalContainerHolder) that).getAdditionalContainers();
+                for (H container : collection.getAll()) {
+                    if (offerFastNoEvents(container)) {
+                        success = true;
+                    }
+                }
+            }
+            return success;
+        }
+        final Collection<H> containers = that.getContainers();
+        for (H thatContainer : containers) {
+            if (offerFastNoEvents(thatContainer, function)) {
+                success = true;
+            }
+        }
+        return success;
     }
 
     /**

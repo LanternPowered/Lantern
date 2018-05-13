@@ -179,6 +179,7 @@ import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemStackComparatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.inventory.InventoryTransformationRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.QueryOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CollisionRuleRegistryModule;
@@ -215,6 +216,7 @@ import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
 import org.lanternpowered.server.inventory.LanternInventoryBuilder;
 import org.lanternpowered.server.inventory.LanternItemStackBuilder;
+import org.lanternpowered.server.inventory.query.LanternQueryTransformationBuilder;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
@@ -379,6 +381,7 @@ import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.GuiId;
@@ -528,6 +531,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
                 .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
                 .registerBuilderSupplier(Inventory.Builder.class, LanternInventoryBuilder::create)
+                .registerBuilderSupplier(InventoryTransformation.Builder.class, LanternQueryTransformationBuilder::new)
                 .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
                 .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
                 .registerBuilderSupplier(BlockStatisticBuilder.class, BlockStatisticBuilder::create)
@@ -672,6 +676,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
                 .registerModule(QueryOperationType.class, new QueryOperationRegistryModule())
+                .registerModule(new InventoryTransformationRegistryModule())
                 .registerModule(GuiId.class, ClientContainerRegistryModule.get())
                 .registerModule(GoldenApple.class, GoldenAppleRegistryModule.get())
                 .registerModule(CoalType.class, CoalTypeRegistryModule.get())

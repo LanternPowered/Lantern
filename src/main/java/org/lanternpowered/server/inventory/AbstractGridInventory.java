@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
+import org.lanternpowered.server.inventory.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
 import org.lanternpowered.server.inventory.type.LanternInventoryRow;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -58,8 +59,8 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
      *
      * @return The builder
      */
-    public static SlotsBuilder<AbstractGridInventory> slotsBuilder() {
-        return new SlotsBuilder<>();
+    public static SlotsBuilder<LanternGridInventory> slotsBuilder() {
+        return new SlotsBuilder<>().type(LanternGridInventory.class);
     }
 
     /**
@@ -72,8 +73,8 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
      *
      * @return The builder
      */
-    public static RowsBuilder<AbstractGridInventory> rowsBuilder() {
-        return new RowsBuilder<>();
+    public static RowsBuilder<LanternGridInventory> rowsBuilder() {
+        return new RowsBuilder<>().type(LanternGridInventory.class);
     }
 
     /**
@@ -86,8 +87,8 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
      *
      * @return The builder
      */
-    public static RowsViewBuilder<AbstractGridInventory> rowsViewBuilder() {
-        return new RowsViewBuilder<>();
+    public static RowsViewBuilder<LanternGridInventory> rowsViewBuilder() {
+        return new RowsViewBuilder<>().type(LanternGridInventory.class);
     }
 
     /**
@@ -100,8 +101,8 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
      *
      * @return The builder
      */
-    public static ColumnsBuilder<AbstractGridInventory> columnsBuilder() {
-        return new ColumnsBuilder<>();
+    public static ColumnsBuilder<LanternGridInventory> columnsBuilder() {
+        return new ColumnsBuilder<>().type(LanternGridInventory.class);
     }
 
     @Nullable private List<AbstractInventoryRow> rows;

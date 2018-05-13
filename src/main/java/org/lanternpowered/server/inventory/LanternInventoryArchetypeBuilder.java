@@ -296,7 +296,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                         return builder.type(LanternInventoryRow.class).buildArchetype(pluginId, id);
                     }
                 } else {
-                    final AbstractGridInventory.SlotsBuilder<AbstractGridInventory> builder = AbstractGridInventory.slotsBuilder();
+                    final AbstractGridInventory.SlotsBuilder<LanternGridInventory> builder = AbstractGridInventory.slotsBuilder();
                     for (int y = 0; y < targetRows; y++) {
                         for (int x = 0; x < targetColumns; x++) {
                             builder.slot(x, y, (LanternInventoryArchetype<? extends AbstractSlot>) this.archetypes.get(y * targetColumns + x));
@@ -380,7 +380,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
             }
             if (fixedColumns) {
                 int y = 0;
-                final AbstractGridInventory.RowsBuilder<AbstractGridInventory> builder = AbstractGridInventory.rowsBuilder();
+                final AbstractGridInventory.RowsBuilder<LanternGridInventory> builder = AbstractGridInventory.rowsBuilder();
                 for (LanternInventoryArchetype<?> archetype : this.archetypes) {
                     if (archetype.getBuilder() instanceof AbstractGridInventory.Builder) {
                         builder.grid(y, (LanternInventoryArchetype) archetype);
@@ -394,7 +394,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                 return builder.type(LanternGridInventory.class).buildArchetype(pluginId, id);
             } else {
                 int x = 0;
-                final AbstractGridInventory.ColumnsBuilder<AbstractGridInventory> builder = AbstractGridInventory.columnsBuilder();
+                final AbstractGridInventory.ColumnsBuilder<LanternGridInventory> builder = AbstractGridInventory.columnsBuilder();
                 for (LanternInventoryArchetype<?> archetype : this.archetypes) {
                     if (archetype.getBuilder() instanceof AbstractGridInventory.Builder) {
                         builder.grid(x, (LanternInventoryArchetype) archetype);

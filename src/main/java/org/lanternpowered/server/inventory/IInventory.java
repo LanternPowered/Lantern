@@ -26,7 +26,9 @@
 package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
@@ -48,6 +50,14 @@ public interface IInventory extends Inventory {
      * @return The root inventory
      */
     IInventory root();
+
+    /**
+     * Gets the {@link EmptyInventory} that should be used by this
+     * inventory when queries fail.
+     *
+     * @return The empty inventory
+     */
+    EmptyInventory empty();
 
     <T extends Inventory> Iterable<T> orderedSlots();
 
@@ -149,4 +159,9 @@ public interface IInventory extends Inventory {
      * @return The transaction result
      */
     InventoryTransactionResult setForced(@Nullable ItemStack stack);
+
+    @Override
+    default IInventory transform(InventoryTransformation transformation) {
+        return (IInventory) Inventory.super.transform(transformation);
+    }
 }

@@ -487,7 +487,7 @@ public final class VanillaInventoryArchetypes {
 
         PLAYER_MAIN = AbstractGridInventory.rowsBuilder()
                 .grid(0, PLAYER_MAIN_GRID)
-                .row(3, PLAYER_HOTBAR, 1050)
+                .row(3, PLAYER_HOTBAR)
                 .type(LanternMainPlayerInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "player_main");
 

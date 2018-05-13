@@ -323,7 +323,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     }
 
     @Override
-    protected EmptyInventory empty() {
+    public EmptyInventory empty() {
         // Lazily construct the empty inventory
         LanternEmptyInventory emptyInventory = this.emptyInventory;
         if (emptyInventory == null) {

@@ -47,8 +47,8 @@ import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
+import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.inventory.vanilla.LanternHotbarInventory;
-import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.item.recipe.crafting.CraftingMatrix;
 import org.lanternpowered.server.item.recipe.crafting.ExtendedCraftingResult;
 import org.lanternpowered.server.item.recipe.crafting.MatrixResult;
@@ -143,8 +143,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     final ItemStack itemStack1 = resultItem.createStack();
                     itemStack1.setQuantity(times * itemStack1.getQuantity());
 
-                    final AbstractInventory targetInventory = this.container.getPlayerInventory()
-                            .getView(LanternPlayerInventory.View.REVERSE_MAIN_AND_HOTBAR);
+                    final AbstractInventory targetInventory = (AbstractInventory) this.container.getPlayerInventory()
+                            .getMain().transform(InventoryTransforms.REVERSE);
                     PeekedOfferTransactionResult peekResult = targetInventory.peekOffer(itemStack1);
 
                     if (peekResult.isSuccess()) {
@@ -226,11 +226,11 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             if (quantity < maxQuantity) {
                 final AbstractInventory inventory;
                 if (clientContainer instanceof PlayerClientContainer) {
-                    inventory = this.container.getPlayerInventory().getView(LanternPlayerInventory.View.ALL_PRIORITY_MAIN);
+                    inventory = this.container.getPlayerInventory();
                 } else {
                     inventory = AbstractOrderedInventory.viewBuilder()
                             .inventory(this.container.getOpenInventory())
-                            .inventory(this.container.getPlayerInventory().getView(LanternPlayerInventory.View.PRIORITY_MAIN_AND_HOTBAR))
+                            .inventory(this.container.getPlayerInventory().getMain())
                             .build();
                 }
 

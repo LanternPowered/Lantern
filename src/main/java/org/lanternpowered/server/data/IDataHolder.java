@@ -38,7 +38,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.Collection;
@@ -70,47 +69,14 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
         return dataContainer;
     }
 
-    @Override
-    default DataTransactionResult copyFrom(DataHolder that, MergeFunction function) {
-        return DataHolderHelper.copyFrom(this, that, function);
-    }
-
-    default DataTransactionResult copyFromNoEvents(DataHolder that, MergeFunction function) {
-        final Collection<DataManipulator<?, ?>> containers = that.getContainers();
-        final DataTransactionResult.Builder builder = DataTransactionResult.builder();
-        boolean success = false;
-        for (DataManipulator<?, ?> thatContainer : containers) {
-            final DataManipulator<?, ?> thisContainer = get(thatContainer.getClass()).orElse(null);
-            final DataManipulator<?, ?> merged = function.merge(thisContainer, thatContainer);
-            final DataTransactionResult result = offerNoEvents(merged, MergeFunction.IGNORE_ALL);
-            builder.absorbResult(result);
-            if (!result.getSuccessfulData().isEmpty()) {
-                success = true;
-            }
-        }
-        return builder.result(success ? DataTransactionResult.Type.SUCCESS : DataTransactionResult.Type.FAILURE).build();
-    }
-
     // TODO: Support event? Would require special handling to restore the container
     @Override
     default boolean removeFast(Class<? extends DataManipulator<?,?>> containerClass) {
         checkNotNull(containerClass, "containerClass");
         // You cannot remove default data manipulators?
         final Optional optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
-        if (optRegistration.isPresent()) {
-            return false;
-        }
+        return !optRegistration.isPresent() && ICompositeValueStore.super.removeFast(containerClass);
 
-        if (this instanceof AdditionalContainerHolder) {
-            final AdditionalContainerCollection<DataManipulator<?,?>> containers =
-                    ((AdditionalContainerHolder<DataManipulator<?,?>>) this).getAdditionalContainers();
-            final Optional<DataManipulator<?,?>> old = containers.remove(containerClass);
-            if (old.isPresent()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     // TODO: Support event? Would require special handling to restore the container
@@ -122,23 +88,12 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
         if (optRegistration.isPresent()) {
             return DataTransactionResult.failNoData();
         }
-
-        if (this instanceof AdditionalContainerHolder) {
-            final AdditionalContainerCollection<DataManipulator<?,?>> containers =
-                    ((AdditionalContainerHolder<DataManipulator<?,?>>) this).getAdditionalContainers();
-            final Optional<DataManipulator<?,?>> old = containers.remove(containerClass);
-            if (old.isPresent()) {
-                return DataTransactionResult.successRemove(old.get().getValues());
-            }
-        }
-
-        return DataTransactionResult.failNoData();
+        return ICompositeValueStore.super.remove(containerClass);
     }
 
     @Override
     default boolean supports(Class<? extends DataManipulator<?,?>> containerClass) {
         checkNotNull(containerClass, "containerClass");
-
         // Offer all the default key values as long if they are supported
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
         if (optRegistration.isPresent()) {
@@ -150,15 +105,12 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
             }
             return true;
         }
-
-        // Support all the additional manipulators
-        return this instanceof AdditionalContainerHolder;
+        return ICompositeValueStore.super.supports(containerClass);
     }
 
     @Override
     default <T extends DataManipulator<?,?>> Optional<T> get(Class<T> containerClass) {
         checkNotNull(containerClass, "containerClass");
-
         // Check default registrations
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
         if (optRegistration.isPresent()) {
@@ -166,15 +118,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
             return manipulator == null ? Optional.empty() : Optional.of(
                     (T) (ImmutableDataManipulator.class.isAssignableFrom(containerClass) ? manipulator.asImmutable() : manipulator));
         }
-
-        // Try the additional containers if they are supported
-        if (this instanceof AdditionalContainerHolder) {
-            final AdditionalContainerCollection<DataManipulator<?,?>> containers =
-                    ((AdditionalContainerHolder<DataManipulator<?,?>>) this).getAdditionalContainers();
-            return containers.get(containerClass);
-        }
-
-        return Optional.empty();
+        return ICompositeValueStore.super.get(containerClass);
     }
 
     @Override
@@ -186,14 +130,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
                 builder.add(manipulator);
             }
         }
-
-        // Try the additional manipulators if they are supported
-        if (this instanceof AdditionalContainerHolder) {
-            final AdditionalContainerCollection<DataManipulator<?,?>> containers =
-                    ((AdditionalContainerHolder<DataManipulator<?,?>>) this).getAdditionalContainers();
-            containers.getAll().forEach(manipulator -> builder.add(manipulator.copy()));
-        }
-
+        builder.addAll(ICompositeValueStore.super.getContainers());
         return builder.build();
     }
 }

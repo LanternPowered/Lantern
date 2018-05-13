@@ -544,6 +544,10 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
         return CompositeValueStoreHelper.offer(this, valueContainer, function);
     }
 
+    default DataTransactionResult offerNoEvents(H valueContainer) {
+        return offerNoEvents(valueContainer, MergeFunction.IGNORE_ALL);
+    }
+
     default DataTransactionResult offerNoEvents(H valueContainer, MergeFunction function) {
         if (valueContainer instanceof IDataManipulatorBase) {
             // Offer all the default key values as long if they are supported
@@ -684,6 +688,58 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
         return ImmutableList.of();
     }
 
+    @Override
+    default DataTransactionResult copyFrom(S that, MergeFunction function) {
+        return CompositeValueStoreHelper.copyFrom(this, that, function);
+    }
+
+    default DataTransactionResult copyFromNoEvents(S that, MergeFunction function) {
+        final DataTransactionResult.Builder builder = DataTransactionResult.builder();
+        boolean success = false;
+        boolean merge = true;
+        if (function == MergeFunction.IGNORE_ALL) {
+            // Lets boost performance a bit by avoiding
+            // constructing unnecessary containers
+            if (that instanceof IValueContainer) {
+                for (Key key : ((IValueContainer) that).getValueCollection().getKeys()) {
+                    final Optional optElement = that.get(key);
+                    if (optElement.isPresent()) {
+                        final DataTransactionResult result = offerNoEvents(key, optElement.get());
+                        builder.absorbResult(result);
+                        if (result.isSuccessful()) {
+                            success = true;
+                        }
+                    }
+                }
+                if (that instanceof AdditionalContainerHolder) {
+                    final AdditionalContainerCollection<H> collection = ((AdditionalContainerHolder) that).getAdditionalContainers();
+                    for (H container : collection.getAll()) {
+                        final DataTransactionResult result = offerNoEvents(container);
+                        builder.absorbResult(result);
+                        if (result.isSuccessful()) {
+                            success = true;
+                        }
+                    }
+                }
+                return builder.result(success ? DataTransactionResult.Type.SUCCESS : DataTransactionResult.Type.FAILURE).build();
+            }
+            // Ignore all just overrides the original containers, so
+            // no need to copy the current one for the merge function
+            merge = false;
+        }
+        final Collection<H> containers = that.getContainers();
+        for (H thatContainer : containers) {
+            final H thisContainer = merge ? get((Class<H>) thatContainer.getClass()).orElse(null) : null;
+            final H merged = function.merge(thisContainer, thatContainer);
+            final DataTransactionResult result = offerNoEvents(merged);
+            builder.absorbResult(result);
+            if (!result.getSuccessfulData().isEmpty()) {
+                success = true;
+            }
+        }
+        return builder.result(success ? DataTransactionResult.Type.SUCCESS : DataTransactionResult.Type.FAILURE).build();
+    }
+
     /**
      * A fast equivalent of {@link #remove(Class)} which
      * avoids the construction of {@link DataTransactionResult}s.
@@ -692,18 +748,41 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
      * @return Whether the removal was successful
      */
     default boolean removeFast(Class<? extends H> containerClass) {
-        return remove(containerClass).isSuccessful();
+        checkNotNull(containerClass, "containerClass");
+
+        if (this instanceof AdditionalContainerHolder) {
+            final AdditionalContainerCollection<H> containers =
+                    ((AdditionalContainerHolder<H>) this).getAdditionalContainers();
+            final Optional<H> old = containers.remove(containerClass);
+            if (old.isPresent()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
     default DataTransactionResult remove(Class<? extends H> containerClass) {
+        checkNotNull(containerClass, "containerClass");
+
+        if (this instanceof AdditionalContainerHolder) {
+            final AdditionalContainerCollection<H> containers =
+                    ((AdditionalContainerHolder<H>) this).getAdditionalContainers();
+            final Optional<H> old = containers.remove(containerClass);
+            if (old.isPresent()) {
+                return DataTransactionResult.successRemove(old.get().getValues());
+            }
+        }
+
         return DataTransactionResult.failNoData();
     }
 
     @Override
     default boolean supports(Class<? extends H> containerClass) {
         checkNotNull(containerClass, "containerClass");
-        return false;
+        // Support all the additional manipulators
+        return this instanceof AdditionalContainerHolder;
     }
 
     @Override
@@ -714,6 +793,14 @@ public interface ICompositeValueStore<S extends CompositeValueStore<S, H>, H ext
     @Override
     default <T extends H> Optional<T> get(Class<T> containerClass) {
         checkNotNull(containerClass, "containerClass");
+
+        // Try the additional containers if they are supported
+        if (this instanceof AdditionalContainerHolder) {
+            final AdditionalContainerCollection<H> containers =
+                    ((AdditionalContainerHolder<H>) this).getAdditionalContainers();
+            return containers.get(containerClass);
+        }
+
         return Optional.empty();
     }
 }

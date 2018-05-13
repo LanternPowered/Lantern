@@ -242,6 +242,13 @@ public final class CompositeValueStoreHelper {
         return processDataTransactionResult(store, store.offerNoEvents(valueContainers, function), hasListeners);
     }
 
+    protected static <S extends CompositeValueStore<S, ?>> DataTransactionResult copyFrom(
+            ICompositeValueStore<S, ?> store, S that, MergeFunction function) {
+        // Assume that there are listeners for this kind of data transfer
+        // TODO: Improve this?
+        return processDataTransactionResult(store, store.copyFromNoEvents(that, function), () -> true);
+    }
+
     private CompositeValueStoreHelper() {
     }
 }

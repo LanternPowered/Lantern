@@ -108,14 +108,6 @@ public abstract class AbstractInventory implements IInventory {
     }
 
     /**
-     * Gets the {@link EmptyInventory} that should be used by this
-     * inventory when queries fail.
-     *
-     * @return The empty inventory
-     */
-    protected abstract EmptyInventory empty();
-
-    /**
      * Gets the {@link EmptyInventory} as a
      * result of type {@link T}.
      *

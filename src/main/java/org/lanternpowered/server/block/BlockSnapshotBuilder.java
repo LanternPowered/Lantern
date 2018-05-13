@@ -215,8 +215,12 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         final WeakWorldReferencedLocation blockLocation = snapshot.location;
         this.worldUUID = blockLocation == null ? null : blockLocation.getWorld().getUniqueId();
         this.position = blockLocation == null ? null : blockLocation.getBlockPosition();
-        this.tileEntityManipulatorData.clear();
-        this.tileEntityKeyData.clear();
+        if (this.tileEntityManipulatorData != null) {
+            this.tileEntityManipulatorData.clear();
+        }
+        if (this.tileEntityKeyData != null) {
+            this.tileEntityKeyData.clear();
+        }
         this.tileEntity = snapshot.tileEntity;
         return this;
     }

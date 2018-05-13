@@ -38,6 +38,7 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
+import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -199,7 +200,7 @@ public class LanternItem extends LanternEntity implements Item {
             }
             Inventory inventory = ((Carrier) entity).getInventory();
             if (inventory instanceof PlayerInventory) {
-                inventory = ((PlayerInventory) inventory).getMain();
+                inventory = ((PlayerInventory) inventory).getMain().transform(InventoryTransforms.PRIORITY_HOTBAR);
             }
 
             final PeekedOfferTransactionResult peekResult = ((IInventory) inventory).peekOffer(itemStack);

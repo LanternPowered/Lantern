@@ -53,7 +53,7 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     }
 
     @Override
-    protected EmptyInventory empty() {
+    public EmptyInventory empty() {
         return this;
     }
 

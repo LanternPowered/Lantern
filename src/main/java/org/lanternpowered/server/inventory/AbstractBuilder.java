@@ -179,7 +179,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     }
 
     R build0(boolean carried, @Nullable PluginContainer plugin, @Nullable LanternInventoryArchetype<R> archetype) {
-        checkState(this.constructor != null);
+        checkState(this.constructor != null, "Inventory constructor must be set.");
         if (plugin == null) {
             plugin = this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer;
         }

@@ -73,6 +73,7 @@ import org.spongepowered.api.data.type.LlamaVariant;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.OcelotType;
+import org.spongepowered.api.data.type.ParrotVariant;
 import org.spongepowered.api.data.type.PickupRule;
 import org.spongepowered.api.data.type.PistonType;
 import org.spongepowered.api.data.type.PlantType;
@@ -324,6 +325,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(OcelotType.class, of("OcelotType"), "ocelot_type"));
         register(makeValueKey(Integer.class, of("Offset"), "offset"));
         register(makeValueKey(Boolean.class, of("Open"), "open"));
+        register(makeValueKey(ParrotVariant.class, of("ParrotVariant"), "parrot_variant"));
         register(makeMutableBoundedValueKey(Integer.class, of("PassedBurnTime"), "passed_burn_time"));
         register(makeMutableBoundedValueKey(Integer.class, of("PassedCookTime"), "passed_cook_time"));
         register(makeListKey(UUID.class, of("Passengers"), "passengers"));
@@ -434,6 +436,20 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         }
 
         causeStack.popCause();
+
+        // Warn about keys that are not registered
+        for (Field field : Key.class.getFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                try {
+                    final Object object = field.get(null);
+                    if (object instanceof Key) {
+                        ((Key) object).getId(); // Trigger a exception if it's a dummy
+                    }
+                } catch (Exception e) {
+                    Lantern.getLogger().warn("No key registered for field: " + field.getName());
+                }
+            }
+        }
     }
 
     private final static class Holder {

@@ -23,20 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data;
+package org.lanternpowered.server.inventory.query;
 
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.merge.MergeFunction;
+import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.item.inventory.InventoryTransformation;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
 
-public final class DataHolderHelper {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    protected static <T extends IDataHolder> DataTransactionResult copyFrom(T holder, DataHolder that, MergeFunction function) {
-        // Assume that there are listeners for this kind of data transfer
-        // TODO: Improve this?
-        return CompositeValueStoreHelper.processDataTransactionResult(holder, holder.copyFromNoEvents(that, function), () -> true);
+public class LanternQueryTransformationBuilder implements InventoryTransformation.Builder {
+
+    private final List<QueryOperation> operationList = new ArrayList<>();
+
+    @Override
+    public InventoryTransformation.Builder append(QueryOperation... operations) {
+        Collections.addAll(this.operationList, operations);
+        return this;
     }
 
-    private DataHolderHelper() {
+    @Override
+    public InventoryTransformation build() {
+        return new LanternQueryTransformation(ImmutableList.copyOf(this.operationList));
+    }
+
+    @Override
+    public InventoryTransformation.Builder from(InventoryTransformation value) {
+        this.operationList.clear();
+        if (value instanceof LanternQueryTransformation) {
+            this.operationList.addAll(((LanternQueryTransformation) value).operations);
+        }
+        return this;
+    }
+
+    @Override
+    public InventoryTransformation.Builder reset() {
+        this.operationList.clear();
+        return this;
     }
 }

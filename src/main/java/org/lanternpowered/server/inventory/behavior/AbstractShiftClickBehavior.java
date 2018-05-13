@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory.behavior;
 import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.inventory.vanilla.LanternMainPlayerInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.item.inventory.slot.InputSlot;
@@ -49,10 +50,10 @@ public abstract class AbstractShiftClickBehavior implements ShiftClickBehavior {
         if (!main.containsInventory(slot)) {
             if (slot instanceof InputSlot) {
                 // The input slots use a different insertion order to the default
-                return container.getPlayerInventory().getView(LanternPlayerInventory.View.PRIORITY_MAIN_AND_HOTBAR);
+                return main;
             }
             // Check click to the main inventory
-            return container.getPlayerInventory().getView(LanternPlayerInventory.View.REVERSE_MAIN_AND_HOTBAR);
+            return main.transform(InventoryTransforms.REVERSE);
         // Shift click from the hotbar to the main inventory
         } else if (main.getHotbar().containsInventory(slot)) {
             return main.getGrid();

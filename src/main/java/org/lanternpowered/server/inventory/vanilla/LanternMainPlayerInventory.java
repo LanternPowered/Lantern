@@ -26,6 +26,10 @@
 package org.lanternpowered.server.inventory.vanilla;
 
 import org.lanternpowered.server.inventory.AbstractGridInventory;
+import org.lanternpowered.server.inventory.AbstractOrderedInventory;
+import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
+import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
@@ -43,12 +47,32 @@ public class LanternMainPlayerInventory extends AbstractGridInventory implements
     private LanternHotbarInventory hotbar;
     private AbstractGridInventory grid;
 
+    private AbstractGridInventory priorityHotbar;
+    private AbstractOrderedInventory reverse;
+
     @Override
     protected void init() {
         super.init();
 
         this.grid = query(Holder.GRID_INVENTORY_OPERATION).first();
         this.hotbar = query(Holder.HOTBAR_OPERATION).first();
+
+        this.priorityHotbar = AbstractGridInventory.rowsViewBuilder()
+                .grid(0, this.grid)
+                .row(this.grid.getRows(), this.hotbar, 1050) // Higher priority for the hotbar
+                .build();
+        this.reverse = (AbstractOrderedInventory) InventoryTransforms.REVERSE.transform(this);
+    }
+
+    @Override
+    public IInventory transform(InventoryTransformation transformation) {
+        // Cache some transformations that will be used often
+        if (transformation == InventoryTransforms.PRIORITY_HOTBAR) {
+            return this.priorityHotbar;
+        } else if (transformation == InventoryTransforms.REVERSE) {
+            return this.reverse;
+        }
+        return super.transform(transformation);
     }
 
     @Override

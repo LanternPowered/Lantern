@@ -104,6 +104,10 @@ public final class TypeTokenHelperTest {
         assertFalse(TypeTokenHelper.isAssignable(
                 new TypeToken<DataRegistration<?,?>>() {},
                 new TypeToken<DataRegistration<LoreData,?>>() {}));
+
+        assertTrue(TypeTokenHelper.isAssignable(
+                new TypeToken<DataRegistration<LoreData,?>>() {},
+                new TypeToken<DataRegistration<?,?>>() {}));
     }
 
     @Test
@@ -121,6 +125,33 @@ public final class TypeTokenHelperTest {
         assertTrue(TypeTokenHelper.isAssignable(
                 new TypeToken<A<Key<BaseValue<EnderDragon>>>.B<Value<Double>>>() {},
                 new TypeToken<A<Key<BaseValue<? extends Living>>>.B<Value<? extends Number>>>() {}));
+    }
+
+    @Test
+    public void testC() {
+        assertFalse(TypeTokenHelper.isAssignable(
+                new TypeToken<A<Object>>() {},
+                new TypeToken<A<Object[]>>() {}));
+
+        assertTrue(TypeTokenHelper.isAssignable(
+                new TypeToken<A<Object[]>>() {},
+                new TypeToken<A<Object>>() {}));
+
+        assertTrue(TypeTokenHelper.isAssignable(
+                new TypeToken<D>() {},
+                new TypeToken<A<Number>>() {}));
+
+        assertTrue(TypeTokenHelper.isAssignable(
+                new TypeToken<C>() {},
+                new TypeToken<A<Number[]>>() {}));
+    }
+
+    private static class D extends A<Number> {
+
+    }
+
+    private static class C extends A<Number[]> {
+
     }
 
     private static class A<T> {

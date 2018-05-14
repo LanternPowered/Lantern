@@ -27,6 +27,7 @@ package org.lanternpowered.server.util;
 
 import com.google.common.reflect.TypeToken;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -126,7 +127,14 @@ public final class TypeTokenHelper {
             // Check if the default generic parameters match the parameters
             // of the parameterized type
             final Type[] toTypes = toType.getActualTypeArguments();
-            final Type[] types = toRaw.getTypeParameters();
+            final Type[] types;
+            if (otherRaw.equals(toRaw)) {
+                types = otherRaw.getTypeParameters();
+            } else {
+                // Get the type parameters based on the super class
+                final ParameterizedType other = (ParameterizedType) TypeToken.of(type).getSupertype((Class) toRaw).getType();
+                types = other.getActualTypeArguments();
+            }
             if (types.length != toTypes.length) {
                 return false;
             }
@@ -238,11 +246,22 @@ public final class TypeTokenHelper {
                 // Strip the new bounds down
                 for (int i = 0; i < bounds.length; i++) {
                     if (bounds[i] instanceof TypeVariable ||
-                            bounds[i] instanceof WildcardType ||
-                            bounds[i] instanceof GenericArrayType) { // No idea how to handle this type
+                            bounds[i] instanceof WildcardType) {
                         bounds[i] = Object.class;
                     } else if (bounds[i] instanceof ParameterizedType) {
                         bounds[i] = ((ParameterizedType) bounds[i]).getRawType();
+                    } else if (bounds[i] instanceof GenericArrayType) {
+                        final Type component = ((GenericArrayType) bounds[i]).getGenericComponentType();
+                        final Class<?> componentClass;
+                        if (component instanceof Class) {
+                            componentClass = (Class<?>) component;
+                        } else if (component instanceof ParameterizedType) { // Is this even possible?
+                            componentClass = (Class<?>) ((ParameterizedType) component).getRawType();
+                        } else {
+                            componentClass = Object.class;
+                        }
+                        bounds[i] = componentClass == Object.class ? Object[].class :
+                                Array.newInstance(componentClass, 0).getClass(); // Get the array class
                     }
                 }
             }

@@ -26,16 +26,6 @@
 package org.lanternpowered.server.util;
 
 import com.google.common.reflect.TypeToken;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.advancement.Advancement;
-import org.spongepowered.api.data.DataRegistration;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.complex.EnderDragon;
-import org.spongepowered.api.entity.living.monster.Slime;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Modifier;
@@ -48,54 +38,6 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
 public final class TypeTokenHelper {
-
-    public static void main(String... args) {
-        test(new TypeToken<Key<?>>() {},
-                new TypeToken<Key<BaseValue<?>>>() {});
-        test(new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<?>>>() {});
-        test(new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<CatalogType>>>() {});
-        test(new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<? extends CatalogType>>>() {});
-        test(new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<? extends Advancement>>>() {});
-        test(new TypeToken<Key<BaseValue<Advancement>>>() {},
-                new TypeToken<Key<BaseValue<Integer>>>() {});
-        test(new TypeToken<Key<BaseValue<Slime>>>() {},
-                new TypeToken<Key<BaseValue<? extends EnderDragon>>>() {});
-        test(new TypeToken<Key<BaseValue<EnderDragon>>>() {},
-                new TypeToken<Key<BaseValue<? extends Living>>>() {});
-        test(new TypeToken<Key<BaseValue<EnderDragon>>>() {},
-                new TypeToken<Key<BaseValue<? extends Living>>>() {});
-        test(TypeToken.of(Key.class),
-                new TypeToken<Key<BaseValue<? extends Living>>>() {});
-
-        test(new TypeToken<DataRegistration>() {},
-                new TypeToken<DataRegistration<?,?>>() {});
-        test(new TypeToken<DataRegistration>() {},
-                new TypeToken<DataRegistration<LoreData,?>>() {});
-        test(new TypeToken<DataRegistration<?,?>>() {},
-                new TypeToken<DataRegistration<LoreData,?>>() {});
-
-        // Enclosing classes testing
-        test(new TypeToken<A<Object>.B<Value<Double>>>() {},
-                new TypeToken<A<Object>.B<Value<? extends Number>>>() {});
-        test(new TypeToken<A<Key<BaseValue<EnderDragon>>>.B<Value<Double>>>() {},
-                new TypeToken<A<Key<BaseValue<Slime>>>.B<Value<? extends Number>>>() {});
-        test(new TypeToken<A<Key<BaseValue<EnderDragon>>>.B<Value<Double>>>() {},
-                new TypeToken<A<Key<BaseValue<? extends Living>>>.B<Value<? extends Number>>>() {});
-    }
-
-    private static class A<T> {
-
-        private class B<V> {
-        }
-    }
-
-    private static void test(TypeToken<?> a, TypeToken<?> b) {
-        System.out.printf("{\n\tA: %s\n\tB: %s\n\tAB: %s\n\tBA: %s\n}\n", a, b, isAssignable(a, b), isAssignable(b, a));
-    }
 
     public static boolean isAssignable(TypeToken<?> type, TypeToken<?> toType) {
         return isAssignable(type.getType(), toType.getType());
@@ -152,7 +94,7 @@ public final class TypeTokenHelper {
         }
         if (type instanceof TypeVariable) {
             final TypeVariable other = (TypeVariable) type;
-            return allSupertypes(type, other.getBounds());
+            return allSupertypes(toType, other.getBounds());
         }
         if (type instanceof WildcardType) {
             final WildcardType other = (WildcardType) type;
@@ -169,27 +111,27 @@ public final class TypeTokenHelper {
 
     private static boolean isAssignable(Type type, ParameterizedType toType, @Nullable Type parent, int index) {
         if (type instanceof Class) {
-            final Class<?> other = (Class<?>) type;
+            final Class<?> otherRaw = (Class<?>) type;
             final Class<?> toRaw = (Class<?>) toType.getRawType();
+            if (!toRaw.isAssignableFrom(otherRaw)) {
+                return false;
+            }
             final Type toEnclosing = toType.getOwnerType();
             if (toEnclosing != null && !Modifier.isStatic(toRaw.getModifiers())) {
-                final Class<?> otherEnclosing = other.getEnclosingClass();
+                final Class<?> otherEnclosing = otherRaw.getEnclosingClass();
                 if (otherEnclosing == null || !isAssignable(otherEnclosing, toEnclosing, null, 0)) {
                     return false;
                 }
             }
-            if (!toRaw.isAssignableFrom(other)) {
-                return false;
-            }
             // Check if the default generic parameters match the parameters
             // of the parameterized type
             final Type[] toTypes = toType.getActualTypeArguments();
-            final TypeVariable[] types = toRaw.getTypeParameters();
+            final Type[] types = toRaw.getTypeParameters();
             if (types.length != toTypes.length) {
                 return false;
             }
             for (int i = 0; i < types.length; i++) {
-                if (!isAssignable(types[i], toTypes[i], other, i)) {
+                if (!isAssignable(types[i], toTypes[i], type, i)) {
                     return false;
                 }
             }
@@ -214,7 +156,7 @@ public final class TypeTokenHelper {
                 types = other.getActualTypeArguments();
             } else {
                 // Get the type parameters based on the super class
-                other = (ParameterizedType) TypeToken.of(type).getSupertype((Class) toRaw).getType();
+                other = (ParameterizedType) TypeToken.of(other).getSupertype((Class) toRaw).getType();
                 types = other.getActualTypeArguments();
             }
             final Type[] toTypes = toType.getActualTypeArguments();

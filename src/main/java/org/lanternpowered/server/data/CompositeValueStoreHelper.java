@@ -61,12 +61,16 @@ public final class CompositeValueStoreHelper {
         return keys;
     }
 
+    protected static boolean supportsEvents(ICompositeValueStore store) {
+        return store instanceof DataHolder;
+    }
+
     protected static boolean hasListeners(ICompositeValueStore store, Key<?> key) {
         return hasListeners(store, Collections.singleton(key));
     }
 
     protected static boolean hasListeners(ICompositeValueStore store, Iterable<Key<?>> keys) {
-        if (!(store instanceof DataHolder)) {
+        if (!supportsEvents(store)) {
             return false;
         }
         for (Key<?> key : keys) {
@@ -244,7 +248,7 @@ public final class CompositeValueStoreHelper {
 
     protected static <S extends CompositeValueStore<S, ?>> DataTransactionResult copyFrom(
             ICompositeValueStore<S, ?> store, S that, MergeFunction function) {
-        final boolean hasListeners = hasListeners(store, Collections.emptyList());
+        final boolean hasListeners = supportsEvents(store);
         // Assume that there are listeners for this kind of data transfer
         // TODO: Improve this?
         return processDataTransactionResult(store, store.copyFromNoEvents(that, function), () -> hasListeners);
@@ -252,7 +256,7 @@ public final class CompositeValueStoreHelper {
 
     protected static <S extends CompositeValueStore<S, ?>> boolean copyFromFast(
             ICompositeValueStore<S, ?> store, S that, MergeFunction function) {
-        final boolean hasListeners = hasListeners(store, Collections.emptyList());
+        final boolean hasListeners = supportsEvents(store);
         // Assume that there are listeners for this kind of data transfer
         // TODO: Improve this?
         if (hasListeners) {

@@ -76,7 +76,6 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
         // You cannot remove default data manipulators?
         final Optional optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
         return !optRegistration.isPresent() && ICompositeValueStore.super.removeFast(containerClass);
-
     }
 
     // TODO: Support event? Would require special handling to restore the container

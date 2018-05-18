@@ -92,8 +92,6 @@ public final class LanternKeys {
             makeValueKey(InventorySnapshot.class, DataQuery.of("InventorySnapshot"), "inventory_snapshot");
     public static final Key<Value<Boolean>> TRIGGERED =
             makeValueKey(Boolean.class, DataQuery.of("Triggered"), "triggered");
-    public static final Key<Value<Boolean>> IS_ELYTRA_FLYING =
-            makeValueKey(Boolean.class, DataQuery.of("IsElytraFlying"), "is_elytra_flying");
     public static final Key<Value<PotionType>> POTION_TYPE =
             makeValueKey(PotionType.class, DataQuery.of("PotionType"), "potion_type");
     public static final Key<Value<Boolean>> EXPLODE =

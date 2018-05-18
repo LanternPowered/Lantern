@@ -137,6 +137,7 @@ import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDamageab
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDamagingData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDespawnDelayData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDominantHandData;
+import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableElytraFlyingData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableExpOrbData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableExpirableData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableExplosionRadiusData;
@@ -296,6 +297,7 @@ import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.DamagingData;
 import org.spongepowered.api.data.manipulator.mutable.entity.DespawnDelayData;
 import org.spongepowered.api.data.manipulator.mutable.entity.DominantHandData;
+import org.spongepowered.api.data.manipulator.mutable.entity.ElytraFlyingData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExpOrbData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExpirableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExplosionRadiusData;
@@ -657,6 +659,8 @@ public class DataManipulatorRegistry {
                 });
         register(DespawnDelayData.class, ImmutableDespawnDelayData.class,
                 c -> c.register(Keys.DESPAWN_DELAY, 2000));
+        register(ElytraFlyingData.class, ImmutableElytraFlyingData.class,
+                c -> c.register(Keys.IS_ELYTRA_FLYING, false));
         // TODO: ExperienceHolderData
         register(ExpirableData.class, ImmutableExpirableData.class,
                 c -> c.register(Keys.EXPIRATION_TICKS, 200));

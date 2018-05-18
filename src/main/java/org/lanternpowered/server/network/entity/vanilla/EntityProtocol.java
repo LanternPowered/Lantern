@@ -375,7 +375,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (this.entity.get(Keys.GLOWING).orElse(false)) {
             flags |= 0x40;
         }
-        if (this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false)) {
+        if (this.entity.get(Keys.IS_ELYTRA_FLYING).orElse(false)) {
             flags |= 0x80;
         }
         return flags;

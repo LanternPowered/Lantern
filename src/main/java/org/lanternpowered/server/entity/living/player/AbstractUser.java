@@ -130,7 +130,7 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
                     GlobalTabList.getInstance().get(getProfile()).ifPresent(e -> e.setGameMode(newElement));
                 });
         c.registerNonRemovable(Keys.DOMINANT_HAND, HandPreferences.RIGHT);
-        c.registerNonRemovable(LanternKeys.IS_ELYTRA_FLYING, false);
+        c.registerNonRemovable(Keys.IS_ELYTRA_FLYING, false);
         c.registerNonRemovable(LanternKeys.ELYTRA_GLIDE_SPEED, 0.1);
         c.registerNonRemovable(LanternKeys.ELYTRA_SPEED_BOOST, false);
         c.registerNonRemovable(LanternKeys.SUPER_STEVE, false);

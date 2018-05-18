@@ -189,7 +189,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.FOOD_LEVEL).ifPresent(v -> dataView.set(FOOD_LEVEL, v));
         valueContainer.remove(Keys.EXHAUSTION).ifPresent(v -> dataView.set(EXHAUSTION, v.floatValue()));
         valueContainer.remove(Keys.SATURATION).ifPresent(v -> dataView.set(SATURATION, v.floatValue()));
-        valueContainer.remove(LanternKeys.IS_ELYTRA_FLYING).ifPresent(v -> dataView.set(IS_ELYTRA_FLYING, (byte) (v ? 1 : 0)));
+        valueContainer.remove(Keys.IS_ELYTRA_FLYING).ifPresent(v -> dataView.set(IS_ELYTRA_FLYING, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.GLOWING).ifPresent(v -> dataView.set(IS_GLOWING, (byte) (v ? 1 : 0)));
         super.serializeValues(object, valueContainer, dataView);
     }
@@ -231,7 +231,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         dataView.getInt(FOOD_LEVEL).ifPresent(v -> valueContainer.set(Keys.FOOD_LEVEL, v));
         dataView.getDouble(EXHAUSTION).ifPresent(v -> valueContainer.set(Keys.EXHAUSTION, v));
         dataView.getDouble(SATURATION).ifPresent(v -> valueContainer.set(Keys.SATURATION, v));
-        dataView.getInt(IS_ELYTRA_FLYING).ifPresent(v -> valueContainer.set(LanternKeys.IS_ELYTRA_FLYING, v > 0));
+        dataView.getInt(IS_ELYTRA_FLYING).ifPresent(v -> valueContainer.set(Keys.IS_ELYTRA_FLYING, v > 0));
         dataView.getInt(IS_GLOWING).ifPresent(v -> valueContainer.set(Keys.GLOWING, v > 0));
 
         super.deserializeValues(object, valueContainer, dataView);

@@ -685,9 +685,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
         this.resourcePackSendQueue.pulse();
 
-        if (get(LanternKeys.IS_ELYTRA_FLYING).get()) {
+        if (get(Keys.IS_ELYTRA_FLYING).get()) {
             if (get(Keys.IS_SNEAKING).get()) {
-                offer(LanternKeys.IS_ELYTRA_FLYING, false);
+                offer(Keys.IS_ELYTRA_FLYING, false);
                 offer(LanternKeys.ELYTRA_SPEED_BOOST, false);
             } else {
                 offer(LanternKeys.ELYTRA_SPEED_BOOST, get(Keys.IS_SPRINTING).get());
@@ -1167,7 +1167,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     public void handleOnGroundState(boolean state) {
         setOnGround(state);
         if (state) {
-            offer(LanternKeys.IS_ELYTRA_FLYING, false);
+            offer(Keys.IS_ELYTRA_FLYING, false);
         }
     }
 
@@ -1177,7 +1177,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 .get().peek().map(ItemStack::getType).orElse(null) != ItemTypes.ELYTRA) {
             return;
         }
-        offer(LanternKeys.IS_ELYTRA_FLYING, true);
+        offer(Keys.IS_ELYTRA_FLYING, true);
     }
 
     public LanternPlayerAdvancements getAdvancementsProgress() {

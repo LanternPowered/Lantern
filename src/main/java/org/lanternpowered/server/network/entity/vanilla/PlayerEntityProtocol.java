@@ -340,7 +340,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             this.lastFlags0 = this.lastFlags;
         }
         // Some 1.11.2 magic, ultra secret stuff...
-        final boolean elytraFlying = this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false);
+        final boolean elytraFlying = this.entity.get(Keys.IS_ELYTRA_FLYING).orElse(false);
         final boolean elytraSpeedBoost = this.entity.get(LanternKeys.ELYTRA_SPEED_BOOST).orElse(false);
         if (this.lastElytraFlying != elytraFlying || this.lastElytraSpeedBoost != elytraSpeedBoost) {
             if (this.lastElytraFlying && this.lastElytraSpeedBoost) {
@@ -392,14 +392,14 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     private float getFlySpeed() {
-        return this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false) ? this.entity.get(LanternKeys.ELYTRA_GLIDE_SPEED).orElse(0.1).floatValue() :
+        return this.entity.get(Keys.IS_ELYTRA_FLYING).orElse(false) ? this.entity.get(LanternKeys.ELYTRA_GLIDE_SPEED).orElse(0.1).floatValue() :
                 this.entity.get(Keys.CAN_FLY).orElse(false) ? this.entity.get(Keys.FLYING_SPEED).orElse(0.1).floatValue() : 0f;
     }
 
     private boolean canFly() {
         // TODO: Double jump?
         return this.entity.get(Keys.CAN_FLY).orElse(false) || this.entity.get(LanternKeys.CAN_WALL_JUMP).orElse(false) ||
-                (this.entity.get(LanternKeys.SUPER_STEVE).orElse(false) && !this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false));
+                (this.entity.get(LanternKeys.SUPER_STEVE).orElse(false) && !this.entity.get(Keys.IS_ELYTRA_FLYING).orElse(false));
     }
 
     private float getAbsorption() {

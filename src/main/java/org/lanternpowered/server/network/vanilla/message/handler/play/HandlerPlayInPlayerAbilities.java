@@ -51,7 +51,7 @@ public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayer
             // TODO: Just set velocity once it's implemented
             if (player.get(LanternKeys.SUPER_STEVE).orElse(false)) {
                 context.getSession().send(new MessagePlayOutEntityVelocity(player.getNetworkId(), 0, 1.0, 0));
-                player.offer(LanternKeys.IS_ELYTRA_FLYING, true);
+                player.offer(Keys.IS_ELYTRA_FLYING, true);
             } else if (player.get(LanternKeys.CAN_WALL_JUMP).orElse(false)) {
                 final Location<World> location = player.getLocation();
 

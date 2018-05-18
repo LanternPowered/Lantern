@@ -56,13 +56,13 @@ public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetVal
     }
 
     @Override
-    public SetValue<E> transform(Function<Set<E>, Set<E>> function) {
+    public LanternSetValue<E> transform(Function<Set<E>, Set<E>> function) {
         this.actualValue = new HashSet<>(checkNotNull(checkNotNull(function).apply(this.actualValue)));
         return this;
     }
 
     @Override
-    public SetValue<E> filter(Predicate<? super E> predicate) {
+    public LanternSetValue<E> filter(Predicate<? super E> predicate) {
         return new LanternSetValue<>(getKey(), getDefault(), getActualValue().stream()
                 .filter(element -> checkNotNull(predicate).test(element))
                 .collect(Collectors.toSet()));
@@ -76,5 +76,10 @@ public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetVal
     @Override
     public ImmutableSetValue<E> asImmutable() {
         return new ImmutableLanternSetValue<>(getKey(), getDefault(), getActualValue());
+    }
+
+    @Override
+    public LanternSetValue<E> copy() {
+        return new LanternSetValue<>(getKey(), getDefault(), getActualValue());
     }
 }

@@ -285,7 +285,9 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     }
 
     void postDestructEvent(DestructEntityEvent event) {
-        Sponge.getEventManager().post(event);
+        if (Sponge.getEventManager().post(event)) { // If it's cancelled, don't continue
+            return;
+        }
         if (!event.isMessageCancelled()) {
             // TODO
         }

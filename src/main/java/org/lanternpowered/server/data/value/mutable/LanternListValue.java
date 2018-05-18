@@ -115,4 +115,9 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
     public int indexOf(E element) {
         return getActualValue().indexOf(checkNotNull(element));
     }
+
+    @Override
+    public LanternListValue<E> copy() {
+        return new LanternListValue<>(getKey(), getDefault(), getActualValue());
+    }
 }

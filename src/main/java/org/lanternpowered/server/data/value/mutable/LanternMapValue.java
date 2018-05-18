@@ -38,7 +38,6 @@ import org.spongepowered.api.data.value.mutable.MapValue;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -101,12 +100,8 @@ public class LanternMapValue<K, V> extends LanternValue<Map<K, V>> implements Ma
 
     @Override
     public MapValue<K, V> removeAll(Predicate<Map.Entry<K, V>> predicate) {
-        for (Iterator<Map.Entry<K, V>> iterator = getActualValue().entrySet().iterator(); iterator.hasNext(); ) {
-            final Map.Entry<K, V> entry = iterator.next();
-            if (!checkNotNull(predicate).test(entry)) {
-                iterator.remove();
-            }
-        }
+        checkNotNull(predicate);
+        getActualValue().entrySet().removeIf(predicate::test);
         return this;
     }
 
@@ -133,5 +128,10 @@ public class LanternMapValue<K, V> extends LanternValue<Map<K, V>> implements Ma
     @Override
     public ImmutableCollection<V> values() {
         return ImmutableSet.copyOf(getActualValue().values());
+    }
+
+    @Override
+    public LanternMapValue<K, V> copy() {
+        return new LanternMapValue<>(getKey(), getDefault(), getActualValue());
     }
 }

@@ -82,4 +82,9 @@ public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implement
         checkNotNull(defaultValue);
         return new LanternValue<>(((LanternKey) getKey()).getOptionalUnwrappedKey(), defaultValue, get().orElse(defaultValue));
     }
+
+    @Override
+    public LanternOptionalValue<E> copy() {
+        return new LanternOptionalValue<>(getKey(), getDefault(), getActualValue());
+    }
 }

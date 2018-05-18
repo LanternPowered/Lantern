@@ -102,11 +102,8 @@ abstract class LanternCollectionValue<E, V extends Collection<E>, I extends Coll
 
     @Override
     public I removeAll(Predicate<E> predicate) {
-        for (Iterator<E> iterator = getActualValue().iterator(); iterator.hasNext(); ) {
-            if (checkNotNull(predicate).test(iterator.next())) {
-                iterator.remove();
-            }
-        }
+        checkNotNull(predicate);
+        getActualValue().removeIf(predicate::test);
         return (I) this;
     }
 
@@ -137,4 +134,7 @@ abstract class LanternCollectionValue<E, V extends Collection<E>, I extends Coll
     public Iterator<E> iterator() {
         return getActualValue().iterator();
     }
+
+    @Override
+    public abstract I copy();
 }

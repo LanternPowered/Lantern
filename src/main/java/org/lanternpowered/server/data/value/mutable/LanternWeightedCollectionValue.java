@@ -29,6 +29,7 @@ import org.lanternpowered.server.data.value.immutable.ImmutableLanternWeightedCo
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableWeightedCollectionValue;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
 import org.spongepowered.api.util.weighted.TableEntry;
 import org.spongepowered.api.util.weighted.WeightedTable;
@@ -55,7 +56,7 @@ public class LanternWeightedCollectionValue<E> extends LanternCollectionValue<Ta
 
     @Override
     public WeightedCollectionValue<E> filter(Predicate<? super TableEntry<E>> predicate) {
-        return set(get().stream().filter(predicate).collect(Collectors.toCollection(WeightedTable<E>::new)));
+        return set(get().stream().filter(predicate).collect(Collectors.toCollection(WeightedTable::new)));
     }
 
     @Override
@@ -72,5 +73,10 @@ public class LanternWeightedCollectionValue<E> extends LanternCollectionValue<Ta
     @Override
     public List<E> get(Random random) {
         return get().get(random);
+    }
+
+    @Override
+    public LanternWeightedCollectionValue<E> copy() {
+        return new LanternWeightedCollectionValue<>(getKey(), getDefault(), getActualValue());
     }
 }

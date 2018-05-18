@@ -90,6 +90,11 @@ public class LanternBoundedValue<E> extends LanternValue<E> implements MutableBo
     }
 
     @Override
+    public LanternBoundedValue<E> copy() {
+        return new LanternBoundedValue<>(getKey(), getDefault(), this.comparator, this.minimum, this.maximum, getActualValue());
+    }
+
+    @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
         return super.toStringHelper()
                 .add("minimum", this.minimum)

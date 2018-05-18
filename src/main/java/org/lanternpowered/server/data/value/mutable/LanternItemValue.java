@@ -66,4 +66,9 @@ public class LanternItemValue extends LanternValue<ItemStack> {
     public ImmutableValue<ItemStack> asImmutable() {
         return new ImmutableLanternItemValue(getKey(), getDefault(), get());
     }
+
+    @Override
+    public LanternItemValue copy() {
+        return new LanternItemValue(getKey(), getDefault(), getActualValue());
+    }
 }

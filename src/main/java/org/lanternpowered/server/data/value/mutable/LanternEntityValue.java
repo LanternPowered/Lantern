@@ -62,6 +62,7 @@ public class LanternEntityValue<T extends Entity> implements Value<T> {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     private T getRaw() {
         T entity = this.weakReference.get();
         if (entity != null) {
@@ -153,5 +154,10 @@ public class LanternEntityValue<T extends Entity> implements Value<T> {
         return Objects.equals(this.key, other.key)
                 && Objects.equals(this.entityId, other.entityId)
                 && Objects.equals(this.weakReference, other.weakReference);
+    }
+
+    @Override
+    public LanternEntityValue<T> copy() {
+        return new LanternEntityValue<>(getKey(), get());
     }
 }

@@ -60,4 +60,9 @@ public class LanternValue<E> extends AbstractBaseValue<E> implements Value<E> {
     public ImmutableValue<E> asImmutable() {
         return ImmutableLanternValue.cachedOf(getKey(), getDefault(), this.actualValue);
     }
+
+    @Override
+    public Value<E> copy() {
+        return new LanternValue<>(getKey(), getDefault(), getActualValue());
+    }
 }

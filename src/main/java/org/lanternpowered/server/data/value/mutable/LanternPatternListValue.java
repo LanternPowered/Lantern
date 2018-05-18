@@ -140,4 +140,9 @@ public class LanternPatternListValue extends LanternListValue<PatternLayer> impl
     public ImmutablePatternListValue asImmutable() {
         return new ImmutableLanternPatternListValue(getKey(), getDefault(), getActualValue());
     }
+
+    @Override
+    public LanternPatternListValue copy() {
+        return new LanternPatternListValue(getKey(), getDefault(), getActualValue());
+    }
 }

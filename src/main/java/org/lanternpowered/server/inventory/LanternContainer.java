@@ -47,6 +47,7 @@ import org.spongepowered.api.item.inventory.property.GuiId;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,12 +70,13 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
      *
      * @param playerInventory The player inventory
      * @param openInventory The inventory to open
+     * @param name The name of the inventory to display
      */
-    public static LanternContainer construct(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory) {
+    public static LanternContainer construct(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory, Translation name) {
         if (openInventory instanceof CarriedInventory) {
-            return new CarriedLanternContainer<>(playerInventory, openInventory);
+            return new CarriedLanternContainer<>(playerInventory, openInventory, name);
         }
-        return new LanternContainer(playerInventory, openInventory);
+        return new LanternContainer(playerInventory, openInventory, name);
     }
 
     private final Map<Player, ClientContainer> viewers = new HashMap<>();
@@ -89,7 +91,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
     private final LanternSlot cursor = new LanternSlot();
 
     @SuppressWarnings("unchecked")
-    LanternContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory) {
+    LanternContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory, Translation name) {
         this.playerInventory = playerInventory;
         this.openInventory = openInventory;
         final List<AbstractOrderedInventory> inventories = ImmutableList.of(openInventory, playerInventory.getMain());
@@ -106,8 +108,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
         }
         this.slotsToContainerSlot = slotsToContainerSlot.build();
         initWithSlots((List) inventories, slots, null);
-        // Apply the name of the open inventory
-        setName(openInventory.getName());
+        setName(name); // Apply the name to display
     }
 
     @Override
@@ -222,6 +223,11 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
         if (session.getOpenContainer() == this) {
             session.setOpenContainer(null);
         }
+    }
+
+    @Override
+    public boolean isViewedSlot(Slot slot) {
+        return this.openInventory.containsInventory(slot.transform());
     }
 
     @Override

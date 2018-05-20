@@ -89,6 +89,7 @@ import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;
@@ -143,6 +144,7 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.ban.Ban;
@@ -948,6 +950,15 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     @Override
     public Optional<Container> openInventory(Inventory inventory) {
+        return openInventory(inventory, inventory.getName());
+    }
+
+    @Override
+    public Optional<Container> openInventory(Inventory inventory, Text displayName) {
+        return openInventory(inventory, TextTranslation.of(displayName));
+    }
+
+    private Optional<Container> openInventory(Inventory inventory, Translation name) {
         checkNotNull(inventory, "inventory");
         final LanternContainer container;
         if (inventory instanceof LanternContainer) {
@@ -959,7 +970,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         } else {
             inventory.getInventoryProperty(GuiIdProperty.class).map(GuiIdProperty::getValue).orElseThrow(() ->
                     new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getId()));
-            container = LanternContainer.construct(this.inventory, (AbstractOrderedInventory) inventory);
+            container = LanternContainer.construct(this.inventory, (AbstractOrderedInventory) inventory, name);
         }
         if (this.containerSession.setOpenContainer(container)) {
             return Optional.of(container);

@@ -44,7 +44,7 @@ public class PlayerInventoryContainer extends CarriedLanternContainer<Player> {
     private PlayerClientContainer clientContainer;
 
     public PlayerInventoryContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory topInventory) {
-        super(playerInventory, topInventory);
+        super(playerInventory, topInventory, playerInventory.getName());
         // Construct the client container and attach the player
         this.clientContainer = new PlayerClientContainer(TextTranslation.toText(getName()));
         this.clientContainer.bindCursor(getCursorSlot());

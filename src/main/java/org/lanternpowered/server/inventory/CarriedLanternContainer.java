@@ -28,14 +28,15 @@ package org.lanternpowered.server.inventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Optional;
 
 @SuppressWarnings("unchecked")
 class CarriedLanternContainer<C extends Carrier> extends LanternContainer implements CarriedInventory<C> {
 
-    CarriedLanternContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory) {
-        super(playerInventory, openInventory);
+    CarriedLanternContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory, Translation name) {
+        super(playerInventory, openInventory, name);
     }
 
     @Override

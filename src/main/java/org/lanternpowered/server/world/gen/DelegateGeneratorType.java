@@ -72,6 +72,7 @@ public final class DelegateGeneratorType extends PluginCatalogType.Base implemen
         this.generatorType = generatorType;
         this.minimalSpawnHeight = Integer.MAX_VALUE;
         this.generatorHeight = Integer.MAX_VALUE;
+        this.seaLevel = Integer.MAX_VALUE;
     }
 
     @Override

@@ -32,9 +32,9 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.World;
 
@@ -254,7 +254,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
                     .add("maxChunks", this.maxChunks)
                     .add("numChunks", this.numChunks)
                     .add("released", this.released)
-                    .add("chunks", Collections3.toString(this.queue));
+                    .add("chunks", Iterables.toString(this.queue));
         }
     }
 

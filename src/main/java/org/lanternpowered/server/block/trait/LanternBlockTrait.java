@@ -27,7 +27,7 @@ package org.lanternpowered.server.block.trait;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.util.collect.Collections3;
+import com.google.common.collect.Iterables;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -90,7 +90,7 @@ public abstract class LanternBlockTrait<T extends Comparable<T>> implements Bloc
                 .add("name", this.name)
                 .add("key", this.key)
                 .add("valueClass", this.valueClass)
-                .add("possibleValues", Collections3.toString(this.possibleValues))
+                .add("possibleValues", Iterables.toString(this.possibleValues))
                 .toString();
     }
 }

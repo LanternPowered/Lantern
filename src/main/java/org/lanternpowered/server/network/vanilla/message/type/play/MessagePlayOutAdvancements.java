@@ -26,10 +26,10 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
-import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -82,8 +82,8 @@ public final class MessagePlayOutAdvancements implements Message {
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
                 .add("clear", this.clear)
-                .add("addedAdvStructs", Collections3.toString(this.addedAdvStructs))
-                .add("removedAdvs", Collections3.toString(this.removedAdvs))
+                .add("addedAdvStructs", Iterables.toString(this.addedAdvStructs))
+                .add("removedAdvs", Iterables.toString(this.removedAdvs))
                 .add("progress", progress.toString())
                 .toString();
     }
@@ -132,7 +132,7 @@ public final class MessagePlayOutAdvancements implements Message {
                     .add("id", this.id)
                     .add("parentId", this.parentId)
                     .add("display", this.display)
-                    .add("criteria", Collections3.toString(this.criteria))
+                    .add("criteria", Iterables.toString(this.criteria))
                     .toString();
         }
 

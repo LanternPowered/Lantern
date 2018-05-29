@@ -26,13 +26,13 @@
 package org.lanternpowered.server.data.manipulator.immutable;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Iterables;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
-import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -109,7 +109,7 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("type", getMutableType().getName())
-                .add("values", Collections3.toString(getValues()))
+                .add("values", Iterables.toString(getValues()))
                 .toString();
     }
 

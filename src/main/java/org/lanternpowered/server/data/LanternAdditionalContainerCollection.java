@@ -28,7 +28,7 @@ package org.lanternpowered.server.data;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.util.collect.Collections3;
+import com.google.common.collect.Iterables;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.ValueContainer;
 
@@ -134,7 +134,7 @@ final class LanternAdditionalContainerCollection<C extends ValueContainer<?>> im
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("containers", Collections3.toString(this.containers.values()))
+                .add("containers", Iterables.toString(this.containers.values()))
                 .add("type", this.containers instanceof ConcurrentHashMap ? "concurrent" : "normal")
                 .toString();
     }

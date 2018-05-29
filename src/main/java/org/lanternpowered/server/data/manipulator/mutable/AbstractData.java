@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.manipulator.mutable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Iterables;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.KeyRegistration;
@@ -39,7 +40,6 @@ import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipu
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
 import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.lanternpowered.server.util.collect.Collections3;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
@@ -198,7 +198,7 @@ public abstract class AbstractData<M extends DataManipulator<M, I>, I extends Im
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("type", getMutableType().getName())
-                .add("values", Collections3.toString(getValues()))
+                .add("values", Iterables.toString(getValues()))
                 .toString();
     }
 

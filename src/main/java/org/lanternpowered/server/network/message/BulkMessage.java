@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.message;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.util.collect.Collections3;
+import com.google.common.collect.Iterables;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public final class BulkMessage implements Message {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("messages", Collections3.toString(this.messages))
+                .add("messages", Iterables.toString(this.messages))
                 .toString();
     }
 }

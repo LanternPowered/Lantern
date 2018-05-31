@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.buffer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.io.ByteStreams;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -36,7 +37,6 @@ import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.network.buffer.objects.Type;
-import org.lanternpowered.server.util.io.LimitInputStream;
 import org.spongepowered.api.data.DataView;
 
 import java.io.IOException;
@@ -670,7 +670,7 @@ public class LanternByteBuffer implements ByteBuffer {
         this.buf.readerIndex(index);
         try {
             try (NbtDataContainerInputStream input = new NbtDataContainerInputStream(
-                    new LimitInputStream(new ByteBufInputStream(this.buf), maxBytes), maximumDepth)) {
+                    ByteStreams.limit(new ByteBufInputStream(this.buf), maxBytes), maximumDepth)) {
                 return input.read();
             }
         } catch (IOException e) {

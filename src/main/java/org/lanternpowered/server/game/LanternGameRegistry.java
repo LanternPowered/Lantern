@@ -54,6 +54,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder;
+import org.lanternpowered.server.block.tile.LanternTileEntityArchetypeBuilder;
 import org.lanternpowered.server.boss.LanternBossBarBuilder;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
@@ -280,6 +281,7 @@ import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
@@ -506,6 +508,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
+                .registerBuilderSupplier(TileEntityArchetype.Builder.class, LanternTileEntityArchetypeBuilder::new)
                 .registerBuilderSupplier(LocatableBlock.Builder.class, LanternLocatableBlockBuilder::new)
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)

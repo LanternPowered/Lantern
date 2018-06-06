@@ -50,7 +50,7 @@ import java.util.UUID;
 
 public class LanternTileEntityArchetype implements TileEntityArchetype, AbstractPropertyHolder, IAdditionalDataHolder {
 
-    private final LanternTileEntity tileEntity;
+    final LanternTileEntity tileEntity;
 
     LanternTileEntityArchetype(LanternTileEntity internalTileEntity) {
         this.tileEntity = internalTileEntity;
@@ -99,10 +99,17 @@ public class LanternTileEntityArchetype implements TileEntityArchetype, Abstract
     @Override
     public Optional<TileEntity> apply(Location<World> location) {
         checkNotNull(location, "location");
-        final LanternTileEntity copy = getTileEntityType().construct();
-        copy.copyFromFastNoEvents(this.tileEntity);
-        copy.setLocation(location);
-        return Optional.of(copy);
+        final BlockState locState = location.getBlock();
+        final BlockState archetypeState = getState();
+        if (locState.getType() != archetypeState.getType()) {
+            location.setBlock(archetypeState);
+        }
+        final Optional<TileEntity> optTileEntity = location.getTileEntity();
+        optTileEntity.ifPresent(tile -> {
+            final LanternTileEntity tileEntity = (LanternTileEntity) tile;
+            tileEntity.copyFromFastNoEvents(this.tileEntity);
+        });
+        return optTileEntity;
     }
 
     @Override

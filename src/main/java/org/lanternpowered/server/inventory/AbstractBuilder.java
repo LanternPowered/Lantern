@@ -186,23 +186,19 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
         try {
             build(inventory);
         } catch (Exception e) {
-            if (archetype == null) {
-                archetype = (LanternInventoryArchetype<R>) inventory.getArchetype();
-            }
-            final String id;
-            final String builderType;
             try {
-                if (inventory.getArchetype() == InventoryArchetypes.UNKNOWN) {
-                    id = "unknown";
-                    builderType = "Unknown";
-                } else {
-                    id = inventory.getArchetype().getId();
-                    builderType = archetype.getBuilder().getClass().getName();
+                if (archetype == null) {
+                    archetype = (LanternInventoryArchetype<R>) inventory.getArchetype();
                 }
+                if (archetype == InventoryArchetypes.UNKNOWN) {
+                    throw e;
+                }
+                final String id = archetype.getId();
+                final String builderType = archetype.getBuilder().getClass().getName();
+                throw new RuntimeException("An error occurred while constructing " + id + " with builder type " + builderType, e);
             } catch (Exception e1) {
                 throw e;
             }
-            throw new RuntimeException("An error occurred while constructing " + id + " with builder type " + builderType, e);
         }
         if (inventory instanceof AbstractMutableInventory) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;

@@ -122,11 +122,6 @@ public abstract class AbstractContainerSlot extends AbstractSlot {
     }
 
     @Override
-    protected List<AbstractSlot> getIndexedSlotInventories() {
-        return getInventorySlot().getIndexedSlotInventories();
-    }
-
-    @Override
     public boolean isValidItem(ItemType type) {
         return getInventorySlot().isValidItem(type);
     }

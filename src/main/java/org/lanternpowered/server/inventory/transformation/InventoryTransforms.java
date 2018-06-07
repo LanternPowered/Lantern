@@ -57,7 +57,7 @@ public final class InventoryTransforms {
 
     public static final InventoryTransformation REVERSE = inventory ->
             AbstractOrderedInventory.viewBuilder()
-                    .inventories(Lists.reverse(Lists.newArrayList(((IInventory) inventory).orderedSlots())))
+                    .inventories(Lists.reverse(Lists.newArrayList(inventory.slots())))
                     .build();
 
     private InventoryTransforms() {

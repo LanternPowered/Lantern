@@ -136,22 +136,12 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
      * Gets all the {@link AbstractSlot}s that could be found in the
      * children inventories. This method may return a empty {@link List}
      * if the subclass doesn't support children, for example slots and
-     * empty inventories.
-     *
-     * @return The slots
-     */
-    protected abstract List<AbstractSlot> getSlotInventories();
-
-    /**
-     * Gets all the {@link AbstractSlot}s that could be found in the
-     * children inventories. This method may return a empty {@link List}
-     * if the subclass doesn't support children, for example slots and
      * empty inventories. The position of the slot also represents the
      * index.
      *
      * @return The slots
      */
-    protected abstract List<AbstractSlot> getIndexedSlotInventories();
+    protected abstract List<AbstractSlot> getSlotInventories();
 
     /**
      * Initializes the target {@link ClientContainer} for this inventory.
@@ -255,11 +245,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
             listener.onViewerRemoved(viewer, container, callback);
             return callback.remove;
         });
-    }
-
-    @Override
-    public <T extends Inventory> Iterable<T> orderedSlots() {
-        return (Iterable<T>) getIndexedSlotInventories();
     }
 
     @Override

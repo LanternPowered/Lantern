@@ -29,19 +29,15 @@ import org.spongepowered.api.item.inventory.type.InventoryRow;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 public abstract class AbstractInventoryRow extends AbstractInventory2D implements InventoryRow {
 
     @Override
-    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots,
-            @Nullable List<? extends AbstractSlot> prioritizedSlots) {
-        super.initWithSlots(children, slots, slots.size(), 1, prioritizedSlots);
+    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots) {
+        super.initWithSlots(children, slots, slots.size(), 1);
     }
 
     @Override
-    void initWithChildren(List<AbstractMutableInventory> children,
-            @Nullable List<AbstractMutableInventory> prioritizedChildren) {
-        super.initWithChildren(children, -1, 1, prioritizedChildren);
+    void initWithChildren(List<AbstractMutableInventory> children) {
+        super.initWithChildren(children, -1, 1);
     }
 }

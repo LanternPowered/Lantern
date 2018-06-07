@@ -69,11 +69,9 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
 
     @Nullable private List<AbstractMutableInventory> children;
     @Nullable private List<AbstractSlot> slots;
-    @Nullable private List<AbstractSlot> prioritizedSlots;
     @Nullable private Object2IntMap<AbstractSlot> slotsToIndex;
 
-    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots,
-            @Nullable List<? extends AbstractSlot> prioritizedSlots) {
+    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots) {
         this.children = children;
         final Object2IntMap<AbstractSlot> slotsToIndex = new Object2IntOpenHashMap<>();
         slotsToIndex.defaultReturnValue(INVALID_INDEX);
@@ -83,13 +81,11 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
         }
         this.slots = ImmutableList.copyOf(slots);
         this.slotsToIndex = Object2IntMaps.unmodifiable(slotsToIndex);
-        this.prioritizedSlots = prioritizedSlots != null ? ImmutableList.copyOf(prioritizedSlots) : null;
         init();
     }
 
-    void initWithChildren(List<AbstractMutableInventory> children,
-            @Nullable List<AbstractMutableInventory> prioritizedChildren) {
-        this.children = prioritizedChildren == null ? children : prioritizedChildren;
+    void initWithChildren(List<AbstractMutableInventory> children) {
+        this.children = children;
         final ImmutableList.Builder<AbstractSlot> slotsBuilder = ImmutableList.builder();
         final Object2IntMap<AbstractSlot> slotsToIndex = new Object2IntOpenHashMap<>();
         slotsToIndex.defaultReturnValue(INVALID_INDEX);
@@ -101,7 +97,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
                 slotsToIndex.put(slot, index++);
             } else if (inventory instanceof AbstractOrderedInventory) {
                 final AbstractOrderedInventory childrenInventory = (AbstractOrderedInventory) inventory;
-                for (AbstractSlot slot : childrenInventory.getIndexedSlotInventories()) {
+                for (AbstractSlot slot : childrenInventory.getSlotInventories()) {
                     slotsBuilder.add(slot);
                     slotsToIndex.put(slot, index++);
                 }
@@ -109,30 +105,14 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
                 throw new IllegalArgumentException("All the children inventories must be ordered.");
             }
         }
-        if (prioritizedChildren != null) {
-            final ImmutableList.Builder<AbstractSlot> prioritizedSlotsBuilder = ImmutableList.builder();
-            for (AbstractMutableInventory inventory : prioritizedChildren) {
-                if (inventory instanceof AbstractSlot) {
-                    prioritizedSlotsBuilder.add((AbstractSlot) inventory);
-                } else {
-                    prioritizedSlotsBuilder.addAll(inventory.getSlotInventories());
-                }
-            }
-            this.prioritizedSlots = prioritizedSlotsBuilder.build();
-        }
         this.slots = slotsBuilder.build();
         this.slotsToIndex = Object2IntMaps.unmodifiable(slotsToIndex);
         init();
     }
 
     @Override
-    protected List<AbstractSlot> getIndexedSlotInventories() {
-        return this.slots == null ? Collections.emptyList() : this.slots;
-    }
-
-    @Override
     protected List<AbstractSlot> getSlotInventories() {
-        return this.prioritizedSlots != null ? this.prioritizedSlots : getIndexedSlotInventories();
+        return this.slots == null ? Collections.emptyList() : this.slots;
     }
 
     @Override
@@ -204,7 +184,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
 
     @Override
     public Optional<ISlot> getSlot(int index) {
-        final List<AbstractSlot> slots = getIndexedSlotInventories();
+        final List<AbstractSlot> slots = getSlotInventories();
         return index < 0 || index >= slots.size() ? Optional.empty() : Optional.ofNullable(slots.get(index));
     }
 
@@ -226,7 +206,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
     public static final class Builder<T extends AbstractOrderedInventory>
             extends AbstractArchetypeBuilder<T, AbstractOrderedInventory, Builder<T>>  {
 
-        private final List<PrioritizedObject<LanternInventoryArchetype<? extends AbstractMutableInventory>>> inventories = new ArrayList<>();
+        private final List<LanternInventoryArchetype<? extends AbstractMutableInventory>> inventories = new ArrayList<>();
         private int expandedSlots = 0;
 
         private Builder() {
@@ -242,62 +222,36 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
         }
 
         /**
-         * Adds the {@link InventoryArchetype} with the specified priority. All the
-         * {@link AbstractSlot} indexes will be generated on the insertion order. The
-         * priority will only affect the iteration order, this will affect
-         * {@link IInventory#offer(ItemStack)}, ... operations.
-         *
-         * @param inventoryArchetype The inventory archetype
-         * @return This builder, for chaining
-         */
-        public Builder<T> addFirst(LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype, int priority) {
-            return add(0, inventoryArchetype, priority);
-        }
-
-        /**
-         * Adds the {@link InventoryArchetype} with the default priority.
+         * Adds the {@link InventoryArchetype} at
+         * the first position.
          *
          * @param inventoryArchetype The inventory archetype
          * @return This builder, for chaining
          */
         public Builder<T> addFirst(LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype) {
-            return add(0, inventoryArchetype, DEFAULT_PRIORITY);
+            return add(0, inventoryArchetype);
         }
 
         /**
-         * Adds the {@link InventoryArchetype} with the specified priority. All the
-         * {@link AbstractSlot} indexes will be generated on the insertion order. The
-         * priority will only affect the iteration order, this will affect
-         * {@link IInventory#offer(ItemStack)}, ... operations.
-         *
-         * @param inventoryArchetype The inventory archetype
-         * @return This builder, for chaining
-         */
-        public Builder<T> addLast(LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype, int priority) {
-            return add(this.inventories.size(), inventoryArchetype, priority);
-        }
-
-        /**
-         * Adds the {@link InventoryArchetype} with the default priority.
+         * Adds the {@link InventoryArchetype} at
+         * the last position.
          *
          * @param inventoryArchetype The inventory archetype
          * @return This builder, for chaining
          */
         public Builder<T> addLast(LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype) {
-            return add(this.inventories.size(), inventoryArchetype, DEFAULT_PRIORITY);
+            return add(this.inventories.size(), inventoryArchetype);
         }
 
         /**
-         * Adds the {@link InventoryArchetype} with the specified priority. All the
-         * {@link AbstractSlot} indexes will be generated on the insertion order. The
-         * priority will only affect the iteration order, this will affect
-         * {@link IInventory#offer(ItemStack)}, ... operations.
+         * Adds the {@link InventoryArchetype} at
+         * the specified position.
          *
          * @param inventoryArchetype The inventory archetype
          * @return This builder, for chaining
          */
-        public Builder<T> add(int index, LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype, int priority) {
-            this.inventories.add(index, new PrioritizedObject<>(inventoryArchetype, priority));
+        public Builder<T> add(int index, LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype) {
+            this.inventories.add(index, inventoryArchetype);
             if (inventoryArchetype.getBuilder() instanceof AbstractInventorySlot.Builder) {
                 this.slots++;
                 if (this.expandedSlots < this.slots) {
@@ -312,32 +266,18 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
             return this;
         }
 
-        /**
-         * Adds the {@link InventoryArchetype} with the default priority.
-         *
-         * @param inventoryArchetype The inventory archetype
-         * @return This builder, for chaining
-         */
-        public Builder<T> add(int index, LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype) {
-            return add(index, inventoryArchetype, DEFAULT_PRIORITY);
-        }
-
         @Override
         protected void build(AbstractOrderedInventory inventory) {
             checkState(this.expandedSlots <= this.slots, "The builder got expanded to %s slots, "
                     + "but only %s slots could be found.", this.expandedSlots, this.slots);
-            final ImmutableList<PrioritizedObject<? extends AbstractMutableInventory>> prioritizedChildrenObjects = this.inventories.stream()
+            final ImmutableList<AbstractMutableInventory> children = this.inventories.stream()
                     .map(e -> {
-                        final AbstractMutableInventory inventory1 = e.object.build();
+                        final AbstractMutableInventory inventory1 = e.build();
                         inventory1.setParentSafely(inventory);
-                        return new PrioritizedObject<>(inventory1, e.priority);
+                        return inventory1;
                     })
                     .collect(ImmutableList.toImmutableList());
-            final ImmutableList<AbstractMutableInventory> children = prioritizedChildrenObjects.stream()
-                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
-            final ImmutableList<AbstractMutableInventory> prioritizedChildren = prioritizedChildrenObjects.stream().sorted()
-                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
-            inventory.initWithChildren(children, prioritizedChildren);
+            inventory.initWithChildren(children);
         }
 
         @Override
@@ -361,7 +301,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
     public static final class ViewBuilder<T extends AbstractOrderedInventory>
             extends AbstractViewBuilder<T, AbstractOrderedInventory, ViewBuilder<T>>  {
 
-        private final List<PrioritizedObject<AbstractMutableInventory>> inventories = new ArrayList<>();
+        private final List<AbstractMutableInventory> inventories = new ArrayList<>();
 
         private ViewBuilder() {
         }
@@ -372,47 +312,19 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
         }
 
         /**
-         * Adds the {@link AbstractMutableInventory} with the specified priority. All the
-         * {@link AbstractSlot} indexes will be generated on the insertion order. The
-         * priority will only affect the iteration order, this will affect
-         * {@link IInventory#offer(ItemStack)}, ... operations.
-         *
-         * @param inventory The inventory
-         * @param priority The priority
-         * @return This builder, for chaining
-         */
-        public ViewBuilder<T> inventory(Inventory inventory, int priority) {
-            this.inventories.add(new PrioritizedObject<>((AbstractMutableInventory) inventory, priority));
-            return this;
-        }
-
-        /**
-         * Adds the {@link AbstractMutableInventory} with the default priority.
+         * Adds the {@link AbstractMutableInventory}.
          *
          * @param inventory The inventory
          * @return This builder, for chaining
          */
         public ViewBuilder<T> inventory(Inventory inventory) {
-            return inventory(inventory, DEFAULT_PRIORITY);
-        }
-
-        /**
-         * Adds the {@link AbstractMutableInventory}s with the specified priority. All the
-         * {@link AbstractSlot} indexes will be generated on the insertion order. The
-         * priority will only affect the iteration order, this will affect
-         * {@link IInventory#offer(ItemStack)}, ... operations.
-         *
-         * @param inventories The inventories
-         * @param priority The priority
-         * @return This builder, for chaining
-         */
-        public ViewBuilder<T> inventories(Iterable<? extends Inventory> inventories, int priority) {
-            inventories.forEach(inventory -> inventory(inventory, priority));
+            checkNotNull(inventory, "inventory");
+            this.inventories.add((AbstractMutableInventory) inventory);
             return this;
         }
 
         /**
-         * Adds the {@link AbstractMutableInventory} with the default priority.
+         * Adds the {@link AbstractMutableInventory}s.
          *
          * @param inventories The inventories
          * @return This builder, for chaining
@@ -424,11 +336,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
 
         @Override
         protected void build(AbstractOrderedInventory inventory) {
-            final ImmutableList<AbstractMutableInventory> children = this.inventories.stream()
-                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
-            final ImmutableList<AbstractMutableInventory> prioritizedChildren = this.inventories.stream().sorted()
-                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
-            inventory.initWithChildren(children, prioritizedChildren);
+            inventory.initWithChildren(ImmutableList.copyOf(this.inventories));
         }
     }
 }

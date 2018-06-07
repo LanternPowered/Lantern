@@ -54,24 +54,6 @@ import javax.annotation.Nullable;
 @SuppressWarnings({"unchecked", "ConstantConditions"})
 public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, B extends AbstractBuilder<R, T, B>> {
 
-    protected static final int DEFAULT_PRIORITY = 1000;
-
-    protected static class PrioritizedObject<T> implements Comparable<PrioritizedObject<T>> {
-
-        protected final T object;
-        protected final int priority;
-
-        protected PrioritizedObject(T object, int priority) {
-            this.priority = priority;
-            this.object = object;
-        }
-
-        @Override
-        public int compareTo(PrioritizedObject<T> o) {
-            return Integer.compare(o.priority, this.priority);
-        }
-    }
-
     @Nullable protected InventoryConstructor<R> constructor;
     protected final Map<Class<?>, Map<String, InventoryProperty<String, ?>>> properties = new HashMap<>();
     @Nullable protected Map<Class<?>, Map<String, InventoryProperty<String, ?>>> cachedProperties;
@@ -91,6 +73,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @return This builder, for chaining
      */
     public <N extends T> AbstractBuilder<N, T, ?> type(Class<N> inventoryType) {
+        checkNotNull(inventoryType, "inventoryType");
         this.constructor = InventoryConstructorFactory.get().getConstructor((Class<R>) inventoryType);
         return (AbstractBuilder<N, T, ?>) this;
     }
@@ -207,13 +190,19 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
                 archetype = (LanternInventoryArchetype<R>) inventory.getArchetype();
             }
             final String id;
+            final String builderType;
             try {
-                id = inventory.getArchetype() == InventoryArchetypes.UNKNOWN ? "unknown" : inventory.getArchetype().getId();
+                if (inventory.getArchetype() == InventoryArchetypes.UNKNOWN) {
+                    id = "unknown";
+                    builderType = "Unknown";
+                } else {
+                    id = inventory.getArchetype().getId();
+                    builderType = archetype.getBuilder().getClass().getName();
+                }
             } catch (Exception e1) {
                 throw e;
             }
-            throw new RuntimeException("An error occurred while constructing " + id + " with builder type " +
-                    archetype.getBuilder().getClass().getName(), e);
+            throw new RuntimeException("An error occurred while constructing " + id + " with builder type " + builderType, e);
         }
         if (inventory instanceof AbstractMutableInventory) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;

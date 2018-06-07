@@ -56,21 +56,18 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
     AbstractInventory2D() {
     }
 
-    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots, int columns, int rows,
-            @Nullable List<? extends AbstractSlot> prioritizedSlots) {
+    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots, int columns, int rows) {
         checkState(columns * rows == slots.size(), "Slots mismatch, %s (columns) * %s (rows) = %s (slots) and not %s (slots)",
                 columns, rows, columns * rows, slots.size());
-        checkState(prioritizedSlots == null || columns * rows == prioritizedSlots.size(), "Slots mismatch");
 
         this.columns = columns;
         this.rows = rows;
 
-        super.initWithSlots(children, slots, prioritizedSlots);
+        super.initWithSlots(children, slots);
     }
 
-    void initWithChildren(List<AbstractMutableInventory> children, int columns, int rows,
-            @Nullable List<AbstractMutableInventory> prioritizedChildren) {
-        super.initWithChildren(children, prioritizedChildren);
+    void initWithChildren(List<AbstractMutableInventory> children, int columns, int rows) {
+        super.initWithChildren(children);
         if (columns == -1 && rows == -1) {
             rows = 1;
         }
@@ -88,14 +85,12 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
     }
 
     @Override
-    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots,
-            @Nullable List<? extends AbstractSlot> prioritizedSlots) {
+    void initWithSlots(List<AbstractMutableInventory> children, List<? extends AbstractSlot> slots) {
         throw new UnsupportedOperationException(getClass().getName());
     }
 
     @Override
-    void initWithChildren(List<AbstractMutableInventory> children,
-            @Nullable List<AbstractMutableInventory> prioritizedChildren) {
+    void initWithChildren(List<AbstractMutableInventory> children) {
         throw new UnsupportedOperationException(getClass().getName());
     }
 

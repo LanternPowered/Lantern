@@ -185,11 +185,6 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     }
 
     @Override
-    protected List<AbstractSlot> getIndexedSlotInventories() {
-        return Collections.emptyList();
-    }
-
-    @Override
     public boolean hasChildren() {
         return false;
     }

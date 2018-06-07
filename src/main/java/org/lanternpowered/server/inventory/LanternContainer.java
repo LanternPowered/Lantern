@@ -98,7 +98,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
         final List<AbstractContainerSlot> slots = new ArrayList<>();
         final ImmutableMap.Builder<AbstractSlot, AbstractContainerSlot> slotsToContainerSlot = ImmutableMap.builder();
         for (AbstractOrderedInventory inventory : inventories) {
-            for (AbstractSlot slot : inventory.getIndexedSlotInventories()) {
+            for (AbstractSlot slot : inventory.getSlotInventories()) {
                 final AbstractContainerSlot containerSlot = ((AbstractInventorySlot) slot).constructContainerSlot();
                 containerSlot.slot = (AbstractInventorySlot) slot;
                 containerSlot.setParent(this);
@@ -107,7 +107,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
             }
         }
         this.slotsToContainerSlot = slotsToContainerSlot.build();
-        initWithSlots((List) inventories, slots, null);
+        initWithSlots((List) inventories, slots);
         setName(name); // Apply the name to display
     }
 

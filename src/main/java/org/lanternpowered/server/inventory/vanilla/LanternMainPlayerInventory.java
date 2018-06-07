@@ -58,8 +58,8 @@ public class LanternMainPlayerInventory extends AbstractGridInventory implements
         this.hotbar = query(Holder.HOTBAR_OPERATION).first();
 
         this.priorityHotbar = AbstractGridInventory.rowsViewBuilder()
-                .grid(0, this.grid)
-                .row(this.grid.getRows(), this.hotbar, 1050) // Higher priority for the hotbar
+                .row(0, this.hotbar) // Higher priority for the hotbar
+                .grid(1, this.grid)
                 .build();
         this.reverse = (AbstractOrderedInventory) InventoryTransforms.REVERSE.transform(this);
     }

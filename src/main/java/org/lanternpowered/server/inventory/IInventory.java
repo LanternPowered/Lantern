@@ -59,8 +59,6 @@ public interface IInventory extends Inventory {
      */
     EmptyInventory empty();
 
-    <T extends Inventory> Iterable<T> orderedSlots();
-
     /**
      * Adds a {@link SlotChangeListener} to
      * this {@link Inventory}.

@@ -150,11 +150,6 @@ public abstract class AbstractInventory implements IInventory {
         return (Iterable<T>) getSlotInventories();
     }
 
-    @Override
-    public <T extends Inventory> Iterable<T> orderedSlots() {
-        return (Iterable<T>) getSlotInventories();
-    }
-
     // Basic inventory stuff
 
     @Override

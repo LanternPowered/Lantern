@@ -59,11 +59,6 @@ public abstract class AbstractUnorderedChildrenInventory extends AbstractChildre
     }
 
     @Override
-    protected List<AbstractSlot> getIndexedSlotInventories() {
-        return getSlotInventories();
-    }
-
-    @Override
     protected List<AbstractSlot> getSlotInventories() {
         if (this.slots != null) {
             return this.slots;

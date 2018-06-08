@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
@@ -43,9 +44,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
     @Nullable private Art lastArt;
     @Nullable private Direction lastDirection;
 
-    private int lastX;
-    private int lastY;
-    private int lastZ;
+    private Vector3i lastBlockPos;
 
     public PaintingEntityProtocol(E entity) {
         super(entity);
@@ -79,25 +78,19 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
     public void update(EntityProtocolUpdateContext context) {
         final Art art = getArt();
         final Direction direction = getDirection();
-        final Vector3i position = this.entity.getPosition().toInt();
-        final int x = position.getX();
-        final int y = position.getY();
-        final int z = position.getZ();
+        final Vector3d pos = this.entity.getPosition();
+        final Vector3i blockPos = pos.toInt();
 
         if (art != this.lastArt || direction != this.lastDirection) {
-            spawn(context, art, direction, position);
+            spawn(context, art, direction, blockPos);
             update0(EntityProtocolUpdateContext.empty());
             this.lastDirection = direction;
+            this.lastBlockPos = blockPos;
             this.lastArt = art;
-            this.lastX = x;
-            this.lastY = y;
-            this.lastZ = z;
-        } else if (x != this.lastX || y != this.lastY || z != this.lastZ) {
+        } else if (!blockPos.equals(this.lastBlockPos)) {
             update0(context);
-            context.sendToAll(() -> new MessagePlayOutEntityTeleport(getRootEntityId(), x, y, z, (byte) 0, (byte) 0, true));
-            this.lastX = x;
-            this.lastY = y;
-            this.lastZ = z;
+            context.sendToAll(() -> new MessagePlayOutEntityTeleport(getRootEntityId(), pos, (byte) 0, (byte) 0, true));
+            this.lastBlockPos = blockPos;
         }
     }
 

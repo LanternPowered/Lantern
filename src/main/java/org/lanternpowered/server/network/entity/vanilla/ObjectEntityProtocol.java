@@ -59,7 +59,7 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnObject(entityId, this.entity.getUniqueId(),
                 this.getObjectType(), this.getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
-        final ParameterList parameterList = this.fillParameters(true);
+        final ParameterList parameterList = fillSpawnParameters();
         if (!parameterList.isEmpty()) {
             context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
         }

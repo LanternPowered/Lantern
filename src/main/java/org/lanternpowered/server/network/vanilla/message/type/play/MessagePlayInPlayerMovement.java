@@ -25,37 +25,24 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayInPlayerMovement implements Message {
 
     private final boolean onGround;
+    private final Vector3d position;
 
-    private final double x;
-    private final double y;
-    private final double z;
-
-    public MessagePlayInPlayerMovement(double x, double y, double z, boolean onGround) {
+    public MessagePlayInPlayerMovement(Vector3d position, boolean onGround) {
+        this.position = position;
         this.onGround = onGround;
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
 
     public boolean isOnGround() {
         return this.onGround;
     }
 
-    public double getX() {
-        return this.x;
+    public Vector3d getPosition() {
+        return this.position;
     }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getZ() {
-        return this.z;
-    }
-
 }

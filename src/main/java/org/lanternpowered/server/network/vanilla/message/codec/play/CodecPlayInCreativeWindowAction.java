@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
@@ -37,8 +37,8 @@ public final class CodecPlayInCreativeWindowAction implements Codec<MessagePlayI
 
     @Override
     public MessagePlayInCreativeWindowAction decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        int slot = buf.readShort();
-        ItemStack item = buf.read(Types.ITEM_STACK);
+        final int slot = buf.readShort();
+        final ItemStack item = context.read(buf, ContextualValueTypes.ITEM_STACK);
         return new MessagePlayInCreativeWindowAction(slot, item);
     }
 }

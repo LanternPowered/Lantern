@@ -159,10 +159,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -1112,10 +1110,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         checkNotNull(type, "chatType");
         checkNotNull(message, "message");
         if (!this.players.isEmpty()) {
-            final Map<Locale, Message> networkMessages = new HashMap<>();
+            final Message networkMessage = ((LanternChatType) type).getMessageProvider().apply(message);
             for (LanternPlayer player : this.players) {
-                player.getConnection().send(networkMessages.computeIfAbsent(player.getLocale(),
-                        locale -> ((LanternChatType) type).getMessageProvider().apply(message, locale)));
+                if (player.getChatVisibility().isVisible(type)) {
+                    player.getConnection().send(networkMessage);
+                }
             }
         }
     }

@@ -26,9 +26,9 @@
 package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
+import org.lanternpowered.server.text.translation.TranslationContext;
+import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
@@ -69,10 +69,12 @@ public class WrittenBookItemTypeObjectSerializer extends WritableBookItemTypeObj
     }
 
     public static void writeBookData(DataView dataView, BookView bookView, Locale locale) {
-        dataView.set(AUTHOR, LanternTexts.toLegacy(bookView.getAuthor()));
-        dataView.set(TITLE, LanternTexts.toLegacy(bookView.getTitle()));
-        JsonTextTranslatableSerializer.setCurrentLocale(locale);
-        dataView.set(PAGES, bookView.getPages().stream().map(Types.TEXT_GSON::toJson).collect(Collectors.toList()));
-        JsonTextTranslatableSerializer.removeCurrentLocale();
+        try (TranslationContext ignored = TranslationContext.enter()
+                .locale(locale)
+                .enableForcedTranslations()) {
+            dataView.set(AUTHOR, LanternTexts.toLegacy(bookView.getAuthor()));
+            dataView.set(TITLE, LanternTexts.toLegacy(bookView.getTitle()));
+            dataView.set(PAGES, bookView.getPages().stream().map(JsonTextSerializer.getGson()::toJson).collect(Collectors.toList()));
+        }
     }
 }

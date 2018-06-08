@@ -26,45 +26,45 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.LocalizedText;
+import org.spongepowered.api.text.Text;
 
 public abstract class MessagePlayOutTitle implements Message {
 
     public static final class SetTitle extends MessagePlayOutTitle {
 
-        private final LocalizedText title;
+        private final Text title;
 
-        public SetTitle(LocalizedText title) {
+        public SetTitle(Text title) {
             this.title = title;
         }
 
-        public LocalizedText getTitle() {
+        public Text getTitle() {
             return this.title;
         }
     }
 
     public static final class SetSubtitle extends MessagePlayOutTitle {
 
-        private final LocalizedText title;
+        private final Text title;
 
-        public SetSubtitle(LocalizedText title) {
+        public SetSubtitle(Text title) {
             this.title = title;
         }
 
-        public LocalizedText getTitle() {
+        public Text getTitle() {
             return this.title;
         }
     }
 
     public static final class SetActionbarTitle extends MessagePlayOutTitle {
 
-        private final LocalizedText title;
+        private final Text title;
 
-        public SetActionbarTitle(LocalizedText title) {
+        public SetActionbarTitle(Text title) {
             this.title = title;
         }
 
-        public LocalizedText getTitle() {
+        public Text getTitle() {
             return this.title;
         }
     }

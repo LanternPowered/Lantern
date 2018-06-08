@@ -26,7 +26,6 @@
 package org.lanternpowered.server.game.registry.type.text;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.text.chat.LanternChatType;
@@ -42,10 +41,9 @@ public final class ChatTypeRegistryModule extends AdditionalPluginCatalogRegistr
     @Override
     public void registerDefaults() {
         register(new LanternChatType("minecraft", "chat",
-                (text, locale) -> new MessagePlayOutChatMessage(new LocalizedText(text, locale), MessagePlayOutChatMessage.Type.CHAT)));
-        register(new LanternChatType("minecraft", "action_bar",
-                (text, locale) -> new MessagePlayOutTitle.SetActionbarTitle(new LocalizedText(text, locale))));
+                text -> new MessagePlayOutChatMessage(text, MessagePlayOutChatMessage.Type.CHAT)));
+        register(new LanternChatType("minecraft", "action_bar", MessagePlayOutTitle.SetActionbarTitle::new));
         register(new LanternChatType("minecraft", "system",
-                (text, locale) -> new MessagePlayOutChatMessage(new LocalizedText(text, locale), MessagePlayOutChatMessage.Type.SYSTEM)));
+                text -> new MessagePlayOutChatMessage(text, MessagePlayOutChatMessage.Type.SYSTEM)));
     }
 }

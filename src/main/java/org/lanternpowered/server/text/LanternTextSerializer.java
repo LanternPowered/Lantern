@@ -32,5 +32,12 @@ import java.util.Locale;
 
 public interface LanternTextSerializer extends TextSerializer {
 
+    /**
+     * Serializes the {@link Text} using the given {@link Locale}.
+     *
+     * @param text The text
+     * @param locale The locale
+     * @return The serialized string
+     */
     String serialize(Text text, Locale locale);
 }

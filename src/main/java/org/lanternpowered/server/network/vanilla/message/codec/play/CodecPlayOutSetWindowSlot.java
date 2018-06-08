@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.objects.RawItemStack;
@@ -44,9 +44,9 @@ public final class CodecPlayOutSetWindowSlot implements Codec<MessagePlayOutSetW
         buf.writeShort((short) message.getIndex());
         final Object item = message.getItem();
         if (item instanceof ItemStack) {
-            buf.write(Types.ITEM_STACK, (ItemStack) item);
+            context.write(buf, ContextualValueTypes.ITEM_STACK, (ItemStack) item);
         } else if (item instanceof RawItemStack || item == null) {
-            buf.write(Types.RAW_ITEM_STACK, (RawItemStack) item);
+            buf.writeRawItemStack((RawItemStack) item);
         } else {
             throw new EncoderException("Invalid item type:" + item.getClass().getName());
         }

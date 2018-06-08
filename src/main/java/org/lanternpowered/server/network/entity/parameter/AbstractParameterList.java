@@ -26,13 +26,16 @@
 package org.lanternpowered.server.network.entity.parameter;
 
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.CodecContext;
 
 public abstract class AbstractParameterList implements ParameterList {
 
     /**
      * Writes the {@link ParameterList} to the {@link ByteBuffer}.
      *
-     * @param byteBuffer The byte buffer
+     * @param buf The byte buffer
      */
-    public abstract void write(ByteBuffer byteBuffer);
+    void write(CodecContext ctx, ByteBuffer buf) {
+        buf.writeByte((byte) 0xff);
+    }
 }

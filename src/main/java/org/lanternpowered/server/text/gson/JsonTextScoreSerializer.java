@@ -33,15 +33,14 @@ import static org.lanternpowered.server.text.gson.TextConstants.SCORE_VALUE;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import org.lanternpowered.server.scoreboard.LanternScore;
 import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.text.ScoreText;
@@ -53,12 +52,9 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
-final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<ScoreText>, JsonDeserializer<ScoreText> {
+final class JsonTextScoreSerializer extends JsonTextBaseSerializer<ScoreText> {
 
-    private final boolean networkingFormat;
-
-    JsonTextScoreSerializer(boolean networkingFormat) {
-        this.networkingFormat = networkingFormat;
+    JsonTextScoreSerializer() {
     }
 
     @Override
@@ -110,7 +106,8 @@ final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements Js
         final Optional<String> override = src.getOverride();
         // If we are using the networking format and there is an override present, just use
         // the override as a literal text object
-        if (this.networkingFormat && override.isPresent()) {
+        final boolean networkingFormat = TranslationContext.current().forcesTranslations();
+        if (networkingFormat && override.isPresent()) {
             return new JsonPrimitive(override.get());
         }
         // There are here some extra fields to represent the (lantern/sponge) score text object,
@@ -126,7 +123,7 @@ final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements Js
             // Provide a list with all the extra objectives that
             // are attached to the score.
             // There is no need to send this to the client.
-            if (!this.networkingFormat) {
+            if (!networkingFormat) {
                 if (it.hasNext()) {
                     final JsonArray array = new JsonArray();
                     while (it.hasNext()) {

@@ -27,13 +27,13 @@ package org.lanternpowered.server.scoreboard;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore;
-import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
@@ -56,10 +56,8 @@ public class LanternObjective implements Objective {
     final Set<Scoreboard> scoreboards = new HashSet<>();
     private ObjectiveDisplayMode displayMode;
     private Text displayName;
-    private String legacyDisplayName;
 
     LanternObjective(String name, Criterion criterion, ObjectiveDisplayMode displayMode, Text displayName) {
-        this.legacyDisplayName = LanternTexts.toLegacy(displayName);
         this.displayName = displayName;
         this.displayMode = displayMode;
         this.criterion = criterion;
@@ -74,10 +72,6 @@ public class LanternObjective implements Objective {
         this.scoreboards.remove(scoreboard);
     }
 
-    public String getLegacyDisplayName() {
-        return this.legacyDisplayName;
-    }
-
     @Override
     public String getName() {
         return this.name;
@@ -90,21 +84,19 @@ public class LanternObjective implements Objective {
 
     @Override
     public void setDisplayName(Text displayName) throws IllegalArgumentException {
-        final String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
-        checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
-                legacyDisplayName.length());
-        final boolean update = !legacyDisplayName.equals(this.legacyDisplayName);
-        this.legacyDisplayName = legacyDisplayName;
+        final int length = displayName.toPlain().length();
+        checkArgument(length <= 32, "Display name is %s characters long! It must be at most 32.", length);
+        final boolean update = !this.displayName.equals(displayName);
         this.displayName = displayName;
         if (update) {
-            this.sendObjectiveUpdate();
+            sendObjectiveUpdate();
         }
     }
 
     private void sendObjectiveUpdate() {
         if (!this.scoreboards.isEmpty()) {
             final List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardObjective.Update(
-                    this.name, this.legacyDisplayName, this.displayMode));
+                    this.name, this.displayName, this.displayMode));
             for (Scoreboard scoreboard : this.scoreboards) {
                 ((LanternScoreboard) scoreboard).sendToPlayers(() -> message);
             }
@@ -126,7 +118,7 @@ public class LanternObjective implements Objective {
         final boolean update = !checkNotNull(displayMode, "displayMode").equals(this.displayMode);
         this.displayMode = displayMode;
         if (update) {
-            this.sendObjectiveUpdate();
+            sendObjectiveUpdate();
         }
     }
 
@@ -142,19 +134,18 @@ public class LanternObjective implements Objective {
 
     @Override
     public void addScore(Score score) throws IllegalArgumentException {
-        if (this.scores.containsKey(checkNotNull(score, "score").getName())) {
-            throw new IllegalArgumentException(String.format("A score with the name %s already exists!",
-                    ((LanternScore) score).getLegacyName()));
-        }
+        checkNotNull(score, "score");
+        checkState(!this.scores.containsKey(score.getName()),
+                "A score with the name %s already exists!", score.getName());
         this.scores.put(score.getName(), score);
         ((LanternScore) score).addObjective(this);
-        this.sendScoreToClient(score);
+        sendScoreToClient(score);
     }
 
     private void sendScoreToClient(Score score) {
         if (!this.scoreboards.isEmpty()) {
-            List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardScore.CreateOrUpdate(this.getName(),
-                    LanternTexts.toLegacy(score.getName()), score.getScore()));
+            final List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardScore.CreateOrUpdate(
+                    getName(), score.getName(), score.getScore()));
             for (Scoreboard scoreboard : this.scoreboards) {
                 ((LanternScoreboard) scoreboard).sendToPlayers(() -> message);
             }
@@ -166,7 +157,7 @@ public class LanternObjective implements Objective {
         return this.scores.computeIfAbsent(name, name1 -> {
             final LanternScore score = new LanternScore(name1);
             score.addObjective(this);
-            this.sendScoreToClient(score);
+            sendScoreToClient(score);
             return score;
         });
     }
@@ -175,7 +166,7 @@ public class LanternObjective implements Objective {
     public boolean removeScore(Score score) {
         if (this.scores.remove(checkNotNull(score, "score").getName(), score)) {
             ((LanternScore) score).removeObjective(this);
-            this.updateClientAfterRemove(score);
+            updateClientAfterRemove(score);
             return true;
         }
         return false;
@@ -186,16 +177,17 @@ public class LanternObjective implements Objective {
         for (Scoreboard scoreboard : this.scoreboards) {
             ((LanternScoreboard) scoreboard).sendToPlayers(() -> Collections.singletonList(
                     messages.computeIfAbsent(this, obj -> new MessagePlayOutScoreboardScore.Remove(
-                            this.getName(), ((LanternScore) score).getLegacyName()))));
+                            getName(), score.getName()))));
         }
     }
 
     @Override
     public boolean removeScore(Text name) {
-        final Score score = this.scores.remove(checkNotNull(name, "name"));
+        checkNotNull(name, "name");
+        final Score score = this.scores.remove(name);
         if (score != null) {
             ((LanternScore) score).removeObjective(this);
-            this.updateClientAfterRemove(score);
+            updateClientAfterRemove(score);
             return true;
         }
         return false;

@@ -37,6 +37,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -326,16 +327,36 @@ public final class EntityProtocolManager {
 
         final Set<AbstractEntityProtocol<?>> protocols = new HashSet<>(this.entityProtocols.values());
         for (AbstractEntityProtocol<?> protocol : protocols) {
-            final AbstractEntityProtocol.TrackerUpdateContextData contextData = protocol.buildUpdateContextData(players);
-            if (contextData != null) {
-                //noinspection unchecked
-                protocol.updateTrackers(contextData);
-                updateContextDataList.add(contextData);
+            synchronized (protocol.trackers) {
+                final AbstractEntityProtocol.TrackerUpdateContextData contextData = protocol.buildUpdateContextData(players);
+                if (contextData != null) {
+                    //noinspection unchecked
+                    protocol.updateTrackers(contextData);
+                    updateContextDataList.add(contextData);
+                }
             }
         }
 
         for (AbstractEntityProtocol.TrackerUpdateContextData contextData : updateContextDataList) {
-            contextData.entityProtocol.postUpdateTrackers(contextData);
+            synchronized (contextData.entityProtocol.trackers) {
+                contextData.entityProtocol.postUpdateTrackers(contextData);
+            }
+        }
+    }
+
+    /**
+     * Updates all the localized {@link Text} objects
+     * that are used by the entities for the given
+     * {@link LanternPlayer}.
+     *
+     * @param player The player to update
+     */
+    public void updateTrackerLocale(LanternPlayer player) {
+        final Set<AbstractEntityProtocol<?>> protocols = new HashSet<>(this.entityProtocols.values());
+        for (AbstractEntityProtocol<?> protocol : protocols) {
+            synchronized (protocol.trackers) {
+                protocol.updateTrackerLocale(player);
+            }
         }
     }
 

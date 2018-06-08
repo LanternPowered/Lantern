@@ -29,10 +29,8 @@ import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
-import org.lanternpowered.server.scoreboard.LanternObjective;
 import org.lanternpowered.server.scoreboard.LanternScore;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
-import org.lanternpowered.server.scoreboard.LanternTeam;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -236,7 +234,7 @@ public class ScoreboardIO {
     public static void write(Path folder, Scoreboard scoreboard) throws IOException {
         final List<DataView> objectives = scoreboard.getObjectives().stream().map(objective -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                 .set(NAME, objective.getName())
-                .set(DISPLAY_NAME, ((LanternObjective) objective).getLegacyDisplayName())
+                .set(DISPLAY_NAME, LanternTexts.toLegacy(objective.getDisplayName()))
                 .set(CRITERION_NAME, objective.getCriterion().getId())
                 .set(DISPLAY_MODE, objective.getDisplayMode().getId())).collect(Collectors.toList());
 
@@ -244,7 +242,7 @@ public class ScoreboardIO {
         for (Score score : scoreboard.getScores()) {
             final Iterator<Objective> it = score.getObjectives().iterator();
             final DataView baseView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
-                    .set(NAME, ((LanternScore) score).getLegacyName())
+                    .set(NAME, LanternTexts.toLegacy(score.getName()))
                     .set(SCORE, score.getScore());
             // TODO: Locked state
 
@@ -272,11 +270,11 @@ public class ScoreboardIO {
                     .set(CAN_SEE_FRIENDLY_INVISIBLES, (byte) (team.canSeeFriendlyInvisibles() ? 1 : 0))
                     .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getName())
                     .set(NAME, team.getName())
-                    .set(DISPLAY_NAME, ((LanternTeam) team).getLegacyDisplayName())
+                    .set(DISPLAY_NAME, LanternTexts.toLegacy(team.getDisplayName()))
                     .set(DEATH_MESSAGE_VISIBILITY, team.getDeathMessageVisibility().getName())
                     .set(COLLISION_RULE, team.getCollisionRule().getName())
-                    .set(PREFIX, ((LanternTeam) team).getLegacyPrefix())
-                    .set(SUFFIX, ((LanternTeam) team).getLegacySuffix());
+                    .set(PREFIX, LanternTexts.toLegacy(team.getPrefix()))
+                    .set(SUFFIX, LanternTexts.toLegacy(team.getSuffix()));
             final TextColor teamColor = team.getColor();
             if (teamColor != TextColors.NONE) {
                 container.set(TEAM_COLOR, teamColor.getId());
@@ -293,8 +291,8 @@ public class ScoreboardIO {
                 .set(TEAMS, teams);
 
         final DataView displaySlots = dataView.createView(DISPLAY_SLOTS);
-        ((LanternScoreboard) scoreboard).getObjectivesInSlot().entrySet().forEach(entry ->
-                displaySlots.set(DataQuery.of("slot_" + ((LanternDisplaySlot) entry.getKey()).getInternalId()), entry.getValue().getName()));
+        ((LanternScoreboard) scoreboard).getObjectivesInSlot()
+                .forEach((key, value) -> displaySlots.set(DataQuery.of("slot_" + ((LanternDisplaySlot) key).getInternalId()), value.getName()));
 
         IOHelper.write(folder.resolve(SCOREBOARD_DATA), file -> {
             NbtStreamUtils.write(rootDataContainer, Files.newOutputStream(file), true);

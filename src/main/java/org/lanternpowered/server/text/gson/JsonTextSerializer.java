@@ -30,42 +30,31 @@ import static org.lanternpowered.server.text.gson.TextConstants.SELECTOR;
 import static org.lanternpowered.server.text.gson.TextConstants.TEXT;
 import static org.lanternpowered.server.text.gson.TextConstants.TRANSLATABLE;
 
-import com.google.gson.GsonBuilder;
+import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.lang.reflect.Type;
 
-public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text>, JsonSerializer<Text> {
+public final class JsonTextSerializer extends JsonTextBaseSerializer<Text> {
 
     /**
-     * Registers the json text serializers for the specified gson builder.
-     * 
-     * @param gsonBuilder The gson builder
-     * @param translationManager The translation manager
-     * @param networkingFormat Whether the text serializers will be used for networking
-     * @return The gson builder for chaining
+     * Gets the {@link Gson} that is used
+     * to serialize {@link Text} objects.
+     *
+     * @return The gson
      */
-    public static GsonBuilder applyTo(GsonBuilder gsonBuilder, TranslationManager translationManager,
-            boolean networkingFormat) {
-        gsonBuilder.registerTypeAdapter(Text.class, new JsonTextSerializer());
-        gsonBuilder.registerTypeAdapter(LiteralText.class, new JsonTextLiteralSerializer(networkingFormat));
-        gsonBuilder.registerTypeAdapter(ScoreText.class, new JsonTextScoreSerializer(networkingFormat));
-        gsonBuilder.registerTypeAdapter(SelectorText.class, new JsonTextSelectorSerializer());
-        gsonBuilder.registerTypeAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(
-                translationManager, networkingFormat, networkingFormat));
-        return gsonBuilder;
+    public static Gson getGson() {
+        return ((LanternJsonTextSerializer) TextSerializers.JSON).getGson();
     }
 
     @Override

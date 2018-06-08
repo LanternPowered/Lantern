@@ -23,13 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.text;
+package org.lanternpowered.server.text.gson;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.network.buffer.contextual.ItemStackContextualValueType;
+import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
@@ -40,7 +42,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.TextActions;
@@ -60,16 +61,14 @@ import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
-public final class LanternTextHelper {
-
-    private static final Gson GSON = new Gson();
+final class JsonTextEventHelper {
 
     private static final DataQuery SHOW_ENTITY_ID = DataQuery.of("id");
     private static final DataQuery SHOW_ENTITY_TYPE = DataQuery.of("type");
     private static final DataQuery SHOW_ENTITY_NAME = DataQuery.of("name");
 
     @Nullable
-    public static ClickAction<?> parseClickAction(String action, String value) {
+    static ClickAction<?> parseClickAction(String action, String value) {
         switch (action) {
             case "open_url":
             case "open_file":
@@ -115,18 +114,18 @@ public final class LanternTextHelper {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
-    public static HoverAction<?> parseHoverAction(String action, String value) throws JsonParseException {
+    static HoverAction<?> parseHoverAction(String action, String value) throws JsonParseException {
         final DataView dataView;
         switch (action) {
             case "show_text":
-                return TextActions.showText(TextSerializers.LEGACY_FORMATTING_CODE.deserializeUnchecked(value));
+                return TextActions.showText(LanternTexts.fromLegacy(value));
             case "show_item":
                 try {
                     dataView = JsonDataFormat.readContainer(value, false);
                 } catch (IOException e) {
                     throw new JsonParseException("Failed to parse the item data container", e);
                 }
+                ItemStackContextualValueType.deserializeTextFromNetwork(dataView);
                 final ItemStack itemStack = ItemStackStore.INSTANCE.deserialize(dataView);
                 return TextActions.showItem(itemStack.createSnapshot());
             case "show_entity":
@@ -150,7 +149,7 @@ public final class LanternTextHelper {
         }
     }
 
-    public static RawAction raw(ClickAction<?> clickAction) {
+    static RawAction raw(ClickAction<?> clickAction) {
         if (clickAction instanceof ClickAction.ChangePage) {
             return new RawAction("change_page", ((ClickAction.ChangePage) clickAction).getResult().toString());
         } else if (clickAction instanceof ClickAction.OpenUrl) {
@@ -175,9 +174,9 @@ public final class LanternTextHelper {
         }
     }
 
-    public static RawAction raw(HoverAction<?> hoverAction) {
+    static RawAction raw(HoverAction<?> hoverAction) {
         if (hoverAction instanceof HoverAction.ShowText) {
-            return new RawAction("show_text", ((HoverAction.ShowText) hoverAction).getResult());
+            return new RawAction("show_text", LanternTexts.toLegacy(((HoverAction.ShowText) hoverAction).getResult()));
         } else if (hoverAction instanceof HoverAction.ShowEntity) {
             final HoverAction.ShowEntity.Ref ref = ((HoverAction.ShowEntity) hoverAction).getResult();
 
@@ -194,7 +193,11 @@ public final class LanternTextHelper {
         } else if (hoverAction instanceof HoverAction.ShowItem) {
             final ItemStackSnapshot itemStackSnapshot = ((HoverAction.ShowItem) hoverAction).getResult();
             final LanternItemStack itemStack = (LanternItemStack) itemStackSnapshot.createStack();
+            final TranslationContext ctx = TranslationContext.current();
             final DataView dataView = ItemStackStore.INSTANCE.serialize(itemStack);
+            if (ctx.forcesTranslations()) {
+                ItemStackContextualValueType.serializeTextForNetwork(dataView, itemStack);
+            }
             try {
                 return new RawAction("show_item", JsonDataFormat.writeAsString(dataView));
             } catch (IOException e) {
@@ -205,45 +208,18 @@ public final class LanternTextHelper {
         }
     }
 
-    public static class RawAction {
+    static final class RawAction {
 
-        private final String action;
-
-        @Nullable private String value;
-        @Nullable private Text text;
+        final String action;
+        final String value;
 
         RawAction(String action, String value) {
             this.action = action;
             this.value = value;
         }
-
-        RawAction(String action, Text value) {
-            this.action = action;
-            this.text = value;
-        }
-
-        public String getAction() {
-            return this.action;
-        }
-
-        @SuppressWarnings("deprecation")
-        public String getValueAsString() {
-            if (this.value != null) {
-                return this.value;
-            }
-            return this.value = LanternTexts.toLegacy(this.text);
-        }
-
-        @SuppressWarnings("deprecation")
-        public Text getValueAsText() {
-            if (this.text != null) {
-                return this.text;
-            }
-            return this.text = LanternTexts.fromLegacy(this.value);
-        }
     }
 
-    private LanternTextHelper() {
+    private JsonTextEventHelper() {
     }
 
 }

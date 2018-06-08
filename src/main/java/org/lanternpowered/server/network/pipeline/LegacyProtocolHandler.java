@@ -47,7 +47,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -97,8 +96,8 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                     return;
                 }
                 legacy = true;
-                sendDisconnectMessage(ctx, LanternTexts.toPlain(t("multiplayer.disconnect.outdated_client",
-                        Lantern.getGame().getPlatform().getMinecraftVersion().getName())));
+                sendDisconnectMessage(ctx, t("multiplayer.disconnect.outdated_client",
+                        Lantern.getGame().getPlatform().getMinecraftVersion().getName()).toPlain());
                 final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol, true);
                 if (clientVersion == LanternMinecraftVersion.UNKNOWN_LEGACY) {
                     Lantern.getLogger().debug("Client with unknown legacy protocol version {} attempted to join the server.", protocol);
@@ -213,7 +212,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                 final String data;
 
                 if (full1) {
-                    final String description0 = getFirstLine(TextSerializers.LEGACY_FORMATTING_CODE.serialize(description));
+                    final String description0 = getFirstLine(LanternTexts.toLegacy(description));
                     // 1. This value is always 1.
                     // 2. The protocol version, just use a value out of range
                     //    of the available ones.
@@ -224,7 +223,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                     data = String.format("\u00A7%s\u0000%s\u0000%s\u0000%s\u0000%s\u0000%s",
                             1, 127, response.getVersion().getName(), description0, online, max);
                 } else {
-                    final String description0 = getFirstLine(TextSerializers.PLAIN.serialize(description));
+                    final String description0 = getFirstLine(description.toPlain());
                     // 1. The motd of the server. In legacy format.
                     // 2. The online players
                     // 3. The maximum amount of players

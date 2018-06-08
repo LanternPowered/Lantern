@@ -39,12 +39,10 @@ public final class CodecPlayOutPlayerPositionAndLook implements Codec<MessagePla
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerPositionAndLook message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeDouble(message.getX());
-        buf.writeDouble(message.getY());
-        buf.writeDouble(message.getZ());
+        buf.writeVector3d(message.getPosition());
         buf.writeFloat(message.getYaw());
         buf.writeFloat(message.getPitch());
-        Set<RelativePositions> relativePositions = message.getRelativePositions();
+        final Set<RelativePositions> relativePositions = message.getRelativePositions();
         byte flags = 0;
         if (relativePositions.contains(RelativePositions.X)) {
             flags |= 0x01;

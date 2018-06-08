@@ -27,6 +27,7 @@ package org.lanternpowered.server.text.translation;
 
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.translation.Translation;
 
 public final class TranslationHelper {
@@ -61,6 +62,41 @@ public final class TranslationHelper {
 
     public static Translation tr(String key, Object... args) {
         return tr(String.format(key, args));
+    }
+
+    /**
+     * Checks whether there are any non minecraft {@link Translation}s
+     * (translations not available on the client) present in the given
+     * {@link Text} object.
+     *
+     * @param text The text
+     * @return Whether any non minecraft translation is found
+     */
+    public static boolean containsNonMinecraftTranslation(Text text) {
+        if (text instanceof TranslatableText) {
+            final Translation translation = ((TranslatableText) text).getTranslation();
+            if (!(translation instanceof MinecraftTranslation)) {
+                return true;
+            }
+        }
+        return containsNonMinecraftTranslation(text.getChildren());
+    }
+
+    /**
+     * Checks whether there are any non minecraft {@link Translation}s
+     * (translations not available on the client) present in the given
+     * {@link Text} objects.
+     *
+     * @param iterable The iterable of text objects
+     * @return Whether any non minecraft translation is found
+     */
+    public static boolean containsNonMinecraftTranslation(Iterable<Text> iterable) {
+        for (Text child : iterable) {
+            if (containsNonMinecraftTranslation(child)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private TranslationHelper() {

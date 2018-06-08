@@ -36,21 +36,18 @@ public final class CodecPlayOutSpawnObject implements Codec<MessagePlayOutSpawnO
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnObject message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         buf.writeUniqueId(message.getUniqueId());
         buf.writeByte((byte) message.getObjectType());
-        Vector3d vector = message.getPosition();
-        buf.writeDouble(vector.getX());
-        buf.writeDouble(vector.getY());
-        buf.writeDouble(vector.getZ());
+        buf.writeVector3d(message.getPosition());
         buf.writeByte((byte) message.getPitch());
         buf.writeByte((byte) message.getYaw());
         buf.writeInteger(message.getObjectData());
-        vector = message.getVelocity();
-        buf.writeShort((short) Math.min(vector.getX() * 8000.0, Short.MAX_VALUE));
-        buf.writeShort((short) Math.min(vector.getY() * 8000.0, Short.MAX_VALUE));
-        buf.writeShort((short) Math.min(vector.getZ() * 8000.0, Short.MAX_VALUE));
+        final Vector3d velocity = message.getVelocity();
+        buf.writeShort((short) Math.min(velocity.getX() * 8000.0, Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(velocity.getY() * 8000.0, Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(velocity.getZ() * 8000.0, Short.MAX_VALUE));
         return buf;
     }
 }

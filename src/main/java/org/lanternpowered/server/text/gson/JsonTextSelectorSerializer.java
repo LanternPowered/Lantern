@@ -28,19 +28,16 @@ package org.lanternpowered.server.text.gson;
 import static org.lanternpowered.server.text.gson.TextConstants.SELECTOR;
 
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.selector.Selector;
 
 import java.lang.reflect.Type;
 
-final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<SelectorText>,
-        JsonDeserializer<SelectorText> {
+final class JsonTextSelectorSerializer extends JsonTextBaseSerializer<SelectorText> {
 
     @Override
     public SelectorText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

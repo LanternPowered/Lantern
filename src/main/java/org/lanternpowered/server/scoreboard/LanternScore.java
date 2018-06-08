@@ -30,7 +30,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore;
-import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.objective.Objective;
@@ -46,16 +45,10 @@ public final class LanternScore implements Score {
 
     private final Set<Objective> objectives = new HashSet<>();
     private final Text name;
-    private final String legacyName;
     private int score;
 
     public LanternScore(Text name) {
-        this.legacyName = LanternTexts.toLegacy(name);
         this.name = name;
-    }
-
-    public String getLegacyName() {
-        return this.legacyName;
     }
 
     @Override
@@ -85,7 +78,7 @@ public final class LanternScore implements Score {
             for (Map.Entry<Scoreboard, Objective> entry : scoreboards.entries()) {
                 ((LanternScoreboard) entry.getKey()).sendToPlayers(() -> Collections.singletonList(
                         messages.computeIfAbsent(entry.getValue(), obj -> new MessagePlayOutScoreboardScore.CreateOrUpdate(
-                                obj.getName(), this.legacyName, score))));
+                                obj.getName(), this.name, score))));
             }
         }
     }

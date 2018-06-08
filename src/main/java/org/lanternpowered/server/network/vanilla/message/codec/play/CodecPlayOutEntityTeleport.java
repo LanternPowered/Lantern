@@ -37,9 +37,7 @@ public final class CodecPlayOutEntityTeleport implements Codec<MessagePlayOutEnt
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityTeleport message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        buf.writeDouble(message.getX());
-        buf.writeDouble(message.getY());
-        buf.writeDouble(message.getZ());
+        buf.writeVector3d(message.getPosition());
         buf.writeByte(message.getYaw());
         buf.writeByte(message.getPitch());
         buf.writeBoolean(message.isOnGround());

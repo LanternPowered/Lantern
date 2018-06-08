@@ -27,6 +27,9 @@ package org.lanternpowered.server.network.buffer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3f;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.io.ByteStreams;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -36,7 +39,7 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.network.buffer.objects.Type;
+import org.lanternpowered.server.network.objects.RawItemStack;
 import org.spongepowered.api.data.DataView;
 
 import java.io.IOException;
@@ -44,6 +47,8 @@ import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -630,11 +635,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public UUID getUniqueId(int index) {
-        final int oldIndex = this.buf.readerIndex();
-        this.buf.readerIndex(index);
-        final UUID data = readUniqueId();
-        this.buf.readerIndex(oldIndex);
-        return data;
+        return getAt(index, this::readUniqueId);
     }
 
     @Override
@@ -687,11 +688,7 @@ public class LanternByteBuffer implements ByteBuffer {
     @Nullable
     @Override
     public DataView getDataView(int index) {
-        final int oldIndex = this.buf.readerIndex();
-        this.buf.readerIndex(index);
-        final DataView data = readDataView();
-        this.buf.readerIndex(oldIndex);
-        return data;
+        return getAt(index, this::readDataView);
     }
 
     @Override
@@ -768,32 +765,134 @@ public class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public <V> LanternByteBuffer write(Type<V> type, V value) {
-        type.getSerializer().write(this, value);
+    public Vector3i getVector3i(int index) {
+        return getAt(index, this::readVector3i);
+    }
+
+    @Override
+    public LanternByteBuffer setVector3i(int index, Vector3i vector) {
+        return setAt(index, vector, this::writeVector3i);
+    }
+
+    @Override
+    public Vector3i readVector3i() {
+        final long value = this.buf.readLong();
+        final int x = (int) (value >> 38);
+        final int y = (int) (value << 26 >> 52);
+        final int z = (int) (value << 38 >> 38);
+        return new Vector3i(x, y, z);
+    }
+
+    @Override
+    public LanternByteBuffer writeVector3i(int x, int y, int z) {
+        this.buf.writeLong(((long) x & 0x3ffffff) << 38 | ((long) y & 0xfff) << 26 | ((long) z & 0x3ffffff));
         return this;
     }
 
     @Override
-    public <V> LanternByteBuffer set(int index, Type<V> type, V value) {
-        final int oldIndex = this.buf.writerIndex();
-        this.buf.writerIndex(index);
-        write(type, value);
-        this.buf.writerIndex(oldIndex);
+    public LanternByteBuffer writeVector3i(Vector3i vector) {
+        return writeVector3i(vector.getX(), vector.getY(), vector.getZ());
+    }
+
+    @Override
+    public Vector3f getVector3f(int index) {
+        return getAt(index, this::readVector3f);
+    }
+
+    @Override
+    public LanternByteBuffer setVector3f(int index, Vector3f vector) {
+        return setAt(index, vector, this::writeVector3f);
+    }
+
+    @Override
+    public Vector3f readVector3f() {
+        final float x = this.buf.readFloat();
+        final float y = this.buf.readFloat();
+        final float z = this.buf.readFloat();
+        return new Vector3f(x, y, z);
+    }
+
+    @Override
+    public LanternByteBuffer writeVector3f(float x, float y, float z) {
+        this.buf.ensureWritable(Float.BYTES * 3);
+        this.buf.writeFloat(x);
+        this.buf.writeFloat(y);
+        this.buf.writeFloat(z);
         return this;
     }
 
     @Override
-    public <V> V read(Type<V> type) {
-        return type.getSerializer().read(this);
+    public LanternByteBuffer writeVector3f(Vector3f vector) {
+        return writeVector3f(vector.getX(), vector.getY(), vector.getZ());
     }
 
     @Override
-    public <V> V get(int index, Type<V> type) {
-        final int oldIndex = this.buf.readerIndex();
-        this.buf.readerIndex(index);
-        final V data = read(type);
-        this.buf.readerIndex(oldIndex);
-        return data;
+    public Vector3d getVector3d(int index) {
+        return getAt(index, this::readVector3d);
+    }
+
+    @Override
+    public LanternByteBuffer setVector3d(int index, Vector3d vector) {
+        return setAt(index, vector, this::writeVector3d);
+    }
+
+    @Override
+    public Vector3d readVector3d() {
+        final double x = this.buf.readDouble();
+        final double y = this.buf.readDouble();
+        final double z = this.buf.readDouble();
+        return new Vector3d(x, y, z);
+    }
+
+    @Override
+    public LanternByteBuffer writeVector3d(double x, double y, double z) {
+        this.buf.ensureWritable(Double.BYTES * 3);
+        this.buf.writeDouble(x);
+        this.buf.writeDouble(y);
+        this.buf.writeDouble(z);
+        return this;
+    }
+
+    @Override
+    public LanternByteBuffer writeVector3d(Vector3d vector) {
+        return writeVector3d(vector.getX(), vector.getY(), vector.getZ());
+    }
+
+    @Nullable
+    @Override
+    public RawItemStack getRawItemStack(int index) {
+        return getAt(index, this::readRawItemStack);
+    }
+
+    @Override
+    public LanternByteBuffer setRawItemStack(int index, @Nullable RawItemStack rawItemStack) {
+        return setAt(index, rawItemStack, this::writeRawItemStack);
+    }
+
+    @Nullable
+    @Override
+    public RawItemStack readRawItemStack() {
+        final short id = this.buf.readShort();
+        if (id == -1) {
+            return null;
+        }
+        final int amount = this.buf.readByte();
+        final int data = this.buf.readShort();
+        final DataView dataView = readDataView();
+        return new RawItemStack(id, data, amount, dataView);
+    }
+
+    @Override
+    public LanternByteBuffer writeRawItemStack(@Nullable RawItemStack rawItemStack) {
+        if (rawItemStack == null) {
+            this.buf.writeShort((short) -1);
+        } else {
+            this.buf.writeShort((short) rawItemStack.getItemType());
+            this.buf.writeByte((byte) rawItemStack.getAmount());
+            this.buf.writeShort((short) rawItemStack.getData());
+            writeDataView(rawItemStack.getDataView());
+        }
+        return this;
     }
 
     @Override
@@ -815,5 +914,21 @@ public class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer copy() {
         return new LanternByteBuffer(this.buf.copy());
+    }
+
+    private <T> T getAt(int index, Supplier<T> supplier) {
+        final int oldIndex = this.buf.readerIndex();
+        this.buf.readerIndex(index);
+        final T data = supplier.get();
+        this.buf.readerIndex(oldIndex);
+        return data;
+    }
+
+    private <T> LanternByteBuffer setAt(int index, T object, Consumer<T> consumer) {
+        final int oldIndex = this.buf.writerIndex();
+        this.buf.writerIndex(index);
+        consumer.accept(object);
+        this.buf.writerIndex(oldIndex);
+        return this;
     }
 }

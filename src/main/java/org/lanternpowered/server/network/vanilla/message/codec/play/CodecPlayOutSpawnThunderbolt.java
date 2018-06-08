@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -39,10 +38,7 @@ public final class CodecPlayOutSpawnThunderbolt implements Codec<MessagePlayOutS
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         buf.writeByte((byte) 1);
-        final Vector3d position = message.getPosition();
-        buf.writeDouble(position.getX());
-        buf.writeDouble(position.getY());
-        buf.writeDouble(position.getZ());
+        buf.writeVector3d(message.getPosition());
         return buf;
     }
 }

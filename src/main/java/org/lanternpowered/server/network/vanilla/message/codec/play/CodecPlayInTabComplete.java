@@ -28,7 +28,6 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
@@ -41,7 +40,7 @@ public final class CodecPlayInTabComplete implements Codec<MessagePlayInTabCompl
         boolean assumeCommand = buf.readBoolean();
         Vector3i blockPosition = null;
         if (buf.readBoolean()) {
-            blockPosition = buf.read(Types.VECTOR_3_I);
+            blockPosition = buf.readVector3i();
         }
         return new MessagePlayInTabComplete(text, assumeCommand, blockPosition);
     }

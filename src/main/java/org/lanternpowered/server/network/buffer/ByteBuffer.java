@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.network.buffer;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3f;
+import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.ReferenceCounted;
-import org.lanternpowered.server.network.buffer.objects.Type;
-import org.lanternpowered.server.network.buffer.objects.ValueSerializer;
+import org.lanternpowered.server.network.objects.RawItemStack;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
@@ -302,22 +304,45 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
      */
     long getVarLong(int index);
 
-    /**
-     * Writes the specified value for the {@link Type}. The value may be {@code null}
-     * depending on the underlying {@link ValueSerializer}.
-     *
-     * @param type The type
-     * @param value The value
-     * @param <V> The value type
-     * @return This stream for chaining
-     */
-    <V> ByteBuffer write(Type<V> type, V value);
+    Vector3i getVector3i(int index);
 
-    <V> ByteBuffer set(int index, Type<V> type, V value);
+    ByteBuffer setVector3i(int index, Vector3i vector);
 
-    <V> V read(Type<V> type);
+    Vector3i readVector3i();
 
-    <V> V get(int index, Type<V> type);
+    ByteBuffer writeVector3i(int x, int y, int z);
+
+    ByteBuffer writeVector3i(Vector3i vector);
+
+    Vector3f getVector3f(int index);
+
+    ByteBuffer setVector3f(int index, Vector3f vector);
+
+    Vector3f readVector3f();
+
+    ByteBuffer writeVector3f(float x, float y, float z);
+
+    ByteBuffer writeVector3f(Vector3f vector);
+
+    Vector3d getVector3d(int index);
+
+    ByteBuffer setVector3d(int index, Vector3d vector);
+
+    Vector3d readVector3d();
+
+    ByteBuffer writeVector3d(double x, double y, double z);
+
+    ByteBuffer writeVector3d(Vector3d vector);
+
+    @Nullable
+    RawItemStack getRawItemStack(int index);
+
+    ByteBuffer setRawItemStack(int index, @Nullable RawItemStack rawItemStack);
+
+    @Nullable
+    RawItemStack readRawItemStack();
+
+    ByteBuffer writeRawItemStack(@Nullable RawItemStack rawItemStack);
 
     /**
      * Makes sure the number of the writable bytes is equal to

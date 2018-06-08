@@ -26,24 +26,36 @@
 package org.lanternpowered.server.text.gson;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.text.LanternTexts.fixJson;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.text.LanternTextSerializer;
 import org.lanternpowered.server.text.translation.TranslationManager;
+import org.spongepowered.api.text.LiteralText;
+import org.spongepowered.api.text.ScoreText;
+import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.serializer.TextParseException;
-import org.spongepowered.api.text.serializer.TextSerializer;
+import org.spongepowered.api.text.translation.locale.Locales;
 
-public final class LanternJsonTextSerializer extends PluginCatalogType.Base implements TextSerializer {
+import java.util.Locale;
+
+public final class LanternJsonTextSerializer extends PluginCatalogType.Base implements LanternTextSerializer {
 
     private final Gson gson;
 
     public LanternJsonTextSerializer(String pluginId, String name, TranslationManager translationManager) {
         super(pluginId, name);
-        this.gson = JsonTextSerializer.applyTo(new GsonBuilder(), translationManager, false).create();
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(Text.class, new JsonTextSerializer())
+                .registerTypeAdapter(LiteralText.class, new JsonTextLiteralSerializer())
+                .registerTypeAdapter(ScoreText.class, new JsonTextScoreSerializer())
+                .registerTypeAdapter(SelectorText.class, new JsonTextSelectorSerializer())
+                .registerTypeAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(translationManager))
+                .create();
     }
 
     /**
@@ -57,13 +69,37 @@ public final class LanternJsonTextSerializer extends PluginCatalogType.Base impl
 
     @Override
     public String serialize(Text text) {
-        return fixJson(this.gson.toJson(checkNotNull(text, "text")));
+        return serialize(text, Locales.EN_US);
+    }
+
+    @Override
+    public String serialize(Text text, Locale locale) {
+        checkNotNull(locale, "locale");
+        return fixJson(this.gson.toJson(text));
+    }
+
+    /**
+     * The client doesn't like it when the server just sends a
+     * primitive json string, so we put it as one entry in an array
+     * to avoid errors.
+     *
+     * @param json The json
+     * @return The result json
+     */
+    private static String fixJson(String json) {
+        final char start = json.charAt(0);
+        if (start == '[' || start == '{') {
+            return json;
+        } else {
+            return '[' + json + ']';
+        }
     }
 
     @Override
     public Text deserialize(String input) throws TextParseException {
+        checkNotNull(input, "input");
         try {
-            return this.gson.fromJson(checkNotNull(input, "input"), Text.class);
+            return this.gson.fromJson(input, Text.class);
         } catch (JsonSyntaxException e) {
             throw new TextParseException("Attempted to parse invalid json: " + input, e);
         }

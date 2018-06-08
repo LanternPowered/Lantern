@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.util.RelativePositions;
 
@@ -32,35 +33,19 @@ import java.util.Set;
 
 public final class MessagePlayOutPlayerPositionAndLook implements Message {
 
-    private final double x;
-    private final double y;
-    private final double z;
+    private final Vector3d position;
     private final float yaw;
     private final float pitch;
     private final int teleportId;
     private final Set<RelativePositions> relativePositions;
 
-    public MessagePlayOutPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch, Set<RelativePositions> relativePositions,
-            int teleportId) {
+    public MessagePlayOutPlayerPositionAndLook(Vector3d position, float yaw, float pitch,
+            Set<RelativePositions> relativePositions, int teleportId) {
+        this.position = position;
         this.relativePositions = relativePositions;
         this.teleportId = teleportId;
         this.pitch = pitch;
         this.yaw = yaw;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getX() {
-        return this.x;
-    }
-
-    public double getZ() {
-        return this.z;
     }
 
     public float getYaw() {
@@ -79,4 +64,7 @@ public final class MessagePlayOutPlayerPositionAndLook implements Message {
         return this.teleportId;
     }
 
+    public Vector3d getPosition() {
+        return this.position;
+    }
 }

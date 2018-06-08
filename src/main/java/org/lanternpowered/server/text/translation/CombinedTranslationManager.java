@@ -46,7 +46,7 @@ public final class CombinedTranslationManager implements TranslationManager, Rel
     private final List<TranslationManager> translationManagers = new ArrayList<>();
 
     // The delegate translation manager
-    @Nullable private volatile TranslationManager delegateTranslationManager;
+    @Nullable private TranslationManager delegateTranslationManager;
 
     /**
      * Adds a translation manager.
@@ -83,6 +83,7 @@ public final class CombinedTranslationManager implements TranslationManager, Rel
         this.delegateTranslationManager = manager;
     }
 
+    @Nullable
     private TranslationManager getDelegateManager() {
         if (this.delegateTranslationManager != null) {
             return this.delegateTranslationManager;
@@ -94,7 +95,7 @@ public final class CombinedTranslationManager implements TranslationManager, Rel
 
     @Override
     public void addResourceBundle(Asset asset, Locale locale) {
-        final TranslationManager manager = this.getDelegateManager();
+        final TranslationManager manager = getDelegateManager();
         if (manager != null) {
             manager.addResourceBundle(asset, locale);
         }
@@ -103,7 +104,7 @@ public final class CombinedTranslationManager implements TranslationManager, Rel
     @Override
     public Translation get(String key) {
         return this.getIfPresent(key).orElseGet(() -> {
-            TranslationManager manager = this.getDelegateManager();
+            final TranslationManager manager = getDelegateManager();
             if (manager != null) {
                 return manager.get(key);
             }
@@ -113,9 +114,8 @@ public final class CombinedTranslationManager implements TranslationManager, Rel
 
     @Override
     public Optional<Translation> getIfPresent(String key) {
-        Optional<Translation> optTranslation;
         for (TranslationManager manager : this.translationManagers) {
-            optTranslation = manager.getIfPresent(key);
+            final Optional<Translation> optTranslation = manager.getIfPresent(key);
             if (optTranslation.isPresent()) {
                 return optTranslation;
             }

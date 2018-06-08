@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.CollisionRules;
 import org.spongepowered.api.scoreboard.Team;
@@ -42,10 +41,12 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 public class LanternTeamBuilder implements Team.Builder {
 
-    private String name;
-    private Text displayName;
+    @Nullable private String name;
+    @Nullable private Text displayName;
     private TextColor color;
     private Text prefix;
     private Text suffix;
@@ -57,15 +58,12 @@ public class LanternTeamBuilder implements Team.Builder {
     private Set<Text> members;
 
     public LanternTeamBuilder() {
-        this.reset();
+        reset();
     }
 
     @Override
     public LanternTeamBuilder name(String name) {
         this.name = checkNotNull(name, "name");
-        if (this.displayName == null) {
-            this.displayName = Text.of(this.name);
-        }
         return this;
     }
 
@@ -81,28 +79,25 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Override
     public LanternTeamBuilder displayName(Text displayName) throws IllegalArgumentException {
-        final String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
-        checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
-                legacyDisplayName.length());
-        this.displayName = checkNotNull(displayName, "displayName");
+        final int length = displayName.toPlain().length();
+        checkArgument(length <= 32, "Display name is %s characters long! It must be at most 32.", length);
+        this.displayName = displayName;
         return this;
     }
 
     @Override
     public LanternTeamBuilder prefix(Text prefix) {
-        final String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
-        checkArgument(legacyPrefix.length() <= 16, "Prefix is %s characters long! It must be at most 16.",
-                legacyPrefix.length());
-        this.prefix = checkNotNull(prefix, "prefix");
+        final int length = prefix.toPlain().length();
+        checkArgument(length <= 16, "Prefix is %s characters long! It must be at most 16.", length);
+        this.prefix = prefix;
         return this;
     }
 
     @Override
     public LanternTeamBuilder suffix(Text suffix) {
-        final String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
-        checkArgument(legacySuffix.length() <= 16, "Suffix is %s characters long! It must be at most 16.",
-                legacySuffix.length());
-        this.suffix = checkNotNull(suffix, "suffix");
+        final int length = suffix.toPlain().length();
+        checkArgument(length <= 16, "Suffix is %s characters long! It must be at most 16.", length);
+        this.suffix = suffix;
         return this;
     }
 
@@ -144,7 +139,7 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Override
     public LanternTeamBuilder from(Team value) {
-        this.name(value.getName())
+        return name(value.getName())
                 .displayName(value.getDisplayName())
                 .prefix(value.getPrefix())
                 .color(value.getColor())
@@ -154,7 +149,6 @@ public class LanternTeamBuilder implements Team.Builder {
                 .nameTagVisibility(value.getNameTagVisibility())
                 .deathTextVisibility(value.getDeathMessageVisibility())
                 .members(value.getMembers());
-        return this;
     }
 
     @Override
@@ -176,9 +170,12 @@ public class LanternTeamBuilder implements Team.Builder {
     @Override
     public Team build() throws IllegalStateException {
         checkState(this.name != null, "name is not set");
-        checkState(this.displayName != null, "displayName is not set");
+        Text displayName = this.displayName;
+        if (displayName == null) {
+            displayName = Text.of(this.name);
+        }
 
-        final LanternTeam team = new LanternTeam(this.name, this.color, this.displayName, this.prefix, this.suffix,
+        final LanternTeam team = new LanternTeam(this.name, this.color, displayName, this.prefix, this.suffix,
                 this.allowFriendlyFire, this.showFriendlyInvisibles, this.nameTagVisibility, this.deathMessageVisibility,
                 this.collisionRule);
         this.members.forEach(team::addMember);

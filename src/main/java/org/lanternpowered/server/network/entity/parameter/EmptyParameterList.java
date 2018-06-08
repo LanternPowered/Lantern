@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.network.entity.parameter;
 
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-
 public final class EmptyParameterList extends AbstractParameterList {
 
     public static EmptyParameterList INSTANCE = new EmptyParameterList();
@@ -41,10 +39,5 @@ public final class EmptyParameterList extends AbstractParameterList {
 
     @Override
     public <T> void add(ParameterType<T> type, T value) {
-    }
-
-    @Override
-    public void write(ByteBuffer byteBuffer) {
-        byteBuffer.writeByte((byte) 0xff);
     }
 }

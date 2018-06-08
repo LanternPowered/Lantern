@@ -26,11 +26,11 @@
 package org.lanternpowered.server.boss;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBossBar;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
@@ -40,7 +40,6 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -84,8 +83,8 @@ public class LanternBossBar implements ServerBossBar {
     public LanternBossBar setName(Text name) {
         this.name = checkNotNull(name, "name");
         if (!this.viewers.isEmpty()) {
-            this.viewers.forEach(player -> player.getConnection().send(new MessagePlayOutBossBar.UpdateTitle(
-                    this.uniqueId, new LocalizedText(name, player.getLocale()))));
+            this.viewers.forEach(player -> player.getConnection().send(
+                    new MessagePlayOutBossBar.UpdateTitle(this.uniqueId, name)));
         }
         return this;
     }
@@ -97,7 +96,7 @@ public class LanternBossBar implements ServerBossBar {
 
     @Override
     public LanternBossBar setPercent(float percent) {
-        checkNotNull(percent >= 0f && percent <= 1f, "Percent must be between 0 and 1, but %s is not", percent);
+        checkState(percent >= 0f && percent <= 1f, "Percent must be between 0 and 1, but %s is not", percent);
         if (percent != this.percent && !this.viewers.isEmpty()) {
             final Message message = new MessagePlayOutBossBar.UpdatePercent(
                     this.uniqueId, percent);
@@ -207,7 +206,8 @@ public class LanternBossBar implements ServerBossBar {
     public LanternBossBar setVisible(boolean visible) {
         if (visible != this.visible) {
             if (visible) {
-                this.viewers.forEach(player -> player.getConnection().send(this.createAddMessage(player.getLocale())));
+                final Message message = createAddMessage();
+                this.viewers.forEach(player -> player.getConnection().send(message));
             } else if (!this.viewers.isEmpty()) {
                 final Message message = new MessagePlayOutBossBar.Remove(this.uniqueId);
                 this.viewers.forEach(player -> player.getConnection().send(message));
@@ -254,11 +254,11 @@ public class LanternBossBar implements ServerBossBar {
     }
 
     public void resendBossBar(LanternPlayer player) {
-        player.getConnection().send(this.createAddMessage(player.getLocale()));
+        player.getConnection().send(createAddMessage());
     }
 
-    private MessagePlayOutBossBar.Add createAddMessage(Locale locale) {
-        return new MessagePlayOutBossBar.Add(this.uniqueId, new LocalizedText(this.name, locale),
+    private MessagePlayOutBossBar.Add createAddMessage() {
+        return new MessagePlayOutBossBar.Add(this.uniqueId, this.name,
                 this.color, this.overlay, this.percent, this.darkenSky, this.playEndBossMusic);
     }
 }

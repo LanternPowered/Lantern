@@ -31,7 +31,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
@@ -89,11 +89,11 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
                     }
                     buf.writeVarInt(((LanternGameMode) entry.getGameMode()).getInternalId());
                     buf.writeVarInt(entry.getPing());
-                    final Text displayName = entry.getDisplayName();
-                    final boolean flag = displayName != null;
+                    Text displayName = entry.getDisplayName();
+                    boolean flag = displayName != null;
                     buf.writeBoolean(flag);
                     if (flag) {
-                        buf.write(Types.TEXT, displayName);
+                        context.write(buf, ContextualValueTypes.TEXT, displayName);
                     }
                     break;
                 case UPDATE_GAME_MODE:
@@ -103,11 +103,11 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
                     buf.writeVarInt(entry.getPing());
                     break;
                 case UPDATE_DISPLAY_NAME:
-                    final Text displayName0 = entry.getDisplayName();
-                    final boolean flag0 = displayName0 != null;
-                    buf.writeBoolean(flag0);
-                    if (flag0) {
-                        buf.write(Types.TEXT, displayName0);
+                    displayName = entry.getDisplayName();
+                    flag = displayName != null;
+                    buf.writeBoolean(flag);
+                    if (flag) {
+                        context.write(buf, ContextualValueTypes.TEXT, displayName);
                     }
                     break;
                 case REMOVE:

@@ -25,35 +25,19 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayInPlayerVehicleMovement implements Message {
 
-    private final double x;
-    private final double y;
-    private final double z;
-
+    private final Vector3d position;
     private final float yaw;
     private final float pitch;
 
-    public MessagePlayInPlayerVehicleMovement(double x, double y, double z, float yaw, float pitch) {
+    public MessagePlayInPlayerVehicleMovement(Vector3d position, float yaw, float pitch) {
+        this.position = position;
         this.pitch = pitch;
         this.yaw = yaw;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public double getX() {
-        return this.x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getZ() {
-        return this.z;
     }
 
     public float getPitch() {
@@ -62,5 +46,9 @@ public final class MessagePlayInPlayerVehicleMovement implements Message {
 
     public float getYaw() {
         return this.yaw;
+    }
+
+    public Vector3d getPosition() {
+        return this.position;
     }
 }

@@ -43,7 +43,7 @@ import org.lanternpowered.server.network.status.LanternStatusHelper;
 import org.lanternpowered.server.network.status.LanternStatusResponse;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
-import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
+import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -52,7 +52,6 @@ import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -124,7 +123,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         }
 
         rootObject.add("version", versionObject);
-        rootObject.add("description", ((LanternJsonTextSerializer) TextSerializers.JSON).getGson().toJsonTree(response.getDescription()));
+        rootObject.add("description", JsonTextSerializer.getGson().toJsonTree(response.getDescription()));
 
         response.getFavicon().ifPresent(icon -> rootObject.addProperty("favicon", ((LanternFavicon) icon).getEncoded()));
 

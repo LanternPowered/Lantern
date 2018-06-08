@@ -42,4 +42,9 @@ public final class ParameterType<T> {
     public int getIndex() {
         return this.index;
     }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(this.index);
+    }
 }

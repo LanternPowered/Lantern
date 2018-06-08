@@ -25,22 +25,56 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.flowpowered.math.GenericMath;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.spongepowered.api.util.Direction;
 
 public final class CodecUtils {
 
-    public static Direction fromFace(int face) {
-        switch (face) {
-            case 0: return Direction.DOWN;
-            case 1: return Direction.UP;
-            case 2: return Direction.NORTH;
-            case 3: return Direction.SOUTH;
-            case 4: return Direction.WEST;
-            case 5: return Direction.EAST;
-            default:
-                throw new IllegalStateException("Unknown face: " + face);
+    private static final Direction[] directions = {
+            Direction.DOWN,
+            Direction.UP,
+            Direction.NORTH,
+            Direction.SOUTH,
+            Direction.WEST,
+            Direction.EAST,
+    };
+    private static final Object2IntMap<Direction> directionToValue;
+
+    static {
+        final Object2IntMap<Direction> map = new Object2IntOpenHashMap<>();
+        map.defaultReturnValue(-1);
+        for (int i = 0; i < directions.length; i++) {
+            map.put(directions[i], i);
         }
+        directionToValue = Object2IntMaps.unmodifiable(map);
+    }
+
+    /**
+     * Decodes the integer into a {@link Direction}.
+     *
+     * @param dir The direction value
+     * @return The direction
+     */
+    public static Direction decodeDirection(int dir) {
+        checkArgument(dir >= 0 && dir < directions.length, "Unknown direction value: %s", dir);
+        return directions[dir];
+    }
+
+    /**
+     * Decodes the {@link Direction} value into a integer.
+     *
+     * @param dir The direction
+     * @return The integer direction
+     */
+    public static int encodeDirection(Direction dir) {
+        final int value = directionToValue.getInt(dir);
+        checkArgument(value != -1, "Unsupported direction: " + dir);
+        return value;
     }
 
     /**

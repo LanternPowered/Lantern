@@ -32,33 +32,24 @@ import java.util.function.BiConsumer;
 
 public final class ParameterValueType<T> {
 
-    private final static AtomicInteger COUNTER = new AtomicInteger();
+    private final static AtomicInteger counter = new AtomicInteger();
 
-    private final byte internalId;
-    private final BiConsumer<ByteBuffer, T> serializer;
+    /**
+     * The internal id of the parameter value type.
+     */
+    final byte internalId;
+
+    /**
+     * The serializer to encode the values.
+     */
+    final ParameterValueSerializer<T> serializer;
 
     ParameterValueType(BiConsumer<ByteBuffer, T> serializer) {
-        this.internalId = (byte) COUNTER.getAndIncrement();
+        this((ctx, buf, value) -> serializer.accept(buf, value));
+    }
+
+    ParameterValueType(ParameterValueSerializer<T> serializer) {
+        this.internalId = (byte) counter.getAndIncrement();
         this.serializer = serializer;
     }
-
-    /**
-     * Gets the internal id of the value type.
-     *
-     * @return The internal id
-     */
-    byte getInternalId() {
-        return internalId;
-    }
-
-    /**
-     * Serializes the value to the {@link ByteBuffer}.
-     *
-     * @param buf The target byte buffer
-     * @param value The value
-     */
-    void serialize(ByteBuffer buf, T value) {
-        this.serializer.accept(buf, value);
-    }
-
 }

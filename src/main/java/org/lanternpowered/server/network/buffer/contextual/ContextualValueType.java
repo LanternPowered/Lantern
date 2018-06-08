@@ -23,15 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.buffer.objects;
+package org.lanternpowered.server.network.buffer.contextual;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.CodecContext;
 
-public interface ValueSerializer<V> {
+public interface ContextualValueType<V> {
 
-    void write(ByteBuffer buf, V object) throws CodecException;
+    void write(CodecContext ctx, V object, ByteBuffer buf) throws CodecException;
 
-    V read(ByteBuffer buf) throws CodecException;
-
+    V read(CodecContext ctx, ByteBuffer buf) throws CodecException;
 }

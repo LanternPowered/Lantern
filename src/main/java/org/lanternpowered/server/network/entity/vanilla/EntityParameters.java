@@ -130,17 +130,17 @@ public final class EntityParameters {
          */
         public static final ParameterType<Byte> FLAGS = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
 
-        public static final ParameterType<Vector3f> HEAD_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+        public static final ParameterType<Vector3f> HEAD_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_3F);
 
-        public static final ParameterType<Vector3f> BODY_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+        public static final ParameterType<Vector3f> BODY_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_3F);
 
-        public static final ParameterType<Vector3f> LEFT_ARM_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+        public static final ParameterType<Vector3f> LEFT_ARM_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_3F);
 
-        public static final ParameterType<Vector3f> RIGHT_ARM_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+        public static final ParameterType<Vector3f> RIGHT_ARM_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_3F);
 
-        public static final ParameterType<Vector3f> LEFT_LEG_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+        public static final ParameterType<Vector3f> LEFT_LEG_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_3F);
 
-        public static final ParameterType<Vector3f> RIGHT_LEG_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_F);
+        public static final ParameterType<Vector3f> RIGHT_LEG_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.VECTOR_3F);
 
         private ArmorStand() {
         }

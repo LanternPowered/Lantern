@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
@@ -36,17 +36,17 @@ public class CodecPlayOutOpenWindow implements Codec<MessagePlayOutOpenWindow> {
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutOpenWindow message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeByte((byte) message.getWindowId());
-        MessagePlayOutOpenWindow.WindowType windowType = message.getWindowType();
-        String type;
+        final MessagePlayOutOpenWindow.WindowType windowType = message.getWindowType();
+        final String type;
         if (windowType == MessagePlayOutOpenWindow.WindowType.HORSE) {
             type = "EntityHorse";
         } else {
             type = "minecraft:" + windowType.name().toLowerCase();
         }
         buf.writeString(type);
-        buf.write(Types.TEXT, message.getTitle());
+        context.write(buf, ContextualValueTypes.TEXT, message.getTitle());
         // That logic...
         if (windowType == MessagePlayOutOpenWindow.WindowType.ANVIL ||
                 windowType == MessagePlayOutOpenWindow.WindowType.CRAFTING_TABLE ||

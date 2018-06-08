@@ -45,8 +45,9 @@ public final class TextSerializersRegistryModule extends AdditionalPluginCatalog
     private final Char2ObjectMap<org.spongepowered.api.text.serializer.FormattingCodeTextSerializer> formattingCodeSerializers =
             new Char2ObjectOpenHashMap<>();
 
+    @SuppressWarnings("deprecation")
     private final TextSerializerFactory textSerializerFactory = legacyChar -> {
-        if (legacyChar == TextSerializers.LEGACY_FORMATTING_CODE.getCharacter()) {
+        if (legacyChar == TextConstants.LEGACY_CHAR) {
             return TextSerializers.LEGACY_FORMATTING_CODE;
         } else if (legacyChar == TextSerializers.FORMATTING_CODE.getCharacter()) {
             return TextSerializers.FORMATTING_CODE;

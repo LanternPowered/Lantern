@@ -29,7 +29,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.spongepowered.api.text.title.Title;
 
@@ -99,12 +98,12 @@ public final class LanternTitles {
                 }
                 final ImmutableList.Builder<Message> builder = ImmutableList.builder();
                 builder.addAll(this.messages);
-                title.getTitle().ifPresent(text1 ->
-                        builder.add(new MessagePlayOutTitle.SetTitle(new LocalizedText(text1, locale))));
-                title.getSubtitle().ifPresent(text1 ->
-                        builder.add(new MessagePlayOutTitle.SetSubtitle(new LocalizedText(text1, locale))));
-                title.getActionBar().ifPresent(text1 ->
-                        builder.add(new MessagePlayOutTitle.SetActionbarTitle(new LocalizedText(text1, locale))));
+                title.getTitle().ifPresent(text ->
+                        builder.add(new MessagePlayOutTitle.SetTitle(text)));
+                title.getSubtitle().ifPresent(text ->
+                        builder.add(new MessagePlayOutTitle.SetSubtitle(text)));
+                title.getActionBar().ifPresent(text ->
+                        builder.add(new MessagePlayOutTitle.SetActionbarTitle(text)));
                 return builder.build();
             });
         }

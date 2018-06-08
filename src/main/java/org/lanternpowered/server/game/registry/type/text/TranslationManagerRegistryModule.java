@@ -33,8 +33,7 @@ import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.MinecraftTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.registry.RegistryModule;
-
-import java.util.Locale;
+import org.spongepowered.api.text.translation.locale.Locales;
 
 public final class TranslationManagerRegistryModule implements RegistryModule {
 
@@ -53,7 +52,8 @@ public final class TranslationManagerRegistryModule implements RegistryModule {
         this.translationManager.addManager(new MinecraftTranslationManager());
         final LanternTranslationManager lanternTranslationManager = new LanternTranslationManager();
         // Add the lantern languages
-        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/en_us.properties").get(), Locale.ENGLISH);
+        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/en_us.properties").get(), Locales.EN_US);
+        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/nl_nl.properties").get(), Locales.NL_NL);
         this.translationManager.addManager(lanternTranslationManager);
         this.translationManager.setDelegateManager(lanternTranslationManager);
     }

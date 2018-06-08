@@ -25,13 +25,12 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.fromFace;
+import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.decodeDirection;
 
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -45,14 +44,14 @@ public final class CodecPlayInPlayerDigging implements Codec<Message> {
     @Override
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         int action = buf.readByte();
-        Vector3i position = buf.read(Types.VECTOR_3_I);
+        Vector3i position = buf.readVector3i();
         int face = buf.readByte();
         switch (action) {
             case 0:
             case 1:
             case 2:
                 return new MessagePlayInPlayerDigging(MessagePlayInPlayerDigging.Action.values()[action],
-                        position, fromFace(face));
+                        position, decodeDirection(face));
             case 3:
             case 4:
                 return new MessagePlayInDropHeldItem(action == 3);

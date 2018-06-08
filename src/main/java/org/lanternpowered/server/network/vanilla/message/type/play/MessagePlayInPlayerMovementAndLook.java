@@ -25,42 +25,25 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayInPlayerMovementAndLook implements Message {
 
     private final boolean onGround;
-
-    private final double x;
-    private final double y;
-    private final double z;
-
+    private final Vector3d position;
     private final float yaw;
     private final float pitch;
 
-    public MessagePlayInPlayerMovementAndLook(double x, double y, double z, float yaw, float pitch, boolean onGround) {
+    public MessagePlayInPlayerMovementAndLook(Vector3d position,float yaw, float pitch, boolean onGround) {
+        this.position = position;
         this.onGround = onGround;
         this.pitch = pitch;
         this.yaw = yaw;
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
 
     public boolean isOnGround() {
         return this.onGround;
-    }
-
-    public double getX() {
-        return this.x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getZ() {
-        return this.z;
     }
 
     public float getPitch() {
@@ -69,5 +52,9 @@ public final class MessagePlayInPlayerMovementAndLook implements Message {
 
     public float getYaw() {
         return this.yaw;
+    }
+
+    public Vector3d getPosition() {
+        return this.position;
     }
 }

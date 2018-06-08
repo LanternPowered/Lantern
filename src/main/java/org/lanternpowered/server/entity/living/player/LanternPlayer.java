@@ -72,11 +72,9 @@ import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
@@ -145,6 +143,7 @@ import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.ban.Ban;
@@ -195,7 +194,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     // The (client) locale of the player
-    private Locale locale = Locale.US;
+    private Locale locale = Locales.DEFAULT;
 
     // The (client) render distance of the player
     // When specified -1, the render distance will match the server one
@@ -386,10 +385,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // The player has joined the server
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
-                this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.networkEntityId,
-                        this.session.getServer().getMaxPlayers(), reducedDebug, false, lowHorizon));
-                // Send the server brand
-                this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
+                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
+                this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
                 // Send the player list
                 final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
                 final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);
@@ -415,7 +412,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
                         new IntArrayList(recipes)));
             } else {
-                if (oldWorld != null && oldWorld != world) {
+                if (oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();
                     // The client only creates a new world instance on the client if a
                     // different dimension is used, that is why we will send two respawn
@@ -484,6 +481,17 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             if (getWorld() != null) {
                 // Update the advancements
                 this.advancementsProgress.initClient();
+                // Update the inventory
+                this.inventoryContainer.initClientContainer();
+                // Update the scoreboard
+                if (this.scoreboard != null) {
+                    this.scoreboard.refreshPlayer(this);
+                }
+                // Update the entities for this player
+                getWorld().getEntityProtocolManager().updateTrackerLocale(this);
+                if (this.tabList != null) {
+                    this.tabList.refresh();
+                }
             }
         }
     }
@@ -581,7 +589,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         final LanternWorld oldWorld = this.getWorld();
         final boolean success = super.setPositionAndWorld(world, position);
         if (success && world == oldWorld) {
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
+            this.session.send(new MessagePlayOutPlayerPositionAndLook(position, 0, 0, RELATIVE_ROTATION, 0));
         }
         return success;
     }
@@ -591,7 +599,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         super.setPosition(position);
         final LanternWorld world = getWorld();
         if (world != null) {
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
+            this.session.send(new MessagePlayOutPlayerPositionAndLook(position, 0, 0, RELATIVE_ROTATION, 0));
         }
     }
 
@@ -600,8 +608,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         super.setRotation(rotation);
         final LanternWorld world = getWorld();
         if (world != null) {
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(0, 0, 0,
-                    (float) rotation.getX(), (float) rotation.getY(), RELATIVE_POSITION, 0));
+            this.session.send(new MessagePlayOutPlayerPositionAndLook(
+                    Vector3d.ZERO, (float) rotation.getX(), (float) rotation.getY(), RELATIVE_POSITION, 0));
         }
     }
 
@@ -634,8 +642,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
                 final Vector3d pos = location.getPosition();
-                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
-                        (float) rotation.getX(), (float) rotation.getY(), Collections.emptySet(), 0);
+                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(
+                        pos, (float) rotation.getX(), (float) rotation.getY(), Collections.emptySet(), 0);
                 this.session.send(message);
             }
         }
@@ -651,8 +659,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
                 final Vector3d pos = location.getPosition();
-                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
-                        (float) rotation.getX(), (float) rotation.getY(), Sets.immutableEnumSet(relativePositions), 0);
+                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(
+                        pos, (float) rotation.getX(), (float) rotation.getY(), Sets.immutableEnumSet(relativePositions), 0);
                 this.session.send(message);
             }
         }
@@ -809,7 +817,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         checkNotNull(message, "message");
         checkNotNull(type, "type");
         if (this.chatVisibility.isVisible(type)) {
-            this.session.send(((LanternChatType) type).getMessageProvider().apply(message, this.locale));
+            this.session.send(((LanternChatType) type).getMessageProvider().apply(message));
         }
     }
 

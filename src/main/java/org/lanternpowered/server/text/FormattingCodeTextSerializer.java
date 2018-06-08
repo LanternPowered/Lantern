@@ -32,6 +32,7 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2CharMap;
 import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -39,7 +40,6 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextParseException;
-import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,7 +128,7 @@ public class FormattingCodeTextSerializer extends PluginCatalogType.Base
 
     @Override
     public String serialize(Text text) {
-        return this.serialize(text, Locales.DEFAULT);
+        return serialize(text, TranslationContext.current().getLocale());
     }
 
     @Override

@@ -31,6 +31,9 @@ import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 public final class MessagePlayOutPlayerRespawn implements Message {
 
@@ -39,11 +42,10 @@ public final class MessagePlayOutPlayerRespawn implements Message {
     private final LanternDimensionType dimensionType;
     private final boolean lowHorizon;
 
-    public MessagePlayOutPlayerRespawn(LanternGameMode gameMode, LanternDimensionType dimensionType,
-            LanternDifficulty difficulty, boolean lowHorizon) {
-        this.dimensionType = checkNotNull(dimensionType, "dimensionType");
-        this.difficulty = checkNotNull(difficulty, "difficulty");
-        this.gameMode = checkNotNull(gameMode, "gameMode");
+    public MessagePlayOutPlayerRespawn(GameMode gameMode, DimensionType dimensionType, Difficulty difficulty, boolean lowHorizon) {
+        this.dimensionType = (LanternDimensionType) checkNotNull(dimensionType, "dimensionType");
+        this.difficulty = (LanternDifficulty) checkNotNull(difficulty, "difficulty");
+        this.gameMode = (LanternGameMode) checkNotNull(gameMode, "gameMode");
         this.lowHorizon = lowHorizon;
     }
 

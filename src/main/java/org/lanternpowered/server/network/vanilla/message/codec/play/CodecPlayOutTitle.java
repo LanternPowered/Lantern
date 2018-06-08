@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
@@ -50,13 +50,13 @@ public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
             buf.writeVarInt(RESET);
         } else if (message instanceof MessagePlayOutTitle.SetTitle) {
             buf.writeVarInt(SET_TITLE);
-            buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetTitle) message).getTitle());
+            context.write(buf, ContextualValueTypes.TEXT, ((MessagePlayOutTitle.SetTitle) message).getTitle());
         } else if (message instanceof MessagePlayOutTitle.SetSubtitle) {
             buf.writeVarInt(SET_SUBTITLE);
-            buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
+            context.write(buf, ContextualValueTypes.TEXT, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
         } else if (message instanceof MessagePlayOutTitle.SetActionbarTitle) {
             buf.writeVarInt(SET_ACTIONBAR_TITLE);
-            buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetActionbarTitle) message).getTitle());
+            context.write(buf, ContextualValueTypes.TEXT, ((MessagePlayOutTitle.SetActionbarTitle) message).getTitle());
         } else {
             final MessagePlayOutTitle.SetTimes message0 = (MessagePlayOutTitle.SetTimes) message;
             buf.writeVarInt(SET_TIMES);

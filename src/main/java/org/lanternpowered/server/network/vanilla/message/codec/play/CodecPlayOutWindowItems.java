@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
@@ -37,12 +37,12 @@ public final class CodecPlayOutWindowItems implements Codec<MessagePlayOutWindow
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutWindowItems message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeByte((byte) message.getWindowId());
-        ItemStack[] items = message.getItems();
+        final ItemStack[] items = message.getItems();
         buf.writeShort((short) items.length);
         for (ItemStack item : items) {
-            buf.write(Types.ITEM_STACK, item);
+            context.write(buf, ContextualValueTypes.ITEM_STACK, item);
         }
         return buf;
     }

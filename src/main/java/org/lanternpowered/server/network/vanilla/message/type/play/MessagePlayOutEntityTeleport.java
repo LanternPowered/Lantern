@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutEntityTeleport implements Message {
@@ -35,18 +36,14 @@ public final class MessagePlayOutEntityTeleport implements Message {
     private final byte yaw;
     private final byte pitch;
 
-    private final double x;
-    private final double y;
-    private final double z;
+    private final Vector3d position;
 
-    public MessagePlayOutEntityTeleport(int entityId, double x, double y, double z, byte yaw, byte pitch, boolean onGround) {
+    public MessagePlayOutEntityTeleport(int entityId, Vector3d position, byte yaw, byte pitch, boolean onGround) {
+        this.position = position;
         this.onGround = onGround;
         this.entityId = entityId;
         this.pitch = pitch;
         this.yaw = yaw;
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
 
     public int getEntityId() {
@@ -65,15 +62,7 @@ public final class MessagePlayOutEntityTeleport implements Message {
         return this.onGround;
     }
 
-    public double getX() {
-        return this.x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getZ() {
-        return this.z;
+    public Vector3d getPosition() {
+        return this.position;
     }
 }

@@ -26,7 +26,6 @@
 package org.lanternpowered.server.network.rcon;
 
 import org.lanternpowered.server.permission.AbstractProxySubject;
-import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
@@ -61,7 +60,7 @@ public final class RconSource extends AbstractProxySubject implements org.sponge
 
     @Override
     public void sendMessage(Text message) {
-        this.buffer.append(LanternTexts.toPlain(message)).append('\n');
+        this.buffer.append(message.toPlain()).append('\n');
     }
 
     @Override

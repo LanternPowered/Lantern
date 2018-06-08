@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -36,7 +35,7 @@ public class HandlerPlayInPlayerMovement implements Handler<MessagePlayInPlayerM
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerMovement message) {
         final LanternPlayer player = context.getSession().getPlayer();
-        player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
+        player.setRawPosition(message.getPosition());
         player.handleOnGroundState(message.isOnGround());
     }
 }

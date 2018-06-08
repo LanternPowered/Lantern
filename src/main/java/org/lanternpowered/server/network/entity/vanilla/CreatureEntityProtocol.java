@@ -58,7 +58,7 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
         final double headYaw = headRot != null ? headRot.getY() : 0;
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnMob(getRootEntityId(), this.entity.getUniqueId(), getMobType(),
-                pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel, fillParameters(true)));
+                pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel, fillSpawnParameters()));
         spawnWithEquipment(context);
     }
 }

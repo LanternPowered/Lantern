@@ -25,13 +25,12 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.fromFace;
+import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.decodeDirection;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
@@ -43,8 +42,8 @@ public final class CodecPlayInPlayerBlockPlacement implements Codec<MessagePlayI
 
     @Override
     public MessagePlayInPlayerBlockPlacement decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final Vector3i position = buf.read(Types.VECTOR_3_I);
-        final Direction face = fromFace(buf.readVarInt());
+        final Vector3i position = buf.readVector3i();
+        final Direction face = decodeDirection(buf.readVarInt());
         final HandType hand = buf.readVarInt() == 0 ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
         final double ox = buf.readFloat();
         final double oy = buf.readFloat();

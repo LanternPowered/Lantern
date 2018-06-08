@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
-import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
@@ -45,7 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -56,11 +54,8 @@ public class LanternTeam implements Team {
     private TextColor color;
     final Set<Text> members = new HashSet<>();
     private Text prefix;
-    private String legacyPrefix;
     private Text suffix;
-    private String legacySuffix;
     private Text displayName;
-    private String legacyDisplayName;
     private boolean allowFriendlyFire;
     private boolean canSeeFriendlyInvisibles;
     private Visibility nameTagVisibility;
@@ -71,11 +66,8 @@ public class LanternTeam implements Team {
                 boolean allowFriendlyFire, boolean canSeeFriendlyInvisibles, Visibility nameTagVisibility,
                 Visibility deathMessageVisibility, CollisionRule collisionRule) {
         this.displayName = displayName;
-        this.legacyDisplayName = LanternTexts.toLegacy(displayName);
         this.prefix = prefix;
-        this.legacyPrefix = LanternTexts.toLegacy(prefix);
         this.suffix = suffix;
-        this.legacySuffix = LanternTexts.toLegacy(suffix);
         this.name = name;
         this.color = color;
         this.allowFriendlyFire = allowFriendlyFire;
@@ -89,20 +81,22 @@ public class LanternTeam implements Team {
         this.scoreboard = scoreboard;
     }
 
-    MessagePlayOutTeams.CreateOrUpdate toCreateOrUpdateMessage(boolean create) {
-        return create ?
-                new MessagePlayOutTeams.Create(this.name, this.legacyDisplayName,
-                        this.legacyPrefix, this.legacySuffix, this.nameTagVisibility,
-                        this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles,
-                        this.members.stream().map(LanternTexts::toLegacy).collect(Collectors.toList())) :
-                new MessagePlayOutTeams.Update(this.name, this.legacyDisplayName,
-                        this.legacyPrefix, this.legacySuffix, this.nameTagVisibility,
-                        this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles);
+    MessagePlayOutTeams.CreateOrUpdate toCreateMessage() {
+        return new MessagePlayOutTeams.Create(this.name, this.displayName,
+                this.prefix, this.suffix, this.nameTagVisibility,
+                this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles,
+                new ArrayList<>(this.members));
+    }
+
+    MessagePlayOutTeams.CreateOrUpdate toUpdateMessage() {
+        return new MessagePlayOutTeams.Update(this.name, this.displayName,
+                this.prefix, this.suffix, this.nameTagVisibility,
+                this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles);
     }
 
     private void sendUpdate() {
         if (this.scoreboard != null) {
-            this.scoreboard.sendToPlayers(() -> Collections.singletonList(this.toCreateOrUpdateMessage(false)));
+            this.scoreboard.sendToPlayers(() -> Collections.singletonList(toUpdateMessage()));
         }
     }
 
@@ -113,10 +107,10 @@ public class LanternTeam implements Team {
 
     @Override
     public void setCollisionRule(CollisionRule rule) {
-        final boolean update = !checkNotNull(rule, "rule").equals(this.collisionRule);
+        final boolean update = !rule.equals(this.collisionRule);
         this.collisionRule = rule;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
     }
 
@@ -130,20 +124,14 @@ public class LanternTeam implements Team {
         return this.displayName;
     }
 
-    public String getLegacyDisplayName() {
-        return this.legacyDisplayName;
-    }
-
     @Override
     public void setDisplayName(Text displayName) throws IllegalArgumentException {
-        final String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
-        checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
-                legacyDisplayName.length());
-        final boolean update = !this.legacyDisplayName.equals(legacyDisplayName);
-        this.legacyDisplayName = legacyDisplayName;
+        final int length = displayName.toPlain().length();
+        checkArgument(length <= 32, "Display name is %s characters long! It must be at most 32.", length);
+        final boolean update = !this.displayName.equals(displayName);
         this.displayName = displayName;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
     }
 
@@ -154,15 +142,11 @@ public class LanternTeam implements Team {
 
     @Override
     public void setColor(TextColor color) throws IllegalArgumentException {
-        final boolean update = !this.color.equals(checkNotNull(color, "color"));
+        final boolean update = !color.equals(this.color);
         this.color = color;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
-    }
-
-    public String getLegacyPrefix() {
-        return this.legacyPrefix;
     }
 
     @Override
@@ -172,19 +156,13 @@ public class LanternTeam implements Team {
 
     @Override
     public void setPrefix(Text prefix) throws IllegalArgumentException {
-        final String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
-        checkArgument(legacyPrefix.length() <= 16, "Prefix is %s characters long! It must be at most 16.",
-                legacyPrefix.length());
-        final boolean update = !this.legacyPrefix.equals(legacyPrefix);
-        this.legacyPrefix = legacyPrefix;
+        final int length = prefix.toPlain().length();
+        checkArgument(length <= 16, "Prefix is %s characters long! It must be at most 16.", length);
+        final boolean update = !this.prefix.equals(prefix);
         this.prefix = prefix;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
-    }
-
-    public String getLegacySuffix() {
-        return this.legacySuffix;
     }
 
     @Override
@@ -194,14 +172,12 @@ public class LanternTeam implements Team {
 
     @Override
     public void setSuffix(Text suffix) throws IllegalArgumentException {
-        final String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
-        checkArgument(legacySuffix.length() <= 16, "Suffix is %s characters long! It must be at most 16.",
-                legacySuffix.length());
-        final boolean update = !this.legacySuffix.equals(legacySuffix);
-        this.legacySuffix = legacySuffix;
-        this.suffix = suffix;
+        final int length = suffix.toPlain().length();
+        checkArgument(length <= 16, "Suffix is %s characters long! It must be at most 16.", length);
+        final boolean update = !this.suffix.equals(suffix);
+        this.suffix = prefix;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
     }
 
@@ -215,7 +191,7 @@ public class LanternTeam implements Team {
         final boolean update = enabled != this.allowFriendlyFire;
         this.allowFriendlyFire = enabled;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
     }
 
@@ -229,7 +205,7 @@ public class LanternTeam implements Team {
         final boolean update = enabled != this.canSeeFriendlyInvisibles;
         this.canSeeFriendlyInvisibles = enabled;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
     }
 
@@ -240,10 +216,10 @@ public class LanternTeam implements Team {
 
     @Override
     public void setNameTagVisibility(Visibility visibility) {
-        final boolean update = !checkNotNull(visibility, "visibility").equals(this.nameTagVisibility);
+        final boolean update = !visibility.equals(this.nameTagVisibility);
         this.nameTagVisibility = visibility;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
     }
 
@@ -254,10 +230,10 @@ public class LanternTeam implements Team {
 
     @Override
     public void setDeathMessageVisibility(Visibility visibility) {
-        final boolean update = !checkNotNull(visibility, "visibility").equals(this.deathMessageVisibility);
+        final boolean update = !visibility.equals(this.deathMessageVisibility);
         this.deathMessageVisibility = visibility;
         if (update) {
-            this.sendUpdate();
+            sendUpdate();
         }
     }
 
@@ -268,18 +244,20 @@ public class LanternTeam implements Team {
 
     @Override
     public void addMember(Text member) {
-        if (this.members.add(checkNotNull(member, "member")) && this.scoreboard != null) {
+        checkNotNull(member, "member");
+        if (this.members.add(member) && this.scoreboard != null) {
             this.scoreboard.sendToPlayers(() -> Collections.singletonList(
-                    new MessagePlayOutTeams.AddPlayers(this.name, Collections.singletonList(LanternTexts.toLegacy(member)))));
+                    new MessagePlayOutTeams.AddMembers(this.name, Collections.singletonList(member))));
         }
     }
 
     @Override
     public boolean removeMember(Text member) {
-        if (this.members.remove(checkNotNull(member, "member"))) {
+        checkNotNull(member, "member");
+        if (this.members.remove(member)) {
             if (this.scoreboard != null) {
                 this.scoreboard.sendToPlayers(() -> Collections.singletonList(
-                        new MessagePlayOutTeams.RemovePlayers(this.name, Collections.singletonList(LanternTexts.toLegacy(member)))));
+                        new MessagePlayOutTeams.RemoveMembers(this.name, Collections.singletonList(member))));
             }
             return true;
         }
@@ -289,17 +267,17 @@ public class LanternTeam implements Team {
     public List<Text> addMembers(Collection<Text> members) {
         checkNotNull(members, "members");
         final List<Text> failedMembers = new ArrayList<>();
-        final List<String> addedPlayers = new ArrayList<>();
+        final List<Text> addedMembers = new ArrayList<>();
         for (Text member : members) {
             if (this.members.add(member)) {
-                addedPlayers.add(LanternTexts.toLegacy(member));
+                addedMembers.add(member);
             } else {
                 failedMembers.add(member);
             }
         }
         if (this.scoreboard != null) {
             this.scoreboard.sendToPlayers(() -> Collections.singletonList(
-                    new MessagePlayOutTeams.AddPlayers(this.name, addedPlayers)));
+                    new MessagePlayOutTeams.AddMembers(this.name, addedMembers)));
         }
         return failedMembers;
     }
@@ -310,17 +288,17 @@ public class LanternTeam implements Team {
         if (this.members.isEmpty()) {
             return failedMembers;
         }
-        final List<String> removedPlayers = new ArrayList<>();
+        final List<Text> removedMembers = new ArrayList<>();
         for (Text member : members) {
             if (this.members.remove(member)) {
-                removedPlayers.add(LanternTexts.toLegacy(member));
+                removedMembers.add(member);
             } else {
                 failedMembers.add(member);
             }
         }
         if (this.scoreboard != null) {
             this.scoreboard.sendToPlayers(() -> Collections.singletonList(
-                    new MessagePlayOutTeams.RemovePlayers(this.name, removedPlayers)));
+                    new MessagePlayOutTeams.RemoveMembers(this.name, removedMembers)));
         }
         return failedMembers;
     }

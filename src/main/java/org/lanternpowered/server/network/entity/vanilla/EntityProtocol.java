@@ -33,17 +33,14 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.ints.IntSets;
-import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
+import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
@@ -69,6 +66,7 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.text.Text;
 
 import javax.annotation.Nullable;
 
@@ -149,13 +147,9 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final Vector3d headRot = this.entity instanceof Living ? ((Living) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();
 
-        final double x = pos.getX();
-        final double y = pos.getY();
-        final double z = pos.getZ();
-
-        final long xu = (long) (x * 4096);
-        final long yu = (long) (y * 4096);
-        final long zu = (long) (z * 4096);
+        final long xu = (long) (pos.getX() * 4096);
+        final long yu = (long) (pos.getY() * 4096);
+        final long zu = (long) (pos.getZ() * 4096);
 
         final byte yaw = wrapAngle(rot.getY());
         // All living entities have a head rotation and changing the pitch
@@ -198,7 +192,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                     }
                 } else {
                     context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
-                            x, y, z, yaw, pitch, this.entity.isOnGround()));
+                            pos, yaw, pitch, this.entity.isOnGround()));
                     // The rotation is already send
                     dirtyRot = false;
                 }
@@ -226,7 +220,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             this.lastVelZ = vz;
         }
         final ParameterList parameterList = context == EntityProtocolUpdateContext.empty() ?
-                fillParameters(false, EmptyParameterList.INSTANCE) : fillParameters(false);
+                EmptyParameterList.INSTANCE : new DefaultParameterList();
+        update(parameterList);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
             context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
@@ -244,6 +239,16 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             }
         }
         // TODO: Update attributes
+    }
+
+    @Override
+    protected void updateTranslations(EntityProtocolUpdateContext context) {
+        final ParameterList parameterList = new DefaultParameterList();
+        updateTranslations(parameterList);
+        // There were parameters applied
+        if (!parameterList.isEmpty()) {
+            context.sendToAll(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), parameterList));
+        }
     }
 
     /**
@@ -292,21 +297,13 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     /**
-     * Fills a {@link ByteBuffer} with parameters to spawn or update the {@link Entity}.
+     * Fills a {@link ParameterList} with parameters to spawn the {@link Entity}.
      *
-     * @param initial Whether the entity is being spawned, the byte buffer can be null if this is false
      * @return The byte buffer
      */
-    ParameterList fillParameters(boolean initial) {
-        return fillParameters(initial, new ByteBufParameterList(ByteBufferAllocator.unpooled()));
-    }
-
-    private ParameterList fillParameters(boolean initial, ParameterList parameterList) {
-        if (initial) {
-            spawn(parameterList);
-        } else {
-            update(parameterList);
-        }
+    ParameterList fillSpawnParameters() {
+        final ParameterList parameterList = new DefaultParameterList();
+        spawn(parameterList);
         return parameterList;
     }
 
@@ -413,6 +410,15 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             parameterList.add(EntityParameters.Base.AIR_LEVEL, airLevel);
             this.lastAirLevel = airLevel;
         }
+    }
+
+    /**
+     * Fills the {@link ParameterList} with parameters to update the {@link Entity} on
+     * the client related to localized {@link Text}.
+     *
+     * @param parameterList The parameter list to fill
+     */
+    protected void updateTranslations(ParameterList parameterList) {
     }
 
     /**

@@ -31,6 +31,9 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
+import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.text.translation.TranslationContext;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -45,9 +48,13 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
         if (message instanceof MessagePlayOutTeams.CreateOrUpdate) {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Create ? 0 : 2));
             final MessagePlayOutTeams.CreateOrUpdate message1 = (MessagePlayOutTeams.CreateOrUpdate) message;
-            buf.writeString(message1.getDisplayName());
-            buf.writeString(message1.getPrefix());
-            buf.writeString(message1.getSuffix());
+            try (TranslationContext ignored = TranslationContext.enter()
+                    .locale(context.getSession().getLocale())
+                    .enableForcedTranslations()) {
+                buf.writeString(LanternTexts.toLegacy(message1.getDisplayName()));
+                buf.writeString(LanternTexts.toLegacy(message1.getPrefix()));
+                buf.writeString(LanternTexts.toLegacy(message1.getSuffix()));
+            }
             int flags = 0;
             if (message1.getFriendlyFire()) {
                 flags |= 0x01;
@@ -63,12 +70,16 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
                             FormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(c)));
         } else {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Remove ? 1 :
-                    message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4));
+                    message instanceof MessagePlayOutTeams.AddMembers ? 3 : 4));
         }
-        if (message instanceof MessagePlayOutTeams.Players) {
-            final List<String> players = ((MessagePlayOutTeams.Players) message).getPlayers();
-            buf.writeVarInt(players.size());
-            players.forEach(buf::writeString);
+        if (message instanceof MessagePlayOutTeams.Members) {
+            final List<Text> members = ((MessagePlayOutTeams.Members) message).getMembers();
+            buf.writeVarInt(members.size());
+            try (TranslationContext ignored = TranslationContext.enter()
+                    .locale(context.getSession().getLocale())
+                    .enableForcedTranslations()) {
+                members.forEach(member -> buf.writeString(LanternTexts.toLegacy(member)));
+            }
         }
         return buf;
     }

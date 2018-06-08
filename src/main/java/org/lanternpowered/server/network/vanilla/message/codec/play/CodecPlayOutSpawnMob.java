@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.entity.parameter.AbstractParameterList;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
@@ -37,22 +37,19 @@ public final class CodecPlayOutSpawnMob implements Codec<MessagePlayOutSpawnMob>
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnMob message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         buf.writeUniqueId(message.getUniqueId());
         buf.writeVarInt(message.getMobType());
-        Vector3d vector = message.getPosition();
-        buf.writeDouble(vector.getX());
-        buf.writeDouble(vector.getY());
-        buf.writeDouble(vector.getZ());
+        buf.writeVector3d(message.getPosition());
         buf.writeByte(message.getYaw());
         buf.writeByte(message.getPitch());
         buf.writeByte(message.getHeadPitch());
-        vector = message.getVelocity();
-        buf.writeShort((short) Math.min(vector.getX() * 8000.0, Short.MAX_VALUE));
-        buf.writeShort((short) Math.min(vector.getY() * 8000.0, Short.MAX_VALUE));
-        buf.writeShort((short) Math.min(vector.getZ() * 8000.0, Short.MAX_VALUE));
-        ((AbstractParameterList) message.getParameterList()).write(buf);
+        final Vector3d velocity = message.getVelocity();
+        buf.writeShort((short) Math.min(velocity.getX() * 8000.0, Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(velocity.getY() * 8000.0, Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(velocity.getZ() * 8000.0, Short.MAX_VALUE));
+        context.write(buf, ContextualValueTypes.PARAMETER_LIST, message.getParameterList());
         return buf;
     }
 }

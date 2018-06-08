@@ -35,7 +35,7 @@ public final class CodecPlayInOutConfirmWindowTransaction implements Codec<Messa
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayInOutConfirmWindowTransaction message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer(6);
+        final ByteBuffer buf = context.byteBufAlloc().buffer(4);
         buf.writeByte((byte) message.getWindowId());
         buf.writeShort((short) message.getTransaction());
         buf.writeBoolean(message.isAccepted());
@@ -44,9 +44,9 @@ public final class CodecPlayInOutConfirmWindowTransaction implements Codec<Messa
 
     @Override
     public MessagePlayInOutConfirmWindowTransaction decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        int windowId = buf.readByte();
-        int transaction = buf.readShort();
-        boolean accepted = buf.readBoolean();
+        final int windowId = buf.readByte();
+        final int transaction = buf.readShort();
+        final boolean accepted = buf.readBoolean();
         return new MessagePlayInOutConfirmWindowTransaction(windowId, transaction, accepted);
     }
 }

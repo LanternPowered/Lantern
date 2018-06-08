@@ -39,7 +39,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
-import org.lanternpowered.server.text.LanternTexts;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,25 +77,46 @@ public class LanternScoreboard implements Scoreboard {
 
     public void removePlayer(LanternPlayer player) {
         this.players.remove(player);
-        for (Objective objective : this.objectives.values()) {
-            player.getConnection().send(new MessagePlayOutScoreboardObjective.Remove(objective.getName()));
-        }
-        for (Team team : this.teams.values()) {
-            player.getConnection().send(new MessagePlayOutTeams.Remove(team.getName()));
-        }
+        player.getConnection().send(collectRemoveMessages(new ArrayList<>()));
     }
 
     public void addPlayer(LanternPlayer player) {
         this.players.add(player);
+        player.getConnection().send(collectAddMessages(new ArrayList<>()));
+    }
+
+    private List<Message> collectRemoveMessages(List<Message> messages) {
         for (Objective objective : this.objectives.values()) {
-            player.getConnection().send(this.createObjectiveInitMessages(objective));
-        }
-        for (Map.Entry<DisplaySlot, Objective> entry : this.objectivesInSlot.entrySet()) {
-            player.getConnection().send(new MessagePlayOutScoreboardDisplayObjective(entry.getValue().getName(), entry.getKey()));
+            messages.add(new MessagePlayOutScoreboardObjective.Remove(objective.getName()));
         }
         for (Team team : this.teams.values()) {
-            player.getConnection().send(((LanternTeam) team).toCreateOrUpdateMessage(true));
+            messages.add(new MessagePlayOutTeams.Remove(team.getName()));
         }
+        return messages;
+    }
+
+    private List<Message> collectAddMessages(List<Message> messages) {
+        for (Objective objective : this.objectives.values()) {
+            messages.addAll(createObjectiveInitMessages(objective));
+        }
+        for (Map.Entry<DisplaySlot, Objective> entry : this.objectivesInSlot.entrySet()) {
+            messages.add(new MessagePlayOutScoreboardDisplayObjective(entry.getValue().getName(), entry.getKey()));
+        }
+        for (Team team : this.teams.values()) {
+            messages.add(((LanternTeam) team).toCreateMessage());
+        }
+        return messages;
+    }
+
+    public void refreshPlayer(Player player) {
+        refreshPlayers(Collections.singletonList(player));
+    }
+
+    public void refreshPlayers(Iterable<Player> players) {
+        final List<Message> messages = new ArrayList<>();
+        collectRemoveMessages(messages);
+        collectAddMessages(messages);
+        players.forEach(player -> ((LanternPlayer) player).getConnection().send(messages));
     }
 
     public Map<DisplaySlot, Objective> getObjectivesInSlot() {
@@ -128,10 +148,10 @@ public class LanternScoreboard implements Scoreboard {
     private List<Message> createObjectiveInitMessages(Objective objective) {
         final List<Message> messages = new ArrayList<>();
         messages.add(new MessagePlayOutScoreboardObjective.Create(
-                objective.getName(), ((LanternObjective) objective).getLegacyDisplayName(), objective.getDisplayMode()));
+                objective.getName(), objective.getDisplayName(), objective.getDisplayMode()));
         for (Score score : ((LanternObjective) objective).scores.values()) {
-            messages.add(new MessagePlayOutScoreboardScore.CreateOrUpdate(objective.getName(),
-                    LanternTexts.toLegacy(score.getName()), score.getScore()));
+            messages.add(new MessagePlayOutScoreboardScore.CreateOrUpdate(
+                    objective.getName(),score.getName(), score.getScore()));
         }
         return messages;
     }
@@ -169,17 +189,12 @@ public class LanternScoreboard implements Scoreboard {
 
     @Override
     public void removeObjective(Objective objective) {
-        if (this.objectives.remove(checkNotNull(objective, "objective").getName(), objective)) {
+        checkNotNull(objective, "objective");
+        if (this.objectives.remove(objective.getName(), objective)) {
             ((LanternObjective) objective).removeScoreboard(this);
             this.objectivesByCriterion.remove(objective.getCriterion(), objective);
-            final Iterator<Map.Entry<DisplaySlot, Objective>> it = this.objectivesInSlot.entrySet().iterator();
-            while (it.hasNext()) {
-                final Map.Entry<DisplaySlot, Objective> entry = it.next();
-                if (entry.getValue().equals(objective)) {
-                    it.remove();
-                }
-            }
-            this.sendToPlayers(() -> Collections.singletonList(new MessagePlayOutScoreboardObjective.Remove(objective.getName())));
+            this.objectivesInSlot.entrySet().removeIf(entry -> entry.getValue().equals(objective));
+            sendToPlayers(() -> Collections.singletonList(new MessagePlayOutScoreboardObjective.Remove(objective.getName())));
         }
     }
 
@@ -222,8 +237,9 @@ public class LanternScoreboard implements Scoreboard {
                 team.getName());
         checkArgument(!team.getScoreboard().isPresent(), "The team is already attached to a scoreboard.");
         this.teams.put(team.getName(), team);
-        ((LanternTeam) team).setScoreboard(this);
-        this.sendToPlayers(() -> Collections.singletonList(((LanternTeam) team).toCreateOrUpdateMessage(true)));
+        final LanternTeam lanternTeam = (LanternTeam) team;
+        lanternTeam.setScoreboard(this);
+        sendToPlayers(() -> Collections.singletonList(lanternTeam.toCreateMessage()));
     }
 
     @Override

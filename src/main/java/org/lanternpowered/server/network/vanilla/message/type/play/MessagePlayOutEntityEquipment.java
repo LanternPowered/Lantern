@@ -35,7 +35,7 @@ public class MessagePlayOutEntityEquipment implements Message {
     private final int slotIndex;
     @Nullable private final Object itemStack;
 
-    public MessagePlayOutEntityEquipment(int entityId, int slotIndex, Object itemStack) {
+    public MessagePlayOutEntityEquipment(int entityId, int slotIndex, @Nullable Object itemStack) {
         this.entityId = entityId;
         this.slotIndex = slotIndex;
         this.itemStack = itemStack;

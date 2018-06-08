@@ -29,7 +29,7 @@ import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.advancement.LanternAdvancementType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
@@ -56,9 +56,9 @@ public final class CodecPlayOutAdvancements implements Codec<MessagePlayOutAdvan
             buf.writeBoolean(optDisplay.isPresent());
             if (optDisplay.isPresent()) {
                 final MessagePlayOutAdvancements.AdvStruct.Display display = optDisplay.get();
-                buf.write(Types.LOCALIZED_TEXT, display.getTitle());
-                buf.write(Types.LOCALIZED_TEXT, display.getDescription());
-                buf.write(Types.ITEM_STACK, display.getIcon().createStack());
+                context.write(buf, ContextualValueTypes.TEXT, display.getTitle());
+                context.write(buf, ContextualValueTypes.TEXT, display.getDescription());
+                context.write(buf, ContextualValueTypes.ITEM_STACK, display.getIcon().createStack());
                 buf.writeVarInt(((LanternAdvancementType) display.getType()).getInternalId());
                 final Optional<String> optBackground = display.getBackground();
                 int flags = 0;

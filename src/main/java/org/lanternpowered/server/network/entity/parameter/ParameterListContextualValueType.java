@@ -23,65 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.objects;
+package org.lanternpowered.server.network.entity.parameter;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueType;
+import org.lanternpowered.server.network.message.codec.CodecContext;
 
-import org.spongepowered.api.text.Text;
+public final class ParameterListContextualValueType implements ContextualValueType<ParameterList> {
 
-import java.util.Locale;
-
-/**
- * Represents a {@link Text} object that will be translated (if needed) for
- * the specified locale.
- */
-public final class LocalizedText {
-
-    /**
-     * A equivalent of the localized text for {@link Text#EMPTY}.
-     */
-    public static final LocalizedText EMPTY = new LocalizedText(Text.EMPTY);
-
-    private final Locale locale;
-    private final Text text;
-
-    /**
-     * Creates a new localized text object for the specified text
-     * and locale.
-     *
-     * @param text the text
-     */
-    public LocalizedText(Text text, Locale locale) {
-        this.locale = checkNotNull(locale, "locale");
-        this.text = checkNotNull(text, "text");
+    @Override
+    public void write(CodecContext ctx, ParameterList object, ByteBuffer buf) throws CodecException {
+        ((AbstractParameterList) object).write(ctx, buf);
     }
 
-    /**
-     * Creates a new localized text object for the specified text
-     * and default locale.
-     *
-     * @param text the text
-     */
-    public LocalizedText(Text text) {
-        this(text, Locale.ENGLISH);
+    @Override
+    public ParameterList read(CodecContext ctx, ByteBuffer buf) throws CodecException {
+        throw new UnsupportedOperationException();
     }
-
-    /**
-     * Gets the locale.
-     *
-     * @return the locale
-     */
-    public Locale getLocale() {
-        return this.locale;
-    }
-
-    /**
-     * Gets the text.
-     *
-     * @return the text
-     */
-    public Text getText() {
-        return this.text;
-    }
-
 }

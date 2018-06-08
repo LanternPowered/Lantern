@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.Visibility;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
 import java.util.List;
@@ -51,26 +52,26 @@ public abstract class MessagePlayOutTeams implements Message {
         }
     }
 
-    public static final class Create extends CreateOrUpdate implements Players {
+    public static final class Create extends CreateOrUpdate implements Members {
 
-        private final List<String> players;
+        private final List<Text> members;
 
-        public Create(String teamName, String displayName, String prefix, String suffix, Visibility nameTagVisibility,
+        public Create(String teamName, Text displayName, Text prefix, Text suffix, Visibility nameTagVisibility,
                 CollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles,
-                List<String> players) {
+                List<Text> members) {
             super(teamName, displayName, prefix, suffix, nameTagVisibility, collisionRule, color, friendlyFire, seeFriendlyInvisibles);
-            this.players = players;
+            this.members = members;
         }
 
         @Override
-        public List<String> getPlayers() {
-            return this.players;
+        public List<Text> getMembers() {
+            return this.members;
         }
     }
 
     public static final class Update extends CreateOrUpdate {
 
-        public Update(String teamName, String displayName, String prefix, String suffix, Visibility nameTagVisibility,
+        public Update(String teamName, Text displayName, Text prefix, Text suffix, Visibility nameTagVisibility,
                 CollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles) {
             super(teamName, displayName, prefix, suffix, nameTagVisibility, collisionRule, color, friendlyFire, seeFriendlyInvisibles);
         }
@@ -78,16 +79,16 @@ public abstract class MessagePlayOutTeams implements Message {
 
     public static abstract class CreateOrUpdate extends MessagePlayOutTeams {
 
-        private final String displayName;
-        private final String prefix;
-        private final String suffix;
+        private final Text displayName;
+        private final Text prefix;
+        private final Text suffix;
         private final Visibility nameTagVisibility;
         private final CollisionRule collisionRule;
         private final TextColor color;
         private final boolean friendlyFire;
         private final boolean seeFriendlyInvisibles;
 
-        CreateOrUpdate(String teamName, String displayName, String prefix, String suffix, Visibility nameTagVisibility,
+        CreateOrUpdate(String teamName, Text displayName, Text prefix, Text suffix, Visibility nameTagVisibility,
                 CollisionRule collisionRule, TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles) {
             super(teamName);
             this.displayName = displayName;
@@ -100,15 +101,15 @@ public abstract class MessagePlayOutTeams implements Message {
             this.seeFriendlyInvisibles = seeFriendlyInvisibles;
         }
 
-        public String getDisplayName() {
+        public Text getDisplayName() {
             return this.displayName;
         }
 
-        public String getPrefix() {
+        public Text getPrefix() {
             return this.prefix;
         }
 
-        public String getSuffix() {
+        public Text getSuffix() {
             return this.suffix;
         }
 
@@ -133,45 +134,37 @@ public abstract class MessagePlayOutTeams implements Message {
         }
     }
 
-    public static final class AddPlayers extends AddOrRemovePlayers {
+    public static final class AddMembers extends AddOrRemovePlayers {
 
-        public AddPlayers(String teamName, List<String> players) {
-            super(teamName, players);
+        public AddMembers(String teamName, List<Text> members) {
+            super(teamName, members);
         }
     }
 
-    public static final class RemovePlayers extends AddOrRemovePlayers {
+    public static final class RemoveMembers extends AddOrRemovePlayers {
 
-        public RemovePlayers(String teamName, List<String> players) {
-            super(teamName, players);
+        public RemoveMembers(String teamName, List<Text> members) {
+            super(teamName, members);
         }
     }
 
-    static abstract class AddOrRemovePlayers extends MessagePlayOutTeams implements Players {
+    public static abstract class AddOrRemovePlayers extends MessagePlayOutTeams implements Members {
 
-        private final List<String> players;
+        private final List<Text> members;
 
-        AddOrRemovePlayers(String teamName, List<String> players) {
+        AddOrRemovePlayers(String teamName, List<Text> members) {
             super(teamName);
-            this.players = players;
+            this.members = members;
         }
 
         @Override
-        public List<String> getPlayers() {
-            return this.players;
+        public List<Text> getMembers() {
+            return this.members;
         }
     }
 
-    /**
-     * Holds a list of player names.
-     */
-    public interface Players {
+    public interface Members {
 
-        /**
-         * Gets the player names of the message.
-         *
-         * @return The players
-         */
-        List<String> getPlayers();
+        List<Text> getMembers();
     }
 }

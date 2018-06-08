@@ -26,9 +26,9 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.LocalizedText;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
+import org.spongepowered.api.text.Text;
 
 import java.util.UUID;
 
@@ -36,14 +36,14 @@ public abstract class MessagePlayOutBossBar implements Message {
 
     public static final class Add extends MessagePlayOutBossBar {
 
-        private final LocalizedText title;
+        private final Text title;
         private final BossBarColor color;
         private final BossBarOverlay overlay;
         private final float health;
         private final boolean darkenSky;
         private final boolean endMusic;
 
-        public Add(UUID uniqueId, LocalizedText title, BossBarColor color, BossBarOverlay overlay, float health,
+        public Add(UUID uniqueId, Text title, BossBarColor color, BossBarOverlay overlay, float health,
                 boolean darkenSky, boolean endMusic) {
             super(uniqueId);
             this.title = title;
@@ -54,7 +54,7 @@ public abstract class MessagePlayOutBossBar implements Message {
             this.endMusic = endMusic;
         }
 
-        public LocalizedText getTitle() {
+        public Text getTitle() {
             return this.title;
         }
 
@@ -102,14 +102,14 @@ public abstract class MessagePlayOutBossBar implements Message {
 
     public static final class UpdateTitle extends MessagePlayOutBossBar {
 
-        private final LocalizedText title;
+        private final Text title;
 
-        public UpdateTitle(UUID uniqueId, LocalizedText title) {
+        public UpdateTitle(UUID uniqueId, Text title) {
             super(uniqueId);
             this.title = title;
         }
 
-        public LocalizedText getTitle() {
+        public Text getTitle() {
             return this.title;
         }
     }

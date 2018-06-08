@@ -40,17 +40,17 @@ import static org.lanternpowered.server.text.gson.TextConstants.UNDERLINE;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
-import org.lanternpowered.server.text.LanternTextHelper;
-import org.lanternpowered.server.text.LanternTextHelper.RawAction;
+import com.google.gson.JsonSerializer;
+import org.lanternpowered.server.text.gson.JsonTextEventHelper.RawAction;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
-import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.ShiftClickAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
@@ -59,16 +59,9 @@ import org.spongepowered.api.text.format.TextStyle;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+abstract class JsonTextBaseSerializer<T extends Text> implements JsonSerializer<T>, JsonDeserializer<T> {
 
-abstract class JsonTextBaseSerializer {
-
-    public static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
-        deserialize(json, builder, context, json.getAsJsonArray(CHILDREN));
-    }
-
-    public static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context, @Nullable JsonArray children)
-            throws JsonParseException {
+    static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
         JsonElement element;
         if ((element = json.get(COLOR)) != null) {
             Sponge.getRegistry().getType(TextColor.class, element.getAsString()).ifPresent(builder::color);
@@ -90,6 +83,7 @@ abstract class JsonTextBaseSerializer {
             style = style.obfuscated(element.getAsBoolean());
         }
         builder.style(style);
+        final JsonArray children = json.getAsJsonArray(CHILDREN);
         if (children != null) {
             builder.append((Text[]) context.deserialize(children, Text[].class));
         }
@@ -102,7 +96,7 @@ abstract class JsonTextBaseSerializer {
                     final String action = jsonEventAction.getAsString();
                     final String value = jsonEventValue.getAsString();
 
-                    final ClickAction<?> clickAction = LanternTextHelper.parseClickAction(action, value);
+                    final ClickAction<?> clickAction = JsonTextEventHelper.parseClickAction(action, value);
                     if (clickAction != null) {
                         builder.onClick(clickAction);
                     }
@@ -117,11 +111,7 @@ abstract class JsonTextBaseSerializer {
                 if (jsonEventAction != null && jsonEventValue != null) {
                     final String action = jsonEventAction.getAsString();
                     final String value = jsonEventValue.getAsString();
-
-                    final HoverAction<?> hoverAction = LanternTextHelper.parseHoverAction(action, value);
-                    if (hoverAction != null) {
-                        builder.onHover(hoverAction);
-                    }
+                    builder.onHover(JsonTextEventHelper.parseHoverAction(action, value));
                 }
             }
         }
@@ -130,11 +120,7 @@ abstract class JsonTextBaseSerializer {
         }
     }
 
-    public static void serialize(JsonObject json, Text text, JsonSerializationContext context) {
-        serialize(json, text, context, text.getChildren());
-    }
-
-    public static void serialize(JsonObject json, Text text, JsonSerializationContext context, List<Text> children) {
+    static void serialize(JsonObject json, Text text, JsonSerializationContext context) {
         final TextColor color = text.getColor();
         if (color != TextColors.NONE) {
             json.addProperty(COLOR, color.getId());
@@ -145,24 +131,25 @@ abstract class JsonTextBaseSerializer {
         style.hasUnderline().ifPresent(v -> json.addProperty(UNDERLINE, v));
         style.hasStrikethrough().ifPresent(v -> json.addProperty(STRIKETHROUGH, v));
         style.isObfuscated().ifPresent(v -> json.addProperty(OBFUSCATED, v));
+        final List<Text> children = text.getChildren();
         if (!children.isEmpty()) {
             json.add(CHILDREN, context.serialize(children.toArray(new Text[children.size()]), Text[].class));
         }
         text.getClickAction().ifPresent(clickAction -> {
-            final RawAction raw = LanternTextHelper.raw(clickAction);
+            final RawAction raw = JsonTextEventHelper.raw(clickAction);
 
             final JsonObject jsonEvent = new JsonObject();
-            jsonEvent.addProperty(EVENT_ACTION, raw.getAction());
-            jsonEvent.addProperty(EVENT_VALUE, raw.getValueAsString());
+            jsonEvent.addProperty(EVENT_ACTION, raw.action);
+            jsonEvent.addProperty(EVENT_VALUE, raw.value);
 
             json.add(CLICK_EVENT, jsonEvent);
         });
         text.getHoverAction().ifPresent(clickAction -> {
-            final RawAction raw = LanternTextHelper.raw(clickAction);
+            final RawAction raw = JsonTextEventHelper.raw(clickAction);
 
             final JsonObject jsonEvent = new JsonObject();
-            jsonEvent.addProperty(EVENT_ACTION, raw.getAction());
-            jsonEvent.addProperty(EVENT_VALUE, raw.getValueAsString());
+            jsonEvent.addProperty(EVENT_ACTION, raw.action);
+            jsonEvent.addProperty(EVENT_VALUE, raw.value);
 
             json.add(HOVER_EVENT, jsonEvent);
         });

@@ -45,7 +45,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.Set;
 
 public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Message> {
@@ -72,8 +71,12 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             channel = result.channel;
             content = result.byteBuf;
         }
-        buf.writeString(channel);
-        buf.writeBytes(content);
+        try {
+            buf.writeString(channel);
+            buf.writeBytes(content);
+        } finally {
+            content.release();
+        }
         return buf;
     }
 
@@ -97,26 +100,14 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
 
     private Message decode0(CodecContext context, ByteBuffer content, String channel) {
         if ("REGISTER".equals(channel)) {
-            Set<String> channels = decodeChannels(content);
-            Iterator<String> it = channels.iterator();
-            while (it.hasNext()) {
-                String channel0 = it.next();
-                if (channel0.startsWith("FML")) {
-                    it.remove();
-                }
-            }
+            final Set<String> channels = decodeChannels(content);
+            channels.removeIf(c -> c.startsWith("FML"));
             if (!channels.isEmpty()) {
                 return new MessagePlayInOutRegisterChannels(channels);
             }
         } else if ("UNREGISTER".equals(channel)) {
-            Set<String> channels = decodeChannels(content);
-            Iterator<String> it = channels.iterator();
-            while (it.hasNext()) {
-                String channel0 = it.next();
-                if (channel0.startsWith("FML")) {
-                    it.remove();
-                }
-            }
+            final Set<String> channels = decodeChannels(content);
+            channels.removeIf(c -> c.startsWith("FML"));
             if (!channels.isEmpty()) {
                 return new MessagePlayInOutUnregisterChannels(channels);
             }
@@ -124,11 +115,11 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
             MultiPartMessage message0 = attribute.get();
             if (message0 == null) {
-                String channel0 = content.readString();
-                int parts = content.readByte() & 0xff;
-                int size = content.readInteger();
-                if (size <= 0 || size >= -16797616) {
-                    throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Max: -16797616, Received: " + size);
+                final String channel0 = content.readString();
+                final int parts = content.readByte() & 0xff;
+                final int size = content.readInteger();
+                if (size <= 0) {
+                    throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Received: " + size);
                 }
                 attribute.set(new MultiPartMessage(channel0, context.byteBufAlloc().buffer(size), parts));
             } else {

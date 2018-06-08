@@ -28,10 +28,10 @@ package org.lanternpowered.server.text;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.SafeTextSerializer;
 import org.spongepowered.api.text.serializer.TextParseException;
-import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.Locale;
 
@@ -43,7 +43,7 @@ public final class PlainTextSerializer extends PluginCatalogType.Base implements
 
     @Override
     public String serialize(Text text) {
-        return serialize(text, Locales.DEFAULT);
+        return serialize(text, TranslationContext.current().getLocale());
     }
 
     @Override

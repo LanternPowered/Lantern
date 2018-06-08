@@ -29,7 +29,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3f;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -42,10 +41,8 @@ import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
-import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
+import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -81,9 +78,8 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
 
 public final class ProcessorPlayOutParticleEffect implements Processor<MessagePlayOutParticleEffect> {
 
@@ -92,7 +88,6 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
      */
     private final LoadingCache<ParticleEffect, ICachedMessage> cache = Caffeine.newBuilder()
             .weakKeys().expireAfterAccess(3, TimeUnit.MINUTES)
-            .removalListener(this::processRemoval)
             .build(this::preProcess);
 
     private final Object2IntMap<PotionEffectType> potionEffectTypeToId = new Object2IntOpenHashMap<>();
@@ -170,14 +165,6 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         }
     }
 
-    private void processRemoval(@Nullable ParticleEffect key, @Nullable ICachedMessage value, RemovalCause cause) {
-        if (value instanceof CachedFireworksMessage) {
-            final ByteBufParameterList parameterList = (ByteBufParameterList) ((CachedFireworksMessage) value)
-                    .entityMetadataMessage.getParameterList();
-            parameterList.getByteBuffer().ifPresent(ByteBuffer::release);
-        }
-    }
-
     private static int[] toExtraItemData(ItemStack itemStack) {
         final ObjectStore<LanternItemStack> store = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
         final DataContainer view = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
@@ -200,7 +187,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 itemStack.tryOffer(Keys.FIREWORK_EFFECTS, effect.getOptionOrDefault(ParticleOptions.FIREWORK_EFFECTS).get());
 
                 // Write the item to a parameter list
-                final ByteBufParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+                final DefaultParameterList parameterList = new DefaultParameterList();
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
 
                 return new CachedFireworksMessage(new MessagePlayOutEntityMetadata(CachedFireworksMessage.ENTITY_ID, parameterList));
@@ -453,7 +440,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
 
         @Override
         public void process(Vector3d position, List<Message> output) {
-            final Random random = new Random();
+            final Random random = ThreadLocalRandom.current();
 
             if (this.offset.equals(Vector3f.ZERO)) {
                 final MessagePlayOutSpawnParticle message = new MessagePlayOutSpawnParticle(

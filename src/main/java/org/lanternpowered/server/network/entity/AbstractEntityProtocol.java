@@ -42,9 +42,11 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -59,7 +61,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     /**
      * All the players tracking this entity.
      */
-    private final Set<LanternPlayer> trackers = new HashSet<>();
+    final Set<LanternPlayer> trackers = new HashSet<>();
 
     /**
      * The entity that is being tracked.
@@ -91,7 +93,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         this.entity = entity;
     }
 
-    private final class SimpleEntityProtocolContext implements EntityProtocolUpdateContext {
+    final class SimpleEntityProtocolContext implements EntityProtocolUpdateContext {
 
         @SuppressWarnings("NullableProblems")
         private Set<LanternPlayer> trackers;
@@ -151,6 +153,10 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         }
     }
 
+    private SimpleEntityProtocolContext newContext() {
+        return new SimpleEntityProtocolContext();
+    }
+
     public E getEntity() {
         return this.entity;
     }
@@ -204,7 +210,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     void destroy(EntityProtocolInitContext context) {
         if (!this.trackers.isEmpty()) {
             // Destroy the entity on all the clients
-            final SimpleEntityProtocolContext ctx = new SimpleEntityProtocolContext();
+            final SimpleEntityProtocolContext ctx = newContext();
             final TempEvents events = processEvents(true, true);
             ctx.trackers = this.trackers;
             if (events != null && events.deathOrAlive != null) {
@@ -256,7 +262,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     final class TrackerUpdateContextData {
 
         final AbstractEntityProtocol<?> entityProtocol;
-        final SimpleEntityProtocolContext ctx = new SimpleEntityProtocolContext();
+        final SimpleEntityProtocolContext ctx = newContext();
 
         @Nullable Set<LanternPlayer> added;
         @Nullable Set<LanternPlayer> removed;
@@ -353,6 +359,15 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         }
     }
 
+    void updateTrackerLocale(LanternPlayer player) {
+        if (!this.trackers.contains(player)) {
+            return;
+        }
+        final SimpleEntityProtocolContext ctx = newContext();
+        ctx.trackers = Collections.singleton(player);
+        updateTranslations(ctx);
+    }
+
     private final class TempEvents {
 
         @Nullable private final List<EntityEvent> deathOrAlive;
@@ -439,6 +454,13 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      * @param context The entity update context
      */
     protected abstract void update(EntityProtocolUpdateContext context);
+
+    /**
+     * Updates the tracked entity for {@link Locale} changes.
+     *
+     * @param context The context
+     */
+    protected abstract void updateTranslations(EntityProtocolUpdateContext context);
 
     protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
     }

@@ -52,7 +52,7 @@ public class LanternParticleOption<V> extends PluginCatalogType.Base implements 
     }
 
     @Nullable
-    public IllegalArgumentException validateValue(V value) {
+    IllegalArgumentException validateValue(V value) {
         if (this.valueValidator != null) {
             return this.valueValidator.apply(value);
         }

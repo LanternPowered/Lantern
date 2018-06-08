@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
@@ -67,6 +66,9 @@ import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.LanternTexts;
@@ -89,8 +91,11 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.difficulty.Difficulties;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -100,6 +105,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -214,6 +220,16 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     private int protocolVersion = -1;
 
+    /**
+     * The locale of the player.
+     */
+    private Locale locale = Locales.DEFAULT;
+
+    /**
+     * Whether the first client settings message was received.
+     */
+    private boolean firstClientSettingsMessage;
+
     public NetworkSession(Channel channel, LanternServer server, NetworkManager networkManager) {
         this.networkManager = networkManager;
         this.channel = channel;
@@ -239,6 +255,18 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception {
+        Message actualMessage = message;
+        if (actualMessage instanceof HandlerMessage) {
+            actualMessage = ((HandlerMessage) actualMessage).getMessage();
+        }
+        if (actualMessage instanceof MessagePlayInClientSettings) { // Special case, keep track of the locale
+            this.locale = ((MessagePlayInClientSettings) actualMessage).getLocale();
+            if (!this.firstClientSettingsMessage) {
+                this.firstClientSettingsMessage = true;
+                // Trigger the init
+                messageReceived(new HandlerMessage<>(new InitPlayerMessage(), (context, initMessage) -> finalizePlayer()));
+            }
+        }
         messageReceived(message);
     }
 
@@ -407,6 +435,16 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
+     * Gets the {@link Locale}.
+     * <p>This method should only be accessed from the netty thread.
+     *
+     * @return The locale
+     */
+    public Locale getLocale() {
+        return this.locale;
+    }
+
+    /**
      * Gets the protocol version.
      *
      * @return The protocol version
@@ -559,7 +597,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     public ChannelFuture sendWithFuture(Message... messages) {
         checkNotNull(messages, "messages");
-        checkArgument(messages.length != 0, "messages cannot be empty");
+        if (messages.length == 0) {
+            return this.channel.voidPromise();
+        }
         final ChannelPromise promise = this.channel.newPromise();
         if (!this.channel.isActive()) {
             return promise;
@@ -608,7 +648,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     public ChannelFuture sendWithFuture(Iterable<Message> messages) {
         checkNotNull(messages, "messages");
         final Iterator<Message> it = messages.iterator();
-        checkArgument(it.hasNext(), "messages cannot be empty");
+        if (!it.hasNext()) {
+            return this.channel.voidPromise();
+        }
         final ChannelPromise promise = this.channel.newPromise();
         if (!this.channel.isActive()) {
             return promise;
@@ -675,8 +717,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     public void send(Message... messages) {
         checkNotNull(messages, "messages");
-        checkArgument(messages.length != 0, "messages cannot be empty");
-        if (!this.channel.isActive()) {
+        if (messages.length == 0 || !this.channel.isActive()) {
             return;
         }
         final ChannelPromise voidPromise = this.channel.voidPromise();
@@ -713,7 +754,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     public void send(Iterable<Message> messages) {
         checkNotNull(messages, "messages");
         final Iterator<Message> it = messages.iterator();
-        checkArgument(it.hasNext(), "messages cannot be empty");
+        if (!it.hasNext()) {
+            return;
+        }
         Message message = it.next();
         // Don't bother checking if we are in the event loop,
         // there is only one message.
@@ -807,9 +850,10 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
-     * Initializes the {@link LanternPlayer} instance
-     * and spawns it in a world if permitted to join
-     * the server.
+     * Pre initializes the {@link LanternPlayer}, after this state we need
+     * to wait for the client to send a {@link MessagePlayInClientSettings}
+     * so that we have the {@link Locale} before we start sending translated
+     * {@link Text} objects.
      */
     public void initPlayer() {
         initKeepAliveTask();
@@ -818,6 +862,20 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         this.player = new LanternPlayer(this.gameProfile, this);
         this.player.setNetworkId(EntityProtocolManager.acquireEntityId());
+
+        // Actually to early to send this, but we want to trigger
+        // the client settings to be send to the server, respawn
+        // messages will be send afterwards with the proper values
+        send(new MessagePlayOutPlayerJoinGame(GameModes.SURVIVAL, DimensionTypes.OVERWORLD,
+                Difficulties.NORMAL, this.player.getNetworkId(), getServer().getMaxPlayers(), false, false, false));
+    }
+
+    /**
+     * Finally initializes the {@link LanternPlayer} instance
+     * and spawns it in a world if permitted to join
+     * the server.
+     */
+    private void finalizePlayer() {
         this.player.setEntityProtocolType(EntityProtocolTypes.PLAYER);
 
         LanternWorld world = this.player.getWorld();
@@ -924,6 +982,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (config.isGameModeForced() || this.player.get(Keys.GAME_MODE).get().equals(GameModes.NOT_SET)) {
             this.player.offer(Keys.GAME_MODE, config.getGameMode());
         }
+
+        // Send the server brand
+        send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
 
         // Reset the raw world
         this.player.setRawWorld(null);

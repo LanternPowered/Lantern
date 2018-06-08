@@ -34,7 +34,6 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -125,7 +124,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             final boolean automatic = content.readBoolean();
             return new MessagePlayInEditCommandBlock.AdvancedBlock(new Vector3i(x, y, z), command, shouldTrackOutput, mode, conditional, automatic);
         } else if ("MC|BSign".equals(channel)) {
-            final RawItemStack rawItemStack = content.read(Types.RAW_ITEM_STACK);
+            final RawItemStack rawItemStack = content.readRawItemStack();
             //noinspection ConstantConditions
             if (rawItemStack == null) {
                 throw new CodecException("Signed book may not be null!");
@@ -139,7 +138,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             final List<String> pages = dataView.getStringList(PAGES).orElseThrow(() -> new CodecException("Signed book pages missing!"));
             return new MessagePlayInSignBook(author, title, pages);
         } else if ("MC|BEdit".equals(channel)) {
-            final RawItemStack rawItemStack = content.read(Types.RAW_ITEM_STACK);
+            final RawItemStack rawItemStack = content.readRawItemStack();
             //noinspection ConstantConditions
             if (rawItemStack == null) {
                 throw new CodecException("Edited book may not be null!");

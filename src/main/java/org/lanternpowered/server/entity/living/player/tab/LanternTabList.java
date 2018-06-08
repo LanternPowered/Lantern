@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
+import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.text.Text;
@@ -79,12 +80,20 @@ public class LanternTabList implements TabList {
         });
         this.player.getConnection().send(new MessagePlayOutTabListEntries(messageEntries));
         if (this.footer.isPresent() || this.header.isPresent()) {
-            this.sendHeaderAndFooterUpdate();
+            sendHeaderAndFooterUpdate();
         }
     }
 
     private void sendHeaderAndFooterUpdate() {
         this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header.orElse(null), this.footer.orElse(null)));
+    }
+
+    public void refresh() {
+        if (this.header.map(TranslationHelper::containsNonMinecraftTranslation).orElse(false) ||
+                this.footer.map(TranslationHelper::containsNonMinecraftTranslation).orElse(false)) {
+            sendHeaderAndFooterUpdate();
+        }
+        this.tabListEntries.values().forEach(LanternTabListEntry::refreshDisplayName);
     }
 
     public void clear() {
@@ -104,7 +113,7 @@ public class LanternTabList implements TabList {
     @Override
     public LanternTabList setHeader(@Nullable Text header) {
         this.header = Optional.ofNullable(header);
-        this.sendHeaderAndFooterUpdate();
+        sendHeaderAndFooterUpdate();
         return this;
     }
 
@@ -116,7 +125,7 @@ public class LanternTabList implements TabList {
     @Override
     public LanternTabList setFooter(@Nullable Text footer) {
         this.footer = Optional.ofNullable(footer);
-        this.sendHeaderAndFooterUpdate();
+        sendHeaderAndFooterUpdate();
         return this;
     }
 
@@ -124,7 +133,7 @@ public class LanternTabList implements TabList {
     public LanternTabList setHeaderAndFooter(@Nullable Text header, @Nullable Text footer) {
         this.header = Optional.ofNullable(header);
         this.footer = Optional.ofNullable(footer);
-        this.sendHeaderAndFooterUpdate();
+        sendHeaderAndFooterUpdate();
         return this;
     }
 
@@ -141,7 +150,7 @@ public class LanternTabList implements TabList {
     @Override
     public TabList addEntry(TabListEntry entry) throws IllegalArgumentException {
         checkNotNull(entry, "entry");
-        UUID uniqueId = entry.getProfile().getUniqueId();
+        final UUID uniqueId = entry.getProfile().getUniqueId();
         checkArgument(entry.getList() == this,
                 "The tab list entries #getList() list does not match to this list.");
         checkArgument(!this.tabListEntries.containsKey(uniqueId),
@@ -149,7 +158,7 @@ public class LanternTabList implements TabList {
         this.tabListEntries.put(uniqueId, (LanternTabListEntry) entry);
         this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(new MessagePlayOutTabListEntries.Entry.Add(
                 entry.getProfile(), entry.getGameMode(), entry.getDisplayName().orElse(null), entry.getLatency()))));
-        LanternTabListEntry entry0 = (LanternTabListEntry) entry;
+        final LanternTabListEntry entry0 = (LanternTabListEntry) entry;
         entry0.attached = true;
         entry0.getGlobalEntry().addEntry(entry0);
         return this;

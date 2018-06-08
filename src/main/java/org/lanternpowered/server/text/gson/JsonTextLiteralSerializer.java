@@ -29,25 +29,21 @@ import static org.lanternpowered.server.text.gson.TextConstants.TEXT;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.lang.reflect.Type;
 
-final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<LiteralText>, JsonDeserializer<LiteralText> {
+final class JsonTextLiteralSerializer extends JsonTextBaseSerializer<LiteralText> {
 
-    private final boolean removeComplexity;
-
-    JsonTextLiteralSerializer(boolean removeComplexity) {
-        this.removeComplexity = removeComplexity;
+    JsonTextLiteralSerializer() {
     }
 
     @Override
@@ -55,15 +51,15 @@ final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements 
         if (json.isJsonPrimitive()) {
             return Text.of(json.getAsString());
         }
-        JsonObject json0 = json.getAsJsonObject();
-        LiteralText.Builder builder = Text.builder(json0.get(TEXT).getAsString());
+        final JsonObject json0 = json.getAsJsonObject();
+        final LiteralText.Builder builder = Text.builder(json0.get(TEXT).getAsString());
         deserialize(json0, builder, context);
         return builder.build();
     }
 
     @Override
     public JsonElement serialize(LiteralText src, Type typeOfSrc, JsonSerializationContext context) {
-        return serializeLiteralText(src, src.getContent(), context, this.removeComplexity);
+        return serializeLiteralText(src, src.getContent(), context, TranslationContext.current().forcesTranslations());
     }
 
     static JsonElement serializeLiteralText(Text text, String content, JsonSerializationContext context, boolean removeComplexity) {

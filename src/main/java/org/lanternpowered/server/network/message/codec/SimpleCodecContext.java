@@ -27,7 +27,9 @@ package org.lanternpowered.server.network.message.codec;
 
 import io.netty.channel.Channel;
 import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueType;
 
 public class SimpleCodecContext implements CodecContext {
 
@@ -44,6 +46,16 @@ public class SimpleCodecContext implements CodecContext {
     @Override
     public ByteBufferAllocator byteBufAlloc() {
         return this.byteBufferAlloc;
+    }
+
+    @Override
+    public <T> void write(ByteBuffer buffer, ContextualValueType<T> type, T value) {
+        type.write(this, value, buffer);
+    }
+
+    @Override
+    public <V> V read(ByteBuffer buffer, ContextualValueType<V> type) {
+        return type.read(this, buffer);
     }
 
     @Override

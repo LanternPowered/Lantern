@@ -28,36 +28,14 @@ package org.lanternpowered.server.text;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
+@SuppressWarnings("deprecation")
 public class LanternTexts {
 
-    @SuppressWarnings("deprecation")
     public static String toLegacy(Text text) {
         return TextSerializers.LEGACY_FORMATTING_CODE.serialize(text);
     }
 
-    public static String toPlain(Text text) {
-        return TextSerializers.PLAIN.serialize(text);
-    }
-
-    @SuppressWarnings("deprecation")
     public static Text fromLegacy(String text) {
         return TextSerializers.LEGACY_FORMATTING_CODE.deserialize(text);
-    }
-
-    /**
-     * The client doesn't like it when the server just sends a
-     * primitive json string, so we put it as one entry in an array
-     * to avoid errors.
-     *
-     * @param json the json
-     * @return the result json
-     */
-    public static String fixJson(String json) {
-        final char start = json.charAt(0);
-        if (start == '[' || start == '{') {
-            return json;
-        } else {
-            return '[' + json + ']';
-        }
     }
 }

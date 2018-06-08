@@ -37,6 +37,7 @@ import org.lanternpowered.server.asset.ReloadListener;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.translation.ResourceBundleTranslation;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,10 +74,10 @@ public final class LanternTranslationManager implements TranslationManager, Relo
 
     private final LoadingCache<ResourceKey, Optional<ResourceBundle>> resourceBundlesCache =
             Caffeine.newBuilder().build(key -> {
-                final Locale locale = key.locale == null ? Locale.ENGLISH : key.locale;
+                final Locale locale = key.locale == null ? Locales.DEFAULT : key.locale;
                 Optional<ResourceBundle> optBundle = this.load(key.name, locale);
-                if (!optBundle.isPresent() && locale != Locale.ENGLISH) {
-                    optBundle = this.load(key.name, Locale.ENGLISH);
+                if (!optBundle.isPresent() && locale != Locales.DEFAULT) {
+                    optBundle = this.load(key.name, Locales.DEFAULT);
                 }
                 return optBundle;
             });
@@ -115,7 +116,7 @@ public final class LanternTranslationManager implements TranslationManager, Relo
                 if (refresh) {
                     final Set<ResourceKey> refreshKeys = new HashSet<>();
                     for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
-                        Locale locale1 = key.locale == null ? Locale.ENGLISH : key.locale;
+                        Locale locale1 = key.locale == null ? Locales.DEFAULT : key.locale;
                         if (locale1.equals(locale) && bundle.containsKey(key.name)) {
                             refreshKeys.add(key);
                         }

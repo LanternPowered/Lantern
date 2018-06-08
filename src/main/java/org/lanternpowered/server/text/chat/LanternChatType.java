@@ -30,20 +30,18 @@ import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 
-import java.util.Locale;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public final class LanternChatType extends PluginCatalogType.Base implements ChatType {
 
-    private final BiFunction<Text, Locale, Message> messageProvider;
+    private final Function<Text, Message> messageProvider;
 
-    public LanternChatType(String pluginId, String name,
-            BiFunction<Text, Locale, Message> messageProvider) {
+    public LanternChatType(String pluginId, String name, Function<Text, Message> messageProvider) {
         super(pluginId, name);
         this.messageProvider = messageProvider;
     }
 
-    public BiFunction<Text, Locale, Message> getMessageProvider() {
+    public Function<Text, Message> getMessageProvider() {
         return this.messageProvider;
     }
 }

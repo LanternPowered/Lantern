@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.connection;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
@@ -36,6 +36,8 @@ public final class CodecOutDisconnect implements Codec<MessageOutDisconnect> {
 
     @Override
     public ByteBuffer encode(CodecContext context, MessageOutDisconnect message) throws CodecException {
-        return context.byteBufAlloc().buffer().write(Types.TEXT, message.getReason());
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        context.write(buf, ContextualValueTypes.TEXT, message.getReason());
+        return buf;
     }
 }

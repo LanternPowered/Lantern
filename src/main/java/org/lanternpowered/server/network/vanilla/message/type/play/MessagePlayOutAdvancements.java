@@ -29,9 +29,9 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.LocalizedText;
 import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
 import java.util.List;
@@ -138,8 +138,8 @@ public final class MessagePlayOutAdvancements implements Message {
 
         public static final class Display {
 
-            private final LocalizedText title;
-            private final LocalizedText description;
+            private final Text title;
+            private final Text description;
             private final ItemStackSnapshot icon;
             private final AdvancementType frameType;
             @Nullable private final String background;
@@ -148,7 +148,7 @@ public final class MessagePlayOutAdvancements implements Message {
             private final boolean showToast;
             private final boolean hidden;
 
-            public Display(LocalizedText title, LocalizedText description, ItemStackSnapshot icon, AdvancementType frameType,
+            public Display(Text title, Text description, ItemStackSnapshot icon, AdvancementType frameType,
                     @Nullable String background, double x, double y, boolean showToast, boolean hidden) {
                 this.description = description;
                 this.background = background;
@@ -165,11 +165,11 @@ public final class MessagePlayOutAdvancements implements Message {
                 return this.hidden;
             }
 
-            public LocalizedText getDescription() {
+            public Text getDescription() {
                 return this.description;
             }
 
-            public LocalizedText getTitle() {
+            public Text getTitle() {
                 return this.title;
             }
 
@@ -202,8 +202,8 @@ public final class MessagePlayOutAdvancements implements Message {
                 return MoreObjects.toStringHelper(this)
                         .omitNullValues()
                         .add("icon", this.icon)
-                        .add("title", this.title.getText())
-                        .add("description", this.description.getText())
+                        .add("title", this.title)
+                        .add("description", this.description)
                         .add("type", this.frameType.getId())
                         .add("background", this.background)
                         .add("showToast", this.showToast)

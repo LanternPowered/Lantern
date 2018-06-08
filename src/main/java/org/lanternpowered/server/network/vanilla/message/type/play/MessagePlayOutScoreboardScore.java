@@ -26,13 +26,14 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.text.Text;
 
 public abstract class MessagePlayOutScoreboardScore implements Message {
 
     private final String objectiveName;
-    private final String scoreName;
+    private final Text scoreName;
 
-    public MessagePlayOutScoreboardScore(String objectiveName, String scoreName) {
+    public MessagePlayOutScoreboardScore(String objectiveName, Text scoreName) {
         this.objectiveName = objectiveName;
         this.scoreName = scoreName;
     }
@@ -41,7 +42,7 @@ public abstract class MessagePlayOutScoreboardScore implements Message {
         return this.objectiveName;
     }
 
-    public String getScoreName() {
+    public Text getScoreName() {
         return this.scoreName;
     }
 
@@ -49,7 +50,7 @@ public abstract class MessagePlayOutScoreboardScore implements Message {
 
         private final int value;
 
-        public CreateOrUpdate(String objectiveName, String scoreName, int value) {
+        public CreateOrUpdate(String objectiveName, Text scoreName, int value) {
             super(objectiveName, scoreName);
             this.value = value;
         }
@@ -61,7 +62,7 @@ public abstract class MessagePlayOutScoreboardScore implements Message {
 
     public static final class Remove extends MessagePlayOutScoreboardScore {
 
-        public Remove(String objectiveName, String scoreName) {
+        public Remove(String objectiveName, Text scoreName) {
             super(objectiveName, scoreName);
         }
     }

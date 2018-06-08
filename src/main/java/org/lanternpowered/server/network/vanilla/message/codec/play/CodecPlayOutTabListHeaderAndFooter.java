@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
@@ -45,12 +45,12 @@ public final class CodecPlayOutTabListHeaderAndFooter implements Codec<MessagePl
         Text header = message.getHeader();
         Text footer = message.getFooter();
         if (header != null) {
-            buf.write(Types.TEXT, header);
+            context.write(buf, ContextualValueTypes.TEXT, header);
         } else {
             buf.writeString(EMPTY_TEXT);
         }
         if (footer != null) {
-            buf.write(Types.TEXT, footer);
+            context.write(buf, ContextualValueTypes.TEXT, footer);
         } else {
             buf.writeString(EMPTY_TEXT);
         }

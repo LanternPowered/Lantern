@@ -38,10 +38,9 @@ import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.extra.accessory.TopHat;
 import org.lanternpowered.server.extra.accessory.TopHats;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
+import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
@@ -123,7 +122,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     private void sendStackEntry(EntityProtocolUpdateContext context, int index, int type) {
-        final ParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+        final ParameterList parameterList = new DefaultParameterList();
         parameterList.add(EntityParameters.Base.FLAGS, (byte) 0x20);
         if (type == 55) {
             parameterList.add(EntityParameters.AbstractSlime.SIZE, -1);
@@ -202,7 +201,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             flags |= 0x40;
         }
 
-        final ParameterList parameterList1 = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+        final ParameterList parameterList1 = new DefaultParameterList();
         parameterList1.add(EntityParameters.ArmorStand.FLAGS, (byte) (0x08 | 0x10));
         parameterList1.add(EntityParameters.Base.FLAGS, flags);
         final int id1 = this.passengerStack[10];
@@ -212,7 +211,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         context.sendToAll(() -> new MessagePlayOutEntityMetadata(id1, parameterList1));
         context.sendToAll(() -> new MessagePlayOutEntityEquipment(id1, 5, paneItem));
 
-        final ParameterList parameterList2 = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+        final ParameterList parameterList2 = new DefaultParameterList();
         parameterList2.add(EntityParameters.ArmorStand.FLAGS, (byte) (0x08 | 0x10 | 0x01));
         parameterList2.add(EntityParameters.Base.FLAGS, flags);
         final int id2 = this.passengerStack[11];
@@ -255,7 +254,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
-        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillParameters(true)));
+        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillSpawnParameters()));
         final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
         context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
         context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
@@ -329,7 +328,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 // context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[14], this.lastYaw));
                 if (this.lastFlags0 != this.lastFlags) {
                     final boolean glow = (this.lastFlags & 0x40) != 0;
-                    final ParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+                    final ParameterList parameterList = new DefaultParameterList();
                     parameterList.add(EntityParameters.Base.FLAGS, (byte) (0x20 | (glow ? 0x40 : 0x00)));
                     context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[10], parameterList));
                     context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[11], parameterList));
@@ -350,7 +349,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORKS);
 
                 // Write the item to a parameter list
-                final ByteBufParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+                final DefaultParameterList parameterList = new DefaultParameterList();
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
                 parameterList.add(EntityParameters.Fireworks.ELYTRA_BOOST_PLAYER, getRootEntityId());
 

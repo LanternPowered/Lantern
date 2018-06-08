@@ -39,7 +39,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
-import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
@@ -456,8 +455,8 @@ public class LanternPlayerAdvancements {
             Locale locale, DisplayInfo displayInfo, TreeLayoutElement layoutElement, @Nullable String background) {
         final Vector2d position = layoutElement.getPosition();
         return new MessagePlayOutAdvancements.AdvStruct.Display(
-                new LocalizedText(displayInfo.getTitle(), locale),
-                new LocalizedText(displayInfo.getDescription(), locale),
+                displayInfo.getTitle(),
+                displayInfo.getDescription(),
                 displayInfo.getIcon(), displayInfo.getType(),
                 background, position.getX(), position.getY(),
                 displayInfo.doesShowToast(),

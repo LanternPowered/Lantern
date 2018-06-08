@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.flowpowered.math.vector.Vector3f;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -38,18 +37,12 @@ public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpaw
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnParticle message) throws CodecException {
-        Vector3f position = message.getPosition();
-        Vector3f offset = message.getOffset();
-        int[] extra = message.getExtra();
-        ByteBuffer buf = context.byteBufAlloc().buffer(BASE_LENGTH);
+        final int[] extra = message.getExtra();
+        final ByteBuffer buf = context.byteBufAlloc().buffer(BASE_LENGTH);
         buf.writeInteger(message.getParticleId());
         buf.writeBoolean(message.isLongDistance());
-        buf.writeFloat(position.getX());
-        buf.writeFloat(position.getY());
-        buf.writeFloat(position.getZ());
-        buf.writeFloat(offset.getX());
-        buf.writeFloat(offset.getY());
-        buf.writeFloat(offset.getZ());
+        buf.writeVector3f(message.getPosition());
+        buf.writeVector3f(message.getOffset());
         buf.writeFloat(message.getData());
         buf.writeInteger(message.getCount());
         for (int value : extra) {

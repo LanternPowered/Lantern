@@ -31,65 +31,29 @@ import static org.lanternpowered.server.text.gson.TextConstants.TRANSLATABLE_ARG
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import io.netty.util.concurrent.FastThreadLocal;
-import org.lanternpowered.server.text.LanternTextSerializer;
+import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.translation.MinecraftTranslation;
+import org.lanternpowered.server.text.translation.TextTranslation;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.text.translation.TranslationManager;
-import org.lanternpowered.server.util.concurrent.FastThreadLocals;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.TranslatableText;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.reflect.Type;
-import java.util.Locale;
 
-public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<TranslatableText>,
-        JsonDeserializer<TranslatableText> {
-
-    private final static FastThreadLocal<Locale> currentLocale = FastThreadLocals.withInitial(() -> Locale.ENGLISH);
-
-    /**
-     * Sets the current locale that should be used to translate all
-     * the text components if {@link #networkingFormat} is set to true.
-     * 
-     * <p>This will only be applied to the current thread, so this will
-     * can be used in concurrent environments.</p>
-     * 
-     * @param locale the locale
-     */
-    public static void setCurrentLocale(Locale locale) {
-        currentLocale.set(locale);
-    }
-
-    /**
-     * Removes the current locale that is attached to the thread, toggling
-     * the locale back to the default.
-     */
-    public static void removeCurrentLocale() {
-        currentLocale.remove();
-    }
-
-    public static Locale getCurrentLocale() {
-        return currentLocale.get();
-    }
+public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer<TranslatableText> {
 
     private final TranslationManager translationManager;
-    private final boolean networkingFormat;
-    private final boolean removeComplexity;
 
-    JsonTextTranslatableSerializer(TranslationManager translationManager, boolean networkingFormat, boolean removeComplexity) {
+    JsonTextTranslatableSerializer(TranslationManager translationManager) {
         this.translationManager = translationManager;
-        this.networkingFormat = networkingFormat;
-        this.removeComplexity = removeComplexity;
     }
 
     @Override
@@ -110,28 +74,30 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
         return builder.build();
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public JsonElement serialize(TranslatableText src, Type typeOfSrc, JsonSerializationContext context) {
         final Translation translation = src.getTranslation();
-        if (this.networkingFormat && !(translation instanceof MinecraftTranslation)) {
+        final TranslationContext networkCtx = TranslationContext.current();
+        if (networkCtx.forcesTranslations() && !(translation instanceof MinecraftTranslation)) {
+            // Take care of the text translations
+            if (translation instanceof TextTranslation) {
+                return context.serialize(TextTranslation.toText(translation));
+            }
             final ImmutableList<Object> arguments = src.getArguments();
             final Object[] rawArguments = arguments.toArray(new Object[arguments.size()]);
-            final Locale locale = currentLocale.get();
             for (int i = 0; i < rawArguments.length; i++) {
                 Object object = rawArguments[i];
                 if (object instanceof TextRepresentable) {
                     if (!(object instanceof Text)) {
                         object = ((TextRepresentable) object).toText();
                     }
-                    rawArguments[i] = ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE)
-                            .serialize((Text) object, locale);
+                    rawArguments[i] = LanternTexts.toLegacy((Text) object);
                 } else {
                     rawArguments[i] = object.toString();
                 }
             }
-            final String content = src.getTranslation().get(locale, rawArguments);
-            return JsonTextLiteralSerializer.serializeLiteralText(src, content, context, this.removeComplexity);
+            final String content = src.getTranslation().get(networkCtx.getLocale(), rawArguments);
+            return JsonTextLiteralSerializer.serializeLiteralText(src, content, context, true);
         }
         final JsonObject obj = new JsonObject();
         obj.addProperty(TRANSLATABLE, src.getTranslation().getId());

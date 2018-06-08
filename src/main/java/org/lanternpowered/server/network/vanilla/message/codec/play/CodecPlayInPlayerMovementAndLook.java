@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -35,12 +36,10 @@ public final class CodecPlayInPlayerMovementAndLook implements Codec<MessagePlay
 
     @Override
     public MessagePlayInPlayerMovementAndLook decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        double x = buf.readDouble();
-        double y = buf.readDouble();
-        double z = buf.readDouble();
-        float yaw = buf.readFloat();
-        float pitch = buf.readFloat();
-        boolean onGround = buf.readBoolean();
-        return new MessagePlayInPlayerMovementAndLook(x, y, z, yaw, pitch, onGround);
+        final Vector3d position = buf.readVector3d();
+        final float yaw = buf.readFloat();
+        final float pitch = buf.readFloat();
+        final boolean onGround = buf.readBoolean();
+        return new MessagePlayInPlayerMovementAndLook(position, yaw, pitch, onGround);
     }
 }

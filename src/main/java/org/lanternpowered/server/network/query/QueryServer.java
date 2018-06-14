@@ -58,8 +58,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -76,14 +76,11 @@ public class QueryServer extends AbstractServer {
     // The {@link Bootstrap} used by netty to instantiate the query server
     private Bootstrap bootstrap;
 
-    // Instance of the LanternServer
-    private LanternGame game;
+    // Instance of the LanternGame
+    private final LanternGame game;
 
-    // Maps each {@link InetSocketAddress} of a client to its challenge token
-    private Map<InetSocketAddress, Integer> challengeTokens = new ConcurrentHashMap<>();
-
-    // The {@link Random} used to generate challenge tokens
-    private Random random = new Random();
+    // Maps each InetSocketAddress of a client to its challenge token
+    private final Map<InetSocketAddress, Integer> challengeTokens = new ConcurrentHashMap<>();
 
     // The task used to invalidate all challenge tokens every 30 seconds
     @Nullable private Task flushTask;
@@ -126,7 +123,7 @@ public class QueryServer extends AbstractServer {
      * @return the generated valid token
      */
     int generateChallengeToken(InetSocketAddress address) {
-        int token = this.random.nextInt();
+        final int token = ThreadLocalRandom.current().nextInt();
         this.challengeTokens.put(address, token);
         return token;
     }

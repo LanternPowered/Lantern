@@ -23,36 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.block.tile.vanilla;
 
-import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.data.DataView;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.network.tile.TileEntityProtocolTypes;
+import org.spongepowered.api.block.tileentity.Banner;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.DyeColors;
 
-import javax.annotation.Nullable;
+import java.util.ArrayList;
 
-public final class MessagePlayOutUpdateTileEntity implements Message {
+public class LanternBanner extends LanternTileEntity implements Banner {
 
-    private final Vector3i position;
-    private final int tileType;
-    @Nullable private final DataView tileData;
-
-    public MessagePlayOutUpdateTileEntity(Vector3i position, int tileType, @Nullable DataView tileData) {
-        this.position = position;
-        this.tileType = tileType;
-        this.tileData = tileData;
+    public LanternBanner() {
+        setProtocolType(TileEntityProtocolTypes.BANNER);
     }
 
-    public Vector3i getPosition() {
-        return this.position;
-    }
+    @Override
+    public void registerKeys() {
+        super.registerKeys();
 
-    public int getTileType() {
-        return this.tileType;
-    }
-
-    @Nullable
-    public DataView getTileData() {
-        return this.tileData;
+        final ValueCollection c = getValueCollection();
+        c.registerNonRemovable(Keys.BANNER_BASE_COLOR, DyeColors.WHITE);
+        c.registerNonRemovable(Keys.BANNER_PATTERNS, new ArrayList<>());
     }
 }

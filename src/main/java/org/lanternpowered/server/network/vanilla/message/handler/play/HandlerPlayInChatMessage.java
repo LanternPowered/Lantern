@@ -83,6 +83,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         final NetworkSession session = context.getSession();
         final LanternPlayer player = session.getPlayer();
         player.resetIdleTimeoutCounter();
+        player.resetOpenedSignPosition();
         final String message0 = message.getMessage();
 
         // Check for a valid click action callback

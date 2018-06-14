@@ -34,6 +34,8 @@ import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
+import org.lanternpowered.server.network.tile.AbstractTileEntityProtocol;
+import org.lanternpowered.server.network.tile.TileEntityProtocolType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
@@ -48,9 +50,11 @@ import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.function.Function;
+
 import javax.annotation.Nullable;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHolder, AbstractPropertyHolder {
 
     private LanternTileEntityType tileEntityType;
@@ -60,6 +64,8 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     @Nullable private volatile Location<World> location;
     @Nullable volatile BlockState blockState;
     private volatile boolean valid;
+    @Nullable private TileEntityProtocolType<?> protocolType;
+    @Nullable private AbstractTileEntityProtocol<?> protocol;
 
     protected LanternTileEntity() {
         registerKeys();
@@ -184,5 +190,30 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
             // Should be fine, in 1.13 ...
             type.defaultBlock = blockState.getType().getDefaultState();
         }
+    }
+
+    /**
+     * Sets the {@link TileEntityProtocolType} of this {@link TileEntity}.
+     *
+     * @param protocolType The protocol type
+     */
+    public void setProtocolType(@Nullable TileEntityProtocolType<?> protocolType) {
+        this.protocolType = protocolType;
+        if (protocolType != null) {
+            this.protocol = (AbstractTileEntityProtocol<?>) ((Function)
+                    protocolType.getSupplier()).apply(this);
+        } else {
+            this.protocol = null;
+        }
+    }
+
+    @Nullable
+    public TileEntityProtocolType<?> getProtocolType() {
+        return this.protocolType;
+    }
+
+    @Nullable
+    public AbstractTileEntityProtocol<?> getProtocol() {
+        return this.protocol;
     }
 }

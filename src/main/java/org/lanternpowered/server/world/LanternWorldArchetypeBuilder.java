@@ -52,8 +52,8 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.Nullable;
 
@@ -279,11 +279,12 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         checkNotNull(id, "id");
         checkNotNull(name, "name");
         checkArgument(this.dimensionType != null, "Dimension type must be set");
+        final long seed = this.seed == null ? ThreadLocalRandom.current().nextLong() : this.seed;
         return new LanternWorldArchetype(CatalogKeys.resolve(id).withName(name), this.gameMode, this.dimensionType, this.generatorType,
                 this.generatorModifiers, this.generatorSettings, this.difficulty, this.serializationBehavior, this.portalAgentType,
                 this.hardcore, this.enabled, this.loadsOnStartup, this.keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
                 this.generateBonusChest, this.commandsAllowed, this.waterEvaporates, this.allowPlayerRespawns, this.generateSpawnOnLoad,
-                this.seed == null, this.seed == null ? new Random().nextLong() : this.seed, this.buildHeight);
+                this.seed == null, seed, this.buildHeight);
     }
 
     @Override

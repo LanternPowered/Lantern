@@ -78,6 +78,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
         final ElementListener<Integer> clearProperty = (oldElement, newElement) -> this.inventory.resetCachedProgress();
 
         final ValueCollection c = getValueCollection();
+        c.register(Keys.DISPLAY_NAME, null);
         c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
         c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME).addListener(clearProperty);
         c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);

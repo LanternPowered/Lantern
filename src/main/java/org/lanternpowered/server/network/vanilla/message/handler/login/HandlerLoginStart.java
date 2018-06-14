@@ -61,9 +61,9 @@ import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.UncheckedThrowables;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Async
 public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
@@ -74,9 +74,6 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
     // The spoofed game profile that may be provided by proxies
     public static final AttributeKey<LanternGameProfile> SPOOFED_GAME_PROFILE = AttributeKey.valueOf("spoofed-game-profile");
 
-    // The random used to generate the session ids
-    private static final Random RANDOM = new Random();
-
     @Override
     public void handle(NetworkContext context, MessageLoginInStart message) {
         final NetworkSession session = context.getSession();
@@ -86,7 +83,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             // Convert to X509 format
             final byte[] publicKey = SecurityHelper.generateX509Key(session.getServer().getKeyPair().getPublic()).getEncoded();
             final byte[] verifyToken = SecurityHelper.generateVerifyToken();
-            final String sessionId = Long.toString(RANDOM.nextLong(), 16).trim();
+            final String sessionId = Long.toString(ThreadLocalRandom.current().nextLong(), 16).trim();
 
             // Store the auth data
             context.getChannel().attr(AUTH_DATA).set(new LoginAuthData(username, sessionId, verifyToken));

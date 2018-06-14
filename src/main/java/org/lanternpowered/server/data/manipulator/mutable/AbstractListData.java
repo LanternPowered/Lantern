@@ -36,7 +36,7 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractListData<E, M extends ListData<E, M, I>, I extends ImmutableListData<E, I, M>> extends AbstractData<M, I>
-        implements ListData<E, M, I> {
+        implements IListData<E, M, I> {
 
     private final Key<ListValue<E>> listKey;
 
@@ -71,5 +71,10 @@ public abstract class AbstractListData<E, M extends ListData<E, M, I>, I extends
     @Override
     public List<E> asList() {
         return get(this.listKey).get();
+    }
+
+    @Override
+    public Key<? extends ListValue<E>> getListKey() {
+        return this.listKey;
     }
 }

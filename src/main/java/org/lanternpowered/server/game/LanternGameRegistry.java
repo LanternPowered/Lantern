@@ -259,6 +259,8 @@ import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegis
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
+import org.lanternpowered.server.network.tile.TileEntityProtocolType;
+import org.lanternpowered.server.network.tile.TileEntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
@@ -761,6 +763,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(EntityType.class, EntityTypeRegistryModule.get())
                 .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
+                .registerModule(TileEntityProtocolType.class, new TileEntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
                 .registerModule(QueryOperationType.class, new QueryOperationRegistryModule())
                 .registerModule(new InventoryTransformationRegistryModule())

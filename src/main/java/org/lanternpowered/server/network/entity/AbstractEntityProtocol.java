@@ -89,7 +89,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
     final List<EntityEvent> entityEvents = new ArrayList<>();
 
-    public AbstractEntityProtocol(E entity) {
+    protected AbstractEntityProtocol(E entity) {
         this.entity = entity;
     }
 

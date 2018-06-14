@@ -36,6 +36,7 @@ public final class HandlerPlayInPlayerBlockPlacement implements Handler<MessageP
     public void handle(NetworkContext context, MessagePlayInPlayerBlockPlacement message) {
         final LanternPlayer player = context.getSession().getPlayer();
         player.resetIdleTimeoutCounter();
+        player.resetOpenedSignPosition();
         player.getInteractionHandler().handleBlockPlacing(message);
     }
 }

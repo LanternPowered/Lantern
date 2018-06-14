@@ -29,16 +29,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.tile.vanilla.LanternBanner;
 import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternFurnace;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
 import org.lanternpowered.server.block.tile.vanilla.LanternNote;
 import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
+import org.lanternpowered.server.block.tile.vanilla.LanternSign;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.spongepowered.api.CatalogKey;
+import org.lanternpowered.server.network.tile.TileEntityProtocolTypeRegistryModule;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
@@ -48,7 +51,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RegistrationDependency({ KeyRegistryModule.class, InventoryArchetypeRegistryModule.class })
+@RegistrationDependency({ KeyRegistryModule.class, InventoryArchetypeRegistryModule.class, TileEntityProtocolTypeRegistryModule.class })
 public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<TileEntityType> {
 
     private static final TileEntityTypeRegistryModule INSTANCE = new TileEntityTypeRegistryModule();
@@ -78,12 +81,14 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
 
     @Override
     public void registerDefaults() {
+        register(LanternTileEntityType.of(CatalogKey.minecraft("banner"), LanternBanner::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("chest"), LanternChest::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("ender_chest"), LanternEnderChest::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("furnace"), LanternFurnace::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("jukebox"), LanternJukebox::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("noteblock"), LanternNote::new));
         register(LanternTileEntityType.of(CatalogKey.minecraft("shulker_box"), LanternShulkerBox::new));
+        register(LanternTileEntityType.of(CatalogKey.minecraft("sign"), LanternSign::new));
     }
 
     @Override

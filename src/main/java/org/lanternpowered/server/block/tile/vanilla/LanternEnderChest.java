@@ -26,6 +26,7 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.inventory.AbstractContainer;
+import org.lanternpowered.server.network.tile.TileEntityProtocolTypes;
 import org.spongepowered.api.block.tileentity.EnderChest;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -33,11 +34,13 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LanternEnderChest extends LanternContainerTileBase implements EnderChest {
 
-    private final Random random = new Random();
+    public LanternEnderChest() {
+        setProtocolType(TileEntityProtocolTypes.DEFAULT);
+    }
 
     @Override
     public void onViewerRemoved(Player viewer, AbstractContainer container, Callback callback) {
@@ -48,12 +51,12 @@ public class LanternEnderChest extends LanternContainerTileBase implements Ender
     @Override
     protected void playOpenSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_ENDERCHEST_OPEN, SoundCategories.BLOCK,
-                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 
     @Override
     protected void playCloseSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_ENDERCHEST_CLOSE, SoundCategories.BLOCK,
-                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 }

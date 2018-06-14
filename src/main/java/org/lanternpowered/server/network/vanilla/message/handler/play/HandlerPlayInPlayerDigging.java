@@ -36,6 +36,7 @@ public final class HandlerPlayInPlayerDigging implements Handler<MessagePlayInPl
     public void handle(NetworkContext context, MessagePlayInPlayerDigging message) {
         final LanternPlayer player = context.getSession().getPlayer();
         player.resetIdleTimeoutCounter();
+        player.resetOpenedSignPosition();
         player.getInteractionHandler().handleDigging(message);
     }
 }

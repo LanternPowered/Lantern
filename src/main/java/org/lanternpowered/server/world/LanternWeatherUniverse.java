@@ -45,14 +45,12 @@ import org.spongepowered.api.world.weather.Weather;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class LanternWeatherUniverse implements WeatherUniverse {
 
     private static final float FADE_SPEED = 0.01f;
 
-    // The random used for the random weather times
-    private final Random random = new Random();
     // The world this weather universe is attached to
     private final LanternWorld world;
 
@@ -158,7 +156,7 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
 
         final WeightedTable<LanternWeather> table = new WeightedTable<>();
         weathers.forEach(weather -> table.add(weather, weather.getWeight()));
-        return table.get(this.random).get(0);
+        return table.get(ThreadLocalRandom.current()).get(0);
     }
 
     @Override

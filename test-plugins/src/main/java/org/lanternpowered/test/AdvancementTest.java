@@ -61,7 +61,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.Nullable;
 
@@ -99,8 +99,7 @@ public class AdvancementTest {
         this.trigger = Trigger.builder()
                 .typeSerializableConfig(MyTriggerConfig.class)
                 .listener(triggerEvent -> {
-                    final Random random = new Random();
-                    final float value = random.nextFloat();
+                    final float value = ThreadLocalRandom.current().nextFloat();
                     final float chance = triggerEvent.getTrigger().getConfiguration().chance;
                     triggerEvent.setResult(value < chance);
                 })

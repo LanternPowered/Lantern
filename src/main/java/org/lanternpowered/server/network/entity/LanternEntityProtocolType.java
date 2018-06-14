@@ -34,6 +34,7 @@ import org.spongepowered.api.CatalogKey;
 
 import java.util.function.Function;
 
+@SuppressWarnings("unchecked")
 public final class LanternEntityProtocolType<E extends LanternEntity> extends DefaultCatalogType implements EntityProtocolType<E> {
 
     public static <E extends LanternEntity> EntityProtocolType<E> of(CatalogKey key,
@@ -54,15 +55,16 @@ public final class LanternEntityProtocolType<E extends LanternEntity> extends De
     private LanternEntityProtocolType(CatalogKey key, Class<E> entityType,
             Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
         super(key);
-        //noinspection unchecked
         this.entityProtocolSupplier = (Function<E, AbstractEntityProtocol<E>>) entityProtocolSupplier;
         this.entityType = entityType;
     }
 
+    @Override
     public Class<E> getEntityType() {
         return this.entityType;
     }
 
+    @Override
     public Function<E, AbstractEntityProtocol<E>> getSupplier() {
         return this.entityProtocolSupplier;
     }

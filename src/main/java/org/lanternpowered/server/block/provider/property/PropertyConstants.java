@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
+import org.lanternpowered.server.block.property.SolidMaterialProperty;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.spongepowered.api.data.property.block.FlammableProperty;
 import org.spongepowered.api.data.property.block.FullBlockSelectionBoxProperty;
@@ -54,6 +55,9 @@ public final class PropertyConstants {
 
     public static final SolidSideProperty SOLID_SIDE_PROPERTY_TRUE = new SolidSideProperty(true);
     public static final SolidSideProperty SOLID_SIDE_PROPERTY_FALSE = new SolidSideProperty(false);
+
+    public static final SolidMaterialProperty SOLID_MATERIAL_PROPERTY_TRUE = new SolidMaterialProperty(true);
+    public static final SolidMaterialProperty SOLID_MATERIAL_PROPERTY_FALSE = new SolidMaterialProperty(false);
 
     public static final PassableProperty PASSABLE_PROPERTY_TRUE = new PassableProperty(true);
     public static final PassableProperty PASSABLE_PROPERTY_FALSE = new PassableProperty(false);

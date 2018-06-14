@@ -96,12 +96,12 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
 
     LanternBlockSnapshot(@Nullable WeakWorldReferencedLocation location, BlockState blockState, @Nullable BlockState extendedState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
-        this.extendedState = extendedState;
-        this.notifier = checkNotNull(notifier, "notifier");
-        this.creator = checkNotNull(creator, "creator");
         this.state = checkNotNull(blockState, "blockState");
         this.tileEntity = (LanternTileEntity) tileEntity;
+        this.extendedState = extendedState;
         this.location = location;
+        this.notifier = notifier;
+        this.creator = creator;
     }
 
     /**

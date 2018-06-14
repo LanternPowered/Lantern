@@ -120,6 +120,7 @@ public class PlayerContainerSession {
      * by a players client.
      */
     private void openPlayerContainer() {
+        this.player.resetOpenedSignPosition();
         final CauseStack causeStack = CauseStack.current();
         causeStack.pushCause(this.player);
         setRawOpenContainer(causeStack, this.player.getInventoryContainer());
@@ -141,6 +142,7 @@ public class PlayerContainerSession {
     }
 
     private boolean setRawOpenContainer(CauseStack causeStack, @Nullable AbstractContainer container, boolean sendClose, boolean client) {
+        this.player.resetOpenedSignPosition();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             if (this.openContainer != container) {
                 frame.addContext(EventContextKeys.PLAYER, this.player);

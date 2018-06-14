@@ -25,20 +25,53 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateTileEntity;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTileEntity;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
 
-public final class CodecPlayOutUpdateTileEntity implements Codec<MessagePlayOutUpdateTileEntity> {
+import java.util.Arrays;
+import java.util.List;
+
+public final class CodecPlayOutUpdateTileEntity implements Codec<MessagePlayOutTileEntity> {
+
+    private static final DataQuery idQuery = DataQuery.of("id");
+    private static final DataQuery xQuery = DataQuery.of("x");
+    private static final DataQuery yQuery = DataQuery.of("y");
+    private static final DataQuery zQuery = DataQuery.of("z");
+
+    // The inbuilt tile entity types, to send updates
+    private static final List<String> hardcodedTypes = Arrays.asList(
+            "minecraft:mob_spawner",
+            "minecraft:command_block",
+            "minecraft:beacon",
+            "minecraft:skull",
+            "minecraft:flower_pot",
+            "minecraft:banner",
+            "minecraft:structure_block",
+            "minecraft:end_gateway",
+            "minecraft:sign",
+            "minecraft:shulker_box",
+            "minecraft:bed"
+    );
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutUpdateTileEntity message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, MessagePlayOutTileEntity message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVector3i(message.getPosition());
-        buf.writeByte((byte) message.getTileType());
-        buf.writeDataView(message.getTileData());
+        final Vector3i pos = message.getPosition();
+        buf.writeVector3i(pos);
+        final String id = message.getType();
+        buf.writeByte((byte) (hardcodedTypes.indexOf(id) + 1));
+        final DataView dataView = message.getTileData();
+        dataView.set(idQuery, id);
+        dataView.set(xQuery, pos.getX());
+        dataView.set(yQuery, pos.getY());
+        dataView.set(zQuery, pos.getZ());
+        buf.writeDataView(dataView);
         return buf;
     }
 }

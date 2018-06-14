@@ -34,6 +34,7 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.passable;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.replaceable;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidCube;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidMaterial;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidSide;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.statisticsTracked;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.surrogateBlock;
@@ -59,12 +60,14 @@ public final class PropertyProviderCollections {
             .add(replaceable(false))
             .add(surrogateBlock(false))
             .add(statisticsTracked(true))
+            .add(solidMaterial(true))
             .build();
 
     public static final PropertyProviderCollection PASSABLE = PropertyProviderCollection.builder()
             .add(passable(true))
             .add(solidCube(false))
             .add(solidSide(false))
+            .add(solidMaterial(false))
             .build();
 
     public static final PropertyProviderCollection UNBREAKABLE = PropertyProviderCollection.builder()
@@ -81,12 +84,14 @@ public final class PropertyProviderCollections {
 
     public static final PropertyProviderCollection DEFAULT_GAS = DEFAULT.toBuilder()
             .add(matter(MatterProperty.Matter.GAS))
+            .add(solidMaterial(false))
             .add(replaceable(true))
             .add(PASSABLE)
             .build();
 
     public static final PropertyProviderCollection DEFAULT_LIQUID = DEFAULT.toBuilder()
             .add(matter(MatterProperty.Matter.LIQUID))
+            .add(solidMaterial(false))
             .add(replaceable(true))
             .add(PASSABLE)
             .build();

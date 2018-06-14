@@ -40,15 +40,14 @@ import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.Collections;
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.Nullable;
 
 public class WeatherBuilder implements ResettableBuilder<LanternWeather, WeatherBuilder>, CatalogTypeConstructor<Weather> {
 
-    private final static Random RANDOM = new Random();
-    final static IntValueProvider DEFAULT_DURATION = scriptContext -> 300 + RANDOM.nextInt(600);
+    final static IntValueProvider DEFAULT_DURATION = scriptContext -> 300 + ThreadLocalRandom.current().nextInt(600);
 
     Set<String> aliases;
     Action action;

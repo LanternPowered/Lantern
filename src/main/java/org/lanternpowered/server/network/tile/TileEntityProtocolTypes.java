@@ -23,22 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.behavior.vanilla;
+package org.lanternpowered.server.network.tile;
 
-import org.lanternpowered.server.behavior.Behavior;
-import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.BehaviorResult;
-import org.lanternpowered.server.behavior.ContextKeys;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.spongepowered.api.data.key.Keys;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-public class OppositeFaceDirectionalPlacementBehavior implements PlaceBlockBehavior {
+@SuppressWarnings("unchecked")
+public final class TileEntityProtocolTypes {
 
-    @Override
-    public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        context.getContext(ContextKeys.INTERACTION_FACE).ifPresent(face ->
-                context.transformBlockChanges((original, builder) -> builder.add(Keys.DIRECTION, face)));
-        return BehaviorResult.CONTINUE;
+    public static final TileEntityProtocolType<LanternTileEntity> BANNER = dummy("BANNER");
+
+    public static final TileEntityProtocolType<LanternTileEntity> DEFAULT = dummy("DEFAULT");
+
+    public static final TileEntityProtocolType<LanternTileEntity> SIGN = dummy("SIGN");
+
+    private static <E extends LanternTileEntity> TileEntityProtocolType<E> dummy(String name) {
+        return DummyObjectProvider.createFor(TileEntityProtocolType.class, name);
+    }
+
+    private TileEntityProtocolTypes() {
     }
 }

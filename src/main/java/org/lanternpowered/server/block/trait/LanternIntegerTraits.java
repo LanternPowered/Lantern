@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.trait;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.spongepowered.api.block.trait.IntegerTrait;
 import org.spongepowered.api.data.key.Keys;
 
@@ -35,6 +36,8 @@ public final class LanternIntegerTraits {
     public static final IntegerTrait POWER = LanternIntegerTrait.minecraftRange("power", Keys.POWER, 0, 15);
 
     public static final IntegerTrait MOISTURE = LanternIntegerTrait.minecraftRange("moisture", Keys.MOISTURE, 0, 7);
+
+    public static final IntegerTrait ROTATION = LanternIntegerTrait.minecraftRange("rotation", LanternKeys.FINE_ROTATION, 0, 15);
 
     private LanternIntegerTraits() {
     }

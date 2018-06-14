@@ -31,6 +31,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
+import org.lanternpowered.server.network.tile.TileEntityProtocolTypes;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
@@ -39,11 +40,13 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LanternShulkerBox extends LanternContainerTile<ChestInventory> {
 
-    private final Random random = new Random();
+    public LanternShulkerBox() {
+        setProtocolType(TileEntityProtocolTypes.DEFAULT);
+    }
 
     @Override
     public void registerKeys() {
@@ -68,12 +71,12 @@ public class LanternShulkerBox extends LanternContainerTile<ChestInventory> {
     @Override
     protected void playOpenSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_SHULKER_BOX_OPEN, SoundCategories.BLOCK,
-                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 
     @Override
     protected void playCloseSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
-                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 }

@@ -34,6 +34,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -52,10 +53,14 @@ public class BlockSnapshotProviderPlaceBehavior implements PlaceBlockBehavior {
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final BlockSnapshot.Builder builder = BlockSnapshotBuilder.createPositionless();
-        final Optional<ItemStack> optItem = context.getContext(ContextKeys.USED_ITEM_STACK);
-        if (optItem.isPresent()) {
-            builder.blockState(optItem.get().getType().getBlock().get().getDefaultState());
-            optItem.get().getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
+        final Optional<ItemStack> optItemStack = context.getContext(ContextKeys.USED_ITEM_STACK);
+        if (optItemStack.isPresent()) {
+            final ItemStack itemStack = optItemStack.get();
+            final Optional<BlockType> optBlockType = itemStack.getType().getBlock();
+            final BlockState blockState = optBlockType.map(BlockType::getDefaultState)
+                    .orElseGet(() -> context.getContext(ContextKeys.USED_BLOCK_STATE).orElseThrow(IllegalStateException::new));
+            builder.blockState(blockState);
+            itemStack.getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
         } else {
             final Optional<BlockState> optState = context.getContext(ContextKeys.USED_BLOCK_STATE);
             if (optState.isPresent()) {

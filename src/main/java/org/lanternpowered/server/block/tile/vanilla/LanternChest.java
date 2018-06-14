@@ -32,6 +32,7 @@ import org.lanternpowered.server.inventory.AbstractGridInventory;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
+import org.lanternpowered.server.network.tile.TileEntityProtocolTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.carrier.Chest;
 import org.spongepowered.api.data.key.Keys;
@@ -48,14 +49,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LanternChest extends LanternContainerTile<ChestInventory> implements Chest {
 
     private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 
-    private final Random random = new Random();
+    public LanternChest() {
+        setProtocolType(TileEntityProtocolTypes.DEFAULT);
+    }
 
     @Override
     public void registerKeys() {
@@ -138,12 +141,12 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
     @Override
     protected void playOpenSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_CHEST_OPEN, SoundCategories.BLOCK,
-                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 
     @Override
     protected void playCloseSound(Location<World> location) {
         location.getExtent().playSound(SoundTypes.BLOCK_CHEST_CLOSE, SoundCategories.BLOCK,
-                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 }

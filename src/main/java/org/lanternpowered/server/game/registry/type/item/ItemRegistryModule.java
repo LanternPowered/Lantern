@@ -69,6 +69,7 @@ import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractio
 import org.lanternpowered.server.item.behavior.vanilla.ConsumableInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.WallOrStandingPlacementBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.CookedFishForwardingPropertyProvider;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.FishForwardingPropertyProvider;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.GoldenAppleEffectsProvider;
@@ -78,6 +79,7 @@ import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.FoodRestorationProperty;
@@ -105,6 +107,7 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
@@ -652,6 +655,10 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(323, builder()
                 .translation("item.sign.name")
                 .maxStackQuantity(16)
+                .behaviors(pipeline -> pipeline
+                        .add(WallOrStandingPlacementBehavior.ofTypes(
+                                () -> BlockTypes.WALL_SIGN,
+                                () -> BlockTypes.STANDING_SIGN)))
                 .build("minecraft", "sign"));
         ///////////////////////
         ///   Wooden Door   ///
@@ -1471,6 +1478,14 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(425, builder()
                 .translation(coloredTranslation("item.banner.%s.name", DyeColors.WHITE))
                 .maxStackQuantity(16)
+                .keysProvider(c -> {
+                    c.register(Keys.BANNER_BASE_COLOR, DyeColors.WHITE);
+                    c.register(Keys.BANNER_PATTERNS, new ArrayList<>());
+                })
+                .behaviors(pipeline -> pipeline
+                        .add(WallOrStandingPlacementBehavior.ofTypes(
+                                () -> BlockTypes.WALL_BANNER,
+                                () -> BlockTypes.STANDING_BANNER)))
                 .build("minecraft", "banner"));
         ///////////////////////
         ///   End Crystal   ///

@@ -28,11 +28,9 @@ package org.lanternpowered.server.world.weather.action;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.script.function.action.Action;
-import org.lanternpowered.api.util.concurrent.ThreadLocals;
 import org.lanternpowered.server.util.collect.Collections3;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk;
@@ -46,10 +44,9 @@ import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Chunk;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LightningSpawnerAction implements Action {
-
-    private static final FastThreadLocal<Random> RANDOM = ThreadLocals.of(Random::new);
 
     private static final AABB MOVE_TO_ENTITY_REGION = new AABB(-1.5, -3.0, -1.5, 1.5, 256.0, 1.5);
 
@@ -65,7 +62,7 @@ public class LightningSpawnerAction implements Action {
     public void run(ScriptContext scriptContext) {
         final LanternWorld world = (LanternWorld) scriptContext.get(Parameters.WORLD).get();
 
-        final Random random = RANDOM.get();
+        final Random random = ThreadLocalRandom.current();
         final Iterable<Chunk> chunks = world.getLoadedChunks();
         final int chance = (int) (1f / Math.max(this.chance, 0.000000000001f));
 

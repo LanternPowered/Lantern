@@ -136,6 +136,8 @@ public final class LanternKeys {
             makeValueKey(Double.class, DataQuery.of("FieldOfViewModifier"), "field_of_view_modifier");
     public static final Key<Value<Boolean>> HAS_CHEST =
             makeValueKey(Boolean.class, DataQuery.of("HasChest"), "has_chest");
+    public static final Key<Value<Integer>> FINE_ROTATION =
+            makeValueKey(Integer.class, DataQuery.of("FineRotation"), "fine_rotation");
 
     public static final Key<Value<Boolean>> DUMMY =
             makeValueKey(Boolean.class, DataQuery.of("Dummy"), "dummy");

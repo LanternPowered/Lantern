@@ -75,6 +75,7 @@ import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
@@ -102,6 +103,7 @@ import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
@@ -272,6 +274,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     // The game profile of this player
     private final GameProfile gameProfile;
 
+    /**
+     * The position of the sign which got opened.
+     */
+    @Nullable private Vector3i openedSignPosition;
+
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super((ProxyUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gameProfile));
         this.gameProfile = gameProfile;
@@ -299,8 +306,51 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         getProxyUser().setInternalUser(this);
     }
 
+    /**
+     * Gets a set with all the {@link LanternBossBar}s this player is tracking.
+     *
+     * @return The boss bars
+     */
     public Set<LanternBossBar> getBossBars() {
         return this.bossBars;
+    }
+
+    /**
+     * Resets the sign editing session, this player will have to attempt
+     * to interact again with the sign to allow to edit it.
+     */
+    public void resetOpenedSignPosition() {
+        this.openedSignPosition = null;
+    }
+
+    /**
+     * Gets the opened sign position, this doesn't mean that it's actually
+     * open but the last known position it was open. As long this doesn't
+     * return {@link Optional#empty()}, this player can edit the sign at
+     * the returned position.
+     *
+     * @return The opened sign position
+     */
+    public Optional<Vector3i> getOpenedSignPosition() {
+        return Optional.ofNullable(this.openedSignPosition);
+    }
+
+    /**
+     * Attempts to open the sign at the given position and returns
+     * whether it was successful.
+     *
+     * @param position The position
+     * @return Whether opening the sign was successful
+     */
+    public boolean openSignAt(Vector3i position) {
+        return getWorld().getTileEntity(position).map(tile -> {
+            if (tile instanceof Sign) {
+                this.session.send(new MessagePlayOutOpenSign(position));
+                this.openedSignPosition = position;
+                return true;
+            }
+            return false;
+        }).orElse(false);
     }
 
     @Override
@@ -546,6 +596,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     public void handleRespawn() {
+        resetOpenedSignPosition();
         Transform<World> transform = getTransform();
         final LanternWorld world = (LanternWorld) transform.getExtent();
         if (isDead()) {
@@ -925,6 +976,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public void sendBookView(BookView bookView) {
         checkNotNull(bookView, "bookView");
+        resetOpenedSignPosition();
 
         final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         WrittenBookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);

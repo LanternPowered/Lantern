@@ -171,8 +171,6 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         add(ItemTypes.COOKED_FISH, new DataValueItemTypeObjectSerializer<>(Keys.COOKED_FISH, CookedFishRegistryModule.get()));
         add(ItemTypes.DYE, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
                 dataValue -> 15 - dataValue, internalId -> 15 - internalId));
-        add(ItemTypes.BANNER, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
-                dataValue -> 15 - dataValue, internalId -> 15 - internalId));
         add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));
         add(ItemTypes.WRITABLE_BOOK, new WritableBookItemTypeObjectSerializer());
         add(ItemTypes.WRITTEN_BOOK, new WrittenBookItemTypeObjectSerializer());
@@ -234,6 +232,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         add(ItemTypes.LEATHER_CHESTPLATE, leatherSerializer);
         add(ItemTypes.LEATHER_HELMET, leatherSerializer);
         add(ItemTypes.LEATHER_LEGGINGS, leatherSerializer);
+        add(ItemTypes.BANNER, new BannerItemTypeSerializer());
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {

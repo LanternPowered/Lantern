@@ -285,7 +285,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateTileEntity;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTileEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
@@ -437,7 +437,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutEntityAnimation.class, MessagePlayOutEntityAnimation.class);
         outbound.bind(CodecPlayOutStatistics.class, MessagePlayOutStatistics.class);
         outbound.bind(CodecPlayOutBlockBreakAnimation.class, MessagePlayOutBlockBreakAnimation.class);
-        outbound.bind(CodecPlayOutUpdateTileEntity.class, MessagePlayOutUpdateTileEntity.class);
+        outbound.bind(CodecPlayOutUpdateTileEntity.class, MessagePlayOutTileEntity.class);
         outbound.bind(CodecPlayOutBlockAction.class, MessagePlayOutBlockAction.class);
         outbound.bind(CodecPlayOutBlockChange.class, MessagePlayOutBlockChange.class);
         final CodecRegistration<MessagePlayOutBossBar, CodecPlayOutBossBar> codecPlayOutBossBar = outbound.bind(CodecPlayOutBossBar.class);

@@ -108,11 +108,13 @@ import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -232,6 +234,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
             // Count the non air blocks.
             recountTypes();
+        }
+
+        public static int index(Vector3i position) {
+            return index(position.getX(), position.getY(), position.getZ());
         }
 
         /**

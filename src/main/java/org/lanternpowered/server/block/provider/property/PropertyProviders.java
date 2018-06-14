@@ -38,6 +38,8 @@ import static org.lanternpowered.server.block.provider.property.PropertyConstant
 import static org.lanternpowered.server.block.provider.property.PropertyConstants.REPLACEABLE_PROPERTY_TRUE;
 import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_CUBE_PROPERTY_FALSE;
 import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_CUBE_PROPERTY_TRUE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_MATERIAL_PROPERTY_FALSE;
+import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_MATERIAL_PROPERTY_TRUE;
 import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_SIDE_PROPERTY_FALSE;
 import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_SIDE_PROPERTY_TRUE;
 import static org.lanternpowered.server.block.provider.property.PropertyConstants.STATISTICS_TRACKED_PROPERTY_FALSE;
@@ -50,6 +52,7 @@ import static org.lanternpowered.server.block.provider.property.PropertyConstant
 import org.lanternpowered.server.block.property.BlockSoundGroupProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
 import org.lanternpowered.server.block.property.FlameInfoProperty;
+import org.lanternpowered.server.block.property.SolidMaterialProperty;
 import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.spongepowered.api.block.BlockSoundGroup;
@@ -202,6 +205,20 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(SolidSideProperty.class, (blockState, location, face) ->
                         provider.get(blockState, location, face) ? SOLID_SIDE_PROPERTY_TRUE : SOLID_SIDE_PROPERTY_FALSE)
+                .build();
+    }
+
+    public static PropertyProviderCollection solidMaterial(boolean constant) {
+        final SolidMaterialProperty property = constant ? SOLID_MATERIAL_PROPERTY_TRUE : SOLID_MATERIAL_PROPERTY_FALSE;
+        return PropertyProviderCollection.builder()
+                .add(SolidMaterialProperty.class, new ConstantPropertyProvider<>(property))
+                .build();
+    }
+
+    public static PropertyProviderCollection solidMaterial(ObjectProvider<Boolean> provider) {
+        return PropertyProviderCollection.builder()
+                .add(SolidMaterialProperty.class, (blockState, location, face) ->
+                        provider.get(blockState, location, face) ? SOLID_MATERIAL_PROPERTY_TRUE : SOLID_MATERIAL_PROPERTY_FALSE)
                 .build();
     }
 

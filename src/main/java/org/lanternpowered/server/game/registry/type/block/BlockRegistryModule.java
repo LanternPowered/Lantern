@@ -35,6 +35,7 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.hardness;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightEmission;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.replaceable;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidMaterial;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
@@ -63,11 +64,12 @@ import org.lanternpowered.server.block.behavior.vanilla.JukeboxInteractionBehavi
 import org.lanternpowered.server.block.behavior.vanilla.LogAxisRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.NoteBlockInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.OpenableContainerInteractionBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.FaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.PlacementCollisionDetectionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ShulkerBoxInteractionBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.SignInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
@@ -895,7 +897,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(54, chestBuilder()
                         .translation("tile.chest.name")
                         .build("minecraft", "chest"),
-                this::chestData);
+                this::horizontalFacingData);
         ///////////////////////////
         ///     Redstone Wire   ///
         ///////////////////////////
@@ -1131,14 +1133,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(new HorizontalRotationPlacementBehavior())
                                 .add(new EnderChestInteractionBehavior()))
                         .build("minecraft", "ender_chest"),
-                this::chestData);
+                this::horizontalFacingData);
         /////////////////////
         /// Trapped Chest ///
         /////////////////////
         register(146, chestBuilder()
                         .translation("tile.chestTrap.name")
                         .build("minecraft", "trapped_chest"),
-                this::chestData);
+                this::horizontalFacingData);
         ///////////////////////////////////////
         /// Weighted Pressure Plate (Light) ///
         ///////////////////////////////////////
@@ -1285,7 +1287,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(171, dyedBuilder("tile.carpet.%s.name")
                         .properties(builder -> builder
                                 .add(hardness(0.1))
-                                .add(blastResistance(0.5)))
+                                .add(blastResistance(0.5))
+                                .add(solidMaterial(false)))
                         .collisionBox(BoundingBoxes.carpet())
                         .build("minecraft", "carpet"),
                 this::dyedData);
@@ -1447,6 +1450,62 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.shulkerBoxBlack.name")
                         .build("minecraft", "black_shulker_box"),
                 this::shulkerBoxData);
+
+
+        //////////////
+        ///  Sign  ///
+        //////////////
+        register(63, simpleBuilder()
+                        .trait(LanternIntegerTraits.ROTATION)
+                        .defaultState(state -> state
+                                .withTrait(LanternIntegerTraits.ROTATION, 0).get())
+                        .properties(builder -> builder
+                                .add(hardness(1.0))
+                                .add(blastResistance(5.0)))
+                        .behaviors(pipeline -> pipeline
+                                .add(new SignInteractionBehavior()))
+                        .tileEntityType(() -> TileEntityTypes.SIGN)
+                        .build("minecraft", "standing_sign"),
+                blockState -> blockState.getTraitValue(LanternIntegerTraits.ROTATION).get().byteValue());
+        register(68, simpleBuilder()
+                        .trait(LanternEnumTraits.HORIZONTAL_FACING)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                        .properties(builder -> builder
+                                .add(hardness(1.0))
+                                .add(blastResistance(5.0)))
+                        .behaviors(pipeline -> pipeline
+                                .add(new SignInteractionBehavior()))
+                        .tileEntityType(() -> TileEntityTypes.SIGN)
+                        .build("minecraft", "wall_sign"),
+                this::horizontalFacingData);
+        ////////////////
+        ///  Banner  ///
+        ////////////////
+        register(176, simpleBuilder()
+                        .trait(LanternIntegerTraits.ROTATION)
+                        .defaultState(state -> state
+                                .withTrait(LanternIntegerTraits.ROTATION, 0).get())
+                        .properties(builder -> builder
+                                .add(hardness(1.0))
+                                .add(blastResistance(5.0)))
+                        .behaviors(pipeline -> pipeline
+                                .add(new SignInteractionBehavior()))
+                        .tileEntityType(() -> TileEntityTypes.BANNER)
+                        .build("minecraft", "standing_banner"),
+                blockState -> blockState.getTraitValue(LanternIntegerTraits.ROTATION).get().byteValue());
+        register(177, simpleBuilder()
+                        .trait(LanternEnumTraits.HORIZONTAL_FACING)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                        .properties(builder -> builder
+                                .add(hardness(1.0))
+                                .add(blastResistance(5.0)))
+                        .behaviors(pipeline -> pipeline
+                                .add(new SignInteractionBehavior()))
+                        .tileEntityType(() -> TileEntityTypes.BANNER)
+                        .build("minecraft", "wall_banner"),
+                this::horizontalFacingData);
 
         // @formatter:on
     }
@@ -1655,7 +1714,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         return (byte) (axis << 2 | type);
     }
 
-    private byte chestData(BlockState blockState) {
+    private byte horizontalFacingData(BlockState blockState) {
         final Direction facing = blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
         return (byte) directionData(facing);
     }
@@ -1696,7 +1755,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .behaviors(pipeline -> pipeline
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new SimplePlacementBehavior())
-                        .add(new OppositeFaceDirectionalPlacementBehavior())
+                        .add(new FaceDirectionalPlacementBehavior())
                         .add(new PlacementCollisionDetectionBehavior())
                         .add(new ShulkerBoxInteractionBehavior())
                         .add(new SimpleBreakBehavior()));

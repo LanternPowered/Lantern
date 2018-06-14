@@ -30,6 +30,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
+import org.lanternpowered.server.util.rotation.RotationHelper;
 
 public class HandlerPlayInPlayerLook implements Handler<MessagePlayInPlayerLook> {
 
@@ -41,18 +42,6 @@ public class HandlerPlayInPlayerLook implements Handler<MessagePlayInPlayerLook>
     }
 
     static Vector3d toRotation(float yaw, float pitch) {
-        while (yaw >= 360.0) {
-            yaw -= 360.0;
-        }
-        while (yaw < 0.0) {
-            yaw += 360.0;
-        }
-        while (pitch >= 360.0) {
-            pitch -= 360.0;
-        }
-        while (pitch < 0.0) {
-            pitch += 360.0;
-        }
-        return new Vector3d(yaw, pitch, 0);
+        return new Vector3d(RotationHelper.wrapDegRotation(yaw), RotationHelper.wrapDegRotation(pitch), 0);
     }
 }

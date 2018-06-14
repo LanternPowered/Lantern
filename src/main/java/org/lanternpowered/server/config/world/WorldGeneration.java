@@ -35,7 +35,7 @@ import org.spongepowered.api.world.GeneratorTypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @ConfigSerializable
 public final class WorldGeneration {
@@ -44,7 +44,7 @@ public final class WorldGeneration {
     private List<String> generationModifiers = new ArrayList<>();
 
     @Setting(value = "seed", comment = "The seed that will be used to generate this world.")
-    private long seed = new Random().nextLong();
+    private long seed = ThreadLocalRandom.current().nextLong();
 
     @Setting(value = "generate-spawn-on-load", comment =
             "Whether the spawn should be generated when the world loads,\n" +

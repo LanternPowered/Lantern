@@ -36,6 +36,7 @@ public class HandlerPlayInPlayerSwingArm implements Handler<MessagePlayInPlayerS
     public void handle(NetworkContext context, MessagePlayInPlayerSwingArm message) {
         final LanternPlayer player = context.getSession().getPlayer();
         player.resetIdleTimeoutCounter();
+        player.resetOpenedSignPosition();
         player.getInteractionHandler().handleSwingArm(message);
     }
 }

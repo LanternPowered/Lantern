@@ -616,7 +616,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 final int last = messages.length - 1;
                 for (int i = 0; i < last; i++) {
                     ReferenceCountUtil.retain(messages[i]);
-                    this.channel.writeAndFlush(messages[i], voidPromise);
+                    this.channel.write(messages[i], voidPromise);
                 }
                 ReferenceCountUtil.retain(messages[last]);
                 this.channel.writeAndFlush(messages[last], promise);
@@ -632,8 +632,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                     do {
                         final Message message0 = it0.next();
                         // Only use a normal channel promise for the last message
-                        this.channel.writeAndFlush(message0, it0.hasNext() ? voidPromise : promise);
+                        this.channel.write(message0, it0.hasNext() ? voidPromise : promise);
                     } while (it0.hasNext());
+                    this.channel.flush();
                 });
             }
         }
@@ -668,13 +669,14 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 while (true) {
                     final boolean next = it.hasNext();
                     // Only use a normal channel promise for the last message
-                    this.channel.writeAndFlush(message, next ? voidPromise : promise);
+                    this.channel.write(message, next ? voidPromise : promise);
                     if (!next) {
                         break;
                     }
                     message = it.next();
                     ReferenceCountUtil.retain(message);
                 }
+                this.channel.flush();
             } else {
                 // If there are more then one message, combine them inside the
                 // event loop to reduce overhead of wakeup calls and object creation
@@ -689,6 +691,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                         // Only use a normal channel promise for the last message
                         this.channel.writeAndFlush(message0, it0.hasNext() ? voidPromise : promise);
                     } while (it0.hasNext());
+                    this.channel.flush();
                 });
             }
         }
@@ -728,8 +731,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             if (eventLoop.inEventLoop()) {
                 for (Message message : messages) {
                     ReferenceCountUtil.retain(message);
-                    this.channel.writeAndFlush(message, voidPromise);
+                    this.channel.write(message, voidPromise);
                 }
+                this.channel.flush();
             } else {
                 // If there are more then one message, combine them inside the
                 // event loop to reduce overhead of wakeup calls and object creation
@@ -739,8 +743,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 messages0.forEach(ReferenceCountUtil::retain);
                 eventLoop.submit(() -> {
                     for (Message message0 : messages0) {
-                        this.channel.writeAndFlush(message0, voidPromise);
+                        this.channel.write(message0, voidPromise);
                     }
+                    this.channel.flush();
                 });
             }
         }
@@ -767,8 +772,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             final EventLoop eventLoop = this.channel.eventLoop();
             if (eventLoop.inEventLoop()) {
                 for (Message message0 : messages) {
-                    this.channel.writeAndFlush(message0, voidPromise);
+                    this.channel.write(message0, voidPromise);
                 }
+                this.channel.flush();
             } else {
                 // If there are more then one message, combine them inside the
                 // event loop to reduce overhead of wakeup calls and object creation
@@ -777,8 +783,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 final List<Message> messages0 = ImmutableList.copyOf(messages);
                 eventLoop.submit(() -> {
                     for (Message message0 : messages0) {
-                        this.channel.writeAndFlush(message0, voidPromise);
+                        this.channel.write(message0, voidPromise);
                     }
+                    this.channel.flush();
                 });
             }
         }

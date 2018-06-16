@@ -33,6 +33,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.property.PropertyKeySetter;
+import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
@@ -40,7 +41,6 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import java.util.ArrayList;
@@ -147,7 +147,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
 
     @Override
     public Inventory.Builder property(InventoryProperty<?, ?> property) {
-        return property((String) AbstractInventoryProperty.getDefaultKey(property.getClass()), property);
+        return property(property.getKey().toString(), property);
     }
 
     @Override

@@ -281,7 +281,7 @@ public class LanternContainer extends AbstractOrderedInventory implements Contai
         checkState(!this.viewers.containsKey(viewer));
         final ClientContainer clientContainer;
         // Get the gui id (ClientContainerType)
-        final GuiId guiId = this.openInventory.getInventoryProperty(GuiIdProperty.class)
+        final GuiId guiId = this.openInventory.getProperty(GuiIdProperty.class)
                 .map(GuiIdProperty::getValue).orElseThrow(IllegalStateException::new);
         clientContainer = ((ClientContainerType) guiId).createContainer(this.openInventory);
         clientContainer.bindCursor(this.cursor);

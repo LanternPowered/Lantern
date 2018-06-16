@@ -29,11 +29,15 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.property.LanternIdentifiable;
+import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.property.Identifiable;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.translation.Translation;
@@ -42,15 +46,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
 
     static class Name {
         static final Translation INSTANCE = tr("inventory.empty.name");
     }
+
+    private static final Identifiable EMPTY_IDENTIFIABLE = new LanternIdentifiable(new UUID(0L, 0L), Property.Operator.DELEGATE);
 
     @Override
     public EmptyInventory empty() {
@@ -277,5 +285,22 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     @Override
     public Translation getName() {
         return Name.INSTANCE;
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
+        if (property == Identifiable.class) {
+            return Optional.of((T) EMPTY_IDENTIFIABLE);
+        }
+        return super.tryGetProperty(property, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
+        final List<T> properties = super.tryGetProperties(property);
+        if (property == Identifiable.class) {
+            properties.add((T) EMPTY_IDENTIFIABLE);
+        }
+        return properties;
     }
 }

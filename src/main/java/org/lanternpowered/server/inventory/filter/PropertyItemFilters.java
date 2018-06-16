@@ -29,11 +29,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.inventory.filter.ItemFilter.ofTypePredicate;
 
+import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.property.AcceptsItems;
 
 import java.util.Collection;
 
@@ -96,12 +96,12 @@ public final class PropertyItemFilters {
 
     /**
      * Constructs a {@link ItemFilter} for the
-     * {@link AcceptsItems} property.
+     * {@link LanternAcceptsItems} property.
      *
      * @param acceptsItems The accepts items property
      * @return The item filter
      */
-    public static ItemFilter of(AcceptsItems acceptsItems) {
+    public static ItemFilter of(LanternAcceptsItems acceptsItems) {
         checkNotNull(acceptsItems, "acceptsItems");
         final Collection<ItemType> itemTypes = acceptsItems.getValue();
         checkNotNull(itemTypes, "value");

@@ -35,7 +35,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.ArmorSlotType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.query.QueryOperationType;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
@@ -61,8 +60,10 @@ public class QueryOperationRegistryModule extends PluginCatalogRegistryModule<Qu
                 (arg, inventory) -> inventory instanceof Slot && inventory.contains(arg)));
         register(new LanternQueryOperationType<Predicate<ItemStack>>("sponge", "item_stack_custom",
                 (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek().orElse(ItemStack.empty()))));
-        register(new LanternQueryOperationType<Class<? extends Inventory>>("sponge", "inventory_type", Class::isInstance));
-        register(new LanternQueryOperationType<Class<?>>("sponge", "type", Class::isInstance));
+        register(new LanternQueryOperationType<Class<? extends Inventory>>("sponge", "inventory_type",
+                (arg, inventory) -> arg.isInstance(inventory)));
+        register(new LanternQueryOperationType<Class<?>>("sponge", "type",
+                (arg, inventory) -> arg.isInstance(inventory)));
         register(new LanternQueryOperationType<Translation>("sponge", "inventory_translation",
                 (arg, inventory) -> inventory.getName().equals(arg)));
         register(new LanternQueryOperationType<InventoryProperty<?,?>>("sponge", "inventory_property",
@@ -70,10 +71,8 @@ public class QueryOperationRegistryModule extends PluginCatalogRegistryModule<Qu
                     // Equipment slot types are a special case, because
                     // they can be grouped
                     if (arg instanceof EquipmentSlotType) {
-                        for (EquipmentSlotType property : Iterables.concat(
-                                inventory.getProperties(EquipmentSlotType.class),
-                                inventory.getProperties(ArmorSlotType.class))) {
-                            if (((LanternEquipmentType) ((EquipmentSlotType) arg).getValue()).isChild(property.getValue())) {
+                        for (EquipmentSlotType property : inventory.getProperties(EquipmentSlotType.class)) {
+                            if (((LanternEquipmentType) arg.getValue()).isChild(property.getValue())) {
                                 return true;
                             }
                         }

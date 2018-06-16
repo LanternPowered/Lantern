@@ -61,7 +61,7 @@ public class ContainerTileEntityStore<T extends LanternContainerTile> extends Ti
             for (DataView itemView : itemViews) {
                 final int slot = itemView.getByte(SLOT).get() & 0xff;
                 final LanternItemStack itemStack = itemStackSerializer.deserialize(itemView);
-                inventory.set(new SlotIndex(slot), itemStack);
+                inventory.set(SlotIndex.builder().value(slot).build(), itemStack);
             }
         }
         super.deserialize(object, dataView);

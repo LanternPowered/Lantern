@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.inventory.filter.EquipmentItemFilter;
 import org.lanternpowered.server.inventory.filter.ItemFilter;
 import org.lanternpowered.server.inventory.filter.PropertyItemFilters;
+import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -42,8 +43,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.property.AcceptsItems;
-import org.spongepowered.api.item.inventory.property.ArmorSlotType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
@@ -578,7 +577,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             checkArgument(!(property instanceof InventoryCapacity), "The slot capacity cannot be set.");
             super.property(property);
             // Regenerate the result item filter
-            if (property instanceof EquipmentSlotType || property instanceof AcceptsItems) {
+            if (property instanceof EquipmentSlotType || property instanceof LanternAcceptsItems) {
                 this.hasItemFilter = true;
                 this.cachedResultItemFilter = null;
                 invalidateCachedArchetype();
@@ -600,21 +599,13 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             if (this.cachedResultItemFilter == null && this.hasItemFilter) {
                 ItemFilter itemFilter = this.itemFilter;
                 // Attempt to generate the ItemFilter
-                final AcceptsItems acceptsItems = findProperty(AcceptsItems.class);
+                final LanternAcceptsItems acceptsItems = findProperty(LanternAcceptsItems.class);
                 if (acceptsItems != null) {
                     itemFilter = PropertyItemFilters.of(acceptsItems);
                 }
                 final EquipmentSlotType equipmentSlotType = findProperty(EquipmentSlotType.class);
                 if (equipmentSlotType != null) {
                     EquipmentItemFilter equipmentItemFilter = EquipmentItemFilter.of(equipmentSlotType);
-                    if (itemFilter != null) {
-                        equipmentItemFilter = equipmentItemFilter.andThen(itemFilter);
-                    }
-                    itemFilter = equipmentItemFilter;
-                }
-                final ArmorSlotType armorSlotType = findProperty(ArmorSlotType.class);
-                if (armorSlotType != null) {
-                    EquipmentItemFilter equipmentItemFilter = EquipmentItemFilter.of(armorSlotType);
                     if (itemFilter != null) {
                         equipmentItemFilter = equipmentItemFilter.andThen(itemFilter);
                     }

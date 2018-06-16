@@ -976,7 +976,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             }
             container = (LanternContainer) inventory;
         } else {
-            inventory.getInventoryProperty(GuiIdProperty.class).map(GuiIdProperty::getValue).orElseThrow(() ->
+            inventory.getProperty(GuiIdProperty.class).map(GuiIdProperty::getValue).orElseThrow(() ->
                     new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getId()));
             container = LanternContainer.construct(this.inventory, (AbstractOrderedInventory) inventory, name);
         }

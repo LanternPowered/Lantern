@@ -27,6 +27,7 @@ package org.lanternpowered.test;
 
 import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
 
+import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -66,8 +67,8 @@ public class TestInventoryPlugin {
                 .with(InventoryArchetypes.MENU_ROW)
                 //.with(InventoryArchetypes.MENU_ROW)
                 .title(Text.of("My Fancy Title"))
-                .property(InventoryDimension.of(9, 1))
-                .property(new GuiIdProperty(GuiIds.CHEST))
+                .property(InventoryDimension.builder().value(new Vector2i(9, 1)).build())
+                .property(GuiIdProperty.builder().value(GuiIds.CHEST).build())
                 .build("inventory_test:test", "Test Inventory");
         Sponge.getCommandManager().register(this, CommandSpec.builder()
                 .executor((src, args) -> {

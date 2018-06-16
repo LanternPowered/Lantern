@@ -278,7 +278,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         for (DataView itemView : itemViews) {
             final int slot = itemView.getByte(SLOT).get() & 0xff;
             final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
-            enderChestInventory.set(new SlotIndex(slot), itemStack);
+            enderChestInventory.set(SlotIndex.builder().value(slot).build(), itemStack);
         }
     }
 
@@ -292,9 +292,9 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
 
             if (slot >= 0 && slot < mainInventory.capacity()) {
-                mainInventory.set(new SlotIndex(slot), itemStack);
+                mainInventory.set(SlotIndex.builder().value(slot).build(), itemStack);
             } else if (slot >= 100 && slot - 100 < equipmentInventory.capacity()) {
-                equipmentInventory.set(new SlotIndex(slot - 100), itemStack);
+                equipmentInventory.set(SlotIndex.builder().value(slot - 100).build(), itemStack);
             } else if (slot == 150) {
                 offHandSlot.set(itemStack);
             }

@@ -31,6 +31,7 @@ import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleShiftClickBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -39,7 +40,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.ArrayList;

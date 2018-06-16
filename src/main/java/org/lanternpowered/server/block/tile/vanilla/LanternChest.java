@@ -92,7 +92,7 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
                 final AbstractGridInventory.RowsViewBuilder<DoubleChestInventory> doubleChestBuilder = AbstractGridInventory.rowsViewBuilder()
                         .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
                         .title(tr("container.chestDouble"))
-                        .property(new GuiIdProperty(GuiIds.CHEST))
+                        .property(GuiIdProperty.builder().value(GuiIds.CHEST).build())
                         .type(DoubleChestInventory.class)
                         .withCarrier(new DoubleChestBlockCarrier(Arrays.asList(this, otherChest)));
                 if (directionToCheck != Direction.WEST && directionToCheck != Direction.NORTH) {

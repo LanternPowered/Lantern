@@ -217,6 +217,17 @@ import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
 import org.lanternpowered.server.inventory.LanternInventoryBuilder;
 import org.lanternpowered.server.inventory.LanternItemStackBuilder;
+import org.lanternpowered.server.inventory.property.LanternEquipmentSlotType;
+import org.lanternpowered.server.inventory.property.LanternGuiIdProperty;
+import org.lanternpowered.server.inventory.property.LanternIdentifiable;
+import org.lanternpowered.server.inventory.property.LanternIntProperty;
+import org.lanternpowered.server.inventory.property.LanternInventoryCapacity;
+import org.lanternpowered.server.inventory.property.LanternInventoryDimension;
+import org.lanternpowered.server.inventory.property.LanternInventoryTitle;
+import org.lanternpowered.server.inventory.property.LanternSlotIndex;
+import org.lanternpowered.server.inventory.property.LanternSlotPos;
+import org.lanternpowered.server.inventory.property.LanternSlotSide;
+import org.lanternpowered.server.inventory.property.LanternStringProperty;
 import org.lanternpowered.server.inventory.query.LanternQueryTransformationBuilder;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
@@ -386,7 +397,18 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.GuiId;
+import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.property.Identifiable;
+import org.spongepowered.api.item.inventory.property.IntProperty;
+import org.spongepowered.api.item.inventory.property.InventoryCapacity;
+import org.spongepowered.api.item.inventory.property.InventoryDimension;
+import org.spongepowered.api.item.inventory.property.InventoryTitle;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.property.SlotPos;
+import org.spongepowered.api.item.inventory.property.SlotSide;
+import org.spongepowered.api.item.inventory.property.StringProperty;
 import org.spongepowered.api.item.inventory.query.QueryOperationType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
@@ -549,6 +571,18 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EventContextKey.Builder.class, LanternEventContextKeyBuilder::new)
                 .registerBuilderSupplier(Enchantment.Builder.class, LanternEnchantmentBuilder::new)
                 .registerBuilderSupplier(Key.Builder.class, LanternKeyBuilder::new)
+                // Inventory properties
+                .registerBuilderSupplier(SlotPos.Builder.class, LanternSlotPos.Builder::new)
+                .registerBuilderSupplier(SlotSide.Builder.class, LanternSlotSide.Builder::new)
+                .registerBuilderSupplier(StringProperty.Builder.class, LanternStringProperty.Builder::new)
+                .registerBuilderSupplier(IntProperty.Builder.class, LanternIntProperty.Builder::new)
+                .registerBuilderSupplier(SlotIndex.Builder.class, LanternSlotIndex.Builder::new)
+                .registerBuilderSupplier(InventoryCapacity.Builder.class, LanternInventoryCapacity.Builder::new)
+                .registerBuilderSupplier(Identifiable.Builder.class, LanternIdentifiable.Builder::new)
+                .registerBuilderSupplier(GuiIdProperty.Builder.class, LanternGuiIdProperty.Builder::new)
+                .registerBuilderSupplier(EquipmentSlotType.Builder.class, LanternEquipmentSlotType.Builder::new)
+                .registerBuilderSupplier(InventoryDimension.Builder.class, LanternInventoryDimension.Builder::new)
+                .registerBuilderSupplier(InventoryTitle.Builder.class, LanternInventoryTitle.Builder::new)
                 // Advancements
                 .registerBuilderSupplier(Advancement.Builder.class, LanternAdvancementBuilder::new)
                 .registerBuilderSupplier(AdvancementTree.Builder.class, LanternAdvancementTreeBuilder::new)

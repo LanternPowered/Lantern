@@ -81,7 +81,7 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            return Optional.of((T) new EquipmentSlotType(EquipmentTypes.MAIN_HAND));
+            return Optional.of((T) EquipmentSlotType.builder().value(EquipmentTypes.MAIN_HAND).build());
         }
         return Optional.empty();
     }
@@ -90,7 +90,7 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
         final List<T> properties = super.tryGetProperties(child, property);
         if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            properties.add((T) new EquipmentSlotType(EquipmentTypes.MAIN_HAND));
+            properties.add((T) EquipmentSlotType.builder().value(EquipmentTypes.MAIN_HAND).build());
         }
         return properties;
     }

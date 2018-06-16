@@ -67,7 +67,7 @@ public class ClientContainerRegistryModule extends PluginCatalogRegistryModule<G
     @Override
     public void registerDefaults() {
         register("minecraft", "chest", inventory -> {
-            final int rows = inventory.getInventoryProperty(InventoryCapacity.class)
+            final int rows = inventory.getProperty(InventoryCapacity.class)
                             .map(capacity -> (int) Math.ceil(capacity.getValue().doubleValue() / 9.0))
                             .orElse(1);
             return new ChestClientContainer(rows);

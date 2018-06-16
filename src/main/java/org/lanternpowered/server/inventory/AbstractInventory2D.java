@@ -209,7 +209,7 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
         if (property == InventoryDimension.class) {
-            return Optional.of((T) new InventoryDimension(getDimensions()));
+            return Optional.of((T) InventoryDimension.builder().value(getDimensions()).build());
         }
         return super.tryGetProperty(property, key);
     }
@@ -218,7 +218,7 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
         final List<T> list = super.tryGetProperties(property);
         if (property == InventoryDimension.class) {
-            list.add((T) new InventoryDimension(getDimensions()));
+            list.add((T) InventoryDimension.builder().value(getDimensions()));
         }
         return list;
     }

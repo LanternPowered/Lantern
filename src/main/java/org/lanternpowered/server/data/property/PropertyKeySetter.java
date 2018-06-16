@@ -27,10 +27,10 @@ package org.lanternpowered.server.data.property;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.AbstractProperty;
-import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

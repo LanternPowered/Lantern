@@ -36,6 +36,7 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
 import org.lanternpowered.server.inventory.filter.ItemFilter;
+import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
 import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingInventory;
@@ -55,9 +56,9 @@ import org.lanternpowered.server.inventory.vanilla.block.DispenserInventory;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
+import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.AcceptsItems;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.property.GuiIds;
@@ -316,7 +317,8 @@ public final class VanillaInventoryArchetypes {
         ///////////////////
 
         HELMET_SLOT = AbstractSlot.builder()
-                .property(EquipmentSlotType.of(EquipmentTypes.HEADWEAR))
+                .property(EquipmentSlotType.builder().value(EquipmentTypes.HEADWEAR)
+                        .operator(Property.Operator.EQUAL).build())
                 .type(LanternEquipmentSlot.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "helmet_slot");
 
@@ -325,7 +327,8 @@ public final class VanillaInventoryArchetypes {
         ///////////////////////
 
         CHESTPLATE_SLOT = AbstractSlot.builder()
-                .property(EquipmentSlotType.of(EquipmentTypes.CHESTPLATE))
+                .property(EquipmentSlotType.builder().value(EquipmentTypes.CHESTPLATE)
+                        .operator(Property.Operator.EQUAL).build())
                 .type(LanternEquipmentSlot.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "chestplate_slot");
 
@@ -334,7 +337,8 @@ public final class VanillaInventoryArchetypes {
         /////////////////////
 
         LEGGINGS_SLOT = AbstractSlot.builder()
-                .property(EquipmentSlotType.of(EquipmentTypes.LEGGINGS))
+                .property(EquipmentSlotType.builder().value(EquipmentTypes.LEGGINGS)
+                        .operator(Property.Operator.EQUAL).build())
                 .type(LanternEquipmentSlot.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "leggings_slot");
 
@@ -343,7 +347,8 @@ public final class VanillaInventoryArchetypes {
         //////////////////
 
         BOOTS_SLOT = AbstractSlot.builder()
-                .property(EquipmentSlotType.of(EquipmentTypes.BOOTS))
+                .property(EquipmentSlotType.builder().value(EquipmentTypes.BOOTS)
+                        .operator(Property.Operator.EQUAL).build())
                 .type(LanternEquipmentSlot.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "boots_slot");
 
@@ -352,7 +357,8 @@ public final class VanillaInventoryArchetypes {
         /////////////////////
 
         MAIN_HAND_SLOT = AbstractSlot.builder()
-                .property(EquipmentSlotType.of(EquipmentTypes.MAIN_HAND))
+                .property(EquipmentSlotType.builder().value(EquipmentTypes.MAIN_HAND)
+                        .operator(Property.Operator.EQUAL).build())
                 .type(LanternUnrestrictedEquipmentSlot.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "main_hand_slot");
 
@@ -361,7 +367,8 @@ public final class VanillaInventoryArchetypes {
         ////////////////////
 
         OFF_HAND_SLOT = AbstractSlot.builder()
-                .property(EquipmentSlotType.of(EquipmentTypes.OFF_HAND))
+                .property(EquipmentSlotType.builder().value(EquipmentTypes.OFF_HAND)
+                        .operator(Property.Operator.EQUAL).build())
                 .type(LanternUnrestrictedEquipmentSlot.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "off_hand_slot");
 
@@ -380,15 +387,15 @@ public final class VanillaInventoryArchetypes {
         }
         CHEST = chestBuilder
                 .title(tr("container.chest"))
-                .property(new GuiIdProperty(GuiIds.CHEST))
+                .property(GuiIdProperty.builder().value(GuiIds.CHEST).build())
                 .buildArchetype(Minecraft.IDENTIFIER, "chest");
         SHULKER_BOX = chestBuilder
                 .title(tr("container.shulkerBox"))
-                .property(new GuiIdProperty(GuiIds.SHULKER_BOX))
+                .property(GuiIdProperty.builder().value(GuiIds.SHULKER_BOX).build())
                 .buildArchetype(Minecraft.IDENTIFIER, "shulker_box");
         ENDER_CHEST = chestBuilder
                 .title(tr("container.enderchest"))
-                .property(new GuiIdProperty(GuiIds.CHEST))
+                .property(GuiIdProperty.builder().value(GuiIds.CHEST).build())
                 .buildArchetype(Minecraft.IDENTIFIER, "ender_chest");
 
         ////////////////////
@@ -400,7 +407,7 @@ public final class VanillaInventoryArchetypes {
                 .grid(0, CHEST)
                 .grid(3, CHEST)
                 .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
-                .property(new GuiIdProperty(GuiIds.CHEST))
+                .property(GuiIdProperty.builder().value(GuiIds.CHEST).build())
                 .type(ChestInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "double_chest");
 
@@ -411,7 +418,7 @@ public final class VanillaInventoryArchetypes {
         final AbstractGridInventory.SlotsBuilder<DispenserInventory> dispenserBuilder = AbstractGridInventory.slotsBuilder()
                 .title(tr("container.dispenser"))
                 .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
-                .property(new GuiIdProperty(GuiIds.DISPENSER))
+                .property(GuiIdProperty.builder().value(GuiIds.DISPENSER).build())
                 .type(DispenserInventory.class)
                 .expand(3, 3);
         for (int y = 0; y < 3; y++) {
@@ -439,7 +446,7 @@ public final class VanillaInventoryArchetypes {
                 .addLast(FUEL_SLOT)
                 .addLast(OUTPUT_SLOT)
                 .shiftClickBehavior(FurnaceShiftClickBehavior.INSTANCE)
-                .property(new GuiIdProperty(GuiIds.FURNACE))
+                .property(GuiIdProperty.builder().value(GuiIds.FURNACE).build())
                 .type(FurnaceInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "furnace");
 
@@ -535,7 +542,7 @@ public final class VanillaInventoryArchetypes {
         CRAFTING_TABLE = AbstractOrderedInventory.builder()
                 .addLast(CRAFTING_OUTPUT_SLOT)
                 .addLast(CRAFTING_TABLE_GRID)
-                .property(new GuiIdProperty(GuiIds.CRAFTING_TABLE))
+                .property(GuiIdProperty.builder().value(GuiIds.CRAFTING_TABLE).build())
                 .type(CraftingTableInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "crafting_table");
 
@@ -575,7 +582,7 @@ public final class VanillaInventoryArchetypes {
 
         SADDLE_SLOT = AbstractSlot.builder()
                 .type(LanternFilteringSlot.class)
-                .property(new AcceptsItems(ImmutableList.of(ItemTypes.SADDLE)))
+                .property(new LanternAcceptsItems(ImmutableList.of(ItemTypes.SADDLE)))
                 .buildArchetype(Minecraft.IDENTIFIER, "saddle_slot");
 
         ////////////////////////
@@ -584,7 +591,7 @@ public final class VanillaInventoryArchetypes {
 
         HORSE_ARMOR_SLOT = AbstractSlot.builder()
                 .type(LanternFilteringSlot.class)
-                .property(new AcceptsItems(ImmutableList.of(
+                .property(new LanternAcceptsItems(ImmutableList.of(
                         ItemTypes.DIAMOND_HORSE_ARMOR, ItemTypes.GOLDEN_HORSE_ARMOR, ItemTypes.IRON_HORSE_ARMOR)))
                 .buildArchetype(Minecraft.IDENTIFIER, "horse_armor_slot");
 

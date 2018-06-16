@@ -29,10 +29,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
+import org.lanternpowered.server.inventory.property.LanternInventoryCapacity;
+import org.lanternpowered.server.inventory.property.LanternInventoryTitle;
 import org.lanternpowered.server.inventory.query.LanternQueryOperation;
 import org.lanternpowered.server.text.translation.TextTranslation;
+import org.spongepowered.api.data.Property;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Container;
@@ -41,7 +46,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
@@ -61,7 +65,7 @@ import javax.annotation.Nullable;
  * The base implementation for all the {@link Inventory}s.
  */
 @SuppressWarnings({"unchecked", "ConstantConditions"})
-public abstract class AbstractInventory implements IInventory {
+public abstract class AbstractInventory implements IInventory, AbstractPropertyHolder {
 
     static class Name {
         static final Translation INVENTORY = tr("inventory.name"); // The default name
@@ -312,6 +316,11 @@ public abstract class AbstractInventory implements IInventory {
     // Properties
 
     @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> property) {
+        return AbstractPropertyHolder.super.getProperty(property);
+    }
+
+    @Override
     public final <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Class<T> property) {
         return getPropertiesBuilder(property).build();
     }
@@ -360,11 +369,6 @@ public abstract class AbstractInventory implements IInventory {
     }
 
     @Override
-    public final <T extends InventoryProperty<?, ?>> Optional<T> getInventoryProperty(Class<T> property) {
-        return getProperty(property, AbstractInventoryProperty.getDefaultKey(property));
-    }
-
-    @Override
     public final <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key) {
         checkNotNull(property, "property");
         final AbstractInventory parent = parent();
@@ -378,7 +382,7 @@ public abstract class AbstractInventory implements IInventory {
     }
 
     @Override
-    public final <T extends InventoryProperty<?, ?>> Optional<T> getInventoryProperty(Inventory child, Class<T> property) {
+    public final <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property) {
         return getProperty(child, property, AbstractInventoryProperty.getDefaultKey(property));
     }
 
@@ -404,9 +408,9 @@ public abstract class AbstractInventory implements IInventory {
      */
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
         if (property == InventoryTitle.class) {
-            return Optional.of((T) new InventoryTitle(TextTranslation.toText(getName())));
+            return Optional.of((T) new LanternInventoryTitle(TextTranslation.toText(getName()), Property.Operator.DELEGATE));
         } else if (property == InventoryCapacity.class) {
-            return Optional.of((T) new InventoryCapacity(capacity()));
+            return Optional.of((T) new LanternInventoryCapacity(capacity(), Property.Operator.DELEGATE));
         }
         return Optional.empty();
     }
@@ -422,9 +426,9 @@ public abstract class AbstractInventory implements IInventory {
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
         final List<T> properties = new ArrayList<>();
         if (property == InventoryTitle.class) {
-            properties.add((T) new InventoryTitle(TextTranslation.toText(getName())));
+            properties.add((T) new LanternInventoryTitle(TextTranslation.toText(getName()), Property.Operator.DELEGATE));
         } else if (property == InventoryCapacity.class) {
-            properties.add((T) new InventoryCapacity(capacity()));
+            properties.add((T) new LanternInventoryCapacity(capacity(), Property.Operator.DELEGATE));
         }
         return properties;
     }

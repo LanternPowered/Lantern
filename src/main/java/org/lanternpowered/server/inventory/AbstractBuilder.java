@@ -34,9 +34,11 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
+import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.property.Identifiable;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
@@ -99,8 +101,12 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      */
     public B property(InventoryProperty<String, ?> property) {
         checkNotNull(property, "property");
-        checkState(!(property instanceof InventoryCapacity), "The inventory capacity cannot be modified with a property.");
-        checkState(!(property instanceof InventoryDimension), "The inventory dimension cannot be modified with a property.");
+        // checkState(!(property instanceof InventoryCapacity), "The inventory capacity cannot be modified with a property.");
+        // checkState(!(property instanceof InventoryDimension), "The inventory dimension cannot be modified with a property.");
+        if (property instanceof InventoryDimension ||
+                property instanceof InventoryCapacity) {
+            return (B) this;
+        }
         putProperty(property);
         if (property instanceof InventoryTitle) {
             this.translation = TextTranslation.of((Text) property.getValue());
@@ -117,12 +123,13 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     public B title(Translation translation) {
         checkNotNull(translation, "translation");
         this.translation = translation;
-        putProperty(new InventoryTitle(TextTranslation.toText(translation)));
+        putProperty(InventoryTitle.builder().value(TextTranslation.toText(translation)).build());
         return (B) this;
     }
 
     private void putProperty(InventoryProperty<String, ?> property) {
-        this.properties.computeIfAbsent(property.getClass(), type -> new HashMap<>()).put(property.getKey(), property);
+        this.properties.computeIfAbsent(AbstractInventoryProperty.getType(property.getClass()),
+                type -> new HashMap<>()).put(property.getKey(), property);
         this.cachedProperties = null;
     }
 
@@ -178,7 +185,15 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
                 }
                 this.cachedProperties = builder.build();
             }
-            mutableInventory.setProperties((Map) this.cachedProperties);
+            Map<Class<?>, Map<String, InventoryProperty<String, ?>>> properties = this.cachedProperties;
+            if (!properties.containsKey(Identifiable.class)) {
+                final ImmutableMap.Builder<Class<?>, Map<String, InventoryProperty<String, ?>>> builder = ImmutableMap.builder();
+                builder.putAll(properties);
+                final Identifiable identifiable = Identifiable.random();
+                builder.put(Identifiable.class, ImmutableMap.of(identifiable.getKey(), identifiable));
+                properties = builder.build();
+            }
+            mutableInventory.setProperties((Map) properties);
         }
         if (this.translation != null) {
             inventory.setName(this.translation);

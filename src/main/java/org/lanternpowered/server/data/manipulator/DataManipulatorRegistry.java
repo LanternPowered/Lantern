@@ -187,6 +187,7 @@ import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableSneaking
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableSprintData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableStatisticData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableStuckArrowsData;
+import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableTagData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableTameableData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableTradeOfferData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableVehicleData;
@@ -347,6 +348,7 @@ import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
 import org.spongepowered.api.data.manipulator.mutable.entity.SprintData;
 import org.spongepowered.api.data.manipulator.mutable.entity.StatisticData;
 import org.spongepowered.api.data.manipulator.mutable.entity.StuckArrowsData;
+import org.spongepowered.api.data.manipulator.mutable.entity.TagData;
 import org.spongepowered.api.data.manipulator.mutable.entity.TameableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.TradeOfferData;
 import org.spongepowered.api.data.manipulator.mutable.entity.VehicleData;
@@ -802,6 +804,8 @@ public class DataManipulatorRegistry {
                 });
         register(JohnnyData.class, ImmutableJohnnyData.class,
                 c -> c.register(Keys.IS_JOHNNY, false));
+        register(TagData.class, ImmutableTagData.class,
+                c -> c.register(Keys.TAGS, new HashSet<>()));
 
         /// variant containers
         registerVariant(ArtData.class, ImmutableArtData.class, Keys.ART, Arts.AZTEC);

@@ -97,6 +97,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -213,12 +214,14 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         final ValueCollection c = getValueCollection();
         c.register(Keys.DISPLAY_NAME, Text.EMPTY);
         c.register(Keys.CUSTOM_NAME_VISIBLE, true);
+        c.registerNonRemovable(Keys.TAGS, new HashSet<>());
         c.registerNonRemovable(Keys.VELOCITY, Vector3d.ZERO);
         c.registerNonRemovable(Keys.FIRE_TICKS, 0);
         c.registerNonRemovable(Keys.FALL_DISTANCE, 0f);
         c.registerNonRemovable(Keys.GLOWING, false);
         c.registerNonRemovable(Keys.INVISIBLE, false);
         c.registerNonRemovable(Keys.INVULNERABLE, false);
+        c.registerNonRemovable(Keys.HAS_GRAVITY, true);
         c.registerNonRemovable(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
     }
 

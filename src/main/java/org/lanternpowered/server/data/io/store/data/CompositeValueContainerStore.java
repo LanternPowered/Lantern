@@ -92,7 +92,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 if (element != null) {
                     element.set(entry.getValue());
                 } else {
-                    Lantern.getLogger().warn("Attempted to offer a unsupported value with key \"{}\" to the object {}",
+                    Lantern.getLogger().debug("Attempted to offer a unsupported value with key \"{}\" to the object {}",
                             entry.getKey().toString(), object.toString());
                 }
             }

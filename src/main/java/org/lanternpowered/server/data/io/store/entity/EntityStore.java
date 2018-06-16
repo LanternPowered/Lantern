@@ -42,6 +42,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,6 +87,8 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     private static final DataQuery FOOD_TICK_TIMER = DataQuery.of("foodTickTimer"); // TODO
     private static final DataQuery IS_ELYTRA_FLYING = DataQuery.of("FallFlying");
     private static final DataQuery IS_GLOWING = DataQuery.of("Glowing");
+    private static final DataQuery TAGS = DataQuery.of("Tags");
+    private static final DataQuery NO_GRAVITY = DataQuery.of("NoGravity");
 
     // TODO: Use this more globally?
     private static final DataQuery DATA_VERSION = DataQuery.of("DataVersion");
@@ -191,6 +194,8 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.SATURATION).ifPresent(v -> dataView.set(SATURATION, v.floatValue()));
         valueContainer.remove(Keys.IS_ELYTRA_FLYING).ifPresent(v -> dataView.set(IS_ELYTRA_FLYING, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.GLOWING).ifPresent(v -> dataView.set(IS_GLOWING, (byte) (v ? 1 : 0)));
+        valueContainer.remove(Keys.TAGS).ifPresent(v -> dataView.set(TAGS, v));
+        valueContainer.remove(Keys.HAS_GRAVITY).ifPresent(v -> dataView.set(NO_GRAVITY, (byte) (v ? 1 : 0)));
         super.serializeValues(object, valueContainer, dataView);
     }
 
@@ -233,7 +238,8 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         dataView.getDouble(SATURATION).ifPresent(v -> valueContainer.set(Keys.SATURATION, v));
         dataView.getInt(IS_ELYTRA_FLYING).ifPresent(v -> valueContainer.set(Keys.IS_ELYTRA_FLYING, v > 0));
         dataView.getInt(IS_GLOWING).ifPresent(v -> valueContainer.set(Keys.GLOWING, v > 0));
-
+        dataView.getStringList(TAGS).ifPresent(v -> valueContainer.set(Keys.TAGS, new HashSet<>(v)));
+        dataView.getInt(NO_GRAVITY).ifPresent(v -> valueContainer.set(Keys.HAS_GRAVITY, v <= 0));
         super.deserializeValues(object, valueContainer, dataView);
     }
 }

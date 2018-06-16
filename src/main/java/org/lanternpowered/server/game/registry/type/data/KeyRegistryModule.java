@@ -396,6 +396,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("SuccessCount"), "success_count"));
         register(makeValueKey(Boolean.class, of("Suspended"), "suspended"));
         register(makeOptionalKey(UUID.class, of("TamedOwner"), "tamed_owner"));
+        register(makeSetKey(String.class, of("Tags"), "tags"));
         register(makeValueKey(Vector3d.class, of("TargetedLocation"), "targeted_location"));
         register(makeValueKey(Integer.class, of("TicksRemaining"), "ticks_remaining"));
         register(makeMutableBoundedValueKey(Integer.class, of("TotalExperience"), "total_experience"));

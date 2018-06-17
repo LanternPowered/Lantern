@@ -53,7 +53,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import org.lanternpowered.server.network.ServerBase;
+import org.lanternpowered.server.network.AbstractServer;
 import org.spongepowered.api.service.rcon.RconService;
 
 import java.net.InetSocketAddress;
@@ -64,7 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
-public class RconServer extends ServerBase implements RconService {
+public class RconServer extends AbstractServer implements RconService {
 
     private final Map<String, RconSource> sourcesByHostname = new ConcurrentHashMap<>();
     private final String password;
@@ -80,17 +80,17 @@ public class RconServer extends ServerBase implements RconService {
     }
 
     @Override
-    protected ChannelFuture init0(SocketAddress address, boolean epoll) {
+    protected ChannelFuture init(SocketAddress address, TransportType channelType) {
         this.address = (InetSocketAddress) address;
         this.bootstrap = new ServerBootstrap();
-        this.bossGroup = createEventLoopGroup(epoll);
-        this.workerGroup = createEventLoopGroup(epoll);
+        this.bossGroup = createEventLoopGroup(channelType);
+        this.workerGroup = createEventLoopGroup(channelType);
         return this.bootstrap
                 .group(this.bossGroup, this.workerGroup)
-                .channel(getServerSocketChannelClass(epoll))
+                .channel(getServerSocketChannelClass(channelType))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
+                    public void initChannel(SocketChannel ch) {
                         ch.pipeline()
                                 .addLast(new RconFramingHandler())
                                 .addLast(new RconHandler(RconServer.this, password));

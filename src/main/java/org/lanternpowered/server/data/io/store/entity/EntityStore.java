@@ -195,7 +195,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.IS_ELYTRA_FLYING).ifPresent(v -> dataView.set(IS_ELYTRA_FLYING, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.GLOWING).ifPresent(v -> dataView.set(IS_GLOWING, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.TAGS).ifPresent(v -> dataView.set(TAGS, v));
-        valueContainer.remove(Keys.HAS_GRAVITY).ifPresent(v -> dataView.set(NO_GRAVITY, (byte) (v ? 1 : 0)));
+        valueContainer.remove(Keys.HAS_GRAVITY).ifPresent(v -> dataView.set(NO_GRAVITY, (byte) (v ? 0 : 1)));
         super.serializeValues(object, valueContainer, dataView);
     }
 

@@ -51,7 +51,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.network.ServerBase;
+import org.lanternpowered.server.network.AbstractServer;
 import org.spongepowered.api.scheduler.Task;
 
 import java.net.InetSocketAddress;
@@ -68,7 +68,7 @@ import javax.annotation.Nullable;
  * Implementation of a server for the minecraft server query protocol.
  * @see <a href="http://wiki.vg/Query">Protocol Specifications</a>
  */
-public class QueryServer extends ServerBase {
+public class QueryServer extends AbstractServer {
 
     // The {@link EventLoopGroup} used by the query server.
     private EventLoopGroup group;
@@ -96,11 +96,11 @@ public class QueryServer extends ServerBase {
     }
 
     @Override
-    protected ChannelFuture init0(SocketAddress address, boolean epoll) {
-        this.group = createEventLoopGroup(epoll);
+    protected ChannelFuture init(SocketAddress address, TransportType channelType) {
+        this.group = createEventLoopGroup(channelType);
         this.bootstrap = new Bootstrap()
                 .group(this.group)
-                .channel(getDatagramChannelClass(epoll))
+                .channel(getDatagramChannelClass(channelType))
                 .handler(new QueryHandler(this, showPlugins));
         if (this.flushTask == null) {
             this.flushTask = this.game.getScheduler().createTaskBuilder().async()

@@ -57,7 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 @Singleton
-public final class NetworkManager extends ServerBase {
+public final class NetworkManager extends AbstractServer {
 
     private final static AtomicInteger threadCounter = new AtomicInteger(0);
 
@@ -120,17 +120,17 @@ public final class NetworkManager extends ServerBase {
     }
 
     @Override
-    protected ChannelFuture init0(SocketAddress address, boolean epoll) {
+    protected ChannelFuture init(SocketAddress address, TransportType channelType) {
         this.bootstrap = new ServerBootstrap();
         // Take advantage of the fast thread local threads,
         // this is also provided by the default thread factory
         final ThreadFactory threadFactory = ThreadHelper.newFastThreadLocalThreadFactory(() -> "netty-" + threadCounter.getAndIncrement());
-        this.bossGroup = createEventLoopGroup(epoll, threadFactory);
-        this.workerGroup = createEventLoopGroup(epoll, threadFactory);
+        this.bossGroup = createEventLoopGroup(channelType, threadFactory);
+        this.workerGroup = createEventLoopGroup(channelType, threadFactory);
         this.socketAddress = address;
         return this.bootstrap
                 .group(this.bossGroup, this.workerGroup)
-                .channel(getServerSocketChannelClass(epoll))
+                .channel(getServerSocketChannelClass(channelType))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {

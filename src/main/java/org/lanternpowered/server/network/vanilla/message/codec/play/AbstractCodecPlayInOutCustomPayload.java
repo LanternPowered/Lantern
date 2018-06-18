@@ -71,8 +71,15 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             channel = result.channel;
             content = result.byteBuf;
         }
-        buf.writeString(channel);
-        buf.writeBytes(content);
+        try {
+            buf.writeString(channel);
+            buf.writeBytes(content);
+        } finally {
+            // MessagePlayInOutChannelPayload will be cleaned by it being a ReferenceCounted
+            if (!(message instanceof MessagePlayInOutChannelPayload)) {
+                content.release();
+            }
+        }
         return buf;
     }
 

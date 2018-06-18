@@ -23,44 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.message;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.AbstractReferenceCountedMessage;
+import io.netty.util.ReferenceCounted;
+import org.lanternpowered.server.network.IReferenceCounted;
 
-public final class MessagePlayInOutChannelPayload extends AbstractReferenceCountedMessage<ByteBuffer> {
+/**
+ * A abstract {@link Message} implementation which
+ * can hold a {@link ReferenceCounted} object.
+ *
+ * @param <T> The reference counted object type
+ */
+public abstract class AbstractReferenceCountedMessage<T extends ReferenceCounted> implements Message, IReferenceCounted {
 
-    private final String channel;
+    protected final T object;
 
-    /**
-     * Creates a new custom payload message.
-     * 
-     * @param channel the channel
-     * @param content the content
-     */
-    public MessagePlayInOutChannelPayload(String channel, ByteBuffer content) {
-        super(checkNotNull(content, "content"));
-        this.channel = checkNotNull(channel, "channel");
+    protected AbstractReferenceCountedMessage(T object) {
+        checkNotNull(object, "object");
+        this.object = object;
     }
 
-    /**
-     * Gets the channel the plugin message is using.
-     * 
-     * @return The channel
-     */
-    public String getChannel() {
-        return this.channel;
+    @Override
+    public int refCnt() {
+        return this.object.refCnt();
     }
 
-    /**
-     * Gets the content of the plugin message.
-     * 
-     * @return The content
-     */
-    public ByteBuffer getContent() {
-        return this.object;
+    @Override
+    public ReferenceCounted retain(int increment) {
+        return this.object.retain(increment);
     }
 
+    @Override
+    public ReferenceCounted touch(Object hint) {
+        return this.object.touch(hint);
+    }
+
+    @Override
+    public boolean release(int decrement) {
+        return this.object.release(decrement);
+    }
 }

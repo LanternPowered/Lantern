@@ -23,44 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import io.netty.util.ReferenceCounted;
 
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.AbstractReferenceCountedMessage;
+/**
+ * This interface implements the methods which could
+ * have been defaulted from {@link ReferenceCounted}.
+ */
+public interface IReferenceCounted extends ReferenceCounted {
 
-public final class MessagePlayInOutChannelPayload extends AbstractReferenceCountedMessage<ByteBuffer> {
-
-    private final String channel;
-
-    /**
-     * Creates a new custom payload message.
-     * 
-     * @param channel the channel
-     * @param content the content
-     */
-    public MessagePlayInOutChannelPayload(String channel, ByteBuffer content) {
-        super(checkNotNull(content, "content"));
-        this.channel = checkNotNull(channel, "channel");
+    @Override
+    default ReferenceCounted retain() {
+        return retain(1);
     }
 
-    /**
-     * Gets the channel the plugin message is using.
-     * 
-     * @return The channel
-     */
-    public String getChannel() {
-        return this.channel;
+    @Override
+    default boolean release() {
+        return release(1);
     }
 
-    /**
-     * Gets the content of the plugin message.
-     * 
-     * @return The content
-     */
-    public ByteBuffer getContent() {
-        return this.object;
+    @Override
+    default ReferenceCounted touch() {
+        return touch(null);
     }
-
 }

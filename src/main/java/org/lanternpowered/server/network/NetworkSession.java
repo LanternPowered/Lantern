@@ -254,7 +254,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Message message) {
         Message actualMessage = message;
         if (actualMessage instanceof HandlerMessage) {
             actualMessage = ((HandlerMessage) actualMessage).getMessage();
@@ -585,6 +585,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (!this.channel.isActive()) {
             return this.channel.newPromise();
         }
+        ReferenceCountUtil.retain(message);
         // Write the message and add a exception handler
         return this.channel.writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
@@ -611,14 +612,16 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.channel.writeAndFlush(messages[0], promise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
+            // Retain the messages
+            for (Message message : messages) {
+                ReferenceCountUtil.retain(message);
+            }
             final ChannelPromise voidPromise = this.channel.voidPromise();
             if (eventLoop.inEventLoop()) {
                 final int last = messages.length - 1;
                 for (int i = 0; i < last; i++) {
-                    ReferenceCountUtil.retain(messages[i]);
                     this.channel.write(messages[i], voidPromise);
                 }
-                ReferenceCountUtil.retain(messages[last]);
                 this.channel.writeAndFlush(messages[last], promise);
             } else {
                 // If there are more then one message, combine them inside the
@@ -626,7 +629,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
                 // Create a copy of the list, to avoid concurrent modifications
                 final List<Message> messages0 = ImmutableList.copyOf(messages);
-                messages0.forEach(ReferenceCountUtil::retain);
                 eventLoop.submit(() -> {
                     final Iterator<Message> it0 = messages0.iterator();
                     do {
@@ -664,6 +666,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.channel.writeAndFlush(message, promise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
+            messages.forEach(ReferenceCountUtil::retain);
             final ChannelPromise voidPromise = this.channel.voidPromise();
             if (eventLoop.inEventLoop()) {
                 while (true) {
@@ -674,7 +677,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                         break;
                     }
                     message = it.next();
-                    ReferenceCountUtil.retain(message);
                 }
                 this.channel.flush();
             } else {
@@ -683,7 +685,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
                 // Create a copy of the list, to avoid concurrent modifications
                 final List<Message> messages0 = ImmutableList.copyOf(messages);
-                messages0.forEach(ReferenceCountUtil::retain);
                 eventLoop.submit(() -> {
                     final Iterator<Message> it0 = messages0.iterator();
                     do {
@@ -728,9 +729,12 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.channel.writeAndFlush(messages[0], voidPromise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
+            // Retain the messages
+            for (Message message : messages) {
+                ReferenceCountUtil.retain(message);
+            }
             if (eventLoop.inEventLoop()) {
                 for (Message message : messages) {
-                    ReferenceCountUtil.retain(message);
                     this.channel.write(message, voidPromise);
                 }
                 this.channel.flush();
@@ -740,7 +744,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
                 // Create a copy of the list, to avoid concurrent modifications
                 final List<Message> messages0 = ImmutableList.copyOf(messages);
-                messages0.forEach(ReferenceCountUtil::retain);
                 eventLoop.submit(() -> {
                     for (Message message0 : messages0) {
                         this.channel.write(message0, voidPromise);
@@ -770,6 +773,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.channel.writeAndFlush(message, voidPromise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
+            messages.forEach(ReferenceCountUtil::retain);
             if (eventLoop.inEventLoop()) {
                 for (Message message0 : messages) {
                     this.channel.write(message0, voidPromise);

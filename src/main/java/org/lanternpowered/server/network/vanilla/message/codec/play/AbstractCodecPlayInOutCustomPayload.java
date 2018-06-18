@@ -71,12 +71,8 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             channel = result.channel;
             content = result.byteBuf;
         }
-        try {
-            buf.writeString(channel);
-            buf.writeBytes(content);
-        } finally {
-            content.release();
-        }
+        buf.writeString(channel);
+        buf.writeBytes(content);
         return buf;
     }
 

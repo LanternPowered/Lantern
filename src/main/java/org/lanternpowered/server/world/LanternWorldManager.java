@@ -70,6 +70,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -92,7 +93,7 @@ public final class LanternWorldManager {
     private final AtomicInteger counter = new AtomicInteger();
     // The executor for async world manager operations
     private final ExecutorService executor = Executors.newCachedThreadPool(
-            runnable -> new Thread(runnable, "worlds-" + this.counter.getAndIncrement()));
+            ThreadHelper.newThreadFactory(() -> "worlds-" + this.counter.getAndIncrement()));
 
     // The name of the world configs
     private static final String WORLD_CONFIG = "world.conf";
@@ -705,11 +706,12 @@ public final class LanternWorldManager {
         if (this.worldThreads.containsKey(world)) {
             return;
         }
-        final Thread thread = ThreadHelper.newFastThreadLocalThread(thread0 -> {
+        final Thread thread = ThreadHelper.newThread(() -> {
             try {
                 // Initialize the world cause stack.
                 CauseStack.set(new LanternCauseStack());
 
+                final Thread thread0 = Thread.currentThread();
                 while (!thread0.isInterrupted() && !this.tickEnd.isTerminated()) {
                     this.tickBegin.arriveAndAwaitAdvance();
                     try {
@@ -724,7 +726,7 @@ public final class LanternWorldManager {
                 this.tickBegin.arriveAndDeregister();
                 this.tickEnd.arriveAndDeregister();
             }
-        }, "world-" + world.getName());
+        }, "world-" + world.getName().toLowerCase(Locale.ENGLISH));
         this.worldThreads.put(world, thread);
         this.tickBegin.register();
         this.tickEnd.register();

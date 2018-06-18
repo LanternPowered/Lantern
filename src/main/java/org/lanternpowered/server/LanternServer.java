@@ -55,6 +55,7 @@ import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
+import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
@@ -113,7 +114,7 @@ public final class LanternServer implements Server {
 
     // The executor service for the server ticks
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
-            runnable -> this.mainThread = new Thread(runnable, "server"));
+            runnable -> this.mainThread = ThreadHelper.newThread(runnable, "server"));
 
     @SuppressWarnings("NullableProblems")
     private Thread mainThread;

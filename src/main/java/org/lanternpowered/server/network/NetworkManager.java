@@ -124,7 +124,7 @@ public final class NetworkManager extends AbstractServer {
         this.bootstrap = new ServerBootstrap();
         // Take advantage of the fast thread local threads,
         // this is also provided by the default thread factory
-        final ThreadFactory threadFactory = ThreadHelper.newFastThreadLocalThreadFactory(() -> "netty-" + threadCounter.getAndIncrement());
+        final ThreadFactory threadFactory = ThreadHelper.newThreadFactory(() -> "netty-" + threadCounter.getAndIncrement());
         this.bossGroup = createEventLoopGroup(channelType, threadFactory);
         this.workerGroup = createEventLoopGroup(channelType, threadFactory);
         this.socketAddress = address;

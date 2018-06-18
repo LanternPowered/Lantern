@@ -181,7 +181,7 @@ public final class LanternChunkManager {
     // The chunk load executor
     private final ThreadPoolExecutor chunkTaskExecutor = new ThreadPoolExecutor(
             CHUNK_LOADING_CORE_POOL_SIZE, CHUNK_LOADING_MAX_POOL_SIZE, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-            ThreadHelper.newFastThreadLocalThreadFactory());
+            ThreadHelper.newThreadFactory());
 
     // Some objects that can be used in {@link Chunk} population.
     private class PopulationData {

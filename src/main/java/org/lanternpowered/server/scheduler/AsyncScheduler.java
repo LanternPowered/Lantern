@@ -64,8 +64,7 @@ final class AsyncScheduler extends SchedulerBase {
         // We are starting it
         this.running = true;
 
-        final Thread thread = new Thread(AsyncScheduler.this::mainLoop);
-        thread.setName("Lantern Async Scheduler Thread");
+        final Thread thread = ThreadHelper.newThread(AsyncScheduler.this::mainLoop, "async-scheduler");
         thread.setDaemon(true);
         thread.start();
     }
@@ -88,7 +87,7 @@ final class AsyncScheduler extends SchedulerBase {
     }
 
     private void mainLoop() {
-        this.executor = Executors.newCachedThreadPool(ThreadHelper.newFastThreadLocalThreadFactory(
+        this.executor = Executors.newCachedThreadPool(ThreadHelper.newThreadFactory(
                 () -> "async-" + this.counter.getAndIncrement()));
         this.lastProcessingTimestamp = System.nanoTime();
         while (this.running) {

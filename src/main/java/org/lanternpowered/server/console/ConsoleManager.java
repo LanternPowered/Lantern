@@ -46,6 +46,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.PrettyPrinter;
+import org.lanternpowered.server.util.ThreadHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -122,7 +123,7 @@ public final class ConsoleManager {
 
         active = true;
 
-        final Thread thread = new Thread(this::readCommandTask, "console");
+        final Thread thread = ThreadHelper.newThread(this::readCommandTask, "console");
         thread.setDaemon(true);
         thread.start();
 

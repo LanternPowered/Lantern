@@ -31,84 +31,62 @@ import io.netty.util.concurrent.FastThreadLocal;
 import io.netty.util.concurrent.FastThreadLocalThread;
 
 import java.util.concurrent.ThreadFactory;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-
+/**
+ * All {@link Thread}s should be constructed through this helper class
+ * to ensure that {@link FastThreadLocalThread}s are used to provide
+ * benefits for using {@link FastThreadLocal}s.
+ */
 public final class ThreadHelper {
 
-    public static ThreadFactory newFastThreadLocalThreadFactory() {
-        return newFastThreadLocalThreadFactory0(null, null);
+    private static final ThreadFactory fastThreadLocalThreadFactory = ThreadHelper::newThread;
+
+    /**
+     * Constructs a {@link ThreadFactory} which produces {@link FastThreadLocalThread}s.
+     *
+     * @return The fast thread factory
+     */
+    public static ThreadFactory newThreadFactory() {
+        return fastThreadLocalThreadFactory;
     }
 
-    public static ThreadFactory newFastThreadLocalThreadFactory(Consumer<Thread> consumer) {
-        return newFastThreadLocalThreadFactory0(null, requireNonNull(consumer, "consumer"));
+    /**
+     * Constructs a {@link ThreadFactory} which produces {@link FastThreadLocalThread}s
+     * which will be named using the name {@link Supplier}.
+     *
+     * @param nameSupplier The name supplier
+     * @return The thread factory
+     */
+    public static ThreadFactory newThreadFactory(Supplier<String> nameSupplier) {
+        requireNonNull(nameSupplier, "nameSupplier");
+        return runnable -> newThread(runnable, nameSupplier.get());
     }
 
-    public static ThreadFactory newFastThreadLocalThreadFactory(Supplier<String> nameSupplier) {
-        return newFastThreadLocalThreadFactory0(requireNonNull(nameSupplier, "nameSupplier"), null);
-    }
-
-    public static ThreadFactory newFastThreadLocalThreadFactory(Supplier<String> nameSupplier, Consumer<Thread> consumer) {
-        return newFastThreadLocalThreadFactory0(requireNonNull(nameSupplier, "nameSupplier"), requireNonNull(consumer, "consumer"));
-    }
-
-    private static ThreadFactory newFastThreadLocalThreadFactory0(@Nullable Supplier<String> nameSupplier,
-            @Nullable Consumer<Thread> consumer) {
-        return runnable -> {
-            final Thread thread = newFastThreadLocalThread0(thr -> runnable.run(), nameSupplier == null ? null : nameSupplier.get());
-            if (consumer != null) {
-                consumer.accept(thread);
-            }
-            return thread;
-        };
-    }
-
-    public static Thread newFastThreadLocalThread(Consumer<Thread> runnable) {
-        return newFastThreadLocalThread0(runnable, null);
-    }
-
-    public static Thread newFastThreadLocalThread(Consumer<Thread> runnable, String name) {
-        return newFastThreadLocalThread0(runnable, requireNonNull(name, "name"));
-    }
-
-    public static Thread newFastThreadLocalThread(Runnable runnable) {
+    /**
+     * Constructs a new {@link FastThreadLocalThread} for the
+     * given {@link Runnable}.
+     *
+     * @param runnable The runnable
+     * @return The thread
+     */
+    public static Thread newThread(Runnable runnable) {
         requireNonNull(runnable, "runnable");
-        return newFastThreadLocalThread0(thread -> runnable.run(), null);
+        return new FastThreadLocalThread(runnable);
     }
 
-    public static Thread newFastThreadLocalThread(Runnable runnable, String name) {
+    /**
+     * Constructs a new {@link FastThreadLocalThread} for the
+     * given {@link Runnable} and thread name.
+     *
+     * @param runnable The runnable
+     * @param name The thread name
+     * @return The thread
+     */
+    public static Thread newThread(Runnable runnable, String name) {
         requireNonNull(runnable, "runnable");
-        return newFastThreadLocalThread0(thread -> runnable.run(), requireNonNull(name, "name"));
-    }
-
-    private static Thread newFastThreadLocalThread0(Consumer<Thread> runnable, @Nullable String name) {
-        requireNonNull(runnable, "runnable");
-        final Consumer<Thread> runnable1 = thread0 -> {
-            try {
-                runnable.accept(thread0);
-            } finally {
-                FastThreadLocal.removeAll();
-            }
-        };
-        final Thread thread;
-        if (name != null) {
-            thread = new FastThreadLocalThread(name) {
-                @Override
-                public void run() {
-                    runnable1.accept(this);
-                }
-            };
-        } else {
-            thread = new FastThreadLocalThread() {
-                @Override
-                public void run() {
-                    runnable1.accept(this);
-                }
-            };
-        }
-        return thread;
+        requireNonNull(name, "name");
+        return new FastThreadLocalThread(runnable, name);
     }
 
     private ThreadHelper() {

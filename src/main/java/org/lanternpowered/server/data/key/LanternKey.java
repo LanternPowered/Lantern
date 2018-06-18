@@ -82,6 +82,8 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
     // then this will be the key with the original wrapped version
     @Nullable private LanternKey optionalWrappedKey;
 
+    private final int hashCode;
+
     LanternKey(LanternKeyBuilder<?, V> builder) {
         this.valueToken = builder.valueToken;
         this.name = builder.name;
@@ -99,6 +101,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
                         + "current PluginContainer in the cause stack. ");
             }
         }
+        this.hashCode = Objects.hash(this.valueToken, this.id, this.name, this.query, this.elementToken);
         TypeToken<?> elementToken = builder.valueToken.resolveType(elementType);
         if (Optional.class.isAssignableFrom(elementToken.getRawType())) {
             elementToken = elementToken.resolveType(optionalType);
@@ -203,7 +206,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.valueToken, this.id, this.name, this.query, this.elementToken);
+        return this.hashCode;
     }
 
     @Override

@@ -29,12 +29,12 @@ import org.spongepowered.api.item.inventory.property.SlotIndex;
 
 public final class LanternSlotIndex extends LanternIntProperty implements SlotIndex {
 
-    public LanternSlotIndex(int value, Operator operator) {
-        super(value, operator);
-    }
-
     public LanternSlotIndex(int value) {
         super(value, null);
+    }
+
+    public LanternSlotIndex(int value, Operator operator) {
+        super(value, operator);
     }
 
     public static final class Builder extends AbstractInventoryPropertyBuilder<Integer, SlotIndex, SlotIndex.Builder>

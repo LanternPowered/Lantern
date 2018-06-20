@@ -30,6 +30,10 @@ import org.spongepowered.api.text.Text;
 
 public final class LanternInventoryTitle extends NonnullAbstractComparableProperty<String, Text> implements InventoryTitle {
 
+    public LanternInventoryTitle(Text value) {
+        super(value);
+    }
+
     public LanternInventoryTitle(Text value, Operator operator) {
         super(value, operator);
     }

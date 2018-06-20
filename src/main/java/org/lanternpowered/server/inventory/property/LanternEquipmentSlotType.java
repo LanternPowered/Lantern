@@ -28,7 +28,11 @@ package org.lanternpowered.server.inventory.property;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
-public class LanternEquipmentSlotType extends NonnullAbstractCatalogTypeProperty<String, EquipmentType> implements EquipmentSlotType {
+public final class LanternEquipmentSlotType extends NonnullAbstractCatalogTypeProperty<String, EquipmentType> implements EquipmentSlotType {
+
+    public LanternEquipmentSlotType(EquipmentType value) {
+        super(value);
+    }
 
     public LanternEquipmentSlotType(EquipmentType value, Operator operator) {
         super(value, operator);

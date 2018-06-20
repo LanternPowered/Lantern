@@ -30,6 +30,7 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.ISlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.VanillaHotbarBehavior;
+import org.lanternpowered.server.inventory.property.LanternEquipmentSlotType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
@@ -81,7 +82,7 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            return Optional.of((T) EquipmentSlotType.builder().value(EquipmentTypes.MAIN_HAND).build());
+            return Optional.of((T) new LanternEquipmentSlotType(EquipmentTypes.MAIN_HAND));
         }
         return Optional.empty();
     }
@@ -90,7 +91,7 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
         final List<T> properties = super.tryGetProperties(child, property);
         if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            properties.add((T) EquipmentSlotType.builder().value(EquipmentTypes.MAIN_HAND).build());
+            properties.add((T) new LanternEquipmentSlotType(EquipmentTypes.MAIN_HAND));
         }
         return properties;
     }

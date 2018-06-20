@@ -31,6 +31,10 @@ import java.util.UUID;
 
 public final class LanternIdentifiable extends NonnullAbstractComparableProperty<String, UUID> implements Identifiable {
 
+    public LanternIdentifiable(UUID value) {
+        super(value);
+    }
+
     public LanternIdentifiable(UUID value, Operator operator) {
         super(value, operator);
     }

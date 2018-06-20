@@ -78,7 +78,8 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                                     + "no supported deserializer exists.", key.getId());
                         } else {
                             if (simpleValueContainer.get(key).isPresent()) {
-                                Lantern.getLogger().warn("Duplicate usage of the key: {}", key.getId());
+                                Lantern.getLogger().warn("Duplicate usage of the key {} for value container {}",
+                                        key.getId(), object.getClass().getName());
                             } else {
                                 simpleValueContainer.set(key, dataTypeSerializer.deserialize(typeToken, context, entry.getValue()));
                             }

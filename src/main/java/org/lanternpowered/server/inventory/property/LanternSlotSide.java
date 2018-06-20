@@ -30,6 +30,10 @@ import org.spongepowered.api.util.Direction;
 
 public final class LanternSlotSide extends NonnullAbstractComparableProperty<String, Direction> implements SlotSide {
 
+    public LanternSlotSide(Direction value) {
+        super(value);
+    }
+
     public LanternSlotSide(Direction value, Operator operator) {
         super(value, operator);
     }

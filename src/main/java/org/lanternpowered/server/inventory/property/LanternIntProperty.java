@@ -29,6 +29,10 @@ import org.spongepowered.api.item.inventory.property.IntProperty;
 
 public class LanternIntProperty extends NonnullAbstractComparableProperty<String, Integer> implements IntProperty {
 
+    public LanternIntProperty(int value) {
+        super(value);
+    }
+
     public LanternIntProperty(int value, Operator operator) {
         super(value, operator);
     }

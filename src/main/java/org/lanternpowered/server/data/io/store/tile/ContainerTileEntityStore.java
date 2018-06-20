@@ -95,7 +95,7 @@ public class ContainerTileEntityStore<T extends LanternContainerTile> extends Ti
 
     @Override
     public void serializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
-        valueContainer.get(Keys.DISPLAY_NAME).ifPresent(text ->
+        valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(text ->
                 dataView.set(DISPLAY_NAME, LanternTexts.toLegacy(text)));
         super.serializeValues(object, valueContainer, dataView);
     }

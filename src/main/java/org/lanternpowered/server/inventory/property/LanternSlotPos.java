@@ -30,6 +30,10 @@ import org.spongepowered.api.item.inventory.property.SlotPos;
 
 public final class LanternSlotPos extends NonnullAbstractComparableProperty<String, Vector2i> implements SlotPos {
 
+    public LanternSlotPos(Vector2i value) {
+        super(value);
+    }
+
     public LanternSlotPos(Vector2i value, Operator operator) {
         super(value, operator);
     }

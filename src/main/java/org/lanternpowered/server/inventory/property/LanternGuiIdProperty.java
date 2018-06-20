@@ -30,6 +30,10 @@ import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 
 public class LanternGuiIdProperty extends NonnullAbstractCatalogTypeProperty<String, GuiId> implements GuiIdProperty {
 
+    public LanternGuiIdProperty(GuiId value) {
+        super(value);
+    }
+
     public LanternGuiIdProperty(GuiId value, Operator operator) {
         super(value, operator);
     }

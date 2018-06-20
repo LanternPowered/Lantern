@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.TopContainerPart;
+import org.lanternpowered.server.inventory.property.LanternSlotIndex;
 import org.lanternpowered.server.inventory.type.LanternOrderedInventory;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -130,7 +131,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (property == SlotIndex.class && child instanceof Slot) {
             final int index = getSlotIndex((Slot) child);
-            return index == INVALID_INDEX ? Optional.empty() : Optional.of(property.cast(SlotIndex.of(index)));
+            return index == INVALID_INDEX ? Optional.empty() : Optional.of(property.cast(new LanternSlotIndex(index)));
         }
         return super.tryGetProperty(child, property, key);
     }
@@ -141,7 +142,7 @@ public abstract class AbstractOrderedInventory extends AbstractChildrenInventory
         if (property == SlotIndex.class && child instanceof Slot) {
             final int index = getSlotIndex((Slot) child);
             if (index != INVALID_INDEX) {
-                properties.add(property.cast(SlotIndex.of(index)));
+                properties.add(property.cast(new LanternSlotIndex(index)));
             }
         }
         return properties;

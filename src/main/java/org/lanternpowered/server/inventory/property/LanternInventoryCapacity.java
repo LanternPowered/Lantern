@@ -29,6 +29,10 @@ import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 
 public final class LanternInventoryCapacity extends LanternIntProperty implements InventoryCapacity {
 
+    public LanternInventoryCapacity(int value) {
+        super(value);
+    }
+
     public LanternInventoryCapacity(int value, Operator operator) {
         super(value, operator);
     }

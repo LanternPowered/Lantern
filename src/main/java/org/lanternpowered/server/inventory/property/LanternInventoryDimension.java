@@ -30,6 +30,10 @@ import org.spongepowered.api.item.inventory.property.InventoryDimension;
 
 public final class LanternInventoryDimension extends NonnullAbstractComparableProperty<String, Vector2i> implements InventoryDimension {
 
+    public LanternInventoryDimension(Vector2i value) {
+        super(value);
+    }
+
     public LanternInventoryDimension(Vector2i value, Operator operator) {
         super(value, operator);
     }

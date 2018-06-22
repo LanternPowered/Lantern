@@ -57,9 +57,12 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
         final String channel;
         final ByteBuffer content;
         if (message instanceof MessagePlayInOutChannelPayload) {
-            final MessagePlayInOutChannelPayload message1 = (MessagePlayInOutChannelPayload) message;
-            content = message1.getContent();
-            channel = message1.getChannel();
+            final MessagePlayInOutChannelPayload channelPayload = (MessagePlayInOutChannelPayload) message;
+            content = channelPayload.getContent();
+            // Retain because content will be released when written, MessagePlayInOutChannelPayload
+            // is ReferenceCounted so it will be cleaned up later.
+            content.retain();
+            channel = channelPayload.getChannel();
         } else if (message instanceof MessagePlayInOutRegisterChannels) {
             content = encodeChannels(((MessagePlayInOutRegisterChannels) message).getChannels());
             channel = "REGISTER";
@@ -75,10 +78,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             buf.writeString(channel);
             buf.writeBytes(content);
         } finally {
-            // MessagePlayInOutChannelPayload will be cleaned by it being a ReferenceCounted
-            if (!(message instanceof MessagePlayInOutChannelPayload)) {
-                content.release();
-            }
+            content.release();
         }
         return buf;
     }

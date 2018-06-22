@@ -162,6 +162,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
         } else if (channel.startsWith("FML")) {
             // A unknown/ignored fml channel
         } else {
+            content.retain(); // Retain the content until we can process it
             return new MessagePlayInOutChannelPayload(channel, content);
         }
         return NullMessage.INSTANCE;

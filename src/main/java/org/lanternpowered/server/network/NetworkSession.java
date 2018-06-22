@@ -282,6 +282,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             handler.handle(this.networkContext, message);
         } catch (Throwable throwable) {
             Lantern.getLogger().error("Error while handling {}", message, throwable);
+        } finally {
+            ReferenceCountUtil.release(message);
         }
     }
 

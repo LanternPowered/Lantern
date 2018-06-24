@@ -32,11 +32,17 @@ import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.script.function.action.Action;
+import org.lanternpowered.server.util.collect.Collections3;
 import org.lanternpowered.server.util.concurrent.FastThreadLocals;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.action.LightningEvent;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Chunk;
 
 import java.util.Random;
@@ -44,6 +50,8 @@ import java.util.Random;
 public class LightningSpawnerAction implements Action {
 
     private static final FastThreadLocal<Random> RANDOM = FastThreadLocals.withInitial(Random::new);
+
+    private static final AABB MOVE_TO_ENTITY_REGION = new AABB(-1.5, -3.0, -1.5, 1.5, 256.0, 1.5);
 
     @Expose
     @SerializedName("attempts-per-chunk")
@@ -63,17 +71,31 @@ public class LightningSpawnerAction implements Action {
 
         for (Chunk chunk : chunks) {
             for (int i = 0; i < this.attemptsPerChunk; i++) {
-                final LanternChunk chunk1 = (LanternChunk) chunk;
+                final LanternChunk lanternChunk = (LanternChunk) chunk;
                 if (random.nextInt(chance) != 0) {
                     continue;
                 }
 
                 final int value = random.nextInt(0x10000);
-                final int x = chunk1.getX() << 4 | value & 0xf;
-                final int z = chunk1.getZ() << 4 | (value >> 4) & 0xf;
+                final int x = lanternChunk.getX() << 4 | value & 0xf;
+                final int z = lanternChunk.getZ() << 4 | (value >> 4) & 0xf;
 
-                final Entity entity = world.createEntity(EntityTypes.LIGHTNING, new Vector3d(x, world.getHighestYAt(x, z), z));
-                world.spawnEntity(entity);
+                Vector3d pos = new Vector3d(x, world.getHighestYAt(x, z), z);
+
+                // Look for nearby entities to see if the lightning bolt should be moved
+                final AABB moveToEntityRegion = MOVE_TO_ENTITY_REGION.offset(pos);
+                final Entity targetEntity = Collections3.pickRandomElement(world.getIntersectingEntities(moveToEntityRegion));
+                if (targetEntity != null) {
+                    pos = targetEntity.getLocation().getPosition();
+                }
+
+                LanternWorld.handleEntitySpawning(EntityTypes.LIGHTNING, new Transform<>(world, pos), entity -> {}, constructEvent -> {
+                    final LightningEvent.Pre lightningPreEvent = SpongeEventFactory.createLightningEventPre(constructEvent.getCause());
+                    Sponge.getEventManager().post(lightningPreEvent);
+                    if (lightningPreEvent.isCancelled()) { // Cancel entity construction if the pre lighting is cancelled
+                        constructEvent.setCancelled(true);
+                    }
+                });
             }
         }
     }

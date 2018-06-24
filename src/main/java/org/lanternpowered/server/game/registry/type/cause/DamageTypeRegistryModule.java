@@ -34,6 +34,7 @@ public class DamageTypeRegistryModule extends AdditionalPluginCatalogRegistryMod
 
     public static final LanternDamageType POISON = new LanternDamageType("minecraft", "poison");
     public static final LanternDamageType WITHER = new LanternDamageType("minecraft", "wither");
+    public static final LanternDamageType LIGHTNING = new LanternDamageType("minecraft", "lightning");
 
     public DamageTypeRegistryModule() {
         super(DamageTypes.class);
@@ -58,5 +59,6 @@ public class DamageTypeRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(new LanternDamageType("minecraft", "void"));
         register(POISON);
         register(WITHER);
+        register(LIGHTNING);
     }
 }

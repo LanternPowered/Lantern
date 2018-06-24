@@ -1236,13 +1236,30 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         return builder.build();
     }
 
+    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform) {
+        handleEntitySpawning(entityType, transform, entity -> {});
+    }
+
     public static void handleEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
         handleEntitySpawning(entityType, transform, entityConsumer, SpongeEventFactory::createSpawnEntityEvent);
     }
 
+    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer,
+            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
+        handleEntitySpawning(entityType, transform, entityConsumer, SpongeEventFactory::createSpawnEntityEvent, constructEventChecker);
+    }
+
     public static void handleEntitySpawning(EntityType entityType, Transform<World> transform,
             Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
-        handleEntitySpawning(Collections.singleton(new EntitySpawningEntry(entityType, transform, entityConsumer)), spawnEventConstructor);
+        handleEntitySpawning(Collections.singleton(
+                new EntitySpawningEntry(entityType, transform, entityConsumer)), spawnEventConstructor);
+    }
+
+    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform,
+            Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor,
+            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
+        handleEntitySpawning(Collections.singleton(
+                new EntitySpawningEntry(entityType, transform, entityConsumer)), spawnEventConstructor, constructEventChecker);
     }
 
     public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries) {
@@ -1250,9 +1267,20 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
+            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
+        handleEntitySpawning(entries, SpongeEventFactory::createSpawnEntityEvent, constructEventChecker);
+    }
+
+    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
             BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
+        handleEntitySpawning(entries, spawnEventConstructor, constructEvent -> {});
+    }
+
+    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
+            BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor,
+            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
         final CauseStack causeStack = CauseStack.current();
-        final List<Entity> entities = handlePreEntitySpawning(causeStack, entries);
+        final List<Entity> entities = handlePreEntitySpawning(causeStack, entries, constructEventChecker);
         if (entities.isEmpty()) {
             return;
         }
@@ -1264,26 +1292,42 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
+        return handlePreEntitySpawning(entityType, transform, entityConsumer, constructEvent -> {});
+    }
+
+    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer,
+            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
         final List<Entity> entities = handlePreEntitySpawning(CauseStack.current(),
-                Collections.singleton(new EntitySpawningEntry(entityType, transform, entityConsumer)));
+                Collections.singleton(new EntitySpawningEntry(entityType, transform, entityConsumer)), constructEventChecker);
         return entities.isEmpty() ? Optional.empty() : Optional.of(entities.get(0));
     }
 
     public static List<Entity> handlePreEntitySpawning(Iterable<EntitySpawningEntry> entries) {
-        return handlePreEntitySpawning(CauseStack.current(), entries);
+        return handlePreEntitySpawning(entries, null);
     }
 
-    private static List<Entity> handlePreEntitySpawning(CauseStack causeStack, Iterable<EntitySpawningEntry> entries) {
+    public static List<Entity> handlePreEntitySpawning(Iterable<EntitySpawningEntry> entries,
+            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
+        return handlePreEntitySpawning(CauseStack.current(), entries, constructEventChecker);
+    }
+
+    private static List<Entity> handlePreEntitySpawning(CauseStack causeStack, Iterable<EntitySpawningEntry> entries,
+            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
         final List<Entity> entities = new ArrayList<>();
+        final Cause cause = causeStack.getCurrentCause();
         for (EntitySpawningEntry entry : entries) {
             // Call the pre construction event
             final ConstructEntityEvent.Pre preConstructEvent = SpongeEventFactory.createConstructEntityEventPre(
-                    causeStack.getCurrentCause(), entry.entityType, entry.transform);
+                    cause, entry.entityType, entry.transform);
             Sponge.getEventManager().post(preConstructEvent);
             if (!preConstructEvent.isCancelled()) {
-                // Calls the post construction event
-                entities.add(((LanternWorld) entry.transform.getExtent())
-                        .createEntity(entry.entityType, entry.transform.getPosition(), entry.entityConsumer));
+                // Apply the event checker, if anything else needs to block the construction
+                constructEventChecker.accept(preConstructEvent);
+                if (!preConstructEvent.isCancelled()) {
+                    // Calls the post construction event
+                    entities.add(((LanternWorld) entry.transform.getExtent())
+                            .createEntity(entry.entityType, entry.transform.getPosition(), entry.entityConsumer));
+                }
             }
         }
         return entities;

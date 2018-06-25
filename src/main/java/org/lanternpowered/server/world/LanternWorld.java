@@ -1303,7 +1303,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     public static List<Entity> handlePreEntitySpawning(Iterable<EntitySpawningEntry> entries) {
-        return handlePreEntitySpawning(entries, null);
+        return handlePreEntitySpawning(entries, constructEvent -> {});
     }
 
     public static List<Entity> handlePreEntitySpawning(Iterable<EntitySpawningEntry> entries,

@@ -115,6 +115,7 @@ public final class ConsoleManager {
                     .terminal(terminal)
                     .completer(new ConsoleCommandCompleter())
                     .build();
+            reader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
             reader.unsetOpt(Option.INSERT_TAB);
             reader.setVariable(LineReader.HISTORY_FILE, this.consoleHistoryFile);
 

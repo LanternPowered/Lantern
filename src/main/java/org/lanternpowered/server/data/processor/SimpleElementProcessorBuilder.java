@@ -411,11 +411,18 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
                 };
             } else {
                 valueProcessor.valueOfferHandler = (valueContainer, elementHolder, value) -> {
-                    final ImmutableValue<E> oldValue = ValueHelper.toImmutable(valueProcessor.valueBuilder
-                            .get(valueContainer, elementHolder, elementHolder.get()));
+                    final E oldElement = elementHolder.get();
                     final ImmutableValue<E> newValue = ValueHelper.toImmutable(value);
+                    final DataTransactionResult result;
+                    if (oldElement == null) {
+                        result = DataTransactionResult.successResult(newValue);
+                    } else {
+                        final ImmutableValue<E> oldValue = ValueHelper.toImmutable(valueProcessor.valueBuilder
+                                .get(valueContainer, elementHolder, elementHolder.get()));
+                        result = DataTransactionResult.successReplaceResult(newValue, oldValue);
+                    }
                     elementHolder.set(value.get());
-                    return DataTransactionResult.successReplaceResult(newValue, oldValue);
+                    return result;
                 };
             }
         }

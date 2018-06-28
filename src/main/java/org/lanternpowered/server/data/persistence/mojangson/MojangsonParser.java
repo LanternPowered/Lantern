@@ -25,24 +25,32 @@
  */
 package org.lanternpowered.server.data.persistence.mojangson;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import org.lanternpowered.server.data.MemoryDataContainer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 final class MojangsonParser {
 
     public static void main(String... args) {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
-                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd'\n"
+                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd', d:false, q:{z:10.0f}\n"
                 + "}");
         System.out.println(parser.parseView());
     }
@@ -135,63 +143,36 @@ final class MojangsonParser {
         nextChar();
         skipWhitespace();
         // Check for arrays
-        char c = currentChar();
-        char arrayType = '\0'; // null char means no array
-        if (containsChar(NUMBER_TOKENS, c)) {
-            char c1 = currentChar(1);
-            if (c1 == TOKEN_ARRAY_TYPE_SUFFIX) {
-                // We got one, skip array type chars
-                skipChars(2);
-                // Keep it safe for later
-                arrayType = c;
-            }
+        char arrayType = currentChar();
+        if (containsChar(NUMBER_TOKENS, arrayType) &&
+                currentChar(1) == TOKEN_ARRAY_TYPE_SUFFIX) {
+            // We got one, skip array type chars
+            skipChars(2);
+        } else {
+            return parseListObjects();
         }
-        final List<Object> objects = parseListObjects();
+        final Collection<? extends Number> numbers = (Collection) parseListObjects();
         switch (arrayType) {
             case TOKEN_BYTE:
             case TOKEN_BYTE_UPPER:
-                final byte[] bytes = new byte[objects.size()];
-                for (int i = 0; i < bytes.length; i++) {
-                    bytes[i] = ((Number) objects.get(i)).byteValue();
-                }
-                return bytes;
+                return Bytes.toArray(numbers);
             case TOKEN_SHORT:
             case TOKEN_SHORT_UPPER:
-                final short[] shorts = new short[objects.size()];
-                for (int i = 0; i < shorts.length; i++) {
-                    shorts[i] = ((Number) objects.get(i)).shortValue();
-                }
-                return shorts;
+                return Shorts.toArray(numbers);
             case TOKEN_INT:
             case TOKEN_INT_UPPER:
-                final int[] ints = new int[objects.size()];
-                for (int i = 0; i < ints.length; i++) {
-                    ints[i] = ((Number) objects.get(i)).intValue();
-                }
-                return ints;
+                return Ints.toArray(numbers);
             case TOKEN_LONG:
             case TOKEN_LONG_UPPER:
-                final long[] longs = new long[objects.size()];
-                for (int i = 0; i < longs.length; i++) {
-                    longs[i] = ((Number) objects.get(i)).longValue();
-                }
-                return longs;
+                return Longs.toArray(numbers);
             case TOKEN_FLOAT:
             case TOKEN_FLOAT_UPPER:
-                final float[] floats = new float[objects.size()];
-                for (int i = 0; i < floats.length; i++) {
-                    floats[i] = ((Number) objects.get(i)).floatValue();
-                }
-                return floats;
+                return Floats.toArray(numbers);
             case TOKEN_DOUBLE:
             case TOKEN_DOUBLE_UPPER:
-                final double[] doubles = new double[objects.size()];
-                for (int i = 0; i < doubles.length; i++) {
-                    doubles[i] = ((Number) objects.get(i)).doubleValue();
-                }
-                return doubles;
+                return Doubles.toArray(numbers);
         }
-        return objects;
+        throw new MojangsonParseException("Array type '" + arrayType + "' is not being handled.");
     }
 
     private final static int ARRAY_TYPE_UNKNOWN = 0;

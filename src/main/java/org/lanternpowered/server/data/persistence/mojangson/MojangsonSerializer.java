@@ -44,6 +44,11 @@ import static org.lanternpowered.server.data.persistence.mojangson.MojangsonPars
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_VIEW_CLOSE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_VIEW_OPEN;
 
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
@@ -51,8 +56,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "StringBufferReplaceableByString"})
 final class MojangsonSerializer {
+
+    private static final String ENTRY_SEPARATOR = TOKEN_NEW_ENTRY + "";
 
     /**
      * Converts the given {@link Object} into mojangson.
@@ -87,60 +94,35 @@ final class MojangsonSerializer {
             }
             return builder.append(TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof short[]) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(TOKEN_ARRAY_OPEN).append(TOKEN_SHORT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
-            final short[] shorts = (short[]) object;
-            for (int i = 0; i < shorts.length; i++) {
-                if (i != 0) {
-                    builder.append(TOKEN_NEW_ENTRY);
-                }
-                builder.append(shorts[i]);
-            }
-            return builder.append(TOKEN_ARRAY_CLOSE).toString();
+            return new StringBuilder()
+                    .append(TOKEN_ARRAY_OPEN).append(TOKEN_SHORT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX)
+                    .append(Shorts.join(ENTRY_SEPARATOR, (short[]) object))
+                    .append(TOKEN_ARRAY_CLOSE)
+                    .toString();
         } else if (object instanceof int[]) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(TOKEN_ARRAY_OPEN).append(TOKEN_INT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
-            final int[] ints = (int[]) object;
-            for (int i = 0; i < ints.length; i++) {
-                if (i != 0) {
-                    builder.append(TOKEN_NEW_ENTRY);
-                }
-                builder.append(ints[i]);
-            }
-            return builder.append(TOKEN_ARRAY_CLOSE).toString();
+            return new StringBuilder()
+                    .append(TOKEN_ARRAY_OPEN).append(TOKEN_INT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX)
+                    .append(Ints.join(ENTRY_SEPARATOR, (int[]) object))
+                    .append(TOKEN_ARRAY_CLOSE)
+                    .toString();
         } else if (object instanceof long[]) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(TOKEN_ARRAY_OPEN).append(TOKEN_LONG_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
-            final long[] longs = (long[]) object;
-            for (int i = 0; i < longs.length; i++) {
-                if (i != 0) {
-                    builder.append(TOKEN_NEW_ENTRY);
-                }
-                builder.append(longs[i]);
-            }
-            return builder.append(TOKEN_ARRAY_CLOSE).toString();
+            return new StringBuilder()
+                    .append(TOKEN_ARRAY_OPEN).append(TOKEN_LONG_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX)
+                    .append(Longs.join(ENTRY_SEPARATOR, (long[]) object))
+                    .append(TOKEN_ARRAY_CLOSE)
+                    .toString();
         } else if (object instanceof float[]) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(TOKEN_ARRAY_OPEN).append(TOKEN_FLOAT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
-            final float[] floats = (float[]) object;
-            for (int i = 0; i < floats.length; i++) {
-                if (i != 0) {
-                    builder.append(TOKEN_NEW_ENTRY);
-                }
-                builder.append(floats[i]);
-            }
-            return builder.append(TOKEN_ARRAY_CLOSE).toString();
+            return new StringBuilder()
+                    .append(TOKEN_ARRAY_OPEN).append(TOKEN_FLOAT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX)
+                    .append(Floats.join(ENTRY_SEPARATOR, (float[]) object))
+                    .append(TOKEN_ARRAY_CLOSE)
+                    .toString();
         } else if (object instanceof double[]) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append(TOKEN_ARRAY_OPEN).append(TOKEN_DOUBLE_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
-            final double[] doubles = (double[]) object;
-            for (int i = 0; i < doubles.length; i++) {
-                if (i != 0) {
-                    builder.append(TOKEN_NEW_ENTRY);
-                }
-                builder.append(doubles[i]);
-            }
-            return builder.append(TOKEN_ARRAY_CLOSE).toString();
+            return new StringBuilder()
+                    .append(TOKEN_ARRAY_OPEN).append(TOKEN_DOUBLE_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX)
+                    .append(Doubles.join(ENTRY_SEPARATOR, (double[]) object))
+                    .append(TOKEN_ARRAY_CLOSE)
+                    .toString();
         } else if (object instanceof Collection) {
             final StringBuilder builder = new StringBuilder();
             builder.append(TOKEN_ARRAY_OPEN);

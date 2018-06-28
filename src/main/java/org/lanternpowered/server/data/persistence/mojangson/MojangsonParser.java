@@ -41,7 +41,7 @@ final class MojangsonParser {
     public static void main(String... args) {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
-                + "  b: [0:\"a\",1:b,2:c]\n"
+                + "  b: [0:\"a\",1:b,2:c], 'c': 'dddd'\n"
                 + "}");
         System.out.println(parser.parseView());
     }
@@ -52,12 +52,14 @@ final class MojangsonParser {
     static final char TOKEN_ARRAY_OPEN = '[';
     static final char TOKEN_ARRAY_CLOSE = ']';
 
-    static final char TOKEN_QUOTED_STRING = '"';
+    static final char TOKEN_DOUBLE_QUOTED_STRING = '"';
+    static final char TOKEN_SINGLE_QUOTED_STRING = '\'';
     static final char TOKEN_NEW_ENTRY = ',';
 
-    private static final Pattern DOUBLE =
-            Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+$");
-    private static final Pattern INTEGER =
+    // https://www.regular-expressions.info/floatingpoint.html
+    private static final Pattern FLOATING_POINT_PATTERN =
+            Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$");
+    private static final Pattern INTEGER_PATTERN =
             Pattern.compile("^[-+]?[0-9]+$");
 
     // The content that is being parsed.
@@ -224,7 +226,8 @@ final class MojangsonParser {
             }
             final String name;
             // Check which name type should be parsed
-            if (c == TOKEN_QUOTED_STRING) {
+            if (c == TOKEN_SINGLE_QUOTED_STRING ||
+                    c == TOKEN_DOUBLE_QUOTED_STRING) {
                 name = parseQuotedString();
             } else {
                 name = parseUnquotedString();
@@ -272,7 +275,8 @@ final class MojangsonParser {
                 return parseView(parent, key);
             case TOKEN_ARRAY_OPEN:
                 return parseArrayOrList();
-            case TOKEN_QUOTED_STRING:
+            case TOKEN_SINGLE_QUOTED_STRING:
+            case TOKEN_DOUBLE_QUOTED_STRING:
                 return parseQuotedString();
         }
         if (shouldCharBeQuoted(c)) {
@@ -290,17 +294,17 @@ final class MojangsonParser {
                 return null;
         }
         // Check if it's a int value
-        if (INTEGER.matcher(value).matches()) {
+        if (INTEGER_PATTERN.matcher(value).matches()) {
             return Integer.parseInt(value);
         }
         // Check if it's a double
-        if (DOUBLE.matcher(value).matches()) {
+        if (FLOATING_POINT_PATTERN.matcher(value).matches()) {
             return Double.parseDouble(value);
         }
         final char numChar = value.charAt(value.length() - 1);
         if ("bBsSlL".indexOf(numChar) != -1) {
             final String numVal = value.substring(0, value.length() - 1);
-            if (INTEGER.matcher(numVal).matches()) {
+            if (INTEGER_PATTERN.matcher(numVal).matches()) {
                 switch (numChar) {
                     case 'b':
                     case 'B':
@@ -315,7 +319,7 @@ final class MojangsonParser {
             }
         } else if ("dDfF".indexOf(numChar) != -1) {
             final String numVal = value.substring(0, value.length() - 1);
-            if (DOUBLE.matcher(numVal).matches()) {
+            if (FLOATING_POINT_PATTERN.matcher(numVal).matches()) {
                 switch (numChar) {
                     case 'd':
                     case 'D':
@@ -421,12 +425,13 @@ final class MojangsonParser {
      */
     private String parseQuotedString() {
         // Skip the quote
+        final char quoteChar = currentChar();
         nextChar();
         final StringBuilder builder = new StringBuilder();
         while (true) {
             char c = currentChar();
             // If we find a quote, we reached the end of the string
-            if (c == TOKEN_QUOTED_STRING) {
+            if (c == quoteChar) {
                 nextChar(); // Skip quote for next value
                 break;
             } else if (c == '\\') { // The next character is literal

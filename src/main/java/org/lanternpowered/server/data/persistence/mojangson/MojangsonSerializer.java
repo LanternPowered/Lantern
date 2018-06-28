@@ -154,8 +154,9 @@ final class MojangsonSerializer {
 
     private static String quoteStringIfNeeded(String value) {
         if (shouldBeQuoted(value)) {
-            // Put the string between quotes and escape quotes
-            return "\"" + value.replace("\"", "\\\"") + "\"";
+            // Put the string between quotes and escape quotes within the original string
+            final char quote = MojangsonParser.TOKEN_DOUBLE_QUOTED_STRING;
+            return quote + value.replace(quote + "", "\\" + quote) + quote;
         }
         return value;
     }

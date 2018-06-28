@@ -44,7 +44,7 @@ final class MojangsonParser {
     public static void main(String... args) {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
-                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd', d:false, q:{z:10.0f}, w:`\u2639`\n"
+                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd', d:false, q:{z:10.0f}, w=`\u2639`\n"
                 + "}");
         System.out.println(parser.parseView());
     }
@@ -78,7 +78,9 @@ final class MojangsonParser {
     static final char TOKEN_DOUBLE_UPPER = 'D';
 
     static final char TOKEN_ARRAY_TYPE_SUFFIX = ';';
+
     static final char TOKEN_KEY_VALUE_SEPARATOR = ':';
+    static final char TOKEN_KEY_VALUE_SEPARATOR_ALT = '=';
 
     static final char TOKEN_CHAR_QUOTE = '`';
 
@@ -122,12 +124,15 @@ final class MojangsonParser {
     }
 
     DataContainer parseContainer() {
-        return (DataContainer) parseView();
+        final Object value = parseObject();
+        if (value instanceof DataContainer) {
+            return (DataContainer) value;
+        }
+        throw new MojangsonParseException("Expected a DataContainer but got: " + value.getClass().getName());
     }
 
     private Object parseArrayOrList() {
-        expectChar(TOKEN_ARRAY_OPEN);
-        nextChar();
+        nextChar(); // Skip [
         skipWhitespace();
         // Check for arrays
         char arrayType = currentChar();
@@ -253,8 +258,7 @@ final class MojangsonParser {
     }
 
     private DataView parseView(@Nullable DataView parent, @Nullable String key) {
-        expectChar(TOKEN_VIEW_OPEN);
-        nextChar();
+        nextChar(); // Skip {
         final DataView dataView;
         if (parent != null) {
             dataView = parent.createView(DataQuery.of(key));
@@ -276,7 +280,13 @@ final class MojangsonParser {
             } else {
                 name = parseUnquotedString();
             }
-            expectChar(TOKEN_KEY_VALUE_SEPARATOR);
+            skipWhitespace();
+            c = currentChar();
+            if (c != TOKEN_KEY_VALUE_SEPARATOR &&
+                    c != TOKEN_KEY_VALUE_SEPARATOR_ALT) {
+                throw new MojangsonParseException("Expected a '" + TOKEN_KEY_VALUE_SEPARATOR + "' or " +
+                        TOKEN_KEY_VALUE_SEPARATOR_ALT + "' but got '" + c + "'");
+            }
             nextChar();
             final Object value = parseObject(dataView, name);
             // Only set the value if it's a view, DataViews
@@ -304,12 +314,10 @@ final class MojangsonParser {
      *
      * @return The parsed object
      */
-    @Nullable
     private Object parseObject() {
         return parseObject(null, null);
     }
 
-    @Nullable
     private Object parseObject(@Nullable DataView parent, @Nullable String key) {
         skipWhitespace();
         char c = currentChar();
@@ -342,8 +350,6 @@ final class MojangsonParser {
                 return true;
             case "false":
                 return false;
-            case "null":
-                return null;
         }
         // Check if it's a int value
         if (INTEGER_PATTERN.matcher(value).matches()) {
@@ -429,25 +435,6 @@ final class MojangsonParser {
             throw new MojangsonParseException("End of the content reached but expected another char.");
         }
         return this.content[index];
-    }
-
-    /**
-     * Skips whitespace and then expects the given character,
-     * if not found, a exception will be thrown.
-     *
-     * @param expected The character
-     */
-    private void expectChar(char expected) {
-        skipWhitespace(); // Ignore whitespace
-
-        // Check if we reached the end
-        if (this.pos >= this.content.length) {
-            throw new MojangsonParseException("End of the content reached but expected '" + expected + "'");
-        }
-        final char c = this.content[this.pos];
-        if (this.content[this.pos] != c) {
-            throw new MojangsonParseException("Expected '" + expected + "' but got " + c);
-        }
     }
 
     /**

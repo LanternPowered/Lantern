@@ -23,27 +23,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data.persistence;
+package org.lanternpowered.server.data.persistence.mojangson;
 
-import org.lanternpowered.server.data.persistence.HoconDataFormat;
-import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
-import org.lanternpowered.server.data.persistence.mojangson.MojangsonDataFormat;
-import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
-import org.spongepowered.api.data.persistence.DataFormat;
-import org.spongepowered.api.data.persistence.DataFormats;
+import com.google.common.io.CharStreams;
+import org.lanternpowered.server.data.persistence.AbstractStringDataFormat;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 
-public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<DataFormat> {
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
-    public DataFormatRegistryModule() {
-        super(DataFormats.class);
+public class MojangsonDataFormat extends AbstractStringDataFormat {
+
+    public MojangsonDataFormat(String identifier) {
+        super(identifier);
     }
 
     @Override
-    public void registerDefaults() {
-        register(new HoconDataFormat("hocon"));
-        register(new JsonDataFormat("json"));
-        register(new NbtDataFormat("nbt"));
-        register(new MojangsonDataFormat("mojangson"));
+    public DataContainer read(String input) throws InvalidDataException {
+        return new MojangsonParser(input).parseContainer();
+    }
+
+    @Override
+    public DataContainer readFrom(Reader input) throws InvalidDataException, IOException {
+        return read(CharStreams.toString(input));
+    }
+
+    @Override
+    public String write(DataView data) {
+        return MojangsonSerializer.toMojangson(data);
+    }
+
+    @Override
+    public void writeTo(Writer output, DataView data) throws IOException {
+        try (BufferedWriter writer = ensureBuffered(output)) {
+            writer.write(write(data));
+        }
     }
 }

@@ -58,82 +58,84 @@ final class MojangsonSerializer {
             return quoteStringIfNeeded((String) object);
         } else if (object instanceof byte[]) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("[B;");
+            builder.append(MojangsonParser.TOKEN_ARRAY_OPEN).append("B;");
             final byte[] bytes = (byte[]) object;
             for (int i = 0; i < bytes.length; i++) {
                 if (i != 0) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
                 builder.append(bytes[i]);
             }
-            return builder.append(']').toString();
+            return builder.append(MojangsonParser.TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof short[]) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("[S;");
+            builder.append(MojangsonParser.TOKEN_ARRAY_OPEN).append("S;");
             final short[] shorts = (short[]) object;
             for (int i = 0; i < shorts.length; i++) {
                 if (i != 0) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
                 builder.append(shorts[i]);
             }
-            return builder.append(']').toString();
+            return builder.append(MojangsonParser.TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof int[]) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("[I;");
+            builder.append(MojangsonParser.TOKEN_ARRAY_OPEN).append("I;");
             final int[] ints = (int[]) object;
             for (int i = 0; i < ints.length; i++) {
                 if (i != 0) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
                 builder.append(ints[i]);
             }
-            return builder.append(']').toString();
+            return builder.append(MojangsonParser.TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof long[]) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("[L;");
+            builder.append(MojangsonParser.TOKEN_ARRAY_OPEN).append("L;");
             final long[] longs = (long[]) object;
             for (int i = 0; i < longs.length; i++) {
                 if (i != 0) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
                 builder.append(longs[i]);
             }
-            return builder.append(']').toString();
+            return builder.append(MojangsonParser.TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof float[]) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("[F;");
+            builder.append(MojangsonParser.TOKEN_ARRAY_OPEN).append("F;");
             final float[] floats = (float[]) object;
             for (int i = 0; i < floats.length; i++) {
                 if (i != 0) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
                 builder.append(floats[i]);
             }
-            return builder.append(']').toString();
+            return builder.append(MojangsonParser.TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof double[]) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("[D;");
+            builder.append(MojangsonParser.TOKEN_ARRAY_OPEN).append("D;");
             final double[] doubles = (double[]) object;
             for (int i = 0; i < doubles.length; i++) {
                 if (i != 0) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
                 builder.append(doubles[i]);
             }
-            return builder.append(']').toString();
+            return builder.append(MojangsonParser.TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof Collection) {
             final StringBuilder builder = new StringBuilder();
+            builder.append(MojangsonParser.TOKEN_ARRAY_OPEN);
             final Iterator<Object> it = ((Collection<Object>) object).iterator();
             while (it.hasNext()) {
                 builder.append(toMojangson(it.next()));
                 if (it.hasNext()) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
             }
-            return builder.toString();
+            return builder.append(MojangsonParser.TOKEN_ARRAY_CLOSE).toString();
         } else if (object instanceof DataView) {
             final StringBuilder builder = new StringBuilder();
+            builder.append(MojangsonParser.TOKEN_VIEW_OPEN);
             final Map<DataQuery, Object> map = ((DataView) object).getValues(false);
             final Iterator<Map.Entry<DataQuery, Object>> it = map.entrySet().iterator();
             while (it.hasNext()) {
@@ -142,10 +144,10 @@ final class MojangsonSerializer {
                 builder.append(':');
                 builder.append(toMojangson(entry.getValue()));
                 if (it.hasNext()) {
-                    builder.append(',');
+                    builder.append(MojangsonParser.TOKEN_NEW_ENTRY);
                 }
             }
-            return builder.toString();
+            return builder.append(MojangsonParser.TOKEN_VIEW_CLOSE).toString();
         }
         throw new IllegalStateException("Unsupported object type");
     }

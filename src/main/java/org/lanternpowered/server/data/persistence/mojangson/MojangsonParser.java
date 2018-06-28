@@ -46,14 +46,14 @@ final class MojangsonParser {
         System.out.println(parser.parseView());
     }
 
-    private static final char TOKEN_VIEW_OPEN = '{';
-    private static final char TOKEN_VIEW_CLOSE = '}';
+    static final char TOKEN_VIEW_OPEN = '{';
+    static final char TOKEN_VIEW_CLOSE = '}';
 
-    private static final char TOKEN_ARRAY_OPEN = '[';
-    private static final char TOKEN_ARRAY_CLOSE = ']';
+    static final char TOKEN_ARRAY_OPEN = '[';
+    static final char TOKEN_ARRAY_CLOSE = ']';
 
-    private static final char TOKEN_QUOTED_STRING = '"';
-    private static final char TOKEN_NEW_ENTRY = ',';
+    static final char TOKEN_QUOTED_STRING = '"';
+    static final char TOKEN_NEW_ENTRY = ',';
 
     private static final Pattern DOUBLE =
             Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+$");

@@ -25,13 +25,7 @@
  */
 package org.lanternpowered.server.data.persistence.mojangson;
 
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Floats;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-import com.google.common.primitives.Shorts;
 import org.lanternpowered.server.data.MemoryDataContainer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -143,25 +137,50 @@ final class MojangsonParser {
             return parseListObjects();
         }
         final Collection<? extends Number> numbers = (Collection) parseListObjects();
+        int i = 0;
         switch (arrayType) {
             case TOKEN_BYTE:
             case TOKEN_BYTE_UPPER:
-                return Bytes.toArray(numbers);
+                final byte[] bytes = new byte[numbers.size()];
+                for (Number number : numbers) {
+                    bytes[i++] = number.byteValue();
+                }
+                return bytes;
             case TOKEN_SHORT:
             case TOKEN_SHORT_UPPER:
-                return Shorts.toArray(numbers);
+                final short[] shorts = new short[numbers.size()];
+                for (Number number : numbers) {
+                    shorts[i++] = number.shortValue();
+                }
+                return shorts;
             case TOKEN_INT:
             case TOKEN_INT_UPPER:
-                return Ints.toArray(numbers);
+                final int[] ints = new int[numbers.size()];
+                for (Number number : numbers) {
+                    ints[i++] = number.intValue();
+                }
+                return ints;
             case TOKEN_LONG:
             case TOKEN_LONG_UPPER:
-                return Longs.toArray(numbers);
+                final long[] longs = new long[numbers.size()];
+                for (Number number : numbers) {
+                    longs[i++] = number.longValue();
+                }
+                return longs;
             case TOKEN_FLOAT:
             case TOKEN_FLOAT_UPPER:
-                return Floats.toArray(numbers);
+                final float[] floats = new float[numbers.size()];
+                for (Number number : numbers) {
+                    floats[i++] = number.floatValue();
+                }
+                return floats;
             case TOKEN_DOUBLE:
             case TOKEN_DOUBLE_UPPER:
-                return Doubles.toArray(numbers);
+                final double[] doubles = new double[numbers.size()];
+                for (Number number : numbers) {
+                    doubles[i++] = number.doubleValue();
+                }
+                return doubles;
         }
         throw new MojangsonParseException("Array type '" + arrayType + "' is not being handled.");
     }

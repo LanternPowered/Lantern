@@ -101,42 +101,42 @@ final class MojangsonParser {
             case 'B':
                 final byte[] bytes = new byte[objects.size()];
                 for (int i = 0; i < bytes.length; i++) {
-                    bytes[i] = ((Number) objects).byteValue();
+                    bytes[i] = ((Number) objects.get(i)).byteValue();
                 }
                 return bytes;
             case 's':
             case 'S':
                 final short[] shorts = new short[objects.size()];
                 for (int i = 0; i < shorts.length; i++) {
-                    shorts[i] = ((Number) objects).shortValue();
+                    shorts[i] = ((Number) objects.get(i)).shortValue();
                 }
                 return shorts;
             case 'i':
             case 'I':
                 final int[] ints = new int[objects.size()];
                 for (int i = 0; i < ints.length; i++) {
-                    ints[i] = ((Number) objects).intValue();
+                    ints[i] = ((Number) objects.get(i)).intValue();
                 }
                 return ints;
             case 'l':
             case 'L':
                 final long[] longs = new long[objects.size()];
                 for (int i = 0; i < longs.length; i++) {
-                    longs[i] = ((Number) objects).longValue();
+                    longs[i] = ((Number) objects.get(i)).longValue();
                 }
                 return longs;
             case 'f':
             case 'F':
                 final float[] floats = new float[objects.size()];
                 for (int i = 0; i < floats.length; i++) {
-                    floats[i] = ((Number) objects).floatValue();
+                    floats[i] = ((Number) objects.get(i)).floatValue();
                 }
                 return floats;
             case 'd':
             case 'D':
                 final double[] doubles = new double[objects.size()];
                 for (int i = 0; i < doubles.length; i++) {
-                    doubles[i] = ((Number) objects).doubleValue();
+                    doubles[i] = ((Number) objects.get(i)).doubleValue();
                 }
                 return doubles;
         }

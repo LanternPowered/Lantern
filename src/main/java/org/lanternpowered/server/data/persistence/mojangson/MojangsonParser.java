@@ -106,15 +106,6 @@ final class MojangsonParser {
 
     private final static char[] NUMBER_TOKENS = Chars.concat(INTEGER_TOKENS, FLOATING_POINT_TOKENS);
 
-    private static boolean containsChar(char[] array, char c) {
-        for (char o : array) {
-            if (o == c) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // https://www.regular-expressions.info/floatingpoint.html
     private static final Pattern FLOATING_POINT_PATTERN =
             Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$");
@@ -144,7 +135,7 @@ final class MojangsonParser {
         skipWhitespace();
         // Check for arrays
         char arrayType = currentChar();
-        if (containsChar(NUMBER_TOKENS, arrayType) &&
+        if (Chars.contains(NUMBER_TOKENS, arrayType) &&
                 currentChar(1) == TOKEN_ARRAY_TYPE_SUFFIX) {
             // We got one, skip array type chars
             skipChars(2);
@@ -334,7 +325,7 @@ final class MojangsonParser {
             return Double.parseDouble(value);
         }
         final char numChar = value.charAt(value.length() - 1);
-        if (containsChar(INTEGER_TOKENS, numChar)) {
+        if (Chars.contains(INTEGER_TOKENS, numChar)) {
             final String numVal = value.substring(0, value.length() - 1);
             if (INTEGER_PATTERN.matcher(numVal).matches()) {
                 switch (numChar) {
@@ -352,7 +343,7 @@ final class MojangsonParser {
                         return Long.parseLong(numVal);
                 }
             }
-        } else if (containsChar(FLOATING_POINT_TOKENS, numChar)) {
+        } else if (Chars.contains(FLOATING_POINT_TOKENS, numChar)) {
             final String numVal = value.substring(0, value.length() - 1);
             if (FLOATING_POINT_PATTERN.matcher(numVal).matches()) {
                 switch (numChar) {

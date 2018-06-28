@@ -44,7 +44,11 @@ public class MojangsonDataFormat extends AbstractStringDataFormat {
 
     @Override
     public DataContainer read(String input) throws InvalidDataException {
-        return new MojangsonParser(input).parseContainer();
+        final Object value = parseObject(input);
+        if (value instanceof DataContainer) {
+            return (DataContainer) value;
+        }
+        throw new MojangsonParseException("Expected a DataContainer but got: " + value.getClass().getName());
     }
 
     @Override
@@ -62,5 +66,13 @@ public class MojangsonDataFormat extends AbstractStringDataFormat {
         try (BufferedWriter writer = ensureBuffered(output)) {
             writer.write(write(data));
         }
+    }
+
+    public static String serializeObject(Object object) {
+        return MojangsonSerializer.toMojangson(object);
+    }
+
+    public static Object parseObject(String input) {
+        return new MojangsonParser(input).parseCompleteObject();
     }
 }

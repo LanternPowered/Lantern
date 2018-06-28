@@ -27,7 +27,6 @@ package org.lanternpowered.server.data.persistence.mojangson;
 
 import com.google.common.primitives.Chars;
 import org.lanternpowered.server.data.MemoryDataContainer;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
@@ -44,9 +43,11 @@ final class MojangsonParser {
     public static void main(String... args) {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
-                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd', d:false, q:{z:10.0f}, w=`\u2639`\n"
+                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464\"*dd', d:false, q:{z:10.0f}, w=`\u2639`\n"
                 + "}");
-        System.out.println(parser.parseView());
+        final Object object = parser.parseCompleteObject();
+        System.out.println(object);
+        System.out.println(MojangsonSerializer.toMojangson(object));
     }
 
     static final char TOKEN_VIEW_OPEN = '{';
@@ -123,14 +124,6 @@ final class MojangsonParser {
         this.content = content;
     }
 
-    DataContainer parseContainer() {
-        final Object value = parseObject();
-        if (value instanceof DataContainer) {
-            return (DataContainer) value;
-        }
-        throw new MojangsonParseException("Expected a DataContainer but got: " + value.getClass().getName());
-    }
-
     private Object parseArrayOrList() {
         nextChar(); // Skip [
         skipWhitespace();
@@ -139,7 +132,8 @@ final class MojangsonParser {
         if (Chars.contains(NUMBER_TOKENS, arrayType) &&
                 currentChar(1) == TOKEN_ARRAY_TYPE_SUFFIX) {
             // We got one, skip array type chars
-            skipChars(2);
+            nextChar();
+            nextChar();
         } else {
             return parseListObjects();
         }
@@ -253,10 +247,6 @@ final class MojangsonParser {
         }
     }
 
-    private DataView parseView() {
-        return parseView(null, null);
-    }
-
     private DataView parseView(@Nullable DataView parent, @Nullable String key) {
         nextChar(); // Skip {
         final DataView dataView;
@@ -284,7 +274,7 @@ final class MojangsonParser {
             c = currentChar();
             if (c != TOKEN_KEY_VALUE_SEPARATOR &&
                     c != TOKEN_KEY_VALUE_SEPARATOR_ALT) {
-                throw new MojangsonParseException("Expected a '" + TOKEN_KEY_VALUE_SEPARATOR + "' or " +
+                throw new MojangsonParseException("Expected a '" + TOKEN_KEY_VALUE_SEPARATOR + "' or '" +
                         TOKEN_KEY_VALUE_SEPARATOR_ALT + "' but got '" + c + "'");
             }
             nextChar();
@@ -305,6 +295,26 @@ final class MojangsonParser {
                     break;
                 default:
                     throw new MojangsonParseException("Got unexpected token: " + c);
+            }
+        }
+    }
+
+    /**
+     * Parses the object and throws an exception
+     * if there were trailing characters.
+     *
+     * @return The parsed object
+     */
+    public Object parseCompleteObject() {
+        final Object object = parseObject(null, null);
+        while (true) {
+            if (this.pos == this.content.length) {
+                return object;
+            } else if (isWhitespace(currentChar())) {
+                nextChar();
+            } else {
+                throw new MojangsonParseException("Found trailing content: " +
+                        new String(this.content, this.pos, this.content.length - this.pos));
             }
         }
     }
@@ -416,18 +426,28 @@ final class MojangsonParser {
         }
     }
 
+    /**
+     * Increases the reader index by one, so pointing to the next character.
+     */
     private void nextChar() {
         this.pos++;
     }
 
-    private void skipChars(int count) {
-        this.pos += count;
-    }
-
+    /**
+     * Gets the character at the current reader index.
+     *
+     * @return The character
+     */
     private char currentChar() {
         return currentChar(0);
     }
 
+    /**
+     * Gets the character at the current reader index + the given offset.
+     *
+     * @param offset The offset to get the character at
+     * @return The character
+     */
     private char currentChar(int offset) {
         final int index = this.pos + offset;
         // Check if we reached the end
@@ -487,10 +507,10 @@ final class MojangsonParser {
     }
 
     /**
-     * Gets whether the given character can be used in unquoted strings.
+     * Gets whether the given character should be quoted to be used in strings or names.
      *
      * @param c The character to check
-     * @return Whether the character can be used in unquoted strings
+     * @return Should be quoted
      */
     static boolean shouldCharBeQuoted(char c) {
         return (c < '0' || c > '9') && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z') && c != '_' && c != '-' && c != '.' && c != '+';

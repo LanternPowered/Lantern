@@ -42,7 +42,9 @@ final class MojangsonSerializer {
      * @return The mojangson string
      */
     static String toMojangson(Object object) {
-        if (object instanceof Byte) {
+        if (object instanceof Boolean || object instanceof Integer) {
+            return object + "";
+        } else if (object instanceof Byte) {
             return object + "b";
         } else if (object instanceof Short) {
             return object + "s";
@@ -50,8 +52,6 @@ final class MojangsonSerializer {
             return object + "l";
         } else if (object instanceof Float) {
             return object + "f";
-        } else if (object instanceof Integer) {
-            return object + "";
         } else if (object instanceof Number) {
             return object + "d";
         } else if (object instanceof String) {

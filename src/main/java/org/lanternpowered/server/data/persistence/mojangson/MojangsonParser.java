@@ -44,7 +44,7 @@ final class MojangsonParser {
     public static void main(String... args) {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
-                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd', d:false, q:{z:10.0f}\n"
+                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd', d:false, q:{z:10.0f}, w:`\u2639`\n"
                 + "}");
         System.out.println(parser.parseView());
     }
@@ -79,6 +79,8 @@ final class MojangsonParser {
 
     static final char TOKEN_ARRAY_TYPE_SUFFIX = ';';
     static final char TOKEN_KEY_VALUE_SEPARATOR = ':';
+
+    static final char TOKEN_CHAR_QUOTE = '`';
 
     private final static char[] INTEGER_TOKENS = {
             TOKEN_BYTE,
@@ -310,7 +312,7 @@ final class MojangsonParser {
     @Nullable
     private Object parseObject(@Nullable DataView parent, @Nullable String key) {
         skipWhitespace();
-        final char c = currentChar();
+        char c = currentChar();
         // Check which type should be parsed
         switch (c) {
             case TOKEN_VIEW_OPEN:
@@ -320,6 +322,14 @@ final class MojangsonParser {
             case TOKEN_SINGLE_QUOTED_STRING:
             case TOKEN_DOUBLE_QUOTED_STRING:
                 return parseQuotedString();
+            case TOKEN_CHAR_QUOTE:
+                nextChar(); // Skip the token
+                c = currentChar(); // Get the next char
+                nextChar();
+                if (currentChar() == TOKEN_CHAR_QUOTE) { // Optionally skip the end quote
+                    nextChar();
+                }
+                return c;
         }
         if (shouldCharBeQuoted(c)) {
             throw new MojangsonParseException("Got unexpected token: " + c);

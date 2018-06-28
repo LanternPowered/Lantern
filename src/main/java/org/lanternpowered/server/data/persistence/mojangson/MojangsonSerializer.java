@@ -29,6 +29,7 @@ import static org.lanternpowered.server.data.persistence.mojangson.MojangsonPars
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_ARRAY_OPEN;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_ARRAY_TYPE_SUFFIX;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_BYTE;
+import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_CHAR_QUOTE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_DOUBLE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_DOUBLE_QUOTED_STRING;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_DOUBLE_UPPER;
@@ -70,6 +71,8 @@ final class MojangsonSerializer {
     static String toMojangson(Object object) {
         if (object instanceof Boolean || object instanceof Integer) {
             return object.toString();
+        } else if (object instanceof Character) {
+            return TOKEN_CHAR_QUOTE + object.toString() + TOKEN_CHAR_QUOTE;
         } else if (object instanceof Byte) {
             return object.toString() + TOKEN_BYTE;
         } else if (object instanceof Short) {

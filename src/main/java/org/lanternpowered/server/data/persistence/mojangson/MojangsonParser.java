@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.persistence.mojangson;
 
+import com.google.common.primitives.Chars;
 import org.lanternpowered.server.data.MemoryDataContainer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -41,7 +42,7 @@ final class MojangsonParser {
     public static void main(String... args) {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
-                + "  b: [0:\"a\",1:b,2:c], 'c': 'dddd'\n"
+                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464*dd'\n"
                 + "}");
         System.out.println(parser.parseView());
     }
@@ -55,6 +56,56 @@ final class MojangsonParser {
     static final char TOKEN_DOUBLE_QUOTED_STRING = '"';
     static final char TOKEN_SINGLE_QUOTED_STRING = '\'';
     static final char TOKEN_NEW_ENTRY = ',';
+
+    static final char TOKEN_BYTE = 'b';
+    static final char TOKEN_BYTE_UPPER = 'B';
+
+    static final char TOKEN_SHORT = 's';
+    static final char TOKEN_SHORT_UPPER = 'S';
+
+    static final char TOKEN_INT = 'i';
+    static final char TOKEN_INT_UPPER = 'I';
+
+    static final char TOKEN_LONG = 'l';
+    static final char TOKEN_LONG_UPPER = 'L';
+
+    static final char TOKEN_FLOAT = 'f';
+    static final char TOKEN_FLOAT_UPPER = 'F';
+
+    static final char TOKEN_DOUBLE = 'd';
+    static final char TOKEN_DOUBLE_UPPER = 'D';
+
+    static final char TOKEN_ARRAY_TYPE_SUFFIX = ';';
+    static final char TOKEN_KEY_VALUE_SEPARATOR = ':';
+
+    private final static char[] INTEGER_TOKENS = {
+            TOKEN_BYTE,
+            TOKEN_BYTE_UPPER,
+            TOKEN_SHORT,
+            TOKEN_SHORT_UPPER,
+            TOKEN_INT,
+            TOKEN_INT_UPPER,
+            TOKEN_LONG,
+            TOKEN_LONG_UPPER,
+    };
+
+    private final static char[] FLOATING_POINT_TOKENS = {
+            TOKEN_FLOAT,
+            TOKEN_FLOAT_UPPER,
+            TOKEN_DOUBLE,
+            TOKEN_DOUBLE_UPPER,
+    };
+
+    private final static char[] NUMBER_TOKENS = Chars.concat(INTEGER_TOKENS, FLOATING_POINT_TOKENS);
+
+    private static boolean containsChar(char[] array, char c) {
+        for (char o : array) {
+            if (o == c) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // https://www.regular-expressions.info/floatingpoint.html
     private static final Pattern FLOATING_POINT_PATTERN =
@@ -86,9 +137,9 @@ final class MojangsonParser {
         // Check for arrays
         char c = currentChar();
         char arrayType = '\0'; // null char means no array
-        if ("bBsSiIlLdDfF".indexOf(arrayType) != -1) {
+        if (containsChar(NUMBER_TOKENS, c)) {
             char c1 = currentChar(1);
-            if (c1 == ';') {
+            if (c1 == TOKEN_ARRAY_TYPE_SUFFIX) {
                 // We got one, skip array type chars
                 skipChars(2);
                 // Keep it safe for later
@@ -97,43 +148,43 @@ final class MojangsonParser {
         }
         final List<Object> objects = parseListObjects();
         switch (arrayType) {
-            case 'b':
-            case 'B':
+            case TOKEN_BYTE:
+            case TOKEN_BYTE_UPPER:
                 final byte[] bytes = new byte[objects.size()];
                 for (int i = 0; i < bytes.length; i++) {
                     bytes[i] = ((Number) objects.get(i)).byteValue();
                 }
                 return bytes;
-            case 's':
-            case 'S':
+            case TOKEN_SHORT:
+            case TOKEN_SHORT_UPPER:
                 final short[] shorts = new short[objects.size()];
                 for (int i = 0; i < shorts.length; i++) {
                     shorts[i] = ((Number) objects.get(i)).shortValue();
                 }
                 return shorts;
-            case 'i':
-            case 'I':
+            case TOKEN_INT:
+            case TOKEN_INT_UPPER:
                 final int[] ints = new int[objects.size()];
                 for (int i = 0; i < ints.length; i++) {
                     ints[i] = ((Number) objects.get(i)).intValue();
                 }
                 return ints;
-            case 'l':
-            case 'L':
+            case TOKEN_LONG:
+            case TOKEN_LONG_UPPER:
                 final long[] longs = new long[objects.size()];
                 for (int i = 0; i < longs.length; i++) {
                     longs[i] = ((Number) objects.get(i)).longValue();
                 }
                 return longs;
-            case 'f':
-            case 'F':
+            case TOKEN_FLOAT:
+            case TOKEN_FLOAT_UPPER:
                 final float[] floats = new float[objects.size()];
                 for (int i = 0; i < floats.length; i++) {
                     floats[i] = ((Number) objects.get(i)).floatValue();
                 }
                 return floats;
-            case 'd':
-            case 'D':
+            case TOKEN_DOUBLE:
+            case TOKEN_DOUBLE_UPPER:
                 final double[] doubles = new double[objects.size()];
                 for (int i = 0; i < doubles.length; i++) {
                     doubles[i] = ((Number) objects.get(i)).doubleValue();
@@ -160,7 +211,7 @@ final class MojangsonParser {
             Object value = parseObject();
             skipWhitespace();
             c = currentChar();
-            final int newType = c == ':' ? ARRAY_TYPE_INDEXED : ARRAY_TYPE_NON_INDEXED;
+            final int newType = c == TOKEN_KEY_VALUE_SEPARATOR ? ARRAY_TYPE_INDEXED : ARRAY_TYPE_NON_INDEXED;
             if (type == ARRAY_TYPE_UNKNOWN) {
                 type = newType;
             } else if (newType != type) {
@@ -232,7 +283,7 @@ final class MojangsonParser {
             } else {
                 name = parseUnquotedString();
             }
-            expectChar(':');
+            expectChar(TOKEN_KEY_VALUE_SEPARATOR);
             nextChar();
             final Object value = parseObject(dataView, name);
             // Only set the value if it's a view, DataViews
@@ -302,30 +353,33 @@ final class MojangsonParser {
             return Double.parseDouble(value);
         }
         final char numChar = value.charAt(value.length() - 1);
-        if ("bBsSlL".indexOf(numChar) != -1) {
+        if (containsChar(INTEGER_TOKENS, numChar)) {
             final String numVal = value.substring(0, value.length() - 1);
             if (INTEGER_PATTERN.matcher(numVal).matches()) {
                 switch (numChar) {
-                    case 'b':
-                    case 'B':
+                    case TOKEN_BYTE:
+                    case TOKEN_BYTE_UPPER:
                         return Byte.parseByte(numVal);
-                    case 's':
-                    case 'S':
+                    case TOKEN_SHORT:
+                    case TOKEN_SHORT_UPPER:
                         return Short.parseShort(numVal);
-                    case 'l':
-                    case 'L':
+                    case TOKEN_INT:
+                    case TOKEN_INT_UPPER:
+                        return Integer.parseInt(numVal);
+                    case TOKEN_LONG:
+                    case TOKEN_LONG_UPPER:
                         return Long.parseLong(numVal);
                 }
             }
-        } else if ("dDfF".indexOf(numChar) != -1) {
+        } else if (containsChar(FLOATING_POINT_TOKENS, numChar)) {
             final String numVal = value.substring(0, value.length() - 1);
             if (FLOATING_POINT_PATTERN.matcher(numVal).matches()) {
                 switch (numChar) {
-                    case 'd':
-                    case 'D':
+                    case TOKEN_DOUBLE:
+                    case TOKEN_DOUBLE_UPPER:
                         return Double.parseDouble(numVal);
-                    case 'f':
-                    case 'F':
+                    case TOKEN_FLOAT:
+                    case TOKEN_FLOAT_UPPER:
                         return Float.parseFloat(numVal);
                 }
             }
@@ -451,6 +505,6 @@ final class MojangsonParser {
      * @return Whether the character can be used in unquoted strings
      */
     static boolean shouldCharBeQuoted(char c) {
-        return !((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_' || c == '-' || c == '.' || c == '+');
+        return (c < '0' || c > '9') && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z') && c != '_' && c != '-' && c != '.' && c != '+';
     }
 }

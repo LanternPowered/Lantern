@@ -28,27 +28,30 @@ package org.lanternpowered.server.data.persistence.mojangson;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_ARRAY_CLOSE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_ARRAY_OPEN;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_ARRAY_TYPE_SUFFIX;
-import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_BOOLEAN_UPPER;
+import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_BOOLEAN;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_BYTE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_BYTE_UPPER;
+import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_CHAR;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_CHAR_QUOTE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_DOUBLE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_DOUBLE_QUOTED_STRING;
-import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_DOUBLE_UPPER;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_FLOAT;
-import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_FLOAT_UPPER;
+import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_INT;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_INT_UPPER;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_KEY_VALUE_SEPARATOR;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_LONG;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_LONG_UPPER;
+import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_MAP_ARRAY;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_MAP_CLOSE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_MAP_OPEN;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_NEW_ENTRY;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_SHORT;
-import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_SHORT_UPPER;
+import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_STRING_ARRAY;
+import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_VIEW_ARRAY;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_VIEW_CLOSE;
 import static org.lanternpowered.server.data.persistence.mojangson.MojangsonParser.TOKEN_VIEW_OPEN;
 
+import com.google.common.base.Joiner;
 import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
@@ -120,15 +123,23 @@ final class MojangsonSerializer {
             return object.toString() + TOKEN_FLOAT;
         } else if (object instanceof Number) {
             final String value = object.toString();
-            if (value.indexOf('.') != -1) {
+            if (value.indexOf('.') == -1) {
                 return value + TOKEN_DOUBLE;
             }
             return value;
         } else if (object instanceof String) {
             return quoteStringIfNeeded((String) object);
+        } else if (object instanceof String[]) {
+            final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
+            if (!vanilla) {
+                builder.append(TOKEN_STRING_ARRAY).append(TOKEN_ARRAY_TYPE_SUFFIX);
+            }
+            builder.append(Joiner.on(TOKEN_NEW_ENTRY).join((String[]) object)).append(TOKEN_ARRAY_CLOSE);
+            final String value = builder.toString();
+            return vanilla ? new Entry(ExtendedObjectType.STRING_ARRAY, value) : value;
         } else if (object instanceof byte[]) {
             final StringBuilder builder = new StringBuilder();
-            builder.append(TOKEN_ARRAY_OPEN).append(TOKEN_BYTE_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
+            builder.append(TOKEN_ARRAY_OPEN).append(vanilla ? TOKEN_BYTE_UPPER : TOKEN_BYTE).append(TOKEN_ARRAY_TYPE_SUFFIX);
             final byte[] bytes = (byte[]) object;
             for (int i = 0; i < bytes.length; i++) {
                 if (i != 0) {
@@ -140,27 +151,27 @@ final class MojangsonSerializer {
         } else if (object instanceof short[]) {
             final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
             if (!vanilla) {
-                builder.append(TOKEN_SHORT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
+                builder.append(TOKEN_SHORT).append(TOKEN_ARRAY_TYPE_SUFFIX);
             }
             builder.append(Shorts.join(ENTRY_SEPARATOR, (short[]) object)).append(TOKEN_ARRAY_CLOSE).toString();
             final String value = builder.toString();
             return vanilla ? new Entry(ExtendedObjectType.SHORT_ARRAY, value) : value;
         } else if (object instanceof int[]) {
             return new StringBuilder()
-                    .append(TOKEN_ARRAY_OPEN).append(TOKEN_INT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX)
+                    .append(TOKEN_ARRAY_OPEN).append(vanilla ? TOKEN_INT_UPPER : TOKEN_INT).append(TOKEN_ARRAY_TYPE_SUFFIX)
                     .append(Ints.join(ENTRY_SEPARATOR, (int[]) object))
                     .append(TOKEN_ARRAY_CLOSE)
                     .toString();
         } else if (object instanceof long[]) {
             return new StringBuilder()
-                    .append(TOKEN_ARRAY_OPEN).append(TOKEN_LONG_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX)
+                    .append(TOKEN_ARRAY_OPEN).append(vanilla ? TOKEN_LONG_UPPER : TOKEN_LONG).append(TOKEN_ARRAY_TYPE_SUFFIX)
                     .append(Longs.join(ENTRY_SEPARATOR, (long[]) object))
                     .append(TOKEN_ARRAY_CLOSE)
                     .toString();
         } else if (object instanceof float[]) {
             final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
             if (!vanilla) {
-                builder.append(TOKEN_FLOAT_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
+                builder.append(TOKEN_FLOAT).append(TOKEN_ARRAY_TYPE_SUFFIX);
             }
             builder.append(Floats.join(ENTRY_SEPARATOR, (float[]) object)).append(TOKEN_ARRAY_CLOSE);
             final String value = builder.toString();
@@ -168,7 +179,7 @@ final class MojangsonSerializer {
         } else if (object instanceof double[]) {
             final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
             if (!vanilla) {
-                builder.append(TOKEN_DOUBLE_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
+                builder.append(TOKEN_DOUBLE).append(TOKEN_ARRAY_TYPE_SUFFIX);
             }
             builder.append(Doubles.join(ENTRY_SEPARATOR, (double[]) object)).append(TOKEN_ARRAY_CLOSE);
             final String value = builder.toString();
@@ -176,13 +187,16 @@ final class MojangsonSerializer {
         } else if (object instanceof boolean[]) {
             final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
             if (!vanilla) {
-                builder.append(TOKEN_BOOLEAN_UPPER).append(TOKEN_ARRAY_TYPE_SUFFIX);
+                builder.append(TOKEN_BOOLEAN).append(TOKEN_ARRAY_TYPE_SUFFIX);
             }
             builder.append(Booleans.join(ENTRY_SEPARATOR, (boolean[]) object)).append(TOKEN_ARRAY_CLOSE);
             final String value = builder.toString();
             return vanilla ? new Entry(ExtendedObjectType.BOOLEAN_ARRAY, value) : value;
         } else if (object instanceof char[]) {
             final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
+            if (!vanilla) {
+                builder.append(TOKEN_CHAR).append(TOKEN_ARRAY_TYPE_SUFFIX);
+            }
             final char[] chars = (char[]) object;
             for (int i = 0; i < chars.length; i++) {
                 if (i != 0) {
@@ -235,12 +249,15 @@ final class MojangsonSerializer {
             return builder.append(TOKEN_VIEW_CLOSE).toString();
         } else if (object instanceof DataView[]) {
             final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
+            if (!vanilla) {
+                builder.append(TOKEN_VIEW_ARRAY).append(TOKEN_ARRAY_TYPE_SUFFIX);
+            }
             final DataView[] views = (DataView[]) object;
             for (int i = 0; i < views.length; i++) {
                 if (i != 0) {
                     builder.append(TOKEN_NEW_ENTRY);
                 }
-                builder.append(toMojangson(views[i]));
+                builder.append(toMojangson(views[i], vanilla));
             }
             final String value = builder.append(TOKEN_ARRAY_CLOSE).toString();
             return vanilla ? new Entry(ExtendedObjectType.VIEW_ARRAY, value) : value;
@@ -293,12 +310,15 @@ final class MojangsonSerializer {
             return vanilla ? new Entry(ExtendedObjectType.MAP, value) : value;
         } else if (object instanceof Map[]) {
             final StringBuilder builder = new StringBuilder().append(TOKEN_ARRAY_OPEN);
+            if (!vanilla) {
+                builder.append(TOKEN_MAP_ARRAY).append(TOKEN_ARRAY_TYPE_SUFFIX);
+            }
             final Map[] maps = (Map[]) object;
             for (int i = 0; i < maps.length; i++) {
                 if (i != 0) {
                     builder.append(TOKEN_NEW_ENTRY);
                 }
-                builder.append(toMojangson(maps[i]));
+                builder.append(toMojangson(maps[i], vanilla));
             }
             final String value = builder.append(TOKEN_ARRAY_CLOSE).toString();
             return vanilla ? new Entry(ExtendedObjectType.MAP_ARRAY, value) : value;

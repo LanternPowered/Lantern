@@ -26,6 +26,8 @@
 package org.lanternpowered.server.data.persistence.mojangson;
 
 import com.google.common.primitives.Chars;
+import it.unimi.dsi.fastutil.objects.Object2CharMap;
+import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap;
 import org.lanternpowered.server.data.MemoryDataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -48,12 +50,13 @@ final class MojangsonParser {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
                 + "  b: [\"a\",b,c], 'c': 'dd--213464\"*dd', d:false, q:{z:10.0f}, w=`\u2639`, 'e$Boolean'='true',"
-                + "'ee$boolean[]': [0,1,0,1], m=(1=20.0, 2=30.0),tt:[C;`q`,`p,`7,`9], 'tw$List$char': [q,w,u,y]\n"
+                + "'ee$boolean[]': [0,1,0,1], m=(1=20.0, 2=30.0),tt:[C;`q`,`p,`7,`9], 'tw$List$char': [q,w,u,y], sss=[string;test,a,b,c,d]\n"
                 + "}");
         final Object object = parser.parseCompleteObject();
         System.out.println(object);
         final DataView dataView = (DataView) object;
         System.out.println(Arrays.toString((boolean[]) dataView.get(DataQuery.of("ee")).get()));
+        System.out.println(Arrays.toString((String[]) dataView.get(DataQuery.of("sss")).get()));
         System.out.println(MojangsonSerializer.toMojangson(object));
         System.out.println(MojangsonSerializer.toLanterson(object));
     }
@@ -107,6 +110,39 @@ final class MojangsonParser {
     static final char TOKEN_VIEW_ARRAY = 'v';
     static final char TOKEN_VIEW_ARRAY_UPPER = 'V';
 
+    static final char TOKEN_STRING_ARRAY = 'w';
+    static final char TOKEN_STRING_ARRAY_UPPER = 'W';
+
+    static final char TOKEN_INVALID_ARRAY_TYPE = '\0';
+
+    private final static Object2CharMap<String> NAMED_ARRAY_TOKENS = new Object2CharOpenHashMap<>();
+    private static int LONGEST_NAMED_ARRAY_TOKEN = 0;
+
+    private static void addNamedArrayToken(String name, char token) {
+        NAMED_ARRAY_TOKENS.put(name, token);
+        if (name.length() > LONGEST_NAMED_ARRAY_TOKEN) {
+            LONGEST_NAMED_ARRAY_TOKEN = name.length();
+        }
+    }
+
+    static {
+        NAMED_ARRAY_TOKENS.defaultReturnValue(TOKEN_INVALID_ARRAY_TYPE);
+        addNamedArrayToken("boolean", TOKEN_BOOLEAN);
+        addNamedArrayToken("bool", TOKEN_BOOLEAN);
+        addNamedArrayToken("byte", TOKEN_BYTE);
+        addNamedArrayToken("short", TOKEN_SHORT);
+        addNamedArrayToken("int", TOKEN_INT);
+        addNamedArrayToken("integer", TOKEN_INT);
+        addNamedArrayToken("long", TOKEN_LONG);
+        addNamedArrayToken("double", TOKEN_DOUBLE);
+        addNamedArrayToken("string", TOKEN_STRING_ARRAY);
+        addNamedArrayToken("view", TOKEN_VIEW_ARRAY);
+        addNamedArrayToken("compound", TOKEN_VIEW_ARRAY);
+        addNamedArrayToken("container", TOKEN_VIEW_ARRAY);
+        addNamedArrayToken("char", TOKEN_CHAR);
+        addNamedArrayToken("character", TOKEN_CHAR);
+    }
+
     private final static char[] INTEGER_TOKENS = {
             TOKEN_BYTE,
             TOKEN_BYTE_UPPER,
@@ -128,10 +164,14 @@ final class MojangsonParser {
     private final static char[] ARRAY_TYPE_TOKENS = Chars.concat(INTEGER_TOKENS, FLOATING_POINT_TOKENS, new char[] {
             TOKEN_CHAR,
             TOKEN_CHAR_UPPER,
+            TOKEN_BOOLEAN,
+            TOKEN_BOOLEAN_UPPER,
             TOKEN_MAP_ARRAY,
             TOKEN_MAP_ARRAY_UPPER,
             TOKEN_VIEW_ARRAY,
             TOKEN_VIEW_ARRAY_UPPER,
+            TOKEN_STRING_ARRAY,
+            TOKEN_STRING_ARRAY_UPPER,
     });
 
     // https://www.regular-expressions.info/floatingpoint.html
@@ -231,17 +271,39 @@ final class MojangsonParser {
     private Object parseArrayOrList(@Nullable ExtendedObjectType arrayObjectType, @Nullable ExtendedObjectType elementType) {
         nextChar(); // Skip [
         skipWhitespace();
-        // Check for arrays
+        // Check for arrays using a single token
         char arrayType = currentChar();
-        if (Chars.contains(ARRAY_TYPE_TOKENS, arrayType) &&
-                currentChar(1) == TOKEN_ARRAY_TYPE_SUFFIX) {
-            // We got one, skip array type chars
+        if (currentChar(1) == TOKEN_ARRAY_TYPE_SUFFIX) {
+            if (!Chars.contains(ARRAY_TYPE_TOKENS, arrayType)) {
+                throw new MojangsonParseException("Unsupported array type token: " + arrayType);
+            }
+            // Skip array type chars
             nextChar();
             nextChar();
-        } else if (arrayObjectType == null) {
-            return parseListObjects(elementType);
+        } else {
+            int offset = 0;
+            String arrayTypeName = null;
+            while (true) {
+                final char c = currentChar(offset);
+                if (c == TOKEN_ARRAY_TYPE_SUFFIX) {
+                    arrayTypeName = new String(this.content, this.pos, offset);
+                    this.pos += offset; // Skip name
+                    this.pos++; // Skip ;
+                    break;
+                } else if (offset >= LONGEST_NAMED_ARRAY_TOKEN || shouldCharBeQuoted(c)) {
+                    break;
+                }
+                offset++;
+            }
+            if (arrayTypeName != null) {
+                arrayType = NAMED_ARRAY_TOKENS.getChar(arrayTypeName.toLowerCase());
+                if (arrayType == TOKEN_INVALID_ARRAY_TYPE) {
+                    throw new MojangsonParseException("Unsupported array type name: " + arrayTypeName);
+                }
+            } else if (arrayObjectType == null) {
+                return parseListObjects(elementType);
+            }
         }
-
         if (arrayObjectType != null) {
             if (arrayObjectType == ExtendedObjectType.MAP_ARRAY) {
                 return parseMapArray();
@@ -282,6 +344,9 @@ final class MojangsonParser {
             case TOKEN_BOOLEAN:
             case TOKEN_BOOLEAN_UPPER:
                 return toBooleanArray(objects);
+            case TOKEN_STRING_ARRAY:
+            case TOKEN_STRING_ARRAY_UPPER:
+                return toStringArray(objects);
         }
         final Collection<? extends Number> numbers = (Collection) objects;
         switch (arrayType) {

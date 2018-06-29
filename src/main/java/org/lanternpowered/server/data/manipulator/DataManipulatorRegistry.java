@@ -54,6 +54,7 @@ import org.lanternpowered.server.fluid.LanternFluidStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -774,7 +775,10 @@ public class DataManipulatorRegistry {
                     c.register(Keys.SCALE, 1f);
                 });
         register(SkinData.class, ImmutableSkinData.class,
-                c -> c.register(Keys.SKIN_UNIQUE_ID, LanternGameProfile.UNKNOWN_UUID));
+                c -> {
+                    c.register(Keys.SKIN, LanternProfileProperty.EMPTY_TEXTURES);
+                    c.register(Keys.UPDATE_GAME_PROFILE, true);
+                });
         register(SleepingData.class, ImmutableSleepingData.class,
                 c -> c.register(Keys.IS_SLEEPING, false));
         register(SlimeData.class, ImmutableSlimeData.class,

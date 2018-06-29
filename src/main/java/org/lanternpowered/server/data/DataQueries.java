@@ -105,4 +105,18 @@ public final class DataQueries {
 
     public static final DataQuery POSITION = DataQuery.of("Position");
     public static final DataQuery ROTATION = DataQuery.of("Rotation");
+
+    // GameProfile
+    public static final DataQuery PROFILE_PROPERTIES = of("ProfileProperties");
+
+    // ProfileProperty
+    public static final DataQuery PROPERTY_NAME = of("PropertyName");
+    public static final DataQuery PROPERTY_VALUE = of("PropertyValue");
+    public static final DataQuery PROPERTY_SIGNATURE = of("PropertySignature");
+
+    // User
+    public static final DataQuery USER_UUID = of("UUID");
+    public static final DataQuery USER_NAME = of("Name");
+    public static final DataQuery USER_SPAWNS = of("Spawns");
+
 }

@@ -43,6 +43,8 @@ import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
+import org.lanternpowered.server.profile.LanternGameProfileBuilder;
+import org.lanternpowered.server.profile.LanternProfilePropertyBuilder;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -70,6 +72,8 @@ import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.property.SlotPos;
 import org.spongepowered.api.item.inventory.property.SlotSide;
 import org.spongepowered.api.item.inventory.property.StringProperty;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.BookViewDataBuilder;
@@ -135,6 +139,8 @@ public class DataRegistrar {
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
         dataManager.registerBuilder(Enchantment.class, new LanternEnchantmentBuilder());
+        dataManager.registerBuilder(ProfileProperty.class, new LanternProfilePropertyBuilder());
+        dataManager.registerBuilder(GameProfile.class, new LanternGameProfileBuilder());
 
         final LanternValueFactory valueFactory = LanternValueFactory.get();
         valueFactory.registerKey(Keys.CONNECTED_DIRECTIONS).add(builder -> builder

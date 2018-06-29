@@ -34,6 +34,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.lanternpowered.server.data.DataQueries;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.profile.property.ProfileProperty;
 
 import java.util.Objects;
@@ -43,6 +45,8 @@ import javax.annotation.Nullable;
 
 @ConfigSerializable
 public final class LanternProfileProperty implements ProfileProperty {
+
+    public static final LanternProfileProperty EMPTY_TEXTURES = new LanternProfileProperty(ProfileProperty.TEXTURES, "", null);
 
     @Setting(value = "name")
     private String name;
@@ -80,6 +84,22 @@ public final class LanternProfileProperty implements ProfileProperty {
 
     public LanternProfileProperty withoutSignature() {
         return this.signature == null ? this : new LanternProfileProperty(this.name, this.value, null);
+    }
+
+    @Override
+    public int getContentVersion() {
+        return 1;
+    }
+
+    @Override
+    public DataContainer toContainer() {
+        final DataContainer dataContainer = DataContainer.createNew()
+                .set(DataQueries.PROPERTY_NAME, this.name)
+                .set(DataQueries.PROPERTY_VALUE, this.value);
+        if (this.signature != null) {
+            dataContainer.set(DataQueries.PROPERTY_SIGNATURE, this.signature);
+        }
+        return dataContainer;
     }
 
     @Override

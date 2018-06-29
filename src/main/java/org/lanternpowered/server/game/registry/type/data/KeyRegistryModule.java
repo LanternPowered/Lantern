@@ -106,6 +106,7 @@ import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.merchant.TradeOffer;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Axis;
@@ -363,7 +364,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("ShouldDrop"), "should_drop"));
         register(makeValueKey(ShrubType.class, of("ShrubType"), "shrub_type"));
         register(makeListKey(Text.class, of("SignLines"), "sign_lines"));
-        register(makeValueKey(UUID.class, of("SkinUniqueId"), "skin_unique_id"));
+        register(makeValueKey(ProfileProperty.class, of("Skin"), "skin"));
         register(makeValueKey(SkullType.class, of("SkullType"), "skull_type"));
         register(makeValueKey(SlabType.class, of("SlabType"), "slab_type"));
         register(makeMutableBoundedValueKey(Integer.class, of("SlimeSize"), "slime_size"));
@@ -404,6 +405,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeListKey(TradeOffer.class, of("TradeOffers"), "trade_offers"));
         register(makeValueKey(TreeType.class, of("TreeType"), "tree_type"));
         register(makeValueKey(Boolean.class, of("Unbreakable"), "unbreakable"));
+        register(makeValueKey(Boolean.class, of("UpdateGameProfile"), "update_game_profile"));
         register(makeValueKey(Boolean.class, of("Vanish"), "vanish"));
         register(makeValueKey(Boolean.class, of("VanishIgnoresCollision"), "vanish_ignores_collision"));
         register(makeValueKey(Boolean.class, of("VanishPreventsTargeting"), "vanish_prevents_targeting"));

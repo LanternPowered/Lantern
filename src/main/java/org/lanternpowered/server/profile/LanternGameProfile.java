@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 @ConfigSerializable
 public final class LanternGameProfile implements GameProfile {
 
@@ -78,7 +79,6 @@ public final class LanternGameProfile implements GameProfile {
         this(uniqueId, name, LinkedHashMultimap.create());
     }
 
-    @SuppressWarnings("unchecked")
     public LanternGameProfile(UUID uniqueId, @Nullable String name, Multimap<String, ProfileProperty> properties) {
         this.properties = (Multimap) checkNotNull(properties, "properties");
         this.uniqueId = checkNotNull(uniqueId, "uniqueId");
@@ -117,14 +117,13 @@ public final class LanternGameProfile implements GameProfile {
 
     @Override
     public UUID getUniqueId() {
-        //noinspection ConstantConditions
         checkState(this.uniqueId != null, "Invalid game profile, the unique id is null!");
         return this.uniqueId;
     }
 
     @Override
     public int getContentVersion() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -160,7 +159,6 @@ public final class LanternGameProfile implements GameProfile {
         this.name = name;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Multimap<String, ProfileProperty> getPropertyMap() {
         return (Multimap) this.properties;
@@ -199,41 +197,4 @@ public final class LanternGameProfile implements GameProfile {
                         .map(LanternProfileProperty::toString).collect(Collectors.toList())))
                 .toString();
     }
-
-    /*
-    public static class LanternDataBuilder implements DataBuilder<GameProfile> {
-
-        // Why use both the optional and data exception?
-        @Override
-        public Optional<GameProfile> build(DataView container) throws InvalidDataException {
-            String uniqueId = container.getString(UNIQUE_ID).orElse(null);
-            if (uniqueId == null) {
-                throw new InvalidDataException("UniqueId is missing!");
-            }
-            UUID uniqueId0;
-            try {
-                uniqueId0 = UUID.fromString(uniqueId);
-            } catch (IllegalArgumentException e) {
-                throw new InvalidDataException("Unknown uniqueId format!", e);
-            }
-            String name = container.getString(NAME).orElse(null);
-            if (name == null) {
-                throw new InvalidDataException("Name is missing!");
-            }
-            List<DataView> views = container.getViewList(PROPERTIES).orElse(null);
-            List<Property> properties;
-            if (views != null && !views.isEmpty()) {
-                properties = Lists.newArrayListWithCapacity(views.size());
-                for (DataView view : views) {
-                    if (view.contains(NAME) && view.contains(VALUE)) {
-                        properties.add(new Property(view.getString(NAME).get(), view.getString(VALUE).get(),
-                                view.getString(SIGNATURE).orElse(null)));
-                    }
-                }
-            } else {
-                properties = Lists.newArrayList();
-            }
-            return Optional.of(new LanternGameProfile(uniqueId0, name, properties));
-        }
-    }*/
 }

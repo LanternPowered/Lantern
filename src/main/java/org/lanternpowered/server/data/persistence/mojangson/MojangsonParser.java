@@ -31,23 +31,31 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "SuspiciousToArrayCall"})
 final class MojangsonParser {
 
     public static void main(String... args) {
         final MojangsonParser parser = new MojangsonParser("{\n"
                 + "  \"test\": \"aaaa\",\n"
-                + "  b: [0:\"a\",1:b,2:c], 'c': 'dd--213464\"*dd', d:false, q:{z:10.0f}, w=`\u2639`\n"
+                + "  b: [\"a\",b,c], 'c': 'dd--213464\"*dd', d:false, q:{z:10.0f}, w=`\u2639`, 'e$Boolean'='true',"
+                + "'ee$boolean[]': [0,1,0,1], m=(1=20.0, 2=30.0),tt:[C;`q`,`p,`7,`9], 'tw$List$char': [q,w,u,y]\n"
                 + "}");
         final Object object = parser.parseCompleteObject();
         System.out.println(object);
+        final DataView dataView = (DataView) object;
+        System.out.println(Arrays.toString((boolean[]) dataView.get(DataQuery.of("ee")).get()));
         System.out.println(MojangsonSerializer.toMojangson(object));
+        System.out.println(MojangsonSerializer.toLanterson(object));
     }
 
     static final char TOKEN_VIEW_OPEN = '{';
@@ -55,6 +63,9 @@ final class MojangsonParser {
 
     static final char TOKEN_ARRAY_OPEN = '[';
     static final char TOKEN_ARRAY_CLOSE = ']';
+
+    static final char TOKEN_MAP_OPEN = '(';
+    static final char TOKEN_MAP_CLOSE = ')';
 
     static final char TOKEN_DOUBLE_QUOTED_STRING = '"';
     static final char TOKEN_SINGLE_QUOTED_STRING = '\'';
@@ -83,7 +94,18 @@ final class MojangsonParser {
     static final char TOKEN_KEY_VALUE_SEPARATOR = ':';
     static final char TOKEN_KEY_VALUE_SEPARATOR_ALT = '=';
 
+    static final char TOKEN_CHAR = 'c';
+    static final char TOKEN_CHAR_UPPER = 'C';
     static final char TOKEN_CHAR_QUOTE = '`';
+
+    static final char TOKEN_BOOLEAN = 'z';
+    static final char TOKEN_BOOLEAN_UPPER = 'Z';
+
+    static final char TOKEN_MAP_ARRAY = 'm';
+    static final char TOKEN_MAP_ARRAY_UPPER = 'M';
+
+    static final char TOKEN_VIEW_ARRAY = 'v';
+    static final char TOKEN_VIEW_ARRAY_UPPER = 'V';
 
     private final static char[] INTEGER_TOKENS = {
             TOKEN_BYTE,
@@ -103,7 +125,12 @@ final class MojangsonParser {
             TOKEN_DOUBLE_UPPER,
     };
 
-    private final static char[] NUMBER_TOKENS = Chars.concat(INTEGER_TOKENS, FLOATING_POINT_TOKENS);
+    private final static char[] ARRAY_TYPE_TOKENS = Chars.concat(INTEGER_TOKENS, FLOATING_POINT_TOKENS, new char[] {
+            TOKEN_CHAR,
+            TOKEN_CHAR_UPPER,
+            TOKEN_MAP_ARRAY,
+            TOKEN_MAP_ARRAY_UPPER,
+    });
 
     // https://www.regular-expressions.info/floatingpoint.html
     private static final Pattern FLOATING_POINT_PATTERN =
@@ -124,21 +151,137 @@ final class MojangsonParser {
         this.content = content;
     }
 
-    private Object parseArrayOrList() {
+    private static double[] toDoubleArray(Collection objects) {
+        int i = 0;
+        final double[] doubles = new double[objects.size()];
+        for (Number number : (Collection<Number>) objects) {
+            doubles[i++] = number.doubleValue();
+        }
+        return doubles;
+    }
+
+    private static float[] toFloatArray(Collection objects) {
+        int i = 0;
+        final float[] floats = new float[objects.size()];
+        for (Number number : (Collection<Number>) objects) {
+            floats[i++] = number.floatValue();
+        }
+        return floats;
+    }
+
+    private static short[] toShortArray(Collection objects) {
+        int i = 0;
+        final short[] shorts = new short[objects.size()];
+        for (Number number : (Collection<Number>) objects) {
+            shorts[i++] = number.shortValue();
+        }
+        return shorts;
+    }
+
+    private static char[] toCharArray(Collection objects) {
+        int i = 0;
+        final char[] chars = new char[objects.size()];
+        for (Object object : objects) {
+            final char c;
+            if (object instanceof Character) {
+                c = (char) object;
+            } else if (object instanceof String) {
+                c = ((String) object).charAt(0);
+            } else {
+                throw new MojangsonParseException("Cannot convert " + object.getClass().getName() + " into a char");
+            }
+            chars[i++] = c;
+        }
+        return chars;
+    }
+
+    private static boolean[] toBooleanArray(Collection objects) {
+        int i = 0;
+        final boolean[] booleans = new boolean[objects.size()];
+        for (Object object : objects) {
+            final boolean b;
+            if (object instanceof Boolean) {
+                b = (boolean) object;
+            } else if (object instanceof Number) {
+                b = ((Number) object).intValue() > 0;
+            } else {
+                throw new MojangsonParseException("Cannot convert " + object.getClass().getName() + " into a char");
+            }
+            booleans[i++] = b;
+        }
+        return booleans;
+    }
+
+    private static String[] toStringArray(Collection objects) {
+        int i = 0;
+        final String[] strings = new String[objects.size()];
+        for (Object object : (Collection<Object>) objects) {
+            strings[i++] = object.toString();
+        }
+        return strings;
+    }
+
+    private Map[] parseMapArray() {
+        final Collection<Map> maps = (Collection) parseListObjects(ExtendedObjectType.MAP);
+        return maps.toArray(new Map[0]);
+    }
+
+    private Object parseArrayOrList(@Nullable ExtendedObjectType arrayObjectType, @Nullable ExtendedObjectType elementType) {
         nextChar(); // Skip [
         skipWhitespace();
         // Check for arrays
         char arrayType = currentChar();
-        if (Chars.contains(NUMBER_TOKENS, arrayType) &&
+        if (Chars.contains(ARRAY_TYPE_TOKENS, arrayType) &&
                 currentChar(1) == TOKEN_ARRAY_TYPE_SUFFIX) {
             // We got one, skip array type chars
             nextChar();
             nextChar();
-        } else {
-            return parseListObjects();
+        } else if (arrayObjectType == null) {
+            return parseListObjects(elementType);
         }
-        final Collection<? extends Number> numbers = (Collection) parseListObjects();
+
+        if (arrayObjectType != null) {
+            if (arrayObjectType == ExtendedObjectType.MAP_ARRAY) {
+                return parseMapArray();
+            }
+            final Collection<Object> objects = parseListObjects(elementType);
+            switch (arrayObjectType) {
+                case VIEW_ARRAY:
+                    return objects.toArray(new DataView[0]);
+                case STRING_ARRAY:
+                    return toStringArray(objects);
+                case BOOLEAN_ARRAY:
+                    return toBooleanArray(objects);
+                case CHAR_ARRAY:
+                    return toCharArray(objects);
+                case SHORT_ARRAY:
+                    return toShortArray(objects);
+                case FLOAT_ARRAY:
+                    return toFloatArray(objects);
+                case DOUBLE_ARRAY:
+                    return toDoubleArray(objects);
+            }
+            throw new MojangsonParseException("Unexpected array object type: " + arrayObjectType);
+        }
+        switch (arrayType) {
+            case TOKEN_MAP_ARRAY:
+            case TOKEN_MAP_ARRAY_UPPER:
+                return parseMapArray();
+        }
+        final Collection<Object> objects = parseListObjects(null);
         int i = 0;
+        switch (arrayType) {
+            case TOKEN_VIEW_ARRAY:
+            case TOKEN_VIEW_ARRAY_UPPER:
+                return objects.toArray(new DataView[0]);
+            case TOKEN_CHAR:
+            case TOKEN_CHAR_UPPER:
+                return toCharArray(objects);
+            case TOKEN_BOOLEAN:
+            case TOKEN_BOOLEAN_UPPER:
+                return toBooleanArray(objects);
+        }
+        final Collection<? extends Number> numbers = (Collection) objects;
         switch (arrayType) {
             case TOKEN_BYTE:
             case TOKEN_BYTE_UPPER:
@@ -147,13 +290,6 @@ final class MojangsonParser {
                     bytes[i++] = number.byteValue();
                 }
                 return bytes;
-            case TOKEN_SHORT:
-            case TOKEN_SHORT_UPPER:
-                final short[] shorts = new short[numbers.size()];
-                for (Number number : numbers) {
-                    shorts[i++] = number.shortValue();
-                }
-                return shorts;
             case TOKEN_INT:
             case TOKEN_INT_UPPER:
                 final int[] ints = new int[numbers.size()];
@@ -168,31 +304,21 @@ final class MojangsonParser {
                     longs[i++] = number.longValue();
                 }
                 return longs;
+            case TOKEN_SHORT:
+            case TOKEN_SHORT_UPPER:
+                return toShortArray(numbers);
             case TOKEN_FLOAT:
             case TOKEN_FLOAT_UPPER:
-                final float[] floats = new float[numbers.size()];
-                for (Number number : numbers) {
-                    floats[i++] = number.floatValue();
-                }
-                return floats;
+                return toFloatArray(numbers);
             case TOKEN_DOUBLE:
             case TOKEN_DOUBLE_UPPER:
-                final double[] doubles = new double[numbers.size()];
-                for (Number number : numbers) {
-                    doubles[i++] = number.doubleValue();
-                }
-                return doubles;
+                return toDoubleArray(numbers);
         }
         throw new MojangsonParseException("Array type '" + arrayType + "' is not being handled.");
     }
 
-    private final static int ARRAY_TYPE_UNKNOWN = 0;
-    private final static int ARRAY_TYPE_INDEXED = 1;
-    private final static int ARRAY_TYPE_NON_INDEXED = 2;
-
-    private List<Object> parseListObjects() {
+    private List<Object> parseListObjects(@Nullable ExtendedObjectType type) {
         final List<Object> objects = new ArrayList<>();
-        int type = ARRAY_TYPE_UNKNOWN;
         while (true) {
             skipWhitespace(); // Skip leading whitespaces
             char c = currentChar();
@@ -200,41 +326,9 @@ final class MojangsonParser {
             if (c == TOKEN_ARRAY_CLOSE) {
                 return objects;
             }
-            Object value = parseObject();
+            objects.add(parseObject(type, null, null));
             skipWhitespace();
             c = currentChar();
-            final int newType = c == TOKEN_KEY_VALUE_SEPARATOR ? ARRAY_TYPE_INDEXED : ARRAY_TYPE_NON_INDEXED;
-            if (type == ARRAY_TYPE_UNKNOWN) {
-                type = newType;
-            } else if (newType != type) {
-                throw new MojangsonParseException("Indexed and non-indexed array elements cannot be mixed.");
-            }
-            // Check if we got a indexed array
-            if (newType == ARRAY_TYPE_INDEXED) {
-                final int index;
-                if (value instanceof Integer) {
-                    index = (Integer) value;
-                } else {
-                    throw new MojangsonParseException("Indexed arrays must use integers as indexes and not " + value);
-                }
-                nextChar();
-                // Parse the new value
-                value = parseObject();
-                while (objects.size() <= index) {
-                    objects.add(null);
-                }
-                objects.set(index, value);
-                skipWhitespace();
-                c = currentChar();
-            } else {
-                objects.add(value);
-            }
-            for (int i = 0; i < objects.size(); i++) {
-                if (objects.get(i) == null) {
-                    throw new MojangsonParseException("Array may not contain null elements (or missing indexed"
-                            + "entries). Null element found at index: " + i);
-                }
-            }
             nextChar();
             switch (c) {
                 case TOKEN_ARRAY_CLOSE:
@@ -247,50 +341,170 @@ final class MojangsonParser {
         }
     }
 
+    private void checkAndSkipKeyValueSeparator() {
+        skipWhitespace();
+        final char c = currentChar();
+        if (c != TOKEN_KEY_VALUE_SEPARATOR &&
+                c != TOKEN_KEY_VALUE_SEPARATOR_ALT) {
+            throw new MojangsonParseException("Expected '" + TOKEN_KEY_VALUE_SEPARATOR + "' or '" +
+                    TOKEN_KEY_VALUE_SEPARATOR_ALT + "' but got '" + c + "'");
+        }
+        nextChar();
+    }
+
+    private Map parseMap() {
+        final char c = currentChar();
+        if (c == TOKEN_MAP_OPEN) {
+            return parseFancyMap();
+        } else if (c == TOKEN_ARRAY_OPEN) {
+            return parseCompatibleMap();
+        } else if (c == TOKEN_VIEW_OPEN) {
+            return parseFancyMap(TOKEN_VIEW_CLOSE);
+        }
+        throw new MojangsonParseException("Expected '" + TOKEN_MAP_OPEN + "' or '" +
+                TOKEN_ARRAY_OPEN + "' but got '" + c + "'");
+    }
+
+    /**
+     * Parses a fancy map, using ( ) brackets, these will be parsed a (key: value)
+     * supporting every value type as key, even arrays and views.
+     *
+     * @return The map
+     */
+    private Map parseFancyMap() {
+        return parseFancyMap(TOKEN_MAP_CLOSE);
+    }
+
+    private Map parseFancyMap(char endToken) {
+        nextChar(); // Skip (
+        final Map map = new HashMap();
+        while (true) {
+            skipWhitespace(); // Skip leading whitespaces
+            char c = currentChar();
+            // End of the array
+            if (c == TOKEN_MAP_CLOSE) {
+                return map;
+            }
+            final Object key = parseObject();
+            checkAndSkipKeyValueSeparator();
+            final Object value = parseObject();
+            map.put(key, value);
+            c = currentChar();
+            nextChar();
+            if (c == endToken) {
+                return map;
+            } else if (c == TOKEN_NEW_ENTRY) {
+                continue;
+            }
+            throw new MojangsonParseException("Got unexpected token: " + c);
+        }
+    }
+
+    /**
+     * Parses a "compatible" map, which is supported in the original mojangson.
+     *
+     * @return The map
+     */
+    private Map parseCompatibleMap() {
+        nextChar(); // Skip [
+        final Map map = new HashMap();
+        while (true) {
+            skipWhitespace(); // Skip leading whitespaces
+            char c = currentChar();
+            // End of the array
+            if (c == TOKEN_ARRAY_CLOSE) {
+                return map;
+            }
+            skipWhitespace();
+            // 0: key
+            // 1: value
+            final Object[] entry = new Object[2];
+            parseViewOrMap(null, (k, v) -> {
+                if (k.equalsIgnoreCase(ExtendedObjectType.mapKeyName)) {
+                    entry[0] = v;
+                } else if (k.equalsIgnoreCase(ExtendedObjectType.mapValueName)) {
+                    entry[1] = v;
+                }
+            });
+            if (entry[0] == null) {
+                throw new MojangsonParseException("Map entry is missing a key");
+            }
+            if (entry[1] == null) {
+                throw new MojangsonParseException("Map entry is missing a value");
+            }
+            map.put(entry[0], entry[1]);
+            c = currentChar();
+            nextChar();
+            switch (c) {
+                case TOKEN_ARRAY_CLOSE:
+                    return map;
+                case TOKEN_NEW_ENTRY:
+                    break;
+                default:
+                    throw new MojangsonParseException("Got unexpected token: " + c);
+            }
+        }
+    }
+
     private DataView parseView(@Nullable DataView parent, @Nullable String key) {
-        nextChar(); // Skip {
         final DataView dataView;
         if (parent != null) {
             dataView = parent.createView(DataQuery.of(key));
         } else {
             dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         }
+        parseViewOrMap(dataView, (k, v) -> dataView.set(DataQuery.of(k), v));
+        return dataView;
+    }
+
+    private void parseViewOrMap(@Nullable DataView dataView, BiConsumer<String, Object> valueAdder) {
+        nextChar(); // Skip {
         while (true) {
             skipWhitespace(); // Skip leading whitespaces
             char c = currentChar();
             // Check for the end of the data view
             if (c == TOKEN_VIEW_CLOSE) {
-                return dataView;
+                return;
             }
-            final String name;
-            // Check which name type should be parsed
-            if (c == TOKEN_SINGLE_QUOTED_STRING ||
-                    c == TOKEN_DOUBLE_QUOTED_STRING) {
-                name = parseQuotedString();
+            String name = parseString();
+            ExtendedObjectType objectType = null;
+            boolean forceList = false;
+            final int index = name.indexOf('$');
+            if (index != -1) {
+                String suffix = name.substring(index + 1);
+                final int index1 = suffix.indexOf('$');
+                if (index1 != -1 && suffix.substring(0, index1).equals("List")) {
+                    forceList = true;
+                    suffix = suffix.substring(index1 + 1);
+                }
+                objectType = ExtendedObjectType.bySuffix.get(suffix);
+                if (objectType != null) {
+                    name = name.substring(0, index);
+                }
+            }
+            checkAndSkipKeyValueSeparator();
+            final Object value;
+            if (forceList) {
+                skipWhitespace();
+                if (currentChar() != TOKEN_ARRAY_OPEN) {
+                    throw new MojangsonParseException("Expected a [ but got " + c);
+                }
+                value = parseArrayOrList(null, objectType);
             } else {
-                name = parseUnquotedString();
+                value = parseObject(objectType, dataView, name);
             }
-            skipWhitespace();
-            c = currentChar();
-            if (c != TOKEN_KEY_VALUE_SEPARATOR &&
-                    c != TOKEN_KEY_VALUE_SEPARATOR_ALT) {
-                throw new MojangsonParseException("Expected a '" + TOKEN_KEY_VALUE_SEPARATOR + "' or '" +
-                        TOKEN_KEY_VALUE_SEPARATOR_ALT + "' but got '" + c + "'");
-            }
-            nextChar();
-            final Object value = parseObject(dataView, name);
             // Only set the value if it's a view, DataViews
             // are already set internally by using createView
             // on it's parent
-            if (!(value instanceof DataView) && value != null) { // Support null values?
-                dataView.set(DataQuery.of(name), value);
+            if (dataView == null || !(value instanceof DataView)) {
+                valueAdder.accept(name, value);
             }
             skipWhitespace(); // Skip again whitespaces after object
             c = currentChar();
             nextChar();
             switch (c) {
                 case TOKEN_VIEW_CLOSE:
-                    return dataView; // Reached the end
+                    return; // Reached the end
                 case TOKEN_NEW_ENTRY:
                     break;
                 default:
@@ -306,7 +520,7 @@ final class MojangsonParser {
      * @return The parsed object
      */
     public Object parseCompleteObject() {
-        final Object object = parseObject(null, null);
+        final Object object = parseObject(null, null, null);
         while (true) {
             if (this.pos == this.content.length) {
                 return object;
@@ -325,18 +539,55 @@ final class MojangsonParser {
      * @return The parsed object
      */
     private Object parseObject() {
-        return parseObject(null, null);
+        return parseObject(null, null, null);
     }
 
-    private Object parseObject(@Nullable DataView parent, @Nullable String key) {
+    private String parseString() {
+        final char c = currentChar();
+        if (c == TOKEN_DOUBLE_QUOTED_STRING ||
+                c == TOKEN_SINGLE_QUOTED_STRING) {
+            return parseQuotedString();
+        } else {
+            return parseUnquotedString();
+        }
+    }
+
+    private Object parseObject(@Nullable ExtendedObjectType type, @Nullable DataView parent, @Nullable String key) {
         skipWhitespace();
         char c = currentChar();
         // Check which type should be parsed
+        if (type != null) { // Handle suffixes first
+            switch (type) {
+                // Custom handling for suffixes
+                case BOOLEAN:
+                    return Boolean.valueOf(parseString());
+                case CHAR:
+                    return parseString().charAt(0);
+                case MAP:
+                    return parseMap();
+                // Validate arrays
+                case MAP_ARRAY:
+                case VIEW_ARRAY:
+                case SHORT_ARRAY:
+                case FLOAT_ARRAY:
+                case DOUBLE_ARRAY:
+                case BOOLEAN_ARRAY:
+                case CHAR_ARRAY:
+                    if (c != TOKEN_ARRAY_OPEN) {
+                        throw new MojangsonParseException("Expected a [ but got " + c);
+                    }
+                    break;
+                default:
+                    throw new MojangsonParseException("Got unexpected object type: " + type);
+            }
+        }
         switch (c) {
             case TOKEN_VIEW_OPEN:
                 return parseView(parent, key);
             case TOKEN_ARRAY_OPEN:
-                return parseArrayOrList();
+                return parseArrayOrList(type, null);
+            case TOKEN_MAP_OPEN:
+                return parseFancyMap();
             case TOKEN_SINGLE_QUOTED_STRING:
             case TOKEN_DOUBLE_QUOTED_STRING:
                 return parseQuotedString();

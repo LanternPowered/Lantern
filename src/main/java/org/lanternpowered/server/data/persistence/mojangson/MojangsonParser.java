@@ -130,6 +130,8 @@ final class MojangsonParser {
             TOKEN_CHAR_UPPER,
             TOKEN_MAP_ARRAY,
             TOKEN_MAP_ARRAY_UPPER,
+            TOKEN_VIEW_ARRAY,
+            TOKEN_VIEW_ARRAY_UPPER,
     });
 
     // https://www.regular-expressions.info/floatingpoint.html

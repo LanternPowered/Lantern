@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.data.persistence;
 
 import org.lanternpowered.server.data.persistence.HoconDataFormat;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
+import org.lanternpowered.server.data.persistence.mojangson.Mojangson;
 import org.lanternpowered.server.data.persistence.mojangson.MojangsonDataFormat;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
 import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
@@ -44,6 +45,7 @@ public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<
         register(new HoconDataFormat("hocon"));
         register(new JsonDataFormat("json"));
         register(new NbtDataFormat("nbt"));
-        register(new MojangsonDataFormat("mojangson"));
+        register(new MojangsonDataFormat("mojangson", Mojangson.Flags.MOJANGSON));
+        register(new MojangsonDataFormat("lanterson", Mojangson.Flags.LANTERSON));
     }
 }

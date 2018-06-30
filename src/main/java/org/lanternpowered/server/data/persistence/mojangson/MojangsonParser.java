@@ -47,12 +47,11 @@ import javax.annotation.Nullable;
 final class MojangsonParser {
 
     public static void main(String... args) {
-        final MojangsonParser parser = new MojangsonParser("{\n"
+        final Object object = Mojangson.parseLanterson("{\n"
                 + "  \"test\": \"aaaa\",\n"
                 + "  b: [\"a\",b,c], 'c': 'dd--213464\"*dd', d:false, q:{z:10.0f}, w=`\u2639`, 'e$Boolean'='true',"
                 + "'ee$boolean[]': [0,1,0,1], m=(1=20.0, 2=30.0),tt:[C;`q`,`p,`7,`9], 'tw$List$char': [q,w,u,y], sss=[string;test,a,b,c,d]\n"
                 + "}");
-        final Object object = parser.parseCompleteObject();
         System.out.println(object);
         final DataView dataView = (DataView) object;
         System.out.println(Arrays.toString((boolean[]) dataView.get(DataQuery.of("ee")).get()));
@@ -182,15 +181,21 @@ final class MojangsonParser {
 
     // The content that is being parsed.
     private final char[] content;
+    private final int flags;
 
     private int pos;
 
-    MojangsonParser(String content) {
-        this(content.toCharArray());
+    MojangsonParser(String content, int flags) {
+        this(content.toCharArray(), flags);
     }
 
-    private MojangsonParser(char[] content) {
+    private MojangsonParser(char[] content, int flags) {
         this.content = content;
+        this.flags = flags;
+    }
+
+    private boolean hasFlag(int flag) {
+        return (this.flags & flag) != 0;
     }
 
     private static double[] toDoubleArray(Collection objects) {
@@ -411,10 +416,12 @@ final class MojangsonParser {
     private void checkAndSkipKeyValueSeparator() {
         skipWhitespace();
         final char c = currentChar();
-        if (c != TOKEN_KEY_VALUE_SEPARATOR &&
-                c != TOKEN_KEY_VALUE_SEPARATOR_ALT) {
-            throw new MojangsonParseException("Expected '" + TOKEN_KEY_VALUE_SEPARATOR + "' or '" +
-                    TOKEN_KEY_VALUE_SEPARATOR_ALT + "' but got '" + c + "'");
+        if (c != TOKEN_KEY_VALUE_SEPARATOR) {
+            final boolean equalAlt = hasFlag(Mojangson.Flags.ALLOW_EQUAL_KEY_VALUE_SEPARATOR);
+            if (!equalAlt || c != TOKEN_KEY_VALUE_SEPARATOR_ALT) {
+                throw new MojangsonParseException("Expected '" + TOKEN_KEY_VALUE_SEPARATOR + "' " +
+                        (equalAlt ? "or '" + TOKEN_KEY_VALUE_SEPARATOR_ALT + "' " : "") + "but got '" + c + "'");
+            }
         }
         nextChar();
     }
@@ -612,7 +619,7 @@ final class MojangsonParser {
     private String parseString() {
         final char c = currentChar();
         if (c == TOKEN_DOUBLE_QUOTED_STRING ||
-                c == TOKEN_SINGLE_QUOTED_STRING) {
+                (hasFlag(Mojangson.Flags.ALLOW_SINGLE_QUOTES) && c == TOKEN_SINGLE_QUOTED_STRING)) {
             return parseQuotedString();
         } else {
             return parseUnquotedString();
@@ -627,7 +634,15 @@ final class MojangsonParser {
             switch (type) {
                 // Custom handling for suffixes
                 case BOOLEAN:
-                    return Boolean.valueOf(parseString());
+                    final Object object = parseObject(null, null, null);
+                    if (object instanceof Boolean) {
+                        return object;
+                    } else if (object instanceof String) {
+                        return Boolean.valueOf((String) object);
+                    } else if (object instanceof Number) {
+                        return ((Number) object).longValue() > 0;
+                    }
+                    throw new MojangsonParseException("Cannot convert " + object.getClass().getName() + " into a boolean");
                 case CHAR:
                     return parseString().charAt(0);
                 case MAP:
@@ -656,6 +671,10 @@ final class MojangsonParser {
             case TOKEN_MAP_OPEN:
                 return parseFancyMap();
             case TOKEN_SINGLE_QUOTED_STRING:
+                if (!hasFlag(Mojangson.Flags.ALLOW_SINGLE_QUOTES)) {
+                    break;
+                }
+                // fall through
             case TOKEN_DOUBLE_QUOTED_STRING:
                 return parseQuotedString();
             case TOKEN_CHAR_QUOTE:
@@ -675,8 +694,14 @@ final class MojangsonParser {
         // Check for booleans
         switch (value) {
             case "true":
+                if (hasFlag(Mojangson.Flags.PARSE_BOOLEAN_AS_BYTE)) {
+                    return (byte) 1;
+                }
                 return true;
             case "false":
+                if (hasFlag(Mojangson.Flags.PARSE_BOOLEAN_AS_BYTE)) {
+                    return (byte) 0;
+                }
                 return false;
         }
         // Check if it's a int value

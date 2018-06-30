@@ -38,13 +38,16 @@ import java.io.Writer;
 
 public class MojangsonDataFormat extends AbstractStringDataFormat {
 
-    public MojangsonDataFormat(String identifier) {
+    private final int flags;
+
+    public MojangsonDataFormat(String identifier, int flags) {
         super(identifier);
+        this.flags = flags;
     }
 
     @Override
     public DataContainer read(String input) throws InvalidDataException {
-        final Object value = parseObject(input);
+        final Object value = Mojangson.parse(input, this.flags);
         if (value instanceof DataContainer) {
             return (DataContainer) value;
         }
@@ -58,7 +61,7 @@ public class MojangsonDataFormat extends AbstractStringDataFormat {
 
     @Override
     public String write(DataView data) {
-        return MojangsonSerializer.toMojangson(data);
+        return Mojangson.to(data, this.flags);
     }
 
     @Override
@@ -66,13 +69,5 @@ public class MojangsonDataFormat extends AbstractStringDataFormat {
         try (BufferedWriter writer = ensureBuffered(output)) {
             writer.write(write(data));
         }
-    }
-
-    public static String serializeObject(Object object) {
-        return MojangsonSerializer.toMojangson(object);
-    }
-
-    public static Object parseObject(String input) {
-        return new MojangsonParser(input).parseCompleteObject();
     }
 }

@@ -35,7 +35,7 @@ public class AbstractViewBuilder<R extends T, T extends AbstractInventory, B ext
 
     @Nullable private Carrier carrier;
 
-    public B withCarrier(Carrier carrier) {
+    public B withCarrier(@Nullable Carrier carrier) {
         this.carrier = carrier;
         return (B) this;
     }

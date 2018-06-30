@@ -23,52 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.vanilla;
 
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
+import org.lanternpowered.server.inventory.AbstractForwardingSlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 
-import javax.annotation.Nullable;
+public final class LanternHotbarSelectedSlot extends AbstractForwardingSlot {
 
-@SuppressWarnings("unchecked")
-public abstract class AbstractSlot extends AbstractMutableInventory implements ISlot {
+    private final LanternHotbarInventory hotbarInventory;
 
-    public static final int DEFAULT_MAX_STACK_SIZE = 64;
-
-    /**
-     * Constructs a new {@link AbstractInventorySlot.Builder}.
-     *
-     * @return The builder
-     */
-    public static AbstractInventorySlot.Builder<AbstractInventorySlot> builder() {
-        return AbstractInventorySlot.builder();
-    }
-
-    /**
-     * Gets the raw {@link LanternItemStack}. Does not make a copy.
-     *
-     * @return The raw item stack
-     */
-    @Nullable
-    public abstract LanternItemStack getRawItemStack();
-
-    /**
-     * Sets the raw {@link LanternItemStack}. Does not make a copy.
-     *
-     * @param itemStack The raw item stack
-     */
-    public abstract void setRawItemStack(@Nullable ItemStack itemStack);
-
-    @Override
-    public AbstractInventorySlot transform() {
-        return (AbstractInventorySlot) transform(Type.INVENTORY);
+    public LanternHotbarSelectedSlot(LanternHotbarInventory hotbarInventory) {
+        this.hotbarInventory = hotbarInventory;
     }
 
     @Override
-    public Slot transform(Type type) {
-        return this;
-    }
-
-    AbstractSlot() {
+    protected AbstractSlot getForwardingSlot() {
+        return this.hotbarInventory.getSelectedSlot();
     }
 }

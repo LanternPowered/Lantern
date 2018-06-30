@@ -225,7 +225,7 @@ public final class VanillaInventoryArchetypes {
     /// Player Armor ///
     ////////////////////
 
-    public static final LanternInventoryArchetype<LanternPlayerEquipmentInventory> PLAYER_ARMOR;
+    public static final LanternInventoryArchetype<LanternPlayerArmorInventory> PLAYER_ARMOR;
 
     //////////////
     /// User ///
@@ -555,7 +555,7 @@ public final class VanillaInventoryArchetypes {
                 .addLast(CHESTPLATE_SLOT)
                 .addLast(LEGGINGS_SLOT)
                 .addLast(BOOTS_SLOT)
-                .type(LanternPlayerEquipmentInventory.class)
+                .type(LanternPlayerArmorInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "player_armor");
 
         ///////////////////////

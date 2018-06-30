@@ -51,7 +51,7 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
         final LanternPlayer player = (LanternPlayer) context.requireContext(ContextKeys.PLAYER);
         final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
 
-        final PeekedOfferTransactionResult peekResult = player.getInventory().getEquipment().peekOffer(itemStack.copy());
+        final PeekedOfferTransactionResult peekResult = player.getInventory().getArmor().peekOffer(itemStack.copy());
         if (peekResult.isSuccess()) {
             final List<SlotTransaction> transactions = new ArrayList<>(peekResult.getTransactions());
             final AbstractSlot slot = (AbstractSlot) context.getContext(ContextKeys.USED_SLOT).orElse(null);

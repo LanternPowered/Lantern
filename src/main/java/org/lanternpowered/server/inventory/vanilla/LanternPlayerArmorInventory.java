@@ -33,7 +33,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 
 import java.util.Optional;
 
-public class LanternPlayerEquipmentInventory extends LanternInventoryColumn implements IArmorEquipableInventory {
+public class LanternPlayerArmorInventory extends LanternInventoryColumn implements IArmorEquipableInventory {
 
     private final CarrierReference<ArmorEquipable> carrierReference = CarrierReference.of(ArmorEquipable.class);
 

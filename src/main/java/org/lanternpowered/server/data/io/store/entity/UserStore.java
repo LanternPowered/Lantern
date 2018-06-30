@@ -42,7 +42,7 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternMainPlayerInventory;
-import org.lanternpowered.server.inventory.vanilla.LanternPlayerEquipmentInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerArmorInventory;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.data.DataContainer;
@@ -284,7 +284,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
 
     private static void deserializePlayerInventory(AbstractUserInventory<?> inventory, List<DataView> itemViews) {
         final LanternMainPlayerInventory mainInventory = inventory.getMain();
-        final LanternPlayerEquipmentInventory equipmentInventory = inventory.getEquipment();
+        final LanternPlayerArmorInventory equipmentInventory = inventory.getArmor();
         final AbstractSlot offHandSlot = inventory.getOffhand();
 
         for (DataView itemView : itemViews) {
@@ -305,7 +305,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         final List<DataView> itemViews = new ArrayList<>();
 
         final LanternMainPlayerInventory mainInventory = inventory.getMain();
-        final LanternPlayerEquipmentInventory equipmentInventory = inventory.getEquipment();
+        final LanternPlayerArmorInventory equipmentInventory = inventory.getArmor();
         final AbstractSlot offHandSlot = inventory.getOffhand();
 
         Iterable<Slot> slots = mainInventory.slots();

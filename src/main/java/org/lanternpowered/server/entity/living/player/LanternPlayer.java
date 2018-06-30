@@ -280,7 +280,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         .title(this.inventory.getName())
                         .inventory(VanillaInventoryArchetypes.CRAFTING.builder()
                                 .build(Lantern.getMinecraftPlugin()))
-                        .inventory(this.inventory.getEquipment())
+                        .inventory(this.inventory.getArmor())
                         .inventory(this.inventory.getOffhand())
                         .shiftClickBehavior(PlayerInventoryShiftClickBehavior.INSTANCE)
                         .build(Lantern.getMinecraftPlugin()));

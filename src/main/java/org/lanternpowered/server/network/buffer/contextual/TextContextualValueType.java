@@ -28,8 +28,8 @@ package org.lanternpowered.server.network.buffer.contextual;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.text.gson.JsonTextSerializer;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.text.Text;
 
 final class TextContextualValueType implements ContextualValueType<Text> {

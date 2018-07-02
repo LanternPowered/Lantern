@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.entity.weather;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;

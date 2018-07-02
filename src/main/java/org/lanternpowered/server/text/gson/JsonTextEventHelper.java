@@ -31,8 +31,8 @@ import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.buffer.contextual.ItemStackContextualValueType;
 import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -45,7 +45,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Coerce;
 
 import java.io.File;

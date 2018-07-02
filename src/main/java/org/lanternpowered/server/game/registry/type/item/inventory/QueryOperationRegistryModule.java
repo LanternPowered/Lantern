@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
-import com.google.common.collect.Iterables;
 import org.lanternpowered.server.data.property.PropertyHelper;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;

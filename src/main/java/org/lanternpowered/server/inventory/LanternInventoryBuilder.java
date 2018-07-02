@@ -33,7 +33,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.property.PropertyKeySetter;
-import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;

@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.filter;
+package org.lanternpowered.server.item.predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,7 +40,7 @@ import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public interface EquipmentItemFilter extends ItemFilter {
+public interface EquipmentItemPredicate extends ItemPredicate {
 
     /**
      * Tests whether the provided {@link EquipmentType} is valid.
@@ -48,77 +48,77 @@ public interface EquipmentItemFilter extends ItemFilter {
      * @param equipmentType The equipment type
      * @return Whether the equipment type is valid
      */
-    boolean isValid(EquipmentType equipmentType);
+    boolean test(EquipmentType equipmentType);
 
     @Override
-    default EquipmentItemFilter andThen(ItemFilter itemFilter) {
-        final EquipmentItemFilter thisFilter = this;
-        return new EquipmentItemFilter() {
+    default EquipmentItemPredicate andThen(ItemPredicate itemPredicate) {
+        final EquipmentItemPredicate thisPredicate = this;
+        return new EquipmentItemPredicate() {
             @Override
-            public boolean isValid(ItemStack stack) {
-                return thisFilter.isValid(stack) && itemFilter.isValid(stack);
+            public boolean test(ItemStack stack) {
+                return thisPredicate.test(stack) && itemPredicate.test(stack);
             }
 
             @Override
-            public boolean isValid(ItemType type) {
-                return thisFilter.isValid(type) && itemFilter.isValid(type);
+            public boolean test(ItemType type) {
+                return thisPredicate.test(type) && itemPredicate.test(type);
             }
 
             @Override
-            public boolean isValid(ItemStackSnapshot stack) {
-                return thisFilter.isValid(stack) && itemFilter.isValid(stack);
+            public boolean test(ItemStackSnapshot stack) {
+                return thisPredicate.test(stack) && itemPredicate.test(stack);
             }
 
             @Override
-            public boolean isValid(EquipmentType equipmentType) {
-                return thisFilter.isValid(equipmentType) && (!(itemFilter instanceof EquipmentItemFilter) ||
-                        ((EquipmentItemFilter) itemFilter).isValid(equipmentType));
+            public boolean test(EquipmentType equipmentType) {
+                return thisPredicate.test(equipmentType) && (!(itemPredicate instanceof EquipmentItemPredicate) ||
+                        ((EquipmentItemPredicate) itemPredicate).test(equipmentType));
             }
         };
     }
 
     @Override
-    default EquipmentItemFilter invert() {
-        final EquipmentItemFilter thisFilter = this;
-        return new EquipmentItemFilter() {
+    default EquipmentItemPredicate invert() {
+        final EquipmentItemPredicate thisPredicate = this;
+        return new EquipmentItemPredicate() {
             @Override
-            public boolean isValid(EquipmentType equipmentType) {
-                return thisFilter.isValid(equipmentType);
+            public boolean test(EquipmentType equipmentType) {
+                return !thisPredicate.test(equipmentType);
             }
 
             @Override
-            public boolean isValid(ItemStack stack) {
-                return thisFilter.isValid(stack);
+            public boolean test(ItemStack stack) {
+                return !thisPredicate.test(stack);
             }
 
             @Override
-            public boolean isValid(ItemType type) {
-                return thisFilter.isValid(type);
+            public boolean test(ItemType type) {
+                return !thisPredicate.test(type);
             }
 
             @Override
-            public boolean isValid(ItemStackSnapshot stack) {
-                return thisFilter.isValid(stack);
+            public boolean test(ItemStackSnapshot stack) {
+                return !thisPredicate.test(stack);
             }
         };
     }
 
     /**
-     * Constructs a {@link ItemFilter} for the provided
+     * Constructs a {@link ItemPredicate} for the provided
      * {@link EquipmentType} predicate.
      *
      * @param predicate The predicate
      * @return The equipment item filter
      */
-    static EquipmentItemFilter of(Predicate<EquipmentType> predicate) {
+    static EquipmentItemPredicate of(Predicate<EquipmentType> predicate) {
         checkNotNull(predicate, "predicate");
-        return new EquipmentItemFilter() {
+        return new EquipmentItemPredicate() {
             @Override
-            public boolean isValid(EquipmentType equipmentType) {
+            public boolean test(EquipmentType equipmentType) {
                 return predicate.test(equipmentType);
             }
 
-            private boolean isValid(Optional<EquipmentProperty> optEquipmentProperty) {
+            private boolean test(Optional<EquipmentProperty> optEquipmentProperty) {
                 return optEquipmentProperty
                         .map(property -> {
                             final EquipmentType equipmentType = property.getValue();
@@ -138,45 +138,45 @@ public interface EquipmentItemFilter extends ItemFilter {
             }
 
             @Override
-            public boolean isValid(ItemStack stack) {
-                return isValid(stack.getProperty(EquipmentProperty.class));
+            public boolean test(ItemStack stack) {
+                return test(stack.getProperty(EquipmentProperty.class));
             }
 
             @Override
-            public boolean isValid(ItemStackSnapshot stack) {
-                return isValid(stack.getProperty(EquipmentProperty.class));
+            public boolean test(ItemStackSnapshot stack) {
+                return test(stack.getProperty(EquipmentProperty.class));
             }
 
             @Override
-            public boolean isValid(ItemType type) {
-                return isValid(type.getDefaultProperty(EquipmentProperty.class));
+            public boolean test(ItemType type) {
+                return test(type.getDefaultProperty(EquipmentProperty.class));
             }
         };
     }
 
 
     /**
-     * Constructs a {@link ItemFilter} for the provided
+     * Constructs a {@link ItemPredicate} for the provided
      * {@link EquipmentSlotType} property.
      *
      * @param equipmentSlotType The equipment slot type property
      * @return The equipment item filter
      */
-    static EquipmentItemFilter of(EquipmentSlotType equipmentSlotType) {
+    static EquipmentItemPredicate of(EquipmentSlotType equipmentSlotType) {
         checkNotNull(equipmentSlotType, "equipmentSlotType");
         final EquipmentType slotEquipmentType = equipmentSlotType.getValue();
         checkNotNull(slotEquipmentType, "value");
         final Property.Operator operator = equipmentSlotType.getOperator();
         checkArgument(operator == Property.Operator.EQUAL || operator == Property.Operator.NOTEQUAL,
                 "Only the operators EQUAL and NOTEQUAL are supported, %s is not.", operator);
-        return new EquipmentItemFilter() {
+        return new EquipmentItemPredicate() {
             @Override
-            public boolean isValid(EquipmentType equipmentType) {
+            public boolean test(EquipmentType equipmentType) {
                 final boolean result = ((LanternEquipmentType) slotEquipmentType).isChild(equipmentType);
                 return (operator == Property.Operator.EQUAL) == result;
             }
 
-            private boolean isValid(Optional<EquipmentProperty> optEquipmentProperty) {
+            private boolean test(Optional<EquipmentProperty> optEquipmentProperty) {
                 return optEquipmentProperty
                         .map(property -> {
                             final EquipmentType equipmentType = property.getValue();
@@ -187,18 +187,18 @@ public interface EquipmentItemFilter extends ItemFilter {
             }
 
             @Override
-            public boolean isValid(ItemStack stack) {
-                return isValid(stack.getProperty(EquipmentProperty.class));
+            public boolean test(ItemStack stack) {
+                return test(stack.getProperty(EquipmentProperty.class));
             }
 
             @Override
-            public boolean isValid(ItemStackSnapshot stack) {
-                return isValid(stack.getProperty(EquipmentProperty.class));
+            public boolean test(ItemStackSnapshot stack) {
+                return test(stack.getProperty(EquipmentProperty.class));
             }
 
             @Override
-            public boolean isValid(ItemType type) {
-                return isValid(type.getDefaultProperty(EquipmentProperty.class));
+            public boolean test(ItemType type) {
+                return test(type.getDefaultProperty(EquipmentProperty.class));
             }
         };
     }

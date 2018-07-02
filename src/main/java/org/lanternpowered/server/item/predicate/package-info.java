@@ -24,4 +24,4 @@
  * THE SOFTWARE.
  */
 @org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.inventory.filter;
+package org.lanternpowered.server.item.predicate;

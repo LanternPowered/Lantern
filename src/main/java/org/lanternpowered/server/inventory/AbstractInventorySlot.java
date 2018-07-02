@@ -29,11 +29,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.inventory.filter.EquipmentItemFilter;
-import org.lanternpowered.server.inventory.filter.ItemFilter;
-import org.lanternpowered.server.inventory.filter.PropertyItemFilters;
 import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
+import org.lanternpowered.server.item.predicate.EquipmentItemPredicate;
+import org.lanternpowered.server.item.predicate.ItemPredicate;
+import org.lanternpowered.server.item.predicate.PropertyItemPredicates;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -97,9 +97,9 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     private final List<SlotChangeListener> changeListeners = new ArrayList<>();
 
     /**
-     * The {@link ItemFilter} that defines which {@link ItemStack}s can be put in this slot.
+     * The {@link ItemPredicate} that defines which {@link ItemStack}s can be put in this slot.
      */
-    @Nullable private ItemFilter itemFilter;
+    @Nullable private ItemPredicate itemFilter;
 
     /**
      * Adds the {@link SlotChangeTracker}.
@@ -133,7 +133,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         this.itemStack = (LanternItemStack) itemStack;
     }
 
-    protected void setFilter(@Nullable ItemFilter itemFilter) {
+    protected void setFilter(@Nullable ItemPredicate itemFilter) {
         this.itemFilter = itemFilter;
     }
 
@@ -152,7 +152,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     }
 
     @Nullable
-    protected ItemFilter getFilter() {
+    protected ItemPredicate getFilter() {
         return this.itemFilter;
     }
 
@@ -196,20 +196,20 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     @Override
     public boolean isValidItem(ItemStack stack) {
         checkNotNull(stack, "stack");
-        return this.itemFilter == null || this.itemFilter.isValid(stack);
+        return this.itemFilter == null || this.itemFilter.test(stack);
     }
 
     @Override
     public boolean isValidItem(ItemType type) {
         checkNotNull(type, "type");
-        return this.itemFilter == null || this.itemFilter.isValid(type);
+        return this.itemFilter == null || this.itemFilter.test(type);
     }
 
     @Override
     public boolean isValidItem(EquipmentType type) {
         checkNotNull(type, "type");
-        return this.itemFilter == null || !(this.itemFilter instanceof EquipmentItemFilter) ||
-                ((EquipmentItemFilter) this.itemFilter).isValid(type);
+        return this.itemFilter == null || !(this.itemFilter instanceof EquipmentItemPredicate) ||
+                ((EquipmentItemPredicate) this.itemFilter).test(type);
     }
 
     @Override
@@ -546,9 +546,9 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     @SuppressWarnings("unchecked")
     public static final class Builder<T extends AbstractInventorySlot> extends AbstractArchetypeBuilder<T, AbstractInventorySlot, Builder<T>> {
 
-        @Nullable private ItemFilter itemFilter;
+        @Nullable private ItemPredicate itemFilter;
 
-        @Nullable private ItemFilter cachedResultItemFilter;
+        @Nullable private ItemPredicate cachedResultItemFilter;
         private boolean hasItemFilter;
 
         private Builder() {
@@ -556,12 +556,12 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         }
 
         /**
-         * Sets the {@link ItemFilter}.
+         * Sets the {@link ItemPredicate}.
          *
          * @param itemFilter The item filter
          * @return This builder, for chaining
          */
-        public Builder<T> filter(ItemFilter itemFilter) {
+        public Builder<T> filter(ItemPredicate itemFilter) {
             checkNotNull(itemFilter, "itemFilter");
             this.itemFilter = itemFilter;
             // Regenerate the result item filter
@@ -597,15 +597,15 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         @Override
         protected void build(AbstractInventorySlot inventory) {
             if (this.cachedResultItemFilter == null && this.hasItemFilter) {
-                ItemFilter itemFilter = this.itemFilter;
+                ItemPredicate itemFilter = this.itemFilter;
                 // Attempt to generate the ItemFilter
                 final LanternAcceptsItems acceptsItems = findProperty(LanternAcceptsItems.class);
                 if (acceptsItems != null) {
-                    itemFilter = PropertyItemFilters.of(acceptsItems);
+                    itemFilter = PropertyItemPredicates.of(acceptsItems);
                 }
                 final EquipmentSlotType equipmentSlotType = findProperty(EquipmentSlotType.class);
                 if (equipmentSlotType != null) {
-                    EquipmentItemFilter equipmentItemFilter = EquipmentItemFilter.of(equipmentSlotType);
+                    EquipmentItemPredicate equipmentItemFilter = EquipmentItemPredicate.of(equipmentSlotType);
                     if (itemFilter != null) {
                         equipmentItemFilter = equipmentItemFilter.andThen(itemFilter);
                     }

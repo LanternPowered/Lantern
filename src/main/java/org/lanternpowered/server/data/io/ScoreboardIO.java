@@ -29,7 +29,6 @@ import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
-import org.lanternpowered.server.scoreboard.LanternScore;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.Sponge;

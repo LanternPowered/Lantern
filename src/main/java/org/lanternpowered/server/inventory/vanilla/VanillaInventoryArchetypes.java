@@ -35,7 +35,6 @@ import org.lanternpowered.server.inventory.AbstractOrderedInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
-import org.lanternpowered.server.inventory.filter.ItemFilter;
 import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
 import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingGridInventory;
@@ -56,6 +55,7 @@ import org.lanternpowered.server.inventory.vanilla.block.DispenserInventory;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
+import org.lanternpowered.server.item.predicate.ItemPredicate;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
@@ -299,7 +299,7 @@ public final class VanillaInventoryArchetypes {
         /////////////////
 
         FUEL_SLOT = AbstractSlot.builder()
-                .filter(ItemFilter.ofStackPredicate(stack ->
+                .filter(ItemPredicate.ofStackPredicate(stack ->
                         Lantern.getRegistry().getFuelRegistry().findMatching(stack.createSnapshot()).isPresent()))
                 .type(LanternFuelSlot.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "fuel_slot");

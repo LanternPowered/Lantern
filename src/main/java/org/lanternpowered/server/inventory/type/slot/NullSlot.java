@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.inventory.type.slot;
 
-import org.lanternpowered.server.inventory.filter.ItemFilter;
+import org.lanternpowered.server.item.predicate.ItemPredicate;
 
 public class NullSlot extends LanternFilteringSlot {
 
@@ -33,6 +33,6 @@ public class NullSlot extends LanternFilteringSlot {
     public void init() {
         super.init();
         // Nothing can be put in
-        setFilter(ItemFilter.ofTypePredicate(type -> false));
+        setFilter(ItemPredicate.ofTypePredicate(type -> false));
     }
 }

@@ -31,7 +31,6 @@ import static org.spongepowered.api.command.CommandMessageFormatting.error;
 
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.scoreboard.LanternTeam;
-import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;

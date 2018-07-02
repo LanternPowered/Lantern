@@ -30,7 +30,6 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.inventory.vanilla.LanternMainPlayerInventory;
-import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.item.inventory.slot.InputSlot;
 
 public abstract class AbstractShiftClickBehavior implements ShiftClickBehavior {

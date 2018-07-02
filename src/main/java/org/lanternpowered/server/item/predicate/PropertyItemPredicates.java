@@ -23,11 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.filter;
+package org.lanternpowered.server.item.predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.inventory.filter.ItemFilter.ofTypePredicate;
+import static org.lanternpowered.server.item.predicate.ItemPredicate.ofTypePredicate;
 
 import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
 import org.spongepowered.api.data.Property;
@@ -37,71 +37,71 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Collection;
 
-public final class PropertyItemFilters {
+public final class PropertyItemPredicates {
 
     /**
-     * Constructs a {@link ItemFilter} that matches whether
+     * Constructs a {@link ItemPredicate} that matches whether
      * the {@link Property} is present and matches on the
      * {@link ItemStack}.
      *
      * @param property The property
      * @return The item filter
      */
-    public static ItemFilter hasMatchingProperty(Property<?,?> property) {
+    public static ItemPredicate hasMatchingProperty(Property<?,?> property) {
         checkNotNull(property, "property");
-        return new ItemFilter() {
+        return new ItemPredicate() {
             @Override
-            public boolean isValid(ItemStack stack) {
+            public boolean test(ItemStack stack) {
                 return stack.getProperty(property.getClass()).map(property::matches).orElse(false);
             }
 
             @Override
-            public boolean isValid(ItemStackSnapshot stack) {
+            public boolean test(ItemStackSnapshot stack) {
                 return stack.getProperty(property.getClass()).map(property::matches).orElse(false);
             }
 
             @Override
-            public boolean isValid(ItemType type) {
+            public boolean test(ItemType type) {
                 return type.getDefaultProperty(property.getClass()).map(property::matches).orElse(false);
             }
         };
     }
 
     /**
-     * Constructs a {@link ItemFilter} that matches whether
+     * Constructs a {@link ItemPredicate} that matches whether
      * the {@link Property} type is present on the {@link ItemStack}.
      *
      * @param propertyType The property type
      * @return The item filter
      */
-    public static ItemFilter hasProperty(Class<? extends Property<?,?>> propertyType) {
+    public static ItemPredicate hasProperty(Class<? extends Property<?,?>> propertyType) {
         checkNotNull(propertyType, "propertyType");
-        return new ItemFilter() {
+        return new ItemPredicate() {
             @Override
-            public boolean isValid(ItemStack stack) {
+            public boolean test(ItemStack stack) {
                 return stack.getProperty(propertyType).isPresent();
             }
 
             @Override
-            public boolean isValid(ItemStackSnapshot stack) {
+            public boolean test(ItemStackSnapshot stack) {
                 return stack.getProperty(propertyType).isPresent();
             }
 
             @Override
-            public boolean isValid(ItemType type) {
+            public boolean test(ItemType type) {
                 return type.getDefaultProperty(propertyType).isPresent();
             }
         };
     }
 
     /**
-     * Constructs a {@link ItemFilter} for the
+     * Constructs a {@link ItemPredicate} for the
      * {@link LanternAcceptsItems} property.
      *
      * @param acceptsItems The accepts items property
      * @return The item filter
      */
-    public static ItemFilter of(LanternAcceptsItems acceptsItems) {
+    public static ItemPredicate of(LanternAcceptsItems acceptsItems) {
         checkNotNull(acceptsItems, "acceptsItems");
         final Collection<ItemType> itemTypes = acceptsItems.getValue();
         checkNotNull(itemTypes, "value");
@@ -115,6 +115,6 @@ public final class PropertyItemFilters {
         }
     }
 
-    private PropertyItemFilters() {
+    private PropertyItemPredicates() {
     }
 }

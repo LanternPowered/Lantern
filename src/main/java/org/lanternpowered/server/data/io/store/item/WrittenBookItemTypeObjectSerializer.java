@@ -27,8 +27,8 @@ package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.text.gson.JsonTextSerializer;
+import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;

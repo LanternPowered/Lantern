@@ -75,7 +75,6 @@ import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSectionSnapshot;
 import org.slf4j.Logger;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;

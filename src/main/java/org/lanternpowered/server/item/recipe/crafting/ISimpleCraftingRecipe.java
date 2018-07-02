@@ -50,14 +50,14 @@ public interface ISimpleCraftingRecipe extends ICraftingRecipe {
     default ItemStackSnapshot getResult(CraftingMatrix craftingMatrix) {
         return match(craftingMatrix, null, Flags.RESULT_ITEM)
                 .map(result -> result.getResultItem().get())
-                .orElseThrow(() -> new IllegalStateException("isValid is false"));
+                .orElseThrow(() -> new IllegalStateException("test is false"));
     }
 
     @Override
     default List<ItemStackSnapshot> getRemainingItems(CraftingMatrix craftingMatrix) {
         return match(craftingMatrix, null, Flags.REMAINING_ITEMS)
                 .map(result -> result.getRemainingItems().get())
-                .orElseThrow(() -> new IllegalStateException("isValid is false"));
+                .orElseThrow(() -> new IllegalStateException("test is false"));
     }
 
     @Override

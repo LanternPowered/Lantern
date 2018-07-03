@@ -52,14 +52,14 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-public class LanternByteBuffer implements ByteBuffer {
+public final class LanternByteBuffer implements ByteBuffer {
 
     private final ByteBuf buf;
 
     @Nullable
     private LanternByteBuffer opposite;
 
-    LanternByteBuffer(ByteBuf buf) {
+    public LanternByteBuffer(ByteBuf buf) {
         this.buf = buf;
     }
 

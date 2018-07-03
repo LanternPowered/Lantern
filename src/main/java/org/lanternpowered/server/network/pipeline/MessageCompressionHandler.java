@@ -73,22 +73,22 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        ByteBuf prefixBuf = ctx.alloc().buffer(5);
-        ByteBuf contentsBuf;
+    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
+        final ByteBuf prefixBuf = ctx.alloc().buffer(5);
+        final ByteBuf contentsBuf;
 
         if (msg.readableBytes() >= this.compressionThreshold) {
             // Message should be compressed
-            int index = msg.readerIndex();
-            int length = msg.readableBytes();
+            final int index = msg.readerIndex();
+            final int length = msg.readableBytes();
 
-            byte[] sourceData = new byte[length];
+            final byte[] sourceData = new byte[length];
             msg.readBytes(sourceData);
             this.deflater.setInput(sourceData);
             this.deflater.finish();
 
-            byte[] compressedData = new byte[length];
-            int compressedLength = this.deflater.deflate(compressedData);
+            final byte[] compressedData = new byte[length];
+            final int compressedLength = this.deflater.deflate(compressedData);
             this.deflater.reset();
 
             if (compressedLength == 0) {
@@ -118,28 +118,27 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        int index = msg.readerIndex();
-        int uncompressedSize = readVarInt(msg);
+        final int index = msg.readerIndex();
+        final int uncompressedSize = readVarInt(msg);
         if (uncompressedSize == 0) {
             // Message is uncompressed
-            int length = msg.readableBytes();
+            final int length = msg.readableBytes();
             if (length >= this.compressionThreshold) {
-                // Invalid
-                throw new DecoderException("Received uncompressed message of size " + length + " greater than threshold "
-                        + this.compressionThreshold);
+                throw new DecoderException(String.format("Received uncompressed message of size %s greater than threshold %s",
+                        length, this.compressionThreshold));
             }
 
-            ByteBuf buf = ctx.alloc().buffer(length);
-            msg.readBytes(buf, length);
+            final ByteBuf buf = msg.slice();
+            buf.retain(); // Retain the sliced buffer, otherwise will MessageToMessageCodec clean it up
             out.add(buf);
         } else {
             // Message is compressed
-            byte[] sourceData = new byte[msg.readableBytes()];
+            final byte[] sourceData = new byte[msg.readableBytes()];
             msg.readBytes(sourceData);
             this.inflater.setInput(sourceData);
 
-            byte[] destData = new byte[uncompressedSize];
-            int resultLength = this.inflater.inflate(destData);
+            final byte[] destData = new byte[uncompressedSize];
+            final int resultLength = this.inflater.inflate(destData);
             this.inflater.reset();
 
             if (resultLength == 0) {

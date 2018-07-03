@@ -79,12 +79,12 @@ public final class MessageEncryptionHandler extends MessageToMessageCodec<ByteBu
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
         this.encodeBuf.crypt(msg, out);
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
         this.decodeBuf.crypt(msg, out);
     }
 

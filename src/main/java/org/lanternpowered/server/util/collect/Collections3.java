@@ -42,13 +42,17 @@ public final class Collections3 {
      */
     @Nullable
     public static <T> T pickRandomElement(Collection<T> collection) {
-        final int index = ThreadLocalRandom.current().nextInt(collection.size());
+        final int size = collection.size();
+        if (size == 0) {
+            return null;
+        }
+        final int index = ThreadLocalRandom.current().nextInt(size);
         int i = 0;
         for (T element : collection) {
             if (i++ == index) {
                 return element;
             }
         }
-        return null;
+        throw new IllegalStateException("Should never be reached");
     }
 }

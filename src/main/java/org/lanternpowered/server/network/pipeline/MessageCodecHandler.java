@@ -66,26 +66,18 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) {
         final Protocol protocol = this.codecContext.getSession().getProtocol();
         final MessageRegistration<Message> registration = (MessageRegistration<Message>) protocol.outbound()
                 .findByMessageType(message.getClass()).orElse(null);
-
         if (registration == null) {
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered!");
         }
-        CodecRegistration codecRegistration = registration.getCodecRegistration().orElse(null);
+
+        final CodecRegistration codecRegistration = registration.getCodecRegistration().orElse(null);
         if (codecRegistration == null) {
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered to allow encoding!");
         }
-
-        /*
-        if (message instanceof MessagePlayOutWorldTime ||
-                message instanceof MessageInOutKeepAlive) {
-        } else {
-            System.out.println(message.getClass().getName());
-        }
-        */
 
         final ByteBuf opcode = ctx.alloc().buffer();
 
@@ -93,21 +85,21 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         writeVarInt(opcode, codecRegistration.getOpcode());
 
         final Codec codec = codecRegistration.getCodec();
-        final ByteBuffer content;
+        final LanternByteBuffer content;
         try {
-            content = codec.encode(this.codecContext, message);
+            content = (LanternByteBuffer) codec.encode(this.codecContext, message);
         } finally {
             ReferenceCountUtil.release(message);
         }
 
         // Add the buffer to the output
-        output.add(Unpooled.wrappedBuffer(opcode, ((LanternByteBuffer) content).getDelegate()));
+        output.add(Unpooled.wrappedBuffer(opcode, content.getDelegate()));
     }
 
     private static final Set<Integer> warnedMissingOpcodes = Sets.newConcurrentHashSet();
 
     @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
+    public void decode(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) {
         if (input.readableBytes() == 0) {
             return;
         }
@@ -126,32 +118,20 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
             return;
         }
 
-        // Copy the remaining content of the buffer to a new buffer used by the
-        // message decoding
-        final ByteBuffer content = this.codecContext.byteBufAlloc().buffer(input.readableBytes());
-        input.readBytes(((LanternByteBuffer) content).getDelegate(), input.readableBytes());
+        // Slice the buffer, the rest of the input is message content
+        final ByteBuffer content = new LanternByteBuffer(input.slice());
 
         // Read the content of the message
-        final Message message;
-        try {
-            message = registration.getCodec().decode(this.codecContext, content);
-            if (content.available() > 0) {
-                Lantern.getLogger().warn("Trailing bytes {}b after decoding with message codec {} with opcode 0x{} in state {}!\n{}",
-                        content.available(), registration.getCodec().getClass().getName(), Integer.toHexString(opcode), state, message);
-            }
-        } finally {
-            content.release();
+        final Message message = registration.getCodec().decode(this.codecContext, content);
+        if (content.available() > 0) {
+            Lantern.getLogger().warn("Trailing bytes {}b after decoding with message codec {} with opcode 0x{} in state {}!\n{}",
+                    content.available(), registration.getCodec().getClass().getName(), Integer.toHexString(opcode), state, message);
         }
-
-        /*
-        if (message instanceof MessageInOutKeepAlive ||
-                message instanceof MessagePlayInPlayerMovement) {
-        } else {
-            System.out.println(message.getClass().getName());
-        }
-        */
 
         processMessage(message, output, protocol, state, this.codecContext);
+        if (!output.contains(message)) {
+            ReferenceCountUtil.release(message);
+        }
     }
 
     private void processMessage(Message message, List<Object> output, Protocol protocol, ProtocolState state, CodecContext context) {
@@ -163,7 +143,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
                     processMessage(message1, output, protocol, state, context));
             return;
         }
-        final MessageRegistration messageRegistration = (MessageRegistration) protocol.inbound()
+        final MessageRegistration messageRegistration = protocol.inbound()
                 .findByMessageType(message.getClass()).orElseThrow(() -> new DecoderException(
                         "The returned message type is not attached to the used protocol state (" + state.toString() + ")!"));
         final List<Processor> processors = messageRegistration.getProcessors();

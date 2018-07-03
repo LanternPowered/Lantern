@@ -64,7 +64,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object object) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object object) {
         final LanternServer server = this.session.getServer();
 
         final ByteBuf buf = (ByteBuf) object;
@@ -259,7 +259,10 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
         output.writeShort(data.length >> 1);
         output.writeBytes(data);
 
-        ctx.channel().pipeline().firstContext().writeAndFlush(output).addListener(ChannelFutureListener.CLOSE);
+        ctx = ctx.channel().pipeline().firstContext();
+        if (ctx != null) {
+            ctx.writeAndFlush(output).addListener(ChannelFutureListener.CLOSE);
+        }
     }
 
     private static String getFirstLine(String value) {

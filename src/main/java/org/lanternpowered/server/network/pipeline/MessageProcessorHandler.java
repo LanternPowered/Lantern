@@ -26,12 +26,13 @@
 package org.lanternpowered.server.network.pipeline;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.EncoderException;
-import io.netty.handler.codec.MessageToMessageEncoder;
-import io.netty.util.ReferenceCounted;
-import io.netty.util.concurrent.FastThreadLocal;
+import io.netty.util.ReferenceCountUtil;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
+import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
@@ -44,9 +45,8 @@ import java.util.List;
  * receiving channel attributes and extra pipeline components.
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
+public class MessageProcessorHandler extends ChannelOutboundHandlerAdapter {
 
-    private final FastThreadLocal<List<Object>> messages = new FastThreadLocal<>();
     private final CodecContext codecContext;
 
     public MessageProcessorHandler(CodecContext codecContext) {
@@ -54,42 +54,45 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
-        final List<Object> messages = this.messages.get();
-        if (messages != null) {
-            this.messages.remove();
-            output.addAll(messages);
+    public void write(ChannelHandlerContext ctx, Object msg0, ChannelPromise promise) {
+        final Message msg = (Message) msg0;
+        if (msg == NullMessage.INSTANCE) {
+            return;
         }
-    }
-
-    @Override
-    public boolean acceptOutboundMessage(Object msg) throws Exception {
-        final Message message = (Message) msg;
         final Protocol protocol = this.codecContext.getSession().getProtocol();
-        final MessageRegistration registration = protocol.outbound().findByMessageType(message.getClass()).orElse(null);
-
+        final MessageRegistration registration = protocol.outbound().findByMessageType(msg.getClass()).orElse(null);
+        // There must be a registration
         if (registration == null) {
-            throw new EncoderException("Message type (" + message.getClass().getName() +
-                    ") is not registered in state " + this.codecContext.getSession().getProtocolState().name() + "!");
+            throw new EncoderException(String.format("Message type (%s) is not registered in state %s!",
+                    msg.getClass().getName(), this.codecContext.getSession().getProtocolState().name()));
         }
 
-        final List<Processor> processors = ((MessageRegistration) protocol.outbound()
-                .findByMessageType(message.getClass()).get()).getProcessors();
-        // Only process if there are processors found
-        if (!processors.isEmpty()) {
+        final List<Processor> processors = registration.getProcessors();
+        if (processors.isEmpty()) {
+            // Just forward the message
+            ctx.write(msg, promise);
+        } else {
             final List<Object> messages = new ArrayList<>();
             for (Processor processor : processors) {
                 // The processor should handle the output messages
-                processor.process(this.codecContext, message, messages);
+                processor.process(this.codecContext, msg, messages);
             }
-            if (message instanceof ReferenceCounted && !messages.contains(message)) {
-                ((ReferenceCounted) message).release();
+            // Only release the message its not being forwarded
+            if (!messages.contains(msg)) {
+                ReferenceCountUtil.release(msg);
             }
-            if (!messages.isEmpty()) {
-                this.messages.set(messages);
+            if (messages.isEmpty()) {
+                // Cancel the promise since the message didn't get sent further into the pipeline
+                promise.cancel(false);
+            } else {
+                final ChannelPromise voidPromise = ctx.voidPromise();
+                // Send all the messages, only send the last message with the promise
+                final int last = messages.size() - 1;
+                for (int i = 0; i < last; i++) {
+                    ctx.write(messages.get(i), voidPromise);
+                }
+                ctx.write(messages.get(last), promise);
             }
-            return true;
         }
-        return false;
     }
 }

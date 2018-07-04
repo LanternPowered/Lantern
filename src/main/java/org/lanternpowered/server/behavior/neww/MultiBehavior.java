@@ -27,19 +27,14 @@ package org.lanternpowered.server.behavior.neww;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import org.lanternpowered.server.util.MethodHandleMagic;
-import org.lanternpowered.server.util.UncheckedThrowables;
+import org.lanternpowered.server.util.FunctionalInterface;
+import org.lanternpowered.server.util.LambdaFactory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -73,13 +68,10 @@ import java.util.Set;
  */
 public abstract class MultiBehavior implements Behavior {
 
-    private static final MethodType internalBehaviorMethodType = MethodType.methodType(InternalBehavior.class);
-    private static final MethodType internalBehaviorApplyMethodType =
-            MethodType.methodType(MultiBehavior.class, BehaviorType.class, BehaviorContext.class);
-
-    private static final MethodType simpleInternalBehaviorMethodType = MethodType.methodType(SimpleInternalBehavior.class);
-    private static final MethodType simpleInternalBehaviorApplyMethodType =
-            MethodType.methodType(MultiBehavior.class, BehaviorType.class, BehaviorContext.class);
+    private static final FunctionalInterface<InternalBehavior> internalBehaviorInterface =
+            FunctionalInterface.of(InternalBehavior.class);
+    private static final FunctionalInterface<SimpleInternalBehavior> simpleInternalBehaviorInterface =
+            FunctionalInterface.of(SimpleInternalBehavior.class);
 
     private final Multimap<BehaviorType, InternalBehavior> behaviors = LinkedListMultimap.create();
 
@@ -119,27 +111,14 @@ public abstract class MultiBehavior implements Behavior {
                     throw new IllegalStateException(String.format("The second (or first) parameter must be BehaviorContext. "
                             + "Found invalid method %s in class %s", method.getName(), theClass.getName()));
                 }
-                try {
-                    final MethodHandles.Lookup lookup = MethodHandleMagic.trustedLookup().in(theClass);
-                    final MethodHandle methodHandle = lookup.unreflect(method);
-
-                    // Generate the lambda class
-                    final CallSite callSite;
-                    if (params.length == 1) {
-                        callSite = LambdaMetafactory.metafactory(lookup, "apply",
-                                simpleInternalBehaviorMethodType, simpleInternalBehaviorApplyMethodType, methodHandle, methodHandle.type());
-                    } else {
-                        callSite = LambdaMetafactory.metafactory(lookup, "apply",
-                                internalBehaviorMethodType, internalBehaviorApplyMethodType, methodHandle, methodHandle.type());
-                    }
-
-                    // Create the supplier
-                    final InternalBehavior internalBehavior = (InternalBehavior) callSite.getTarget().invokeExact();
-                    for (BehaviorMethod behaviorMethod : behaviorMethods.value()) {
-                        this.behaviors.put(BehaviorType.of(behaviorMethod.value()), internalBehavior);
-                    }
-                } catch (Throwable t) {
-                    throw UncheckedThrowables.thrOw(t);
+                final InternalBehavior internalBehavior;
+                if (params.length == 1) {
+                    internalBehavior = LambdaFactory.create(simpleInternalBehaviorInterface, method);
+                } else {
+                    internalBehavior = LambdaFactory.create(internalBehaviorInterface, method);
+                }
+                for (BehaviorMethod behaviorMethod : behaviorMethods.value()) {
+                    this.behaviors.put(BehaviorType.of(behaviorMethod.value()), internalBehavior);
                 }
             }
         // Loop through all the superclasses until we reach this class

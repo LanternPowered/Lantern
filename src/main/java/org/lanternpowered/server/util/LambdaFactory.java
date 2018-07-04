@@ -34,8 +34,8 @@ import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
@@ -45,23 +45,9 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public final class LambdaFactory {
 
-    /**
-     * The {@link MethodType}s for a {@link Supplier}.
-     */
-    private static final MethodType supplierMethodType = MethodType.methodType(Supplier.class);
-    private static final MethodType supplierGetMethodType = MethodType.methodType(Object.class);
-
-    /**
-     * The {@link MethodType}s for a {@link Consumer}.
-     */
-    private static final MethodType consumerMethodType = MethodType.methodType(Consumer.class);
-    private static final MethodType consumerAcceptMethodType = MethodType.methodType(void.class, Object.class);
-
-    /**
-     * The {@link MethodType}s for a {@link BiConsumer}.
-     */
-    private static final MethodType biConsumerMethodType = MethodType.methodType(BiConsumer.class);
-    private static final MethodType biConsumerAcceptMethodType = MethodType.methodType(void.class, Object.class, Object.class);
+    private static final FunctionalInterface<Supplier> supplierInterface = FunctionalInterface.of(Supplier.class);
+    private static final FunctionalInterface<Consumer> consumerInterface = FunctionalInterface.of(Consumer.class);
+    private static final FunctionalInterface<BiConsumer> biConsumerInterface = FunctionalInterface.of(BiConsumer.class);
 
     /**
      * Creates a {@link Supplier} to create objects of the type
@@ -83,19 +69,7 @@ public final class LambdaFactory {
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("The object class \"" + objectType.getName() + "\" doesn't have a empty constructor.");
         }
-        try {
-            final MethodHandles.Lookup lookup = MethodHandleMagic.trustedLookup().in(objectType);
-            final MethodHandle methodHandle = lookup.unreflectConstructor(constructor);
-
-            // Generate the lambda class
-            final CallSite callSite = LambdaMetafactory.metafactory(lookup, "get",
-                    supplierMethodType, supplierGetMethodType, methodHandle, methodHandle.type());
-
-            // Create the supplier
-            return (Supplier<T>) callSite.getTarget().invokeExact();
-        } catch (Throwable e) {
-            throw new IllegalStateException("Something went wrong for \"" + objectType.getName() + "\"", e);
-        }
+        return create(supplierInterface, constructor);
     }
 
     /**
@@ -114,19 +88,7 @@ public final class LambdaFactory {
                 "The method \"%s\" may not have any parameters.", method);
         checkMethodArgument(method.getReturnType().equals(void.class),
                 "The method \"%s\" return type must not be void.", method);
-        try {
-            final MethodHandles.Lookup lookup = MethodHandleMagic.trustedLookup().in(method.getDeclaringClass());
-            final MethodHandle methodHandle = lookup.unreflect(method);
-
-            // Generate the lambda class
-            final CallSite callSite = LambdaMetafactory.metafactory(lookup, "get",
-                    supplierMethodType, supplierGetMethodType, methodHandle, methodHandle.type());
-
-            // Create the supplier
-            return (Supplier<T>) callSite.getTarget().invokeExact();
-        } catch (Throwable e) {
-            throw new IllegalStateException("Something went wrong for \"" + formatMethod(method) + "\"", e);
-        }
+        return create(supplierInterface, method);
     }
 
     /**
@@ -149,18 +111,7 @@ public final class LambdaFactory {
         }
         checkMethodArgument(method.getReturnType().equals(void.class),
                 "The method \"%s\" return type must be void.", method);
-        try {
-            final MethodHandles.Lookup lookup = MethodHandleMagic.trustedLookup().in(method.getDeclaringClass());
-            final MethodHandle methodHandle = lookup.unreflect(method);
-
-            final CallSite callSite = LambdaMetafactory.metafactory(lookup, "accept",
-                    consumerMethodType, consumerAcceptMethodType, methodHandle, methodHandle.type());
-
-            // Create the bi consumer
-            return (Consumer<A>) callSite.getTarget().invokeExact();
-        } catch (Throwable e) {
-            throw new IllegalStateException("Something went wrong for \"" + formatMethod(method) + "\"", e);
-        }
+        return create(consumerInterface, method);
     }
 
     /**
@@ -184,17 +135,41 @@ public final class LambdaFactory {
         }
         checkMethodArgument(method.getReturnType().equals(void.class),
                 "The method \"%s\" return type must be void.", method);
+        return create(biConsumerInterface, method);
+    }
+
+    /**
+     * Attempts to create a lambda for the given {@link Executable}
+     * implementing the {@link FunctionalInterface}.
+     *
+     * @param functionalInterface The functional interface to implement
+     * @param executable The executable to call
+     * @param <T> The functional interface type
+     * @param <F> The function type
+     * @return The function
+     */
+    public static <T, F extends T> F create(FunctionalInterface<T> functionalInterface, Executable executable) {
         try {
-            final MethodHandles.Lookup lookup = MethodHandleMagic.trustedLookup().in(method.getDeclaringClass());
-            final MethodHandle methodHandle = lookup.unreflect(method);
+            final MethodHandles.Lookup lookup = MethodHandleMagic.trustedLookup().in(executable.getDeclaringClass());
+            final MethodHandle methodHandle;
+            if (executable instanceof Constructor) {
+                methodHandle = lookup.unreflectConstructor((Constructor<?>) executable);
+            } else {
+                methodHandle = lookup.unreflect((Method) executable);
+            }
 
-            final CallSite callSite = LambdaMetafactory.metafactory(lookup, "accept",
-                    biConsumerMethodType, biConsumerAcceptMethodType, methodHandle, methodHandle.type());
+            // Generate the lambda class
+            final CallSite callSite = LambdaMetafactory.metafactory(lookup, functionalInterface.methodName,
+                    functionalInterface.classType, functionalInterface.methodType, methodHandle, methodHandle.type());
 
-            // Create the bi consumer
-            return (BiConsumer<A, B>) callSite.getTarget().invokeExact();
+            // Create the function
+            // DON'T USE invokeExact, this acts really weird in this case,
+            // for some reason is WrongMethodTypeException being thrown when
+            // it shouldn't be, anyway, don't bother
+            return (F) callSite.getTarget().invoke();
         } catch (Throwable e) {
-            throw new IllegalStateException("Something went wrong for \"" + formatMethod(method) + "\"", e);
+            throw new IllegalStateException("Couldn't create lambda for: \"" + executable + "\". "
+                    + "Failed to implement: " + functionalInterface, e);
         }
     }
 

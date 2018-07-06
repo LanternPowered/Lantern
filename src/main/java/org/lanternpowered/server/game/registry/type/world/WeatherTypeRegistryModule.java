@@ -59,7 +59,7 @@ public final class WeatherTypeRegistryModule extends AdditionalPluginCatalogRegi
         LanternScriptGameRegistry.get()
                 .constructAll("*:weather", Weather.class)
                 .forEach(weather -> {
-                    Lantern.getLogger().debug("Registered a Weather: " + weather.getId());
+                    Lantern.getLogger().debug("Registered a Weather: " + weather.getKey());
                     register(weather);
                 });
     }

@@ -123,7 +123,7 @@ public final class ImmutableDataCachingUtil {
         final StringBuilder builder = new StringBuilder(immutableClass.getCanonicalName() + ":");
         for (Object object : args) {
             if (object instanceof CatalogType) {
-                builder.append("{").append(((CatalogType) object).getId()).append("}");
+                builder.append("{").append(((CatalogType) object).getKey()).append("}");
             } else {
                 builder.append("{").append(object.toString()).append("}");
             }

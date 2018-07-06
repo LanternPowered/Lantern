@@ -26,6 +26,9 @@
 package org.lanternpowered.server.plugin;
 
 import com.google.inject.Injector;
+import com.google.inject.Scopes;
+import kotlin.jvm.JvmClassMappingKt;
+import kotlin.reflect.KClass;
 import org.lanternpowered.server.inject.plugin.PluginModule;
 import org.spongepowered.plugin.meta.PluginMetadata;
 
@@ -34,6 +37,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("ALL")
 public final class LanternPluginContainer extends InfoPluginContainer {
 
     private final Injector injector;
@@ -45,8 +49,30 @@ public final class LanternPluginContainer extends InfoPluginContainer {
         super(id, pluginMetadata);
         this.source = source;
 
-        this.injector = injector.createChildInjector(new PluginModule(this, pluginClass));
-        this.instance = this.injector.getInstance(pluginClass);
+        final KClass<?> kClass = JvmClassMappingKt.getKotlinClass(pluginClass);
+        // Check for object classes, in this case is the object already instantiated
+        final Object objectInstance = kClass.getObjectInstance();
+        if (objectInstance != null) {
+            this.instance = objectInstance;
+            this.injector = injector.createChildInjector(new PluginModule(this) {
+                @Override
+                protected void configure() {
+                    super.configure();
+                    bind((Class) pluginClass).toInstance(objectInstance);
+                }
+            });
+            // Just inject the members
+            this.injector.injectMembers(objectInstance);
+        } else {
+            this.injector = injector.createChildInjector(new PluginModule(this) {
+                @Override
+                protected void configure() {
+                    super.configure();
+                    bind(pluginClass).in(Scopes.SINGLETON);
+                }
+            });
+            this.instance = this.injector.getInstance(pluginClass);
+        }
     }
 
     @Override

@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.fluid;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.fluid.LanternFluidType;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
 import org.spongepowered.api.block.BlockTypes;
@@ -45,7 +46,7 @@ public class FluidTypeRegistryModule extends InternalPluginCatalogRegistryModule
 
     @Override
     public void registerDefaults() {
-        register(new LanternFluidType("minecraft", "Water", 0, () -> BlockTypes.WATER));
-        register(new LanternFluidType("minecraft", "Lava", 1, () -> BlockTypes.LAVA));
+        register(new LanternFluidType(CatalogKeys.minecraft("water", "Water"), 0, () -> BlockTypes.WATER));
+        register(new LanternFluidType(CatalogKeys.minecraft("lava", "Lava"), 1, () -> BlockTypes.LAVA));
     }
 }

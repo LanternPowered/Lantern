@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.text;
 
 import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.text.chat.LanternChatVisibility;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
@@ -50,11 +51,11 @@ public final class ChatVisibilityRegistryModule extends AdditionalInternalPlugin
 
     @Override
     public void registerDefaults() {
-        register(new LanternChatVisibility("minecraft", "full", 0,
+        register(new LanternChatVisibility(CatalogKey.minecraft("full"), 0,
                 type -> true));
-        register(new LanternChatVisibility("minecraft", "system", 1,
+        register(new LanternChatVisibility(CatalogKey.minecraft("system"), 1,
                 type -> type == ChatTypes.SYSTEM || type == ChatTypes.ACTION_BAR));
-        register(new LanternChatVisibility("minecraft", "hidden", 2,
+        register(new LanternChatVisibility(CatalogKey.minecraft("hidden"), 2,
                 type -> false));
     }
 }

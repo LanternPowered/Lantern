@@ -38,6 +38,7 @@ import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
@@ -78,19 +79,19 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
 
     @Override
     public void registerDefaults() {
-        register(LanternTileEntityType.of("minecraft", "chest", LanternChest::new));
-        register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
-        register(LanternTileEntityType.of("minecraft", "furnace", LanternFurnace::new));
-        register(LanternTileEntityType.of("minecraft", "jukebox", LanternJukebox::new));
-        register(LanternTileEntityType.of("minecraft", "noteblock", LanternNote::new));
-        register(LanternTileEntityType.of("minecraft", "shulker_box", LanternShulkerBox::new));
+        register(LanternTileEntityType.of(CatalogKey.minecraft("chest"), LanternChest::new));
+        register(LanternTileEntityType.of(CatalogKey.minecraft("ender_chest"), LanternEnderChest::new));
+        register(LanternTileEntityType.of(CatalogKey.minecraft("furnace"), LanternFurnace::new));
+        register(LanternTileEntityType.of(CatalogKey.minecraft("jukebox"), LanternJukebox::new));
+        register(LanternTileEntityType.of(CatalogKey.minecraft("noteblock"), LanternNote::new));
+        register(LanternTileEntityType.of(CatalogKey.minecraft("shulker_box"), LanternShulkerBox::new));
     }
 
     @Override
     public Map<String, TileEntityType> provideCatalogMap() {
         final Map<String, TileEntityType> map = new HashMap<>(super.provideCatalogMap());
         // Because they had to give the mapping a different name
-        map.putIfAbsent("note", getById("minecraft:noteblock").get());
+        map.putIfAbsent("note", get(CatalogKey.minecraft("noteblock")).get());
         return map;
     }
 }

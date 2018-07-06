@@ -25,22 +25,23 @@
  */
 package org.lanternpowered.server.game.registry;
 
+import kotlin.reflect.KClass;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 
-import java.util.function.Function;
-
-import javax.annotation.Nullable;
-
 public class AdditionalInternalPluginCatalogRegistryModule<T extends CatalogType> extends InternalPluginCatalogRegistryModule<T>
         implements AdditionalCatalogRegistryModule<T> {
+
+    public AdditionalInternalPluginCatalogRegistryModule() {
+        super();
+    }
 
     public AdditionalInternalPluginCatalogRegistryModule(Class<?>... catalogClasses) {
         super(catalogClasses);
     }
 
-    public AdditionalInternalPluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider) {
-        super(catalogClasses, mappingProvider);
+    public AdditionalInternalPluginCatalogRegistryModule(KClass<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
     @Override

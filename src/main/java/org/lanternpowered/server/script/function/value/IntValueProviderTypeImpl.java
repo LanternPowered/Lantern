@@ -28,16 +28,11 @@ package org.lanternpowered.server.script.function.value;
 import org.lanternpowered.api.script.function.value.IntValueProvider;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
 import org.lanternpowered.server.script.function.AbstractFunctionType;
+import org.spongepowered.api.CatalogKey;
 
 public class IntValueProviderTypeImpl extends AbstractFunctionType<IntValueProvider> implements IntValueProviderType {
 
-    public IntValueProviderTypeImpl(String pluginId, String name,
-            Class<? extends IntValueProvider> type) {
-        super(pluginId, name, type);
-    }
-
-    public IntValueProviderTypeImpl(String pluginId, String id, String name,
-            Class<? extends IntValueProvider> type) {
-        super(pluginId, id, name, type);
+    public IntValueProviderTypeImpl(CatalogKey key, Class<? extends IntValueProvider> type) {
+        super(key, type);
     }
 }

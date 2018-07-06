@@ -27,7 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleShiftClickBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;

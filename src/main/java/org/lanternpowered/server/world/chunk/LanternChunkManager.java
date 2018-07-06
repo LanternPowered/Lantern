@@ -46,16 +46,16 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.util.concurrent.SoftThreadLocal;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.util.ThreadHelper;
-import org.lanternpowered.server.util.concurrent.FastSoftThreadLocal;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
@@ -324,10 +324,10 @@ public final class LanternChunkManager {
     }
 
     // The world generation buffers that will be reused
-    private final FastSoftThreadLocal<GenerationBuffers> genBuffers = FastSoftThreadLocal.withInitial(GenerationBuffers::new);
+    private final SoftThreadLocal<GenerationBuffers> genBuffers = new SoftThreadLocal<>(GenerationBuffers::new);
 
     // The randoms that will be shared for population
-    private final FastSoftThreadLocal<PopulationData> populationData = FastSoftThreadLocal.withInitial(PopulationData::new);
+    private final SoftThreadLocal<PopulationData> populationData = new SoftThreadLocal<>(PopulationData::new);
 
     // The world generator
     private volatile WorldGenerator worldGenerator;

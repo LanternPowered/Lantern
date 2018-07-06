@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
@@ -58,7 +59,6 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
@@ -273,7 +273,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         // Get the dimension type
         final LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
         // Create the weather universe if needed
-        if (dimensionType.hasSky()) {
+        if (dimensionType.getHasSky()) {
             this.weatherUniverse = new LanternWeatherUniverse(this);
         } else {
             this.weatherUniverse = null;
@@ -1110,7 +1110,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         checkNotNull(type, "chatType");
         checkNotNull(message, "message");
         if (!this.players.isEmpty()) {
-            final Message networkMessage = ((LanternChatType) type).getMessageProvider().apply(message);
+            final Message networkMessage = ((LanternChatType) type).getMessageProvider().invoke(message);
             for (LanternPlayer player : this.players) {
                 if (player.getChatVisibility().isVisible(type)) {
                     player.getConnection().send(networkMessage);

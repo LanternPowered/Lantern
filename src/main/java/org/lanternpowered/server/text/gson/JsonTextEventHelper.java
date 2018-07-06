@@ -34,6 +34,7 @@ import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.util.UncheckedThrowables;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
@@ -139,7 +140,7 @@ final class JsonTextEventHelper {
                 EntityType entityType = null;
                 if (dataView.contains(SHOW_ENTITY_TYPE)) {
                     entityType = Sponge.getRegistry().getType(EntityType.class,
-                            dataView.getString(SHOW_ENTITY_TYPE).get()).orElse(null);
+                            CatalogKey.resolve(dataView.getString(SHOW_ENTITY_TYPE).get())).orElse(null);
                 }
 
                 return TextActions.showEntity(uuid, name, entityType);
@@ -182,7 +183,7 @@ final class JsonTextEventHelper {
             final DataContainer dataContainer = DataContainer.createNew()
                     .set(SHOW_ENTITY_ID, ref.getUniqueId().toString())
                     .set(SHOW_ENTITY_NAME, ref.getName());
-            ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, type.getId()));
+            ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, type.getKey().toString()));
 
             try {
                 return new RawAction("show_entity", JsonDataFormat.writeAsString(dataContainer));

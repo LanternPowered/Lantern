@@ -25,12 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.data.type.LanternHandPreference;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
 
-public final class HandPreferenceRegistryModule extends SimpleCatalogRegistryModule<HandPreference> {
+public final class HandPreferenceRegistryModule extends DefaultCatalogRegistryModule<HandPreference> {
 
     public HandPreferenceRegistryModule() {
         super(HandPreferences.class);
@@ -38,7 +39,7 @@ public final class HandPreferenceRegistryModule extends SimpleCatalogRegistryMod
 
     @Override
     public void registerDefaults() {
-        register(new LanternHandPreference("left", "options.mainHand.left"));
-        register(new LanternHandPreference("right", "options.mainHand.right"));
+        register(new LanternHandPreference(CatalogKeys.minecraft("left"), "options.mainHand.left"));
+        register(new LanternHandPreference(CatalogKeys.minecraft("right"), "options.mainHand.right"));
     }
 }

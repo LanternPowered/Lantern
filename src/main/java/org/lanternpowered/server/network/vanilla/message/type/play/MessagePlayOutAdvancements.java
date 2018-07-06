@@ -204,7 +204,7 @@ public final class MessagePlayOutAdvancements implements Message {
                         .add("icon", this.icon)
                         .add("title", this.title)
                         .add("description", this.description)
-                        .add("type", this.frameType.getId())
+                        .add("type", this.frameType.getKey())
                         .add("background", this.background)
                         .add("showToast", this.showToast)
                         .add("x", this.x)

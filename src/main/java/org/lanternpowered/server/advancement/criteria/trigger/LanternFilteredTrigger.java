@@ -53,7 +53,7 @@ public final class LanternFilteredTrigger<C extends FilteredTriggerConfiguration
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("type", this.type.getId())
+                .add("type", this.type.getKey())
                 .add("config", this.config)
                 .toString();
     }

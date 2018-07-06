@@ -33,6 +33,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.config.world.WorldConfig;
@@ -56,7 +57,6 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
@@ -96,6 +96,7 @@ import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
@@ -340,7 +341,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         ((ElementKeyRegistration<?, Optional<AdvancementTree>>) c.get(LanternKeys.OPEN_ADVANCEMENT_TREE).get())
                 .addListener((oldElement, newElement) -> {
                     if (getWorld() != null) {
-                        this.session.send(new MessagePlayOutSelectAdvancementTree(newElement.map(AdvancementTree::getId).orElse(null)));
+                        this.session.send(new MessagePlayOutSelectAdvancementTree(
+                                newElement.map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
                     }
                 });
     }
@@ -401,8 +403,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 }
                 this.tabList.init(tabListEntries);
                 this.advancementsProgress.initClient();
-                this.session.send(new MessagePlayOutSelectAdvancementTree(
-                        get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getId).orElse(null)));
+                this.session.send(new MessagePlayOutSelectAdvancementTree(get(LanternKeys.OPEN_ADVANCEMENT_TREE).get()
+                        .map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
                 // TODO: the readable ids still has to be made
                 final int[] recipes = new int[435];
@@ -833,7 +835,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         checkNotNull(message, "message");
         checkNotNull(type, "type");
         if (this.chatVisibility.isVisible(type)) {
-            this.session.send(((LanternChatType) type).getMessageProvider().apply(message));
+            this.session.send(((LanternChatType) type).getMessageProvider().invoke(message));
         }
     }
 
@@ -993,7 +995,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             container = ((IContainerProvidedInventory) inventory).createContainer(this);
         } else {
             inventory.getProperty(GuiIdProperty.class).map(GuiIdProperty::getValue).orElseThrow(() ->
-                    new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getId()));
+                    new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getKey()));
             container = PlayerTopBottomContainer.construct(this.inventory, (AbstractChildrenInventory) inventory);
             container.setName(name);
         }

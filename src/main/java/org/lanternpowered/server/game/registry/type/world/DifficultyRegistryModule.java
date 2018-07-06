@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.world;
 
 import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
@@ -44,9 +45,9 @@ public final class DifficultyRegistryModule extends AdditionalInternalPluginCata
 
     @Override
     public void registerDefaults() {
-        register(new LanternDifficulty("minecraft", "peaceful", 0));
-        register(new LanternDifficulty("minecraft", "easy", 1));
-        register(new LanternDifficulty("minecraft", "normal", 2));
-        register(new LanternDifficulty("minecraft", "hard", 3));
+        register(new LanternDifficulty(CatalogKey.minecraft("peaceful"), 0));
+        register(new LanternDifficulty(CatalogKey.minecraft("easy"), 1));
+        register(new LanternDifficulty(CatalogKey.minecraft("normal"), 2));
+        register(new LanternDifficulty(CatalogKey.minecraft("hard"), 3));
     }
 }

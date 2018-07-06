@@ -28,10 +28,10 @@ package org.lanternpowered.server.advancement.criteria.progress;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternAdvancementProgress;
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.criteria.ScoreCriterionProgress;

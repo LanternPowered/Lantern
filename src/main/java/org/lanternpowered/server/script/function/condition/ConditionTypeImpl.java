@@ -28,16 +28,11 @@ package org.lanternpowered.server.script.function.condition;
 import org.lanternpowered.api.script.function.condition.Condition;
 import org.lanternpowered.api.script.function.condition.ConditionType;
 import org.lanternpowered.server.script.function.AbstractFunctionType;
+import org.spongepowered.api.CatalogKey;
 
 public class ConditionTypeImpl extends AbstractFunctionType<Condition> implements ConditionType {
 
-    public ConditionTypeImpl(String pluginId, String name,
-            Class<? extends Condition> type) {
-        super(pluginId, name, type);
-    }
-
-    public ConditionTypeImpl(String pluginId, String id, String name,
-            Class<? extends Condition> type) {
-        super(pluginId, id, name, type);
+    public ConditionTypeImpl(CatalogKey key, Class<? extends Condition> type) {
+        super(key, type);
     }
 }

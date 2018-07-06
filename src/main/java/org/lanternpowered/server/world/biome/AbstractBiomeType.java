@@ -25,20 +25,17 @@
  */
 package org.lanternpowered.server.world.biome;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.world.biome.BiomeType;
 
-public abstract class AbstractBiomeType extends PluginCatalogType.Base implements BiomeType {
+public abstract class AbstractBiomeType extends DefaultCatalogType implements BiomeType {
 
     private double temperature;
     private double humidity;
 
-    public AbstractBiomeType(String pluginId, String identifier) {
-        super(pluginId, identifier);
-    }
-
-    public AbstractBiomeType(String pluginId, String identifier, String name) {
-        super(pluginId, identifier, name);
+    public AbstractBiomeType(CatalogKey key) {
+        super(key);
     }
 
     @Override

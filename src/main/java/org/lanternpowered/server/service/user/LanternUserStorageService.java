@@ -44,7 +44,7 @@ import org.lanternpowered.server.data.io.UserIO;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ProxyUser;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inject.Service;
+import org.lanternpowered.server.service.Service;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.util.UncheckedThrowables;

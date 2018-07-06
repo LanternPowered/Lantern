@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.rules;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;

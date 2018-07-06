@@ -28,6 +28,7 @@ package org.lanternpowered.server.statistic.builder;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.statistic.LanternBlockStatistic;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
@@ -67,6 +68,6 @@ final class LanternBlockStatisticBuilder extends AbstractStatisticBuilder<BlockS
     protected BlockStatistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
             String internalId, @Nullable Criterion criterion) {
         checkState(this.blockType != null, "The blockType must be set");
-        return new LanternBlockStatistic(pluginId, id, name, translation, internalId, format, criterion, type, this.blockType);
+        return new LanternBlockStatistic(CatalogKeys.of(pluginId, id, name), translation, internalId, format, criterion, type, this.blockType);
     }
 }

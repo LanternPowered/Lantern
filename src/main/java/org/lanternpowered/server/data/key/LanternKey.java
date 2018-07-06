@@ -30,9 +30,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.event.RegisteredListener;
 import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
@@ -55,7 +57,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class LanternKey<V extends BaseValue<?>> implements Key<V> {
+public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
 
     private static final TypeVariable<Class<Optional>> optionalType = Optional.class.getTypeParameters()[0];
     private static final TypeVariable<Class<BaseValue>> elementType = BaseValue.class.getTypeParameters()[0];
@@ -65,7 +67,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
     private static Set<String> loggedPlugins = new HashSet<>();
 
     private final TypeToken<V> valueToken;
-    private final String id;
+    private final CatalogKey key;
     private final String name;
     private final DataQuery query;
     private final TypeToken<?> elementToken;
@@ -92,16 +94,16 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
         final PluginContainer plugin = CauseStack.current().first(PluginContainer.class).get();
         final String id = builder.id;
         if (id.indexOf(':') == -1) {
-            this.id = plugin.getId() + ':' + id;
+            this.key = CatalogKey.of(plugin.getId(), id);
         } else {
-            this.id = id;
+            this.key = CatalogKey.resolve(id);
             if (loggedPlugins.add(plugin.getId())) {
                 Lantern.getLogger().warn(plugin.getId() + ": It is no longer required to include the plugin id when specifying a "
                         + "Key id through Key.Builder#id. This is deprecated and may be removed later. The plugin id will be retrieved from the "
                         + "current PluginContainer in the cause stack. ");
             }
         }
-        this.hashCode = Objects.hash(this.valueToken, this.id, this.name, this.query, this.elementToken);
+        this.hashCode = Objects.hash(this.valueToken, this.key, this.name, this.query, this.elementToken);
         TypeToken<?> elementToken = builder.valueToken.resolveType(elementType);
         if (Optional.class.isAssignableFrom(elementToken.getRawType())) {
             elementToken = elementToken.resolveType(optionalType);
@@ -179,8 +181,8 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
     }
 
     @Override
-    public String getId() {
-        return this.id;
+    public CatalogKey getKey() {
+        return this.key;
     }
 
     @Override
@@ -198,7 +200,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
         }
         final LanternKey<?> key = (LanternKey<?>) o;
         return Objects.equals(this.valueToken, key.valueToken) &&
-                Objects.equals(this.id, key.id) &&
+                Objects.equals(this.key, key.key) &&
                 Objects.equals(this.name, key.name) &&
                 Objects.equals(this.query, key.query) &&
                 Objects.equals(this.elementToken, key.elementToken);
@@ -213,7 +215,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V> {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("name", this.name)
-                .add("id", this.id)
+                .add("id", this.key)
                 .add("valueToken", this.valueToken)
                 .add("elementToken", this.elementToken)
                 .add("query", this.query)

@@ -26,9 +26,9 @@
 package org.lanternpowered.server.block.trait;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.collect.ImmutableSet;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.trait.BooleanTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -40,19 +40,23 @@ public final class LanternBooleanTrait extends LanternBlockTrait<Boolean> implem
 
     private final static ImmutableSet<Boolean> STATES = ImmutableSet.of(true, false);
 
-    private LanternBooleanTrait(String name, Key<? extends Value<Boolean>> key) {
-        super(name, key, Boolean.class, STATES);
+    private LanternBooleanTrait(CatalogKey key, Key<? extends Value<Boolean>> valueKey) {
+        super(key, valueKey, Boolean.class, STATES);
     }
 
     /**
      * Creates a new boolean trait with the specified name.
      * 
-     * @param name the name
-     * @param key the key that should be attached to the trait
-     * @return the boolean trait
+     * @param key The catalog key
+     * @param valueKey The key that should be attached to the trait
+     * @return The boolean trait
      */
-    public static BooleanTrait of(String name, Key<? extends Value<Boolean>> key) {
-        return new LanternBooleanTrait(checkNotNullOrEmpty(name, "name"), checkNotNull(key, "key"));
+    public static BooleanTrait of(CatalogKey key, Key<? extends Value<Boolean>> valueKey) {
+        return new LanternBooleanTrait(key, checkNotNull(valueKey, "valueKey"));
+    }
+
+    public static BooleanTrait minecraft(String id, Key<? extends Value<Boolean>> valueKey) {
+        return of(CatalogKey.minecraft(id), valueKey);
     }
 
     @Override

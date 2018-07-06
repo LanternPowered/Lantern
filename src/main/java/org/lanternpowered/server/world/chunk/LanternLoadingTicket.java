@@ -33,7 +33,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.World;

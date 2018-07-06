@@ -30,7 +30,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.event.cause.EventContextKey;
 
 import javax.annotation.Nullable;
@@ -39,7 +41,7 @@ public final class LanternEventContextKeyBuilder<T> implements EventContextKey.B
 
     @Nullable private TypeToken<T> typeToken;
     @Nullable private String name;
-    @Nullable private String id;
+    @Nullable private CatalogKey id;
 
     public LanternEventContextKeyBuilder<T> type(TypeToken<T> typeToken) {
         this.typeToken = checkNotNull(typeToken, "typeToken");
@@ -52,8 +54,8 @@ public final class LanternEventContextKeyBuilder<T> implements EventContextKey.B
     }
 
     @Override
-    public LanternEventContextKeyBuilder<T> id(String id) {
-        this.id = checkNotNullOrEmpty(id, "id");
+    public LanternEventContextKeyBuilder<T> id(CatalogKey id) {
+        this.id = checkNotNull(id, "id");
         return this;
     }
 
@@ -67,12 +69,8 @@ public final class LanternEventContextKeyBuilder<T> implements EventContextKey.B
     public LanternEventContextKey<T> build() {
         checkState(this.id != null, "The id must be set");
         checkState(this.typeToken != null, "The type must be set");
-        final int index = this.id.indexOf(':');
-        checkState(index != -1, "The plugin id cannot be found in the id %s", this.id);
-        final String pluginId = this.id.substring(0, index);
-        final String id = this.id.substring(index + 1);
-        final String name = this.name == null ? id : this.name;
-        final LanternEventContextKey<T> contextKey = new LanternEventContextKey<>(pluginId, id, name, this.typeToken);
+        final LanternEventContextKey<T> contextKey = new LanternEventContextKey<>(
+                CatalogKeys.of(this.id.getNamespace(), this.id.getValue(), this.name == null ? this.id.getValue() : this.name), this.typeToken);
         EventContextKeysModule.get().registerAdditionalCatalog(contextKey);
         return contextKey;
     }

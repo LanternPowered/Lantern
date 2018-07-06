@@ -42,6 +42,7 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
@@ -58,7 +59,6 @@ import org.lanternpowered.server.data.property.AbstractDirectionRelativeProperty
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
@@ -1122,7 +1122,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             // TODO: Update
         }
 
-        final CauseStack causeStack = CauseStack.current();
+        final CauseStack causeStack = CauseStack.Companion.current();
         causeStack.pushCause(this); // Add the chunk that is being pulsed
         getTileEntities().forEach(tileEntity -> {
             causeStack.pushCause(tileEntity); // Add the tile entity to the cause

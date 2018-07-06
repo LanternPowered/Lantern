@@ -36,6 +36,7 @@ import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
 import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.lanternpowered.server.text.translation.TextTranslation;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
@@ -222,9 +223,9 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
                 if (archetype == InventoryArchetypes.UNKNOWN) {
                     throw e;
                 }
-                final String id = archetype.getId();
+                final CatalogKey key = archetype.getKey();
                 final String builderType = archetype.getBuilder().getClass().getName();
-                throw new RuntimeException("An error occurred while constructing " + id + " with builder type " + builderType, e);
+                throw new RuntimeException("An error occurred while constructing " + key + " with builder type " + builderType, e);
             } catch (Exception e1) {
                 throw e;
             }

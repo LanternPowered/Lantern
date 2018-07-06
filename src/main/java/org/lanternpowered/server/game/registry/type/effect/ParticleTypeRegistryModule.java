@@ -29,12 +29,13 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.type.NotePitches;
 import org.spongepowered.api.effect.particle.ParticleOption;
@@ -54,7 +55,7 @@ import java.util.OptionalInt;
 
 @RegistrationDependency({ ParticleOptionRegistryModule.class, NotePitchRegistryModule.class, BlockRegistryModule.class,
         ItemRegistryModule.class, PotionEffectTypeRegistryModule.class, FireworkShapeRegistryModule.class })
-public final class ParticleTypeRegistryModule extends PluginCatalogRegistryModule<ParticleType> {
+public final class ParticleTypeRegistryModule extends DefaultCatalogRegistryModule<ParticleType> {
 
     public ParticleTypeRegistryModule() {
         super(ParticleTypes.class);
@@ -166,6 +167,6 @@ public final class ParticleTypeRegistryModule extends PluginCatalogRegistryModul
     }
 
     private void registerEffect(String id, OptionalInt internalType, Map<ParticleOption<?>, Object> options) {
-        register(new LanternParticleType("minecraft", id, id, internalType, options));
+        register(new LanternParticleType(CatalogKey.minecraft(id), internalType.isPresent() ? internalType.getAsInt() : null, options));
     }
 }

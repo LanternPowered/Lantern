@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternCoalType;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.CoalType;
 import org.spongepowered.api.data.type.CoalTypes;
 
@@ -44,7 +45,7 @@ public class CoalTypeRegistryModule extends InternalPluginCatalogRegistryModule<
 
     @Override
     public void registerDefaults() {
-        register(new LanternCoalType("minecraft", "coal", "item.coal.name", 0));
-        register(new LanternCoalType("minecraft", "charcoal", "item.charcoal.name", 1));
+        register(new LanternCoalType(CatalogKey.minecraft("coal"), 0));
+        register(new LanternCoalType(CatalogKey.minecraft("charcoal"), 1));
     }
 }

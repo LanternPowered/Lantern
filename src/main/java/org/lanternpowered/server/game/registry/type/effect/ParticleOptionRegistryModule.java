@@ -26,8 +26,10 @@
 package org.lanternpowered.server.game.registry.type.effect;
 
 import com.flowpowered.math.vector.Vector3d;
+import kotlin.jvm.functions.Function1;
 import org.lanternpowered.server.effect.particle.LanternParticleOption;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleOption;
@@ -38,11 +40,10 @@ import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
 
 import java.util.List;
-import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class ParticleOptionRegistryModule extends PluginCatalogRegistryModule<ParticleOption> {
+public class ParticleOptionRegistryModule extends DefaultCatalogRegistryModule<ParticleOption> {
 
     public ParticleOptionRegistryModule() {
         super(ParticleOptions.class);
@@ -71,7 +72,8 @@ public class ParticleOptionRegistryModule extends PluginCatalogRegistryModule<Pa
         registerOption(id, valueType, null);
     }
 
-    private <V> void registerOption(String id, Class<V> valueType, @Nullable Function<V, IllegalArgumentException> valueValidator) {
-        register(new LanternParticleOption<>("minecraft", id, id, valueType, valueValidator));
+    private <V> void registerOption(String id, Class<V> valueType, @Nullable Function1<V, IllegalArgumentException> valueValidator) {
+        register(new LanternParticleOption<>(CatalogKey.minecraft(id), valueType,
+                valueValidator == null ? v -> null : valueValidator));
     }
 }

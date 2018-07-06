@@ -93,7 +93,7 @@ public class TestInventoryPlugin {
             while (it.hasNext()) {
                 final ImmutableValue<?> value = it.next();
                 if (value.getKey() == Keys.COAL_TYPE) {
-                    System.out.println("Changed coal type to: " + ((CoalType) value.get()).getId() + ", but this not allowed");
+                    System.out.println("Changed coal type to: " + ((CoalType) value.get()).getKey() + ", but this not allowed");
                     it.remove();
                     break;
                 }

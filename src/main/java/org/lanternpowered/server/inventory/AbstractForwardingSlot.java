@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;

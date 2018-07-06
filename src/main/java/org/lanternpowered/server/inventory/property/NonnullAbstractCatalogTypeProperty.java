@@ -49,6 +49,6 @@ public abstract class NonnullAbstractCatalogTypeProperty<K, V extends CatalogTyp
 
     @Override
     protected int compareValue(V thisValue, V otherValue) {
-        return thisValue.getId().compareTo(otherValue.getId());
+        return thisValue.getKey().compareTo(otherValue.getKey());
     }
 }

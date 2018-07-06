@@ -27,7 +27,6 @@ package org.lanternpowered.server.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import org.lanternpowered.server.data.key.LanternKey;
@@ -37,6 +36,7 @@ import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.ValueHelper;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
+import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -73,8 +73,8 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
      */
     static String valuesToString(Iterable<? extends BaseValue<?>> values) {
         return Arrays.toString(Streams.stream(values)
-                .map(e -> MoreObjects.toStringHelper("")
-                        .add("key", e.getKey().getId())
+                .map(e -> new ToStringHelper()
+                        .add("key", e.getKey().getKey())
                         .add("value", e.get())
                         .toString())
                 .toArray());

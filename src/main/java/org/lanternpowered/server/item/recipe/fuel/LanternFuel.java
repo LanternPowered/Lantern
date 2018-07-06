@@ -25,22 +25,23 @@
  */
 package org.lanternpowered.server.item.recipe.fuel;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.item.recipe.IIngredient;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.OptionalInt;
 
-final class LanternFuel extends PluginCatalogType.Base implements IFuel {
+final class LanternFuel extends DefaultCatalogType implements IFuel {
 
     final IFuelBurnTimeProvider burnTimeProvider;
     private final IIngredient ingredient;
 
-    LanternFuel(String pluginId, String name,
+    LanternFuel(CatalogKey key,
             IFuelBurnTimeProvider burnTimeProvider,
             IIngredient ingredient) {
-        super(pluginId, name);
+        super(key);
         this.burnTimeProvider = burnTimeProvider;
         this.ingredient = ingredient;
     }

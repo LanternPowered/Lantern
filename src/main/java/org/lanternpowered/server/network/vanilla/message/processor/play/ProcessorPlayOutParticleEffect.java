@@ -75,7 +75,6 @@ import org.spongepowered.api.util.Direction;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -177,10 +176,10 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
     private ICachedMessage preProcess(ParticleEffect effect0) {
         final LanternParticleEffect effect = (LanternParticleEffect) effect0;
         final LanternParticleType type = effect.getType();
-        final OptionalInt internalType = type.getInternalType();
+        final Integer internalType = type.getInternalType();
 
         // Special cases
-        if (!internalType.isPresent()) {
+        if (internalType == null) {
             if (type == ParticleTypes.FIREWORKS) {
                 // Create the fireworks data item
                 final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORKS);
@@ -216,7 +215,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             return EmptyCachedMessage.INSTANCE;
         }
 
-        final int internalId = internalType.getAsInt();
+        final int internalId = internalType;
         final Vector3f offset = effect.getOption(ParticleOptions.OFFSET).map(Vector3d::toFloat).orElse(Vector3f.ZERO);
         final int quantity = effect.getOption(ParticleOptions.QUANTITY).orElse(1);
 

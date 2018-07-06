@@ -47,14 +47,14 @@ public interface TranslationProvider extends ObjectProvider<Translation> {
             translationLookupMap.put(enumValue, lookupFunction.apply(enumValue));
         }
         return (blockState, location, face) -> translationLookupMap.get(blockState.getTraitValue(enumTrait)
-                .orElseThrow(() -> new IllegalStateException("Unable to find the enum trait " + enumTrait.getId() +
-                        " for the block type " + blockState.getId())));
+                .orElseThrow(() -> new IllegalStateException("Unable to find the enum trait " + enumTrait.getKey() +
+                        " for the block type " + blockState.getKey())));
     }
 
     static <E extends Enum<E> & Translatable> TranslationProvider of(EnumTrait<E> enumTrait) {
         return (blockState, location, face) -> blockState.getTraitValue(enumTrait)
-                .orElseThrow(() -> new IllegalStateException("Unable to find the enum trait " + enumTrait.getId() +
-                        " for the block type " + blockState.getId()))
+                .orElseThrow(() -> new IllegalStateException("Unable to find the enum trait " + enumTrait.getKey() +
+                        " for the block type " + blockState.getKey()))
                 .getTranslation();
     }
 }

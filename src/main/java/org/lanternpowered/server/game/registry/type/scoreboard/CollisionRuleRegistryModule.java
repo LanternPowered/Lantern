@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternCollisionRule;
 import org.spongepowered.api.scoreboard.CollisionRule;
@@ -38,9 +39,9 @@ public final class CollisionRuleRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        register(new LanternCollisionRule("minecraft", "always"));
-        register(new LanternCollisionRule("minecraft", "push_own_team", "pushOwnTeam"));
-        register(new LanternCollisionRule("minecraft", "push_other_teams", "pushOtherTeams"));
-        register(new LanternCollisionRule("minecraft", "never"));
+        register(new LanternCollisionRule(CatalogKeys.minecraft("always")));
+        register(new LanternCollisionRule(CatalogKeys.minecraft("push_own_team", "pushOwnTeam")));
+        register(new LanternCollisionRule(CatalogKeys.minecraft("push_other_teams", "pushOtherTeams")));
+        register(new LanternCollisionRule(CatalogKeys.minecraft("never")));
     }
 }

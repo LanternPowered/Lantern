@@ -25,16 +25,17 @@
  */
 package org.lanternpowered.server.advancement.criteria.trigger;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonObject;
+import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.advancement.criteria.progress.AbstractCriterionProgress;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
@@ -46,7 +47,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +56,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternTrigger<C extends FilteredTriggerConfiguration> extends PluginCatalogType.Base implements Trigger<C> {
+public class LanternTrigger<C extends FilteredTriggerConfiguration> extends DefaultCatalogType implements Trigger<C> {
 
     private final Class<C> configType;
     private final Function<JsonObject, C> configConstructor;
@@ -67,8 +67,7 @@ public class LanternTrigger<C extends FilteredTriggerConfiguration> extends Plug
     private final Multimap<LanternPlayerAdvancements, AbstractCriterionProgress> progress = HashMultimap.create();
 
     LanternTrigger(LanternTriggerBuilder<C> builder) {
-        super(CauseStack.current().first(PluginContainer.class).get().getId(), builder.id,
-                builder.name == null ? builder.id : builder.name);
+        super(CatalogKeys.activePlugin(builder.id, builder.name == null ? builder.id : builder.name));
         this.configTypeToken = TypeToken.of(builder.configType);
         this.configType = builder.configType;
         this.configConstructor = builder.constructor;
@@ -138,7 +137,7 @@ public class LanternTrigger<C extends FilteredTriggerConfiguration> extends Plug
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
                 .add("configType", this.configType.getName());
     }

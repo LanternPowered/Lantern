@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.script.function.value;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.script.function.value.FloatValueProvider;
 import org.lanternpowered.api.script.function.value.FloatValueProviderType;
 import org.lanternpowered.api.script.function.value.FloatValueProviderTypes;
@@ -44,7 +45,7 @@ public class FloatValueProviderTypeRegistryModule extends AbstractObjectTypeRegi
 
     @Override
     public void registerDefaults() {
-        this.register(new FloatValueProviderTypeImpl("lantern", "constant", FloatValueProvider.Constant.class));
-        this.register(new FloatValueProviderTypeImpl("lantern", "range", FloatValueProvider.Range.class));
+        this.register(new FloatValueProviderTypeImpl(CatalogKeys.lantern("constant"), FloatValueProvider.Constant.class));
+        this.register(new FloatValueProviderTypeImpl(CatalogKeys.lantern("range"), FloatValueProvider.Range.class));
     }
 }

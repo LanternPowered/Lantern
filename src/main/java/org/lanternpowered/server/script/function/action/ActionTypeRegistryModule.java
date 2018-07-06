@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.script.function.action;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.api.script.function.action.ActionType;
 import org.lanternpowered.api.script.function.action.ConditionalAction;
@@ -45,8 +46,8 @@ public class ActionTypeRegistryModule extends AbstractObjectTypeRegistryModule<A
 
     @Override
     public void registerDefaults() {
-        register(new ActionTypeImpl("lantern", "multi", MultiAction.class));
-        register(new ActionTypeImpl("lantern", "conditional", ConditionalAction.class));
-        register(new ActionTypeImpl("lantern", "lightning_weather_spawner", LightningSpawnerAction.class));
+        register(new ActionTypeImpl(CatalogKeys.lantern("multi"), MultiAction.class));
+        register(new ActionTypeImpl(CatalogKeys.lantern("conditional"), ConditionalAction.class));
+        register(new ActionTypeImpl(CatalogKeys.lantern("lightning_weather_spawner"), LightningSpawnerAction.class));
     }
 }

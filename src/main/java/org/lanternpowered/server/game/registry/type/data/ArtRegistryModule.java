@@ -25,12 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.data.type.LanternArt;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.Arts;
 
-public class ArtRegistryModule extends PluginCatalogRegistryModule<Art> {
+public class ArtRegistryModule extends DefaultCatalogRegistryModule<Art> {
 
     public ArtRegistryModule() {
         super(Arts.class);
@@ -38,31 +39,31 @@ public class ArtRegistryModule extends PluginCatalogRegistryModule<Art> {
 
     @Override
     public void registerDefaults() {
-        register(new LanternArt("minecraft", "alban", "Alban", 1, 1));
-        register(new LanternArt("minecraft", "aztec", "Aztec", 1, 1));
-        register(new LanternArt("minecraft", "aztec_2", "Aztec2", 1, 1));
-        register(new LanternArt("minecraft", "bomb", "Bomb", 1, 1));
-        register(new LanternArt("minecraft", "burning_skull", "BurningSkull", 4, 4));
-        register(new LanternArt("minecraft", "bust", "Bust", 2, 2));
-        register(new LanternArt("minecraft", "courbet", "Courbet", 2, 1));
-        register(new LanternArt("minecraft", "creebet", "Creebet", 2, 1));
-        register(new LanternArt("minecraft", "donkey_kong", "DonkeyKong", 4, 3));
-        register(new LanternArt("minecraft", "fighters", "Fighters", 4, 2));
-        register(new LanternArt("minecraft", "graham", "Graham", 1, 2));
-        register(new LanternArt("minecraft", "kebab", "Kebab", 1, 1));
-        register(new LanternArt("minecraft", "match", "Match", 2, 2));
-        register(new LanternArt("minecraft", "pigscene", "Pigscene", 4, 4));
-        register(new LanternArt("minecraft", "plant", "Plant", 1, 1));
-        register(new LanternArt("minecraft", "pointer", "Pointer", 4, 4));
-        register(new LanternArt("minecraft", "pool", "Pool", 2, 1));
-        register(new LanternArt("minecraft", "sea", "Sea", 2, 1));
-        register(new LanternArt("minecraft", "skeleton", "Skeleton", 4, 3));
-        register(new LanternArt("minecraft", "skull_and_roses", "SkullAndRoses", 2, 2));
-        register(new LanternArt("minecraft", "stage", "Stage", 2, 2));
-        register(new LanternArt("minecraft", "sunset", "Sunset", 2, 1));
-        register(new LanternArt("minecraft", "void", "Void", 2, 2));
-        register(new LanternArt("minecraft", "wanderer", "Wanderer", 1, 2));
-        register(new LanternArt("minecraft", "wasteland", "Wasteland", 1, 1));
-        register(new LanternArt("minecraft", "wither", "Wither", 2, 2));
+        register(new LanternArt(CatalogKeys.minecraft("alban", "Alban"), 1, 1));
+        register(new LanternArt(CatalogKeys.minecraft("aztec", "Aztec"), 1, 1));
+        register(new LanternArt(CatalogKeys.minecraft("aztec_2", "Aztec2"), 1, 1));
+        register(new LanternArt(CatalogKeys.minecraft("bomb", "Bomb"), 1, 1));
+        register(new LanternArt(CatalogKeys.minecraft("burning_skull", "BurningSkull"), 4, 4));
+        register(new LanternArt(CatalogKeys.minecraft("bust", "Bust"), 2, 2));
+        register(new LanternArt(CatalogKeys.minecraft("courbet", "Courbet"), 2, 1));
+        register(new LanternArt(CatalogKeys.minecraft("creebet", "Creebet"), 2, 1));
+        register(new LanternArt(CatalogKeys.minecraft("donkey_kong", "DonkeyKong"), 4, 3));
+        register(new LanternArt(CatalogKeys.minecraft("fighters", "Fighters"), 4, 2));
+        register(new LanternArt(CatalogKeys.minecraft("graham", "Graham"), 1, 2));
+        register(new LanternArt(CatalogKeys.minecraft("kebab", "Kebab"), 1, 1));
+        register(new LanternArt(CatalogKeys.minecraft("match", "Match"), 2, 2));
+        register(new LanternArt(CatalogKeys.minecraft("pigscene", "Pigscene"), 4, 4));
+        register(new LanternArt(CatalogKeys.minecraft("plant", "Plant"), 1, 1));
+        register(new LanternArt(CatalogKeys.minecraft("pointer", "Pointer"), 4, 4));
+        register(new LanternArt(CatalogKeys.minecraft("pool", "Pool"), 2, 1));
+        register(new LanternArt(CatalogKeys.minecraft("sea", "Sea"), 2, 1));
+        register(new LanternArt(CatalogKeys.minecraft("skeleton", "Skeleton"), 4, 3));
+        register(new LanternArt(CatalogKeys.minecraft("skull_and_roses", "SkullAndRoses"), 2, 2));
+        register(new LanternArt(CatalogKeys.minecraft("stage", "Stage"), 2, 2));
+        register(new LanternArt(CatalogKeys.minecraft("sunset", "Sunset"), 2, 1));
+        register(new LanternArt(CatalogKeys.minecraft("void", "Void"), 2, 2));
+        register(new LanternArt(CatalogKeys.minecraft("wanderer", "Wanderer"), 1, 2));
+        register(new LanternArt(CatalogKeys.minecraft("wasteland", "Wasteland"), 1, 1));
+        register(new LanternArt(CatalogKeys.minecraft("wither", "Wither"), 2, 2));
     }
 }

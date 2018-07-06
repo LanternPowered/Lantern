@@ -28,10 +28,10 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.script.context.ContextImpl;
 import org.lanternpowered.server.world.rules.RuleTypes;

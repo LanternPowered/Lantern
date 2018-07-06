@@ -30,11 +30,11 @@ import org.spongepowered.api.data.key.Keys;
 
 public final class LanternIntegerTraits {
 
-    public static final IntegerTrait SAPLING_GROWTH_STAGE = LanternIntegerTrait.of("stage", Keys.GROWTH_STAGE, 0, 1);
+    public static final IntegerTrait SAPLING_GROWTH_STAGE = LanternIntegerTrait.minecraft("stage", Keys.GROWTH_STAGE, 0, 1);
 
-    public static final IntegerTrait POWER = LanternIntegerTrait.ofRange("power", Keys.POWER, 0, 15);
+    public static final IntegerTrait POWER = LanternIntegerTrait.minecraftRange("power", Keys.POWER, 0, 15);
 
-    public static final IntegerTrait MOISTURE = LanternIntegerTrait.ofRange("moisture", Keys.MOISTURE, 0, 7);
+    public static final IntegerTrait MOISTURE = LanternIntegerTrait.minecraftRange("moisture", Keys.MOISTURE, 0, 7);
 
     private LanternIntegerTraits() {
     }

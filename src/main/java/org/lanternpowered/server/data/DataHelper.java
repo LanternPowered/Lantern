@@ -40,6 +40,7 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataRegistration;
@@ -142,7 +143,7 @@ public final class DataHelper {
                 getLogger().error("Could not serialize {}. No registration could be found.", manipulatorType.getName());
             } else {
                 builder.add(DataContainer.createNew()
-                        .set(DataQueries.MANIPULATOR_ID, optRegistration.get().getId())
+                        .set(DataQueries.MANIPULATOR_ID, optRegistration.get().getKey().toString())
                         .set(DataQueries.MANIPULATOR_DATA, ((DataManipulator) manipulator).toContainer()));
             }
         }
@@ -230,7 +231,7 @@ public final class DataHelper {
             String id;
             if (view.contains(DataQueries.MANIPULATOR_ID)) {
                 id = view.getString(DataQueries.MANIPULATOR_ID).get();
-                optRegistration = DataManipulatorRegistryModule.get().getById(id);
+                optRegistration = DataManipulatorRegistryModule.get().get(CatalogKey.resolve(id));
             } else if (view.contains(DATA_CLASS)) {
                 id = view.getString(DATA_CLASS).get();
                 optRegistration = dataManager.getLegacyRegistration(id);

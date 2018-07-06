@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.effect.entity;
 
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 import org.spongepowered.api.entity.living.animal.Horse;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 

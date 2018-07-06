@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.script.function.condition;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.script.function.condition.AndCondition;
 import org.lanternpowered.api.script.function.condition.Condition;
 import org.lanternpowered.api.script.function.condition.ConditionType;
@@ -46,7 +47,7 @@ public class ConditionTypeRegistryModule extends AbstractObjectTypeRegistryModul
 
     @Override
     public void registerDefaults() {
-        this.register(new ConditionTypeImpl("lantern", "and", AndCondition.class));
-        this.register(new ConditionTypeImpl("lantern", "or", OrCondition.class));
+        this.register(new ConditionTypeImpl(CatalogKeys.lantern("and"), AndCondition.class));
+        this.register(new ConditionTypeImpl(CatalogKeys.lantern("or"), OrCondition.class));
     }
 }

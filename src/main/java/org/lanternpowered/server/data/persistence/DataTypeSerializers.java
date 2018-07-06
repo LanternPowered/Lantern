@@ -32,6 +32,7 @@ import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.roman.IllegalRomanNumberException;
 import org.lanternpowered.server.util.roman.RomanNumber;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -71,6 +72,20 @@ public final class DataTypeSerializers {
         dataManager.registerTypeSerializer(TypeToken.of(Boolean.class), new BooleanSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(DataSerializable.class), new DataSerializableSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(DataView.class), new DataViewSerializer());
+        dataManager.registerTypeSerializer(TypeToken.of(CatalogKey.class), new CatalogKeySerializer());
+    }
+
+    private static class CatalogKeySerializer implements DataTypeSerializer<CatalogKey, String> {
+
+        @Override
+        public CatalogKey deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
+            return CatalogKey.resolve(data);
+        }
+
+        @Override
+        public String serialize(TypeToken<?> type, DataTypeSerializerContext ctx, CatalogKey obj) throws InvalidDataException {
+            return obj.toString();
+        }
     }
 
     private static class DataViewSerializer implements DataViewTypeSerializer<DataView> {
@@ -108,7 +123,8 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public CatalogType deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
-            final Optional<CatalogType> catalogType = Sponge.getRegistry().getType((Class<CatalogType>) type.getRawType(), data);
+            final Optional<CatalogType> catalogType = Sponge.getRegistry().getType(
+                    (Class<CatalogType>) type.getRawType(), CatalogKey.resolve(data));
             if (!catalogType.isPresent()) {
                 throw new InvalidDataException("The catalog type " + data + " of type " + type.toString() + " is missing.");
             }
@@ -117,7 +133,7 @@ public final class DataTypeSerializers {
 
         @Override
         public String serialize(TypeToken<?> type, DataTypeSerializerContext ctx, CatalogType obj) throws InvalidDataException {
-            return obj.getId();
+            return obj.getKey().toString();
         }
     }
 

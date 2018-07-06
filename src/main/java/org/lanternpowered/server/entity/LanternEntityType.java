@@ -26,10 +26,12 @@
 package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.lanternpowered.server.util.ToStringHelper;
 import org.lanternpowered.server.util.UncheckedThrowables;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
@@ -40,66 +42,36 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.function.Function;
 
-public final class LanternEntityType extends PluginCatalogType.Base.Translatable implements EntityType {
+public final class LanternEntityType extends DefaultCatalogType implements EntityType {
 
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, String translation,
+    public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, String translation,
             Class<E> entityClass, Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, id, name, translation, entityClass, entityConstructor);
+        return new LanternEntityType(key, translation, entityClass, entityConstructor);
     }
 
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, Translation translation,
+    public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, Translation translation,
             Class<E> entityClass, Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, id, name, translation, entityClass, entityConstructor);
+        return new LanternEntityType(key, translation, entityClass, entityConstructor);
     }
 
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, String translation,
-            Class<E> entityClass, Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, name, translation, entityClass, entityConstructor);
-    }
-
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, Translation translation,
-            Class<E> entityClass, Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, name, translation, entityClass, entityConstructor);
-    }
-
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, String translation,
+    public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, String translation,
             Class<E> entityClass) {
-        return new LanternEntityType(pluginId, id, name, translation, entityClass, getEntityConstructor(entityClass));
+        return new LanternEntityType(key, translation, entityClass, getEntityConstructor(entityClass));
     }
 
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, Translation translation,
+    public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, Translation translation,
             Class<E> entityClass) {
-        return new LanternEntityType(pluginId, id, name, translation, entityClass, getEntityConstructor(entityClass));
+        return new LanternEntityType(key, translation, entityClass, getEntityConstructor(entityClass));
     }
 
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, String translation,
-            Class<E> entityClass) {
-        return new LanternEntityType(pluginId, name, translation, entityClass, getEntityConstructor(entityClass));
-    }
-
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, Translation translation,
-            Class<E> entityClass) {
-        return new LanternEntityType(pluginId, name, translation, entityClass, getEntityConstructor(entityClass));
-    }
-
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, String translation,
+    public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, String translation,
             Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, id, name, translation, getEntityClass(entityConstructor), entityConstructor);
+        return new LanternEntityType(key, translation, getEntityClass(entityConstructor), entityConstructor);
     }
 
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, Translation translation,
+    public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, Translation translation,
             Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, id, name, translation, getEntityClass(entityConstructor), entityConstructor);
-    }
-
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, String translation,
-            Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, name, translation, getEntityClass(entityConstructor), entityConstructor);
-    }
-
-    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, Translation translation,
-            Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(pluginId, name, translation, getEntityClass(entityConstructor), entityConstructor);
+        return new LanternEntityType(key, translation, getEntityClass(entityConstructor), entityConstructor);
     }
 
     private static <E extends LanternEntity> Function<UUID, E> getEntityConstructor(Class<E> entityClass) {
@@ -146,31 +118,20 @@ public final class LanternEntityType extends PluginCatalogType.Base.Translatable
 
     private final Class<? extends Entity> entityClass;
     private final Function<UUID, ? extends Entity> entityConstructor;
+    private final Translation translation;
 
-    private LanternEntityType(String pluginId, String name, String translation,
+    private LanternEntityType(CatalogKey key, String translation,
             Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
-        super(pluginId, name, translation);
+        super(key);
+        this.translation = tr(translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
         this.entityClass = checkNotNull(entityClass, "entityClass");
     }
 
-    private LanternEntityType(String pluginId, String name, Translation translation,
+    private LanternEntityType(CatalogKey key, Translation translation,
             Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
-        super(pluginId, name, translation);
-        this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = checkNotNull(entityClass, "entityClass");
-    }
-
-    private LanternEntityType(String pluginId, String id, String name, String translation,
-            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
-        super(pluginId, id, name, translation);
-        this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = checkNotNull(entityClass, "entityClass");
-    }
-
-    private LanternEntityType(String pluginId, String id, String name, Translation translation,
-            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
-        super(pluginId, id, name, translation);
+        super(key);
+        this.translation = translation;
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
         this.entityClass = checkNotNull(entityClass, "entityClass");
     }
@@ -185,7 +146,12 @@ public final class LanternEntityType extends PluginCatalogType.Base.Translatable
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper().add("entityClass", this.entityClass);
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
     }
 }

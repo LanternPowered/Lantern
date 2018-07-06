@@ -26,11 +26,12 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternProfession;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.Professions;
 
-public class ProfessionRegistryModule extends PluginCatalogRegistryModule<Profession> {
+public class ProfessionRegistryModule extends DefaultCatalogRegistryModule<Profession> {
 
     public ProfessionRegistryModule() {
         super(Professions.class);
@@ -38,11 +39,11 @@ public class ProfessionRegistryModule extends PluginCatalogRegistryModule<Profes
 
     @Override
     public void registerDefaults() {
-        register(new LanternProfession("minecraft", "farmer", 0));
-        register(new LanternProfession("minecraft", "librarian", 1));
-        register(new LanternProfession("minecraft", "priest", 2));
-        register(new LanternProfession("minecraft", "blacksmith", 3));
-        register(new LanternProfession("minecraft", "butcher", 4));
-        register(new LanternProfession("minecraft", "nitwit", 5));
+        register(new LanternProfession(CatalogKey.minecraft("farmer"), 0));
+        register(new LanternProfession(CatalogKey.minecraft("librarian"), 1));
+        register(new LanternProfession(CatalogKey.minecraft("priest"), 2));
+        register(new LanternProfession(CatalogKey.minecraft("blacksmith"), 3));
+        register(new LanternProfession(CatalogKey.minecraft("butcher"), 4));
+        register(new LanternProfession(CatalogKey.minecraft("nitwit"), 5));
     }
 }

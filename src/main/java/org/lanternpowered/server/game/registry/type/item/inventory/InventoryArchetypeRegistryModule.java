@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.item.inventory;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
@@ -36,6 +36,7 @@ import org.lanternpowered.server.inventory.UnknownInventoryArchetype;
 import org.lanternpowered.server.inventory.sponge.SpongeInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.util.UncheckedThrowables;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
@@ -46,7 +47,7 @@ import java.util.List;
 
 @RegistrationDependency({ ClientContainerRegistryModule.class, EquipmentTypeRegistryModule.class, ItemRegistryModule.class,
         QueryOperationRegistryModule.class })
-public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModule<InventoryArchetype> {
+public class InventoryArchetypeRegistryModule extends DefaultCatalogRegistryModule<InventoryArchetype> {
 
     public InventoryArchetypeRegistryModule() {
         super(InventoryArchetypes.class);
@@ -62,8 +63,8 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
-        register(new UnknownInventoryArchetype("minecraft", "unknown"));
-        register(new UnknownInventoryArchetype("minecraft", "empty"));
+        register(new UnknownInventoryArchetype(CatalogKey.minecraft("unknown")));
+        register(new UnknownInventoryArchetype(CatalogKey.minecraft("empty")));
 
         for (Class<?> target : Arrays.asList(VanillaInventoryArchetypes.class, SpongeInventoryArchetypes.class)) {
             for (Field field : target.getFields()) {

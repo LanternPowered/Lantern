@@ -35,12 +35,12 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import org.lanternpowered.server.cause.LanternCauseStack;
+import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
-import org.lanternpowered.server.event.LanternCauseStack;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
@@ -284,7 +284,7 @@ public final class LanternServer implements Server {
         }
 
         // Initialize a CauseStack on the server thread.
-        this.executor.submit(() -> CauseStack.set(new LanternCauseStack()));
+        this.executor.submit(() -> LanternCauseStackManager.INSTANCE.setCurrentCauseStack(new LanternCauseStack()));
         // Start server ticking.
         this.executor.scheduleAtFixedRate(() -> {
             try {

@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
@@ -43,8 +44,8 @@ public class BuilderInventoryArchetype<T extends AbstractInventory> extends Lant
     private final List<InventoryArchetype> childArchetypes;
     private final Map<String, InventoryProperty<String, ?>> propertiesByName;
 
-    BuilderInventoryArchetype(String pluginId, String name, AbstractArchetypeBuilder<T, ? super T, ?> builder) {
-        super(pluginId, name);
+    BuilderInventoryArchetype(CatalogKey key, AbstractArchetypeBuilder<T, ? super T, ?> builder) {
+        super(key);
         this.childArchetypes = Collections.unmodifiableList(builder.getArchetypes());
         this.builder = builder;
         final ImmutableMap.Builder<String, InventoryProperty<String, ?>> mapBuilder = ImmutableMap.builder();

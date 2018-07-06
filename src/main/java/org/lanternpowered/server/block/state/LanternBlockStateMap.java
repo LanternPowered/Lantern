@@ -87,7 +87,7 @@ public final class LanternBlockStateMap {
 
         for (BlockTrait<?> trait : list) {
             allowedValues.add(new HashSet<>(trait.getPossibleValues()));
-            keys.add(((LanternBlockTrait) trait).getKey());
+            keys.add(((LanternBlockTrait) trait).getValueKey());
             builder.put(trait.getName(), trait);
         }
 

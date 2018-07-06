@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -128,7 +129,7 @@ public class LanternShapelessCraftingRecipeBuilder implements IShapelessCrafting
 
         final ItemStackSnapshot exemplary = this.resultProvider.getSnapshot(
                 EmptyCraftingMatrix.INSTANCE, EmptyIngredientList.INSTANCE);
-        return new LanternShapelessCraftingRecipe(container.getId(), id, exemplary,
+        return new LanternShapelessCraftingRecipe(CatalogKey.of(container.getId(), id), exemplary,
                 this.groupName, this.resultProvider, ImmutableList.copyOf(this.ingredients));
     }
 }

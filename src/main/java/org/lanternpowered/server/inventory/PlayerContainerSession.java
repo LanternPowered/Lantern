@@ -27,8 +27,8 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.client.AnvilClientContainer;
 import org.lanternpowered.server.inventory.client.BeaconClientContainer;

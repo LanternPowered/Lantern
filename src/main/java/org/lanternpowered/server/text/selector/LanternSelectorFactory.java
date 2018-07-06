@@ -131,7 +131,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     selector);
         }
         String typeStr = selector.substring(1, argListIndex);
-        Optional<SelectorType> optSelectorType = this.selectorTypeRegistry.getById(typeStr);
+        Optional<SelectorType> optSelectorType = Optional.ofNullable(SelectorTypeRegistryModule.INSTANCE.getByCode(typeStr));
         checkArgument(optSelectorType.isPresent(), "No type known as '%s'", typeStr);
         try {
             Map<String, String> rawMap;

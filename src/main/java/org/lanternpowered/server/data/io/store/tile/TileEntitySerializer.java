@@ -30,6 +30,7 @@ import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.data.DataContainer;
@@ -49,8 +50,9 @@ public class TileEntitySerializer implements ObjectSerializer<LanternTileEntity>
         final String id = fixTileId(dataView, dataView.getString(ID).get());
         dataView.remove(ID);
 
-        final LanternTileEntityType tileEntityType = (LanternTileEntityType) Sponge.getRegistry().getType(TileEntityType.class, id).orElseThrow(
-                () -> new InvalidDataException("Unknown tile entity id: " + id));
+        final LanternTileEntityType tileEntityType = (LanternTileEntityType) Sponge.getRegistry()
+                .getType(TileEntityType.class, CatalogKey.resolve(id))
+                .orElseThrow(() -> new InvalidDataException("Unknown tile entity id: " + id));
         //noinspection unchecked
         final ObjectStore<LanternTileEntity> store = (ObjectStore)
                 ObjectStoreRegistry.get().get(tileEntityType.getTileEntityType()).get();
@@ -63,7 +65,7 @@ public class TileEntitySerializer implements ObjectSerializer<LanternTileEntity>
     @Override
     public DataView serialize(LanternTileEntity object) {
         final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-        dataView.set(ID, object.getType().getId());
+        dataView.set(ID, object.getType().getKey());
         //noinspection unchecked
         final ObjectStore<LanternTileEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();
         store.serialize(object, dataView);

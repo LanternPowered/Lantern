@@ -27,8 +27,9 @@ package org.lanternpowered.server.block.tile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
@@ -38,26 +39,16 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public final class LanternTileEntityType extends PluginCatalogType.Base implements TileEntityType {
+public final class LanternTileEntityType extends DefaultCatalogType implements TileEntityType {
 
-    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String name,
+    public static <T extends TileEntity> LanternTileEntityType of(CatalogKey key,
             Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
-        return new LanternTileEntityType(pluginId, name, tileEntityClass, (Supplier) tileEntitySupplier);
+        return new LanternTileEntityType(key, tileEntityClass, (Supplier) tileEntitySupplier);
     }
 
-    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String id, String name,
-            Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
-        return new LanternTileEntityType(pluginId, id, name, tileEntityClass, (Supplier) tileEntitySupplier);
-    }
-
-    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String name,
+    public static <T extends TileEntity> LanternTileEntityType of(CatalogKey key,
             Supplier<T> tileEntitySupplier) {
-        return new LanternTileEntityType(pluginId, name, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
-    }
-
-    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String id, String name,
-            Supplier<T> tileEntitySupplier) {
-        return new LanternTileEntityType(pluginId, id, name, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
+        return new LanternTileEntityType(key, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
     }
 
     private final Class<? extends TileEntity> tileEntityClass;
@@ -65,16 +56,9 @@ public final class LanternTileEntityType extends PluginCatalogType.Base implemen
 
     @Nullable BlockState defaultBlock;
 
-    private LanternTileEntityType(String pluginId, String name, Class<? extends TileEntity> tileEntityClass,
+    private LanternTileEntityType(CatalogKey key, Class<? extends TileEntity> tileEntityClass,
             Supplier<TileEntity> tileEntityConstructor) {
-        super(pluginId, name);
-        this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
-        this.tileEntityConstructor = tileEntityConstructor;
-    }
-
-    private LanternTileEntityType(String pluginId, String id, String name, Class<? extends TileEntity> tileEntityClass,
-            Supplier<TileEntity> tileEntityConstructor) {
-        super(pluginId, id, name);
+        super(key);
         this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
         this.tileEntityConstructor = tileEntityConstructor;
     }
@@ -85,7 +69,7 @@ public final class LanternTileEntityType extends PluginCatalogType.Base implemen
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
                 .omitNullValues()
                 .add("tileEntityClass", this.tileEntityClass)

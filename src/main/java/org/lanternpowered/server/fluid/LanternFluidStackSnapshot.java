@@ -149,7 +149,7 @@ public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutable
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("fluid", getFluid().getId())
+                .add("fluid", getFluid().getKey())
                 .add("volume", getVolume())
                 .add("data", IValueContainer.valuesToString(this.fluidStack))
                 .toString();

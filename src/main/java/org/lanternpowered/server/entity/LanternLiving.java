@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffect;
@@ -40,7 +41,6 @@ import org.lanternpowered.server.effect.entity.sound.DefaultLivingFallSoundEffec
 import org.lanternpowered.server.effect.entity.sound.DefaultLivingSoundEffect;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.world.EntitySpawningEntry;
@@ -367,7 +367,7 @@ public class LanternLiving extends LanternEntity implements Living {
                 final int duration = instant ? 1 : potionEffect.getDuration() - deltaTicks;
                 if (duration > 0) {
                     final PotionEffect newPotionEffect = builder.from(potionEffect).duration(duration).build();
-                    ((LanternPotionEffectType) newPotionEffect.getType()).getEffectConsumer().accept(this, newPotionEffect);
+                    ((LanternPotionEffectType) newPotionEffect.getType()).getEffectConsumer().invoke(this, newPotionEffect);
                     if (!instant) {
                         newPotionEffects.add(newPotionEffect);
                     }

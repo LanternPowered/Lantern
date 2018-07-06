@@ -38,12 +38,12 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.lanternpowered.server.catalog.AbstractCatalogType;
-import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.data.IImmutableDataHolderBase;
 import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -71,7 +71,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings({"rawtypes", "unchecked", "SuspiciousMethodCalls"})
-public final class LanternBlockState extends AbstractCatalogType implements PluginCatalogType, BlockState,
+public final class LanternBlockState extends AbstractCatalogType implements CatalogType, BlockState,
         AbstractDirectionRelativePropertyHolder, IImmutableDataHolderBase<BlockState> {
 
     // A lookup table to get a specific state when you would change a value
@@ -93,8 +93,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     private final ImmutableContainerCache immutableContainerCache = new ImmutableContainerCache();
 
     // The name of the block state
-    private final String name;
-    private final String id;
+    private final CatalogKey key;
 
     // A internal id that is used for faster lookups
     int internalId;
@@ -111,7 +110,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         final ImmutableSet.Builder<ImmutableValue<?>> valuesBuilder = ImmutableSet.builder();
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
             final LanternBlockTrait trait = (LanternBlockTrait) entry.getKey();
-            final LanternKey key = (LanternKey) trait.getKey();
+            final LanternKey key = (LanternKey) trait.getValueKey();
             keyToBlockTraitBuilder.put(key, trait);
             final BaseValue value = (BaseValue) LanternValueFactory.get().createValueForKey(key, entry.getValue());
             valuesBuilder.add(value instanceof ImmutableValue ? (ImmutableValue) value : ((Value) value).asImmutable());
@@ -120,19 +119,25 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         this.values = valuesBuilder.build();
 
         final StringBuilder idBuilder = new StringBuilder();
-        idBuilder.append(baseState.getBlockType().getId().substring(baseState.getBlockType().getPluginId().length() + 1));
+        idBuilder.append(baseState.getBlockType().getKey().getValue());
         if (!traitValues.isEmpty()) {
             idBuilder.append('[');
             final Joiner joiner = Joiner.on(',');
             final List<String> propertyValues = new ArrayList<>();
             for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
-                propertyValues.add(entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase(Locale.ENGLISH));
+                final String value;
+                final Comparable<?> comparable = entry.getValue();
+                if (comparable instanceof Enum) {
+                    value = ((Enum) comparable).name();
+                } else {
+                    value = comparable.toString();
+                }
+                propertyValues.add(entry.getKey().getName() + "=" + value.toLowerCase(Locale.ENGLISH));
             }
             idBuilder.append(joiner.join(propertyValues));
             idBuilder.append(']');
         }
-        this.name = idBuilder.toString();
-        this.id = baseState.getBlockType().getPluginId() + ':' + this.name;
+        this.key = CatalogKey.of(baseState.getBlockType().getKey().getNamespace(), idBuilder.toString());
     }
 
     public int getInternalId() {
@@ -147,10 +152,10 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     @Override
     public DataContainer toContainer() {
         final DataContainer dataContainer = DataContainer.createNew();
-        dataContainer.set(Queries.BLOCK_TYPE, this.baseState.getBlockType().getId());
+        dataContainer.set(Queries.BLOCK_TYPE, this.baseState.getBlockType().getKey());
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : this.traitValues.entrySet()) {
             final Object value = entry.getValue();
-            dataContainer.set(((LanternBlockTrait) entry.getKey()).getKey().getQuery(), value);
+            dataContainer.set(((LanternBlockTrait) entry.getKey()).getValueKey().getQuery(), value);
         }
         return dataContainer;
     }
@@ -366,7 +371,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
                 return Optional.empty();
             }
             for (Object object : trait.getPossibleValues()) {
-                if (object.toString().equals(value) || (object instanceof CatalogType && ((CatalogType) object).getId()
+                if (object.toString().equals(value) || (object instanceof CatalogType && ((CatalogType) object).getKey().toString()
                         .equalsIgnoreCase((String) value))) {
                     value = object;
                     break;
@@ -437,17 +442,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     }
 
     @Override
-    public String getId() {
-        return this.id;
-    }
-
-    @Override
-    public String getPluginId() {
-        return this.baseState.getBlockType().getPluginId();
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
+    public CatalogKey getKey() {
+        return this.key;
     }
 }

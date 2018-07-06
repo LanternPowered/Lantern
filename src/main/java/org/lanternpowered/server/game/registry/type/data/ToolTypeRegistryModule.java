@@ -26,11 +26,12 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternToolType;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.ToolTypes;
 
-public final class ToolTypeRegistryModule extends PluginCatalogRegistryModule<ToolType> {
+public final class ToolTypeRegistryModule extends DefaultCatalogRegistryModule<ToolType> {
 
     public ToolTypeRegistryModule() {
         super(ToolTypes.class);
@@ -38,10 +39,10 @@ public final class ToolTypeRegistryModule extends PluginCatalogRegistryModule<To
 
     @Override
     public void registerDefaults() {
-        register(new LanternToolType("minecraft", "diamond"));
-        register(new LanternToolType("minecraft", "gold"));
-        register(new LanternToolType("minecraft", "iron"));
-        register(new LanternToolType("minecraft", "stone"));
-        register(new LanternToolType("minecraft", "wood"));
+        register(new LanternToolType(CatalogKey.minecraft("diamond")));
+        register(new LanternToolType(CatalogKey.minecraft("gold")));
+        register(new LanternToolType(CatalogKey.minecraft("iron")));
+        register(new LanternToolType(CatalogKey.minecraft("stone")));
+        register(new LanternToolType(CatalogKey.minecraft("wood")));
     }
 }

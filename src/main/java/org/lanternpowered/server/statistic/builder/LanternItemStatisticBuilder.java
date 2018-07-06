@@ -28,6 +28,7 @@ package org.lanternpowered.server.statistic.builder;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.statistic.LanternItemStatistic;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
@@ -68,6 +69,6 @@ final class LanternItemStatisticBuilder extends AbstractStatisticBuilder<ItemSta
     protected ItemStatistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
             String internalId, @Nullable Criterion criterion) {
         checkState(this.itemType != null, "The itemType must be set");
-        return new LanternItemStatistic(pluginId, id, name, translation, internalId, format, criterion, type, this.itemType);
+        return new LanternItemStatistic(CatalogKeys.of(pluginId, id, name), translation, internalId, format, criterion, type, this.itemType);
     }
 }

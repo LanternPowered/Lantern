@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
-import org.lanternpowered.server.data.type.record.LanternRecordType;
+import org.lanternpowered.server.data.type.LanternRecordType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;

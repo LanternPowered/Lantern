@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.reflect.TypeToken;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
@@ -64,6 +65,11 @@ public class LanternKeyBuilder<E, V extends BaseValue<E>> implements Key.Builder
         checkArgument(!checkNotNull(name).isEmpty(), "Name cannot be empty!");
         this.name = name;
         return this;
+    }
+
+    @Override
+    public Key.Builder<E, V> key(CatalogKey key) { // No need for this? The active plugin provides the namespace
+        return id(key.getValue()); // TODO: Remove this method
     }
 
     @Override

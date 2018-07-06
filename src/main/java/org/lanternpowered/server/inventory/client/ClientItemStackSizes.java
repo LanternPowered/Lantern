@@ -42,7 +42,7 @@ final class ClientItemStackSizes {
     private static final Object2IntMap<String> STACK_SIZES = new Object2IntOpenHashMap<>();
 
     static int getOriginalMaxSize(ItemType itemType) {
-        final int size = STACK_SIZES.getInt(itemType.getId());
+        final int size = STACK_SIZES.getInt(itemType.getKey().toString());
         return size == 0 ? itemType.getMaxStackQuantity() : size;
     }
 

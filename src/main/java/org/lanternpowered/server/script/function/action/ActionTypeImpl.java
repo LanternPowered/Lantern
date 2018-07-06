@@ -28,16 +28,11 @@ package org.lanternpowered.server.script.function.action;
 import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.api.script.function.action.ActionType;
 import org.lanternpowered.server.script.function.AbstractFunctionType;
+import org.spongepowered.api.CatalogKey;
 
 public class ActionTypeImpl extends AbstractFunctionType<Action> implements ActionType {
 
-    public ActionTypeImpl(String pluginId, String name,
-            Class<? extends Action> type) {
-        super(pluginId, name, type);
-    }
-
-    public ActionTypeImpl(String pluginId, String id, String name,
-            Class<? extends Action> type) {
-        super(pluginId, id, name, type);
+    public ActionTypeImpl(CatalogKey key, Class<? extends Action> type) {
+        super(key, type);
     }
 }

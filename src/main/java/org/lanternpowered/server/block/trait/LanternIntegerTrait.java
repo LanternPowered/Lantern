@@ -27,9 +27,9 @@ package org.lanternpowered.server.block.trait;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.collect.ImmutableSet;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.trait.IntegerTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -38,8 +38,8 @@ import java.util.Optional;
 
 public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implements IntegerTrait {
 
-    private LanternIntegerTrait(String name, Key<? extends Value<Integer>> key, ImmutableSet<Integer> possibleValues) {
-        super(name, key, Integer.class, possibleValues);
+    private LanternIntegerTrait(CatalogKey key, Key<? extends Value<Integer>> valueKey, ImmutableSet<Integer> possibleValues) {
+        super(key, valueKey, Integer.class, possibleValues);
     }
 
     /**
@@ -47,21 +47,25 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
      * 
      * <p>The possible values array may not be empty.</p>
      * 
-     * @param name the name
-     * @param key the key that should be attached to the trait
+     * @param key the key
+     * @param valueKey the value key that should be attached to the trait
      * @param possibleValues the possible values
      * @return the integer trait
      */
-    public static IntegerTrait of(String name, Key<? extends Value<Integer>> key, int... possibleValues) {
-        checkNotNullOrEmpty(name, "name");
-        checkNotNull(possibleValues, "possibleValues");
+    public static IntegerTrait of(CatalogKey key, Key<? extends Value<Integer>> valueKey, int... possibleValues) {
         checkNotNull(key, "key");
+        checkNotNull(possibleValues, "possibleValues");
+        checkNotNull(valueKey, "valueKey");
         checkState(possibleValues.length != 0, "possibleValues may not be empty");
         ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
         for (int possibleValue : possibleValues) {
             builder.add(possibleValue);
         }
-        return new LanternIntegerTrait(name, key, builder.build());
+        return new LanternIntegerTrait(key, valueKey, builder.build());
+    }
+
+    public static IntegerTrait minecraft(String id, Key<? extends Value<Integer>> valueKey, int... possibleValues) {
+        return of(CatalogKey.minecraft(id), valueKey, possibleValues);
     }
 
     /**
@@ -69,17 +73,21 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
      * 
      * <p>The possible values array may not be empty.</p>
      * 
-     * @param name the name
-     * @param key the key that should be attached to the trait
+     * @param key the key
+     * @param valueKey the value key that should be attached to the trait
      * @param possibleValues the possible values
      * @return the integer trait
      */
-    public static IntegerTrait of(String name, Key<? extends Value<Integer>> key, Iterable<Integer> possibleValues) {
-        checkNotNullOrEmpty(name, "name");
-        checkNotNull(possibleValues, "possibleValues");
+    public static IntegerTrait of(CatalogKey key, Key<? extends Value<Integer>> valueKey, Iterable<Integer> possibleValues) {
         checkNotNull(key, "key");
+        checkNotNull(possibleValues, "possibleValues");
+        checkNotNull(valueKey, "valueKey");
         checkState(possibleValues.iterator().hasNext(), "possibleValues may not be empty");
-        return new LanternIntegerTrait(name, key, ImmutableSet.copyOf(possibleValues));
+        return new LanternIntegerTrait(key, valueKey, ImmutableSet.copyOf(possibleValues));
+    }
+
+    public static IntegerTrait of(String id, Key<? extends Value<Integer>> valueKey, Iterable<Integer> possibleValues) {
+        return of(CatalogKey.minecraft(id), valueKey, possibleValues);
     }
 
     /**
@@ -89,21 +97,25 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
      * <p>The difference between the minimum and the maximum value must
      * be greater then zero.</p>
      * 
-     * @param name the name
-     * @param key the key that should be attached to the trait
+     * @param key the key
+     * @param valueKey the value key that should be attached to the trait
      * @param min the minimum value
      * @param max the maximum value
      * @return the integer trait
      */
-    public static IntegerTrait ofRange(String name, Key<? extends Value<Integer>> key, int min, int max) {
-        checkNotNullOrEmpty(name, "name");
+    public static IntegerTrait ofRange(CatalogKey key, Key<? extends Value<Integer>> valueKey, int min, int max) {
         checkNotNull(key, "key");
+        checkNotNull(valueKey, "key");
         checkState(max - min > 0, "difference between min and max must be greater then zero");
         ImmutableSet.Builder<Integer> set = ImmutableSet.builder();
         for (int i = min; i <= max; i++) {
             set.add(i);
         }
-        return new LanternIntegerTrait(name, key, set.build());
+        return new LanternIntegerTrait(key, valueKey, set.build());
+    }
+
+    public static IntegerTrait minecraftRange(String id, Key<? extends Value<Integer>> valueKey, int min, int max) {
+        return of(CatalogKey.minecraft(id), valueKey, min, max);
     }
 
     @Override

@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.scoreboard;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternObjectiveDisplayMode;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayModes;
 
@@ -38,7 +39,7 @@ public final class ObjectiveDisplayModeRegistryModule extends AdditionalPluginCa
 
     @Override
     public void registerDefaults() {
-        register(new LanternObjectiveDisplayMode("minecraft", "integer"));
-        register(new LanternObjectiveDisplayMode("minecraft", "hearts"));
+        register(new LanternObjectiveDisplayMode(CatalogKey.minecraft("integer")));
+        register(new LanternObjectiveDisplayMode(CatalogKey.minecraft("hearts")));
     }
 }

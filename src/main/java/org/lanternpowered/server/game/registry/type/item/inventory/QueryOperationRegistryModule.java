@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.data.property.PropertyHelper;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.lanternpowered.server.inventory.query.LanternQueryOperationType;
@@ -45,7 +46,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public class QueryOperationRegistryModule extends PluginCatalogRegistryModule<QueryOperationType> {
+public class QueryOperationRegistryModule extends DefaultCatalogRegistryModule<QueryOperationType> {
 
     public QueryOperationRegistryModule() {
         super(QueryOperationTypes.class, QueryOperations.class);
@@ -53,25 +54,25 @@ public class QueryOperationRegistryModule extends PluginCatalogRegistryModule<Qu
 
     @Override
     public void registerDefaults() {
-        register(new LanternQueryOperationType<ItemStack>("sponge", "item_stack_exact",
+        register(new LanternQueryOperationType<ItemStack>(CatalogKeys.sponge("item_stack_exact"),
                 (arg, inventory) -> inventory instanceof Slot && inventory.contains(arg)));
-        register(new LanternQueryOperationType<ItemStack>("sponge", "item_stack_ignore_quantity",
+        register(new LanternQueryOperationType<ItemStack>(CatalogKeys.sponge("item_stack_ignore_quantity"),
                 (arg, inventory) -> inventory instanceof Slot && inventory.containsAny(arg)));
-        register(new LanternQueryOperationType<ItemType>("sponge", "item_type",
+        register(new LanternQueryOperationType<ItemType>(CatalogKeys.sponge("item_type"),
                 (arg, inventory) -> inventory instanceof Slot && inventory.contains(arg)));
-        register(new LanternQueryOperationType<Predicate<ItemStack>>("sponge", "item_stack_custom",
+        register(new LanternQueryOperationType<Predicate<ItemStack>>(CatalogKeys.sponge("item_stack_custom"),
                 (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek())));
-        register(new LanternQueryOperationType<Predicate<ItemStack>>("lantern", "item_stack_predicate",
+        register(new LanternQueryOperationType<Predicate<ItemStack>>(CatalogKeys.lantern("item_stack_predicate"),
                 (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek())));
-        register(new LanternQueryOperationType<Predicate<ItemStack>>("lantern", "unsafe_item_stack_predicate",
+        register(new LanternQueryOperationType<Predicate<ItemStack>>(CatalogKeys.lantern("unsafe_item_stack_predicate"),
                 (arg, inventory) -> inventory instanceof Slot && arg.test(((AbstractSlot) inventory).getRawItemStack())));
-        register(new LanternQueryOperationType<Class<? extends Inventory>>("sponge", "inventory_type",
+        register(new LanternQueryOperationType<Class<? extends Inventory>>(CatalogKeys.sponge("inventory_type"),
                 (arg, inventory) -> arg.isInstance(inventory)));
-        register(new LanternQueryOperationType<Class<?>>("sponge", "type",
+        register(new LanternQueryOperationType<Class<?>>(CatalogKeys.sponge("type"),
                 (arg, inventory) -> arg.isInstance(inventory)));
-        register(new LanternQueryOperationType<Translation>("sponge", "inventory_translation",
+        register(new LanternQueryOperationType<Translation>(CatalogKeys.sponge("inventory_translation"),
                 (arg, inventory) -> inventory.getName().equals(arg)));
-        register(new LanternQueryOperationType<InventoryProperty<?,?>>("sponge", "inventory_property",
+        register(new LanternQueryOperationType<InventoryProperty<?,?>>(CatalogKeys.sponge("inventory_property"),
                 (arg, inventory) -> {
                     // Equipment slot types are a special case, because
                     // they can be grouped

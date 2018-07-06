@@ -29,6 +29,7 @@ import org.lanternpowered.server.effect.potion.LanternPotionType;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.potion.PotionTypes;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
@@ -48,74 +49,74 @@ public class PotionTypeRegistryModule extends InternalPluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
-        register(new LanternPotionType("minecraft", "empty", "%s.effect.empty", 0));
-        register(new LanternPotionType("minecraft", "water", "%s.effect.water", 1));
-        register(new LanternPotionType("minecraft", "mundane", "%s.effect.mundane", 2));
-        register(new LanternPotionType("minecraft", "thick", "%s.effect.thick", 3));
-        register(new LanternPotionType("minecraft", "awkward", "%s.effect.awkward", 4));
-        register(new LanternPotionType("minecraft", "night_vision", "%s.effect.night_vision", 5)
+        register(new LanternPotionType(CatalogKey.minecraft("empty"), "%s.effect.empty", 0));
+        register(new LanternPotionType(CatalogKey.minecraft("water"), "%s.effect.water", 1));
+        register(new LanternPotionType(CatalogKey.minecraft("mundane"), "%s.effect.mundane", 2));
+        register(new LanternPotionType(CatalogKey.minecraft("thick"), "%s.effect.thick", 3));
+        register(new LanternPotionType(CatalogKey.minecraft("awkward"), "%s.effect.awkward", 4));
+        register(new LanternPotionType(CatalogKey.minecraft("night_vision"), "%s.effect.night_vision", 5)
                 .add(PotionEffect.of(PotionEffectTypes.NIGHT_VISION, 0, 3600)));
-        register(new LanternPotionType("minecraft", "long_night_vision", "%s.effect.night_vision", 6)
+        register(new LanternPotionType(CatalogKey.minecraft("long_night_vision"), "%s.effect.night_vision", 6)
                 .add(PotionEffect.of(PotionEffectTypes.NIGHT_VISION, 0, 9600)));
-        register(new LanternPotionType("minecraft", "invisibility", "%s.effect.invisibility", 7)
+        register(new LanternPotionType(CatalogKey.minecraft("invisibility"), "%s.effect.invisibility", 7)
                 .add(PotionEffect.of(PotionEffectTypes.INVISIBILITY, 0, 3600)));
-        register(new LanternPotionType("minecraft", "long_invisibility", "%s.effect.invisibility", 8)
+        register(new LanternPotionType(CatalogKey.minecraft("long_invisibility"), "%s.effect.invisibility", 8)
                 .add(PotionEffect.of(PotionEffectTypes.INVISIBILITY, 0, 9600)));
-        register(new LanternPotionType("minecraft", "leaping", "%s.effect.leaping", 9)
+        register(new LanternPotionType(CatalogKey.minecraft("leaping"), "%s.effect.leaping", 9)
                 .add(PotionEffect.of(PotionEffectTypes.JUMP_BOOST, 0, 3600)));
-        register(new LanternPotionType("minecraft", "long_leaping", "%s.effect.leaping", 10)
+        register(new LanternPotionType(CatalogKey.minecraft("long_leaping"), "%s.effect.leaping", 10)
                 .add(PotionEffect.of(PotionEffectTypes.JUMP_BOOST, 0, 9600)));
-        register(new LanternPotionType("minecraft", "strong_leaping", "%s.effect.leaping", 11)
+        register(new LanternPotionType(CatalogKey.minecraft("strong_leaping"), "%s.effect.leaping", 11)
                 .add(PotionEffect.of(PotionEffectTypes.JUMP_BOOST, 1, 1800)));
-        register(new LanternPotionType("minecraft", "fire_resistance", "%s.effect.fire_resistance", 12)
+        register(new LanternPotionType(CatalogKey.minecraft("fire_resistance"), "%s.effect.fire_resistance", 12)
                 .add(PotionEffect.of(PotionEffectTypes.JUMP_BOOST, 0, 3600)));
-        register(new LanternPotionType("minecraft", "long_fire_resistance", "%s.effect.fire_resistance", 13)
+        register(new LanternPotionType(CatalogKey.minecraft("long_fire_resistance"), "%s.effect.fire_resistance", 13)
                 .add(PotionEffect.of(PotionEffectTypes.JUMP_BOOST, 0, 9600)));
-        register(new LanternPotionType("minecraft", "swiftness", "%s.effect.swiftness", 14)
+        register(new LanternPotionType(CatalogKey.minecraft("swiftness"), "%s.effect.swiftness", 14)
                 .add(PotionEffect.of(PotionEffectTypes.SPEED, 0, 3600)));
-        register(new LanternPotionType("minecraft", "long_swiftness", "%s.effect.swiftness", 15)
+        register(new LanternPotionType(CatalogKey.minecraft("long_swiftness"), "%s.effect.swiftness", 15)
                 .add(PotionEffect.of(PotionEffectTypes.SPEED, 0, 9600)));
-        register(new LanternPotionType("minecraft", "strong_swiftness", "%s.effect.swiftness", 16)
+        register(new LanternPotionType(CatalogKey.minecraft("strong_swiftness"), "%s.effect.swiftness", 16)
                 .add(PotionEffect.of(PotionEffectTypes.SPEED, 1, 1800)));
-        register(new LanternPotionType("minecraft", "slowness", "%s.effect.slowness", 17)
+        register(new LanternPotionType(CatalogKey.minecraft("slowness"), "%s.effect.slowness", 17)
                 .add(PotionEffect.of(PotionEffectTypes.SLOWNESS, 0, 1800)));
-        register(new LanternPotionType("minecraft", "long_slowness", "%s.effect.slowness", 18)
+        register(new LanternPotionType(CatalogKey.minecraft("long_slowness"), "%s.effect.slowness", 18)
                 .add(PotionEffect.of(PotionEffectTypes.SLOWNESS, 0, 4800)));
-        register(new LanternPotionType("minecraft", "water_breathing", "%s.effect.water_breathing", 19)
+        register(new LanternPotionType(CatalogKey.minecraft("water_breathing"), "%s.effect.water_breathing", 19)
                 .add(PotionEffect.of(PotionEffectTypes.WATER_BREATHING, 0, 3600)));
-        register(new LanternPotionType("minecraft", "long_water_breathing", "%s.effect.water_breathing", 20)
+        register(new LanternPotionType(CatalogKey.minecraft("long_water_breathing"), "%s.effect.water_breathing", 20)
                 .add(PotionEffect.of(PotionEffectTypes.WATER_BREATHING, 0, 9600)));
-        register(new LanternPotionType("minecraft", "healing", "%s.effect.healing", 21)
+        register(new LanternPotionType(CatalogKey.minecraft("healing"), "%s.effect.healing", 21)
                 .add(PotionEffect.of(PotionEffectTypes.INSTANT_HEALTH, 0, 1)));
-        register(new LanternPotionType("minecraft", "strong_healing", "%s.effect.healing", 22)
+        register(new LanternPotionType(CatalogKey.minecraft("strong_healing"), "%s.effect.healing", 22)
                 .add(PotionEffect.of(PotionEffectTypes.INSTANT_HEALTH, 1, 1)));
-        register(new LanternPotionType("minecraft", "harming", "%s.effect.harming", 23)
+        register(new LanternPotionType(CatalogKey.minecraft("harming"), "%s.effect.harming", 23)
                 .add(PotionEffect.of(PotionEffectTypes.INSTANT_DAMAGE, 0, 1)));
-        register(new LanternPotionType("minecraft", "strong_harming", "%s.effect.harming", 24)
+        register(new LanternPotionType(CatalogKey.minecraft("strong_harming"), "%s.effect.harming", 24)
                 .add(PotionEffect.of(PotionEffectTypes.INSTANT_DAMAGE, 1, 1)));
-        register(new LanternPotionType("minecraft", "poison", "%s.effect.poison", 25)
+        register(new LanternPotionType(CatalogKey.minecraft("poison"), "%s.effect.poison", 25)
                 .add(PotionEffect.of(PotionEffectTypes.POISON, 0, 900)));
-        register(new LanternPotionType("minecraft", "long_poison", "%s.effect.poison", 26)
+        register(new LanternPotionType(CatalogKey.minecraft("long_poison"), "%s.effect.poison", 26)
                 .add(PotionEffect.of(PotionEffectTypes.POISON, 0, 1800)));
-        register(new LanternPotionType("minecraft", "strong_poison", "%s.effect.poison", 27)
+        register(new LanternPotionType(CatalogKey.minecraft("strong_poison"), "%s.effect.poison", 27)
                 .add(PotionEffect.of(PotionEffectTypes.POISON, 1, 432)));
-        register(new LanternPotionType("minecraft", "regeneration", "%s.effect.regeneration", 28)
+        register(new LanternPotionType(CatalogKey.minecraft("regeneration"), "%s.effect.regeneration", 28)
                 .add(PotionEffect.of(PotionEffectTypes.REGENERATION, 0, 900)));
-        register(new LanternPotionType("minecraft", "long_regeneration", "%s.effect.regeneration", 29)
+        register(new LanternPotionType(CatalogKey.minecraft("long_regeneration"), "%s.effect.regeneration", 29)
                 .add(PotionEffect.of(PotionEffectTypes.REGENERATION, 0, 1800)));
-        register(new LanternPotionType("minecraft", "strong_regeneration", "%s.effect.regeneration", 30)
+        register(new LanternPotionType(CatalogKey.minecraft("strong_regeneration"), "%s.effect.regeneration", 30)
                 .add(PotionEffect.of(PotionEffectTypes.REGENERATION, 1, 450)));
-        register(new LanternPotionType("minecraft", "strength", "%s.effect.strength", 31)
+        register(new LanternPotionType(CatalogKey.minecraft("strength"), "%s.effect.strength", 31)
                 .add(PotionEffect.of(PotionEffectTypes.STRENGTH, 0, 3600)));
-        register(new LanternPotionType("minecraft", "long_strength", "%s.effect.strength", 32)
+        register(new LanternPotionType(CatalogKey.minecraft("long_strength"), "%s.effect.strength", 32)
                 .add(PotionEffect.of(PotionEffectTypes.STRENGTH, 0, 9600)));
-        register(new LanternPotionType("minecraft", "strong_strength", "%s.effect.strength", 33)
+        register(new LanternPotionType(CatalogKey.minecraft("strong_strength"), "%s.effect.strength", 33)
                 .add(PotionEffect.of(PotionEffectTypes.STRENGTH, 1, 1800)));
-        register(new LanternPotionType("minecraft", "weakness", "%s.effect.weakness", 34)
+        register(new LanternPotionType(CatalogKey.minecraft("weakness"), "%s.effect.weakness", 34)
                 .add(PotionEffect.of(PotionEffectTypes.WEAKNESS, 0, 1800)));
-        register(new LanternPotionType("minecraft", "long_weakness", "%s.effect.weakness", 35)
+        register(new LanternPotionType(CatalogKey.minecraft("long_weakness"), "%s.effect.weakness", 35)
                 .add(PotionEffect.of(PotionEffectTypes.WEAKNESS, 0, 4800)));
-        register(new LanternPotionType("minecraft", "luck", "%s.effect.luck", 36)
+        register(new LanternPotionType(CatalogKey.minecraft("luck"), "%s.effect.luck", 36)
                 .add(PotionEffect.of(PotionEffectTypes.LUCK, 0, 6000)));
     }
 }

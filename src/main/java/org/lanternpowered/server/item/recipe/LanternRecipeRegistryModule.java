@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.item.recipe;
 
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.item.recipe.Recipe;
 
-public class LanternRecipeRegistryModule<T extends CatalogType & Recipe> extends PluginCatalogRegistryModule<T> {
+public class LanternRecipeRegistryModule<T extends CatalogType & Recipe> extends DefaultCatalogRegistryModule<T> {
 
     public LanternRecipeRegistryModule(Class<?>... catalogClasses) {
         super(catalogClasses);

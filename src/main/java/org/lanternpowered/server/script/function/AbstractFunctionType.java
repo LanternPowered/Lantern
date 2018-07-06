@@ -27,14 +27,11 @@ package org.lanternpowered.server.script.function;
 
 import org.lanternpowered.api.script.function.FunctionType;
 import org.lanternpowered.server.script.AbstractObjectType;
+import org.spongepowered.api.CatalogKey;
 
 public class AbstractFunctionType<F> extends AbstractObjectType<F> implements FunctionType<F> {
 
-    public AbstractFunctionType(String pluginId, String name, Class<? extends F> type) {
-        super(pluginId, name, type);
-    }
-
-    public AbstractFunctionType(String pluginId, String id, String name, Class<? extends F> type) {
-        super(pluginId, id, name, type);
+    public AbstractFunctionType(CatalogKey key, Class<? extends F> type) {
+        super(key, type);
     }
 }

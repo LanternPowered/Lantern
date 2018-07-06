@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternPickupRule;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.PickupRule;
 import org.spongepowered.api.data.type.PickupRules;
 
@@ -44,8 +45,8 @@ public class PickupRuleRegistryModule extends InternalPluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
-        register(new LanternPickupRule("minecraft", "disallowed", 0));
-        register(new LanternPickupRule("minecraft", "allowed", 1));
-        register(new LanternPickupRule("minecraft", "creative_only", 2));
+        register(new LanternPickupRule(CatalogKey.minecraft("disallowed"), 0));
+        register(new LanternPickupRule(CatalogKey.minecraft("allowed"), 1));
+        register(new LanternPickupRule(CatalogKey.minecraft("creative_only"), 2));
     }
 }

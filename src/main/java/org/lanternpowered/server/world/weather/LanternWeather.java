@@ -27,15 +27,16 @@ package org.lanternpowered.server.world.weather;
 
 import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.api.script.function.value.IntValueProvider;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.script.context.EmptyScriptContext;
 import org.lanternpowered.server.util.option.OptionValueMap;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.Set;
 
-public final class LanternWeather extends PluginCatalogType.Base implements Weather {
+public final class LanternWeather extends DefaultCatalogType implements Weather {
 
     public static WeatherBuilder builder() {
         return new WeatherBuilder();
@@ -47,24 +48,14 @@ public final class LanternWeather extends PluginCatalogType.Base implements Weat
     private final double weight;
     private final IntValueProvider duration;
 
-    LanternWeather(String pluginId, String name, Action action, Set<String> aliases,
+    LanternWeather(CatalogKey key, Action action, Set<String> aliases,
             OptionValueMap options, double weight, IntValueProvider duration) {
-        super(pluginId, name);
+        super(key);
         this.action = action;
         this.aliases = aliases;
         this.options = options;
         this.weight = weight;
         this.duration = duration;
-    }
-
-    LanternWeather(String pluginId, String id, String name, Action action, Set<String> aliases,
-            OptionValueMap options, double weight, IntValueProvider duration) {
-        super(pluginId, id, name);
-        this.duration = duration;
-        this.action = action;
-        this.aliases = aliases;
-        this.options = options;
-        this.weight = weight;
     }
 
     public Action getAction() {

@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.game.registry.type.item;
 
+import org.lanternpowered.server.effect.firework.LanternFireworkShape;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
-import org.lanternpowered.server.item.firework.LanternFireworkShape;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.FireworkShape;
 import org.spongepowered.api.item.FireworkShapes;
 
@@ -44,10 +45,10 @@ public class FireworkShapeRegistryModule extends InternalPluginCatalogRegistryMo
 
     @Override
     public void registerDefaults() {
-        register(new LanternFireworkShape("minecraft", "ball", 0));
-        register(new LanternFireworkShape("minecraft", "large_ball", 1));
-        register(new LanternFireworkShape("minecraft", "star", 2));
-        register(new LanternFireworkShape("minecraft", "creeper", 3));
-        register(new LanternFireworkShape("minecraft", "burst", 4));
+        register(new LanternFireworkShape(CatalogKey.minecraft("ball"), 0));
+        register(new LanternFireworkShape(CatalogKey.minecraft("large_ball"), 1));
+        register(new LanternFireworkShape(CatalogKey.minecraft("star"), 2));
+        register(new LanternFireworkShape(CatalogKey.minecraft("creeper"), 3));
+        register(new LanternFireworkShape(CatalogKey.minecraft("burst"), 4));
     }
 }

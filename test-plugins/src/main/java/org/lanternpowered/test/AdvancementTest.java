@@ -30,6 +30,7 @@ import com.google.inject.Inject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.slf4j.Logger;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.AdvancementTypes;
@@ -220,7 +221,7 @@ public class AdvancementTest {
                 .build());
 
         this.suicidalAdvancement = null;
-        event.getRegistryModule().getById("minecraft:adventure_root").ifPresent(parent -> {
+        event.getRegistryModule().get(CatalogKey.of("minecraft", "adventure_root")).ifPresent(parent -> {
             // Create the suicidal advancement
             this.suicidalAdvancement = Advancement.builder()
                     .parent(parent)

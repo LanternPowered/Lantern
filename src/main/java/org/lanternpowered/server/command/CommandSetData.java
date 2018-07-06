@@ -32,6 +32,7 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -73,12 +74,13 @@ public final class CommandSetData extends CommandProvider {
                         new PatternMatchingCommandElement(Text.of("key")) {
                             @Override
                             protected Iterable<String> getChoices(CommandSource source) {
-                                return Sponge.getGame().getRegistry().getAllOf(Key.class).stream().map(Key::getId).collect(Collectors.toList());
+                                return Sponge.getGame().getRegistry().getAllOf(Key.class).stream()
+                                        .map(Key::getKey).map(CatalogKey::toString).collect(Collectors.toList());
                             }
 
                             @Override
                             protected Object getValue(String choice) throws IllegalArgumentException {
-                                final Optional<Key> ret = Sponge.getGame().getRegistry().getType(Key.class, choice);
+                                final Optional<Key> ret = Sponge.getGame().getRegistry().getType(Key.class, CatalogKey.resolve(choice));
                                 if (!ret.isPresent()) {
                                     throw new IllegalArgumentException("Invalid input " + choice + " was found");
                                 }
@@ -110,7 +112,7 @@ public final class CommandSetData extends CommandProvider {
                                         .getTypeSerializer(typeToken).orElse(null);
                                 if (dataTypeSerializer == null) {
                                     throw args.createError(Text.of("Unable to deserialize the data key value: {}, "
-                                            + "no supported deserializer exists.", key.getId()));
+                                            + "no supported deserializer exists.", key.getKey()));
                                 } else {
                                     final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
                                     try {
@@ -133,7 +135,7 @@ public final class CommandSetData extends CommandProvider {
                     final Key key = args.<Key>getOne("key").get();
                     final Object data = args.<ValueHolder>getOne("data").get().data;
                     target.offer(key, data);
-                    src.sendMessage(t("Successfully offered the data for the key %s to the player %s", key.getId(), target.getName()));
+                    src.sendMessage(t("Successfully offered the data for the key %s to the player %s", key.getKey(), target.getName()));
                     return CommandResult.success();
                 });
     }

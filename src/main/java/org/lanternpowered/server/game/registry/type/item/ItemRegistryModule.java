@@ -45,6 +45,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.effect.potion.PotionType;
@@ -53,6 +54,7 @@ import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryMo
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RecordTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
@@ -75,6 +77,7 @@ import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsP
 import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.util.UncheckedThrowables;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.FoodRestorationProperty;
@@ -116,6 +119,7 @@ import java.util.function.Function;
         PotionEffectTypeRegistryModule.class,
         RecordTypeRegistryModule.class,
         EquipmentTypeRegistryModule.class,
+        DyeColorRegistryModule.class,
 })
 public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
 
@@ -162,13 +166,15 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     }
 
     @Override
-    public Optional<ItemType> getById(String id) {
-        if ("minecraft:cooked_fished".equals(id)) {
-            id = "minecraft:cooked_fish";
-        } else if ("minecraft:totem".equals(id)) {
-            id = "minecraft:totem_of_undying";
+    public Optional<ItemType> get(CatalogKey key) {
+        if (key.getNamespace().equals(CatalogKeys.MINECRAFT_NAMESPACE)) {
+            if ("cooked_fished".equals(key.getValue())) {
+                key = CatalogKey.minecraft("cooked_fish");
+            } else if ("totem".equals(key.getValue())) {
+                key = CatalogKey.minecraft("totem_of_undying");
+            }
         }
-        return super.getById(id);
+        return super.get(key);
     }
 
     @Override

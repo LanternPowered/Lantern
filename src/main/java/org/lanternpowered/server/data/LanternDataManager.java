@@ -238,8 +238,8 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         checkState(!this.builders.containsKey(immutableClass), "ImmutableDataManipulator already registered!");
         checkState(!this.immutableBuilderMap.containsKey(immutableClass), "ImmutableDataManipulator already registered!");
         checkState(!this.immutableBuilderMap.containsValue(manipulatorBuilder), "DataManipulatorBuilder already registered!");
-        checkState(!DataManipulatorRegistryModule.get().getById(registration.getId()).isPresent(),
-                "There is already a DataRegistration registered with the ID: " + registration.getId());
+        checkState(!DataManipulatorRegistryModule.get().get(registration.getKey()).isPresent(),
+                "There is already a DataRegistration registered with the ID: " + registration.getKey());
     }
 
     @SuppressWarnings("unchecked")

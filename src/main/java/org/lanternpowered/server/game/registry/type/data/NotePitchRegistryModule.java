@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.NotePitches;
 
@@ -77,7 +78,7 @@ public final class NotePitchRegistryModule extends InternalPluginCatalogRegistry
     public void registerDefaults() {
         final List<LanternNotePitch> entries = new ArrayList<>(SORTED_NOTE_PITCHES.length);
         for (String noteName : SORTED_NOTE_PITCHES) {
-            final LanternNotePitch notePitch = new LanternNotePitch("minecraft", noteName, entries.size());
+            final LanternNotePitch notePitch = new LanternNotePitch(CatalogKey.minecraft(noteName.toLowerCase()), entries.size());
             entries.add(notePitch);
             register(notePitch);
         }

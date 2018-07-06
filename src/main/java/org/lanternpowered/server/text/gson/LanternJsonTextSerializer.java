@@ -30,9 +30,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.lanternpowered.server.text.translation.TranslationManager;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
@@ -43,12 +44,12 @@ import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.Locale;
 
-public final class LanternJsonTextSerializer extends PluginCatalogType.Base implements LanternTextSerializer {
+public final class LanternJsonTextSerializer extends DefaultCatalogType implements LanternTextSerializer {
 
     private final Gson gson;
 
-    public LanternJsonTextSerializer(String pluginId, String name, TranslationManager translationManager) {
-        super(pluginId, name);
+    public LanternJsonTextSerializer(CatalogKey key, TranslationManager translationManager) {
+        super(key);
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(Text.class, new JsonTextSerializer())
                 .registerTypeAdapter(LiteralText.class, new JsonTextLiteralSerializer())

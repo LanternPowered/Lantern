@@ -28,10 +28,11 @@ package org.lanternpowered.server.data;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
@@ -41,7 +42,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import javax.annotation.Nullable;
 
 public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>>
-        extends PluginCatalogType.Base implements DataRegistration<M, I>, Comparable<LanternDataRegistration<?, ?>> {
+        extends DefaultCatalogType implements DataRegistration<M, I>, Comparable<LanternDataRegistration<?, ?>> {
 
     private static String fixId(PluginContainer plugin, String id) {
         final int index = id.indexOf(':');
@@ -63,7 +64,7 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
 
     protected LanternDataRegistration(PluginContainer plugin, String id, String name, Class<M> manipulatorClass, Class<I> immutableClass,
             @Nullable DataManipulatorBuilder<M, I> manipulatorBuilder) {
-        super(plugin.getId(), fixId(plugin, id), name);
+        super(CatalogKeys.of(plugin.getId(), fixId(plugin, id), name));
         this.plugin = checkNotNull(plugin, "plugin");
         this.manipulatorClass = checkNotNull(manipulatorClass, "manipulatorClass");
         this.immutableClass = checkNotNull(immutableClass, "immutableClass");
@@ -71,9 +72,9 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
     }
 
     LanternDataRegistration(LanternDataRegistrationBuilder<M, I> builder) {
-        super(checkNotNull(builder.plugin, "PluginContainer is null!").getId(),
+        super(CatalogKeys.of(checkNotNull(builder.plugin, "PluginContainer is null!").getId(),
                 checkNotNull(builder.id, "Data ID is null!"),
-                checkNotNull(builder.name, "Data name is null!"));
+                checkNotNull(builder.name, "Data name is null!")));
         this.manipulatorClass = checkNotNull(builder.manipulatorClass, "DataManipulator class is null!");
         this.immutableClass = checkNotNull(builder.immutableClass, "ImmutableDataManipulator class is null!");
         this.manipulatorBuilder = checkNotNull(builder.manipulatorBuilder, "DataManipulatorBuilder is null!");
@@ -138,16 +139,16 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
                 && Objects.equal(this.immutableClass, that.immutableClass)
                 && Objects.equal(this.manipulatorBuilder, that.manipulatorBuilder)
                 && Objects.equal(this.plugin, that.plugin)
-                && Objects.equal(getId(), that.getId());
+                && Objects.equal(getKey(), that.getKey());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.manipulatorClass, this.immutableClass, this.manipulatorBuilder, getId());
+        return Objects.hashCode(this.manipulatorClass, this.immutableClass, this.manipulatorBuilder, getKey());
     }
 
     @Override
-    public MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
                 .add("manipulatorClass", this.manipulatorClass)
                 .add("immutableClass", this.immutableClass)
@@ -156,6 +157,6 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
 
     @Override
     public int compareTo(LanternDataRegistration<?, ?> o) {
-        return this.getId().compareTo(o.getId());
+        return getKey().compareTo(o.getKey());
     }
 }

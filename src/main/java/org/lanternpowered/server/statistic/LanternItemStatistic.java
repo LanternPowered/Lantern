@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.statistic;
 
-import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.statistic.ItemStatistic;
@@ -40,9 +41,9 @@ public class LanternItemStatistic extends LanternStatistic implements ItemStatis
 
     private final ItemType itemType;
 
-    public LanternItemStatistic(String pluginId, String id, String name, Translation translation, String internalId, NumberFormat format,
+    public LanternItemStatistic(CatalogKey key, Translation translation, String internalId, NumberFormat format,
             @Nullable Criterion criterion, StatisticType type, ItemType itemType) {
-        super(pluginId, id, name, translation, internalId, format, criterion, type);
+        super(key, translation, internalId, format, criterion, type);
         this.itemType = itemType;
     }
 
@@ -52,8 +53,8 @@ public class LanternItemStatistic extends LanternStatistic implements ItemStatis
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .add("itemType", this.itemType.getId());
+                .add("itemType", this.itemType.getKey());
     }
 }

@@ -25,33 +25,20 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.data.type.LanternCareer;
 import org.lanternpowered.server.data.type.LanternProfession;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.lanternpowered.server.util.UncheckedThrowables;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.Careers;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.Professions;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 @RegistrationDependency(ProfessionRegistryModule.class)
-public class CareerRegistryModule extends PluginCatalogRegistryModule<Career> {
-
-    private static final Method ADD_CAREER;
-
-    static {
-        try {
-            ADD_CAREER = LanternProfession.class.getDeclaredMethod("addCareer", Career.class);
-            ADD_CAREER.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            throw UncheckedThrowables.thrOw(e);
-        }
-    }
+public class CareerRegistryModule extends DefaultCatalogRegistryModule<Career> {
 
     public CareerRegistryModule() {
         super(Careers.class);
@@ -60,28 +47,24 @@ public class CareerRegistryModule extends PluginCatalogRegistryModule<Career> {
     @Override
     protected void register(Career catalogType, boolean disallowInbuiltPluginIds) {
         super.register(catalogType, disallowInbuiltPluginIds);
-        try {
-            ADD_CAREER.invoke(catalogType.getProfession(), catalogType);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw UncheckedThrowables.thrOw(e);
-        }
+        ((LanternProfession) catalogType.getProfession()).addCareer(catalogType);
     }
 
     @Override
     public void registerDefaults() {
-        register(new LanternCareer("minecraft", "farmer", Professions.FARMER));
-        register(new LanternCareer("minecraft", "fisherman", Professions.FARMER));
-        register(new LanternCareer("minecraft", "shepherd", Professions.FARMER));
-        register(new LanternCareer("minecraft", "fletcher", Professions.FARMER));
-        register(new LanternCareer("minecraft", "librarian", Professions.LIBRARIAN));
-        register(new LanternCareer("minecraft", "cartographer", Professions.LIBRARIAN));
-        register(new LanternCareer("minecraft", "cleric", Professions.PRIEST));
-        register(new LanternCareer("minecraft", "armor", Professions.BLACKSMITH));
-        register(new LanternCareer("minecraft", "weapon", Professions.BLACKSMITH));
-        register(new LanternCareer("minecraft", "butcher", Professions.BUTCHER));
-        register(new LanternCareer("minecraft", "leather", Professions.BUTCHER));
+        register(new LanternCareer(CatalogKey.minecraft("farmer"), Professions.FARMER));
+        register(new LanternCareer(CatalogKey.minecraft("fisherman"), Professions.FARMER));
+        register(new LanternCareer(CatalogKey.minecraft("shepherd"), Professions.FARMER));
+        register(new LanternCareer(CatalogKey.minecraft("fletcher"), Professions.FARMER));
+        register(new LanternCareer(CatalogKey.minecraft("librarian"), Professions.LIBRARIAN));
+        register(new LanternCareer(CatalogKey.minecraft("cartographer"), Professions.LIBRARIAN));
+        register(new LanternCareer(CatalogKey.minecraft("cleric"), Professions.PRIEST));
+        register(new LanternCareer(CatalogKey.minecraft("armor"), Professions.BLACKSMITH));
+        register(new LanternCareer(CatalogKey.minecraft("weapon"), Professions.BLACKSMITH));
+        register(new LanternCareer(CatalogKey.minecraft("butcher"), Professions.BUTCHER));
+        register(new LanternCareer(CatalogKey.minecraft("leather"), Professions.BUTCHER));
         // TODO: Use field when available
-        register(new LanternCareer("minecraft", "nitwit",
-                Lantern.getRegistry().getType(Profession.class, "minecraft:nitwit").get()));
+        register(new LanternCareer(CatalogKey.minecraft("nitwit"),
+                Lantern.getRegistry().getType(Profession.class, CatalogKeys.minecraft("nitwit")).get()));
     }
 }

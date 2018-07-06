@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternGoldenApple;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.GoldenApple;
 import org.spongepowered.api.data.type.GoldenApples;
 
@@ -44,7 +45,7 @@ public class GoldenAppleRegistryModule extends InternalPluginCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
-        register(new LanternGoldenApple("minecraft", "golden_apple", 0));
-        register(new LanternGoldenApple("minecraft", "enchanted_golden_apple", 1));
+        register(new LanternGoldenApple(CatalogKey.minecraft("golden_apple"), 0));
+        register(new LanternGoldenApple(CatalogKey.minecraft("enchanted_golden_apple"), 1));
     }
 }

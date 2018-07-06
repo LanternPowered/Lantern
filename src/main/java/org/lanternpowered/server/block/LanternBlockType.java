@@ -31,8 +31,9 @@ import org.lanternpowered.server.block.behavior.types.RandomTickBehavior;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -47,7 +48,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternBlockType extends PluginCatalogType.Base implements BlockType, AbstractPropertyHolder {
+public class LanternBlockType extends DefaultCatalogType implements BlockType, AbstractPropertyHolder {
 
     /**
      * The property provider collection.
@@ -93,29 +94,15 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
      */
     private BlockSoundGroup blockSoundGroup = BlockSoundGroups.STONE;
 
-    LanternBlockType(String pluginId, String name, Iterable<BlockTrait<?>> blockTraits,
+    LanternBlockType(CatalogKey key, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
             @Nullable TileEntityProvider tileEntityProvider, ExtendedBlockStateProvider extendedBlockStateProvider) {
-        super(pluginId, name);
+        super(key);
         this.translationProvider = translationProvider;
         this.behaviorPipeline = behaviorPipeline;
         this.tileEntityProvider = tileEntityProvider;
         this.tickRandomly = !behaviorPipeline.pipeline(RandomTickBehavior.class).getBehaviors().isEmpty();
         this.extendedBlockStateProvider = extendedBlockStateProvider;
-        this.blockStateBase = new LanternBlockStateMap(this, blockTraits);
-        this.defaultBlockState = this.blockStateBase.getBaseState();
-    }
-
-    LanternBlockType(String pluginId, String id, String name,
-            Iterable<BlockTrait<?>> blockTraits, TranslationProvider translationProvider,
-            MutableBehaviorPipeline<Behavior> behaviorPipeline, @Nullable TileEntityProvider tileEntityProvider,
-            ExtendedBlockStateProvider extendedBlockStateProvider) {
-        super(pluginId, id, name);
-        this.translationProvider = translationProvider;
-        this.behaviorPipeline = behaviorPipeline;
-        this.tileEntityProvider = tileEntityProvider;
-        this.extendedBlockStateProvider = extendedBlockStateProvider;
-        this.tickRandomly = !behaviorPipeline.pipeline(RandomTickBehavior.class).getBehaviors().isEmpty();
         this.blockStateBase = new LanternBlockStateMap(this, blockTraits);
         this.defaultBlockState = this.blockStateBase.getBaseState();
     }

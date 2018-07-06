@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.statistic;
 
-import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.statistic.EntityStatistic;
@@ -40,9 +41,9 @@ public class LanternEntityStatistic extends LanternStatistic implements EntitySt
 
     private final EntityType entityType;
 
-    public LanternEntityStatistic(String pluginId, String id, String name, Translation translation, String internalId, NumberFormat format,
+    public LanternEntityStatistic(CatalogKey key, Translation translation, String internalId, NumberFormat format,
             @Nullable Criterion criterion, StatisticType type, EntityType entityType) {
-        super(pluginId, id, name, translation, internalId, format, criterion, type);
+        super(key, translation, internalId, format, criterion, type);
         this.entityType = entityType;
     }
 
@@ -52,8 +53,8 @@ public class LanternEntityStatistic extends LanternStatistic implements EntitySt
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .add("entityType", this.entityType.getId());
+                .add("entityType", this.entityType.getKey());
     }
 }

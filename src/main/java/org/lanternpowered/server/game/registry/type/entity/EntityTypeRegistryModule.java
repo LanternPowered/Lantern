@@ -38,6 +38,7 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.sound.entity.EntityEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
@@ -79,11 +80,11 @@ public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegis
 
     @Override
     public void registerDefaults() {
-        register(LanternEntityType.of("minecraft", "player", "entity.player.name", LanternPlayer.class,
+        register(LanternEntityType.of(CatalogKey.minecraft("player"), "entity.player.name", LanternPlayer.class,
                 uuid -> { throw new UnsupportedOperationException("You cannot construct a Player."); }));
-        register(LanternEntityType.of("minecraft", "offline_user", "entity.player.name", OfflineUser.class,
+        register(LanternEntityType.of(CatalogKey.minecraft("offline_user"), "entity.player.name", OfflineUser.class,
                 uuid -> { throw new UnsupportedOperationException("You cannot construct a Offline User."); }));
-        register(LanternEntityType.of("minecraft", "item", "entity.Item.name", LanternItem::new));
-        register(LanternEntityType.of("minecraft", "lightning", "entity.lightning.name", LanternLightning::new));
+        register(LanternEntityType.of(CatalogKey.minecraft("item"), "entity.Item.name", LanternItem::new));
+        register(LanternEntityType.of(CatalogKey.minecraft("lightning"), "entity.lightning.name", LanternLightning::new));
     }
 }

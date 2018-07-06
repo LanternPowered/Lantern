@@ -35,6 +35,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.lanternpowered.api.script.ObjectType;
 import org.lanternpowered.server.script.AbstractObjectTypeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -86,7 +87,7 @@ public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements Typ
                     + value.getClass().getName());
         }
         final JsonObject json = new JsonObject();
-        json.addProperty(TYPE, optType.get().getId());
+        json.addProperty(TYPE, optType.get().getKey().toString());
         final TypeAdapter<V> delegateTypeAdapter = gson.getDelegateAdapter(this,
                 (TypeToken<V>) TypeToken.get(optType.get().getType()));
         json.add(DATA, delegateTypeAdapter.toJsonTree(value));
@@ -96,7 +97,7 @@ public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements Typ
     protected V deserialize(TypeToken<V> type, JsonElement element, Gson gson) {
         final JsonObject obj = element.getAsJsonObject();
         final String valueTypeId = obj.get(TYPE).getAsString();
-        final Optional<O> optType = this.registry.getById(valueTypeId);
+        final Optional<O> optType = this.registry.get(CatalogKey.resolve(valueTypeId));
         if (!optType.isPresent()) {
             throw new IllegalStateException("Unknown type id: " + valueTypeId);
         }

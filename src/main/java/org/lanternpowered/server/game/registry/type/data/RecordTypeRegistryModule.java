@@ -25,9 +25,10 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.data.type.record.LanternRecordType;
+import org.lanternpowered.server.data.type.LanternRecordType;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.sound.SoundTypeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.effect.sound.record.RecordTypes;
@@ -48,17 +49,17 @@ public class RecordTypeRegistryModule extends InternalPluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
-        register(new LanternRecordType("minecraft", "thirteen", "item.record.13.desc", 0, SoundTypes.RECORD_13));
-        register(new LanternRecordType("minecraft", "cat", "item.record.cat.desc", 1, SoundTypes.RECORD_CAT));
-        register(new LanternRecordType("minecraft", "blocks", "item.record.blocks.desc", 2, SoundTypes.RECORD_BLOCKS));
-        register(new LanternRecordType("minecraft", "chirp", "item.record.chirp.desc", 3, SoundTypes.RECORD_CHIRP));
-        register(new LanternRecordType("minecraft", "far", "item.record.far.desc", 4, SoundTypes.RECORD_FAR));
-        register(new LanternRecordType("minecraft", "mall", "item.record.mall.desc", 5, SoundTypes.RECORD_MALL));
-        register(new LanternRecordType("minecraft", "mellohi", "item.record.mellohi.desc", 6, SoundTypes.RECORD_MELLOHI));
-        register(new LanternRecordType("minecraft", "stal", "item.record.stal.desc", 7, SoundTypes.RECORD_STAL));
-        register(new LanternRecordType("minecraft", "strad", "item.record.strad.desc", 8, SoundTypes.RECORD_STRAD));
-        register(new LanternRecordType("minecraft", "ward", "item.record.ward.desc", 9, SoundTypes.RECORD_WARD));
-        register(new LanternRecordType("minecraft", "eleven", "item.record.11.desc", 10, SoundTypes.RECORD_11));
-        register(new LanternRecordType("minecraft", "wait", "item.record.wait.desc", 11, SoundTypes.RECORD_WAIT));
+        register(new LanternRecordType(CatalogKey.minecraft("thirteen"), "item.record.13.desc", 0, SoundTypes.RECORD_13));
+        register(new LanternRecordType(CatalogKey.minecraft("cat"), "item.record.cat.desc", 1, SoundTypes.RECORD_CAT));
+        register(new LanternRecordType(CatalogKey.minecraft("blocks"), "item.record.blocks.desc", 2, SoundTypes.RECORD_BLOCKS));
+        register(new LanternRecordType(CatalogKey.minecraft("chirp"), "item.record.chirp.desc", 3, SoundTypes.RECORD_CHIRP));
+        register(new LanternRecordType(CatalogKey.minecraft("far"), "item.record.far.desc", 4, SoundTypes.RECORD_FAR));
+        register(new LanternRecordType(CatalogKey.minecraft("mall"), "item.record.mall.desc", 5, SoundTypes.RECORD_MALL));
+        register(new LanternRecordType(CatalogKey.minecraft("mellohi"), "item.record.mellohi.desc", 6, SoundTypes.RECORD_MELLOHI));
+        register(new LanternRecordType(CatalogKey.minecraft("stal"), "item.record.stal.desc", 7, SoundTypes.RECORD_STAL));
+        register(new LanternRecordType(CatalogKey.minecraft("strad"), "item.record.strad.desc", 8, SoundTypes.RECORD_STRAD));
+        register(new LanternRecordType(CatalogKey.minecraft("ward"), "item.record.ward.desc", 9, SoundTypes.RECORD_WARD));
+        register(new LanternRecordType(CatalogKey.minecraft("eleven"), "item.record.11.desc", 10, SoundTypes.RECORD_11));
+        register(new LanternRecordType(CatalogKey.minecraft("wait"), "item.record.wait.desc", 11, SoundTypes.RECORD_WAIT));
     }
 }

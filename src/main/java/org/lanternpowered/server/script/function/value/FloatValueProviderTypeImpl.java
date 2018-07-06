@@ -28,16 +28,11 @@ package org.lanternpowered.server.script.function.value;
 import org.lanternpowered.api.script.function.value.FloatValueProvider;
 import org.lanternpowered.api.script.function.value.FloatValueProviderType;
 import org.lanternpowered.server.script.function.AbstractFunctionType;
+import org.spongepowered.api.CatalogKey;
 
 public class FloatValueProviderTypeImpl extends AbstractFunctionType<FloatValueProvider> implements FloatValueProviderType {
 
-    public FloatValueProviderTypeImpl(String pluginId, String name,
-            Class<? extends FloatValueProvider> type) {
-        super(pluginId, name, type);
-    }
-
-    public FloatValueProviderTypeImpl(String pluginId, String id, String name,
-            Class<? extends FloatValueProvider> type) {
-        super(pluginId, id, name, type);
+    public FloatValueProviderTypeImpl(CatalogKey key, Class<? extends FloatValueProvider> type) {
+        super(key, type);
     }
 }

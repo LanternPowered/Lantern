@@ -27,13 +27,14 @@ package org.lanternpowered.server.attribute;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.CatalogTypeBase;
+import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
 
 import java.util.function.Predicate;
 
-public class LanternAttribute extends CatalogTypeBase {
+public class LanternAttribute extends DefaultCatalogType {
 
     private final Text name;
     private final Predicate<DataHolder> targets;
@@ -42,8 +43,8 @@ public class LanternAttribute extends CatalogTypeBase {
     private final double min;
     private final double def;
 
-    LanternAttribute(String identifier, Text name, double max, double min, double def, Predicate<DataHolder> targets) {
-        super(identifier, name.toPlain());
+    LanternAttribute(String id, Text name, double max, double min, double def, Predicate<DataHolder> targets) {
+        super(CatalogKeys.activePlugin(id, name.toPlain()));
 
         this.name = checkNotNull(name, "name");
         this.targets = checkNotNull(targets, "targets");
@@ -72,9 +73,9 @@ public class LanternAttribute extends CatalogTypeBase {
 
     /**
      * Gets the display name of the attribute.
-     * 
+     *
      * <p>No method in the sponge api? There is one in the builder though.</p>
-     * 
+     *
      * @return the display name
      */
     public Text getDisplayName() {

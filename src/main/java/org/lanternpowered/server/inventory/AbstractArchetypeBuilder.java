@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.Archetype;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -104,11 +105,11 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
      */
     public LanternInventoryArchetype<R> buildArchetype(String pluginId, String id) {
         checkState(this.constructor != null);
-        if (this.cachedArchetype != null && this.cachedArchetype.getId()
-                .equals(pluginId + ':' + id.toLowerCase(Locale.ENGLISH))) {
+        if (this.cachedArchetype != null && this.cachedArchetype.getKey()
+                .equals(CatalogKey.of(pluginId, id.toLowerCase(Locale.ENGLISH)))) {
             return this.cachedArchetype;
         }
-        return this.cachedArchetype = new BuilderInventoryArchetype<>(pluginId, id, copy());
+        return this.cachedArchetype = new BuilderInventoryArchetype<>(CatalogKey.of(pluginId, id), copy());
     }
 
     protected void copyTo(B builder) {

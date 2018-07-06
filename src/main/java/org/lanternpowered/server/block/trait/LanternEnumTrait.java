@@ -27,9 +27,9 @@ package org.lanternpowered.server.block.trait;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.collect.ImmutableSet;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -40,8 +40,8 @@ import java.util.function.Predicate;
 @SuppressWarnings("unchecked")
 public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E> implements EnumTrait<E> {
 
-    private LanternEnumTrait(String name, Class<E> valueClass, Key<? extends Value<E>> key, ImmutableSet<E> possibleValues) {
-        super(name, key, valueClass, possibleValues);
+    private LanternEnumTrait(CatalogKey key, Class<E> valueClass, Key<? extends Value<E>> valueKey, ImmutableSet<E> possibleValues) {
+        super(key, valueKey, valueClass, possibleValues);
     }
 
     /**
@@ -49,18 +49,22 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
      * 
      * <p>The possible values array may not be empty.</p>
      * 
-     * @param name the name
-     * @param key the key that should be attached to the trait
+     * @param key the key
+     * @param valueKey the value key that should be attached to the trait
      * @param possibleValues the possible values
      * @return the enum trait
      */
-    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key, Iterable<E> possibleValues) {
-        checkNotNullOrEmpty(name, "name");
-        checkNotNull(possibleValues, "possibleValues");
+    public static <E extends Enum<E>> EnumTrait<E> of(CatalogKey key, Key<? extends Value<E>> valueKey, Iterable<E> possibleValues) {
         checkNotNull(key, "key");
+        checkNotNull(possibleValues, "possibleValues");
+        checkNotNull(valueKey, "valueKey");
         checkState(possibleValues.iterator().hasNext(), "possibleValues may not be empty");
-        return new LanternEnumTrait<>(name, (Class<E>) possibleValues.iterator().getClass(),
-                key, ImmutableSet.copyOf(possibleValues));
+        return new LanternEnumTrait<>(key, (Class<E>) possibleValues.iterator().getClass(),
+                valueKey, ImmutableSet.copyOf(possibleValues));
+    }
+
+    public static <E extends Enum<E>> EnumTrait<E> minecraft(String id, Key<? extends Value<E>> valueKey, Iterable<E> possibleValues) {
+        return of(CatalogKey.minecraft(id), valueKey, possibleValues);
     }
 
     /**
@@ -68,17 +72,21 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
      * 
      * <p>The enum must contain values.</p>
      * 
-     * @param name the name
-     * @param key the key that should be attached to the trait
+     * @param key the key
+     * @param valueKey the value key that should be attached to the trait
      * @param enumClass the enum class
      * @return the enum trait
      */
-    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key, Class<E> enumClass) {
-        checkNotNullOrEmpty(name, "name");
-        checkNotNull(enumClass, "enumClass");
+    public static <E extends Enum<E>> EnumTrait<E> of(CatalogKey key, Key<? extends Value<E>> valueKey, Class<E> enumClass) {
         checkNotNull(key, "key");
+        checkNotNull(enumClass, "enumClass");
+        checkNotNull(valueKey, "valueKey");
         checkState(enumClass.getEnumConstants().length != 0, "enumClass must contain values");
-        return new LanternEnumTrait<>(name, enumClass, key, ImmutableSet.copyOf(enumClass.getEnumConstants()));
+        return new LanternEnumTrait<>(key, enumClass, valueKey, ImmutableSet.copyOf(enumClass.getEnumConstants()));
+    }
+
+    public static <E extends Enum<E>> EnumTrait<E> minecraft(String id, Key<? extends Value<E>> valueKey, Class<E> enumClass) {
+        return of(CatalogKey.minecraft(id), valueKey, enumClass);
     }
 
     /**
@@ -87,41 +95,50 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
      *
      * <p>The enum must contain values.</p>
      *
-     * @param name the name
-     * @param key the key that should be attached to the trait
+     * @param key the key
+     * @param valueKey the value key that should be attached to the trait
      * @param enumClass the enum class
      * @return the enum trait
      */
-    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key,
+    public static <E extends Enum<E>> EnumTrait<E> of(CatalogKey key, Key<? extends Value<E>> valueKey,
             Class<E> enumClass, Predicate<E> predicate) {
-        checkNotNullOrEmpty(name, "name");
-        checkNotNull(enumClass, "enumClass");
         checkNotNull(key, "key");
+        checkNotNull(enumClass, "enumClass");
+        checkNotNull(valueKey, "valueKey");
         checkState(enumClass.getEnumConstants().length != 0, "enumClass must contain values");
-        return new LanternEnumTrait<>(name, enumClass, key, ImmutableSet.copyOf(enumClass.getEnumConstants())
+        return new LanternEnumTrait<>(key, enumClass, valueKey, ImmutableSet.copyOf(enumClass.getEnumConstants())
                 .stream().filter(predicate).collect(ImmutableSet.toImmutableSet()));
     }
 
+    public static <E extends Enum<E>> EnumTrait<E> minecraft(String id, Key<? extends Value<E>> valueKey,
+            Class<E> enumClass, Predicate<E> predicate) {
+        return of(CatalogKey.minecraft(id), valueKey, enumClass, predicate);
+    }
+
     /**
      * Creates a new enum trait with the specified name and all the values
      * from the enum that match the {@link Predicate}.
      *
      * <p>The enum must contain values.</p>
      *
-     * @param name the name
-     * @param key the key that should be attached to the trait
+     * @param key the key
+     * @param valueKey the value key that should be attached to the trait
      * @param value the value
      * @param values the values
      * @return the enum trait
      */
-    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key, E value, E... values) {
-        checkNotNullOrEmpty(name, "name");
+    public static <E extends Enum<E>> EnumTrait<E> of(CatalogKey key, Key<? extends Value<E>> valueKey, E value, E... values) {
+        checkNotNull(key, "key");
         checkNotNull(value, "value");
         checkNotNull(values, "values");
-        checkNotNull(key, "key");
+        checkNotNull(valueKey, "valueKey");
         checkState(values.length != 0, "enumClass must contain values");
-        return new LanternEnumTrait<>(name, (Class) value.getClass(), key,
+        return new LanternEnumTrait<>(key, (Class) value.getClass(), valueKey,
                 ImmutableSet.<E>builder().add(value).add(values).build());
+    }
+
+    public static <E extends Enum<E>> EnumTrait<E> minecraft(String id, Key<? extends Value<E>> valueKey, E value, E... values) {
+        return of(CatalogKey.minecraft(id), valueKey, value, values);
     }
 
     @Override

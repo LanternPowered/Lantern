@@ -45,6 +45,7 @@ import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.weather.LanternWeather;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -267,7 +268,8 @@ final class LanternWorldPropertiesIO {
             } else if (dimensionTypeId.equalsIgnoreCase(END)) {
                 properties.setDimensionType(DimensionTypes.THE_END);
             } else {
-                final DimensionType dimensionType = Sponge.getRegistry().getType(DimensionType.class, dimensionTypeId).orElse(null);
+                final DimensionType dimensionType = Sponge.getRegistry().getType(
+                        DimensionType.class, CatalogKey.resolve(dimensionTypeId)).orElse(null);
                 if (dimensionType == null) {
                     Lantern.getLogger().warn("Could not find a dimension type with id {} for the world {}, falling back to overworld...",
                             dimensionTypeId, levelData.worldName);
@@ -278,7 +280,8 @@ final class LanternWorldPropertiesIO {
             PortalAgentType portalAgentType = null;
             if (spongeDataView.contains(PORTAL_AGENT_TYPE)) {
                 final String portalAgentTypeId = spongeDataView.getString(PORTAL_AGENT_TYPE).get();
-                portalAgentType = Sponge.getRegistry().getType(PortalAgentType.class, portalAgentTypeId).orElse(null);
+                portalAgentType = Sponge.getRegistry().getType(
+                        PortalAgentType.class, CatalogKey.resolve(portalAgentTypeId)).orElse(null);
                 if (portalAgentType == null) {
                     Lantern.getLogger().warn("Could not find a portal agent type with id {} for the world {}, falling back to default...",
                             portalAgentTypeId, levelData.worldName);
@@ -316,12 +319,13 @@ final class LanternWorldPropertiesIO {
             final DataView weatherView = lanternDataView.getView(WEATHER).get();
 
             final String weatherTypeId = weatherView.getString(WEATHER_TYPE).get();
-            final Optional<Weather> weatherType = Sponge.getRegistry().getType(Weather.class, weatherTypeId);
+            final Optional<Weather> weatherType = Sponge.getRegistry().getType(
+                    Weather.class, CatalogKey.resolve(weatherTypeId));
             if (weatherType.isPresent()) {
                 weatherData.setWeather((LanternWeather) weatherType.get());
             } else {
                 Lantern.getLogger().info("Unknown weather type: {}, the server will default to {}",
-                        weatherTypeId, weatherData.getWeather().getId());
+                        weatherTypeId, weatherData.getWeather().getKey());
             }
             weatherData.setRunningDuration(weatherView.getLong(WEATHER_RUNNING_DURATION).get());
             weatherData.setRemainingDuration(weatherView.getLong(WEATHER_REMAINING_DURATION).get());
@@ -388,7 +392,7 @@ final class LanternWorldPropertiesIO {
             if (dataView.contains(GENERATOR_NAME)) {
                 final String genName0 = dataView.getString(GENERATOR_NAME).get();
                 final String genName = genName0.indexOf(':') == -1 ? "minecraft:" + genName0 : genName0;
-                final GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, genName)
+                final GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, CatalogKey.resolve(genName))
                         .orElse(properties.getDimensionType().getDefaultGeneratorType());
                 DataContainer generatorSettings = null;
                 if (dataView.contains(GENERATOR_OPTIONS)) {
@@ -430,7 +434,7 @@ final class LanternWorldPropertiesIO {
             if (spongeDataView != null) {
                 spongeDataView.getInt(ENABLED).ifPresent(v -> worldConfig.setWorldEnabled(v > 0));
                 worldConfig.setKeepSpawnLoaded(spongeDataView.getInt(KEEP_SPAWN_LOADED).map(v -> v > 0)
-                        .orElse(properties.getDimensionType().doesKeepSpawnLoaded()));
+                        .orElse(properties.getDimensionType().getKeepSpawnLoaded()));
                 spongeDataView.getInt(LOAD_ON_STARTUP).ifPresent(v -> worldConfig.setKeepSpawnLoaded(v > 0));
                 spongeDataView.getStringList(GENERATOR_MODIFIERS).ifPresent(v -> {
                     final List<String> modifiers = worldConfig.getGeneration().getGenerationModifiers();
@@ -440,8 +444,8 @@ final class LanternWorldPropertiesIO {
                 });
             } else {
                 final LanternDimensionType dimensionType = properties.getDimensionType();
-                worldConfig.setKeepSpawnLoaded(dimensionType.doesKeepSpawnLoaded());
-                worldConfig.setDoesWaterEvaporate(dimensionType.doesWaterEvaporate());
+                worldConfig.setKeepSpawnLoaded(dimensionType.getKeepSpawnLoaded());
+                worldConfig.setDoesWaterEvaporate(dimensionType.getDoesWaterEvaporate());
             }
         }
 
@@ -473,7 +477,7 @@ final class LanternWorldPropertiesIO {
         dataView.set(HARDCORE, (byte) (properties.isHardcore() ? 1 : 0));
         dataView.set(CLEAR_WEATHER_TIME, raining || thunderStorm ? 0 : weatherData.getRemainingDuration());
         final DataView weatherDataView = lanternDataView.createView(WEATHER);
-        weatherDataView.set(WEATHER_TYPE, weatherData.getWeather().getId());
+        weatherDataView.set(WEATHER_TYPE, weatherData.getWeather().getKey());
         weatherDataView.set(WEATHER_REMAINING_DURATION, weatherData.getRemainingDuration());
         weatherDataView.set(WEATHER_RUNNING_DURATION, weatherData.getRunningDuration());
 
@@ -486,7 +490,7 @@ final class LanternWorldPropertiesIO {
         dataView.set(LAST_PLAYED, properties.getLastPlayedTime());
         dataView.set(SIZE_ON_DISK, 0L);
         dataView.set(INITIALIZED, (byte) (properties.isInitialized() ? 1 : 0));
-        String generatorId = properties.getGeneratorType().getId();
+        String generatorId = properties.getGeneratorType().getKey().toString();
         if (generatorId.startsWith("minecraft:")) {
             generatorId = generatorId.replaceFirst("minecraft:", "");
         }
@@ -524,10 +528,10 @@ final class LanternWorldPropertiesIO {
         dataView.set(SPAWN_Y, spawn.getY());
         dataView.set(SPAWN_Z, spawn.getZ());
         spongeContainer.set(GENERATE_BONUS_CHEST, (byte) (properties.doesGenerateBonusChest() ? 1 : 0));
-        spongeContainer.set(DIMENSION_TYPE, properties.getDimensionType().getId());
-        spongeContainer.set(PORTAL_AGENT_TYPE, properties.getPortalAgentType().getId());
+        spongeContainer.set(DIMENSION_TYPE, properties.getDimensionType().getKey());
+        spongeContainer.set(PORTAL_AGENT_TYPE, properties.getPortalAgentType().getKey());
         spongeContainer.set(GENERATOR_MODIFIERS, properties.generatorModifiers.stream().map(
-                CatalogType::getId).collect(Collectors.toList()));
+                CatalogType::getKey).collect(Collectors.toList()));
 
         // Serialization behavior
         short serializationBehaviorId = 1;

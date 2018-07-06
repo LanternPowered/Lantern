@@ -32,6 +32,7 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import org.lanternpowered.server.item.recipe.IIngredient;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -181,7 +182,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
 
         final ItemStackSnapshot exemplary = this.resultProvider.getSnapshot(
                 EmptyCraftingMatrix.INSTANCE, EmptyIngredientList.INSTANCE);
-        return new LanternShapedCraftingRecipe(container.getId(), id, exemplary,
+        return new LanternShapedCraftingRecipe(CatalogKey.of(container.getId(), id), exemplary,
                 this.groupName, this.resultProvider, ingredients);
     }
 

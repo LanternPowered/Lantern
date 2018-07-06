@@ -48,13 +48,13 @@ import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.asset.LanternAssetManager;
 import org.lanternpowered.server.asset.json.AssetRepositoryJsonDeserializer;
+import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.command.LanternCommandDisambiguator;
 import org.lanternpowered.server.command.LanternCommandManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
-import org.lanternpowered.server.event.LanternCauseStackManager;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.LanternGame;
@@ -77,6 +77,7 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceManager;
+import org.lanternpowered.server.service.Service;
 import org.lanternpowered.server.util.PathUtils;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.LanternTeleportHelper;
@@ -233,7 +234,7 @@ public class LanternModule extends PrivateModule {
         bindAndExpose(PropertyRegistry.class)
                 .to(LanternPropertyRegistry.class);
         bindAndExpose(CauseStackManager.class)
-                .to(LanternCauseStackManager.class);
+                .toInstance(LanternCauseStackManager.INSTANCE);
 
         // Services
         bindService(PermissionService.class);

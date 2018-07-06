@@ -65,7 +65,7 @@ public class LanternTreeLayoutElement implements TreeLayoutElement {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("advancement", this.advancement.getId())
+                .add("advancement", this.advancement.getKey())
                 .add("position", this.position)
                 .toString();
     }

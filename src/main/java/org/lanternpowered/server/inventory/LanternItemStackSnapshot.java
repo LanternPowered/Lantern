@@ -212,7 +212,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("type", getType().getId())
+                .add("type", getType().getKey())
                 .add("quantity", getQuantity())
                 .add("data", IValueContainer.valuesToString(this.itemStack))
                 .toString();

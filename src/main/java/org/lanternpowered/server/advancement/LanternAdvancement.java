@@ -27,18 +27,17 @@ package org.lanternpowered.server.advancement;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.advancement.layout.LanternTreeLayoutElement;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.TreeLayoutElement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextFormat;
@@ -52,7 +51,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternAdvancement extends PluginCatalogType.Base implements Advancement {
+public class LanternAdvancement extends DefaultCatalogType implements Advancement {
 
     @Nullable private AdvancementTree advancementTree;
     @Nullable private final Advancement parent;
@@ -69,9 +68,8 @@ public class LanternAdvancement extends PluginCatalogType.Base implements Advanc
     final Tuple<List<AdvancementCriterion>, String[][]> clientCriteria;
 
     LanternAdvancement(LanternAdvancementBuilder builder) {
-        super(CauseStack.current().first(PluginContainer.class).get().getId(), builder.id,
-                builder.name == null ? (builder.displayInfo != null ?
-                        builder.displayInfo.getTitle().toPlain() : builder.id) : builder.name);
+        super(CatalogKeys.activePlugin(builder.id,
+                builder.name == null ? (builder.displayInfo != null ? builder.displayInfo.getTitle().toPlain() : builder.id) : builder.name));
         this.layoutElement = builder.displayInfo == null ? null : new LanternTreeLayoutElement(this);
         this.displayInfo = builder.displayInfo;
         this.criterion = builder.criterion;
@@ -153,10 +151,10 @@ public class LanternAdvancement extends PluginCatalogType.Base implements Advanc
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .add("tree", this.advancementTree == null ? null : this.advancementTree.getId())
-                .add("parent", this.parent == null ? null : this.parent.getId())
+                .add("tree", this.advancementTree == null ? null : this.advancementTree.getKey())
+                .add("parent", this.parent == null ? null : this.parent.getKey())
                 .add("displayInfo", this.displayInfo)
                 .add("layoutElement", this.layoutElement)
                 .add("criterion", this.criterion)

@@ -28,11 +28,12 @@ package org.lanternpowered.server.game.registry.type.data.persistence;
 import org.lanternpowered.server.data.persistence.HoconDataFormat;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.persistence.DataFormat;
 import org.spongepowered.api.data.persistence.DataFormats;
 
-public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<DataFormat> {
+public final class DataFormatRegistryModule extends DefaultCatalogRegistryModule<DataFormat> {
 
     public DataFormatRegistryModule() {
         super(DataFormats.class);
@@ -40,8 +41,8 @@ public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<
 
     @Override
     public void registerDefaults() {
-        register(new HoconDataFormat("hocon"));
-        register(new JsonDataFormat("json"));
-        register(new NbtDataFormat("nbt"));
+        register(new HoconDataFormat(CatalogKey.sponge("hocon")));
+        register(new JsonDataFormat(CatalogKey.sponge("json")));
+        register(new NbtDataFormat(CatalogKey.minecraft("nbt")));
     }
 }

@@ -29,14 +29,15 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.gen.LanternWorldGenerator;
 import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
 public final class DebugGeneratorType extends LanternGeneratorType {
 
-    public DebugGeneratorType(String pluginId, String name) {
-        super(pluginId, name);
+    public DebugGeneratorType(CatalogKey key) {
+        super(key);
     }
 
     @Override

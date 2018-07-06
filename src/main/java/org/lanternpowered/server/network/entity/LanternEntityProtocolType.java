@@ -27,33 +27,33 @@ package org.lanternpowered.server.network.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 
 import java.util.function.Function;
 
-public final class LanternEntityProtocolType<E extends LanternEntity> extends PluginCatalogType.Base implements EntityProtocolType<E> {
+public final class LanternEntityProtocolType<E extends LanternEntity> extends DefaultCatalogType implements EntityProtocolType<E> {
 
-    public static <E extends LanternEntity> EntityProtocolType<E> of(String pluginId, String name,
+    public static <E extends LanternEntity> EntityProtocolType<E> of(CatalogKey key,
             Class<E> entityType, Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
-        checkNotNull(pluginId, "entityType");
+        checkNotNull(key, "key");
         checkNotNull(entityProtocolSupplier, "entityProtocolSupplier");
-        return new LanternEntityProtocolType<>(pluginId, name, entityType, entityProtocolSupplier);
+        return new LanternEntityProtocolType<>(key, entityType, entityProtocolSupplier);
     }
 
-    public static <E extends LanternEntity> EntityProtocolType<E> of(String pluginId, String name,
+    public static <E extends LanternEntity> EntityProtocolType<E> of(CatalogKey key,
             Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
-        //noinspection unchecked
-        return of(pluginId, name, (Class<E>) LanternEntity.class, entityProtocolSupplier);
+        return of(key, (Class<E>) LanternEntity.class, entityProtocolSupplier);
     }
 
     private final Class<E> entityType;
     private final Function<E, AbstractEntityProtocol<E>> entityProtocolSupplier;
 
-    private LanternEntityProtocolType(String pluginId, String name, Class<E> entityType,
+    private LanternEntityProtocolType(CatalogKey key, Class<E> entityType,
             Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
-        super(pluginId, name);
+        super(key);
         //noinspection unchecked
         this.entityProtocolSupplier = (Function<E, AbstractEntityProtocol<E>>) entityProtocolSupplier;
         this.entityType = entityType;
@@ -68,7 +68,7 @@ public final class LanternEntityProtocolType<E extends LanternEntity> extends Pl
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper().add("entityType", this.entityType);
     }
 }

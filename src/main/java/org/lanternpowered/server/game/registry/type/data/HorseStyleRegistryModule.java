@@ -26,11 +26,12 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternHorseStyle;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.HorseStyles;
 
-public class HorseStyleRegistryModule extends PluginCatalogRegistryModule<HorseStyle> {
+public class HorseStyleRegistryModule extends DefaultCatalogRegistryModule<HorseStyle> {
 
     public HorseStyleRegistryModule() {
         super(HorseStyles.class);
@@ -38,10 +39,10 @@ public class HorseStyleRegistryModule extends PluginCatalogRegistryModule<HorseS
 
     @Override
     public void registerDefaults() {
-        register(new LanternHorseStyle("minecraft", "none", 0));
-        register(new LanternHorseStyle("minecraft", "white", 1));
-        register(new LanternHorseStyle("minecraft", "whitefield", 2));
-        register(new LanternHorseStyle("minecraft", "white_dots", 3));
-        register(new LanternHorseStyle("minecraft", "black_dots", 4));
+        register(new LanternHorseStyle(CatalogKey.minecraft("none"), 0));
+        register(new LanternHorseStyle(CatalogKey.minecraft("white"), 1));
+        register(new LanternHorseStyle(CatalogKey.minecraft("whitefield"), 2));
+        register(new LanternHorseStyle(CatalogKey.minecraft("white_dots"), 3));
+        register(new LanternHorseStyle(CatalogKey.minecraft("black_dots"), 4));
     }
 }

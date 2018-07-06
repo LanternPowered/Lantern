@@ -48,6 +48,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.lanternpowered.server.text.gson.JsonTextEventHelper.RawAction;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
@@ -64,7 +65,7 @@ abstract class JsonTextBaseSerializer<T extends Text> implements JsonSerializer<
     static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
         JsonElement element;
         if ((element = json.get(COLOR)) != null) {
-            Sponge.getRegistry().getType(TextColor.class, element.getAsString()).ifPresent(builder::color);
+            Sponge.getRegistry().getType(TextColor.class, CatalogKey.resolve(element.getAsString())).ifPresent(builder::color);
         }
         TextStyle style = builder.getStyle();
         if ((element = json.get(BOLD)) != null) {
@@ -123,7 +124,7 @@ abstract class JsonTextBaseSerializer<T extends Text> implements JsonSerializer<
     static void serialize(JsonObject json, Text text, JsonSerializationContext context) {
         final TextColor color = text.getColor();
         if (color != TextColors.NONE) {
-            json.addProperty(COLOR, color.getId());
+            json.addProperty(COLOR, color.getKey().toString());
         }
         final TextStyle style = text.getStyle();
         style.isBold().ifPresent(v -> json.addProperty(BOLD, v));

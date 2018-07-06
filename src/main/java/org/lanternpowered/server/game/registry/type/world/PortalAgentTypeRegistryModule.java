@@ -28,6 +28,7 @@ package org.lanternpowered.server.game.registry.type.world;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.world.portal.EmptyPortalAgent;
 import org.lanternpowered.server.world.portal.LanternPortalAgentType;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.PortalAgentTypes;
 
@@ -39,6 +40,6 @@ public class PortalAgentTypeRegistryModule extends AdditionalPluginCatalogRegist
 
     @Override
     public void registerDefaults() {
-        register(new LanternPortalAgentType<>("minecraft", "default", EmptyPortalAgent.class, (world, type) -> new EmptyPortalAgent(type)));
+        register(new LanternPortalAgentType<>(CatalogKey.minecraft("default"), EmptyPortalAgent.class, (world, type) -> new EmptyPortalAgent(type)));
     }
 }

@@ -46,6 +46,7 @@ import org.lanternpowered.server.inventory.vanilla.LanternPlayerArmorInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPrimaryPlayerInventory;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -174,11 +175,8 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         recipeBook.set(RECIPE_BOOK_FILTER_ACTIVE, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).orElse(false) ? 1 : 0));
         recipeBook.set(RECIPE_BOOK_GUI_OPEN, (byte) (valueContainer.remove(LanternKeys.RECIPE_BOOK_GUI_OPEN).orElse(false) ? 1 : 0));
 
-        valueContainer.remove(LanternKeys.OPEN_ADVANCEMENT_TREE).ifPresent(o -> {
-            if (o.isPresent()) {
-                dataView.set(OPEN_ADVANCEMENT_TREE, o.get().getId());
-            }
-        });
+        valueContainer.remove(LanternKeys.OPEN_ADVANCEMENT_TREE).ifPresent(o ->
+                o.ifPresent(advancementTree -> dataView.set(OPEN_ADVANCEMENT_TREE, advancementTree.getKey())));
 
         super.serializeValues(player, valueContainer, dataView);
     }
@@ -244,7 +242,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             view.getInt(RECIPE_BOOK_GUI_OPEN).ifPresent(v -> valueContainer.set(LanternKeys.RECIPE_BOOK_GUI_OPEN, v > 0));
         });
         dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> valueContainer
-                .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTreeRegistryModule.get().getById(id)));
+                .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTreeRegistryModule.get().get(CatalogKey.resolve(id))));
 
         super.deserializeValues(player, valueContainer, dataView);
     }

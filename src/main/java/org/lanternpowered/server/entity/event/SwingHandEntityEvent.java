@@ -56,7 +56,7 @@ public final class SwingHandEntityEvent implements EntityEvent {
 
     @Override
     public String toString() {
-        return toStringHelper(this).add("handType", this.handType.getId()).toString();
+        return toStringHelper(this).add("handType", this.handType.getKey()).toString();
     }
 
     private static class Holder {

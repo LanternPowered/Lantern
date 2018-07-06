@@ -26,9 +26,9 @@
 package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.lanternpowered.server.effect.firework.LanternFireworkShape;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
-import org.lanternpowered.server.item.firework.LanternFireworkShape;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;

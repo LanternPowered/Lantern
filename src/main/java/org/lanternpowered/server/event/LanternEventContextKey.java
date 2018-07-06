@@ -25,13 +25,14 @@
  */
 package org.lanternpowered.server.event;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.event.cause.EventContextKey;
 
 @SuppressWarnings("unchecked")
-public final class LanternEventContextKey<T> extends PluginCatalogType.Base implements EventContextKey<T> {
+public final class LanternEventContextKey<T> extends DefaultCatalogType implements EventContextKey<T> {
 
     public static <T> LanternEventContextKeyBuilder<T> builder(Class<T> type) {
         return new LanternEventContextKeyBuilder<T>().type(type);
@@ -43,12 +44,12 @@ public final class LanternEventContextKey<T> extends PluginCatalogType.Base impl
 
     private final TypeToken<T> typeToken;
 
-    public LanternEventContextKey(String pluginId, String id, String name, Class<T> type) {
-        this(pluginId, id, name, TypeToken.of(type));
+    public LanternEventContextKey(CatalogKey key, Class<T> type) {
+        this(key, TypeToken.of(type));
     }
 
-    public LanternEventContextKey(String pluginId, String id, String name, TypeToken<T> typeToken) {
-        super(pluginId, id, name);
+    public LanternEventContextKey(CatalogKey key, TypeToken<T> typeToken) {
+        super(key);
         this.typeToken = typeToken;
     }
 
@@ -62,7 +63,7 @@ public final class LanternEventContextKey<T> extends PluginCatalogType.Base impl
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
                 .add("allowedType", this.typeToken);
     }

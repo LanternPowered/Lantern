@@ -26,15 +26,16 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternInstrumentType;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.sound.SoundTypeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
 @RegistrationDependency(SoundTypeRegistryModule.class)
-public class InstrumentTypeRegistryModule extends PluginCatalogRegistryModule<InstrumentType> {
+public class InstrumentTypeRegistryModule extends DefaultCatalogRegistryModule<InstrumentType> {
 
     public InstrumentTypeRegistryModule() {
         super(InstrumentTypes.class);
@@ -42,17 +43,17 @@ public class InstrumentTypeRegistryModule extends PluginCatalogRegistryModule<In
 
     @Override
     public void registerDefaults() {
-        register(new LanternInstrumentType("minecraft", "harp", 0, SoundTypes.BLOCK_NOTE_HARP));
-        register(new LanternInstrumentType("minecraft", "bass_drum", 1, SoundTypes.BLOCK_NOTE_BASEDRUM));
-        register(new LanternInstrumentType("minecraft", "snare", 2, SoundTypes.BLOCK_NOTE_SNARE));
-        register(new LanternInstrumentType("minecraft", "high_hat", 3, SoundTypes.BLOCK_NOTE_HAT));
-        register(new LanternInstrumentType("minecraft", "bass_attack", 4, SoundTypes.BLOCK_NOTE_BASS));
-        register(new LanternInstrumentType("minecraft", "flute", 5, SoundTypes.BLOCK_NOTE_FLUTE));
-        register(new LanternInstrumentType("minecraft", "bell", 6, SoundTypes.BLOCK_NOTE_BELL));
-        register(new LanternInstrumentType("minecraft", "guitar", 7, SoundTypes.BLOCK_NOTE_GUITAR));
-        register(new LanternInstrumentType("minecraft", "chime", 8, SoundTypes.BLOCK_NOTE_CHIME));
-        register(new LanternInstrumentType("minecraft", "xylophone", 9, SoundTypes.BLOCK_NOTE_XYLOPHONE));
+        register(new LanternInstrumentType(CatalogKey.minecraft("harp"), 0, SoundTypes.BLOCK_NOTE_HARP));
+        register(new LanternInstrumentType(CatalogKey.minecraft("bass_drum"), 1, SoundTypes.BLOCK_NOTE_BASEDRUM));
+        register(new LanternInstrumentType(CatalogKey.minecraft("snare"), 2, SoundTypes.BLOCK_NOTE_SNARE));
+        register(new LanternInstrumentType(CatalogKey.minecraft("high_hat"), 3, SoundTypes.BLOCK_NOTE_HAT));
+        register(new LanternInstrumentType(CatalogKey.minecraft("bass_attack"), 4, SoundTypes.BLOCK_NOTE_BASS));
+        register(new LanternInstrumentType(CatalogKey.minecraft("flute"), 5, SoundTypes.BLOCK_NOTE_FLUTE));
+        register(new LanternInstrumentType(CatalogKey.minecraft("bell"), 6, SoundTypes.BLOCK_NOTE_BELL));
+        register(new LanternInstrumentType(CatalogKey.minecraft("guitar"), 7, SoundTypes.BLOCK_NOTE_GUITAR));
+        register(new LanternInstrumentType(CatalogKey.minecraft("chime"), 8, SoundTypes.BLOCK_NOTE_CHIME));
+        register(new LanternInstrumentType(CatalogKey.minecraft("xylophone"), 9, SoundTypes.BLOCK_NOTE_XYLOPHONE));
         // Not officially registered as a instrument type
-        register(new LanternInstrumentType("minecraft", "pling", 100, SoundTypes.BLOCK_NOTE_PLING));
+        register(new LanternInstrumentType(CatalogKey.minecraft("pling"), 100, SoundTypes.BLOCK_NOTE_PLING));
     }
 }

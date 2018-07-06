@@ -40,7 +40,7 @@ import org.jline.reader.LineReader.Option;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
-import org.lanternpowered.server.event.LanternCauseStack;
+import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation;

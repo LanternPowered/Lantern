@@ -150,7 +150,7 @@ public class LanternSelector implements Selector {
 
     private String buildString() {
         StringBuilder result = new StringBuilder();
-        result.append('@').append(this.type.getId());
+        result.append('@').append(this.type.getKey());
 
         if (!this.arguments.isEmpty()) {
             result.append('[');

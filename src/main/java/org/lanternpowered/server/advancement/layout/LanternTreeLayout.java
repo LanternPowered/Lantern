@@ -27,8 +27,8 @@ package org.lanternpowered.server.advancement.layout;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternAdvancement;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
@@ -219,7 +219,7 @@ public class LanternTreeLayout implements TreeLayout {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("advancementTree", this.advancementTree.getId())
+                .add("advancementTree", this.advancementTree.getKey())
                 .toString();
     }
 }

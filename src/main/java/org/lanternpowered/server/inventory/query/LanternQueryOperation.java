@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.inventory.query;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -52,12 +50,12 @@ public final class LanternQueryOperation<T> implements QueryOperation<T> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("type", this.type.getId())
+                .add("type", this.type.getKey())
                 .add("arg", this.arg)
                 .toString();
     }
 
     public boolean test(Inventory inventory) {
-        return this.type.queryOperator.test(this.arg, (AbstractInventory) inventory);
+        return this.type.getQueryOperator().test(this.arg, (AbstractInventory) inventory);
     }
 }

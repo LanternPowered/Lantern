@@ -40,9 +40,9 @@ import static org.spongepowered.api.data.DataQuery.of;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.util.UncheckedThrowables;
@@ -447,7 +447,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
                 try {
                     final Object object = field.get(null);
                     if (object instanceof Key) {
-                        ((Key) object).getId(); // Trigger a exception if it's a dummy
+                        ((Key) object).getKey(); // Trigger a exception if it's a dummy
                     }
                 } catch (Exception e) {
                     Lantern.getLogger().warn("No key registered for field: " + field.getName());

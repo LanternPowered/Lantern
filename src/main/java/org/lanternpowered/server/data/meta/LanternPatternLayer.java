@@ -27,6 +27,7 @@ package org.lanternpowered.server.data.meta;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -69,14 +70,14 @@ public final class LanternPatternLayer implements PatternLayer {
 
     @Override
     public DataContainer toContainer() {
-        return DataContainer.createNew().set(BANNER_SHAPE, this.shape.getId()).set(DYE_COLOR, this.color.getId());
+        return DataContainer.createNew().set(BANNER_SHAPE, this.shape.getKey()).set(DYE_COLOR, this.color.getKey());
     }
 
     @Override
     public String toString() {
         return toStringHelper(this)
-                .add("shape", this.shape.getId())
-                .add("dyeColor", this.color.getId())
+                .add("shape", this.shape.getKey())
+                .add("dyeColor", this.color.getKey())
                 .toString();
     }
 
@@ -96,8 +97,10 @@ public final class LanternPatternLayer implements PatternLayer {
             if (bannerShape == null || dyeColor == null) {
                 return Optional.empty();
             }
-            final BannerPatternShape shape = this.game.getRegistry().getType(BannerPatternShape.class, bannerShape).orElse(null);
-            final DyeColor color = this.game.getRegistry().getType(DyeColor.class, dyeColor).orElse(null);
+            final BannerPatternShape shape = this.game.getRegistry()
+                    .getType(BannerPatternShape.class, CatalogKey.resolve(bannerShape)).orElse(null);
+            final DyeColor color = this.game.getRegistry()
+                    .getType(DyeColor.class, CatalogKey.resolve(dyeColor)).orElse(null);
             if (shape == null || color == null) {
                 return Optional.empty();
             }

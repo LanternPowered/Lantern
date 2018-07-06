@@ -26,13 +26,13 @@
 package org.lanternpowered.server.entity;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.particle.item.ItemDeathParticleEffect;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.LanternEventContextKeys;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;

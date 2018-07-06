@@ -26,9 +26,9 @@
 package org.lanternpowered.server.advancement.criteria.progress;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternAdvancementProgress;
 import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
-import org.lanternpowered.server.event.CauseStack;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.event.SpongeEventFactory;

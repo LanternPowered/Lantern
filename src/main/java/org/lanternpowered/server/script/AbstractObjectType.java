@@ -25,21 +25,17 @@
  */
 package org.lanternpowered.server.script;
 
-import com.google.common.base.MoreObjects;
 import org.lanternpowered.api.script.ObjectType;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 
-public abstract class AbstractObjectType<O> extends PluginCatalogType.Base implements ObjectType<O> {
+public abstract class AbstractObjectType<O> extends DefaultCatalogType implements ObjectType<O> {
 
     private final Class<? extends O> type;
 
-    public AbstractObjectType(String pluginId, String name, Class<? extends O> type) {
-        super(pluginId, name);
-        this.type = type;
-    }
-
-    public AbstractObjectType(String pluginId, String id, String name, Class<? extends O> type) {
-        super(pluginId, id, name);
+    public AbstractObjectType(CatalogKey key, Class<? extends O> type) {
+        super(key);
         this.type = type;
     }
 
@@ -49,7 +45,7 @@ public abstract class AbstractObjectType<O> extends PluginCatalogType.Base imple
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper().add("type", this.type);
     }
 }

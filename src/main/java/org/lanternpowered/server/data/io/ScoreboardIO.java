@@ -31,6 +31,7 @@ import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegist
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.LanternTexts;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -113,14 +114,16 @@ public class ScoreboardIO {
         dataView.getViewList(OBJECTIVES).ifPresent(list -> list.forEach(entry -> {
             final String name = entry.getString(NAME).get();
             final Text displayName = LanternTexts.fromLegacy(entry.getString(DISPLAY_NAME).get());
-            final Criterion criterion = Sponge.getRegistry().getType(Criterion.class, entry.getString(CRITERION_NAME).get())
+            final Criterion criterion = Sponge.getRegistry()
+                    .getType(Criterion.class, CatalogKey.resolve(entry.getString(CRITERION_NAME).get()))
                     .orElseGet(() -> {
                         Lantern.getLogger().warn("Unable to find a criterion with id: {}, default to dummy.",
                                 entry.getString(CRITERION_NAME).get());
                         return Criteria.DUMMY;
                     });
-            final ObjectiveDisplayMode objectiveDisplayMode = Sponge.getRegistry().getType(ObjectiveDisplayMode.class,
-                    entry.getString(DISPLAY_MODE).get()).orElseGet(() -> {
+            final ObjectiveDisplayMode objectiveDisplayMode = Sponge.getRegistry()
+                    .getType(ObjectiveDisplayMode.class, CatalogKey.resolve(entry.getString(DISPLAY_MODE).get()))
+                    .orElseGet(() -> {
                         Lantern.getLogger().warn("Unable to find a display mode with id: {}, default to integer.",
                                 entry.getString(CRITERION_NAME).get());
                         return ObjectiveDisplayModes.INTEGER;
@@ -189,7 +192,7 @@ public class ScoreboardIO {
                 return CollisionRules.NEVER;
             })));
             entry.getString(TEAM_COLOR).ifPresent(color -> {
-                TextColor textColor = Sponge.getRegistry().getType(TextColor.class, color).orElseGet(() -> {
+                TextColor textColor = Sponge.getRegistry().getType(TextColor.class, CatalogKey.resolve(color)).orElseGet(() -> {
                     Lantern.getLogger().warn("Unable to find a team color with id: {}, default to none.", color);
                     return TextColors.NONE;
                 });
@@ -234,8 +237,8 @@ public class ScoreboardIO {
         final List<DataView> objectives = scoreboard.getObjectives().stream().map(objective -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                 .set(NAME, objective.getName())
                 .set(DISPLAY_NAME, LanternTexts.toLegacy(objective.getDisplayName()))
-                .set(CRITERION_NAME, objective.getCriterion().getId())
-                .set(DISPLAY_MODE, objective.getDisplayMode().getId())).collect(Collectors.toList());
+                .set(CRITERION_NAME, objective.getCriterion().getKey())
+                .set(DISPLAY_MODE, objective.getDisplayMode().getKey())).collect(Collectors.toList());
 
         final List<DataView> scores = new ArrayList<>();
         for (Score score : scoreboard.getScores()) {
@@ -276,7 +279,7 @@ public class ScoreboardIO {
                     .set(SUFFIX, LanternTexts.toLegacy(team.getSuffix()));
             final TextColor teamColor = team.getColor();
             if (teamColor != TextColors.NONE) {
-                container.set(TEAM_COLOR, teamColor.getId());
+                container.set(TEAM_COLOR, teamColor.getKey());
             }
             final Set<Text> members = team.getMembers();
             container.set(MEMBERS, members.stream().map(LanternTexts::toLegacy).collect(Collectors.toList()));

@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.statistic;
 
-import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
@@ -41,9 +42,9 @@ public class LanternBlockStatistic extends LanternStatistic implements BlockStat
 
     private final BlockType blockType;
 
-    public LanternBlockStatistic(String pluginId, String id, String name, Translation translation, String internalId,
+    public LanternBlockStatistic(CatalogKey key, Translation translation, String internalId,
             NumberFormat format, @Nullable Criterion criterion, StatisticType type, BlockType blockType) {
-        super(pluginId, id, name, translation, internalId, format, criterion, type);
+        super(key, translation, internalId, format, criterion, type);
         this.blockType = blockType;
     }
 
@@ -53,9 +54,9 @@ public class LanternBlockStatistic extends LanternStatistic implements BlockStat
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .add("entityType", this.blockType.getId());
+                .add("entityType", this.blockType.getKey());
     }
 
     @Override

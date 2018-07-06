@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
+import kotlin.jvm.functions.Function1;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.client.AnvilClientContainer;
 import org.lanternpowered.server.inventory.client.BeaconClientContainer;
@@ -42,6 +43,7 @@ import org.lanternpowered.server.inventory.client.FurnaceClientContainer;
 import org.lanternpowered.server.inventory.client.HopperClientContainer;
 import org.lanternpowered.server.inventory.client.ShulkerBoxClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.property.GuiId;
@@ -49,10 +51,8 @@ import org.spongepowered.api.item.inventory.property.GuiIds;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import java.util.function.Function;
-
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public class ClientContainerRegistryModule extends PluginCatalogRegistryModule<GuiId> {
+public class ClientContainerRegistryModule extends DefaultCatalogRegistryModule<GuiId> {
 
     private static final ClientContainerRegistryModule instance = new ClientContainerRegistryModule();
 
@@ -102,7 +102,7 @@ public class ClientContainerRegistryModule extends PluginCatalogRegistryModule<G
         register("minecraft", "shulker_box", inventory -> new ShulkerBoxClientContainer());
     }
 
-    private void register(String plugin, String id, Function<AbstractInventory, ClientContainer> supplier) {
-        register(new ClientContainerType(plugin, id, supplier));
+    private void register(String plugin, String id, Function1<AbstractInventory, ClientContainer> supplier) {
+        register(new ClientContainerType(CatalogKey.of(plugin, id), supplier));
     }
 }

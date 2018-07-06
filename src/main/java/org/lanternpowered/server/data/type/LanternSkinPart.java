@@ -30,14 +30,15 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collection;
 import java.util.Set;
 
-public final class LanternSkinPart extends PluginCatalogType.Base implements SkinPart {
+public final class LanternSkinPart extends DefaultCatalogType implements SkinPart {
 
     private static final Int2ObjectMap<LanternSkinPart> lookup = new Int2ObjectOpenHashMap<>();
 
@@ -46,11 +47,11 @@ public final class LanternSkinPart extends PluginCatalogType.Base implements Ski
 
     private final Translation translation;
 
-    public LanternSkinPart(String pluginId, String name, int index) {
-        super(pluginId, name);
+    public LanternSkinPart(CatalogKey key, int index) {
+        super(key);
         this.mask = index << 1;
         this.index = index;
-        this.translation =  tr("options.modelPart.%s", name);
+        this.translation =  tr("options.modelPart.%s", key.getValue());
         // Add to the lookup
         // TODO: Should this be moved to the registry?
         lookup.put(index, this);

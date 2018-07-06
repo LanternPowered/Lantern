@@ -27,16 +27,13 @@ package org.lanternpowered.server.inventory.vanilla.block;
 
 import org.lanternpowered.server.block.tile.ITileEntityInventory;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
-import org.lanternpowered.server.inventory.CarrierReference;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ContainerProperties;
 import org.lanternpowered.server.inventory.type.slot.LanternFuelSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternInputSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternOutputSlot;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 

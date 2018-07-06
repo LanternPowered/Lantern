@@ -25,12 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.world.LanternSerializationBehavior;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.SerializationBehaviors;
 
-public final class SerializationBehaviorRegistryModule extends PluginCatalogRegistryModule<SerializationBehavior> {
+public final class SerializationBehaviorRegistryModule extends DefaultCatalogRegistryModule<SerializationBehavior> {
 
     public SerializationBehaviorRegistryModule() {
         super(SerializationBehaviors.class);
@@ -38,9 +39,9 @@ public final class SerializationBehaviorRegistryModule extends PluginCatalogRegi
 
     @Override
     public void registerDefaults() {
-        register(new LanternSerializationBehavior("minecraft", "automatic", "Automatic"));
-        register(new LanternSerializationBehavior("minecraft", "manual", "Manual"));
-        register(new LanternSerializationBehavior("minecraft", "none", "None"));
+        register(new LanternSerializationBehavior(CatalogKeys.minecraft("automatic", "Automatic")));
+        register(new LanternSerializationBehavior(CatalogKeys.minecraft("manual", "Manual")));
+        register(new LanternSerializationBehavior(CatalogKeys.minecraft("none", "None")));
     }
 }
 

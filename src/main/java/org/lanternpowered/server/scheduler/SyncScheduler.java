@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.scheduler;
 
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 
 final class SyncScheduler extends SchedulerBase {
 

@@ -28,16 +28,11 @@ package org.lanternpowered.server.script.function.value;
 import org.lanternpowered.api.script.function.value.DoubleValueProvider;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
 import org.lanternpowered.server.script.function.AbstractFunctionType;
+import org.spongepowered.api.CatalogKey;
 
 public class DoubleValueProviderTypeImpl extends AbstractFunctionType<DoubleValueProvider> implements DoubleValueProviderType {
 
-    public DoubleValueProviderTypeImpl(String pluginId, String name,
-            Class<? extends DoubleValueProvider> type) {
-        super(pluginId, name, type);
-    }
-
-    public DoubleValueProviderTypeImpl(String pluginId, String id, String name,
-            Class<? extends DoubleValueProvider> type) {
-        super(pluginId, id, name, type);
+    public DoubleValueProviderTypeImpl(CatalogKey key, Class<? extends DoubleValueProvider> type) {
+        super(key, type);
     }
 }

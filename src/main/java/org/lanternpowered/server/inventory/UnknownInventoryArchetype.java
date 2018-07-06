@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
@@ -35,8 +36,8 @@ import java.util.Optional;
 
 public class UnknownInventoryArchetype extends LanternInventoryArchetype<AbstractInventory> {
 
-    public UnknownInventoryArchetype(String pluginId, String name) {
-        super(pluginId, name);
+    public UnknownInventoryArchetype(CatalogKey key) {
+        super(key);
     }
 
     @Override

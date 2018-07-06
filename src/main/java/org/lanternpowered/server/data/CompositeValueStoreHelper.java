@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.data;
 
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.data.key.LanternKey;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.event.RegisteredListener;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataHolder;

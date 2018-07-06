@@ -29,7 +29,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.type.LanternBannerPatternShape;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.BannerPatternShape;
 import org.spongepowered.api.data.type.BannerPatternShapes;
 
@@ -37,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public final class BannerPatternShapeRegistryModule extends PluginCatalogRegistryModule<BannerPatternShape> {
+public final class BannerPatternShapeRegistryModule extends DefaultCatalogRegistryModule<BannerPatternShape> {
 
     private static final BannerPatternShapeRegistryModule INSTANCE = new BannerPatternShapeRegistryModule();
 
@@ -73,44 +74,48 @@ public final class BannerPatternShapeRegistryModule extends PluginCatalogRegistr
 
     @Override
     public void registerDefaults() {
-        register(new LanternBannerPatternShape("minecraft", "base", "b"));
-        register(new LanternBannerPatternShape("minecraft", "border", "bo"));
-        register(new LanternBannerPatternShape("minecraft", "bricks", "bri"));
-        register(new LanternBannerPatternShape("minecraft", "circle_middle", "mc"));
-        register(new LanternBannerPatternShape("minecraft", "creeper", "cre"));
-        register(new LanternBannerPatternShape("minecraft", "cross", "cr"));
-        register(new LanternBannerPatternShape("minecraft", "curly_border", "cbo"));
-        register(new LanternBannerPatternShape("minecraft", "diagonal_left", "ld"));
-        register(new LanternBannerPatternShape("minecraft", "diagonal_left_mirror", "lud"));
-        register(new LanternBannerPatternShape("minecraft", "diagonal_right", "rd"));
-        register(new LanternBannerPatternShape("minecraft", "diagonal_right_mirror", "rud"));
-        register(new LanternBannerPatternShape("minecraft", "flower", "flo"));
-        register(new LanternBannerPatternShape("minecraft", "gradient", "gra"));
-        register(new LanternBannerPatternShape("minecraft", "gradient_up", "gru"));
-        register(new LanternBannerPatternShape("minecraft", "half_horizontal", "hh"));
-        register(new LanternBannerPatternShape("minecraft", "half_horizontal_mirror", "hhb"));
-        register(new LanternBannerPatternShape("minecraft", "half_vertical", "vh"));
-        register(new LanternBannerPatternShape("minecraft", "half_vertical_mirror", "vhr"));
-        register(new LanternBannerPatternShape("minecraft", "mojang", "moj"));
-        register(new LanternBannerPatternShape("minecraft", "rhombus_middle", "mr"));
-        register(new LanternBannerPatternShape("minecraft", "skull", "sku"));
-        register(new LanternBannerPatternShape("minecraft", "square_bottom_left", "bl"));
-        register(new LanternBannerPatternShape("minecraft", "square_bottom_right", "br"));
-        register(new LanternBannerPatternShape("minecraft", "square_top_left", "tl"));
-        register(new LanternBannerPatternShape("minecraft", "square_top_right", "tr"));
-        register(new LanternBannerPatternShape("minecraft", "straight_cross", "sc"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_bottom", "bs"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_center", "cs"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_downleft", "dls"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_downright", "drs"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_left", "ls"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_middle", "ms"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_right", "rs"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_small", "ss"));
-        register(new LanternBannerPatternShape("minecraft", "stripe_top", "ts"));
-        register(new LanternBannerPatternShape("minecraft", "triangles_bottom", "bts"));
-        register(new LanternBannerPatternShape("minecraft", "triangles_top", "tts"));
-        register(new LanternBannerPatternShape("minecraft", "triangle_bottom", "bt"));
-        register(new LanternBannerPatternShape("minecraft", "triangle_top", "tt"));
+        registerMinecraft("base", "b");
+        registerMinecraft("border", "bo");
+        registerMinecraft("bricks", "bri");
+        registerMinecraft("circle_middle", "mc");
+        registerMinecraft("creeper", "cre");
+        registerMinecraft("cross", "cr");
+        registerMinecraft("curly_border", "cbo");
+        registerMinecraft("diagonal_left", "ld");
+        registerMinecraft("diagonal_left_mirror", "lud");
+        registerMinecraft("diagonal_right", "rd");
+        registerMinecraft("diagonal_right_mirror", "rud");
+        registerMinecraft("flower", "flo");
+        registerMinecraft("gradient", "gra");
+        registerMinecraft("gradient_up", "gru");
+        registerMinecraft("half_horizontal", "hh");
+        registerMinecraft("half_horizontal_mirror", "hhb");
+        registerMinecraft("half_vertical", "vh");
+        registerMinecraft("half_vertical_mirror", "vhr");
+        registerMinecraft("mojang", "moj");
+        registerMinecraft("rhombus_middle", "mr");
+        registerMinecraft("skull", "sku");
+        registerMinecraft("square_bottom_left", "bl");
+        registerMinecraft("square_bottom_right", "br");
+        registerMinecraft("square_top_left", "tl");
+        registerMinecraft("square_top_right", "tr");
+        registerMinecraft("straight_cross", "sc");
+        registerMinecraft("stripe_bottom", "bs");
+        registerMinecraft("stripe_center", "cs");
+        registerMinecraft("stripe_downleft", "dls");
+        registerMinecraft("stripe_downright", "drs");
+        registerMinecraft("stripe_left", "ls");
+        registerMinecraft("stripe_middle", "ms");
+        registerMinecraft("stripe_right", "rs");
+        registerMinecraft("stripe_small", "ss");
+        registerMinecraft("stripe_top", "ts");
+        registerMinecraft("triangles_bottom", "bts");
+        registerMinecraft("triangles_top", "tts");
+        registerMinecraft("triangle_bottom", "bt");
+        registerMinecraft("triangle_top", "tt");
+    }
+
+    private void registerMinecraft(String id, String internalId) {
+        register(new LanternBannerPatternShape(CatalogKey.minecraft(id), internalId));
     }
 }

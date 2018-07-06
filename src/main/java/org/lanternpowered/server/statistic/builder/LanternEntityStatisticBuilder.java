@@ -28,6 +28,7 @@ package org.lanternpowered.server.statistic.builder;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.statistic.LanternEntityStatistic;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
@@ -68,6 +69,6 @@ final class LanternEntityStatisticBuilder extends AbstractStatisticBuilder<Entit
     protected EntityStatistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
             String internalId, @Nullable Criterion criterion) {
         checkState(this.entityType != null, "The entityType must be set");
-        return new LanternEntityStatistic(pluginId, id, name, translation, internalId, format, criterion, type, this.entityType);
+        return new LanternEntityStatistic(CatalogKeys.of(pluginId, id, name), translation, internalId, format, criterion, type, this.entityType);
     }
 }

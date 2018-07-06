@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
@@ -36,17 +37,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public abstract class EnumValueRegistryModule<V extends CatalogType>
+public class EnumValueRegistryModule<V extends CatalogType>
         implements CatalogRegistryModule<V>, CatalogMappingDataHolder {
 
-    private final Map<String, V> values = new HashMap<>();
+    private final Map<CatalogKey, V> values = new HashMap<>();
     @Nullable private Set<V> unmodifiableValues;
     final Class<? extends Enum<?>> enumType;
     @Nullable private final Class<?> catalogClass;
@@ -56,20 +56,19 @@ public abstract class EnumValueRegistryModule<V extends CatalogType>
         this.catalogClass = catalogClass;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void registerDefaults() {
         for (Enum<?> type : this.enumType.getEnumConstants()) {
-            //noinspection unchecked
             final V catalogType = (V) type;
-            this.values.put(catalogType.getId().toLowerCase(Locale.ENGLISH), catalogType);
-            this.values.put(type.name().toLowerCase(Locale.ENGLISH), catalogType);
+            this.values.put(catalogType.getKey(), catalogType);
         }
         this.unmodifiableValues = ImmutableSet.copyOf(this.values.values());
     }
 
     @Override
-    public Optional<V> getById(String id) {
-        return Optional.ofNullable(this.values.get(checkNotNull(id, "id").toLowerCase(Locale.ENGLISH)));
+    public Optional<V> get(CatalogKey key) {
+        return Optional.ofNullable(this.values.get(key));
     }
 
     @Override
@@ -79,6 +78,11 @@ public abstract class EnumValueRegistryModule<V extends CatalogType>
 
     @Override
     public List<CatalogMappingData> getCatalogMappings() {
-        return this.catalogClass == null ? ImmutableList.of() : ImmutableList.of(new CatalogMappingData(this.catalogClass, this.values));
+        if (this.catalogClass == null) {
+            return ImmutableList.of();
+        }
+        final Map<String, V> mappings = new HashMap<>();
+        this.values.forEach((key, value) -> mappings.put(key.getValue(), value));
+        return ImmutableList.of(new CatalogMappingData(this.catalogClass, mappings));
     }
 }

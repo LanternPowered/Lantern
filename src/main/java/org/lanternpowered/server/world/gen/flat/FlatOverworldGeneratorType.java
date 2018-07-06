@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
@@ -33,8 +34,8 @@ import java.util.List;
 
 public final class FlatOverworldGeneratorType extends AbstractFlatGeneratorType {
 
-    public FlatOverworldGeneratorType(String pluginId, String name) {
-        super(pluginId, name);
+    public FlatOverworldGeneratorType(CatalogKey key) {
+        super(key);
     }
 
     @Override

@@ -26,11 +26,12 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternHorseColor;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseColors;
 
-public class HorseColorRegistryModule extends PluginCatalogRegistryModule<HorseColor> {
+public class HorseColorRegistryModule extends DefaultCatalogRegistryModule<HorseColor> {
 
     public HorseColorRegistryModule() {
         super(HorseColors.class);
@@ -38,12 +39,12 @@ public class HorseColorRegistryModule extends PluginCatalogRegistryModule<HorseC
 
     @Override
     public void registerDefaults() {
-        register(new LanternHorseColor("minecraft", "white", 0));
-        register(new LanternHorseColor("minecraft", "creamy", 1));
-        register(new LanternHorseColor("minecraft", "chestnut", 2));
-        register(new LanternHorseColor("minecraft", "brown", 3));
-        register(new LanternHorseColor("minecraft", "black", 4));
-        register(new LanternHorseColor("minecraft", "gray", 5));
-        register(new LanternHorseColor("minecraft", "dark_brown", 6));
+        register(new LanternHorseColor(CatalogKey.minecraft("white"), 0));
+        register(new LanternHorseColor(CatalogKey.minecraft("creamy"), 1));
+        register(new LanternHorseColor(CatalogKey.minecraft("chestnut"), 2));
+        register(new LanternHorseColor(CatalogKey.minecraft("brown"), 3));
+        register(new LanternHorseColor(CatalogKey.minecraft("black"), 4));
+        register(new LanternHorseColor(CatalogKey.minecraft("gray"), 5));
+        register(new LanternHorseColor(CatalogKey.minecraft("dark_brown"), 6));
     }
 }

@@ -26,11 +26,12 @@
 package org.lanternpowered.server.game.registry.type.effect.sound;
 
 import org.lanternpowered.server.effect.sound.LanternSoundCategory;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundCategory;
 
-public final class SoundCategoryRegistryModule extends PluginCatalogRegistryModule<SoundCategory> {
+public final class SoundCategoryRegistryModule extends DefaultCatalogRegistryModule<SoundCategory> {
 
     public SoundCategoryRegistryModule() {
         super(SoundCategories.class);
@@ -38,15 +39,15 @@ public final class SoundCategoryRegistryModule extends PluginCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
-        register(new LanternSoundCategory("minecraft", "master", 0));
-        register(new LanternSoundCategory("minecraft", "music", 1));
-        register(new LanternSoundCategory("minecraft", "record", 2));
-        register(new LanternSoundCategory("minecraft", "weather", 3));
-        register(new LanternSoundCategory("minecraft", "block", 4));
-        register(new LanternSoundCategory("minecraft", "hostile", 5));
-        register(new LanternSoundCategory("minecraft", "neutral", 6));
-        register(new LanternSoundCategory("minecraft", "player", 7));
-        register(new LanternSoundCategory("minecraft", "ambient", 8));
-        register(new LanternSoundCategory("minecraft", "voice", 9));
+        register(new LanternSoundCategory(CatalogKey.minecraft("master"), 0));
+        register(new LanternSoundCategory(CatalogKey.minecraft("music"), 1));
+        register(new LanternSoundCategory(CatalogKey.minecraft("record"), 2));
+        register(new LanternSoundCategory(CatalogKey.minecraft("weather"), 3));
+        register(new LanternSoundCategory(CatalogKey.minecraft("block"), 4));
+        register(new LanternSoundCategory(CatalogKey.minecraft("hostile"), 5));
+        register(new LanternSoundCategory(CatalogKey.minecraft("neutral"), 6));
+        register(new LanternSoundCategory(CatalogKey.minecraft("player"), 7));
+        register(new LanternSoundCategory(CatalogKey.minecraft("ambient"), 8));
+        register(new LanternSoundCategory(CatalogKey.minecraft("voice"), 9));
     }
 }

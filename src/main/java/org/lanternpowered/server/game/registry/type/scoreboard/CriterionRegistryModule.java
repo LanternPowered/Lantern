@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternCriterion;
 import org.spongepowered.api.scoreboard.critieria.Criteria;
@@ -38,11 +39,11 @@ public final class CriterionRegistryModule extends AdditionalPluginCatalogRegist
 
     @Override
     public void registerDefaults() {
-        register(new LanternCriterion("minecraft", "dummy"));
-        register(new LanternCriterion("minecraft", "trigger"));
-        register(new LanternCriterion("minecraft", "health"));
-        register(new LanternCriterion("minecraft", "player_kills", "playerKillCount"));
-        register(new LanternCriterion("minecraft", "total_kills", "totalKillCount"));
-        register(new LanternCriterion("minecraft", "deaths", "deathCount"));
+        register(new LanternCriterion(CatalogKeys.minecraft("dummy")));
+        register(new LanternCriterion(CatalogKeys.minecraft("trigger")));
+        register(new LanternCriterion(CatalogKeys.minecraft("health")));
+        register(new LanternCriterion(CatalogKeys.minecraft("player_kills", "playerKillCount")));
+        register(new LanternCriterion(CatalogKeys.minecraft("total_kills", "totalKillCount")));
+        register(new LanternCriterion(CatalogKeys.minecraft("deaths", "deathCount")));
     }
 }

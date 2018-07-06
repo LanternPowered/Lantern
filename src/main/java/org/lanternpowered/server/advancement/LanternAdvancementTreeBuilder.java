@@ -50,7 +50,7 @@ public class LanternAdvancementTreeBuilder implements AdvancementTree.Builder {
     public AdvancementTree.Builder rootAdvancement(Advancement rootAdvancement) {
         checkNotNull(rootAdvancement, "rootAdvancement");
         final AdvancementRegistryModule registry = AdvancementRegistryModule.get();
-        checkState(rootAdvancement.equals(registry.getById(rootAdvancement.getId()).orElse(null)),
+        checkState(rootAdvancement.equals(registry.get(rootAdvancement.getKey()).orElse(null)),
                 "The root advancement must be registered.");
         checkState(!rootAdvancement.getParent().isPresent(),
                 "The root advancement cannot have a parent.");

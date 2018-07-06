@@ -39,6 +39,7 @@ import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
 
+@SuppressWarnings("deprecation") // Ugh, shouldn't be deprecated
 public final class LanternKeyFactory {
 
     public static <E> Key<Value<E>> makeValueKey(TypeToken<E> elementToken,

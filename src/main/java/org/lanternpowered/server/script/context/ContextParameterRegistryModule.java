@@ -25,13 +25,14 @@
  */
 package org.lanternpowered.server.script.context;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.script.context.Parameter;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.world.World;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.world.Location;
 
-public class ContextParameterRegistryModule extends SimpleCatalogRegistryModule<Parameter> {
+public class ContextParameterRegistryModule extends DefaultCatalogRegistryModule<Parameter> {
 
     public ContextParameterRegistryModule() {
         super(Parameters.class);
@@ -39,7 +40,7 @@ public class ContextParameterRegistryModule extends SimpleCatalogRegistryModule<
 
     @Override
     public void registerDefaults() {
-        this.register(new ContextParameterImpl<>("target_location", Location.class));
-        this.register(new ContextParameterImpl<>("world", World.class));
+        this.register(new ContextParameterImpl<>(CatalogKeys.lantern("target_location"), Location.class));
+        this.register(new ContextParameterImpl<>(CatalogKeys.lantern("world"), World.class));
     }
 }

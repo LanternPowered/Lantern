@@ -50,6 +50,7 @@ import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistry
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -246,7 +247,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
     @Override
     public LanternItemStack deserialize(DataView dataView) throws InvalidDataException {
         final String identifier = dataView.getString(IDENTIFIER).get();
-        final ItemType itemType = ItemRegistryModule.get().getById(identifier).orElseThrow(
+        final ItemType itemType = ItemRegistryModule.get().get(CatalogKey.resolve(identifier)).orElseThrow(
                 () -> new InvalidDataException("There is no item type with the id: " + identifier));
         final LanternItemStack itemStack = new LanternItemStack(itemType);
         deserialize(itemStack, dataView);
@@ -256,7 +257,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
     @Override
     public DataView serialize(LanternItemStack object) {
         final DataContainer dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-        dataContainer.set(IDENTIFIER, object.getType().getId());
+        dataContainer.set(IDENTIFIER, object.getType().getKey());
         serialize(object, dataContainer);
         return dataContainer;
     }
@@ -306,7 +307,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         }
         final Optional<Set<BlockType>> optBlockTypes = valueContainer.remove(Keys.BREAKABLE_BLOCK_TYPES);
         if (optBlockTypes.isPresent() && !optBlockTypes.get().isEmpty()) {
-            dataView.set(CAN_DESTROY, optBlockTypes.get().stream().map(CatalogType::getId).collect(Collectors.toSet()));
+            dataView.set(CAN_DESTROY, optBlockTypes.get().stream().map(CatalogType::getKey).collect(Collectors.toSet()));
         }
         valueContainer.remove(Keys.ITEM_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, ENCHANTMENTS, list));
         valueContainer.remove(Keys.STORED_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, STORED_ENCHANTMENTS, list));
@@ -332,7 +333,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         dataView.getStringList(CAN_DESTROY).ifPresent(types -> {
             if (!types.isEmpty()) {
                 final Set<BlockType> blockTypes = new HashSet<>();
-                types.forEach(type -> BlockRegistryModule.get().getById(type).ifPresent(blockTypes::add));
+                types.forEach(type -> BlockRegistryModule.get().get(CatalogKey.resolve(type)).ifPresent(blockTypes::add));
                 valueContainer.set(Keys.BREAKABLE_BLOCK_TYPES, blockTypes);
             }
         });

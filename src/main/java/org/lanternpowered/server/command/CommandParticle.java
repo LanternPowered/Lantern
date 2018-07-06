@@ -34,6 +34,7 @@ import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -76,15 +77,16 @@ public final class CommandParticle extends CommandProvider {
                             @Override
                             protected Iterable<String> getChoices(CommandSource source) {
                                 return Sponge.getGame().getRegistry().getAllOf(ParticleType.class).stream()
-                                        .filter(type -> ((LanternParticleType) type).getInternalType().isPresent())
+                                        .filter(type -> ((LanternParticleType) type).getInternalType() != null)
                                         .map(CatalogType::getId)
                                         .collect(Collectors.toList());
                             }
 
                             @Override
                             protected Object getValue(String choice) throws IllegalArgumentException {
-                                final Optional<ParticleType> ret = Sponge.getGame().getRegistry().getType(ParticleType.class, choice);
-                                if (!ret.isPresent() || !((LanternParticleType) ret.get()).getInternalType().isPresent()) {
+                                final Optional<ParticleType> ret = Sponge.getGame().getRegistry()
+                                        .getType(ParticleType.class, CatalogKey.resolve(choice));
+                                if (!ret.isPresent() || ((LanternParticleType) ret.get()).getInternalType() == null) {
                                     throw new IllegalArgumentException("Invalid input " + choice + " was found");
                                 }
                                 return ret.get();
@@ -139,7 +141,7 @@ public final class CommandParticle extends CommandProvider {
                 )
                 .executor((src, args) -> {
                     final LanternParticleType particleType = args.<LanternParticleType>getOne("type").get();
-                    final int particleId = particleType.getInternalType().getAsInt();
+                    final int particleId = particleType.getInternalType();
                     final Vector3f position = args.<Vector3d>getOne("position").get().toFloat();
                     final Vector3f offset = args.<Vector3d>getOne("offset").get().toFloat();
                     final float speed = args.<Double>getOne("speed").get().floatValue();
@@ -161,7 +163,7 @@ public final class CommandParticle extends CommandProvider {
 
                     if (params.length != dataLength) {
                         throw new CommandException(t("Invalid parameters (%s), length mismatch (got %s, expected %s) for the particle type %s",
-                                Arrays.toString(params), params.length, dataLength, particleType.getId()));
+                                Arrays.toString(params), params.length, dataLength, particleType.getKey()));
                     }
 
                     final MessagePlayOutSpawnParticle message = new MessagePlayOutSpawnParticle(

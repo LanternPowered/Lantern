@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.effect.sound;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -49,7 +50,7 @@ public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegist
         for (int i = 0; i < array.size(); i++) {
             final String name = array.get(i).getAsString();
             final String id = name.replaceAll("\\.", "_");
-            register(new LanternSoundType("minecraft", id, name, i));
+            register(new LanternSoundType(CatalogKeys.minecraft(id, name), i));
         }
     }
 }

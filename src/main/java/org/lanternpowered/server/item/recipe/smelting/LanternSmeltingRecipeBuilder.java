@@ -32,6 +32,7 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.recipe.IIngredient;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -190,10 +191,10 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
         check();
 
         // Attempt to generate a id for the smelting recipe
-        String ingredient = this.exemplaryIngredient.getType().getId();
+        String ingredient = this.exemplaryIngredient.getType().getKey().toString();
         ingredient = ingredient.substring(ingredient.indexOf(':') + 1);
         final ItemStackSnapshot exemplaryResult = getResultProvider().get(this.exemplaryIngredient).getResult();
-        String result = exemplaryResult.getType().getId();
+        String result = exemplaryResult.getType().getKey().toString();
         result = result.substring(result.indexOf(':') + 1);
 
         final String id = ingredient + "_to_" + result;
@@ -243,7 +244,7 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
         if (smeltingTimeProvider == null) {
             smeltingTimeProvider = DEFAULT_SMELTING_TIME_PROVIDER;
         }
-        return new LanternSmeltingRecipe(plugin.getId(), id, exemplaryResult,
+        return new LanternSmeltingRecipe(CatalogKey.of(plugin.getId(), id), exemplaryResult,
                 this.exemplaryIngredient, this.ingredient, resultProvider, smeltingTimeProvider);
     }
 }

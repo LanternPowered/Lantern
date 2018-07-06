@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.script.function.value;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.script.function.value.IntValueProvider;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
 import org.lanternpowered.api.script.function.value.IntValueProviderTypes;
@@ -44,7 +45,7 @@ public class IntValueProviderTypeRegistryModule extends AbstractObjectTypeRegist
 
     @Override
     public void registerDefaults() {
-        this.register(new IntValueProviderTypeImpl("lantern", "constant", IntValueProvider.Constant.class));
-        this.register(new IntValueProviderTypeImpl("lantern", "range", IntValueProvider.Range.class));
+        this.register(new IntValueProviderTypeImpl(CatalogKeys.lantern("constant"), IntValueProvider.Constant.class));
+        this.register(new IntValueProviderTypeImpl(CatalogKeys.lantern("range"), IntValueProvider.Range.class));
     }
 }

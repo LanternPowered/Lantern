@@ -34,11 +34,12 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.server.cause.LanternCauseStack;
+import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ScoreboardIO;
-import org.lanternpowered.server.event.CauseStack;
-import org.lanternpowered.server.event.LanternCauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
@@ -709,7 +710,7 @@ public final class LanternWorldManager {
         final Thread thread = ThreadHelper.newThread(() -> {
             try {
                 // Initialize the world cause stack.
-                CauseStack.set(new LanternCauseStack());
+                LanternCauseStackManager.INSTANCE.setCurrentCauseStack(new LanternCauseStack());
 
                 final Thread thread0 = Thread.currentThread();
                 while (!thread0.isInterrupted() && !this.tickEnd.isTerminated()) {

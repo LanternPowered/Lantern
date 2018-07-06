@@ -35,6 +35,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.game.Lantern;

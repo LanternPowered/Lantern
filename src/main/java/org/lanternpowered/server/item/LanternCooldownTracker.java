@@ -29,8 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.ints.Int2LongMap;
 import it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown;

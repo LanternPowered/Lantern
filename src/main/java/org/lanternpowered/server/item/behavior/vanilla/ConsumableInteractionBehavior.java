@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla;
 
+import org.lanternpowered.api.ext.PotionEffectHelper;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.effect.potion.PotionEffectHelper;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.ISlot;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;

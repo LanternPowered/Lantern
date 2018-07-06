@@ -57,6 +57,7 @@ import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -323,7 +324,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                 }
             };
         }
-        final LanternBlockType blockType = new LanternBlockType(pluginId, id, this.traits,
+        final LanternBlockType blockType = new LanternBlockType(CatalogKey.of(pluginId, id), this.traits,
                 translationProvider, behaviorPipeline, this.tileEntityProvider, extendedBlockStateProvider);
         // Override the default solid cube property provider if necessary
         final PropertyProvider<SolidCubeProperty> solidCubeProvider = properties.build().get(SolidCubeProperty.class).orElse(null);
@@ -515,7 +516,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                             pipeline.add(new InteractWithBlockItemBehavior());
                         }
                     })
-                    .build(blockType.getPluginId(), blockType.getName());
+                    .build(blockType.getKey().getNamespace(), blockType.getKey().getValue());
             blockType.setItemType(itemType);
         }
         return blockType;

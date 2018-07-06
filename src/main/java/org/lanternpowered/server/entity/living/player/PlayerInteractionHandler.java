@@ -27,6 +27,7 @@ package org.lanternpowered.server.entity.living.player;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -36,7 +37,6 @@ import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.AbstractSlot;

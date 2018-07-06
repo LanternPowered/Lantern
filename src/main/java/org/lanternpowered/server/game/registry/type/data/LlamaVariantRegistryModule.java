@@ -26,11 +26,12 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternLlamaVariant;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.LlamaVariant;
 import org.spongepowered.api.data.type.LlamaVariants;
 
-public class LlamaVariantRegistryModule extends PluginCatalogRegistryModule<LlamaVariant> {
+public class LlamaVariantRegistryModule extends DefaultCatalogRegistryModule<LlamaVariant> {
 
     public LlamaVariantRegistryModule() {
         super(LlamaVariants.class);
@@ -38,9 +39,9 @@ public class LlamaVariantRegistryModule extends PluginCatalogRegistryModule<Llam
 
     @Override
     public void registerDefaults() {
-        register(new LanternLlamaVariant("minecraft", "creamy", 0));
-        register(new LanternLlamaVariant("minecraft", "white", 1));
-        register(new LanternLlamaVariant("minecraft", "brown", 2));
-        register(new LanternLlamaVariant("minecraft", "gray", 3));
+        register(new LanternLlamaVariant(CatalogKey.minecraft("creamy"), 0));
+        register(new LanternLlamaVariant(CatalogKey.minecraft("white"), 1));
+        register(new LanternLlamaVariant(CatalogKey.minecraft("brown"), 2));
+        register(new LanternLlamaVariant(CatalogKey.minecraft("gray"), 3));
     }
 }

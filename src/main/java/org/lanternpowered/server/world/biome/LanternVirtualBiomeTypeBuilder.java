@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -114,7 +115,8 @@ public class LanternVirtualBiomeTypeBuilder implements VirtualBiomeType.Builder 
         } else {
             pluginId = "minecraft";
         }
-        final LanternVirtualBiomeType biomeType = new LanternVirtualBiomeType(pluginId, id, this.name, this.settingsBuilder, this.persisted);
+        final LanternVirtualBiomeType biomeType = new LanternVirtualBiomeType(
+                CatalogKeys.of(pluginId, id, this.name), this.settingsBuilder, this.persisted);
         biomeType.setHumidity(this.humidity);
         biomeType.setTemperature(this.temperature);
         return biomeType;

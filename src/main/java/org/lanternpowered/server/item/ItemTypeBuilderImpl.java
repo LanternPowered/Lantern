@@ -34,6 +34,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
 import org.lanternpowered.server.data.ValueCollection;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -148,7 +149,7 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
         } else {
             properties = PropertyProviderCollection.builder().build();
         }
-        return new LanternItemType(pluginId, name, properties, behaviorPipeline, translationProvider,
+        return new LanternItemType(CatalogKey.of(pluginId, name), properties, behaviorPipeline, translationProvider,
                 this.keysProvider, this.blockType, this.maxStackQuantity);
     }
 }

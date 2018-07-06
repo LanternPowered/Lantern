@@ -124,7 +124,7 @@ public class LanternFluidStack implements FluidStack, AbstractPropertyHolder, IA
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("fluid", getFluid().getId())
+                .add("fluid", getFluid().getKey())
                 .add("volume", getVolume())
                 .add("data", IValueContainer.valuesToString(this))
                 .toString();

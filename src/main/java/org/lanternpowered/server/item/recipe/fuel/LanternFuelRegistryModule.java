@@ -28,7 +28,7 @@ package org.lanternpowered.server.item.recipe.fuel;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -40,7 +40,7 @@ import org.spongepowered.api.registry.util.DelayedRegistration;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public class LanternFuelRegistryModule extends PluginCatalogRegistryModule<IFuel> implements IFuelRegistry {
+public class LanternFuelRegistryModule extends DefaultCatalogRegistryModule<IFuel> implements IFuelRegistry {
 
     public LanternFuelRegistryModule() {
         super();

@@ -30,6 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.criteria.AbstractCriterion;
 import org.lanternpowered.server.advancement.criteria.EmptyCriterion;
 import org.lanternpowered.server.advancement.criteria.LanternAndCriterion;
@@ -43,7 +44,6 @@ import org.lanternpowered.server.advancement.criteria.progress.LanternEmptyCrite
 import org.lanternpowered.server.advancement.criteria.progress.LanternOrCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternScoreCriterionProgress;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;

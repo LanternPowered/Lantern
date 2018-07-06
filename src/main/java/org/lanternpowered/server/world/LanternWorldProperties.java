@@ -44,6 +44,7 @@ import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.rules.Rules;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
@@ -170,7 +171,8 @@ public final class LanternWorldProperties implements WorldProperties {
         final ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
         final GameRegistry registry = Sponge.getRegistry();
         for (String modifier : modifiers) {
-            Optional<WorldGeneratorModifier> genModifier = registry.getType(WorldGeneratorModifier.class, modifier);
+            Optional<WorldGeneratorModifier> genModifier = registry.getType(
+                    WorldGeneratorModifier.class, CatalogKey.resolve(modifier));
             if (genModifier.isPresent()) {
                 genModifiers.add(genModifier.get());
             } else {
@@ -600,7 +602,10 @@ public final class LanternWorldProperties implements WorldProperties {
         this.generatorModifiers = ImmutableSet.copyOf(this.generatorModifiers);
         final List<String> genModifiers = this.worldConfig.getGeneration().getGenerationModifiers();
         genModifiers.clear();
-        genModifiers.addAll(modifiers.stream().map(CatalogType::getId).collect(Collectors.toList()));
+        genModifiers.addAll(modifiers.stream()
+                .map(CatalogType::getKey)
+                .map(CatalogKey::toString)
+                .collect(Collectors.toList()));
     }
 
     @Override

@@ -30,33 +30,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import kotlin.reflect.KClass;
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.spongepowered.api.CatalogType;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends PluginCatalogRegistryModule<T>
+public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends DefaultCatalogRegistryModule<T>
         implements InternalCatalogRegistryModule<T> {
 
     private final Int2ObjectMap<T> byInternalId = new Int2ObjectOpenHashMap<>();
+
+    public InternalPluginCatalogRegistryModule() {
+    }
 
     public InternalPluginCatalogRegistryModule(Class<?>... catalogClasses) {
         super(catalogClasses);
     }
 
+    public InternalPluginCatalogRegistryModule(KClass<?>... catalogClasses) {
+        super(catalogClasses);
+    }
+
     public InternalPluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable String pattern) {
         super(catalogClasses, pattern);
-    }
-
-    public InternalPluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider) {
-        super(catalogClasses, mappingProvider);
-    }
-
-    public InternalPluginCatalogRegistryModule(Class<?>[] catalogClasses, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
-        super(catalogClasses, mappingProvider, pattern);
     }
 
     protected boolean isDuplicateInternalIdAllowed() {
@@ -67,7 +66,7 @@ public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends 
     protected void register(T catalogType, boolean disallowInbuiltPluginIds) {
         checkNotNull(catalogType, "catalogType");
         final int internalId = ((InternalCatalogType) catalogType).getInternalId();
-        checkArgument(this.isDuplicateInternalIdAllowed() || !this.byInternalId.containsKey(internalId),
+        checkArgument(isDuplicateInternalIdAllowed() || !this.byInternalId.containsKey(internalId),
                 "The internal id %s is already in use", internalId);
         super.register(catalogType, disallowInbuiltPluginIds);
         this.byInternalId.putIfAbsent(internalId, catalogType);

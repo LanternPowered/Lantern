@@ -28,8 +28,7 @@ package org.lanternpowered.server.util;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.util.concurrent.FastThreadLocal;
-import io.netty.util.concurrent.FastThreadLocalThread;
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Supplier;

@@ -25,13 +25,12 @@
  */
 package org.lanternpowered.server.util.graph;
 
-import org.lanternpowered.server.util.graph.DirectedGraph.DataNode;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.lanternpowered.server.util.graph.DirectedGraph.DataNode;
 
 public class DirectedGraphTest {
 

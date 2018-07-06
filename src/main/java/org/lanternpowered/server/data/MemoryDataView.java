@@ -41,6 +41,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.EqualsHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -272,7 +273,9 @@ class MemoryDataView implements DataView {
             // see above for why this is copied
             copyDataView(path, valueContainer);
         } else if (value instanceof CatalogType) {
-            return set(path, ((CatalogType) value).getId());
+            return set(path, ((CatalogType) value).getKey().toString());
+        } else if (value instanceof CatalogKey) {
+            return set(path, ((CatalogKey) value).toString());
         } else if (value instanceof Integer ||
                 value instanceof Byte ||
                 value instanceof Short ||
@@ -355,7 +358,7 @@ class MemoryDataView implements DataView {
                     builder.add(object);
                 }
             } else if (object instanceof CatalogType) {
-                builder.add(((CatalogType) object).getId());
+                builder.add(((CatalogType) object).getKey().toString());
             } else if (object instanceof Map) {
                 builder.add(ensureSerialization((Map) object));
             } else if (object instanceof Collection) {
@@ -745,7 +748,7 @@ class MemoryDataView implements DataView {
     public <T extends CatalogType> Optional<T> getCatalogType(DataQuery path, Class<T> catalogType) {
         checkNotNull(path, "path");
         checkNotNull(catalogType, "dummy type");
-        return getString(path).flatMap(string -> Sponge.getRegistry().getType(catalogType, string));
+        return getString(path).flatMap(string -> Sponge.getRegistry().getType(catalogType, CatalogKey.resolve(string)));
     }
 
     @Override
@@ -753,7 +756,7 @@ class MemoryDataView implements DataView {
         checkNotNull(path, "path");
         checkNotNull(catalogType, "catalogType");
         return getStringList(path).map(list -> list.stream()
-                .map(string -> Sponge.getRegistry().getType(catalogType, string))
+                .map(value -> Sponge.getRegistry().getType(catalogType, CatalogKey.resolve(value)))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()));

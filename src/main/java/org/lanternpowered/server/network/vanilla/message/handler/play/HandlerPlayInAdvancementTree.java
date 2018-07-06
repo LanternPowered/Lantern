@@ -30,6 +30,7 @@ import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeR
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import org.spongepowered.api.CatalogKey;
 
 public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayInAdvancementTree> {
 
@@ -38,7 +39,7 @@ public final class HandlerPlayInAdvancementTree implements Handler<MessagePlayIn
         if (message instanceof MessagePlayInAdvancementTree.Open) {
             final String id = ((MessagePlayInAdvancementTree.Open) message).getId();
             context.getSession().getPlayer().offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistryModule.get().getById(id));
+                    AdvancementTreeRegistryModule.get().get(CatalogKey.resolve(id)));
         } else {
             // Do we need the close event?
         }

@@ -30,12 +30,14 @@ import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.game.registry.type.effect.PotionTypeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Color;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSerializer {
@@ -54,7 +56,7 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
             }
             dataView.set(EFFECTS, effects.stream().map(PotionEffectSerializer::serialize).collect(Collectors.toList()));
         });
-        valueContainer.remove(LanternKeys.POTION_TYPE).ifPresent(potionType -> dataView.set(POTION, potionType.getId()));
+        valueContainer.remove(LanternKeys.POTION_TYPE).ifPresent(potionType -> dataView.set(POTION, potionType.getKey()));
     }
 
     @Override
@@ -67,10 +69,10 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
             }
             valueContainer.set(Keys.POTION_EFFECTS, effects.stream()
                     .map(PotionEffectSerializer::deserialize)
-                    .filter(effect -> effect != null)
+                    .filter(Objects::nonNull)
                     .collect(ImmutableList.toImmutableList()));
         });
-        dataView.getString(POTION).ifPresent(id -> PotionTypeRegistryModule.get().getById(id).ifPresent(
+        dataView.getString(POTION).ifPresent(id -> PotionTypeRegistryModule.get().get(CatalogKey.resolve(id)).ifPresent(
                 potionType -> valueContainer.set(LanternKeys.POTION_TYPE, potionType)));
     }
 }

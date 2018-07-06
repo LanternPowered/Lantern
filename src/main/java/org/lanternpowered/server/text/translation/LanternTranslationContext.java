@@ -26,7 +26,7 @@
 package org.lanternpowered.server.text.translation;
 
 import io.netty.util.concurrent.FastThreadLocal;
-import org.lanternpowered.server.util.concurrent.FastThreadLocals;
+import org.lanternpowered.api.util.concurrent.ThreadLocals;
 import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.Locale;
@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 final class LanternTranslationContext implements TranslationContext {
 
     static final FastThreadLocal<TranslationContext> currentContext =
-            FastThreadLocals.withInitial(() -> new LanternTranslationContext().locale(Locales.DEFAULT));
+            ThreadLocals.of(() -> new LanternTranslationContext().locale(Locales.DEFAULT));
 
     @Nullable private TranslationContext previousContext;
     private Locale locale;

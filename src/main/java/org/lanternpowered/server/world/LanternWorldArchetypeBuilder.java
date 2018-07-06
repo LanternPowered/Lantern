@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -195,7 +196,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         final GeneratorModifierRegistryModule registry = Lantern.getGame().getRegistry().getWorldGeneratorModifierRegistry();
         for (WorldGeneratorModifier modifier : modifiers) {
             checkNotNull(modifier, "modifier");
-            checkState(registry.getById(modifier.getId()).isPresent(), "Modifier not registered: " + modifier.getId()
+            checkState(registry.get(modifier.getKey()).isPresent(), "Modifier not registered: " + modifier.getKey()
                         + " of type " + modifier.getClass().getName());
             entries.add(modifier);
         }
@@ -279,7 +280,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         checkNotNull(id, "id");
         checkNotNull(name, "name");
         checkArgument(this.dimensionType != null, "Dimension type must be set");
-        return new LanternWorldArchetype(id, name, this.gameMode, this.dimensionType, this.generatorType,
+        return new LanternWorldArchetype(CatalogKeys.resolve(id).withName(name), this.gameMode, this.dimensionType, this.generatorType,
                 this.generatorModifiers, this.generatorSettings, this.difficulty, this.serializationBehavior, this.portalAgentType,
                 this.hardcore, this.enabled, this.loadsOnStartup, this.keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
                 this.generateBonusChest, this.commandsAllowed, this.waterEvaporates, this.allowPlayerRespawns, this.generateSpawnOnLoad,

@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.scoreboard;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
@@ -56,18 +57,18 @@ public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCat
 
     @Override
     public void registerDefaults() {
-        register(new LanternDisplaySlot("minecraft", "list", null, 0));
-        register(new LanternDisplaySlot("minecraft", "sidebar", null, 1));
-        register(new LanternDisplaySlot("minecraft", "below_name", "belowName", null, 2));
+        register(new LanternDisplaySlot(CatalogKeys.minecraft("list"), null, 0));
+        register(new LanternDisplaySlot(CatalogKeys.minecraft("sidebar"), null, 1));
+        register(new LanternDisplaySlot(CatalogKeys.minecraft("below_name", "belowName"), null, 2));
         for (TextColor textColor : Sponge.getRegistry().getAllOf(TextColor.class)) {
             // There is not mapping for "none"
             if (textColor == TextColors.NONE) {
                 continue;
             }
             final char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(textColor);
-            final String id = "below_name_" + textColor.getId();
-            final String name = "sidebar.team." + textColor.getId();
-            register(new LanternDisplaySlot("minecraft", id, name, textColor, 3 + character));
+            final String id = "below_name_" + textColor.getName().toLowerCase();
+            final String name = "sidebar.team." + textColor.getName().toLowerCase();
+            register(new LanternDisplaySlot(CatalogKeys.minecraft(id, name), textColor, 3 + character));
         }
     }
 

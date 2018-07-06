@@ -25,9 +25,11 @@
  */
 package org.lanternpowered.server.block.trait;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -36,18 +38,17 @@ import java.util.Collection;
 import java.util.function.Predicate;
 
 @SuppressWarnings({"unchecked","rawtypes"})
-public abstract class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T> {
+public abstract class LanternBlockTrait<T extends Comparable<T>> extends DefaultCatalogType implements BlockTrait<T> {
 
-    private final Key<? extends Value<T>> key;
+    private final Key<? extends Value<T>> valueKey;
     private final ImmutableSet<T> possibleValues;
     private final Class<T> valueClass;
-    private final String name;
 
-    LanternBlockTrait(String name, Key<? extends Value<T>> key, Class<T> valueClass, ImmutableSet<T> possibleValues) {
+    LanternBlockTrait(CatalogKey key, Key<? extends Value<T>> valueKey, Class<T> valueClass, ImmutableSet<T> possibleValues) {
+        super(key);
         this.possibleValues = possibleValues;
         this.valueClass = valueClass;
-        this.name = name;
-        this.key = key;
+        this.valueKey = valueKey;
     }
 
     /**
@@ -55,18 +56,8 @@ public abstract class LanternBlockTrait<T extends Comparable<T>> implements Bloc
      * 
      * @return the block trait key
      */
-    public Key<? extends Value<T>> getKey() {
-        return this.key;
-    }
-
-    @Override
-    public String getId() {
-        return this.name;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
+    public Key<? extends Value<T>> getValueKey() {
+        return this.valueKey;
     }
 
     @Override
@@ -85,12 +76,9 @@ public abstract class LanternBlockTrait<T extends Comparable<T>> implements Bloc
     }
 
     @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("name", this.name)
-                .add("key", this.key)
+    public ToStringHelper toStringHelper() {
+        return super.toStringHelper()
                 .add("valueClass", this.valueClass)
-                .add("possibleValues", Iterables.toString(this.possibleValues))
-                .toString();
+                .add("possibleValues", Iterables.toString(this.possibleValues));
     }
 }

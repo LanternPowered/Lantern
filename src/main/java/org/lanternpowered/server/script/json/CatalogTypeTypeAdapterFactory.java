@@ -33,6 +33,7 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 
@@ -53,14 +54,14 @@ public class CatalogTypeTypeAdapterFactory implements TypeAdapterFactory {
         return new TypeAdapter<T>() {
             @Override
             public void write(JsonWriter out, T value) throws IOException {
-                jsonElementTypeAdapter.write(out, new JsonPrimitive(((CatalogType) value).getId()));
+                jsonElementTypeAdapter.write(out, new JsonPrimitive(((CatalogType) value).getKey().toString()));
             }
 
             @Override
             public T read(JsonReader in) throws IOException {
                 final String id = jsonElementTypeAdapter.read(in).getAsString();
                 //noinspection unchecked
-                return (T) Sponge.getRegistry().getType((Class<? extends CatalogType>) raw, id).orElseThrow(
+                return (T) Sponge.getRegistry().getType((Class<? extends CatalogType>) raw, CatalogKey.resolve(id)).orElseThrow(
                         () -> new IllegalArgumentException("There does not exist a " + raw.getName() + " with id: " + id));
             }
         };

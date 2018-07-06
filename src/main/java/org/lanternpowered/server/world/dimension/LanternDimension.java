@@ -66,7 +66,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public boolean hasSky() {
-        return this.dimensionType.hasSky();
+        return this.dimensionType.getHasSky();
     }
 
     @Override
@@ -94,7 +94,7 @@ public abstract class LanternDimension implements Dimension {
         return toStringHelper(this)
                 .add("worldUUID", this.world.getUniqueId().toString())
                 .add("worldName", this.world.getName())
-                .add("dimensionType", this.dimensionType.getId())
+                .add("dimensionType", this.dimensionType.getKey())
                 .toString();
     }
 }

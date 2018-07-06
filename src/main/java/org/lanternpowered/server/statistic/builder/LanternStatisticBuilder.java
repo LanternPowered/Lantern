@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.statistic.builder;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.statistic.LanternStatistic;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.statistic.Statistic;
@@ -40,6 +41,6 @@ final class LanternStatisticBuilder extends AbstractStatisticBuilder<Statistic, 
     @Override
     protected Statistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
             String internalId, @Nullable Criterion criterion) {
-        return new LanternStatistic(pluginId, id, name, translation, internalId, format, criterion, type);
+        return new LanternStatistic(CatalogKeys.of(pluginId, id, name), translation, internalId, format, criterion, type);
     }
 }

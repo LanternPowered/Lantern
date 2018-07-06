@@ -59,7 +59,7 @@ public class LanternArgument<T> implements Argument<T> {
 
     private static String toSelectorArgument(Object val) {
         if (val instanceof CatalogType) {
-            return ((CatalogType) val).getId();
+            return ((CatalogType) val).getKey().getValue();
         }
         return String.valueOf(val);
     }

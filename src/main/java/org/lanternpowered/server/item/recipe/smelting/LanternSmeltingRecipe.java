@@ -27,6 +27,7 @@ package org.lanternpowered.server.item.recipe.smelting;
 
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.LanternRecipe;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
@@ -41,11 +42,11 @@ final class LanternSmeltingRecipe extends LanternRecipe implements ISmeltingReci
     final ISmeltingResultProvider resultProvider;
     final ISmeltingTimeProvider smeltingTimeProvider;
 
-    LanternSmeltingRecipe(String pluginId, String name,
+    LanternSmeltingRecipe(CatalogKey key,
             ItemStackSnapshot exemplaryResult, ItemStackSnapshot exemplaryIngredient,
             IIngredient ingredient, ISmeltingResultProvider resultProvider,
             ISmeltingTimeProvider smeltingTimeProvider) {
-        super(pluginId, name, exemplaryResult);
+        super(key, exemplaryResult);
         this.exemplaryIngredient = exemplaryIngredient;
         this.ingredient = ingredient;
         this.resultProvider = resultProvider;

@@ -34,6 +34,7 @@ import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.lanternpowered.server.text.PlainTextSerializer;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.serializer.TextSerializer;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
@@ -56,7 +57,7 @@ public final class TextSerializersRegistryModule extends AdditionalPluginCatalog
                 org.spongepowered.api.text.serializer.FormattingCodeTextSerializer serializer = this.formattingCodeSerializers.get(legacyChar);
                 if (serializer == null) {
                     this.formattingCodeSerializers.put(legacyChar, serializer = new FormattingCodeTextSerializer(
-                            "minecraft", "formatting_code_" + legacyChar, legacyChar));
+                            CatalogKey.minecraft("formatting_code_" + legacyChar), legacyChar));
                 }
                 return serializer;
             }
@@ -70,10 +71,10 @@ public final class TextSerializersRegistryModule extends AdditionalPluginCatalog
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        register(new PlainTextSerializer("minecraft", "plain"));
-        register(new FormattingCodeTextSerializer("minecraft", "legacy_formatting_code", TextConstants.LEGACY_CHAR));
-        register(new FormattingCodeTextSerializer("minecraft", "formatting_code", '&'));
-        register(new LanternJsonTextSerializer("minecraft", "json", Lantern.getGame().getRegistry().getRegistryModule(
+        register(new PlainTextSerializer(CatalogKey.minecraft("plain")));
+        register(new FormattingCodeTextSerializer(CatalogKey.minecraft("legacy_formatting_code"), TextConstants.LEGACY_CHAR));
+        register(new FormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code"), '&'));
+        register(new LanternJsonTextSerializer(CatalogKey.minecraft("json"), Lantern.getGame().getRegistry().getRegistryModule(
                 TranslationManagerRegistryModule.class).get().getTranslationManager()));
     }
 
@@ -87,7 +88,7 @@ public final class TextSerializersRegistryModule extends AdditionalPluginCatalog
                 if (this.formattingCodeSerializers.containsKey(serializer.getCharacter())) {
                     Lantern.getLogger().warn("There is already a FormattingCodeTextSerializer registered for the character: {}."
                                     + "The original {} will be overridden by {}",
-                            serializer.getCharacter(), this.formattingCodeSerializers.get(serializer.getCharacter()).getId(), serializer.getId());
+                            serializer.getCharacter(), this.formattingCodeSerializers.get(serializer.getCharacter()).getKey(), serializer.getKey());
                 }
                 this.formattingCodeSerializers.put(serializer.getCharacter(), serializer);
             }

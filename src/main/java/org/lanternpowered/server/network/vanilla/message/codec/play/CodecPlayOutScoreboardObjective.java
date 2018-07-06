@@ -48,7 +48,7 @@ public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayO
                     .enableForcedTranslations()) {
                 buf.writeString(LanternTexts.toLegacy(message0.getDisplayName()));
             }
-            buf.writeString(message0.getDisplayMode().getId());
+            buf.writeString(message0.getDisplayMode().getKey().toString());
         } else {
             buf.writeByte((byte) 1);
         }

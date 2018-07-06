@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.io.store.data;
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IValueContainer;
@@ -66,7 +67,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
                 final DataView valuesView = optDataView.get();
                 for (Map.Entry<DataQuery, Object> entry : valuesView.getValues(false).entrySet()) {
-                    final Key key = KeyRegistryModule.get().getById(entry.getKey().toString()).orElse(null);
+                    final Key key = KeyRegistryModule.get().get(CatalogKeys.resolve(entry.getKey().toString())).orElse(null);
                     if (key == null) {
                         Lantern.getLogger().warn("Unable to deserialize the data value with key: {} because it doesn't exist.",
                                 entry.getKey().toString());
@@ -75,11 +76,11 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                         final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager().getTypeSerializer(typeToken).orElse(null);
                         if (dataTypeSerializer == null) {
                             Lantern.getLogger().warn("Unable to deserialize the data key value: {}, "
-                                    + "no supported deserializer exists.", key.getId());
+                                    + "no supported deserializer exists.", key.getKey().toString());
                         } else {
                             if (simpleValueContainer.get(key).isPresent()) {
                                 Lantern.getLogger().warn("Duplicate usage of the key {} for value container {}",
-                                        key.getId(), object.getClass().getName());
+                                        key.getKey().toString(), object.getClass().getName());
                             } else {
                                 simpleValueContainer.set(key, dataTypeSerializer.deserialize(typeToken, context, entry.getValue()));
                             }
@@ -138,7 +139,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                     if (dataTypeSerializer == null) {
                         Lantern.getLogger().warn("Unable to serialize the data key value: " + entry.getKey());
                     } else {
-                        valuesView.set(DataQuery.of(entry.getKey().getId()),
+                        valuesView.set(DataQuery.of(entry.getKey().getKey().toString()),
                                 dataTypeSerializer.serialize(typeToken, context, entry.getValue()));
                     }
                 }

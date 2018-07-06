@@ -26,28 +26,21 @@
 package org.lanternpowered.server.inject.plugin;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Scopes;
 import org.slf4j.Logger;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public class PluginModule extends AbstractModule {
+public abstract class PluginModule extends AbstractModule {
 
     private final PluginContainer container;
-    private final Class<?> pluginClass;
 
-    public PluginModule(PluginContainer container, Class<?> pluginClass) {
+    protected PluginModule(PluginContainer container) {
         this.container = container;
-        this.pluginClass = pluginClass;
     }
 
     @Override
     protected void configure() {
-        bind(this.pluginClass).in(Scopes.SINGLETON);
-
-        bind(PluginContainer.class)
-                .toInstance(this.container);
-        bind(Logger.class)
-                .toInstance(this.container.getLogger());
+        bind(PluginContainer.class).toInstance(this.container);
+        bind(Logger.class).toInstance(this.container.getLogger());
 
         install(new PluginConfigurationModule());
     }

@@ -40,6 +40,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.DisplayInfo;
@@ -205,7 +206,7 @@ public class LanternPlayerAdvancements {
 
     private void loadProgress(Map<String, Map<String, Instant>> progressMap) {
         for (Advancement advancement : AdvancementRegistryModule.get().getAll()) {
-            final Map<String, Instant> entry = progressMap.get(advancement.getId());
+            final Map<String, Instant> entry = progressMap.get(advancement.getKey().toString());
             if (entry != null) {
                 get(advancement).loadProgress(entry);
             }
@@ -217,7 +218,7 @@ public class LanternPlayerAdvancements {
         for (LanternAdvancementProgress entry : this.progress.values()) {
             final Map<String, Instant> entryProgress = entry.saveProgress();
             if (!entryProgress.isEmpty()) {
-                progressMap.put(entry.getAdvancement().getId(), entryProgress);
+                progressMap.put(entry.getAdvancement().getKey().toString(), entryProgress);
             }
         }
         return progressMap;
@@ -225,7 +226,7 @@ public class LanternPlayerAdvancements {
 
     private void loadProgressFromJson(JsonObject json) {
         for (Advancement advancement : AdvancementRegistryModule.get().getAll()) {
-            final JsonObject entry = json.getAsJsonObject(advancement.getId());
+            final JsonObject entry = json.getAsJsonObject(advancement.getKey().toString());
             if (entry != null) {
                 loadAdvancementProgressFromJson(get(advancement), entry);
             }
@@ -237,7 +238,7 @@ public class LanternPlayerAdvancements {
         for (LanternAdvancementProgress entry : this.progress.values()) {
             final JsonObject entryJson = saveAdvancementProgressToJson(entry);
             if (entryJson != null) {
-                json.add(entry.getAdvancement().getId(), entryJson);
+                json.add(entry.getAdvancement().getKey().toString(), entryJson);
             }
         }
         return json;
@@ -300,7 +301,7 @@ public class LanternPlayerAdvancements {
                     final Object2LongMap<String> progressMap1 = progress.collectProgress();
                     if (!progressMap1.isEmpty()) {
                         // Fill the progress map
-                        progressMap.put(progress.getAdvancement().getId(), progressMap1);
+                        progressMap.put(progress.getAdvancement().getKey().toString(), progressMap1);
                     }
                 }
             }
@@ -333,19 +334,19 @@ public class LanternPlayerAdvancements {
                     if (progressMap != null) {
                         final Object2LongMap<String> progressMap1 = progress.collectProgress();
                         if (!progressMap1.isEmpty()) {
-                            progressMap.put(advancement.getId(), progressMap1);
+                            progressMap.put(advancement.getKey().toString(), progressMap1);
                         }
                         // The progress is already updated, prevent from doing it again
                         progress.dirtyProgress = false;
                     }
                 } else if (removed != null) {
-                    removed.add(advancement.getId());
+                    removed.add(advancement.getKey().toString());
                 }
                 updateParentAndChildren = true;
             }
         }
         if (progress.visible && progress.dirtyProgress && progressMap != null) {
-            progressMap.put(advancement.getId(), progress.collectProgress());
+            progressMap.put(advancement.getKey().toString(), progress.collectProgress());
         }
         // Reset dirty state, even if nothing changed
         progress.dirtyProgress = false;
@@ -437,7 +438,7 @@ public class LanternPlayerAdvancements {
     @SuppressWarnings("ConstantConditions")
     private static MessagePlayOutAdvancements.AdvStruct createAdvancement(
             Locale locale, Advancement advancement) {
-        final String parentId = advancement.getParent().map(Advancement::getId).orElse(null);
+        final String parentId = advancement.getParent().map(Advancement::getKey).map(CatalogKey::toString).orElse(null);
         final String background = parentId == null ? advancement.getTree().get().getBackgroundPath() : null;
         final DisplayInfo displayInfo = advancement.getDisplayInfo().orElse(null);
         final TreeLayoutElement layoutElement = ((LanternAdvancement) advancement).getLayoutElement();
@@ -446,7 +447,7 @@ public class LanternPlayerAdvancements {
         for (String[] array : criteriaRequirements) {
             Collections.addAll(criteria, array);
         }
-        return new MessagePlayOutAdvancements.AdvStruct(advancement.getId(), parentId,
+        return new MessagePlayOutAdvancements.AdvStruct(advancement.getKey().toString(), parentId,
                 displayInfo == null ? null : createDisplay(locale, displayInfo, layoutElement, background),
                 criteria, criteriaRequirements);
     }

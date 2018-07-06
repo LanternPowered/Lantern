@@ -28,9 +28,10 @@ package org.lanternpowered.server.game.registry.type.effect.sound.entity;
 import org.lanternpowered.server.effect.entity.EntityEffectType;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.LanternEntityEffectType;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 
-public final class EntityEffectTypeRegistryModule extends PluginCatalogRegistryModule<EntityEffectType> {
+public final class EntityEffectTypeRegistryModule extends DefaultCatalogRegistryModule<EntityEffectType> {
 
     public EntityEffectTypeRegistryModule() {
         super(EntityEffectTypes.class);
@@ -38,17 +39,17 @@ public final class EntityEffectTypeRegistryModule extends PluginCatalogRegistryM
 
     @Override
     public void registerDefaults() {
-        register(new LanternEntityEffectType("minecraft", "angry"));
-        register(new LanternEntityEffectType("minecraft", "death"));
-        register(new LanternEntityEffectType("minecraft", "fall"));
-        register(new LanternEntityEffectType("minecraft", "hurt"));
-        register(new LanternEntityEffectType("minecraft", "idle"));
-        register(new LanternEntityEffectType("minecraft", "lightning"));
-        register(new LanternEntityEffectType("minecraft", "merge"));
-        register(new LanternEntityEffectType("minecraft", "splash"));
-        register(new LanternEntityEffectType("minecraft", "swim"));
-        register(new LanternEntityEffectType("minecraft", "villager_no"));
-        register(new LanternEntityEffectType("minecraft", "villager_yes"));
-        register(new LanternEntityEffectType("minecraft", "walk"));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("angry")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("death")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("fall")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("hurt")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("idle")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("lightning")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("merge")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("splash")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("swim")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("villager_no")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("villager_yes")));
+        register(new LanternEntityEffectType(CatalogKey.minecraft("walk")));
     }
 }

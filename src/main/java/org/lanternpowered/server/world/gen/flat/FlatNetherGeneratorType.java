@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
@@ -33,8 +34,8 @@ import java.util.List;
 
 public final class FlatNetherGeneratorType extends AbstractFlatGeneratorType {
 
-    public FlatNetherGeneratorType(String pluginId, String name) {
-        super(pluginId, name);
+    public FlatNetherGeneratorType(CatalogKey key) {
+        super(key);
         setDefaultGeneratorHeight(128);
         setDefaultMinimalSpawnHeight(4);
     }

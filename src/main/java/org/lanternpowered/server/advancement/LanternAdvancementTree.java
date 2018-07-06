@@ -25,24 +25,23 @@
  */
 package org.lanternpowered.server.advancement;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
+import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.DisplayInfo;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
-public class LanternAdvancementTree extends PluginCatalogType.Base implements AdvancementTree {
+public class LanternAdvancementTree extends DefaultCatalogType implements AdvancementTree {
 
     private final Advancement rootAdvancement;
     private final String background;
 
     LanternAdvancementTree(LanternAdvancementTreeBuilder builder) {
-        super(CauseStack.current().first(PluginContainer.class).get().getId(), builder.id,
+        super(CatalogKeys.activePlugin(builder.id,
                 builder.name == null ? builder.rootAdvancement.getDisplayInfo()
-                        .map(DisplayInfo::getTitle).map(Text::toPlain).orElse(builder.id) : builder.name);
+                        .map(DisplayInfo::getTitle).map(Text::toPlain).orElse(builder.id) : builder.name));
         this.rootAdvancement = builder.rootAdvancement;
         this.background = builder.background;
         applyTree(builder.rootAdvancement, this);
@@ -66,9 +65,9 @@ public class LanternAdvancementTree extends PluginCatalogType.Base implements Ad
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    public ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .add("rootAdvancement", this.rootAdvancement.getId())
+                .add("rootAdvancement", this.rootAdvancement.getKey())
                 .add("background", this.background);
     }
 }

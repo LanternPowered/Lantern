@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.lanternpowered.server.command.test.CommandOpenTestContainer;
-import org.lanternpowered.server.inject.Service;
+import org.lanternpowered.server.service.Service;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.spongepowered.api.command.CommandManager;

@@ -28,12 +28,13 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.lanternpowered.server.inventory.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
 import org.lanternpowered.server.inventory.type.LanternInventoryRow;
-import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
@@ -248,7 +249,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
             }
             return buildArchetype(pluginId, name, properties, archetype);
         } else if (size == 0 || this.archetypes.isEmpty()) { // A empty archetype
-            return new UnknownInventoryArchetype(pluginId, id);
+            return new UnknownInventoryArchetype(CatalogKey.of(pluginId, id));
         }
 
         if (inventoryDimension != null) {

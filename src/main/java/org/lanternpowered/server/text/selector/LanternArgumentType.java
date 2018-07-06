@@ -28,6 +28,7 @@ package org.lanternpowered.server.text.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityType;
@@ -45,7 +46,7 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
     static {
         converters.put(String.class.getName(), Function.identity());
         converters.put(EntityType.class.getName(), input ->
-                Sponge.getRegistry().getType(EntityType.class, input).orElse(null));
+                Sponge.getRegistry().getType(EntityType.class, CatalogKey.resolve(input)).orElse(null));
     }
 
     @SuppressWarnings("unchecked")
@@ -57,8 +58,8 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
             } catch (NoSuchMethodException ignored) {
                 if (CatalogType.class.isAssignableFrom(type)) {
                     Class<? extends CatalogType> type2 = type.asSubclass(CatalogType.class);
-                    converters.put(converterKey, input -> (T) Sponge.getRegistry()
-                            .getType(type2, input).get());
+                    converters.put(converterKey, input -> Sponge.getRegistry()
+                            .getType(type2, CatalogKey.resolve(input)).get());
                 } else {
                     throw new IllegalStateException("Can't convert " + type);
                 }

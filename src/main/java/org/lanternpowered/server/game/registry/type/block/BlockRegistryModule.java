@@ -163,8 +163,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             }
             byte value = stateToDataConverter.apply(blockState);
             if (usedValues.containsKey(value)) {
-                throw new IllegalStateException("The data value " + value + " for state '" + blockState.getId() +
-                        "' is already used by '" + usedValues.get(value).getId() + "'");
+                throw new IllegalStateException("The data value " + value + " for state '" + blockState.getKey() +
+                        "' is already used by '" + usedValues.get(value).getKey() + "'");
             }
             usedValues.put(value, blockState);
             final short internalStateId =  (short) (internalStateIdBase | value & 0xf);

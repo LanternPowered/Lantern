@@ -31,6 +31,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -66,7 +67,7 @@ final class FlatGeneratorSettingsParser {
             }
             final BlockState block = layer.getBlockState();
             // Append the block id
-            builder.append(block.getType().getId());
+            builder.append(block.getType().getKey());
             final int data = BlockRegistryModule.get().getStateData(block);
             // Only append the data if needed
             if (data > 0) {
@@ -179,7 +180,7 @@ final class FlatGeneratorSettingsParser {
                     blockType = BlockRegistryModule.get().getStateByInternalId(optId.get()).orElse(BlockTypes.STONE.getDefaultState()).getType();
                 // Not an integer, try the catalog system
                 } else {
-                    blockType = BlockRegistryModule.get().getById(blockStatePart).orElse(BlockTypes.STONE);
+                    blockType = BlockRegistryModule.get().get(CatalogKey.resolve(blockStatePart)).orElse(BlockTypes.STONE);
                 }
 
                 layers.add(new FlatLayer(BlockRegistryModule.get().getStateByTypeAndData(blockType, (byte) blockData).get(), depth));

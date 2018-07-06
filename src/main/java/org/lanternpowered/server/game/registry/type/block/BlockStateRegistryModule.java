@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.game.registry.type.block;
 
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.block.BlockState;
 
-public final class BlockStateRegistryModule extends PluginCatalogRegistryModule<BlockState> {
+public final class BlockStateRegistryModule extends DefaultCatalogRegistryModule<BlockState> {
 
     public BlockStateRegistryModule() {
         super(new Class[0], "^[a-z][a-z0-9-_]+:[a-z][a-z0-9-_\\[\\]=,]+$");

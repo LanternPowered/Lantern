@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternOcelotType;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.OcelotTypes;
 
@@ -38,9 +39,9 @@ public class OcelotTypeRegistryModule extends InternalPluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
-        register(new LanternOcelotType("minecraft", "wild_ocelot", 0));
-        register(new LanternOcelotType("minecraft", "black_cat", 1));
-        register(new LanternOcelotType("minecraft", "red_cat", 2));
-        register(new LanternOcelotType("minecraft", "siamese_cat", 3));
+        register(new LanternOcelotType(CatalogKey.minecraft("wild_ocelot"), 0));
+        register(new LanternOcelotType(CatalogKey.minecraft("black_cat"), 1));
+        register(new LanternOcelotType(CatalogKey.minecraft("red_cat"), 2));
+        register(new LanternOcelotType(CatalogKey.minecraft("siamese_cat"), 3));
     }
 }

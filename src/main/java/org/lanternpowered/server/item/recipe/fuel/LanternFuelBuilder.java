@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import org.lanternpowered.server.item.recipe.IIngredient;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -115,6 +116,6 @@ public class LanternFuelBuilder implements IFuel.Builder {
             id = id.substring(index + 1);
         }
 
-        return new LanternFuel(container.getId(), id, this.burnTimeProvider, this.ingredient);
+        return new LanternFuel(CatalogKey.of(container.getId(), id), this.burnTimeProvider, this.ingredient);
     }
 }

@@ -26,8 +26,8 @@
 package org.lanternpowered.server.item.behavior.vanilla.consumable;
 
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.api.ext.PotionEffectHelper;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.effect.potion.PotionEffectHelper;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.item.ObjectProvider;
 import org.spongepowered.api.data.key.Keys;

@@ -25,45 +25,24 @@
  */
 package org.lanternpowered.server.game.registry.type.attribute;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.attribute.LanternOperations;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class AttributeOperationRegistryModule extends DefaultCatalogRegistryModule<LanternOperation> {
 
-public final class AttributeOperationRegistryModule implements CatalogRegistryModule<LanternOperation> {
-
-    @RegisterCatalog(LanternOperations.class)
-    private final Map<String, LanternOperation> operations = new HashMap<>();
+    public AttributeOperationRegistryModule() {
+        super(LanternOperations.class);
+    }
 
     @Override
     public void registerDefaults() {
-        final List<LanternOperation> types = new ArrayList<>();
-        types.add(new LanternOperation("add_amount", 3, false,
+        register(new LanternOperation(CatalogKey.minecraft("add_amount"), 3, false,
                 (base, modifier, current) -> modifier));
-        types.add(new LanternOperation("multiply", 2, false,
+        register(new LanternOperation(CatalogKey.minecraft("multiply"), 2, false,
                 (base, modifier, current) -> current * modifier - current));
-        types.add(new LanternOperation("multiply_base", 1, false,
+        register(new LanternOperation(CatalogKey.minecraft("multiply_base"), 1, false,
                 (base, modifier, current) -> base * modifier - current));
-        types.forEach(type -> this.operations.put(type.getId(), type));
-    }
-
-    @Override
-    public Optional<LanternOperation> getById(String id) {
-        return Optional.ofNullable(this.operations.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<LanternOperation> getAll() {
-        return ImmutableList.copyOf(this.operations.values());
     }
 }

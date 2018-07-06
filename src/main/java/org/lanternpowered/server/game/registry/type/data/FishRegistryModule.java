@@ -32,6 +32,7 @@ import static org.lanternpowered.server.item.PropertyProviders.saturation;
 import org.lanternpowered.server.data.type.LanternFish;
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.Fish;
 import org.spongepowered.api.data.type.Fishes;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -53,19 +54,19 @@ public class FishRegistryModule extends InternalPluginCatalogRegistryModule<Fish
 
     @Override
     public void registerDefaults() {
-        register(new LanternFish("minecraft", "cod", "item.fish.cod.raw.name", 0,
+        register(new LanternFish(CatalogKey.minecraft("cod"), "item.fish.cod.raw.name", 0,
                 builder -> builder
                         .add(foodRestoration(2))
                         .add(saturation(0.4))));
-        register(new LanternFish("minecraft", "salmon", "item.fish.salmon.raw.name", 1,
+        register(new LanternFish(CatalogKey.minecraft("salmon"), "item.fish.salmon.raw.name", 1,
                 builder -> builder
                         .add(foodRestoration(2))
                         .add(saturation(0.4))));
-        register(new LanternFish("minecraft", "clownfish", "item.fish.clownfish.raw.name", 2,
+        register(new LanternFish(CatalogKey.minecraft("clownfish"), "item.fish.clownfish.raw.name", 2,
                 builder -> builder
                         .add(foodRestoration(1))
                         .add(saturation(0.2))));
-        register(new LanternFish("minecraft", "pufferfish", "item.fish.pufferfish.raw.name", 3,
+        register(new LanternFish(CatalogKey.minecraft("pufferfish"), "item.fish.pufferfish.raw.name", 3,
                 builder -> builder
                         .add(foodRestoration(1))
                         .add(saturation(0.2))

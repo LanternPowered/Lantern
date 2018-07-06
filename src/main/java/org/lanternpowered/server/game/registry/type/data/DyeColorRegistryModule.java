@@ -26,11 +26,13 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternDyeColor;
-import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 
-public class DyeColorRegistryModule extends InternalEnumValueRegistryModule<DyeColor> {
+import java.util.Arrays;
+
+public class DyeColorRegistryModule extends InternalPluginCatalogRegistryModule<DyeColor> {
 
     private static final DyeColorRegistryModule INSTANCE = new DyeColorRegistryModule();
 
@@ -39,6 +41,11 @@ public class DyeColorRegistryModule extends InternalEnumValueRegistryModule<DyeC
     }
 
     private DyeColorRegistryModule() {
-        super(LanternDyeColor.class, DyeColors.class);
+        super(DyeColors.class);
+    }
+
+    @Override
+    public void registerDefaults() {
+        Arrays.stream(LanternDyeColor.values()).forEach(this::register);
     }
 }

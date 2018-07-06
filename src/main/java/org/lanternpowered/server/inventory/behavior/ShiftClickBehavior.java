@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.inventory.behavior;
 
+import org.lanternpowered.server.inventory.AbstractContainer;
 import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.AbstractContainer;
 
 import javax.annotation.Nullable;
 

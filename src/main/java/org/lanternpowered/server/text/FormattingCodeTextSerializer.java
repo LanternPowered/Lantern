@@ -31,8 +31,9 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2CharMap;
 import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.text.translation.TranslationContext;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -51,7 +52,7 @@ import javax.annotation.Nullable;
 /**
  * TODO: Separate the usage of {@link TextColors#RESET} and {@link TextStyles#RESET}.
  */
-public class FormattingCodeTextSerializer extends PluginCatalogType.Base
+public class FormattingCodeTextSerializer extends DefaultCatalogType
         implements org.spongepowered.api.text.serializer.FormattingCodeTextSerializer, LanternTextSerializer {
 
     public static final Object2CharMap<Object> FORMATS_TO_CODE = new Object2CharOpenHashMap<>();
@@ -106,8 +107,8 @@ public class FormattingCodeTextSerializer extends PluginCatalogType.Base
 
     private final char formattingCode;
 
-    public FormattingCodeTextSerializer(String pluginId, String name, char formattingCode) {
-        super(pluginId, name);
+    public FormattingCodeTextSerializer(CatalogKey key, char formattingCode) {
+        super(key);
         this.formattingCode = formattingCode;
     }
 

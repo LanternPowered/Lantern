@@ -26,13 +26,14 @@
 package org.lanternpowered.server.game.registry.type.util;
 
 import org.lanternpowered.server.config.user.ban.LanternBanType;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
 
-public final class BanTypeRegistryModule extends SimpleCatalogRegistryModule<BanType> {
+public final class BanTypeRegistryModule extends DefaultCatalogRegistryModule<BanType> {
 
     public BanTypeRegistryModule() {
         super(BanTypes.class);
@@ -41,7 +42,7 @@ public final class BanTypeRegistryModule extends SimpleCatalogRegistryModule<Ban
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        register(new LanternBanType("profile", Ban.Profile.class));
-        register(new LanternBanType("ip", Ban.Ip.class));
+        register(new LanternBanType(CatalogKey.minecraft("profile"), Ban.Profile.class));
+        register(new LanternBanType(CatalogKey.minecraft("ip"), Ban.Ip.class));
     }
 }

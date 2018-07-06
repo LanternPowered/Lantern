@@ -26,12 +26,14 @@
 package org.lanternpowered.server.attribute;
 
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 import java.util.function.Predicate;
 
+@SuppressWarnings("unchecked")
 public class AttributeTargets {
 
-    public static final Predicate<DataHolder> GENERIC = null;
-    public static final Predicate<DataHolder> HORSE = null;
-    public static final Predicate<DataHolder> ZOMBIE = null;
+    public static final Predicate<DataHolder> GENERIC = DummyObjectProvider.createFor(Predicate.class, "GENERIC");
+    public static final Predicate<DataHolder> HORSE = DummyObjectProvider.createFor(Predicate.class, "HORSE");
+    public static final Predicate<DataHolder> ZOMBIE = DummyObjectProvider.createFor(Predicate.class, "ZOMBIE");
 }

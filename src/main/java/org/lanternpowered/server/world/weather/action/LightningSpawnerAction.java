@@ -32,8 +32,8 @@ import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.script.function.action.Action;
+import org.lanternpowered.api.util.concurrent.ThreadLocals;
 import org.lanternpowered.server.util.collect.Collections3;
-import org.lanternpowered.server.util.concurrent.FastThreadLocals;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.Sponge;
@@ -49,7 +49,7 @@ import java.util.Random;
 
 public class LightningSpawnerAction implements Action {
 
-    private static final FastThreadLocal<Random> RANDOM = FastThreadLocals.withInitial(Random::new);
+    private static final FastThreadLocal<Random> RANDOM = ThreadLocals.of(Random::new);
 
     private static final AABB MOVE_TO_ENTITY_REGION = new AABB(-1.5, -3.0, -1.5, 1.5, 256.0, 1.5);
 

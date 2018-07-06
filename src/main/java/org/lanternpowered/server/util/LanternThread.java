@@ -26,7 +26,7 @@
 package org.lanternpowered.server.util;
 
 import io.netty.util.concurrent.FastThreadLocalThread;
-import org.lanternpowered.server.event.CauseStack;
+import org.lanternpowered.api.cause.CauseStack;
 
 import javax.annotation.Nullable;
 

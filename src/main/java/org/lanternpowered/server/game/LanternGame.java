@@ -34,9 +34,12 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.launch.Environment;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.LanternAssetManager;
+import org.lanternpowered.server.cause.LanternCauseStack;
+import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.command.DefaultCommandsCollection;
 import org.lanternpowered.server.command.LanternCommandManager;
 import org.lanternpowered.server.config.GlobalConfig;
@@ -47,14 +50,10 @@ import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
-import org.lanternpowered.server.event.CauseStack;
-import org.lanternpowered.server.event.LanternCauseStack;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.game.version.MinecraftVersionCache;
 import org.lanternpowered.server.inject.Option;
-import org.lanternpowered.server.inject.Service;
-import org.lanternpowered.server.inject.ServiceProvider;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.rcon.EmptyRconService;
@@ -64,6 +63,7 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceListeners;
+import org.lanternpowered.server.service.Service;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
@@ -200,18 +200,12 @@ public class LanternGame implements Game {
 
     /// Services
 
-    // The Whitelist Service
-    @Inject @ServiceProvider(WhitelistConfig.class) private Service<WhitelistService> whitelistService;
-    // The Ban Service
-    @Inject @ServiceProvider(BanConfig.class) private Service<BanService> banService;
-    // The User Storage Service
-    @Inject @ServiceProvider(LanternUserStorageService.class) private Service<UserStorageService> userStorageService;
-    // The Pagination Service
-    @Inject @ServiceProvider(LanternPaginationService.class) private Service<PaginationService> paginationService;
-    // The SQL Service
-    @Inject @ServiceProvider(LanternSqlService.class) private Service<SqlService> sqlService;
-    // The Permission Service
-    @Inject @ServiceProvider(LanternPermissionService.class) private Service<PermissionService> permissionService;
+    @Inject private Service<WhitelistService> whitelistService;
+    @Inject private Service<BanService> banService;
+    @Inject private Service<UserStorageService> userStorageService;
+    @Inject private Service<PaginationService> paginationService;
+    @Inject private Service<SqlService> sqlService;
+    @Inject private Service<PermissionService> permissionService;
 
     // The minecraft version cache
     @Inject private MinecraftVersionCache minecraftVersionCache;
@@ -229,10 +223,22 @@ public class LanternGame implements Game {
         game = this;
 
         // Set the CauseStack for the main thread, at startup
-        CauseStack.set(new LanternCauseStack());
+        LanternCauseStackManager.INSTANCE.setCurrentCauseStack(new LanternCauseStack());
+    }
+
+    private <T> void initService(Class<T> serviceType, Class<? extends T> defaultImpl) {
+        this.serviceManager.setProvider(this.implContainer, serviceType, this.injector.getInstance(defaultImpl));
     }
 
     public void initialize() throws IOException {
+        // Initialize the default services
+        initService(WhitelistService.class, WhitelistConfig.class);
+        initService(BanService.class, BanConfig.class);
+        initService(UserStorageService.class, LanternUserStorageService.class);
+        initService(PaginationService.class, LanternPaginationService.class);
+        initService(SqlService.class, LanternSqlService.class);
+        initService(PermissionService.class, LanternPermissionService.class);
+
         final LanternMinecraftVersion versionCacheEntry = this.minecraftVersionCache.getVersionOrUnknown(
                 Protocol.CURRENT_VERSION, false);
         if (!LanternMinecraftVersion.CURRENT.equals(versionCacheEntry)) {
@@ -262,8 +268,8 @@ public class LanternGame implements Game {
         this.globalConfig.save();
 
         // They should not be replaced by now
-        this.whitelistService.extended(WhitelistConfig.class).get().load();
-        this.banService.extended(BanConfig.class).get().load();
+        this.whitelistService.as(WhitelistConfig.class).get().load();
+        this.banService.as(BanConfig.class).get().load();
 
         // Create the event manager instance
         this.eventManager.registerListeners(this.implContainer, LanternServiceListeners.getInstance());

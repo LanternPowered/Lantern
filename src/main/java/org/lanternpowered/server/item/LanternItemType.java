@@ -27,8 +27,9 @@ package org.lanternpowered.server.item;
 
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
-import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.data.ValueCollection;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
@@ -39,7 +40,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-public class LanternItemType extends PluginCatalogType.Base implements ItemType {
+public class LanternItemType extends DefaultCatalogType implements ItemType {
 
     private final PropertyProviderCollection propertyProviderCollection;
     private final MutableBehaviorPipeline<Behavior> behaviorPipeline;
@@ -50,11 +51,11 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
 
     private final int maxStackQuantity;
 
-    LanternItemType(String pluginId, String name, PropertyProviderCollection propertyProviderCollection,
+    LanternItemType(CatalogKey key, PropertyProviderCollection propertyProviderCollection,
             MutableBehaviorPipeline<Behavior> behaviorPipeline,
             TranslationProvider translationProvider, Consumer<ValueCollection> keysProvider,
             @Nullable BlockType blockType, int maxStackQuantity) {
-        super(pluginId, name);
+        super(key);
         this.keysProvider = keysProvider;
         this.maxStackQuantity = maxStackQuantity;
         this.behaviorPipeline = behaviorPipeline;

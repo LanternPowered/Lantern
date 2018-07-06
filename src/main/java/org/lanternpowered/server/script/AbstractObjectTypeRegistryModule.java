@@ -28,13 +28,13 @@ package org.lanternpowered.server.script;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.script.ObjectType;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractObjectTypeRegistryModule<O, T extends ObjectType<O>> extends PluginCatalogRegistryModule<T> {
+public abstract class AbstractObjectTypeRegistryModule<O, T extends ObjectType<O>> extends DefaultCatalogRegistryModule<T> {
 
     private final Map<Class<?>, T> byClass = new HashMap<>();
 

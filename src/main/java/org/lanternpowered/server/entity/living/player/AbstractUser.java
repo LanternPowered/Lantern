@@ -117,7 +117,7 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
         c.registerNonRemovable(Keys.RESPAWN_LOCATIONS, new HashMap<>());
         c.registerNonRemovable(Keys.GAME_MODE, GameModes.NOT_SET).addListener(
                 (oldElement, newElement) -> {
-                    ((LanternGameMode) newElement).getAbilityApplier().accept(this);
+                    ((LanternGameMode) newElement).getAbilityApplier().invoke(this);
                     // This MUST be updated, unless you want strange behavior on the client,
                     // the client has 3 different concepts of 'isCreative', and each combination
                     // gives a different outcome...

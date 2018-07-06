@@ -155,11 +155,7 @@ public final class DataManipulatorGenerator {
             Key closestKey = null;
 
             for (Key key : requiredKeys) {
-                String keyId = key.getId();
-                final int index = keyId.indexOf(':');
-                if (index != -1) {
-                    keyId = keyId.substring(index + 1);
-                }
+                final String keyId = key.getKey().getValue();
                 final int distance = StringUtils.getLevenshteinDistance(methodName, keyId);
                 if (distance < closestDistance) {
                     closestDistance = distance;

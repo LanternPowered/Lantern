@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.script.function.value;
 
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.script.function.value.DoubleValueProvider;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderTypes;
@@ -44,7 +45,7 @@ public class DoubleValueProviderTypeRegistryModule extends AbstractObjectTypeReg
 
     @Override
     public void registerDefaults() {
-        this.register(new DoubleValueProviderTypeImpl("lantern", "constant", DoubleValueProvider.Constant.class));
-        this.register(new DoubleValueProviderTypeImpl("lantern", "range", DoubleValueProvider.Range.class));
+        this.register(new DoubleValueProviderTypeImpl(CatalogKeys.lantern("constant"), DoubleValueProvider.Constant.class));
+        this.register(new DoubleValueProviderTypeImpl(CatalogKeys.lantern("range"), DoubleValueProvider.Range.class));
     }
 }

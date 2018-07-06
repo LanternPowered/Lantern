@@ -29,6 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import kotlin.jvm.JvmClassMappingKt;
+import kotlin.reflect.KClass;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 
 import java.util.Collections;
@@ -47,6 +49,10 @@ public final class CatalogMappingData {
 
     public CatalogMappingData(Class<?> target, Map<String, ?> mappings) {
         this(target, mappings, Collections.emptySet());
+    }
+
+    public CatalogMappingData(KClass<?> target, Map<String, ?> mappings) {
+        this(JvmClassMappingKt.getJavaClass(target), mappings, Collections.emptySet());
     }
 
     public CatalogMappingData(Class<?> target, Map<String, ?> mappings, Set<String> ignoredFields) {

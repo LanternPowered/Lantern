@@ -29,6 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.statistic.LanternStatisticType;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.statistic.StatisticTypes;
 
@@ -46,14 +47,14 @@ public final class StatisticTypeRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        register(new LanternStatisticType("sponge", "basic", tr("Basic")));
-        register(new LanternStatisticType("sponge", "blocks_broken", tr("Blocks Broken")));
-        register(new LanternStatisticType("sponge", "entities_killed", tr("Entities Killed")));
-        register(new LanternStatisticType("sponge", "items_broken", tr("Items Broken")));
-        register(new LanternStatisticType("sponge", "items_crafted", tr("Items Crafted")));
-        register(new LanternStatisticType("sponge", "items_dropped", tr("Items Dropped")));
-        register(new LanternStatisticType("sponge", "items_picked_up", tr("Items Picked Up")));
-        register(new LanternStatisticType("sponge", "items_used", tr("Items Used")));
-        register(new LanternStatisticType("sponge", "killed_by_entity", tr("Killed By Entity")));
+        register(new LanternStatisticType(CatalogKey.sponge("basic"), tr("Basic")));
+        register(new LanternStatisticType(CatalogKey.sponge("blocks_broken"), tr("Blocks Broken")));
+        register(new LanternStatisticType(CatalogKey.sponge("entities_killed"), tr("Entities Killed")));
+        register(new LanternStatisticType(CatalogKey.sponge("items_broken"), tr("Items Broken")));
+        register(new LanternStatisticType(CatalogKey.sponge("items_crafted"), tr("Items Crafted")));
+        register(new LanternStatisticType(CatalogKey.sponge("items_dropped"), tr("Items Dropped")));
+        register(new LanternStatisticType(CatalogKey.sponge("items_picked_up"), tr("Items Picked Up")));
+        register(new LanternStatisticType(CatalogKey.sponge("items_used"), tr("Items Used")));
+        register(new LanternStatisticType(CatalogKey.sponge("killed_by_entity"), tr("Killed By Entity")));
     }
 }

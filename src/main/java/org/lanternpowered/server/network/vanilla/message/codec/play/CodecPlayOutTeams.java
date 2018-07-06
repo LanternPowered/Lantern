@@ -63,7 +63,7 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
                 flags |= 0x02;
             }
             buf.writeByte((byte) flags);
-            buf.writeString(message1.getNameTagVisibility().getId());
+            buf.writeString(message1.getNameTagVisibility().getKey().toString());
             buf.writeString(message1.getCollisionRule().getName());
             final TextColor c = message1.getColor();
             buf.writeByte((byte) (c == TextColors.NONE || c == TextColors.RESET ? -1 :

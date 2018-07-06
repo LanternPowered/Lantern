@@ -2,7 +2,7 @@ apply from: rootProject.file('gradle/lantern-base.gradle')
 
 apply plugin: 'java'
 apply plugin: 'org.spongepowered.plugin'
-apply plugin: 'com.github.hierynomus.license'
+apply plugin: 'net.minecrell.licenser'
 
 // Setup the default tasks
 defaultTasks 'licenseFormat', 'build'
@@ -50,9 +50,10 @@ assemble.dependsOn sourceJar
 license {
     header rootProject.file('HEADER.txt')
     include '**/*.java'
+    include '**/*.kt'
 
-    strictCheck true
-    ignoreFailures = false
+    newLine false
+    ignoreFailures false
 
     ext {
         name = rootProject.name
@@ -60,10 +61,6 @@ license {
         organizationa = rootProject.organization
         urlb = rootProject.api.url
         organizationb = rootProject.api.organization
-    }
-
-    mapping {
-        java = 'SLASHSTAR_STYLE'
     }
 }
 

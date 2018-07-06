@@ -11,9 +11,10 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.hierynomus.license' version '0.14.0'
+    id 'net.minecrell.licenser' version '0.4'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id 'org.spongepowered.plugin' version '0.8.1'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.51'
 }
 
 apply from: rootProject.file('gradle/lantern.gradle')
@@ -70,9 +71,12 @@ dependencies {
     compileExcluded testDataPacks
     // Add the sponge api
     compileExcluded api
-    // Add a tiny json library just to read the
-    // library files
+    // Add a tiny json library just to read the library files
     compileTinyJson 'com.googlecode.json-simple:json-simple:1.1.1'
+
+    // Kotlin
+    compile 'org.jetbrains.kotlin:kotlin-stdlib'
+    compile 'org.jetbrains.kotlin:kotlin-reflect'
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
@@ -119,6 +123,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.mockito:mockito-core:2.8.47'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
 }
 
 runConfigurations {
@@ -337,7 +345,7 @@ if (project.hasProperty('lanternRepo')) {
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.7'
+    gradleVersion = '4.8.1'
 }
 
 // A custom update wrapper task, using a custom task prevents

@@ -95,12 +95,11 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-core:2.11.0'
     compile 'org.apache.logging.log4j:log4j-api:2.11.0'
     compile 'org.apache.logging.log4j:log4j-iostreams:2.11.0'
+    compile 'com.lmax:disruptor:3.4.2'
 
     // Console
-    compile 'org.jline:jline-reader:3.7.0'
-    compile 'org.jline:jline-terminal-jna:3.7.0'
-    compile 'net.java.dev.jna:jna:4.5.1'
-    compile 'net.minecrell:terminalconsoleappender:1.0.0'
+    compile 'net.minecrell:terminalconsoleappender:1.1.0'
+    compile 'net.java.dev.jna:jna:4.5.2'
 
     // Fastutil
     compile 'it.unimi.dsi:fastutil:8.1.1'
@@ -183,6 +182,11 @@ task theJar(type: ShadowJar) {
 
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
+    // Only enable async logging outside dev mode, using async in combination
+    // with code location logging is disabled by default to avoid performance
+    // issues, but in dev we want to see the locations, so no async here
+    // See https://logging.apache.org/log4j/2.x/manual/async.html @ Location, location, location...
+    rename 'log4j2_prod.component.properties', 'log4j2.component.properties'
 
     // Include the lantern classes
     from sourceSets.main.output

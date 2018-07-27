@@ -27,8 +27,10 @@ package org.lanternpowered.server.game.registry.type.item.inventory;
 
 import org.lanternpowered.server.data.property.PropertyHelper;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.lanternpowered.server.inventory.query.LanternQueryOperationType;
+import org.lanternpowered.server.inventory.query.QueryOperations;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
@@ -46,7 +48,7 @@ import java.util.function.Predicate;
 public class QueryOperationRegistryModule extends PluginCatalogRegistryModule<QueryOperationType> {
 
     public QueryOperationRegistryModule() {
-        super(QueryOperationTypes.class);
+        super(QueryOperationTypes.class, QueryOperations.class);
     }
 
     @Override
@@ -58,7 +60,11 @@ public class QueryOperationRegistryModule extends PluginCatalogRegistryModule<Qu
         register(new LanternQueryOperationType<ItemType>("sponge", "item_type",
                 (arg, inventory) -> inventory instanceof Slot && inventory.contains(arg)));
         register(new LanternQueryOperationType<Predicate<ItemStack>>("sponge", "item_stack_custom",
-                (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek().orElse(ItemStack.empty()))));
+                (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek())));
+        register(new LanternQueryOperationType<Predicate<ItemStack>>("lantern", "item_stack_predicate",
+                (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek())));
+        register(new LanternQueryOperationType<Predicate<ItemStack>>("lantern", "unsafe_item_stack_predicate",
+                (arg, inventory) -> inventory instanceof Slot && arg.test(((AbstractSlot) inventory).getRawItemStack())));
         register(new LanternQueryOperationType<Class<? extends Inventory>>("sponge", "inventory_type",
                 (arg, inventory) -> arg.isInstance(inventory)));
         register(new LanternQueryOperationType<Class<?>>("sponge", "type",

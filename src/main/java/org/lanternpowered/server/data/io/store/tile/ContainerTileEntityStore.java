@@ -40,11 +40,9 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
-import org.spongepowered.api.item.inventory.type.OrderedInventory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ContainerTileEntityStore<T extends LanternContainerTile> extends TileEntityObjectStore<T> {
 
@@ -56,7 +54,7 @@ public class ContainerTileEntityStore<T extends LanternContainerTile> extends Ti
         final List<DataView> itemViews = dataView.getViewList(ITEMS).orElse(null);
         if (itemViews != null) {
             dataView.remove(ITEMS);
-            final OrderedInventory inventory = (OrderedInventory) object.getInventory();
+            final Inventory inventory = object.getInventory();
             final ObjectSerializer<LanternItemStack> itemStackSerializer = ObjectSerializerRegistry.get().get(LanternItemStack.class).get();
             for (DataView itemView : itemViews) {
                 final int slot = itemView.getByte(SLOT).get() & 0xff;
@@ -75,11 +73,11 @@ public class ContainerTileEntityStore<T extends LanternContainerTile> extends Ti
         final Inventory inventory = object.getInventory();
         final Iterable<Slot> slots = inventory.slots();
         for (Slot slot : slots) {
-            final Optional<ItemStack> optItemStack = slot.peek();
-            if (!optItemStack.isPresent()) {
+            final ItemStack itemStack = slot.peek();
+            if (itemStack.isEmpty()) {
                 continue;
             }
-            final DataView itemView = itemStackSerializer.serialize((LanternItemStack) optItemStack.get());
+            final DataView itemView = itemStackSerializer.serialize((LanternItemStack) itemStack);
             //noinspection ConstantConditions
             itemView.set(SLOT, (byte) inventory.getProperty(slot, SlotIndex.class, null).get().getValue().intValue());
             itemViews.add(itemView);

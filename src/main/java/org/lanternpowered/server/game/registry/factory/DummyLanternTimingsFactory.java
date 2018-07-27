@@ -28,6 +28,7 @@ package org.lanternpowered.server.game.registry.factory;
 import co.aikar.timings.Timing;
 import co.aikar.timings.TimingsFactory;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.text.channel.MessageChannel;
 
 import javax.annotation.Nullable;
 
@@ -91,6 +92,11 @@ public class DummyLanternTimingsFactory implements TimingsFactory {
 
     @Override
     public void generateReport(@Nullable CommandSource source) {
+        // Ignore
+    }
+
+    @Override
+    public void generateReport(MessageChannel channel) {
         // Ignore
     }
 }

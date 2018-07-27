@@ -23,29 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.query;
 
-import com.google.common.reflect.TypeToken;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.query.QueryOperationType;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-import java.lang.reflect.TypeVariable;
+import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public final class CarriedInventoryHelper {
-
-    private static final TypeVariable<Class<CarriedInventory>> CARRIER_TYPE = CarriedInventory.class.getTypeParameters()[0];
+public class QueryOperations {
 
     /**
-     * Constructs a {@link CarrierReference} for the given {@link CarriedInventory}. This
-     * method extract the generic type from the implementing class and uses that as the type
-     * for the reference.
-     *
-     * @param inventory The inventory
-     * @param <C> The carrier type
-     * @return The carrier reference
+     * The same as {@link QueryOperationTypes#ITEM_STACK_CUSTOM}.
      */
-    public static <C extends Carrier> CarrierReference<C> constructReference(CarriedInventory<C> inventory) {
-        return CarrierReference.of((Class) TypeToken.of(inventory.getClass()).resolveType(CARRIER_TYPE).getRawType());
-    }
+    public static final QueryOperationType<Predicate<ItemStack>> ITEM_STACK_PREDICATE =
+            DummyObjectProvider.createFor(QueryOperationType.class, "ITEM_STACK_PREDICATE");
+
+    /**
+     * Similar to {@link #ITEM_STACK_PREDICATE}, but doesn't copy
+     * the {@link ItemStack} before testing. It's not allowed to modify the provided
+     * stack.
+     */
+    public static final QueryOperationType<Predicate<ItemStack>> UNSAFE_ITEM_STACK_PREDICATE =
+            DummyObjectProvider.createFor(QueryOperationType.class, "ITEM_STACK_PREDICATE");
 }

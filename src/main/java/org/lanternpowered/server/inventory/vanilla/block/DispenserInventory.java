@@ -27,24 +27,7 @@ package org.lanternpowered.server.inventory.vanilla.block;
 
 import org.lanternpowered.server.block.tile.ITileEntityInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.lanternpowered.server.inventory.CarrierReference;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.Carrier;
-
-import java.util.Optional;
 
 public class DispenserInventory extends AbstractGridInventory implements ITileEntityInventory {
 
-    private final CarrierReference<TileEntityCarrier> carrierReference = CarrierReference.of(TileEntityCarrier.class);
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
-    }
-
-    @Override
-    public Optional<TileEntityCarrier> getCarrier() {
-        return this.carrierReference.get();
-    }
 }

@@ -25,43 +25,48 @@
  */
 package org.lanternpowered.server.inventory.vanilla;
 
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import org.spongepowered.api.item.inventory.entity.PrimaryPlayerInventory;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 
-public class LanternMainPlayerInventory extends AbstractGridInventory implements MainPlayerInventory {
+public class LanternPrimaryPlayerInventory extends AbstractChildrenInventory implements PrimaryPlayerInventory {
 
     private static final class Holder {
 
-        private static final QueryOperation<?> GRID_INVENTORY_OPERATION =
+        private static final QueryOperation<?> STORAGE_INVENTORY_OPERATION =
                 QueryOperationTypes.INVENTORY_TYPE.of(AbstractGridInventory.class);
         private static final QueryOperation<?> HOTBAR_OPERATION =
                 QueryOperationTypes.INVENTORY_TYPE.of(LanternHotbarInventory.class);
     }
 
     private LanternHotbarInventory hotbar;
+    private AbstractGridInventory storage;
     private AbstractGridInventory grid;
 
     private AbstractGridInventory priorityHotbar;
-    private AbstractOrderedInventory reverse;
+    private AbstractChildrenInventory reverse;
 
     @Override
     protected void init() {
         super.init();
 
-        this.grid = query(Holder.GRID_INVENTORY_OPERATION).first();
-        this.hotbar = query(Holder.HOTBAR_OPERATION).first();
+        this.storage = (AbstractGridInventory) query(Holder.STORAGE_INVENTORY_OPERATION).first();
+        this.hotbar = (LanternHotbarInventory) query(Holder.HOTBAR_OPERATION).first();
 
         this.priorityHotbar = AbstractGridInventory.rowsViewBuilder()
                 .row(0, this.hotbar) // Higher priority for the hotbar
-                .grid(1, this.grid)
+                .grid(this.hotbar.getRows(), this.storage)
                 .build();
-        this.reverse = (AbstractOrderedInventory) InventoryTransforms.REVERSE.transform(this);
+        this.grid = AbstractGridInventory.rowsViewBuilder()
+                .grid(0, this.storage)
+                .row(this.storage.getRows(), this.hotbar)
+                .build();
+        this.reverse = (AbstractChildrenInventory) InventoryTransforms.REVERSE.transform(this);
     }
 
     @Override
@@ -81,7 +86,12 @@ public class LanternMainPlayerInventory extends AbstractGridInventory implements
     }
 
     @Override
-    public AbstractGridInventory getGrid() {
+    public AbstractGridInventory getStorage() {
+        return this.storage;
+    }
+
+    @Override
+    public AbstractGridInventory asGrid() {
         return this.grid;
     }
 }

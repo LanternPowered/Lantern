@@ -27,20 +27,22 @@ package org.lanternpowered.server.inventory.constructor;
 
 import org.lanternpowered.server.inventory.AbstractInventory;
 
-import java.util.function.Function;
-
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.IntFunction;
 
 public final class InventoryConstructor<T extends AbstractInventory> {
 
-    private final Class<T> inventoryType;
-    @Nullable private final Class<? extends T> carriedInventoryType;
-    private final Function<Boolean, T> constructor;
+    public static int CARRIED = 0x1;
+    public static int VIEWABLE = 0x2;
 
-    InventoryConstructor(Class<T> inventoryType, @Nullable Class<? extends T> carriedInventoryType,
-            Function<Boolean, T> constructor) {
-        this.carriedInventoryType = carriedInventoryType;
+    private final Class<T> inventoryType;
+    private final List<Class<T>> classes;
+    private final IntFunction<T> constructor;
+
+    InventoryConstructor(Class<T> inventoryType,
+            List<Class<T>> classes, IntFunction<T> constructor) {
         this.inventoryType = inventoryType;
+        this.classes = classes;
         this.constructor = constructor;
     }
 
@@ -54,16 +56,16 @@ public final class InventoryConstructor<T extends AbstractInventory> {
     }
 
     public T construct() {
-        return construct(false);
+        return construct(0);
     }
 
     /**
      * Constructs a new {@link AbstractInventory}.
      *
-     * @param carried Whether the inventory can be carried
+     * @param flags The flags
      * @return The inventory
      */
-    public T construct(boolean carried) {
-        return this.constructor.apply(carried);
+    public T construct(int flags) {
+        return this.constructor.apply(flags);
     }
 }

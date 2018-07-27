@@ -33,6 +33,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.PotionEffectHelper;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.ISlot;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
@@ -45,7 +46,6 @@ import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
 
 import java.util.Collections;
 import java.util.List;
@@ -141,11 +141,11 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
             }
 
             if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
-                final Slot slot = context.requireContext(ContextKeys.USED_SLOT);
+                final ISlot slot = (ISlot) context.requireContext(ContextKeys.USED_SLOT);
                 slot.poll(1);
                 if (this.restItemSupplier != null) {
-                    if (slot.peek().isPresent()) {
-                        ((LanternPlayer) player).getInventory().getMain().offer(this.restItemSupplier.get());
+                    if (slot.peek().isFilled()) {
+                        ((LanternPlayer) player).getInventory().getPrimary().offer(this.restItemSupplier.get());
                     } else {
                         slot.set(this.restItemSupplier.get());
                     }

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.inventory.client;
 
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -68,7 +67,7 @@ public interface ClientSlot {
          *
          * @return The slot
          */
-        AbstractInventorySlot getSlot();
+        AbstractSlot getSlot();
     }
 
     /**

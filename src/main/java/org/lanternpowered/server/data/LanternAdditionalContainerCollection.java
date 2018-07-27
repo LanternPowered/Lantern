@@ -42,7 +42,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings({"unchecked", "Convert2MethodRef"})
-final class LanternAdditionalContainerCollection<C extends ValueContainer<?>> implements AdditionalContainerCollection<C> {
+class LanternAdditionalContainerCollection<C extends ValueContainer<?>> implements AdditionalContainerCollection<C> {
 
     private final Map<Class<?>, C> containers;
     private final Map<Class<?>, C> unmodifiableContainers;

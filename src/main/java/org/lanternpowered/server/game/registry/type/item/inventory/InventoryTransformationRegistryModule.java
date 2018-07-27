@@ -30,7 +30,7 @@ import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.InventoryTransformations;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import org.spongepowered.api.item.inventory.entity.PrimaryPlayerInventory;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
@@ -48,9 +48,9 @@ public final class InventoryTransformationRegistryModule implements RegistryModu
     @Override
     public void registerDefaults() {
         register("no_op", InventoryTransforms.NO_OP);
-        register("player_main_hotbar_first", new LanternQueryTransformationBuilder()
+        register("player_primary_hotbar_first", new LanternQueryTransformationBuilder()
                 .append(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class),
-                        QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class))
+                        QueryOperationTypes.INVENTORY_TYPE.of(PrimaryPlayerInventory.class))
                 .build());
         register("reverse", InventoryTransforms.REVERSE);
         register("empty", InventoryTransforms.EMPTY);

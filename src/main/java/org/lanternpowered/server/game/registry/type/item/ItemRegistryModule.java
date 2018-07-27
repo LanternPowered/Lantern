@@ -1724,9 +1724,13 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(2267, recordBuilder(RecordTypes.WAIT)
                 .build("minecraft", "record_wait"));
+
+        // Initialize empty stacks
+        final LanternItemStack emptyStack = new LanternItemStack(none, 0);
+        final ItemStackSnapshot emptySnapshot = emptyStack.toWrappedSnapshot();
         try {
-            ReflectionHelper.setField(ItemStackSnapshot.class.getField("NONE"), null,
-                    new LanternItemStack(none, 0).createSnapshot());
+            ReflectionHelper.setField(LanternItemStack.class.getDeclaredField("empty"), null, emptyStack);
+            ReflectionHelper.setField(ItemStackSnapshot.class.getField("NONE"), null, emptySnapshot);
         } catch (Exception e) {
             throw UncheckedThrowables.thrOw(e);
         }

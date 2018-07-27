@@ -31,7 +31,7 @@ import com.flowpowered.math.vector.Vector2i;
 import org.lanternpowered.server.inventory.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
 import org.lanternpowered.server.inventory.type.LanternInventoryRow;
-import org.lanternpowered.server.inventory.type.LanternOrderedInventory;
+import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -204,8 +204,8 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                 } else {
                     throw new IllegalStateException();
                 }
-            } else if (this.baseArchetype.getBuilder() instanceof AbstractOrderedInventory.Builder) {
-                final AbstractOrderedInventory.Builder builder = (AbstractOrderedInventory.Builder) this.baseArchetype.getBuilder().copy();
+            } else if (this.baseArchetype.getBuilder() instanceof AbstractChildrenInventory.Builder) {
+                final AbstractChildrenInventory.Builder builder = (AbstractChildrenInventory.Builder) this.baseArchetype.getBuilder().copy();
                 if (inventoryDimension != null) {
                     final Class<?> inventoryType = builder.constructor.getType();
                     if (InventoryColumn.class.isAssignableFrom(inventoryType) && inventoryDimension.getColumns() != 1) {
@@ -219,19 +219,6 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                 } else if (inventoryCapacity != null) {
                     builder.expand(inventoryCapacity.getValue());
                 }
-                for (LanternInventoryArchetype<?> archetype : this.archetypes) {
-                    if (!(archetype.getBuilder() instanceof AbstractSlot.Builder)) {
-                        throw new IllegalStateException("Only slot archetypes can be added to a slot based builder.");
-                    }
-                    builder.addLast(archetype);
-                }
-                applyProperties(properties, builder);
-                return builder.buildArchetype(pluginId, id);
-            } else if (this.baseArchetype.getBuilder() instanceof AbstractOrderedInventory.Builder) {
-                if (inventoryDimension != null) {
-                    throw new IllegalStateException("A InventoryDimension cannot be applied to a ordered children inventory.");
-                }
-                final AbstractOrderedInventory.Builder builder = (AbstractOrderedInventory.Builder) this.baseArchetype.getBuilder().copy();
                 for (LanternInventoryArchetype<?> archetype : this.archetypes) {
                     builder.addLast(archetype);
                 }
@@ -285,7 +272,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                     throw new IllegalStateException("Not enough slots are found (" + this.archetypes.size() + ") to reach the capacity of " + size);
                 }
                 if (targetColumns == 1 || targetRows == 1) {
-                    final AbstractOrderedInventory.Builder<LanternOrderedInventory> builder = AbstractOrderedInventory.builder();
+                    final AbstractChildrenInventory.Builder<LanternChildrenInventory> builder = AbstractChildrenInventory.builder();
                     for (LanternInventoryArchetype<?> archetype : this.archetypes) {
                         builder.addLast((LanternInventoryArchetype<? extends AbstractSlot>) archetype);
                     }
@@ -310,10 +297,10 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
             // Try to copy a row archetype
             if ((targetColumns == 1 || targetRows == 1) && this.archetypes.size() == 1) {
                 final LanternInventoryArchetype<?> archetype = this.archetypes.get(0);
-                if (archetype.getBuilder() instanceof AbstractOrderedInventory.Builder) {
-                    final AbstractOrderedInventory.Builder<AbstractOrderedInventory> builder =
-                            (AbstractOrderedInventory.Builder<AbstractOrderedInventory>) archetype.getBuilder().copy();
-                    final Class<?> inventoryType = ((AbstractOrderedInventory.Builder) archetype.getBuilder()).constructor.getType();
+                if (archetype.getBuilder() instanceof AbstractChildrenInventory.Builder) {
+                    final AbstractChildrenInventory.Builder<AbstractChildrenInventory> builder =
+                            (AbstractChildrenInventory.Builder<AbstractChildrenInventory>) archetype.getBuilder().copy();
+                    final Class<?> inventoryType = ((AbstractChildrenInventory.Builder) archetype.getBuilder()).constructor.getType();
                     if (targetRows == 1 && !(InventoryRow.class.isAssignableFrom(inventoryType))) {
                         builder.type(LanternInventoryRow.class);
                     } else if (targetColumns == 1 && !(InventoryColumn.class.isAssignableFrom(inventoryType))) {
@@ -339,13 +326,13 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                     final AbstractGridInventory.Builder builder = (AbstractGridInventory.Builder) archetype.getBuilder();
                     rows1 = builder.rows;
                     columns1 = builder.columns;
-                } else if (archetype.getBuilder() instanceof AbstractOrderedInventory.Builder) {
-                    final Class<?> inventoryType = ((AbstractOrderedInventory.Builder) archetype.getBuilder()).constructor.getType();
+                } else if (archetype.getBuilder() instanceof AbstractChildrenInventory.Builder) {
+                    final Class<?> inventoryType = ((AbstractChildrenInventory.Builder) archetype.getBuilder()).constructor.getType();
                     if (InventoryRow.class.isAssignableFrom(inventoryType)) {
-                        columns1 = ((AbstractOrderedInventory.Builder) archetype.getBuilder()).slots;
+                        columns1 = ((AbstractChildrenInventory.Builder) archetype.getBuilder()).slots;
                         rows1 = 1;
                     } else if (InventoryColumn.class.isAssignableFrom(inventoryType)) {
-                        rows1 = ((AbstractOrderedInventory.Builder) archetype.getBuilder()).slots;
+                        rows1 = ((AbstractChildrenInventory.Builder) archetype.getBuilder()).slots;
                         columns1 = 1;
                     }
                 }
@@ -410,7 +397,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         }
 
         // Just generate a ordered children inventory
-        final AbstractOrderedInventory.Builder<LanternOrderedInventory> builder = AbstractOrderedInventory.builder();
+        final AbstractChildrenInventory.Builder<LanternChildrenInventory> builder = AbstractChildrenInventory.builder();
         for (LanternInventoryArchetype<?> archetype : this.archetypes) {
             builder.addLast((LanternInventoryArchetype<? extends AbstractMutableInventory>) archetype);
         }

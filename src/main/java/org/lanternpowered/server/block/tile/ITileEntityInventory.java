@@ -25,21 +25,17 @@
  */
 package org.lanternpowered.server.block.tile;
 
+import org.lanternpowered.server.inventory.ICarriedInventory;
+import org.lanternpowered.server.inventory.IViewableInventory;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 
 import java.util.Optional;
 
-public interface ITileEntityInventory extends TileEntityInventory<TileEntityCarrier> {
+public interface ITileEntityInventory extends TileEntityInventory<TileEntityCarrier>, ICarriedInventory<TileEntityCarrier>, IViewableInventory {
 
     @Override
     default void markDirty() {
-    }
-
-    @Override
-    default boolean canInteractWith(Player player) {
-        return true;
     }
 
     @Override

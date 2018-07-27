@@ -28,6 +28,9 @@ package org.lanternpowered.server.inventory;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.spongepowered.api.item.inventory.Slot;
 
+/**
+ * Can be used to track the changes of a {@link Slot}.
+ */
 public interface SlotChangeTracker {
 
     /**

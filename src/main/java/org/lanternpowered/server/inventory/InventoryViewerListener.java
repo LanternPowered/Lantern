@@ -25,27 +25,27 @@
  */
 package org.lanternpowered.server.inventory;
 
-import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.entity.living.player.Player;
 
 public interface InventoryViewerListener {
 
     /**
-     * Is called when the specified {@link Viewer} starts watching the {@link LanternContainer}.
+     * Is called when the specified {@link Player} starts watching the {@link AbstractContainer}.
      *
      * @param viewer The viewer
      * @param container The container
      * @param callback The callback
      */
-    void onViewerAdded(Viewer viewer, LanternContainer container, Callback callback);
+    void onViewerAdded(Player viewer, AbstractContainer container, Callback callback);
 
     /**
-     * Is called when the specified {@link Viewer} stops watching the {@link LanternContainer}.
+     * Is called when the specified {@link Player} stops watching the {@link AbstractContainer}.
      *
      * @param viewer The viewer
      * @param container The container
      * @param callback The callback
      */
-    void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback);
+    void onViewerRemoved(Player viewer, AbstractContainer container, Callback callback);
 
     interface Callback { // TODO: Better name?
 

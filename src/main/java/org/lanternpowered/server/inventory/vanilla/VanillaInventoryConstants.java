@@ -23,24 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.vanilla;
 
-import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
-import org.spongepowered.api.text.translation.Translation;
+public final class VanillaInventoryConstants {
 
-import java.util.Optional;
-
-@SuppressWarnings("unchecked")
-class CarriedLanternContainer<C extends Carrier> extends LanternContainer implements CarriedInventory<C> {
-
-    CarriedLanternContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory openInventory, Translation name) {
-        super(playerInventory, openInventory, name);
-    }
-
-    @Override
-    public Optional<C> getCarrier() {
-        return ((CarriedInventory<C>) this.openInventory).getCarrier();
-    }
+    public static final int CHEST_COLUMNS = 9;
+    public static final int MAX_CHEST_ROWS = 6;
+    public static final int MAX_CHEST_SIZE = CHEST_COLUMNS * MAX_CHEST_ROWS;
+    public static final int HOPPER_SIZE = 5;
 }

@@ -46,6 +46,9 @@ public interface AdditionalContainerCollection<C extends ValueContainer<?>> exte
     /**
      * Creates a {@link AdditionalContainerCollection} that
      * permits concurrent modifications.
+     *
+     * @param <C> The value container type
+     * @return The additional container collection
      */
     static <C extends ValueContainer<?>> AdditionalContainerCollection<C> createConcurrent() {
         return new LanternAdditionalContainerCollection<>(new ConcurrentHashMap<>());
@@ -53,9 +56,24 @@ public interface AdditionalContainerCollection<C extends ValueContainer<?>> exte
 
     /**
      * Creates a normal {@link AdditionalContainerCollection}.
+     *
+     * @param <C> The value container type
+     * @return The additional container collection
      */
     static <C extends ValueContainer<?>> AdditionalContainerCollection<C> create() {
         return new LanternAdditionalContainerCollection<>(new HashMap<>());
+    }
+
+    /**
+     * Gets a {@link AdditionalContainerCollection}, will not
+     * store any data that is offered to it.
+     *
+     * @param <C> The value container type
+     * @return The additional container collection
+     */
+    @SuppressWarnings("unchecked")
+    static <C extends ValueContainer<?>> AdditionalContainerCollection<C> empty() {
+        return EmptyAdditionalContainerCollection.INSTANCE;
     }
 
     /**

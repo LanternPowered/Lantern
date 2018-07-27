@@ -25,36 +25,27 @@
  */
 package org.lanternpowered.server.inventory.constructor;
 
-import static org.objectweb.asm.Opcodes.ACC_FINAL;
-import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
-import static org.objectweb.asm.Opcodes.ACC_PROTECTED;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ARETURN;
-import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
-import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.PUTFIELD;
-import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V1_8;
 
 import org.lanternpowered.server.inventory.AbstractInventory;
-import org.lanternpowered.server.inventory.CarrierReference;
+import org.lanternpowered.server.inventory.ICarriedInventory;
+import org.lanternpowered.server.inventory.IViewableInventory;
+import org.lanternpowered.server.util.BytecodeUtils;
 import org.lanternpowered.server.util.DefineableClassLoader;
 import org.lanternpowered.server.util.LambdaFactory;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
@@ -66,16 +57,9 @@ public final class InventoryConstructorFactory {
 
     private final static InventoryConstructorFactory instance = new InventoryConstructorFactory();
 
-    private final static String CARRIER_REFERENCE_NAME = Type.getInternalName(CarrierReference.class);
-    private final static String CARRIER_REFERENCE_DESC = Type.getDescriptor(CarrierReference.class);
-
-    private final static String CARRIED_INVENTORY_NAME = Type.getInternalName(CarriedInventory.class);
-    private final static String CARRIED_INVENTORY_DESC = Type.getDescriptor(CarriedInventory.class);
-
+    private final static String CARRIED_INVENTORY_NAME = Type.getInternalName(ICarriedInventory.class);
     private final static String CARRIER_NAME = Type.getInternalName(Carrier.class);
-    private final static String CARRIER_DESC = Type.getDescriptor(Carrier.class);
-
-    private final static String CARRIER_REF_FIELD = "carrierReference";
+    private final static String VIEWABLE_INVENTORY_NAME = Type.getInternalName(IViewableInventory.class);
 
     private final DefineableClassLoader classLoader = new DefineableClassLoader();
     private final Map<Class<?>, InventoryConstructor<?>> inventoryConstructors = new HashMap<>();
@@ -91,11 +75,12 @@ public final class InventoryConstructorFactory {
     public <T extends AbstractInventory> InventoryConstructor<T> getConstructor(Class<T> inventoryType) {
         return (InventoryConstructor<T>) this.inventoryConstructors.computeIfAbsent(inventoryType, type -> {
             final boolean isCarried = CarriedInventory.class.isAssignableFrom(inventoryType);
+            final boolean isViewable = ViewableInventory.class.isAssignableFrom(inventoryType);
             if (Modifier.isAbstract(inventoryType.getModifiers()) ||
                     Modifier.isInterface(inventoryType.getModifiers())) {
                 throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be abstract.");
             }
-            if (Modifier.isFinal(inventoryType.getModifiers()) && !isCarried) {
+            if (Modifier.isFinal(inventoryType.getModifiers()) && !(isCarried || isViewable)) {
                 throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be final.");
             }
             try {
@@ -105,18 +90,72 @@ public final class InventoryConstructorFactory {
             }
 
             final Supplier<T> supplier = LambdaFactory.createSupplier(inventoryType);
-            final Function<Boolean, T> constructor;
-            Class<T> carriedType = null;
+            final List<Class<T>> classes = new ArrayList<>();
+            Supplier<T> carriedSupplier = supplier;
+            Supplier<T> carriedViewableSupplier = supplier;
+            Supplier<T> viewableSupplier = supplier;
             if (!isCarried) {
-                carriedType = (Class<T>) generateCarriedClass(inventoryType);
-                final Supplier<T> carriedSupplier = LambdaFactory.createSupplier(carriedType);
-                constructor = carried -> (carried ? carriedSupplier : supplier).get();
-            } else {
-                constructor = carried -> supplier.get();
+                final Class<T> carriedType = (Class<T>) generateCarriedClass(inventoryType);
+                classes.add(carriedType);
+                carriedSupplier = LambdaFactory.createSupplier(carriedType);
+                carriedViewableSupplier = carriedSupplier;
+                if (!isViewable) {
+                    final Class<T> carriedViewableType = (Class<T>) generateViewableClass(carriedType);
+                    classes.add(carriedViewableType);
+                    carriedViewableSupplier = LambdaFactory.createSupplier(carriedViewableType);
+                }
+            } else if (!isViewable) {
+                final Class<T> viewableType = (Class<T>) generateViewableClass(inventoryType);
+                classes.add(viewableType);
+                viewableSupplier = LambdaFactory.createSupplier(viewableType);
             }
-            return new InventoryConstructor<>(inventoryType, carriedType, constructor);
+            final Supplier<T> carriedSupplier0 = carriedSupplier;
+            final Supplier<T> carriedViewableSupplier0 = carriedViewableSupplier;
+            final Supplier<T> viewableSupplier0 = viewableSupplier;
+            return new InventoryConstructor(inventoryType, classes, flags -> {
+                if ((flags & InventoryConstructor.CARRIED) != 0) {
+                    if ((flags & InventoryConstructor.VIEWABLE) != 0) {
+                        return carriedViewableSupplier0.get();
+                    }
+                    return carriedSupplier0.get();
+                }
+                if ((flags & InventoryConstructor.VIEWABLE) != 0) {
+                    return viewableSupplier0.get();
+                }
+                return supplier.get();
+            });
         });
     }
+
+    // Will generate a viewable class like the following:
+    // public class LanternGridInventory$$Viewable extends LanternGridInventory implements IViewableInventory {}
+
+    /**
+     * Gets the generated class for the target class that
+     * also implements {@link CarriedInventory}.
+     *
+     * @param inventoryType The inventory type
+     * @return The carried inventory type
+     */
+    private Class<? extends AbstractInventory> generateViewableClass(Class<? extends AbstractInventory> inventoryType) {
+        final String name = inventoryType.getName() + "$$Viewable";
+        final String className = name.replace('.', '/');
+
+        // Generate the class bytecode and load it
+        final ClassWriter cw = new ClassWriter(0);
+
+        final String superName = Type.getInternalName(inventoryType);
+        cw.visit(V1_8, ACC_PUBLIC | ACC_SUPER, className, null, superName, new String[] { VIEWABLE_INVENTORY_NAME });
+
+        // Add a empty constructor
+        BytecodeUtils.visitEmptyConstructor(cw, inventoryType);
+
+        cw.visitEnd();
+        return this.classLoader.defineClass(name, cw.toByteArray());
+    }
+
+    // Will generate a carried class like the following:
+    // public class LanternGridInventory$$Carried extends LanternGridInventory implements ICarriedInventory<Carrier> {}
 
     /**
      * Gets the generated class for the target class that
@@ -133,48 +172,11 @@ public final class InventoryConstructorFactory {
         final ClassWriter cw = new ClassWriter(0);
 
         final String superName = Type.getInternalName(inventoryType);
-        cw.visit(V1_8, ACC_PUBLIC + ACC_SUPER, className,
+        cw.visit(V1_8, ACC_PUBLIC | ACC_SUPER, className,
                 String.format("L%s;L%s<L%s;>;", superName, CARRIED_INVENTORY_NAME, CARRIER_NAME), superName, new String[] { CARRIED_INVENTORY_NAME });
 
-        final FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_FINAL, CARRIER_REF_FIELD,
-                CARRIER_REFERENCE_DESC, String.format("L%s<L%s;>;", CARRIER_REFERENCE_NAME, CARRIER_NAME), null);
-        fv.visitEnd();
-
-        MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
-        mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKESPECIAL, superName, "<init>", "()V", false);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(Type.getType(CARRIER_DESC));
-        mv.visitMethodInsn(INVOKESTATIC, CARRIER_REFERENCE_NAME, "of",
-                String.format("(Ljava/lang/Class;)L%s;", CARRIER_REFERENCE_NAME), true);
-        mv.visitFieldInsn(PUTFIELD, className, CARRIER_REF_FIELD, CARRIER_REFERENCE_DESC);
-        mv.visitInsn(RETURN);
-        mv.visitMaxs(2, 1);
-        mv.visitEnd();
-
-        mv = cw.visitMethod(ACC_PROTECTED, "setCarrier", String.format("(L%s;)V", CARRIER_NAME), null, null);
-        mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitVarInsn(ALOAD, 1);
-        mv.visitMethodInsn(INVOKESPECIAL, superName, "setCarrier", String.format("(L%s;)V", CARRIER_NAME), false);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETFIELD, className, CARRIER_REF_FIELD, CARRIER_REFERENCE_DESC);
-        mv.visitVarInsn(ALOAD, 1);
-        mv.visitMethodInsn(INVOKEINTERFACE, CARRIER_REFERENCE_NAME, "set", String.format("(L%s;)V", CARRIER_NAME), true);
-        mv.visitInsn(RETURN);
-        mv.visitMaxs(2, 2);
-        mv.visitEnd();
-
-        mv = cw.visitMethod(ACC_PUBLIC, "getCarrier", "()Ljava/util/Optional;",
-                String.format("()Ljava/util/Optional<L%s;>;", CARRIER_NAME), null);
-        mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETFIELD, className, CARRIER_REF_FIELD, CARRIER_REFERENCE_DESC);
-        mv.visitMethodInsn(INVOKEINTERFACE, CARRIER_REFERENCE_NAME, "get", "()Ljava/util/Optional;", true);
-        mv.visitInsn(ARETURN);
-        mv.visitMaxs(1, 1);
-        mv.visitEnd();
+        // Add a empty constructor
+        BytecodeUtils.visitEmptyConstructor(cw, inventoryType);
 
         cw.visitEnd();
         return this.classLoader.defineClass(name, cw.toByteArray());

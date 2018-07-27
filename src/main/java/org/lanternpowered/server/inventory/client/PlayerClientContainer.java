@@ -28,13 +28,14 @@ package org.lanternpowered.server.inventory.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerClientContainer extends ClientContainer {
@@ -45,13 +46,14 @@ public class PlayerClientContainer extends ClientContainer {
             FLAG_DISABLE_SHIFT_INSERTION, // Crafting input slot 2
             FLAG_DISABLE_SHIFT_INSERTION, // Crafting input slot 3
             FLAG_DISABLE_SHIFT_INSERTION, // Crafting input slot 4
-            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Equipment slot 1
-            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Equipment slot 2
-            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Equipment slot 3
-            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION, // Equipment slot 4
-            FLAG_DISABLE_SHIFT_INSERTION, // Offhand slot
+            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION | 40 << FLAG_SILENT_SLOT_INDEX_SHIFT, // Equipment slot 1
+            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION | 39 << FLAG_SILENT_SLOT_INDEX_SHIFT, // Equipment slot 2
+            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION | 38 << FLAG_SILENT_SLOT_INDEX_SHIFT, // Equipment slot 3
+            FLAG_POSSIBLY_DISABLED_SHIFT_INSERTION | 37 << FLAG_SILENT_SLOT_INDEX_SHIFT, // Equipment slot 4
+            FLAG_DISABLE_SHIFT_INSERTION | 41 << FLAG_SILENT_SLOT_INDEX_SHIFT, // Offhand slot
     };
     private static final int OFFHAND_SLOT_INDEX = TOP_SLOT_FLAGS.length - 1;
+    private static final int EQUIPMENT_START_INDEX = OFFHAND_SLOT_INDEX - 4;
     private static final int[] ALL_SLOT_FLAGS = compileAllSlotFlags(TOP_SLOT_FLAGS);
 
     private HotbarBehavior hotbarBehavior = new SimpleHotbarBehavior();
@@ -110,6 +112,25 @@ public class PlayerClientContainer extends ClientContainer {
     @Override
     protected void collectChangeMessages(List<Message> messages) {
         super.collectChangeMessages(messages);
+        collectHotbarSlotChange(messages);
+    }
+
+    /**
+     * Update for changes while a other {@link ClientContainer} is opened.
+     */
+    public void closedUpdate() {
+        final List<Message> messages = new ArrayList<>();
+        collectHotbarSlotChange(messages);
+        for (int i = EQUIPMENT_START_INDEX; i <= OFFHAND_SLOT_INDEX; i++) {
+            collectSlotChangeMessages(messages, i, true);
+        }
+        if (!messages.isEmpty()) {
+            // Stream the messages to the player
+            getPlayer().getConnection().send(messages);
+        }
+    }
+
+    private void collectHotbarSlotChange(List<Message> messages) {
         final int selectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
         // Update the selected hotbar slot
         if (selectedHotbarSlot != this.previousSelectedHotbarSlot) {
@@ -119,7 +140,7 @@ public class PlayerClientContainer extends ClientContainer {
     }
 
     @Override
-    public ClientSlot.Slot bindSlot(int index, AbstractInventorySlot slot) {
+    public ClientSlot.Slot bindSlot(int index, AbstractSlot slot) {
         return super.bindSlot(index, slot);
     }
 
@@ -148,7 +169,7 @@ public class PlayerClientContainer extends ClientContainer {
     public void setSelectedHotbarSlot(ClientSlot hotbarSlot) {
         checkNotNull(hotbarSlot, "hotbarSlot");
         final int index = ((BaseClientSlot) hotbarSlot).index;
-        final int hotbarSlotIndex = (index & FLAG_HOTBAR) >> 4;
+        final int hotbarSlotIndex = (index & FLAG_HOTBAR_MASK) >> 4;
         checkArgument(hotbarSlotIndex != 0, "The client slot isn't located in the hotbar.");
         setSelectedHotbarSlotIndex(hotbarSlotIndex - 1);
     }

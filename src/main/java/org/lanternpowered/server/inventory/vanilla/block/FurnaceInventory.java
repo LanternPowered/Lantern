@@ -26,7 +26,7 @@
 package org.lanternpowered.server.inventory.vanilla.block;
 
 import org.lanternpowered.server.block.tile.ITileEntityInventory;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.CarrierReference;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ContainerProperties;
@@ -42,7 +42,7 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 
 import java.util.Optional;
 
-public class FurnaceInventory extends AbstractOrderedInventory implements ITileEntityInventory {
+public class FurnaceInventory extends AbstractChildrenInventory implements ITileEntityInventory {
 
     private static final class Holder {
 
@@ -53,8 +53,6 @@ public class FurnaceInventory extends AbstractOrderedInventory implements ITileE
         private static final QueryOperation<?> OUTPUT_SLOT_OPERATION =
                 QueryOperationTypes.INVENTORY_TYPE.of(LanternOutputSlot.class);
     }
-
-    private final CarrierReference<Carrier> carrierReference = CarrierReference.of(Carrier.class);
 
     private LanternInputSlot inputSlot;
     private LanternFuelSlot fuelSlot;
@@ -91,20 +89,9 @@ public class FurnaceInventory extends AbstractOrderedInventory implements ITileE
         super.init();
 
         resetCachedProgress();
-        this.inputSlot = query(Holder.INPUT_SLOT_OPERATION).first();
-        this.fuelSlot = query(Holder.FUEL_SLOT_OPERATION).first();
-        this.outputSlot = query(Holder.OUTPUT_SLOT_OPERATION).first();
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
-    }
-
-    @Override
-    public Optional<TileEntityCarrier> getCarrier() {
-        return this.carrierReference.as(TileEntityCarrier.class);
+        this.inputSlot = (LanternInputSlot) query(Holder.INPUT_SLOT_OPERATION).first();
+        this.fuelSlot = (LanternFuelSlot) query(Holder.FUEL_SLOT_OPERATION).first();
+        this.outputSlot = (LanternOutputSlot) query(Holder.OUTPUT_SLOT_OPERATION).first();
     }
 
     @Override
@@ -112,7 +99,7 @@ public class FurnaceInventory extends AbstractOrderedInventory implements ITileE
         super.initClientContainer(clientContainer);
         // Provide the smelting progress
         clientContainer.bindPropertySupplier(ContainerProperties.SMELT_PROGRESS, () -> {
-            final Optional<DataHolder> dataHolder = this.carrierReference.as(DataHolder.class);
+            final Optional<DataHolder> dataHolder = getCarrierAs(DataHolder.class);
             if (!dataHolder.isPresent()) {
                 return 0.0;
             }
@@ -126,7 +113,7 @@ public class FurnaceInventory extends AbstractOrderedInventory implements ITileE
         });
         // Provide the fuel progress
         clientContainer.bindPropertySupplier(ContainerProperties.FUEL_PROGRESS, () -> {
-            final Optional<DataHolder> dataHolder = this.carrierReference.as(DataHolder.class);
+            final Optional<DataHolder> dataHolder = getCarrierAs(DataHolder.class);
             if (!dataHolder.isPresent()) {
                 return 0.0;
             }

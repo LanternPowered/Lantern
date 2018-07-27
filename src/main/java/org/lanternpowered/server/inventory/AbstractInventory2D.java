@@ -48,7 +48,7 @@ import javax.annotation.Nullable;
  * that are combined into a grid/row/column.
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractInventory2D extends AbstractOrderedInventory implements IInventory2D {
+public abstract class AbstractInventory2D extends AbstractChildrenInventory implements IInventory2D {
 
     private int columns;
     private int rows;
@@ -67,7 +67,7 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
     }
 
     void initWithChildren(List<AbstractMutableInventory> children, int columns, int rows) {
-        super.initWithChildren(children);
+        super.initWithChildren(children, false);
         if (columns == -1 && rows == -1) {
             rows = 1;
         }
@@ -90,7 +90,7 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
     }
 
     @Override
-    void initWithChildren(List<AbstractMutableInventory> children) {
+    void initWithChildren(List<AbstractMutableInventory> children, boolean lazy) {
         throw new UnsupportedOperationException(getClass().getName());
     }
 
@@ -116,22 +116,22 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
 
     @Override
     public Optional<ItemStack> peek(int x, int y, int limit) {
-        return getSlot(x, y).flatMap(slot -> slot.peek(limit));
+        return getSlot(x, y).map(slot -> slot.peek(limit));
     }
 
     @Override
     public Optional<ItemStack> peek(int x, int y) {
-        return getSlot(x, y).flatMap(Slot::peek);
+        return getSlot(x, y).map(Slot::peek);
     }
 
     @Override
     public Optional<ItemStack> poll(int x, int y, int limit) {
-        return getSlot(x, y).flatMap(slot -> slot.poll(limit));
+        return getSlot(x, y).map(slot -> slot.poll(limit));
     }
 
     @Override
     public Optional<ItemStack> poll(int x, int y) {
-        return getSlot(x, y).flatMap(Slot::poll);
+        return getSlot(x, y).map(Slot::poll);
     }
 
     @Override
@@ -145,22 +145,22 @@ public abstract class AbstractInventory2D extends AbstractOrderedInventory imple
 
     @Override
     public Optional<ItemStack> poll(SlotPos pos) {
-        return getSlot(pos).flatMap(Inventory::poll);
+        return getSlot(pos).map(Inventory::poll);
     }
 
     @Override
     public Optional<ItemStack> poll(SlotPos pos, int limit) {
-        return getSlot(pos).flatMap(slot -> slot.poll(limit));
+        return getSlot(pos).map(slot -> slot.poll(limit));
     }
 
     @Override
     public Optional<ItemStack> peek(SlotPos pos) {
-        return getSlot(pos).flatMap(Inventory::peek);
+        return getSlot(pos).map(Inventory::peek);
     }
 
     @Override
     public Optional<ItemStack> peek(SlotPos pos, int limit) {
-        return getSlot(pos).flatMap(slot -> slot.peek(limit));
+        return getSlot(pos).map(slot -> slot.peek(limit));
     }
 
     @Override

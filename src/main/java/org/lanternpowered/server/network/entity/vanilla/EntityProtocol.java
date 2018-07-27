@@ -37,6 +37,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
+import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
@@ -130,11 +131,11 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     protected void spawnWithEquipment(EntityProtocolUpdateContext context) {
         if (hasEquipment() && this.entity instanceof Carrier) {
-            final Inventory inventory = ((Carrier) this.entity).getInventory();
+            final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
-                final ItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek().orElse(null);
+                final LanternItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek();
                 final int slotIndex = i;
-                if (itemStack != null) {
+                if (itemStack.isFilled()) {
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
                 }
             }
@@ -227,9 +228,9 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
         }
         if (hasEquipment() && this.entity instanceof Carrier) {
-            final Inventory inventory = ((Carrier) this.entity).getInventory();
+            final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
-                final ItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek().orElse(null);
+                final ItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek();
                 final ItemStack oldItemStack = this.lastEquipment.get(i);
                 if (!LanternItemStack.areSimilar(itemStack, oldItemStack)) {
                     this.lastEquipment.put(i, itemStack);

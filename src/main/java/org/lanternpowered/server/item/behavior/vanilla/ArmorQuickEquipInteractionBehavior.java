@@ -32,7 +32,6 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.data.Transaction;
@@ -49,15 +48,14 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final LanternPlayer player = (LanternPlayer) context.requireContext(ContextKeys.PLAYER);
-        final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
+        final ItemStack stack = context.requireContext(ContextKeys.USED_ITEM_STACK).copy();
 
-        final PeekedOfferTransactionResult peekResult = player.getInventory().getArmor().peekOffer(itemStack.copy());
-        if (peekResult.isSuccess()) {
+        final PeekedOfferTransactionResult peekResult = player.getInventory().getArmor().peekOffer(stack);
+        if (!peekResult.isEmpty()) {
             final List<SlotTransaction> transactions = new ArrayList<>(peekResult.getTransactions());
             final AbstractSlot slot = (AbstractSlot) context.getContext(ContextKeys.USED_SLOT).orElse(null);
             if (slot != null) {
-                transactions.add(new SlotTransaction(
-                        slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(peekResult.getRejectedItem().orElse(null))));
+                transactions.addAll(slot.peekSet(stack).getTransactions());
             }
             final ChangeInventoryEvent.Equipment event = SpongeEventFactory.createChangeInventoryEventEquipment(
                     context.getCurrentCause(), player.getInventory(), transactions);

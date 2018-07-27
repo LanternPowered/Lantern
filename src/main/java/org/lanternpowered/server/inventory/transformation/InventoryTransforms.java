@@ -26,7 +26,7 @@
 package org.lanternpowered.server.inventory.transformation;
 
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.IInventory;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -56,7 +56,7 @@ public final class InventoryTransforms {
     };
 
     public static final InventoryTransformation REVERSE = inventory ->
-            AbstractOrderedInventory.viewBuilder()
+            AbstractChildrenInventory.viewBuilder()
                     .inventories(Lists.reverse(Lists.newArrayList(inventory.slots())))
                     .build();
 

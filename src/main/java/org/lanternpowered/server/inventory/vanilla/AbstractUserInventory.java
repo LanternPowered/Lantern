@@ -25,58 +25,43 @@
  */
 package org.lanternpowered.server.inventory.vanilla;
 
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.CarrierReference;
+import org.lanternpowered.server.inventory.ContainerProvidedWrappedInventory;
+import org.lanternpowered.server.inventory.ICarriedInventory;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.entity.UserInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
-import java.util.Optional;
-
-public abstract class AbstractUserInventory<T extends User> extends AbstractOrderedInventory implements UserInventory<T> {
+public abstract class AbstractUserInventory<T extends User> extends AbstractChildrenInventory implements UserInventory<T>, ICarriedInventory<T> {
 
     private static final class Holder {
 
         private static final QueryOperation<?> MAIN_INVENTORY_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(LanternMainPlayerInventory.class);
+                QueryOperationTypes.INVENTORY_TYPE.of(LanternPrimaryPlayerInventory.class);
         private static final QueryOperation<?> ARMOR_INVENTORY_OPERATION =
                 QueryOperationTypes.INVENTORY_TYPE.of(LanternPlayerArmorInventory.class);
         private static final QueryOperation<?> OFF_HAND_OPERATION =
                 QueryOperationTypes.INVENTORY_PROPERTY.of(EquipmentSlotType.of(EquipmentTypes.OFF_HAND));
     }
 
-    private final CarrierReference<T> carrierReference;
-
-    private LanternMainPlayerInventory mainInventory;
+    private LanternPrimaryPlayerInventory mainInventory;
     private LanternPlayerArmorInventory armorInventory;
     private LanternArmorEquipableInventory equipmentInventory;
     private AbstractSlot offhandSlot;
 
-    private AbstractOrderedInventory priorityHotbar;
+    private AbstractChildrenInventory priorityHotbar;
 
-    AbstractUserInventory(Class<T> userType) {
-        this.carrierReference = CarrierReference.of(userType);
-    }
-
-    @Override
-    public Optional<T> getCarrier() {
-        return this.carrierReference.get();
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
+    AbstractUserInventory() {
     }
 
     @Override
@@ -84,17 +69,17 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractOrde
         super.init();
 
         // Search the the inventories for the helper methods
-        this.mainInventory = query(Holder.MAIN_INVENTORY_OPERATION).first();
-        this.armorInventory = query(Holder.ARMOR_INVENTORY_OPERATION).first();
-        this.offhandSlot = query(Holder.OFF_HAND_OPERATION).first();
+        this.mainInventory = (LanternPrimaryPlayerInventory) query(Holder.MAIN_INVENTORY_OPERATION).first();
+        this.armorInventory = (LanternPlayerArmorInventory) query(Holder.ARMOR_INVENTORY_OPERATION).first();
+        this.offhandSlot = (AbstractSlot) query(Holder.OFF_HAND_OPERATION).first();
 
-        this.priorityHotbar = AbstractOrderedInventory.viewBuilder()
+        this.priorityHotbar = AbstractChildrenInventory.viewBuilder()
                 .inventory(this.armorInventory)
                 .inventory(this.offhandSlot)
                 .inventory(this.mainInventory.transform(InventoryTransforms.PRIORITY_HOTBAR))
                 .plugin(getPlugin())
                 .build();
-        this.equipmentInventory = AbstractOrderedInventory.viewBuilder()
+        this.equipmentInventory = AbstractChildrenInventory.viewBuilder()
                 .inventory(this.armorInventory)
                 .inventory(new LanternHotbarSelectedSlot(this.mainInventory.getHotbar()))
                 .inventory(this.offhandSlot)
@@ -114,7 +99,7 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractOrde
     }
 
     @Override
-    public LanternMainPlayerInventory getMain() {
+    public LanternPrimaryPlayerInventory getPrimary() {
         return this.mainInventory;
     }
 
@@ -134,11 +119,25 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractOrde
 
     @Override
     public LanternHotbarInventory getHotbar() {
-        return getMain().getHotbar();
+        return getPrimary().getHotbar();
     }
 
     @Override
-    public AbstractGridInventory getMainGrid() {
-        return getMain().getGrid();
+    public AbstractGridInventory getStorage() {
+        return getPrimary().getStorage();
+    }
+
+    @Override
+    protected ViewableInventory toViewable() {
+        // This container can normally not be opened on the client,
+        // so create a chest inventory which represents this inventory.
+        return new ContainerProvidedWrappedInventory(this,
+                viewer -> new ViewedPlayerInventory(viewer.getInventory(),
+                        // Only view armor and off hand in top
+                        AbstractChildrenInventory.viewBuilder()
+                                .shiftClickBehavior(PlayerInventoryShiftClickBehavior.INSTANCE)
+                                .inventory(this.armorInventory)
+                                .inventory(this.offhandSlot)
+                                .build()));
     }
 }

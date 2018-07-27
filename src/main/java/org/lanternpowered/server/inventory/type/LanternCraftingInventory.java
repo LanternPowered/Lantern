@@ -26,10 +26,9 @@
 package org.lanternpowered.server.inventory.type;
 
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractInventory;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
-import org.lanternpowered.server.inventory.CarrierReference;
-import org.spongepowered.api.item.inventory.Carrier;
+import org.lanternpowered.server.inventory.ICarriedInventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
@@ -46,7 +45,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternCraftingInventory extends AbstractOrderedInventory implements CraftingInventory {
+public class LanternCraftingInventory extends AbstractChildrenInventory implements CraftingInventory {
 
     private static final class Holder {
 
@@ -56,26 +55,16 @@ public class LanternCraftingInventory extends AbstractOrderedInventory implement
                 QueryOperationTypes.INVENTORY_TYPE.of(CraftingGridInventory.class);
     }
 
-    protected final CarrierReference<?> carrierReference;
-
     private CraftingOutput output;
     private CraftingGridInventory grid;
-
-    protected LanternCraftingInventory(CarrierReference<?> carrierReference) {
-        this.carrierReference = carrierReference;
-    }
-
-    public LanternCraftingInventory() {
-        this(CarrierReference.of(Locatable.class));
-    }
 
     @Override
     protected void init() {
         super.init();
 
         // Search for the underlying inventories
-        this.output = query(Holder.CRAFTING_OUTPUT_OPERATION).first();
-        this.grid = query(Holder.CRAFTING_GRID_OPERATION).first();
+        this.output = (CraftingOutput) query(Holder.CRAFTING_OUTPUT_OPERATION).first();
+        this.grid = (CraftingGridInventory) query(Holder.CRAFTING_GRID_OPERATION).first();
 
         // Add a change listener to update the output slot
         ((AbstractInventory) this.grid).addChangeListener(slot -> {
@@ -92,12 +81,6 @@ public class LanternCraftingInventory extends AbstractOrderedInventory implement
         });
     }
 
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
-    }
-
     /**
      * Attempts to get a {@link World} instance that is passed through in the
      * crafting system. By default, lets just use the first {@link World} that
@@ -108,9 +91,11 @@ public class LanternCraftingInventory extends AbstractOrderedInventory implement
     @SuppressWarnings("unchecked")
     @Nullable
     protected World getWorld() {
-        final Optional<Locatable> optLocatable = this.carrierReference.as(Locatable.class);
-        if (optLocatable.isPresent()) {
-            return optLocatable.get().getWorld();
+        if (this instanceof ICarriedInventory) {
+            final Optional<Locatable> optLocatable = ((ICarriedInventory) this).getCarrierAs(Locatable.class);
+            if (optLocatable.isPresent()) {
+                return optLocatable.get().getWorld();
+            }
         }
         final Iterator<World> it = Lantern.getWorldManager().getWorlds().iterator();
         return it.hasNext() ? it.next() : null;

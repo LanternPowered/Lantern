@@ -25,14 +25,35 @@
  */
 package org.lanternpowered.server.inventory.behavior;
 
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractContainer;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.PlayerTopBottomContainer;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
-import org.lanternpowered.server.inventory.vanilla.LanternMainPlayerInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternPrimaryPlayerInventory;
 import org.spongepowered.api.item.inventory.slot.InputSlot;
 
+import javax.annotation.Nullable;
+
 public abstract class AbstractShiftClickBehavior implements ShiftClickBehavior {
+
+    /**
+     * Gets the default target {@link IInventory}, this target will never
+     * be to the top inventory, only from the top to the bottom one or shifting
+     * between the hotbar and the grid. {@code null} can be returned if there
+     * isn't a default shift click target.
+     *
+     * @param container The container
+     * @param slot The slot
+     * @return The default target inventory
+     */
+    @Nullable
+    protected IInventory getDefaultTarget(AbstractContainer container, AbstractSlot slot) {
+        if (!(container instanceof PlayerTopBottomContainer)) {
+            return null;
+        }
+        return getDefaultTarget((PlayerTopBottomContainer) container, slot);
+    }
 
     /**
      * Gets the default target {@link IInventory}, this target will never
@@ -43,21 +64,22 @@ public abstract class AbstractShiftClickBehavior implements ShiftClickBehavior {
      * @param slot The slot
      * @return The default target inventory
      */
-    protected IInventory getDefaultTarget(LanternContainer container, AbstractInventorySlot slot) {
-        final LanternMainPlayerInventory main = container.getPlayerInventory().getMain();
+    protected IInventory getDefaultTarget(PlayerTopBottomContainer container, AbstractSlot slot) {
+        // Default top bottom inventory behavior
+        final LanternPrimaryPlayerInventory primary = container.getPlayerInventory().getPrimary();
         // Check if the slot isn't in the main inventory
-        if (!main.containsInventory(slot)) {
+        if (!primary.containsInventory(slot)) {
             if (slot instanceof InputSlot) {
                 // The input slots use a different insertion order to the default
-                return main;
+                return primary;
             }
             // Check click to the main inventory
-            return main.transform(InventoryTransforms.REVERSE);
+            return primary.transform(InventoryTransforms.REVERSE);
         // Shift click from the hotbar to the main inventory
-        } else if (main.getHotbar().containsInventory(slot)) {
-            return main.getGrid();
+        } else if (primary.getHotbar().containsInventory(slot)) {
+            return primary.getStorage();
         } else {
-            return main.getHotbar();
+            return primary.getHotbar();
         }
     }
 }

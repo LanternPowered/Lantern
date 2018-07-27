@@ -43,7 +43,7 @@ public class AbstractViewBuilder<R extends T, T extends AbstractInventory, B ext
     @Override
     protected void build(R inventory) {
         if (this.carrier != null && inventory instanceof AbstractMutableInventory) {
-            ((AbstractMutableInventory) inventory).setCarrier(this.carrier);
+            inventory.setCarrier(this.carrier);
         }
     }
 }

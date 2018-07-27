@@ -23,13 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
-
-import org.spongepowered.api.entity.ArmorEquipable;
-
-public abstract class AbstractArmorEquipableInventory extends AbstractEquipmentInventory<ArmorEquipable> implements IArmorEquipableInventory {
-
-    public AbstractArmorEquipableInventory() {
-        super(ArmorEquipable.class);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.transaction;

@@ -30,8 +30,8 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
@@ -40,7 +40,7 @@ import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingGridInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.type.LanternGridInventory;
-import org.lanternpowered.server.inventory.type.LanternOrderedInventory;
+import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.lanternpowered.server.inventory.type.slot.LanternCraftingOutputSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternEquipmentSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternFilteringSlot;
@@ -195,7 +195,7 @@ public final class VanillaInventoryArchetypes {
     /// Player Main ///
     ///////////////////
 
-    public static final LanternInventoryArchetype<LanternMainPlayerInventory> PLAYER_MAIN;
+    public static final LanternInventoryArchetype<LanternPrimaryPlayerInventory> PLAYER_MAIN;
 
     /////////////////////
     /// Crafting Grid ///
@@ -243,7 +243,7 @@ public final class VanillaInventoryArchetypes {
     /// Horse Inventory ///
     ///////////////////////
 
-    public static final LanternInventoryArchetype<LanternOrderedInventory> HORSE;
+    public static final LanternInventoryArchetype<LanternChildrenInventory> HORSE;
 
     ///////////////////
     /// Saddle Slot ///
@@ -440,7 +440,7 @@ public final class VanillaInventoryArchetypes {
         /// Furnace ///
         ///////////////
 
-        FURNACE = AbstractOrderedInventory.builder()
+        FURNACE = AbstractChildrenInventory.builder()
                 .title(tr("container.furnace"))
                 .addLast(INPUT_SLOT)
                 .addLast(FUEL_SLOT)
@@ -454,7 +454,7 @@ public final class VanillaInventoryArchetypes {
         /// Entity Equipment ///
         ////////////////////////
 
-        ENTITY_EQUIPMENT = AbstractOrderedInventory.builder()
+        ENTITY_EQUIPMENT = AbstractChildrenInventory.builder()
                 .addLast(MAIN_HAND_SLOT)
                 .addLast(OFF_HAND_SLOT)
                 .addLast(HELMET_SLOT)
@@ -481,7 +481,7 @@ public final class VanillaInventoryArchetypes {
         /// Player Hotbar ///
         /////////////////////
 
-        final AbstractOrderedInventory.Builder<LanternHotbarInventory> hotbarBuilder = AbstractOrderedInventory.builder()
+        final AbstractChildrenInventory.Builder<LanternHotbarInventory> hotbarBuilder = AbstractChildrenInventory.builder()
                 .type(LanternHotbarInventory.class);
         for (int x = 0; x < 9; x++) {
             hotbarBuilder.addLast(SLOT);
@@ -492,10 +492,10 @@ public final class VanillaInventoryArchetypes {
         /// Player Main ///
         ///////////////////
 
-        PLAYER_MAIN = AbstractGridInventory.rowsBuilder()
-                .grid(0, PLAYER_MAIN_GRID)
-                .row(3, PLAYER_HOTBAR)
-                .type(LanternMainPlayerInventory.class)
+        PLAYER_MAIN = AbstractChildrenInventory.builder()
+                .addLast(PLAYER_MAIN_GRID)
+                .addLast(PLAYER_HOTBAR)
+                .type(LanternPrimaryPlayerInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "player_main");
 
         /////////////////////
@@ -515,7 +515,7 @@ public final class VanillaInventoryArchetypes {
         /// Crafting ///
         ////////////////
 
-        CRAFTING = AbstractOrderedInventory.builder()
+        CRAFTING = AbstractChildrenInventory.builder()
                 .addLast(CRAFTING_OUTPUT_SLOT)
                 .addLast(CRAFTING_GRID)
                 .type(LanternCraftingInventory.class)
@@ -539,7 +539,7 @@ public final class VanillaInventoryArchetypes {
         /// Workbench ///
         /////////////////
 
-        CRAFTING_TABLE = AbstractOrderedInventory.builder()
+        CRAFTING_TABLE = AbstractChildrenInventory.builder()
                 .addLast(CRAFTING_OUTPUT_SLOT)
                 .addLast(CRAFTING_TABLE_GRID)
                 .property(GuiIdProperty.builder().value(GuiIds.CRAFTING_TABLE).build())
@@ -550,7 +550,7 @@ public final class VanillaInventoryArchetypes {
         /// Player Armor ///
         ////////////////////
 
-        PLAYER_ARMOR = AbstractOrderedInventory.builder()
+        PLAYER_ARMOR = AbstractChildrenInventory.builder()
                 .addLast(HELMET_SLOT)
                 .addLast(CHESTPLATE_SLOT)
                 .addLast(LEGGINGS_SLOT)
@@ -562,8 +562,8 @@ public final class VanillaInventoryArchetypes {
         /// Player and User ///
         ///////////////////////
 
-        final AbstractOrderedInventory.Builder<LanternOrderedInventory> userInventoryBuilder =
-                AbstractOrderedInventory.builder()
+        final AbstractChildrenInventory.Builder<LanternChildrenInventory> userInventoryBuilder =
+                AbstractChildrenInventory.builder()
                         .addLast(PLAYER_ARMOR)
                         .addLast(OFF_HAND_SLOT)
                         .addLast(PLAYER_MAIN);
@@ -621,9 +621,9 @@ public final class VanillaInventoryArchetypes {
         /// Horse Equipment ///
         ///////////////////////
 
-        HORSE = AbstractOrderedInventory.builder()
+        HORSE = AbstractChildrenInventory.builder()
                 .carrierBased(new HorseCarrierBasedTransformer())
-                .type(LanternOrderedInventory.class)
+                .type(LanternChildrenInventory.class)
                 .buildArchetype(Minecraft.IDENTIFIER, "horse");
 
     }

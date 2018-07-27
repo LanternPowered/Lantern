@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.inventory.sponge;
 
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.type.LanternGridInventory;
@@ -64,7 +64,7 @@ public final class SpongeInventoryArchetypes {
     public static final LanternInventoryArchetype<LanternGridInventory> MENU_GRID;
 
     static {
-        final AbstractOrderedInventory.Builder<?> builder = AbstractOrderedInventory.builder();
+        final AbstractChildrenInventory.Builder<?> builder = AbstractChildrenInventory.builder();
         for (int x = 0; x < 9; x++) {
             builder.addLast(VanillaInventoryArchetypes.SLOT);
         }

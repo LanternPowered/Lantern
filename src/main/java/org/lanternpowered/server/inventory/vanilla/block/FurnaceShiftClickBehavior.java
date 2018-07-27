@@ -26,11 +26,11 @@
 package org.lanternpowered.server.inventory.vanilla.block;
 
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.AbstractTopBottomShiftClickBehavior;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
-import org.lanternpowered.server.inventory.behavior.AbstractShiftClickBehavior;
+import org.lanternpowered.server.inventory.PlayerTopBottomContainer;
 import org.lanternpowered.server.item.recipe.fuel.IFuel;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
@@ -39,17 +39,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FurnaceShiftClickBehavior extends AbstractShiftClickBehavior {
+public class FurnaceShiftClickBehavior extends AbstractTopBottomShiftClickBehavior {
 
     public static final FurnaceShiftClickBehavior INSTANCE = new FurnaceShiftClickBehavior();
 
     @Override
-    public IInventory getTarget(LanternContainer container, AbstractInventorySlot slot) {
+    public IInventory getTarget(PlayerTopBottomContainer container, AbstractSlot slot) {
         if (container.getOpenInventory().containsInventory(slot)) {
             return getDefaultTarget(container, slot);
         }
         // The item stack should be present
-        final ItemStackSnapshot snapshot = LanternItemStackSnapshot.wrap(slot.peek().get()); // Wrap, peek creates a copy
+        final ItemStackSnapshot snapshot = LanternItemStackSnapshot.wrap(slot.peek()); // Wrap, peek creates a copy
         // Check if the item can be used as a ingredient
         final Optional<SmeltingRecipe> optSmeltingRecipe = Lantern.getRegistry()
                 .getSmeltingRecipeRegistry().findMatchingRecipe(snapshot);

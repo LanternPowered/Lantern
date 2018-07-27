@@ -130,7 +130,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         this.rows.stream().filter(predicate::test).forEach(inventories::add);
         this.columns.stream().filter(predicate::test).forEach(inventories::add);
         // Check the slots their parents, in case they are nested into another grid
-        for (AbstractSlot slot : getSlotInventories()) {
+        for (AbstractSlot slot : getSlots()) {
             final AbstractInventory parent = slot.parent();
             if ((parent != this || parent != slot) && parent instanceof AbstractMutableInventory &&
                     predicate.test((AbstractMutableInventory) parent)) {
@@ -641,7 +641,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                     rowsBuilder.add((AbstractInventoryRow) inventory2D);
                     inventory2D.setParentSafely(inventory);
                     for (int x = 0; x < this.columns; x++) {
-                        final AbstractSlot slot = inventory2D.getSlotInventories().get(x);
+                        final AbstractSlot slot = inventory2D.getSlots().get(x);
                         columnSlotsBuilders[x].add(slot);
                         slotsBuilder.add(slot);
                     }
@@ -656,7 +656,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                         final ImmutableList.Builder<AbstractSlot> rowSlotsBuilder = ImmutableList.builder();
                         for (int x = 0; x < this.columns; x++) {
                             final int index = y * this.columns + x;
-                            final AbstractSlot slot = inventory2D.getSlotInventories().get(index);
+                            final AbstractSlot slot = inventory2D.getSlots().get(index);
                             rowSlotsBuilder.add(slot);
                             slotsBuilder.add(slot);
                             columnSlotsBuilders[x].add(slot);
@@ -808,7 +808,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                     columnsBuilder.add((AbstractInventoryColumn) inventory2D);
                     inventory2D.setParentSafely(inventory);
                     for (int y = 0; y < this.rows; y++) {
-                        rowSlotsBuilders[y].add(inventory2D.getSlotInventories().get(y));
+                        rowSlotsBuilders[y].add(inventory2D.getSlots().get(y));
                     }
                 } else {
                     final AbstractGridInventory gridInventory = (AbstractGridInventory) inventory2D;
@@ -822,7 +822,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                                 builder.columnTypes[i] != null ? builder.columnTypes[i].construct() : new LanternInventoryColumn();
                         final ImmutableList.Builder<AbstractSlot> columnSlotsBuilder = ImmutableList.builder();
                         for (int y = 0; y < this.rows; y++) {
-                            final AbstractSlot slot = column.getSlotInventories().get(y);
+                            final AbstractSlot slot = column.getSlots().get(y);
                             rowSlotsBuilders[y].add(slot);
                             columnSlotsBuilder.add(slot);
                         }

@@ -31,17 +31,24 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractForwardingSlot extends AbstractSlot {
 
     /**
@@ -89,18 +96,33 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    protected List<AbstractSlot> getSlotInventories() {
-        return getForwardingSlot().getSlotInventories();
+    protected List<AbstractSlot> getSlots() {
+        return getForwardingSlot().getSlots();
     }
 
     @Override
-    protected FastOfferResult offerFast(ItemStack stack) {
-        return getForwardingSlot().offerFast(stack);
+    protected List<? extends AbstractInventory> getChildren() {
+        return getForwardingSlot().getChildren();
     }
 
     @Override
-    protected <T extends Inventory> T queryInventories(Predicate<AbstractMutableInventory> predicate) {
+    protected void offer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
+        getForwardingSlot().offer(stack, transactionAdder);
+    }
+
+    @Override
+    protected void set(ItemStack stack, boolean force, @Nullable Consumer<SlotTransaction> transactionAdder) {
+        getForwardingSlot().set(stack, force, transactionAdder);
+    }
+
+    @Override
+    protected Collection<? extends Inventory> queryInventories(Predicate<AbstractMutableInventory> predicate) {
         return getForwardingSlot().queryInventories(predicate);
+    }
+
+    @Override
+    public boolean isValidItem(ItemStackSnapshot stack) {
+        return getForwardingSlot().isValidItem(stack);
     }
 
     @Override
@@ -114,32 +136,32 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    public Optional<ItemStack> poll(Predicate<ItemStack> matcher) {
+    public LanternItemStack poll(Predicate<ItemStack> matcher) {
         return getForwardingSlot().poll(matcher);
     }
 
     @Override
-    public Optional<ItemStack> poll(int limit, Predicate<ItemStack> matcher) {
+    public LanternItemStack poll(int limit, Predicate<ItemStack> matcher) {
         return getForwardingSlot().poll(limit, matcher);
     }
 
     @Override
-    public Optional<ItemStack> peek(Predicate<ItemStack> matcher) {
+    public LanternItemStack peek(Predicate<ItemStack> matcher) {
         return getForwardingSlot().peek(matcher);
     }
 
     @Override
-    public Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher) {
+    public LanternItemStack peek(int limit, Predicate<ItemStack> matcher) {
         return getForwardingSlot().peek(limit, matcher);
     }
 
     @Override
-    public Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher) {
+    public PeekedPollTransactionResult peekPoll(Predicate<ItemStack> matcher) {
         return getForwardingSlot().peekPoll(matcher);
     }
 
     @Override
-    public Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher) {
+    public PeekedPollTransactionResult peekPoll(int limit, Predicate<ItemStack> matcher) {
         return getForwardingSlot().peekPoll(limit, matcher);
     }
 
@@ -149,7 +171,7 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    public PeekedSetTransactionResult peekSet(@Nullable ItemStack itemStack) {
+    public PeekedSetTransactionResult peekSet(ItemStack itemStack) {
         return getForwardingSlot().peekSet(itemStack);
     }
 
@@ -164,13 +186,58 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    public InventoryTransactionResult set(@Nullable ItemStack stack) {
+    public InventoryTransactionResult set(ItemStack stack) {
         return getForwardingSlot().set(stack);
     }
 
     @Override
-    public InventoryTransactionResult setForced(@Nullable ItemStack stack) {
+    public InventoryTransactionResult set(ItemStack stack, boolean force) {
+        return getForwardingSlot().set(stack, force);
+    }
+
+    @Override
+    public Optional<ItemStack> poll(SlotIndex index) {
+        return getForwardingSlot().poll(index);
+    }
+
+    @Override
+    public Optional<ItemStack> poll(SlotIndex index, int limit) {
+        return getForwardingSlot().poll(index, limit);
+    }
+
+    @Override
+    public Optional<ItemStack> peek(SlotIndex index) {
+        return getForwardingSlot().peek(index);
+    }
+
+    @Override
+    public Optional<ItemStack> peek(SlotIndex index, int limit) {
+        return getForwardingSlot().peek(index, limit);
+    }
+
+    @Override
+    public InventoryTransactionResult set(SlotIndex index, ItemStack stack) {
+        return getForwardingSlot().set(index, stack);
+    }
+
+    @Override
+    public Optional<Slot> getSlot(SlotIndex index) {
+        return getForwardingSlot().getSlot(index);
+    }
+
+    @Override
+    public InventoryTransactionResult setForced(ItemStack stack) {
         return getForwardingSlot().setForced(stack);
+    }
+
+    @Override
+    public Optional<ISlot> getSlot(int index) {
+        return getForwardingSlot().getSlot(index);
+    }
+
+    @Override
+    public int getSlotIndex(Slot slot) {
+        return getForwardingSlot().getSlotIndex(slot);
     }
 
     @Override
@@ -224,23 +291,41 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
+    public <T extends Inventory> Optional<T> query(Class<T> inventoryType) {
+        if (inventoryType.isInstance(this)) {
+            return Optional.of((T) this);
+        }
+        return getForwardingSlot().query(inventoryType);
+    }
+
+    @Override
     public boolean containsInventory(Inventory inventory) {
         return inventory == this || getForwardingSlot().containsInventory(inventory);
     }
 
+    @Nullable
     @Override
-    public Iterator<Inventory> iterator() {
-        return getForwardingSlot().iterator();
+    protected ViewableInventory toViewable() {
+        return getForwardingSlot().toViewable();
     }
 
-    @Nullable
     @Override
     public LanternItemStack getRawItemStack() {
         return getForwardingSlot().getRawItemStack();
     }
 
     @Override
-    public void setRawItemStack(@Nullable ItemStack itemStack) {
+    public void setRawItemStack(ItemStack itemStack) {
         getForwardingSlot().setRawItemStack(itemStack);
+    }
+
+    @Override
+    public void addTracker(SlotChangeTracker tracker) {
+        getForwardingSlot().addTracker(tracker);
+    }
+
+    @Override
+    public void removeTracker(SlotChangeTracker tracker) {
+        getForwardingSlot().removeTracker(tracker);
     }
 }

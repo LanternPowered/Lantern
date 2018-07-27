@@ -40,6 +40,7 @@ import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
@@ -283,8 +284,8 @@ public final class PlayerInteractionHandler {
         }
         // Don't pass the players profile through, this avoids an
         // unnecessary user lookup
-        return this.player.getWorld().getBlockDigTimeWith(pos.getX(), pos.getY(), pos.getZ(), null,
-                this.player.getItemInHand(HandTypes.MAIN_HAND).orElse(null));
+        return this.player.getWorld().getBlockDigTimeWith(pos.getX(), pos.getY(), pos.getZ(),
+                null, this.player.getItemInHand(HandTypes.MAIN_HAND));
     }
 
     public void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
@@ -333,7 +334,7 @@ public final class PlayerInteractionHandler {
                 BehaviorContext.Snapshot snapshot1 = context.pushSnapshot();
 
                 // Try first with the main hand
-                hotbarSlot.peek().ifPresent(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
+                hotbarSlot.peek().ifFilled(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
                 frame.addContext(ContextKeys.USED_SLOT, hotbarSlot);
                 frame.addContext(ContextKeys.INTERACTION_HAND, HandTypes.MAIN_HAND);
 
@@ -344,7 +345,7 @@ public final class PlayerInteractionHandler {
                     snapshot1 = context.pushSnapshot();
 
                     // Try again with the off hand
-                    offHandSlot.peek().ifPresent(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
+                    offHandSlot.peek().ifFilled(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
                     frame.addContext(ContextKeys.USED_SLOT, offHandSlot);
                     frame.addContext(ContextKeys.INTERACTION_HAND, HandTypes.OFF_HAND);
 
@@ -418,24 +419,23 @@ public final class PlayerInteractionHandler {
     }
 
     private void handleFinishItemInteraction0(AbstractSlot slot, HandType handType) {
-        final Optional<ItemStack> handItem = slot.peek();
-        if (handItem.isPresent()) {
+        final LanternItemStack handItem = slot.peek();
+        if (handItem.isFilled()) {
             final CauseStack causeStack = CauseStack.current();
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
                 frame.pushCause(this.player);
                 frame.addContext(ContextKeys.PLAYER, this.player);
-                if (handItem.isPresent()) {
-                    final LanternItemType itemType = (LanternItemType) handItem.get().getType();
-                    frame.addContext(ContextKeys.USED_ITEM_STACK, handItem.get());
-                    frame.addContext(ContextKeys.USED_SLOT, slot);
-                    frame.addContext(ContextKeys.INTERACTION_HAND, handType);
-                    frame.addContext(ContextKeys.ITEM_TYPE, itemType);
 
-                    final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
-                    if (context.process(itemType.getPipeline().pipeline(FinishUsingItemBehavior.class),
-                            (ctx, behavior) -> behavior.tryUse(itemType.getPipeline(), ctx)).isSuccess()) {
-                        context.accept();
-                    }
+                final LanternItemType itemType = (LanternItemType) handItem.getType();
+                frame.addContext(ContextKeys.USED_ITEM_STACK, handItem);
+                frame.addContext(ContextKeys.USED_SLOT, slot);
+                frame.addContext(ContextKeys.INTERACTION_HAND, handType);
+                frame.addContext(ContextKeys.ITEM_TYPE, itemType);
+
+                final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
+                if (context.process(itemType.getPipeline().pipeline(FinishUsingItemBehavior.class),
+                        (ctx, behavior) -> behavior.tryUse(itemType.getPipeline(), ctx)).isSuccess()) {
+                    context.accept();
                 }
             }
         }
@@ -469,9 +469,9 @@ public final class PlayerInteractionHandler {
                     return;
                 }
                 final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
-                final Optional<ItemStack> handItem = offHandSlot.peek();
-                if (handItem.isPresent()) {
-                    final DualWieldProperty property = handItem.get().getProperty(DualWieldProperty.class).orElse(null);
+                final LanternItemStack handItem = offHandSlot.peek();
+                if (handItem.isFilled()) {
+                    final DualWieldProperty property = handItem.getProperty(DualWieldProperty.class).orElse(null);
                     //noinspection ConstantConditions
                     if (property != null && property.getValue()) {
                     /*
@@ -519,10 +519,10 @@ public final class PlayerInteractionHandler {
         if (activeHand.isPresent()) {
             return true;
         }
-        final Optional<ItemStack> handItem = slot.peek();
-        if (handItem.isPresent()) {
-            final LanternItemType itemType = (LanternItemType) handItem.get().getType();
-            context.addContext(ContextKeys.USED_ITEM_STACK, handItem.get());
+        final LanternItemStack handItem = slot.peek();
+        if (handItem.isFilled()) {
+            final LanternItemType itemType = (LanternItemType) handItem.getType();
+            context.addContext(ContextKeys.USED_ITEM_STACK, handItem);
             context.addContext(ContextKeys.USED_SLOT, slot);
             context.addContext(ContextKeys.INTERACTION_HAND, handType);
             context.addContext(ContextKeys.ITEM_TYPE, itemType);

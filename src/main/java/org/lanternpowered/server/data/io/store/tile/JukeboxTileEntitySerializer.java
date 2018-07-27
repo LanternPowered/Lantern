@@ -29,7 +29,7 @@ import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
-import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.IInventory;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -56,7 +56,7 @@ public class JukeboxTileEntitySerializer<T extends LanternJukebox> extends TileE
     @Override
     public void serializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(object, valueContainer, dataView);
-        object.getInventory().peek().ifPresent(itemStack -> dataView
-                .set(RECORD_ITEM, ItemStackStore.INSTANCE.serialize((LanternItemStack) itemStack)));
+        ((IInventory) object.getInventory()).peek().ifFilled(stack -> dataView
+                .set(RECORD_ITEM, ItemStackStore.INSTANCE.serialize(stack)));
     }
 }

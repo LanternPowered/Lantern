@@ -29,7 +29,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
@@ -49,13 +48,13 @@ public final class InventorySnapshot {
      * @return The snapshot
      */
     public static InventorySnapshot ofInventory(Inventory inventory) {
-        final Iterator<Slot> it = inventory.<Slot>slots().iterator();
+        final Iterator<Slot> it = inventory.slots().iterator();
         final Int2ObjectMap<ItemStackSnapshot> itemStackSnapshots = new Int2ObjectOpenHashMap<>();
         while (it.hasNext()) {
-            final Slot slot = it.next();
-            slot.peek().map(ItemStack::createSnapshot).ifPresent(itemStackSnapshot -> {
+            final ISlot slot = (ISlot) it.next();
+            slot.peek().ifFilled(stack -> {
                 final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, "slot_index").get();
-                itemStackSnapshots.put((int) index.getValue(), itemStackSnapshot);
+                itemStackSnapshots.put((int) index.getValue(), LanternItemStackSnapshot.wrap(stack));
             });
         }
         return new InventorySnapshot(itemStackSnapshots);
@@ -80,7 +79,7 @@ public final class InventorySnapshot {
     }
 
     public void offerTo(Inventory inventory) {
-        for (Slot slot : inventory.<Slot>slots()) {
+        for (Slot slot : inventory.slots()) {
             final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, "slot_index").get();
             final ItemStackSnapshot itemStackSnapshot = this.itemStackSnapshots.get((int) index.getValue());
             if (itemStackSnapshot != null) {

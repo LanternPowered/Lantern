@@ -59,12 +59,13 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBui
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
-import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
+import org.lanternpowered.server.inventory.AbstractContainer;
+import org.lanternpowered.server.inventory.IContainerProvidedInventory;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
+import org.lanternpowered.server.inventory.PlayerTopBottomContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.vanilla.PlayerInventoryShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
@@ -129,6 +130,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -231,7 +233,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     private final LanternPlayerInventory inventory;
 
     /**
-     * The {@link LanternContainer} of the players inventory.
+     * The {@link AbstractContainer} of the players inventory.
      */
     private final PlayerInventoryContainer inventoryContainer;
 
@@ -276,7 +278,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         this.inventory = VanillaInventoryArchetypes.PLAYER.builder()
                 .withCarrier(this).build(Lantern.getMinecraftPlugin());
         this.inventoryContainer = new PlayerInventoryContainer(this.inventory,
-                AbstractOrderedInventory.viewBuilder()
+                AbstractChildrenInventory.viewBuilder()
                         .title(this.inventory.getName())
                         .inventory(VanillaInventoryArchetypes.CRAFTING.builder()
                                 .build(Lantern.getMinecraftPlugin()))
@@ -457,6 +459,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             this.session.getServer().removePlayer(this);
             this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));
             this.tabList.clear();
+            this.inventoryContainer.release();
             // Remove this player from the global tab list
             GlobalTabList.getInstance().get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
         }
@@ -509,8 +512,12 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             final List<ItemStackSnapshot> drops = new ArrayList<>();
             if (!harvestEvent.keepsInventory()) {
                 // Make a copy of all the items in the players inventory, and put them in the drops
-                getInventory().<AbstractSlot>slots().forEach(slot ->
-                        slot.peek().ifPresent(itemStack -> drops.add(LanternItemStackSnapshot.wrap(itemStack))));
+                getInventory().slots().forEach(slot -> {
+                    final ItemStack stack = slot.peek();
+                    if (!stack.isEmpty()) {
+                        drops.add(LanternItemStackSnapshot.wrap(stack));
+                    }
+                });
             }
             if (!harvestEvent.keepsLevel()) {
                 offer(Keys.EXPERIENCE_LEVEL, harvestEvent.getLevel());
@@ -690,8 +697,17 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         this.interactionHandler.pulse();
 
         // Stream the inventory updates
-        final LanternContainer container = this.containerSession.getOpenContainer();
-        (container == null ? this.inventoryContainer : container).tryGetClientContainer(this).update();
+        final AbstractContainer container = this.containerSession.getOpenContainer();
+        if (container != null) {
+            container.getClientContainer().update();
+            // Also update changes for player equipment/offhand
+            // slots while having a non player inventory open
+            if (container != this.inventoryContainer) {
+                this.inventoryContainer.getClientContainer().closedUpdate();
+            }
+        } else {
+            this.inventoryContainer.getClientContainer().update();
+        }
 
         this.resourcePackSendQueue.pulse();
 
@@ -916,7 +932,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
         this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, rawItemStack));
         this.session.send(new MessagePlayOutOpenBook(HandTypes.MAIN_HAND));
-        this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek().orElse(null)));
+        this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek()));
     }
 
     @Override
@@ -968,17 +984,18 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     private Optional<Container> openInventory(Inventory inventory, Translation name) {
         checkNotNull(inventory, "inventory");
-        final LanternContainer container;
-        if (inventory instanceof LanternContainer) {
-            // You cannot open a player inventory container
-            if (inventory instanceof PlayerInventoryContainer) {
-                return Optional.empty();
-            }
-            container = (LanternContainer) inventory;
+        // The inventory must be viewable
+        if (!(inventory instanceof ViewableInventory)) {
+            return Optional.empty();
+        }
+        final AbstractContainer container;
+        if (inventory instanceof IContainerProvidedInventory) {
+            container = ((IContainerProvidedInventory) inventory).createContainer(this);
         } else {
             inventory.getProperty(GuiIdProperty.class).map(GuiIdProperty::getValue).orElseThrow(() ->
                     new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getId()));
-            container = LanternContainer.construct(this.inventory, (AbstractOrderedInventory) inventory, name);
+            container = PlayerTopBottomContainer.construct(this.inventory, (AbstractChildrenInventory) inventory);
+            container.setName(name);
         }
         if (this.containerSession.setOpenContainer(container)) {
             return Optional.of(container);
@@ -1193,7 +1210,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     public void handleStartElytraFlying() {
         // Check for the elytra item
         if (getInventory().getEquipment().getSlot(EquipmentTypes.CHESTPLATE)
-                .get().peek().map(ItemStack::getType).orElse(null) != ItemTypes.ELYTRA) {
+                .get().peek().getType() != ItemTypes.ELYTRA) {
             return;
         }
         offer(Keys.IS_ELYTRA_FLYING, true);

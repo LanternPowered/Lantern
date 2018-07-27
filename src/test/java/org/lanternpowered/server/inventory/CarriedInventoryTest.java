@@ -36,7 +36,7 @@ public class CarriedInventoryTest {
     public void test() {
         final InventoryConstructorFactory factory = InventoryConstructorFactory.get();
         final InventoryConstructor<LanternGridInventory> constructor = factory.getConstructor(LanternGridInventory.class);
-        System.out.println(constructor.construct(false).getClass().getName());
-        System.out.println(constructor.construct(true).getClass().getName());
+        System.out.println(constructor.construct(0).getClass().getName());
+        System.out.println(constructor.construct(3).getClass().getName());
     }
 }

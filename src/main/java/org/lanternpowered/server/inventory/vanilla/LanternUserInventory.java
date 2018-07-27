@@ -27,9 +27,6 @@ package org.lanternpowered.server.inventory.vanilla;
 
 import org.spongepowered.api.entity.living.player.User;
 
-public final class LanternUserInventory extends AbstractUserInventory<User> {
+public class LanternUserInventory extends AbstractUserInventory<User> {
 
-    public LanternUserInventory() {
-        super(User.class);
-    }
 }

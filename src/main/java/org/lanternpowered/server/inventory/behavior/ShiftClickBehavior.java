@@ -26,8 +26,11 @@
 package org.lanternpowered.server.inventory.behavior;
 
 import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.AbstractContainer;
+
+import javax.annotation.Nullable;
 
 @FunctionalInterface
 public interface ShiftClickBehavior {
@@ -35,10 +38,12 @@ public interface ShiftClickBehavior {
     /**
      * Gets the {@link IInventory}s that should be used when shift
      * clicking from the specified {@link AbstractInventorySlot}.
+     * {@code null} can be returned to disable shift clicking.
      *
      * @param container The container
      * @param slot The slot
-     * @return The target inventory
+     * @return The target inventory, or null if none
      */
-    IInventory getTarget(LanternContainer container, AbstractInventorySlot slot);
+    @Nullable
+    IInventory getTarget(AbstractContainer container, AbstractSlot slot);
 }

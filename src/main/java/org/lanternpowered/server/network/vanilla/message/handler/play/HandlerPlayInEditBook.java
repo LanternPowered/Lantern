@@ -27,12 +27,12 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
 import java.util.stream.Collectors;
@@ -44,8 +44,8 @@ public class HandlerPlayInEditBook implements Handler<MessagePlayInEditBook> {
         final LanternPlayer player = context.getSession().getPlayer();
         final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
-        final ItemStack itemStack = slot.peek().orElse(null);
-        if (itemStack != null && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
+        final LanternItemStack itemStack = slot.peek();
+        if (itemStack.isFilled() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
             itemStack.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));
             slot.set(itemStack);
         }

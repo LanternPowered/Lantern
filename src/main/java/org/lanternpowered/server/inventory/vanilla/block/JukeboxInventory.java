@@ -26,17 +26,10 @@
 package org.lanternpowered.server.inventory.vanilla.block;
 
 import org.lanternpowered.server.block.tile.ITileEntityInventory;
-import org.lanternpowered.server.inventory.CarrierReference;
 import org.lanternpowered.server.inventory.type.slot.LanternFilteringSlot;
 import org.spongepowered.api.block.tileentity.Jukebox;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.Carrier;
-
-import java.util.Optional;
 
 public class JukeboxInventory extends LanternFilteringSlot implements ITileEntityInventory {
-
-    private final CarrierReference<TileEntityCarrier> carrier = CarrierReference.of(TileEntityCarrier.class);
 
     @Override
     protected void queueUpdate() {
@@ -44,19 +37,6 @@ public class JukeboxInventory extends LanternFilteringSlot implements ITileEntit
         // Stop the record if it's already playing,
         // don't eject the current one, who's interacting
         // with the inventory should handle that
-        if (this.carrier instanceof Jukebox) {
-            ((Jukebox) this.carrier).stopRecord();
-        }
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrier.set(carrier);
-    }
-
-    @Override
-    public Optional<TileEntityCarrier> getCarrier() {
-        return this.carrier.get();
+        getCarrierAs(Jukebox.class).ifPresent(Jukebox::stopRecord);
     }
 }

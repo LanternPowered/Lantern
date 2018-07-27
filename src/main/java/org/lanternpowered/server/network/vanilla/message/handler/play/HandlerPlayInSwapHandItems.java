@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkContext;
@@ -38,7 +39,6 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
@@ -56,8 +56,8 @@ public final class HandlerPlayInSwapHandItems implements Handler<MessagePlayInSw
         final AbstractSlot hotbarSlot = inventory.getHotbar().getSelectedSlot();
         final AbstractSlot offHandSlot = inventory.getOffhand();
 
-        final ItemStackSnapshot hotbarItem = hotbarSlot.peek().map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE);
-        final ItemStackSnapshot offHandItem = offHandSlot.peek().map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE);
+        final ItemStackSnapshot hotbarItem = LanternItemStackSnapshot.wrap(hotbarSlot.peek());
+        final ItemStackSnapshot offHandItem = LanternItemStackSnapshot.wrap(offHandSlot.peek());
 
         final List<SlotTransaction> transactions = new ArrayList<>();
         transactions.add(new SlotTransaction(hotbarSlot, hotbarItem, offHandItem));

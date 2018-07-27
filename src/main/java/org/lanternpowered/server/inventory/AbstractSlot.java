@@ -26,9 +26,6 @@
 package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
-
-import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractSlot extends AbstractMutableInventory implements ISlot {
@@ -49,7 +46,6 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
      *
      * @return The raw item stack
      */
-    @Nullable
     public abstract LanternItemStack getRawItemStack();
 
     /**
@@ -57,17 +53,26 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
      *
      * @param itemStack The raw item stack
      */
-    public abstract void setRawItemStack(@Nullable ItemStack itemStack);
+    public abstract void setRawItemStack(ItemStack itemStack);
 
     @Override
-    public AbstractInventorySlot transform() {
-        return (AbstractInventorySlot) transform(Type.INVENTORY);
-    }
-
-    @Override
-    public Slot transform(Type type) {
+    public AbstractSlot viewedSlot() {
         return this;
     }
+
+    /**
+     * Adds the {@link SlotChangeTracker}.
+     *
+     * @param tracker The slot change tracker
+     */
+    public abstract void addTracker(SlotChangeTracker tracker);
+
+    /**
+     * Removes the {@link SlotChangeTracker}.
+     *
+     * @param tracker The slot change tracker
+     */
+    public abstract void removeTracker(SlotChangeTracker tracker);
 
     AbstractSlot() {
     }

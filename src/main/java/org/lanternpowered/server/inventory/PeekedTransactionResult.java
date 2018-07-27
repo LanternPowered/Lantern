@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.List;
@@ -35,6 +36,12 @@ public abstract class PeekedTransactionResult {
 
     private final List<SlotTransaction> transactions;
 
+    /**
+     * Constructs a new {@link PeekedTransactionResult}
+     * from the given {@link SlotTransaction}s.
+     *
+     * @param transactions The slot transactions
+     */
     protected PeekedTransactionResult(List<SlotTransaction> transactions) {
         this.transactions = ImmutableList.copyOf(transactions);
     }
@@ -60,6 +67,31 @@ public abstract class PeekedTransactionResult {
                 transaction.getSlot().set(transaction.getFinal().createStack());
             }
         });
+    }
+
+    /**
+     * Gets whether this {@link PeekedTransactionResult} is empty.
+     *
+     * @return Is empty
+     */
+    public boolean isEmpty() {
+        return this.transactions.isEmpty();
+    }
+
+    /**
+     * Converts this {@link PeekedTransactionResult} into a
+     * {@link InventoryTransactionResult}.
+     *
+     * @return The inventory transaction result
+     */
+    public InventoryTransactionResult asInventoryTransaction() {
+        return asInventoryTransactionBuilder().build();
+    }
+
+    protected InventoryTransactionResult.Builder asInventoryTransactionBuilder() {
+        return InventoryTransactionResult.builder()
+                .type(InventoryTransactionResult.Type.SUCCESS) // Default to success
+                .transaction(this.transactions);
     }
 
     protected MoreObjects.ToStringHelper toStringHelper() {

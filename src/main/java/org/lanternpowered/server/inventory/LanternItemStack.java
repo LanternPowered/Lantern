@@ -49,11 +49,14 @@ import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "SimplifiableConditionalExpression"})
 public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdditionalDataHolder {
+
+    private static final LanternItemStack empty = null;
 
     /**
      * Gets a empty {@link ItemStack} if the specified {@link ItemStack}
@@ -63,7 +66,20 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
      * @return A empty or the provided item stack
      */
     public static LanternItemStack orEmpty(@Nullable ItemStack itemStack) {
-        return itemStack == null ? new LanternItemStack(ItemTypes.NONE, 0) : (LanternItemStack) itemStack;
+        return itemStack == null ? empty : (LanternItemStack) itemStack;
+    }
+
+    /**
+     * Gets a empty {@link ItemStack}.
+     *
+     * <p>A empty item stack will always have the item type
+     * {@link ItemTypes#NONE} and a quantity of {@code 0}.
+     * And any data offered to it will be rejected.</p>
+     *
+     * @return The empty item stack
+     */
+    public static LanternItemStack empty() {
+        return empty;
     }
 
     private final ValueCollection valueCollection;
@@ -88,7 +104,9 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
      * @param quantity The quantity
      */
     public LanternItemStack(ItemType itemType, int quantity) {
-        this(itemType, quantity, ValueCollection.create(), AdditionalContainerCollection.createConcurrent());
+        // Use empty containers for the none item type
+        this(itemType, quantity, ValueCollection.create(),
+                itemType == ItemTypes.NONE ? AdditionalContainerCollection.empty() : AdditionalContainerCollection.createConcurrent());
         registerKeys();
     }
 
@@ -143,17 +161,17 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
 
     @Override
     public Translation getTranslation() {
-        return ((LanternItemType) this.itemType).getTranslationProvider().get(this.itemType, this);
+        return ((LanternItemType) getType()).getTranslationProvider().get(this.itemType, this);
     }
 
     @Override
     public ItemType getType() {
-        return this.itemType;
+        return this.quantity == 0 ? ItemTypes.NONE : this.itemType;
     }
 
     @Override
     public int getQuantity() {
-        return this.quantity;
+        return this.itemType == ItemTypes.NONE ? 0 : this.quantity;
     }
 
     @Override
@@ -162,14 +180,35 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
         this.quantity = quantity;
     }
 
+    /**
+     * Clears this {@link ItemStack}, this sets the quantity to {@code 0}.
+     */
+    public void clear() {
+        setQuantity(0);
+    }
+
     @Override
     public int getMaxStackQuantity() {
-        return this.itemType.getMaxStackQuantity();
+        return getType().getMaxStackQuantity();
     }
 
     @Override
     public ItemStackSnapshot createSnapshot() {
+        if (isEmpty()) {
+            return ItemStackSnapshot.NONE;
+        }
         return new LanternItemStackSnapshot(copy());
+    }
+
+    public ItemStackSnapshot toSnapshot() {
+        return createSnapshot();
+    }
+
+    public ItemStackSnapshot toWrappedSnapshot() {
+        if (isEmpty() && empty != null) {
+            return ItemStackSnapshot.NONE;
+        }
+        return new LanternItemStackSnapshot(this);
     }
 
     @Override
@@ -195,7 +234,32 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
 
     @Override
     public LanternItemStack copy() {
+        // Just return the empty instance
+        if (isEmpty()) {
+            return empty;
+        }
         return new LanternItemStack(this.itemType, this.quantity, getValueCollection().copy(), this.additionalContainers.copy());
+    }
+
+    /**
+     * Gets whether this item stack is filled. (non empty)
+     *
+     * @return Is filled
+     */
+    public boolean isFilled() {
+        return !isEmpty();
+    }
+
+    /**
+     * Applies the {@link Consumer} when this item stack isn't empty.
+     *
+     * @param consumer The consumer to accept
+     * @see #isEmpty()
+     */
+    public void ifFilled(Consumer<LanternItemStack> consumer) {
+        if (isFilled()) {
+            consumer.accept(this);
+        }
     }
 
     /**
@@ -221,6 +285,11 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
      */
     public boolean similarTo(ItemStack that) {
         checkNotNull(that, "that");
+        final boolean emptyA = isEmpty();
+        final boolean emptyB = that.isEmpty();
+        if (emptyA != emptyB) {
+            return emptyA && emptyB;
+        }
         return getType() == that.getType() && IValueContainer.matchContents(this, (IValueContainer) that);
     }
 
@@ -251,8 +320,8 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdd
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("type", this.itemType.getId())
-                .add("quantity", this.quantity)
+                .add("type", getType().getId())
+                .add("quantity", getQuantity())
                 .add("data", IValueContainer.valuesToString(this))
                 .toString();
     }

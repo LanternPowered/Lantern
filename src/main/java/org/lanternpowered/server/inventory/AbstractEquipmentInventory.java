@@ -25,26 +25,6 @@
  */
 package org.lanternpowered.server.inventory;
 
-import org.spongepowered.api.item.inventory.Carrier;
+public abstract class AbstractEquipmentInventory extends AbstractChildrenInventory implements IEquipmentInventory {
 
-import java.util.Optional;
-
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedInventory implements IEquipmentInventory<C> {
-
-    private final CarrierReference<C> carrierReference;
-
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
-    }
-
-    @Override
-    public Optional<C> getCarrier() {
-        return this.carrierReference.get();
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
-    }
 }

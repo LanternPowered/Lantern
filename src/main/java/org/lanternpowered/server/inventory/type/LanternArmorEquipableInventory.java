@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.inventory.type;
 
-import org.lanternpowered.server.inventory.AbstractArmorEquipableInventory;
+import org.lanternpowered.server.inventory.AbstractEquipmentInventory;
 
-public class LanternArmorEquipableInventory extends AbstractArmorEquipableInventory {
+public class LanternArmorEquipableInventory extends AbstractEquipmentInventory {
 
 }

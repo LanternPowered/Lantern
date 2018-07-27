@@ -89,10 +89,10 @@ public class LanternItem extends LanternEntity implements Item {
     public void registerKeys() {
         super.registerKeys();
         final ValueCollection c = getValueCollection();
-        c.register(Keys.REPRESENTED_ITEM, null);
-        c.register(Keys.PICKUP_DELAY, 10);
-        c.register(Keys.DESPAWN_DELAY, 6000);
-        c.register(LanternKeys.GRAVITY_FACTOR, 0.002);
+        c.registerNonRemovable(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE);
+        c.registerNonRemovable(Keys.PICKUP_DELAY, 10);
+        c.registerNonRemovable(Keys.DESPAWN_DELAY, 6000);
+        c.registerNonRemovable(LanternKeys.GRAVITY_FACTOR, 0.002);
     }
 
     @Override
@@ -187,8 +187,8 @@ public class LanternItem extends LanternEntity implements Item {
         if (entities.isEmpty()) {
             return;
         }
-        ItemStack itemStack = get(Keys.REPRESENTED_ITEM).map(ItemStackSnapshot::createStack).orElse(null);
-        if (itemStack == null) {
+        final LanternItemStack stack = (LanternItemStack) get(Keys.REPRESENTED_ITEM).map(ItemStackSnapshot::createStack).get();
+        if (stack.isEmpty()) {
             remove();
             return;
         }
@@ -200,22 +200,24 @@ public class LanternItem extends LanternEntity implements Item {
             }
             Inventory inventory = ((Carrier) entity).getInventory();
             if (inventory instanceof PlayerInventory) {
-                inventory = ((PlayerInventory) inventory).getMain().transform(InventoryTransforms.PRIORITY_HOTBAR);
+                inventory = ((PlayerInventory) inventory).getPrimary().transform(InventoryTransforms.PRIORITY_HOTBAR);
             }
 
-            final PeekedOfferTransactionResult peekResult = ((IInventory) inventory).peekOffer(itemStack);
-            final ItemStack rejected = peekResult.getRejectedItem().orElse(null);
+            // Copy before consuming
+            final LanternItemStack originalStack = stack.copy();
+            final PeekedOfferTransactionResult peekResult = ((IInventory) inventory).peekOffer(stack);
 
             final CauseStack causeStack = CauseStack.current();
             final ChangeInventoryEvent.Pickup event;
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
-                frame.addContext(LanternEventContextKeys.ORIGINAL_ITEM_STACK, itemStack);
-                if (rejected != null) {
-                    frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, rejected);
+                frame.addContext(LanternEventContextKeys.ORIGINAL_ITEM_STACK, originalStack);
+                if (stack.isFilled()) {
+                    frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, stack);
                 }
 
-                event = SpongeEventFactory.createChangeInventoryEventPickup(causeStack.getCurrentCause(), inventory, peekResult.getTransactions());
-                event.setCancelled(!peekResult.isSuccess());
+                event = SpongeEventFactory.createChangeInventoryEventPickup(
+                        causeStack.getCurrentCause(), inventory, peekResult.getTransactions());
+                event.setCancelled(peekResult.getTransactions().isEmpty());
 
                 Sponge.getEventManager().post(event);
             }
@@ -225,25 +227,19 @@ public class LanternItem extends LanternEntity implements Item {
             event.getTransactions().stream()
                     .filter(Transaction::isValid)
                     .forEach(transaction -> transaction.getSlot().set(transaction.getFinal().createStack()));
-            final int added;
-            if (rejected != null) {
-                added = itemStack.getQuantity() - rejected.getQuantity();
-                itemStack = rejected;
-            } else {
-                added = itemStack.getQuantity();
-            }
+            final int added = originalStack.getQuantity() - stack.getQuantity();
             if (added != 0 && entity instanceof Living) {
                 triggerEvent(new CollectEntityEvent((Living) entity, added));
             }
-            if (rejected == null || isRemoved()) {
-                itemStack = null;
+            if (isRemoved()) {
+                stack.clear();
             }
-            if (itemStack == null) {
+            if (stack.isEmpty()) {
                 break;
             }
         }
-        if (itemStack != null) {
-            offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+        if (stack.isFilled()) {
+            offer(Keys.REPRESENTED_ITEM, stack.toWrappedSnapshot());
         } else {
             remove();
         }

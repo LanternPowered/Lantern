@@ -26,7 +26,7 @@
 package org.lanternpowered.server.inventory.behavior;
 
 import org.lanternpowered.server.event.CauseStack;
-import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.AbstractContainer;
 import org.lanternpowered.server.inventory.behavior.event.ContainerEvent;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 
 /**
  * Represents the behavior when a {@link Player} interacts with
- * a {@link ClientContainer} and {@link LanternContainer}.
+ * a {@link ClientContainer} and {@link AbstractContainer}.
  * <p>
  * The current {@link CauseStack} will always be populated before
  * a handler method is invoked. In the process will the {@link Player}
@@ -123,7 +123,7 @@ public interface ContainerInteractionBehavior {
      * @param clientSlot The client slot
      * @param itemStack The item stack
      */
-    void handleCreativeClick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot, @Nullable ItemStack itemStack);
+    void handleCreativeClick(ClientContainer clientContainer, @Nullable ClientSlot clientSlot, ItemStack itemStack);
 
     /**
      * Handles a item pick operation. The client sends a {@link ClientSlot} to swap

@@ -28,7 +28,7 @@ package org.lanternpowered.server.inventory.vanilla;
 import org.lanternpowered.server.inventory.AbstractForwardingSlot;
 import org.lanternpowered.server.inventory.AbstractSlot;
 
-public final class LanternHotbarSelectedSlot extends AbstractForwardingSlot {
+public class LanternHotbarSelectedSlot extends AbstractForwardingSlot {
 
     private final LanternHotbarInventory hotbarInventory;
 

@@ -74,8 +74,8 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         }
 
         @Override
-        public void handle(InteractInventoryEvent event) throws Exception {
-            final LanternContainer container = (LanternContainer) event.getTargetInventory();
+        public void handle(InteractInventoryEvent event) {
+            final AbstractContainer container = (AbstractContainer) event.getTargetInventory();
             if (container.containsInventory(this.inventory)) {
                 for (Consumer<InteractInventoryEvent> consumer : this.consumers) {
                     consumer.accept(event);
@@ -205,7 +205,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         final AbstractInventory inventory = builder.build(this.carrier != null, plugin, inventoryArchetype);
         if (inventory instanceof AbstractMutableInventory && this.carrier != null) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
-            mutableInventory.setCarrier0(this.carrier);
+            mutableInventory.setCarrier(this.carrier);
         }
         if (this.carrier instanceof AbstractCarrier) {
             ((AbstractCarrier) this.carrier).setInventory((CarriedInventory<?>) inventory);

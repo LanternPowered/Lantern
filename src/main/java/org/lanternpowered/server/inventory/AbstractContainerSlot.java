@@ -25,10 +25,7 @@
  */
 package org.lanternpowered.server.inventory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-
-import org.spongepowered.api.item.inventory.Slot;
 
 import javax.annotation.Nullable;
 
@@ -37,17 +34,13 @@ public abstract class AbstractContainerSlot extends AbstractForwardingSlot {
     @Nullable AbstractInventorySlot slot;
 
     @Override
-    protected AbstractSlot getForwardingSlot() {
+    protected AbstractInventorySlot getForwardingSlot() {
         checkState(this.slot != null, "The inventory slot is not initialized yet.");
         return this.slot;
     }
 
     @Override
-    public Slot transform(Type type) {
-        checkNotNull(type, "type");
-        if (type == Type.INVENTORY) {
-            return getForwardingSlot();
-        }
-        throw new IllegalStateException("Unsupported transform type: " + type);
+    public AbstractInventorySlot viewedSlot() {
+        return getForwardingSlot();
     }
 }

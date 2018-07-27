@@ -229,6 +229,7 @@ import org.lanternpowered.server.inventory.property.LanternSlotPos;
 import org.lanternpowered.server.inventory.property.LanternSlotSide;
 import org.lanternpowered.server.inventory.property.LanternStringProperty;
 import org.lanternpowered.server.inventory.query.LanternQueryTransformationBuilder;
+import org.lanternpowered.server.inventory.transaction.LanternInventoryTransactionResult;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
@@ -410,6 +411,7 @@ import org.spongepowered.api.item.inventory.property.SlotPos;
 import org.spongepowered.api.item.inventory.property.SlotSide;
 import org.spongepowered.api.item.inventory.property.StringProperty;
 import org.spongepowered.api.item.inventory.query.QueryOperationType;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -571,6 +573,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EventContextKey.Builder.class, LanternEventContextKeyBuilder::new)
                 .registerBuilderSupplier(Enchantment.Builder.class, LanternEnchantmentBuilder::new)
                 .registerBuilderSupplier(Key.Builder.class, LanternKeyBuilder::new)
+                .registerBuilderSupplier(InventoryTransactionResult.Builder.class, LanternInventoryTransactionResult.Builder::new)
                 // Inventory properties
                 .registerBuilderSupplier(SlotPos.Builder.class, LanternSlotPos.Builder::new)
                 .registerBuilderSupplier(SlotSide.Builder.class, LanternSlotSide.Builder::new)

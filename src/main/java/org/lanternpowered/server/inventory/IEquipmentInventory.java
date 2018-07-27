@@ -27,134 +27,63 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Streams;
 import org.spongepowered.api.data.Property;
-import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.entity.Equipable;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+public interface IEquipmentInventory extends ICarriedInventory<Equipable>, EquipmentInventory {
 
-public interface IEquipmentInventory<C extends Carrier> extends IInventory, CarriedInventory<C> {
-
-    /**
-     * Get and remove the stack for the specified equipment type in this
-     * Inventory.
-     *
-     * @see Inventory#poll()
-     * @param equipmentType Type of equipment slot to query for
-     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
-     */
+    @Override
     default Optional<ItemStack> poll(EquipmentSlotType equipmentType) {
-        return getSlot(equipmentType).flatMap(Inventory::poll);
+        return getSlot(equipmentType).map(Inventory::poll);
     }
 
-    /**
-     * Get and remove the items from the stack for the specified equipment type
-     * in this Inventory.
-     *
-     * @see Inventory#poll()
-     * @param equipmentType Type of equipment slot to query for
-     * @param limit The item limit
-     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
-     */
+    @Override
     default Optional<ItemStack> poll(EquipmentSlotType equipmentType, int limit) {
-        return getSlot(equipmentType).flatMap(slot -> slot.poll(limit));
+        return getSlot(equipmentType).map(slot -> slot.poll(limit));
     }
 
-    /**
-     * Get and remove the stack for the specified equipment type in this
-     * Inventory.
-     *
-     * @see Inventory#poll()
-     * @param equipmentType Type of equipment slot to query for
-     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
-     */
+    @Override
     default Optional<ItemStack> poll(EquipmentType equipmentType) {
-        return getSlot(equipmentType).flatMap(Inventory::poll);
+        return getSlot(equipmentType).map(Inventory::poll);
     }
 
-    /**
-     * Get and remove the items from the stack for the specified equipment type
-     * in this Inventory.
-     *
-     * @see Inventory#poll()
-     * @param equipmentType Type of equipment slot to query for
-     * @param limit The item limit
-     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
-     */
+    @Override
     default Optional<ItemStack> poll(EquipmentType equipmentType, int limit) {
-        return getSlot(equipmentType).flatMap(slot -> slot.poll(limit));
+        return getSlot(equipmentType).map(slot -> slot.poll(limit));
     }
 
-    /**
-     * Get without removing the stack for the specified equipment type in this
-     * Inventory.
-     *
-     * @see Inventory#peek()
-     * @param equipmentType Type of equipment slot to query for
-     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
-     */
+    @Override
     default Optional<ItemStack> peek(EquipmentSlotType equipmentType) {
-        return getSlot(equipmentType).flatMap(Inventory::peek);
+        return getSlot(equipmentType).map(Inventory::peek);
     }
 
-    /**
-     * Get without removing the items from the stack for the specified equipment
-     * type in this Inventory.
-     *
-     * @see Inventory#peek()
-     * @param equipmentType Type of equipment slot to query for
-     * @param limit The item limit
-     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
-     */
+    @Override
     default Optional<ItemStack> peek(EquipmentSlotType equipmentType, int limit) {
-        return getSlot(equipmentType).flatMap(slot -> slot.peek(limit));
+        return getSlot(equipmentType).map(slot -> slot.peek(limit));
     }
 
-    /**
-     * Get without removing the stack for the specified equipment type in this
-     * Inventory.
-     *
-     * @see Inventory#peek()
-     * @param equipmentType Type of equipment slot to query for
-     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
-     */
+    @Override
     default Optional<ItemStack> peek(EquipmentType equipmentType) {
-        return getSlot(equipmentType).flatMap(Inventory::peek);
+        return getSlot(equipmentType).map(Inventory::peek);
     }
 
-    /**
-     * Get without removing the items from the stack for the specified equipment
-     * type in this Inventory.
-     *
-     * @see Inventory#peek()
-     * @param equipmentType Type of equipment slot to query for
-     * @param limit The item limit
-     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
-     */
+    @Override
     default Optional<ItemStack> peek(EquipmentType equipmentType, int limit) {
-        return getSlot(equipmentType).flatMap(slot -> slot.peek(limit));
+        return getSlot(equipmentType).map(slot -> slot.peek(limit));
     }
 
-    /**
-     * Set the item for the specified equipment type.
-     *
-     * @see Inventory#set(ItemStack)
-     * @param equipmentType Type of equipment slot to set
-     * @param stack The stack to insert
-     * @return The operation result, for details see {@link Inventory#set}
-     */
-    default InventoryTransactionResult set(EquipmentSlotType equipmentType, @Nullable ItemStack stack) {
+    @Override
+    default InventoryTransactionResult set(EquipmentSlotType equipmentType, ItemStack stack) {
         checkNotNull(equipmentType, "equipmentType");
-        //noinspection ConstantConditions
         return getSlot(equipmentType).map(slot -> slot.set(stack))
                 .orElseGet(() -> InventoryTransactionResult.builder()
                         .type(InventoryTransactionResult.Type.FAILURE)
@@ -162,17 +91,9 @@ public interface IEquipmentInventory<C extends Carrier> extends IInventory, Carr
                         .build());
     }
 
-    /**
-     * Set the item for the specified equipment type.
-     *
-     * @see Inventory#set(ItemStack)
-     * @param equipmentType Type of equipment slot to set
-     * @param stack The stack to insert
-     * @return The operation result, for details see {@link Inventory#set}
-     */
-    default InventoryTransactionResult set(EquipmentType equipmentType, @Nullable ItemStack stack) {
+    @Override
+    default InventoryTransactionResult set(EquipmentType equipmentType, ItemStack stack) {
         checkNotNull(equipmentType, "equipmentType");
-        //noinspection ConstantConditions
         return getSlot(equipmentType).map(slot -> slot.set(stack))
                 .orElseGet(() -> InventoryTransactionResult.builder()
                         .type(InventoryTransactionResult.Type.FAILURE)
@@ -180,13 +101,7 @@ public interface IEquipmentInventory<C extends Carrier> extends IInventory, Carr
                         .build());
     }
 
-    /**
-     * Get the {@link Slot} for the specified equipment type.
-     *
-     * @param equipmentType Type of equipment slot to set
-     * @return The matching slot or {@link Optional#empty()} if no matching slot
-     */
-    @SuppressWarnings("unchecked")
+    @Override
     default Optional<Slot> getSlot(EquipmentSlotType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
         if (equipmentType.getValue() == null || equipmentType.getOperator() != Property.Operator.EQUAL) {
@@ -204,6 +119,6 @@ public interface IEquipmentInventory<C extends Carrier> extends IInventory, Carr
     @SuppressWarnings("unchecked")
     default Optional<Slot> getSlot(EquipmentType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return (Optional) Streams.stream(this.<AbstractSlot>slots()).filter(s -> s.isValidItem(equipmentType)).findFirst();
+        return this.slots().stream().filter(s -> ((AbstractSlot) s).isValidItem(equipmentType)).findFirst();
     }
 }

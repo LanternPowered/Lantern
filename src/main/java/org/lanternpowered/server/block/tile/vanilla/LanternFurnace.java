@@ -33,6 +33,7 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.element.ElementListener;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
@@ -113,9 +114,9 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
             Optional<SmeltingResult> smeltingResult = Optional.empty();
             Optional<SmeltingRecipe> smeltingRecipe = Optional.empty();
-            ItemStack itemStack = this.inventory.getInputSlot().getRawItemStack();
-            final ItemStackSnapshot inputSlotItemSnapshot = itemStack == null ? null : itemStack.createSnapshot();
-            if (inputSlotItemSnapshot != null) {
+            LanternItemStack itemStack = this.inventory.getInputSlot().getRawItemStack();
+            final ItemStackSnapshot inputSlotItemSnapshot = itemStack.createSnapshot();
+            if (!inputSlotItemSnapshot.isEmpty()) {
                 // Check if the item can be smelted, this means finding a compatible
                 // recipe and the output has to be empty.
                 smeltingRecipe = Lantern.getRegistry().getSmeltingRecipeRegistry()
@@ -129,7 +130,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                             // Check if the result could be added to the output
                             final PeekedOfferTransactionResult peekResult = this.inventory.getOutputSlot().peekOffer(
                                     smeltingResult.get().getResult().createStack());
-                            if (peekResult.isSuccess()) {
+                            if (!peekResult.isEmpty()) {
                                 maxCookTime = ((ISmeltingRecipe) smeltingRecipe.get())
                                         .getSmeltTime(inputSlotItemSnapshot).orElse(200);
                             }
@@ -143,7 +144,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             // if actually a item is being cooked
             long elapsed1 = elapsed;
 
-            int elapsedCookTime = get(Keys.PASSED_COOK_TIME).get();
+            int elapsedCookTime = require(Keys.PASSED_COOK_TIME);
             int remainingCookTime = maxCookTime - elapsedCookTime;
 
             if (maxCookTime > 0 && elapsed1 > remainingCookTime) {
@@ -152,8 +153,8 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
             elapsed -= elapsed1;
 
             // Burn items until the furnace is burning properly
-            int maxBurnTime = get(Keys.MAX_BURN_TIME).get();
-            int elapsedBurnTime = get(Keys.PASSED_BURN_TIME).get();
+            int maxBurnTime = require(Keys.MAX_BURN_TIME);
+            int elapsedBurnTime = require(Keys.PASSED_BURN_TIME);
             int remainingBurnTime = maxBurnTime - elapsedBurnTime;
 
             long elapsed2 = elapsed1;
@@ -163,14 +164,14 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                 maxBurnTime = 0;
                 // Only burn a new item if the target item can be smelted
                 itemStack = this.inventory.getFuelSlot().getRawItemStack();
-                if (itemStack != null && maxCookTime > 0) {
+                if (itemStack.isFilled() && maxCookTime > 0) {
                     // Check for the next fuel item
                     final ItemStackSnapshot itemStackSnapshot = itemStack.createSnapshot();
                     final Optional<IFuel> result = Lantern.getRegistry().getFuelRegistry().findMatching(itemStackSnapshot);
                     if (result.isPresent()) {
                         final OptionalInt optBurnTime = result.get().getBurnTime(itemStackSnapshot);
                         // We have a next matching burn item, check if we can poll one and then continue burning
-                        if (optBurnTime.isPresent() && this.inventory.getFuelSlot().poll(1).isPresent()) {
+                        if (optBurnTime.isPresent() && this.inventory.getFuelSlot().poll(1).isFilled()) {
                             maxBurnTime = optBurnTime.getAsInt();
                             remainingBurnTime = maxBurnTime;
                             elapsedBurnTime = 0;
@@ -233,7 +234,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
         BlockState blockState = getLocation().getBlock();
 
-        final boolean burning = get(Keys.PASSED_BURN_TIME).get() < get(Keys.MAX_BURN_TIME).get();
+        final boolean burning = require(Keys.PASSED_BURN_TIME) < require(Keys.MAX_BURN_TIME);
         final boolean blockBurning = blockState.getType() == BlockTypes.LIT_FURNACE;
 
         if (burning != blockBurning) {
@@ -246,8 +247,8 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
 
     @Override
     public boolean smelt() {
-        final ItemStack itemStack = this.inventory.getInputSlot().getRawItemStack();
-        if (itemStack != null) {
+        final LanternItemStack itemStack = this.inventory.getInputSlot().getRawItemStack();
+        if (itemStack.isFilled()) {
             // Check if the item can be smelted, this means finding a compatible
             // recipe and the output has to be empty.
             final ItemStackSnapshot itemStackSnapshot = itemStack.createSnapshot();
@@ -261,7 +262,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                     final ItemStack result = smeltingResult.get().getResult().createStack();
                     // Check if the result could be added to the output
                     final PeekedOfferTransactionResult peekResult = this.inventory.getOutputSlot().peekOffer(result);
-                    if (peekResult.isSuccess()) {
+                    if (!peekResult.isEmpty()) {
                         this.inventory.getInputSlot().poll(quantity);
                         this.inventory.getOutputSlot().offer(result);
                         return true;

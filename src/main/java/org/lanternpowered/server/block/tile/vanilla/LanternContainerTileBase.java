@@ -27,10 +27,10 @@ package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.vanilla.container.action.ContainerAnimationAction;
+import org.lanternpowered.server.inventory.AbstractContainer;
 import org.lanternpowered.server.inventory.InventoryViewerListener;
-import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -39,7 +39,7 @@ import java.util.Set;
 
 public abstract class LanternContainerTileBase extends LanternTileEntity implements InventoryViewerListener {
 
-    protected final Set<Viewer> viewers = new HashSet<>();
+    protected final Set<Player> viewers = new HashSet<>();
 
     /**
      * The delay that will be used to play
@@ -48,7 +48,7 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
     private int soundDelay;
 
     @Override
-    public void onViewerAdded(Viewer viewer, LanternContainer container, Callback callback) {
+    public void onViewerAdded(Player viewer, AbstractContainer container, Callback callback) {
         if (this.viewers.add(viewer) && this.viewers.size() == 1) {
             this.soundDelay = getOpenSoundDelay();
 
@@ -59,7 +59,7 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
     }
 
     @Override
-    public void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback) {
+    public void onViewerRemoved(Player viewer, AbstractContainer container, Callback callback) {
         if (this.viewers.remove(viewer) && this.viewers.size() == 0) {
             this.soundDelay = getCloseSoundDelay();
 

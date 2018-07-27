@@ -25,31 +25,45 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.lanternpowered.server.item.predicate.ItemPredicate;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
 
 public interface IInventory extends Inventory {
 
     @Override
     IInventory parent();
 
-    /**
-     * Gets the root {@link IInventory}.
-     *
-     * @return The root inventory
-     */
+    @Override
     IInventory root();
+
+    /**
+     * Gets the first child of this inventory.
+     *
+     * @return The first child
+     * @throws IllegalStateException If there are no children
+     */
+    default IInventory first() {
+        final List<Inventory> children = children();
+        if (children.isEmpty()) {
+            throw new IllegalStateException("No children");
+        }
+        return (IInventory) children.get(0);
+    }
+
+    IInventory query(QueryOperation<?>... operations);
 
     /**
      * Gets the {@link EmptyInventory} that should be used by this
@@ -82,13 +96,32 @@ public interface IInventory extends Inventory {
     void addCloseListener(InventoryCloseListener listener);
 
     /**
+     * Try to put an {@link ItemStack} into this inventory. The return value
+     * will be {@code true} only when the entire item stack fits the inventory.
+     *
+     * <p>The size of the supplied stack is reduced by the number of items
+     * successfully consumed by the inventory.</p>
+     *
+     * <p>Any rejected items are also available in the transaction result.</p>
+     *
+     * <p>Unlike {@link #set}, this method's general contract does not permit
+     * items in the Inventory to be replaced.</p>
+     *
+     * @param stack A stack of items to insert into this inventory
+     * @return Whether the complete stack was successfully inserted into this inventory
+     */
+    boolean offerFast(ItemStack stack);
+
+    /**
      * Polls the first available stack with the specific {@link ItemType}.
      *
      * @param itemType The item type
      * @return The polled item stack, if found
      * @see #poll()
      */
-    Optional<ItemStack> poll(ItemType itemType);
+    LanternItemStack poll(ItemType itemType);
+
+    LanternItemStack poll(ItemPredicate matcher);
 
     /**
      * Polls the first available stack that is matched by the {@link Predicate}.
@@ -97,25 +130,63 @@ public interface IInventory extends Inventory {
      * @return The polled item stack, if found
      * @see #poll()
      */
-    Optional<ItemStack> poll(Predicate<ItemStack> matcher);
+    LanternItemStack poll(Predicate<ItemStack> matcher);
 
-    Optional<ItemStack> poll(int limit, ItemType itemType);
+    @Override
+    LanternItemStack poll();
 
-    Optional<ItemStack> poll(int limit, Predicate<ItemStack> matcher);
+    @Override
+    LanternItemStack poll(int limit);
 
-    Optional<ItemStack> peek(ItemType itemType);
+    LanternItemStack poll(int limit, ItemType itemType);
 
-    Optional<ItemStack> peek(Predicate<ItemStack> matcher);
+    LanternItemStack poll(int limit, ItemPredicate matcher);
 
-    Optional<ItemStack> peek(int limit, ItemType itemType);
+    LanternItemStack poll(int limit, Predicate<ItemStack> matcher);
 
-    Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher);
+    @Override
+    LanternItemStack peek();
 
-    Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher);
+    @Override
+    LanternItemStack peek(int limit);
 
-    Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher);
+    LanternItemStack peek(ItemType itemType);
 
-    PeekedOfferTransactionResult peekOffer(ItemStack itemStack);
+    LanternItemStack peek(ItemPredicate matcher);
+
+    LanternItemStack peek(Predicate<ItemStack> matcher);
+
+    LanternItemStack peek(int limit, ItemType itemType);
+
+    LanternItemStack peek(int limit, ItemPredicate matcher);
+
+    LanternItemStack peek(int limit, Predicate<ItemStack> matcher);
+
+    PeekedPollTransactionResult peekPoll(ItemPredicate matcher);
+
+    PeekedPollTransactionResult peekPoll(Predicate<ItemStack> matcher);
+
+    PeekedPollTransactionResult peekPoll(int limit, ItemPredicate matcher);
+
+    PeekedPollTransactionResult peekPoll(int limit, Predicate<ItemStack> matcher);
+
+    /**
+     * Peeks a result to put an {@link ItemStack} into this Inventory. The
+     * {@link PeekedOfferTransactionResult} will be a success only when the
+     * entire item stack fits the inventory.
+     *
+     * <p>The size of the supplied stack is reduced by the number of items
+     * successfully consumed by the inventory.</p>
+     *
+     * <p>Any rejected items are also available in the transaction result.</p>
+     *
+     * <p>Unlike {@link #set}, this method's general contract does not permit
+     * items in the Inventory to be replaced.</p>
+     *
+     * @param stack The stack of items to offer
+     * @return The peeked offer transaction result
+     */
+    PeekedOfferTransactionResult peekOffer(ItemStack stack);
 
     /**
      * Peeks for the result {@link SlotTransaction}s and {@link InventoryTransactionResult}
@@ -124,7 +195,7 @@ public interface IInventory extends Inventory {
      * @param itemStack The item stack to set
      * @return The peeked transaction result
      */
-    PeekedSetTransactionResult peekSet(@Nullable ItemStack itemStack);
+    PeekedSetTransactionResult peekSet(ItemStack itemStack);
 
     /**
      * Check whether the supplied item can be inserted into this one of the children of the
@@ -143,12 +214,6 @@ public interface IInventory extends Inventory {
     IInventory union(Inventory inventory);
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    InventoryTransactionResult set(@Nullable ItemStack stack);
-
-    /**
      * Similar to the {@link #set(ItemStack)} method but ignores
      * the checking whether a specific item can be put into a
      * {@link Slot}.
@@ -156,10 +221,49 @@ public interface IInventory extends Inventory {
      * @param stack The stack to insert
      * @return The transaction result
      */
-    InventoryTransactionResult setForced(@Nullable ItemStack stack);
+    default InventoryTransactionResult setForced(ItemStack stack) {
+        return set(stack, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default InventoryTransactionResult set(ItemStack stack) {
+        return set(stack, false);
+    }
+
+    InventoryTransactionResult set(ItemStack stack, boolean force);
 
     @Override
     default IInventory transform(InventoryTransformation transformation) {
         return (IInventory) Inventory.super.transform(transformation);
+    }
+
+    /**
+     * Gets the {@link Slot} for the specified index.
+     *
+     * @param index The slot index
+     * @return The slot if found
+     */
+    Optional<ISlot> getSlot(int index);
+
+    /**
+     * Gets the index of the {@link Slot} in this ordered inventory,
+     * may return {@code -1} if the slot was not found.
+     *
+     * @param slot The slot
+     * @return The slot index
+     */
+    int getSlotIndex(Slot slot);
+
+    @Override
+    default boolean hasChildren() {
+        return !children().isEmpty();
+    }
+
+    @Override
+    default Optional<ViewableInventory> asViewable() {
+        return this instanceof ViewableInventory ? Optional.of((ViewableInventory) this) : Optional.empty();
     }
 }

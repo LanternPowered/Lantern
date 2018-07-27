@@ -26,10 +26,10 @@
 package org.lanternpowered.server.inventory.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.inventory.AbstractOrderedInventory;
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.CarrierBasedTransformer;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
-import org.lanternpowered.server.inventory.type.LanternOrderedInventory;
+import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.animal.Donkey;
 import org.spongepowered.api.entity.living.animal.Horse;
@@ -40,16 +40,16 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-public class HorseCarrierBasedTransformer implements CarrierBasedTransformer<LanternOrderedInventory, LanternOrderedInventory.Builder<LanternOrderedInventory>> {
+public class HorseCarrierBasedTransformer implements CarrierBasedTransformer<LanternChildrenInventory, LanternChildrenInventory.Builder<LanternChildrenInventory>> {
 
-    @Nullable private LanternInventoryArchetype<LanternOrderedInventory> horse;
-    @Nullable private LanternInventoryArchetype<LanternOrderedInventory> donkeyMule;
-    @Nullable private LanternInventoryArchetype<LanternOrderedInventory> donkeyMuleChested;
+    @Nullable private LanternInventoryArchetype<LanternChildrenInventory> horse;
+    @Nullable private LanternInventoryArchetype<LanternChildrenInventory> donkeyMule;
+    @Nullable private LanternInventoryArchetype<LanternChildrenInventory> donkeyMuleChested;
 
     @Nullable
     @Override
-    public LanternInventoryArchetype<LanternOrderedInventory> apply(Carrier carrier,
-            Supplier<AbstractOrderedInventory.Builder<LanternOrderedInventory>> builderSupplier) {
+    public LanternInventoryArchetype<LanternChildrenInventory> apply(Carrier carrier,
+            Supplier<AbstractChildrenInventory.Builder<LanternChildrenInventory>> builderSupplier) {
         if (carrier instanceof Donkey ||
                 carrier instanceof Mule) {
             return applyDonkeyMule(builderSupplier,
@@ -62,8 +62,8 @@ public class HorseCarrierBasedTransformer implements CarrierBasedTransformer<Lan
 
     @Nullable
     @Override
-    public LanternInventoryArchetype<LanternOrderedInventory> apply(Class<? extends Carrier> carrierType,
-            Supplier<AbstractOrderedInventory.Builder<LanternOrderedInventory>> builderSupplier) {
+    public LanternInventoryArchetype<LanternChildrenInventory> apply(Class<? extends Carrier> carrierType,
+            Supplier<AbstractChildrenInventory.Builder<LanternChildrenInventory>> builderSupplier) {
         if (Donkey.class.isAssignableFrom(carrierType) ||
                 Mule.class.isAssignableFrom(carrierType)) {
             return applyDonkeyMule(builderSupplier, false);
@@ -73,8 +73,8 @@ public class HorseCarrierBasedTransformer implements CarrierBasedTransformer<Lan
         return null;
     }
 
-    private LanternInventoryArchetype<LanternOrderedInventory> applyHorse(
-            Supplier<AbstractOrderedInventory.Builder<LanternOrderedInventory>> builderSupplier) {
+    private LanternInventoryArchetype<LanternChildrenInventory> applyHorse(
+            Supplier<AbstractChildrenInventory.Builder<LanternChildrenInventory>> builderSupplier) {
         if (this.horse == null) {
             this.horse = builderSupplier.get()
                     .addLast(VanillaInventoryArchetypes.SADDLE_SLOT)
@@ -85,10 +85,10 @@ public class HorseCarrierBasedTransformer implements CarrierBasedTransformer<Lan
     }
 
     @SuppressWarnings("ConstantConditions")
-    private LanternInventoryArchetype<LanternOrderedInventory> applyDonkeyMule(
-            Supplier<AbstractOrderedInventory.Builder<LanternOrderedInventory>> builderSupplier, boolean chest) {
+    private LanternInventoryArchetype<LanternChildrenInventory> applyDonkeyMule(
+            Supplier<AbstractChildrenInventory.Builder<LanternChildrenInventory>> builderSupplier, boolean chest) {
         if (this.donkeyMule == null) {
-            final AbstractOrderedInventory.Builder<LanternOrderedInventory> builder = builderSupplier.get()
+            final AbstractChildrenInventory.Builder<LanternChildrenInventory> builder = builderSupplier.get()
                     .addLast(VanillaInventoryArchetypes.SADDLE_SLOT) // The slot exists, but isn't visible
                     .addLast(VanillaInventoryArchetypes.NULL_SLOT);
             this.donkeyMule = builder

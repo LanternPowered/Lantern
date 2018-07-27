@@ -26,6 +26,8 @@
 package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConstants.CHEST_COLUMNS;
+import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConstants.MAX_CHEST_ROWS;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
@@ -41,7 +43,7 @@ public class ChestClientContainer extends ClientContainer {
 
     static {
         for (int i = 0; i < TOP_SLOT_FLAGS.length; i++) {
-            final int[] flags = new int[i * 9];
+            final int[] flags = new int[i * CHEST_COLUMNS];
             Arrays.fill(flags, FLAG_REVERSE_SHIFT_INSERTION);
             TOP_SLOT_FLAGS[i] = flags;
             ALL_SLOT_FLAGS[i] = compileAllSlotFlags(flags);
@@ -60,7 +62,7 @@ public class ChestClientContainer extends ClientContainer {
 
     ChestClientContainer(Text title, int rows) {
         super(title);
-        checkArgument(rows >= 0 && rows <= 6, "invalid rows count %s", rows);
+        checkArgument(rows >= 0 && rows <= MAX_CHEST_ROWS, "invalid rows count %s", rows);
         this.rowIndex = rows;
     }
 

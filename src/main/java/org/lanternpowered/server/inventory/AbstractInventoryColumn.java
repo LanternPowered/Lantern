@@ -37,7 +37,7 @@ public abstract class AbstractInventoryColumn extends AbstractInventory2D implem
     }
 
     @Override
-    void initWithChildren(List<AbstractMutableInventory> children) {
+    void initWithChildren(List<AbstractMutableInventory> children, boolean lazy) {
         super.initWithChildren(children, 1, -1);
     }
 }

@@ -78,7 +78,12 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
      * @return The item stack snapshot
      */
     public static LanternItemStackSnapshot wrap(ItemStack itemStack) {
-        return new LanternItemStackSnapshot((LanternItemStack) checkNotNull(itemStack, "itemStack"));
+        checkNotNull(itemStack, "itemStack");
+        // Reuse the none item stack snapshot if possible
+        if (itemStack.isEmpty()) {
+            return (LanternItemStackSnapshot) ItemStackSnapshot.NONE;
+        }
+        return new LanternItemStackSnapshot((LanternItemStack) itemStack);
     }
 
     final LanternItemStack itemStack;
@@ -238,5 +243,16 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     public boolean similarTo(ItemStack that) {
         checkNotNull(that, "that");
         return getType() == that.getType() && IValueContainer.matchContents(this.itemStack, (IValueContainer) that);
+    }
+
+    /**
+     * Gets the internal {@link LanternItemStack},
+     * internal use only to avoid copying. The returned
+     * stack may never me modified.
+     *
+     * @return The internal stack
+     */
+    public LanternItemStack unwrap() {
+        return this.itemStack;
     }
 }

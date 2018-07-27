@@ -33,8 +33,7 @@ import org.lanternpowered.server.inventory.behavior.SimpleShiftClickBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.lanternpowered.server.text.translation.TextTranslation;
-import org.spongepowered.api.effect.Viewer;
-import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -57,7 +56,7 @@ import javax.annotation.Nullable;
  * A base class for every {@link Inventory} that
  * isn't a {@link EmptyInventory}.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "ConstantConditions"})
 public abstract class AbstractMutableInventory extends AbstractInventory {
 
     @Nullable private PluginContainer plugin;
@@ -99,15 +98,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     }
 
     /**
-     * Sets the {@link Carrier} of this {@link Inventory}.
-     *
-     * @param carrier The carrier
-     */
-    void setCarrier0(Carrier carrier) {
-        setCarrier(carrier);
-    }
-
-    /**
      * Gets the {@link ShiftClickBehavior} of this {@link Inventory}.
      *
      * @return The shift click behavior
@@ -124,24 +114,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     void setShiftClickBehavior(ShiftClickBehavior shiftClickBehavior) {
         this.shiftClickBehavior = shiftClickBehavior;
     }
-
-    /**
-     * Sets the {@link Carrier} of this {@link Inventory}.
-     *
-     * @param carrier The carrier
-     */
-    protected abstract void setCarrier(Carrier carrier);
-
-    /**
-     * Gets all the {@link AbstractSlot}s that could be found in the
-     * children inventories. This method may return a empty {@link List}
-     * if the subclass doesn't support children, for example slots and
-     * empty inventories. The position of the slot also represents the
-     * index.
-     *
-     * @return The slots
-     */
-    protected abstract List<AbstractSlot> getSlotInventories();
 
     /**
      * Initializes the target {@link ClientContainer} for this inventory.
@@ -222,7 +194,8 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     }
 
     @Override
-    void addViewer(Viewer viewer, LanternContainer container) {
+    void addViewer(Player viewer, AbstractContainer container) {
+        super.addViewer(viewer, container);
         if (this.viewerListeners.isEmpty()) {
             return;
         }
@@ -235,7 +208,8 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     }
 
     @Override
-    void removeViewer(Viewer viewer, LanternContainer container) {
+    void removeViewer(Player viewer, AbstractContainer container) {
+        super.removeViewer(viewer, container);
         if (this.viewerListeners.isEmpty()) {
             return;
         }
@@ -254,19 +228,19 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
             return this;
         }
         final AbstractInventory abstractInventory = (AbstractInventory) inventory;
-        List<AbstractSlot> slots = abstractInventory.getSlotInventories();
+        List<AbstractSlot> slots = abstractInventory.getSlots();
         if (slots.isEmpty()) {
             return genericEmpty();
         }
         slots = new ArrayList<>(slots);
-        slots.retainAll(getSlotInventories());
+        slots.retainAll(getSlots());
         if (slots.isEmpty()) { // No slots were intersected, just return a empty inventory
             return genericEmpty();
         } else {
             // Construct the result inventory
-            final UnorderedChildrenInventoryQuery result = new UnorderedChildrenInventoryQuery();
+            final ChildrenInventoryQuery result = new ChildrenInventoryQuery();
             slots = Collections.unmodifiableList(slots);
-            result.init(slots, slots);
+            result.initWithSlots((List) slots, slots);
             return result;
         }
     }
@@ -278,21 +252,21 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
             return this;
         }
         final AbstractInventory abstractInventory = (AbstractInventory) inventory;
-        List<AbstractSlot> slotsB = abstractInventory.getSlotInventories();
+        List<AbstractSlot> slotsB = abstractInventory.getSlots();
         if (slotsB.isEmpty()) {
             return this;
         }
         slotsB = new ArrayList<>(slotsB);
-        final List<AbstractSlot> slotsA = getSlotInventories();
+        final List<AbstractSlot> slotsA = getSlots();
         slotsB.removeAll(slotsA);
         slotsB.addAll(0, slotsA);
         if (slotsB.isEmpty()) { // No slots were intersected, just return a empty inventory
             return genericEmpty();
         } else {
             // Construct the result inventory
-            final UnorderedChildrenInventoryQuery result = new UnorderedChildrenInventoryQuery();
+            final ChildrenInventoryQuery result = new ChildrenInventoryQuery();
             slotsB = Collections.unmodifiableList(slotsB);
-            result.init(slotsB, slotsB);
+            result.initWithSlots((List) slotsB, slotsB);
             return result;
         }
     }

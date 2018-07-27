@@ -36,7 +36,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
@@ -110,7 +110,7 @@ public abstract class ClientContainer implements ContainerBase {
      * A flag that defines that the slot is present in the hotbar. The flag
      * uses 4 bits and this is the raw slot index. Counting from 1 to 9.
      */
-    protected static final int FLAG_HOTBAR = 0xf << FLAG_HOTBAR_SHIFT;
+    protected static final int FLAG_HOTBAR_MASK = 0xf << FLAG_HOTBAR_SHIFT;
 
     /**
      * A flag that defines that only one item (item stack with quantity one)
@@ -123,6 +123,14 @@ public abstract class ClientContainer implements ContainerBase {
      * retrieve items from that slot.
      */
     protected static final int FLAG_IGNORE_DOUBLE_CLICK = 0x200;
+
+    protected static final int FLAG_SILENT_SLOT_INDEX_SHIFT = 23;
+
+    /**
+     * A flag that defines the silent update slot index. Not needed to apply
+     * on hotbar slot indexes, they are always silently updatable.
+     */
+    protected static final int FLAG_SILENT_SLOT_INDEX_MASK = 0xff << FLAG_SILENT_SLOT_INDEX_SHIFT;
 
     /**
      * A counter for container ids.
@@ -184,20 +192,20 @@ public abstract class ClientContainer implements ContainerBase {
 
     private final class SlotClientSlot extends BaseClientSlot implements ClientSlot.Slot {
 
-        private final AbstractInventorySlot slot;
+        private final AbstractSlot slot;
 
-        private SlotClientSlot(int index, AbstractInventorySlot slot) {
+        private SlotClientSlot(int index, AbstractSlot slot) {
             super(index);
             this.slot = slot;
         }
 
         @Override
         public ItemStack getItem() {
-            return this.slot.peek().orElse(ItemStack.empty());
+            return this.slot.peek();
         }
 
         @Override
-        public AbstractInventorySlot getSlot() {
+        public AbstractSlot getSlot() {
             return this.slot;
         }
 
@@ -248,7 +256,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     private Text title;
-    private final Multimap<AbstractInventorySlot, SlotClientSlot> slotMap = HashMultimap.create();
+    private final Multimap<AbstractSlot, SlotClientSlot> slotMap = HashMultimap.create();
     private BaseClientSlot cursor = new EmptyClientSlot(CURSOR_SLOT_INDEX); // Not really a slot, but the implementation does the trick
     private final int containerId;
     @SuppressWarnings("NullableProblems") protected BaseClientSlot[] slots;
@@ -293,7 +301,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public ClientSlot.Slot bindSlot(int index, AbstractInventorySlot slot) {
+        public ClientSlot.Slot bindSlot(int index, AbstractSlot slot) {
             return getRoot().bindSlot(localToGlobalIndex(index), slot);
         }
 
@@ -303,7 +311,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public Optional<AbstractInventorySlot> getSlot(int index) {
+        public Optional<AbstractSlot> getSlot(int index) {
             return getRoot().getSlot(localToGlobalIndex(index));
         }
 
@@ -354,7 +362,7 @@ public abstract class ClientContainer implements ContainerBase {
     private final TopContainerPart topContainerPart = new TopContainerPartImpl();
     @Nullable private BottomContainerPart bottomContainerPart;
     // Double click data
-    @Nullable private ItemStack doubleClickItem;
+    @Nullable private LanternItemStack doubleClickItem;
 
     // Drag mode data
     private final IntSet dragSlots = new IntArraySet();
@@ -392,7 +400,7 @@ public abstract class ClientContainer implements ContainerBase {
         populate();
         final int[] slotFlags = getSlotFlags();
         for (int i = 0; i < this.slots.length; i++) {
-            final int slotIndex = ((slotFlags[i] & FLAG_HOTBAR) >> FLAG_HOTBAR_SHIFT) - 1;
+            final int slotIndex = ((slotFlags[i] & FLAG_HOTBAR_MASK) >> FLAG_HOTBAR_SHIFT) - 1;
             if (slotIndex != -1 && hotbarSlotIndex == slotIndex) {
                 return Optional.of(this.slots[i]);
             }
@@ -455,7 +463,7 @@ public abstract class ClientContainer implements ContainerBase {
             removeSlot(index);
             BaseClientSlot clientSlot = clientContainer.slots[s2 + i];
             if (clientSlot instanceof SlotClientSlot) {
-                final AbstractInventorySlot slot = ((SlotClientSlot) clientSlot).slot;
+                final AbstractSlot slot = ((SlotClientSlot) clientSlot).slot;
                 clientSlot = new SlotClientSlot(index, slot);
                 this.slotMap.put(slot, (SlotClientSlot) clientSlot);
                 if (this.player != null) {
@@ -552,7 +560,7 @@ public abstract class ClientContainer implements ContainerBase {
         this.interactionBehavior = interactionBehavior;
     }
 
-    public void bindCursor(AbstractInventorySlot slot) {
+    public void bindCursor(AbstractSlot slot) {
         bindSlot(CURSOR_SLOT_INDEX, slot);
     }
 
@@ -572,7 +580,7 @@ public abstract class ClientContainer implements ContainerBase {
         queueSilentSlotChangeSafely(clientSlot);
     }
 
-    protected ClientSlot.Slot bindSlot(int index, AbstractInventorySlot slot) {
+    protected ClientSlot.Slot bindSlot(int index, AbstractSlot slot) {
         populate();
         final SlotClientSlot clientSlot = new SlotClientSlot(index, slot);
         removeSlot(index);
@@ -601,7 +609,7 @@ public abstract class ClientContainer implements ContainerBase {
         // Cleanup the old client slot
         final BaseClientSlot oldClientSlot = index == CURSOR_SLOT_INDEX ? this.cursor : this.slots[index];
         if (oldClientSlot instanceof SlotClientSlot) {
-            final AbstractInventorySlot slot = ((SlotClientSlot) oldClientSlot).slot;
+            final AbstractSlot slot = ((SlotClientSlot) oldClientSlot).slot;
             // Remove the tracker from this slot
             if (this.slotMap.remove(slot, oldClientSlot) &&
                     this.player != null && this.slotMap.get(slot).isEmpty()) {
@@ -646,7 +654,7 @@ public abstract class ClientContainer implements ContainerBase {
 
     @Override
     public void queueSlotChange(Slot slot) {
-        this.slotMap.get((AbstractInventorySlot) checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
+        this.slotMap.get((AbstractSlot) checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
     }
 
     @Override
@@ -679,7 +687,7 @@ public abstract class ClientContainer implements ContainerBase {
 
     @Override
     public void queueSilentSlotChange(Slot slot) {
-        this.slotMap.get((AbstractInventorySlot) checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
+        this.slotMap.get((AbstractSlot) checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
     }
 
     @Override
@@ -727,7 +735,7 @@ public abstract class ClientContainer implements ContainerBase {
         populate();
         this.player = (LanternPlayer) player;
         // Add the tracker to each slot
-        for (AbstractInventorySlot slot : this.slotMap.keySet()) {
+        for (AbstractSlot slot : this.slotMap.keySet()) {
             slot.addTracker(this);
         }
     }
@@ -777,26 +785,8 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     protected void collectChangeMessages(List<Message> messages) {
-        final int[] flags = getSlotFlags();
         for (int i = 0; i < this.slots.length; i++) {
-            final BaseClientSlot slot = this.slots[i];
-            if ((slot.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
-                int containerId = getContainerId();
-                final int index;
-                final int hotbarSlot;
-                // Check if we can do a silent update
-                if ((slot.dirtyState & BaseClientSlot.SILENT_UPDATE) != 0 &&
-                        (hotbarSlot = (flags[i] & FLAG_HOTBAR) >> 4) != 0) {
-                    index = hotbarSlot - 1;
-                    containerId = -2;
-                } else {
-                    index = i;
-                }
-                // Reset the dirty state
-                slot.dirtyState = 0;
-                // Add a update message
-                messages.add(new MessagePlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.getItem()));
-            }
+            collectSlotChangeMessages(messages, i, false);
         }
         // Update the cursor item if needed
         if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
@@ -805,6 +795,31 @@ public abstract class ClientContainer implements ContainerBase {
         }
         // Collect the property changes
         collectPropertyChanges(messages);
+    }
+
+    protected void collectSlotChangeMessages(List<Message> messages, int index, boolean forceSilently) {
+        final BaseClientSlot slot = this.slots[index];
+        if ((slot.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
+            int containerId = getContainerId();
+            // Check if we can do a silent update
+            if ((slot.dirtyState & BaseClientSlot.SILENT_UPDATE) != 0 || forceSilently) {
+                final int flags = getSlotFlags()[index];
+                int silentIndex = (flags & FLAG_HOTBAR_MASK) >> FLAG_HOTBAR_SHIFT;
+                if (silentIndex == 0) {
+                    silentIndex = (flags & FLAG_SILENT_SLOT_INDEX_MASK) >> FLAG_SILENT_SLOT_INDEX_SHIFT;
+                } else {
+                    silentIndex--; // hotbar silent index is + 1
+                }
+                if (silentIndex != 0) {
+                    index = silentIndex;
+                    containerId = -2;
+                }
+            }
+            // Reset the dirty state
+            slot.dirtyState = 0;
+            // Add a update message
+            messages.add(new MessagePlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.getItem()));
+        }
     }
 
     protected void collectPropertyChanges(List<Message> messages) {
@@ -821,7 +836,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Releases all the {@link AbstractInventorySlot} and
+     * Releases all the {@link AbstractSlot} and
      * removes the {@link LanternPlayer}.
      */
     public void release() {
@@ -831,7 +846,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
         this.player = null;
         // Remove the tracker from each slot
-        for (AbstractInventorySlot slot : this.slotMap.keySet()) {
+        for (AbstractSlot slot : this.slotMap.keySet()) {
             slot.removeTracker(this);
         }
     }
@@ -854,7 +869,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     @Override
-    public Optional<AbstractInventorySlot> getSlot(int index) {
+    public Optional<AbstractSlot> getSlot(int index) {
         populate();
         if (index != CURSOR_SLOT_INDEX && (index < 0 || index >= this.slots.length)) {
             return Optional.empty();
@@ -908,20 +923,18 @@ public abstract class ClientContainer implements ContainerBase {
     public void handlePick(int slotIndex) {
         populate();
         // Convert the slot index
-        slotIndex = clientSlotIndexToServer(slotIndex);
+        final int serverSlotIndex = clientSlotIndexToServer(slotIndex);
 
-        queueSilentSlotChangeSafely(this.slots[slotIndex]);
-        final int hotbarSlotIndex = ((PlayerClientContainer) this.player.getInventoryContainer()
-                .getClientContainer(this.player).get()).getSelectedHotbarSlotIndex();
+        queueSilentSlotChangeSafely(this.slots[serverSlotIndex]);
+        final int hotbarSlotIndex = this.player.getInventoryContainer().getClientContainer().getSelectedHotbarSlotIndex();
         queueSilentSlotChangeSafely(this.slots[getHotbarSlotIndex(hotbarSlotIndex)]);
-        final int slotIndex1 = slotIndex;
-        tryProcessBehavior(behavior -> behavior.handlePick(this, this.slots[slotIndex1]));
+        tryProcessBehavior(behavior -> behavior.handlePick(this, this.slots[serverSlotIndex]));
     }
 
-    public void handleCreativeClick(int slotIndex, @Nullable ItemStack itemStack) {
+    public void handleCreativeClick(int slotIndex, ItemStack itemStack) {
         populate();
         // You can only use this in creative mode
-        if (this.player == null || this.player.get(Keys.GAME_MODE).get() != GameModes.CREATIVE) {
+        if (this.player == null || this.player.require(Keys.GAME_MODE) != GameModes.CREATIVE) {
             return;
         }
         // Convert the slot index
@@ -1113,7 +1126,7 @@ public abstract class ClientContainer implements ContainerBase {
      */
     private void handleDoubleClick(int slotIndex) {
         if (this.doubleClickItem != null) {
-            final ItemStack itemStack = this.doubleClickItem;
+            final LanternItemStack itemStack = this.doubleClickItem;
             final int maxStack = ClientItemStackSizes.getOriginalMaxSize(itemStack.getType());
             final int[] flags = getSlotFlags();
             for (int i = 0; i < flags.length; i++) {
@@ -1126,7 +1139,7 @@ public abstract class ClientContainer implements ContainerBase {
                 }
                 final BaseClientSlot slot1 = this.slots[i];
                 final ItemStack itemStack1 = slot1.getRaw();
-                if (itemStack1.isEmpty() || !LanternItemStack.areSimilar(itemStack, itemStack1)) {
+                if (itemStack1.isEmpty() || !itemStack.similarTo(itemStack1)) {
                     continue;
                 }
                 // Increase quantity
@@ -1177,7 +1190,7 @@ public abstract class ClientContainer implements ContainerBase {
                 queueSlotChangeSafely(this.cursor);
                 if (!cursor) {
                     // Store the clicked item, it's possible that a double click occurs
-                    this.doubleClickItem = slot.getItem();
+                    this.doubleClickItem = (LanternItemStack) slot.getItem();
                 }
             }
         } else if (cursor) {
@@ -1208,8 +1221,8 @@ public abstract class ClientContainer implements ContainerBase {
             return;
         }
         final int[] flags = getSlotFlags();
-        final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;
-        final boolean hotbar = (flags[slotIndex] & FLAG_HOTBAR) != 0;
+        //final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;
+        //final boolean hotbar = (flags[slotIndex] & FLAG_HOTBAR_MASK) != 0;
         queueSilentSlotChangeSafely(slot);
         for (int i = 0; i < flags.length; i++) {
             // Don't shift to itself
@@ -1221,7 +1234,7 @@ public abstract class ClientContainer implements ContainerBase {
                 continue;
             }
             // final boolean main1 = (flags[i] & FLAG_MAIN_INVENTORY) != 0;
-            // final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
+            // final boolean hotbar1 = (flags[i] & FLAG_HOTBAR_MASK) != 0;
             // Only attempt to move from bottom to top or from top to bottom inventory
             // Disable the following fix, allows glitches when rapidly shift clicking
             /*
@@ -1246,7 +1259,7 @@ public abstract class ClientContainer implements ContainerBase {
         final int[] flags = getSlotFlags();
         // Check if the slot is in the main inventory
         final boolean main = (flags[slotIndex] & FLAG_MAIN_INVENTORY) != 0;
-        final boolean hotbar = (flags[slotIndex] & FLAG_HOTBAR) != 0;
+        final boolean hotbar = (flags[slotIndex] & FLAG_HOTBAR_MASK) != 0;
         // Get the client slot
         final BaseClientSlot slot = this.slots[slotIndex];
         ItemStack itemStack = slot.getItem();
@@ -1275,7 +1288,7 @@ public abstract class ClientContainer implements ContainerBase {
                 continue;
             }
             final boolean main1 = (flags[i] & FLAG_MAIN_INVENTORY) != 0;
-            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
+            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR_MASK) != 0;
             if (main && hotbar != hotbar1) {
                 mainSlots.add(i);
             }
@@ -1354,7 +1367,7 @@ public abstract class ClientContainer implements ContainerBase {
         for (int i : mainSlotsArray) {
             // No need to check if shifting is disabled, it will always work
             // for the main inventory
-            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR) != 0;
+            final boolean hotbar1 = (flags[i] & FLAG_HOTBAR_MASK) != 0;
             // Only move between hotbar and main
             if (hotbar == hotbar1) {
                 continue;

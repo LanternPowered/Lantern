@@ -38,6 +38,7 @@ import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.property.Identifiable;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
@@ -65,6 +66,8 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     @Nullable protected Translation translation;
 
     @Nullable protected ShiftClickBehavior shiftClickBehavior;
+
+    private boolean viewable;
 
     /**
      * Sets the {@link Supplier} for the {@link AbstractInventory}, the
@@ -106,6 +109,10 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
         if (property instanceof InventoryDimension ||
                 property instanceof InventoryCapacity) {
             return (B) this;
+        }
+        // All inventories with this property are viewable
+        if (property instanceof GuiIdProperty) {
+            this.viewable = true;
         }
         putProperty(property);
         if (property instanceof InventoryTitle) {
@@ -173,7 +180,14 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
         if (plugin == null) {
             plugin = this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer;
         }
-        final R inventory = this.constructor.construct(carried);
+        int flags = 0;
+        if (carried) {
+            flags |= InventoryConstructor.CARRIED;
+        }
+        if (this.viewable) {
+            flags |= InventoryConstructor.VIEWABLE;
+        }
+        final R inventory = this.constructor.construct(flags);
         if (inventory instanceof AbstractMutableInventory) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
             mutableInventory.setPlugin(plugin);

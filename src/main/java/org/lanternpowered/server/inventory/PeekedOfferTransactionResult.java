@@ -29,31 +29,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public class PeekedOfferTransactionResult extends PeekedTransactionResult {
 
-    private final InventoryTransactionResult.Type type;
-    @Nullable private final ItemStack rejectedItem;
+    private final ItemStackSnapshot rejectedItem;
 
     /**
      * Constructs a new {@link PeekedOfferTransactionResult}.
      *
-     * @param type The type of the transaction result
      * @param transactions The slot transactions that will occur
      * @param rejectedItem The rejected item stack, this can occur if the stack doesn't fit the inventory
      */
-    public PeekedOfferTransactionResult(InventoryTransactionResult.Type type, List<SlotTransaction> transactions,
-            @Nullable ItemStack rejectedItem) {
+    public PeekedOfferTransactionResult(List<SlotTransaction> transactions, ItemStackSnapshot rejectedItem) {
         super(transactions);
-        checkNotNull(type, "type");
-        this.type = type;
+        checkNotNull(rejectedItem, "rejectedItem");
         this.rejectedItem = rejectedItem;
     }
 
@@ -64,44 +59,19 @@ public class PeekedOfferTransactionResult extends PeekedTransactionResult {
      *
      * @return The rejected item stack
      */
-    public Optional<ItemStack> getRejectedItem() {
-        return Optional.ofNullable(this.rejectedItem);
+    public ItemStackSnapshot getRejectedItem() {
+        return this.rejectedItem;
     }
 
-    /**
-     * Gets the {@link InventoryTransactionResult.Type}.
-     *
-     * @return The result type
-     */
-    public InventoryTransactionResult.Type getType() {
-        return this.type;
-    }
-
-    /**
-     * Gets whether the {@link InventoryTransactionResult.Type}
-     * is successful.
-     *
-     * @return The successful
-     */
-    public boolean isSuccess() {
-        return this.type == InventoryTransactionResult.Type.SUCCESS;
-    }
-
-    /**
-     * Converts this {@link PeekedOfferTransactionResult} into a
-     * {@link InventoryTransactionResult}.
-     *
-     * @return The inventory transaction result
-     */
-    public InventoryTransactionResult asInventoryTransaction() {
-        return asInventoryTransactionBuilder().build();
-    }
-
+    @Override
     protected InventoryTransactionResult.Builder asInventoryTransactionBuilder() {
-        final InventoryTransactionResult.Builder builder = InventoryTransactionResult.builder();
-        builder.type(this.type);
-        if (this.rejectedItem != null) {
-            builder.reject(this.rejectedItem);
+        final InventoryTransactionResult.Builder builder = super.asInventoryTransactionBuilder();
+        if (this.rejectedItem.isEmpty()) {
+            // The complete stack is consumed, so success
+            builder.type(InventoryTransactionResult.Type.SUCCESS);
+        } else {
+            builder.type(InventoryTransactionResult.Type.FAILURE);
+            builder.reject(Collections.singleton(this.rejectedItem));
         }
         return builder;
     }

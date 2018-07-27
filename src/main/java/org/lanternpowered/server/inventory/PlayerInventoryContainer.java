@@ -25,81 +25,76 @@
  */
 package org.lanternpowered.server.inventory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import javax.annotation.Nonnull;
 
-public class PlayerInventoryContainer extends CarriedLanternContainer<Player> {
+@SuppressWarnings("ConstantConditions")
+public class PlayerInventoryContainer extends PlayerTopBottomContainer implements ICarriedInventory<Player> {
 
-    private PlayerClientContainer clientContainer;
+    private final PlayerClientContainer clientContainer;
 
-    public PlayerInventoryContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory topInventory) {
-        super(playerInventory, topInventory, playerInventory.getName());
+    public PlayerInventoryContainer(LanternPlayerInventory playerInventory, AbstractChildrenInventory topInventory) {
+        super(playerInventory, topInventory);
+
+        final Player player = playerInventory.getCarrier().get();
+        setCarrier(player);
+
         // Construct the client container and attach the player
         this.clientContainer = new PlayerClientContainer(TextTranslation.toText(getName()));
         this.clientContainer.bindCursor(getCursorSlot());
         this.clientContainer.bindHotbarBehavior(playerInventory.getHotbar().getHotbarBehavior());
         this.clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(this));
         this.clientContainer.bindBottom();
+        // Bind all the slots
         getSlotsToIndexMap().object2IntEntrySet().forEach(
-                entry -> this.clientContainer.bindSlot(entry.getIntValue(), entry.getKey().transform()));
-        this.clientContainer.bind(playerInventory.getCarrier().get());
+                entry -> this.clientContainer.bindSlot(entry.getIntValue(), entry.getKey().viewedSlot()));
+        this.clientContainer.bind(player);
+        // Attach the viewer to all the linked children inventories, etc.
+        addViewer(player, this);
+
+        // Set the title of the container
+        setName(playerInventory.getName());
+        // Bind the player to this container
+        bind(player);
     }
 
     @Override
-    void removeViewer(Player viewer) {
-        if (viewer == this.playerInventory.getCarrier().orElse(null)) {
-            return;
-        }
-        super.removeViewer(viewer);
+    protected ClientContainer constructClientContainer() {
+        return null;
     }
 
     @Override
-    void addViewer(Player viewer) {
-        if (viewer == this.playerInventory.getCarrier().orElse(null)) {
-            return;
-        }
-        super.addViewer(viewer);
+    protected ViewableInventory toViewable() {
+        // This container can normally not be opened on the client,
+        // so create a chest inventory which represents this inventory.
+        return new ContainerProvidedWrappedInventory(this,
+                () -> new ViewedPlayerInventoryContainer(getPlayerInventory(), getOpenInventory()));
     }
 
     @Override
-    public Optional<ClientContainer> getClientContainer(Player viewer) {
-        checkNotNull(viewer, "viewer");
-        // The client container of player who owns the inventory will
-        // always be present
-        final Player player = getPlayerInventory().getCarrier().orElse(null);
-        if (player == viewer) {
-            return Optional.of(this.clientContainer);
-        }
-        return super.getClientContainer(viewer);
+    void open() {
+        // Do nothing, it's always open
     }
 
+    @Nonnull
     @Override
-    Collection<Player> getRawViewers() {
-        final Player player = getPlayerInventory().getCarrier().orElse(null);
-        if (player != null) {
-            final Set<Player> viewers = new HashSet<>(super.getRawViewers());
-            viewers.add(player);
-            return viewers;
-        }
-        return super.getRawViewers();
-    }
-
     public PlayerClientContainer getClientContainer() {
         return this.clientContainer;
     }
 
     public void initClientContainer() {
         this.clientContainer.init();
+    }
+
+    public void release() {
+        this.clientContainer.release();
+        removeViewer(getViewer(), this);
     }
 }

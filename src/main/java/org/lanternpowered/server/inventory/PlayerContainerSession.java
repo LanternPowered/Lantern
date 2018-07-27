@@ -63,14 +63,13 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 /**
  * Represents a session of a player interacting with a
- * {@link LanternContainer}. It is possible to switch
- * between {@link LanternContainer}s without canceling
+ * {@link AbstractContainer}. It is possible to switch
+ * between {@link AbstractContainer}s without canceling
  * the session.
  *
  * This will for example keep the cursor item until it
@@ -83,7 +82,7 @@ public class PlayerContainerSession {
     /**
      * The container that is currently open.
      */
-    @Nullable private LanternContainer openContainer;
+    @Nullable private AbstractContainer openContainer;
 
     public PlayerContainerSession(LanternPlayer player) {
         this.player = player;
@@ -94,7 +93,7 @@ public class PlayerContainerSession {
     }
 
     private ClientContainer getClientContainer() {
-        return checkNotNull(this.openContainer).tryGetClientContainer(this.player);
+        return checkNotNull(checkNotNull(this.openContainer).getClientContainer());
     }
 
     /**
@@ -103,7 +102,7 @@ public class PlayerContainerSession {
      * @return The container
      */
     @Nullable
-    public LanternContainer getOpenContainer() {
+    public AbstractContainer getOpenContainer() {
         return this.openContainer;
     }
 
@@ -112,7 +111,7 @@ public class PlayerContainerSession {
      *
      * @param container The container
      */
-    public boolean setOpenContainer(@Nullable LanternContainer container) {
+    public boolean setOpenContainer(@Nullable AbstractContainer container) {
         return setRawOpenContainer(CauseStack.current(), container, true, false);
     }
 
@@ -127,7 +126,7 @@ public class PlayerContainerSession {
         causeStack.popCause();
     }
 
-    public boolean setRawOpenContainer(CauseStack causeStack, @Nullable LanternContainer container) {
+    public boolean setRawOpenContainer(CauseStack causeStack, @Nullable AbstractContainer container) {
         return setRawOpenContainer(causeStack, container, false, false);
     }
 
@@ -141,14 +140,13 @@ public class PlayerContainerSession {
         causeStack.popCause();
     }
 
-    private boolean setRawOpenContainer(CauseStack causeStack, @Nullable LanternContainer container, boolean sendClose, boolean client) {
+    private boolean setRawOpenContainer(CauseStack causeStack, @Nullable AbstractContainer container, boolean sendClose, boolean client) {
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             if (this.openContainer != container) {
                 frame.addContext(EventContextKeys.PLAYER, this.player);
                 ItemStackSnapshot cursorItem = ItemStackSnapshot.NONE;
                 if (this.openContainer != null) {
-                    final ItemStackSnapshot cursorItemSnapshot = this.openContainer.getCursorSlot().peek()
-                            .map(LanternItemStackSnapshot::wrap).orElse(LanternItemStackSnapshot.none());
+                    final ItemStackSnapshot cursorItemSnapshot = LanternItemStackSnapshot.wrap(this.openContainer.getCursorSlot().peek());
                     final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
                             frame.getCurrentCause(), new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
                     Sponge.getEventManager().post(event);
@@ -205,13 +203,14 @@ public class PlayerContainerSession {
                         container.getCursorSlot().setRawItemStack(cursorItem1.createStack());
                     }
                     sendClose = false;
-                    container.addViewer(this.player);
+                    container.bind(this.player);
+                    container.open();
                 }
                 if (sendClose && getContainerId() != 0) {
                     this.player.getConnection().send(new MessagePlayInOutCloseWindow(getContainerId()));
                 }
                 if (this.openContainer != null) {
-                    this.openContainer.removeViewer(this.player);
+                    this.openContainer.close();
                 }
             }
             this.openContainer = container;
@@ -220,10 +219,8 @@ public class PlayerContainerSession {
     }
 
     public void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
-        final ClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer(this.player).get();
-        if (clientContainer instanceof PlayerClientContainer) {
-            ((PlayerClientContainer) clientContainer).handleHeldItemChange(message.getSlot());
-        }
+        final PlayerClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer();
+        clientContainer.handleHeldItemChange(message.getSlot());
     }
 
     public void handleRecipeClick(MessagePlayInClickRecipe message) {
@@ -247,14 +244,15 @@ public class PlayerContainerSession {
             openPlayerContainer();
         }
         final ClientContainer clientContainer = getClientContainer();
-        clientContainer.handleCreativeClick(message.getSlot(), message.getItemStack());
+        clientContainer.handleCreativeClick(message.getSlot(),
+                message.getItemStack() == null ? LanternItemStack.empty() : message.getItemStack());
     }
 
     public void handleItemDrop(MessagePlayInDropHeldItem message) {
         final AbstractSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
-        final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
+        final ItemStack itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
-        if (itemStack.isPresent()) {
+        if (!itemStack.isEmpty()) {
             final CauseStack causeStack = CauseStack.current();
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
                 frame.pushCause(this.player);
@@ -264,7 +262,7 @@ public class PlayerContainerSession {
 
                 final List<Entity> entities = new ArrayList<>();
                 LanternEventHelper.handlePreDroppedItemSpawning(
-                        this.player.getTransform(), itemStack.get().createSnapshot()).ifPresent(entities::add);
+                        this.player.getTransform(), LanternItemStackSnapshot.wrap(itemStack)).ifPresent(entities::add);
 
                 final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(causeStack.getCurrentCause(), entities);
                 Sponge.getEventManager().post(event);

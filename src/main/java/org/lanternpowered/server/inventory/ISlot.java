@@ -27,10 +27,13 @@ package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 
 public interface ISlot extends IInventory, Slot {
+
+    boolean isValidItem(ItemStackSnapshot stack);
 
     boolean isValidItem(ItemStack stack);
 
@@ -38,8 +41,5 @@ public interface ISlot extends IInventory, Slot {
 
     boolean isValidItem(EquipmentType type);
 
-    @Override
-    default Slot transform() {
-        return transform(Type.INVENTORY);
-    }
+    ISlot viewedSlot();
 }

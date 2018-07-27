@@ -25,16 +25,16 @@
  */
 package org.lanternpowered.server.inventory.behavior;
 
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractContainer;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
 
 public class SimpleShiftClickBehavior extends AbstractShiftClickBehavior {
 
     public static final SimpleShiftClickBehavior INSTANCE = new SimpleShiftClickBehavior();
 
     @Override
-    public IInventory getTarget(LanternContainer container, AbstractInventorySlot slot) {
+    public IInventory getTarget(AbstractContainer container, AbstractSlot slot) {
         return getDefaultTarget(container, slot);
     }
 }

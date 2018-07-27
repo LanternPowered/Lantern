@@ -25,20 +25,20 @@
  */
 package org.lanternpowered.server.inventory.vanilla;
 
-import org.lanternpowered.server.inventory.AbstractInventorySlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.AbstractTopBottomShiftClickBehavior;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.behavior.AbstractShiftClickBehavior;
+import org.lanternpowered.server.inventory.PlayerTopBottomContainer;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.spongepowered.api.item.inventory.slot.OutputSlot;
 
-public class PlayerInventoryShiftClickBehavior extends AbstractShiftClickBehavior {
+public class PlayerInventoryShiftClickBehavior extends AbstractTopBottomShiftClickBehavior {
 
     public static final PlayerInventoryShiftClickBehavior INSTANCE = new PlayerInventoryShiftClickBehavior();
 
     @Override
-    public IInventory getTarget(LanternContainer container, AbstractInventorySlot slot) {
-        final LanternMainPlayerInventory main = container.getPlayerInventory().getMain();
+    public IInventory getTarget(PlayerTopBottomContainer container, AbstractSlot slot) {
+        final LanternPrimaryPlayerInventory main = container.getPlayerInventory().getPrimary();
         // Check if the slot isn't in the main inventory
         if (!main.containsInventory(slot)) {
             if (slot instanceof OutputSlot) {
@@ -49,7 +49,7 @@ public class PlayerInventoryShiftClickBehavior extends AbstractShiftClickBehavio
         } else {
             IInventory target;
             if (main.getHotbar().containsInventory(slot)) {
-                target = main.getGrid();
+                target = main.getStorage();
             } else {
                 target = main.getHotbar();
             }

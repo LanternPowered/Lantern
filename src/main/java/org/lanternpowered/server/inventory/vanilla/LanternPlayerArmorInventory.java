@@ -25,26 +25,11 @@
  */
 package org.lanternpowered.server.inventory.vanilla;
 
-import org.lanternpowered.server.inventory.CarrierReference;
-import org.lanternpowered.server.inventory.IArmorEquipableInventory;
+import org.lanternpowered.server.inventory.ICarriedInventory;
+import org.lanternpowered.server.inventory.IEquipmentInventory;
 import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
-import org.spongepowered.api.entity.ArmorEquipable;
-import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.entity.Equipable;
 
-import java.util.Optional;
+public class LanternPlayerArmorInventory extends LanternInventoryColumn implements IEquipmentInventory, ICarriedInventory<Equipable> {
 
-public class LanternPlayerArmorInventory extends LanternInventoryColumn implements IArmorEquipableInventory {
-
-    private final CarrierReference<ArmorEquipable> carrierReference = CarrierReference.of(ArmorEquipable.class);
-
-    @Override
-    public Optional<ArmorEquipable> getCarrier() {
-        return this.carrierReference.get();
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
-    }
 }

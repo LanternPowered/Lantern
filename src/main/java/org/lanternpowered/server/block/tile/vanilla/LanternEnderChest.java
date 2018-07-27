@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.AbstractContainer;
 import org.spongepowered.api.block.tileentity.EnderChest;
-import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -40,7 +40,7 @@ public class LanternEnderChest extends LanternContainerTileBase implements Ender
     private final Random random = new Random();
 
     @Override
-    public void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback) {
+    public void onViewerRemoved(Player viewer, AbstractContainer container, Callback callback) {
         super.onViewerRemoved(viewer, container, callback);
         callback.remove();
     }

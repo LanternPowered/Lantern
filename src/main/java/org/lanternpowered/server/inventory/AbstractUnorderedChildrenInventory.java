@@ -59,7 +59,7 @@ public abstract class AbstractUnorderedChildrenInventory extends AbstractChildre
     }
 
     @Override
-    protected List<AbstractSlot> getSlotInventories() {
+    protected List<AbstractSlot> getSlots() {
         if (this.slots != null) {
             return this.slots;
         } else if (this.children == null) {
@@ -71,7 +71,7 @@ public abstract class AbstractUnorderedChildrenInventory extends AbstractChildre
             if (child instanceof AbstractSlot) {
                 slots.add((AbstractSlot) child);
             } else {
-                slots.addAll(child.getSlotInventories());
+                slots.addAll(child.getSlots());
             }
         }
         this.slots = slots.build();

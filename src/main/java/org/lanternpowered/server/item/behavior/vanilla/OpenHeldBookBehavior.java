@@ -42,7 +42,7 @@ public class OpenHeldBookBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final ItemStack itemStack = context.getContext(ContextKeys.USED_SLOT).flatMap(Slot::peek).orElse(null);
+        final ItemStack itemStack = context.getContext(ContextKeys.USED_SLOT).map(Slot::peek).orElse(null);
         if (itemStack != null && itemStack.getType() == ItemTypes.WRITTEN_BOOK) {
             final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
             if (player != null) {

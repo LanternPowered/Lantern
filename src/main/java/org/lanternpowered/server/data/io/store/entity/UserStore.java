@@ -39,10 +39,11 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.ISlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
-import org.lanternpowered.server.inventory.vanilla.LanternMainPlayerInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerArmorInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternPrimaryPlayerInventory;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.data.DataContainer;
@@ -53,7 +54,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.type.GridInventory;
@@ -262,13 +262,11 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         final List<DataView> itemViews = new ArrayList<>();
         final Iterable<Slot> slots = enderChestInventory.slots();
         for (Slot slot : slots) {
-            final Optional<ItemStack> optItemStack = slot.peek();
-            if (!optItemStack.isPresent()) {
-                continue;
-            }
-            final DataView itemView = ItemStackStore.INSTANCE.serialize((LanternItemStack) optItemStack.get());
-            itemView.set(SLOT, (byte) enderChestInventory.getProperty(slot, SlotIndex.class, null).get().getValue().intValue());
-            itemViews.add(itemView);
+            ((ISlot) slot).peek().ifFilled(stack -> {
+                final DataView itemView = ItemStackStore.INSTANCE.serialize(stack);
+                itemView.set(SLOT, (byte) enderChestInventory.getProperty(slot, SlotIndex.class, null).get().getValue().intValue());
+                itemViews.add(itemView);
+            });
         }
 
         return itemViews;
@@ -283,7 +281,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
     }
 
     private static void deserializePlayerInventory(AbstractUserInventory<?> inventory, List<DataView> itemViews) {
-        final LanternMainPlayerInventory mainInventory = inventory.getMain();
+        final LanternPrimaryPlayerInventory mainInventory = inventory.getPrimary();
         final LanternPlayerArmorInventory equipmentInventory = inventory.getArmor();
         final AbstractSlot offHandSlot = inventory.getOffhand();
 
@@ -304,7 +302,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
     private static List<DataView> serializePlayerInventory(AbstractUserInventory<?> inventory) {
         final List<DataView> itemViews = new ArrayList<>();
 
-        final LanternMainPlayerInventory mainInventory = inventory.getMain();
+        final LanternPrimaryPlayerInventory mainInventory = inventory.getPrimary();
         final LanternPlayerArmorInventory equipmentInventory = inventory.getArmor();
         final AbstractSlot offHandSlot = inventory.getOffhand();
 
@@ -328,13 +326,10 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
     }
 
     private static void serializeSlot(int index, Slot slot, ObjectSerializer<LanternItemStack> itemStackSerializer, List<DataView> views) {
-        final Optional<ItemStack> optItemStack = slot.peek();
-        if (!optItemStack.isPresent()) {
-            return;
-        }
-        final ItemStack itemStack = optItemStack.get();
-        final DataView itemView = itemStackSerializer.serialize((LanternItemStack) itemStack);
-        itemView.set(SLOT, (byte) index);
-        views.add(itemView);
+        ((ISlot) slot).peek().ifFilled(stack -> {
+            final DataView itemView = itemStackSerializer.serialize(stack);
+            itemView.set(SLOT, (byte) index);
+            views.add(itemView);
+        });
     }
 }

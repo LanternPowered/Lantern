@@ -46,6 +46,7 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -149,7 +150,7 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     }
 
     @Override
-    public boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
+    public boolean canEquip(EquipmentType type, ItemStack equipment) {
         return resolveUser().canEquip(type, equipment);
     }
 
@@ -159,7 +160,7 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     }
 
     @Override
-    public boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
+    public boolean equip(EquipmentType type, ItemStack equipment) {
         return resolveUser().equip(type, equipment);
     }
 
@@ -200,6 +201,11 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     @Override
     public Vector3d getRotation() {
         return resolveUser().getRotation();
+    }
+
+    @Override
+    public Inventory getEnderChestInventory() {
+        return resolveUser().getEnderChestInventory();
     }
 
     @Override
@@ -313,12 +319,52 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     }
 
     @Override
-    public Optional<ItemStack> getItemInHand(HandType handType) {
+    public ItemStack getHelmet() {
+        return resolveUser().getHelmet();
+    }
+
+    @Override
+    public void setHelmet(ItemStack helmet) {
+        resolveUser().setHelmet(helmet);
+    }
+
+    @Override
+    public ItemStack getChestplate() {
+        return resolveUser().getChestplate();
+    }
+
+    @Override
+    public void setChestplate(ItemStack chestplate) {
+        resolveUser().setChestplate(chestplate);
+    }
+
+    @Override
+    public ItemStack getLeggings() {
+        return resolveUser().getLeggings();
+    }
+
+    @Override
+    public void setLeggings(ItemStack leggings) {
+        resolveUser().setLeggings(leggings);
+    }
+
+    @Override
+    public ItemStack getBoots() {
+        return resolveUser().getBoots();
+    }
+
+    @Override
+    public void setBoots(ItemStack boots) {
+        resolveUser().setBoots(boots);
+    }
+
+    @Override
+    public ItemStack getItemInHand(HandType handType) {
         return resolveUser().getItemInHand(handType);
     }
 
     @Override
-    public void setItemInHand(HandType hand, @Nullable ItemStack itemInHand) {
+    public void setItemInHand(HandType hand, ItemStack itemInHand) {
         resolveUser().setItemInHand(hand, itemInHand);
     }
 }

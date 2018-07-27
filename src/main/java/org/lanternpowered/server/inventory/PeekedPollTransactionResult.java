@@ -28,12 +28,22 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.List;
 
 public final class PeekedPollTransactionResult extends PeekedTransactionResult {
+
+    /**
+     * Gets a empty {@link PeekedPollTransactionResult}.
+     *
+     * @return The empty peeked poll transaction result
+     */
+    public static PeekedPollTransactionResult empty() {
+        return new PeekedPollTransactionResult(ImmutableList.of(), LanternItemStack.empty());
+    }
 
     private final ItemStack polledItem;
 

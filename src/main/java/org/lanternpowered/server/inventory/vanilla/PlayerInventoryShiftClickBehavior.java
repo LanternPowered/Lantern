@@ -29,6 +29,8 @@ import org.lanternpowered.server.inventory.AbstractInventorySlot;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.behavior.AbstractShiftClickBehavior;
+import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
+import org.spongepowered.api.item.inventory.slot.OutputSlot;
 
 public class PlayerInventoryShiftClickBehavior extends AbstractShiftClickBehavior {
 
@@ -36,13 +38,22 @@ public class PlayerInventoryShiftClickBehavior extends AbstractShiftClickBehavio
 
     @Override
     public IInventory getTarget(LanternContainer container, AbstractInventorySlot slot) {
-        IInventory target = getDefaultTarget(container, slot);
-        // Just shift click to the top inventory as well by default, and
-        // block shift clicking when the top is full
-        if (container.getPlayerInventory().getMain().containsInventory(slot)) {
-            // Only query to the equipment inventory
-            target = container.getPlayerInventory().getEquipment().union(target);
+        final LanternMainPlayerInventory main = container.getPlayerInventory().getMain();
+        // Check if the slot isn't in the main inventory
+        if (!main.containsInventory(slot)) {
+            if (slot instanceof OutputSlot) {
+                return main.transform(InventoryTransforms.REVERSE);
+            }
+            return main;
+        // Shift click from the hotbar to the main inventory
+        } else {
+            IInventory target;
+            if (main.getHotbar().containsInventory(slot)) {
+                target = main.getGrid();
+            } else {
+                target = main.getHotbar();
+            }
+            return container.getPlayerInventory().getArmor().union(target);
         }
-        return target;
     }
 }

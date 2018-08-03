@@ -49,7 +49,7 @@ public interface CauseStack extends CauseStackManager {
      */
     @Nullable
     static CauseStack currentOrNull() {
-        return LanternCauseStack.causeStacks.get();
+        return LanternCauseStack.get();
     }
 
     /**
@@ -59,7 +59,7 @@ public interface CauseStack extends CauseStackManager {
      * @return The cause stack
      */
     static CauseStack currentOrEmpty() {
-        final CauseStack causeStack = LanternCauseStack.causeStacks.get();
+        final CauseStack causeStack = LanternCauseStack.get();
         return causeStack == null ? EmptyCauseStack.instance : causeStack;
     }
 
@@ -71,7 +71,7 @@ public interface CauseStack extends CauseStackManager {
      * @return The cause stack
      */
     static CauseStack current() {
-        final CauseStack causeStack = LanternCauseStack.causeStacks.get();
+        final CauseStack causeStack = LanternCauseStack.get();
         checkState(causeStack != null, "The current thread doesn't support a cause stack.");
         return causeStack;
     }
@@ -85,7 +85,7 @@ public interface CauseStack extends CauseStackManager {
      * @param causeStack The cause stack
      */
     static void set(LanternCauseStack causeStack) {
-        LanternCauseStack.causeStacks.set(checkNotNull(causeStack, "causeStack"));
+        LanternCauseStack.set(causeStack);
     }
 
     /**

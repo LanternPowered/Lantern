@@ -29,30 +29,31 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.util.concurrent.FastThreadLocal;
 import io.netty.util.concurrent.FastThreadLocalThread;
+import org.lanternpowered.server.event.CauseStack;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Supplier;
 
 /**
  * All {@link Thread}s should be constructed through this helper class
- * to ensure that {@link FastThreadLocalThread}s are used to provide
- * benefits for using {@link FastThreadLocal}s.
+ * to ensure that {@link LanternThread}s are used to provide benefits
+ * for using {@link FastThreadLocal}s and fast per thread {@link CauseStack}s.
  */
 public final class ThreadHelper {
 
-    private static final ThreadFactory fastThreadLocalThreadFactory = ThreadHelper::newThread;
+    private static final ThreadFactory lanternThreadFactory = ThreadHelper::newThread;
 
     /**
-     * Constructs a {@link ThreadFactory} which produces {@link FastThreadLocalThread}s.
+     * Constructs a {@link ThreadFactory} which produces {@link LanternThread}s.
      *
      * @return The fast thread factory
      */
     public static ThreadFactory newThreadFactory() {
-        return fastThreadLocalThreadFactory;
+        return lanternThreadFactory;
     }
 
     /**
-     * Constructs a {@link ThreadFactory} which produces {@link FastThreadLocalThread}s
+     * Constructs a {@link ThreadFactory} which produces {@link LanternThread}s
      * which will be named using the name {@link Supplier}.
      *
      * @param nameSupplier The name supplier
@@ -64,7 +65,7 @@ public final class ThreadHelper {
     }
 
     /**
-     * Constructs a new {@link FastThreadLocalThread} for the
+     * Constructs a new {@link LanternThread} for the
      * given {@link Runnable}.
      *
      * @param runnable The runnable
@@ -72,11 +73,11 @@ public final class ThreadHelper {
      */
     public static Thread newThread(Runnable runnable) {
         requireNonNull(runnable, "runnable");
-        return new FastThreadLocalThread(runnable);
+        return new LanternThread(runnable);
     }
 
     /**
-     * Constructs a new {@link FastThreadLocalThread} for the
+     * Constructs a new {@link LanternThread} for the
      * given {@link Runnable} and thread name.
      *
      * @param runnable The runnable
@@ -86,7 +87,7 @@ public final class ThreadHelper {
     public static Thread newThread(Runnable runnable, String name) {
         requireNonNull(runnable, "runnable");
         requireNonNull(name, "name");
-        return new FastThreadLocalThread(runnable, name);
+        return new LanternThread(runnable, name);
     }
 
     private ThreadHelper() {

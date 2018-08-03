@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Strings;
 import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.LanternThread;
 import org.lanternpowered.server.util.PrettyPrinter;
 import org.lanternpowered.server.util.SystemProperties;
 import org.spongepowered.api.event.cause.Cause;
@@ -50,7 +51,30 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public final class LanternCauseStack implements CauseStack {
 
-    static final FastThreadLocal<LanternCauseStack> causeStacks = new FastThreadLocal<>();
+    /**
+     * A {@link FastThreadLocal} to fall back to if a thread doesn't extend {@link LanternThread}.
+     */
+    private static final FastThreadLocal<LanternCauseStack> fallbackCauseStacks = new FastThreadLocal<>();
+
+    @Nullable
+    static CauseStack get() {
+        final Thread thread = Thread.currentThread();
+        if (thread instanceof LanternThread) {
+            return ((LanternThread) thread).getCauseStack();
+        }
+        return fallbackCauseStacks.get();
+    }
+
+    static void set(LanternCauseStack causeStack) {
+        checkNotNull(causeStack, "causeStack");
+        final Thread thread = Thread.currentThread();
+        if (thread instanceof LanternThread) {
+            ((LanternThread) thread).setCauseStack(causeStack);
+        } else {
+            fallbackCauseStacks.set(causeStack);
+        }
+    }
+
 
     /**
      * Whether the debug mode of cause frames should be enabled.

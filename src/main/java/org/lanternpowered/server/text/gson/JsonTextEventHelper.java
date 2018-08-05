@@ -154,7 +154,7 @@ final class JsonTextEventHelper {
         } else if (clickAction instanceof ClickAction.OpenUrl) {
             final URL url = ((ClickAction.OpenUrl) clickAction).getResult();
             final String scheme = url.getProtocol();
-            final String host = url.getProtocol();
+            final String host = url.getHost();
             if ("file".equalsIgnoreCase(scheme) && (host == null || host.equals(""))) {
                 return new RawAction("open_file", url.getFile());
             } else {

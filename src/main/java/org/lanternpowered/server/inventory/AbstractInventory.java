@@ -482,6 +482,11 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
     }
 
     @Override
+    public InventoryTransactionResult offer(SlotIndex index, ItemStack stack) {
+        return getSlot(index).map(slot -> slot.offer(stack)).orElse(CachedInventoryTransactionResults.FAIL_NO_TRANSACTIONS);
+    }
+
+    @Override
     public InventoryTransactionResult set(SlotIndex index, ItemStack stack) {
         return getSlot(index).map(slot -> slot.set(stack)).orElse(CachedInventoryTransactionResults.FAIL_NO_TRANSACTIONS);
     }

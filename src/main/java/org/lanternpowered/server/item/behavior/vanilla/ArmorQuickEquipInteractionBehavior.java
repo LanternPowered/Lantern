@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -58,7 +59,7 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
                 transactions.addAll(slot.peekSet(stack).getTransactions());
             }
             final ChangeInventoryEvent.Equipment event = SpongeEventFactory.createChangeInventoryEventEquipment(
-                    context.getCurrentCause(), player.getInventory(), transactions);
+                    context.getCurrentCause(), player.getInventory(), ImmutableList.copyOf(transactions));
             if (event.isCancelled()) {
                 return BehaviorResult.CONTINUE;
             }

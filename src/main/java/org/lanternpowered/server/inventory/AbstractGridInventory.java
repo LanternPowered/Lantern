@@ -44,7 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -120,21 +119,20 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
     }
 
     @Override
-    void queryInventories(Set<AbstractMutableInventory> inventories, Predicate<AbstractMutableInventory> predicate) {
-        super.queryInventories(inventories, predicate);
+    protected void queryInventories(QueryInventoryAdder adder) throws QueryInventoryAdder.Stop {
+        super.queryInventories(adder);
         if (this.rows == null || this.columns == null) {
             return;
         }
         // Match against the rows and columns, no children of these rows or
         // columns since they are already matched
-        this.rows.stream().filter(predicate::test).forEach(inventories::add);
-        this.columns.stream().filter(predicate::test).forEach(inventories::add);
+        this.rows.forEach(adder::add);
+        this.columns.forEach(adder::add);
         // Check the slots their parents, in case they are nested into another grid
         for (AbstractSlot slot : getSlots()) {
             final AbstractInventory parent = slot.parent();
-            if ((parent != this || parent != slot) && parent instanceof AbstractMutableInventory &&
-                    predicate.test((AbstractMutableInventory) parent)) {
-                inventories.add((AbstractMutableInventory) parent);
+            if ((parent != this || parent != slot) && parent instanceof AbstractMutableInventory) {
+                adder.add(parent);
             }
         }
     }

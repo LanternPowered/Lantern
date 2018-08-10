@@ -55,7 +55,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
+class LanternEmptyInventory extends AbstractInventory implements EmptyInventory, IQueryInventory {
 
     static class Name {
         static final Translation INSTANCE = tr("inventory.empty.name");
@@ -277,11 +277,6 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     }
 
     @Override
-    protected List<? extends Inventory> queryInventories(Predicate<AbstractMutableInventory> predicate) {
-        return Collections.emptyList();
-    }
-
-    @Override
     public PluginContainer getPlugin() {
         // Use the plugin container from the parent if possible
         final AbstractInventory parent = parent();
@@ -296,6 +291,10 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     @Override
     public Translation getName() {
         return Name.INSTANCE;
+    }
+
+    @Override
+    protected void queryInventories(QueryInventoryAdder adder) {
     }
 
     @Override

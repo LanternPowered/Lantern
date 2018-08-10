@@ -508,8 +508,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     }
 
     @Override
-    protected List<? extends Inventory> queryInventories(Predicate<AbstractMutableInventory> predicate) {
-        return Collections.emptyList();
+    protected void queryInventories(QueryInventoryAdder adder) {
     }
 
     @Override

@@ -23,41 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.query;
+package org.lanternpowered.server.inventory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.inventory.AbstractInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.query.QueryOperation;
-import org.spongepowered.api.item.inventory.query.QueryOperationType;
 
-@SuppressWarnings("unchecked")
-public final class LanternQueryOperation<T> implements QueryOperation<T> {
+import java.util.List;
 
-    private final LanternQueryOperationType<T> type;
-    private final T arg;
+/**
+ * Represents a inventory that is the
+ * result of a query operation.
+ */
+public interface IQueryInventory extends IInventory {
 
-    LanternQueryOperation(LanternQueryOperationType<T> type, T arg) {
-        this.type = type;
-        this.arg = arg;
-    }
-
-    @Override
-    public QueryOperationType<T> getType() {
-        return this.type;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("type", this.type.getId())
-                .add("arg", this.arg)
-                .toString();
-    }
-
-    public boolean test(Inventory inventory) {
-        return this.type.queryOperator.test(this.arg, (AbstractInventory) inventory);
+    /**
+     * Gets the first child of this inventory.
+     *
+     * @return The first child
+     * @throws IllegalStateException If there are no children
+     */
+    default IInventory first() {
+        final List<Inventory> children = children();
+        if (children.isEmpty()) {
+            throw new IllegalStateException("No children");
+        }
+        return (IInventory) children.get(0);
     }
 }

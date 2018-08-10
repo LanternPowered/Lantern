@@ -45,11 +45,10 @@ import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
@@ -98,19 +97,21 @@ public abstract class AbstractContainer extends AbstractChildrenInventory implem
         checkNotNull(cursorSlot, "cursorSlot");
         checkNotNull(inventories, "inventories");
         this.cursor = cursorSlot;
-        final List<AbstractContainerSlot> slots = new ArrayList<>();
-        final ImmutableMap.Builder<AbstractSlot, AbstractContainerSlot> slotsToContainerSlot = ImmutableMap.builder();
+        final ImmutableList.Builder<AbstractContainerSlot> slots = ImmutableList.builder();
+        final Map<AbstractSlot, AbstractContainerSlot> slotsToContainerSlot = new HashMap<>();
         for (AbstractMutableInventory inventory : inventories) {
             for (AbstractSlot slot : inventory.getSlots()) {
-                final AbstractContainerSlot containerSlot = ((AbstractInventorySlot) slot).constructContainerSlot();
-                containerSlot.slot = (AbstractInventorySlot) slot;
-                containerSlot.setParent(this);
-                slots.add(containerSlot);
-                slotsToContainerSlot.put(slot, containerSlot);
+                slotsToContainerSlot.computeIfAbsent(slot, slot1 -> {
+                    final AbstractContainerSlot containerSlot = ((AbstractInventorySlot) slot).constructContainerSlot();
+                    containerSlot.slot = (AbstractInventorySlot) slot;
+                    containerSlot.setParent(this);
+                    slots.add(containerSlot);
+                    return containerSlot;
+                });
             }
         }
-        this.slotsToContainerSlot = slotsToContainerSlot.build();
-        initWithSlots(inventories, slots);
+        this.slotsToContainerSlot = ImmutableMap.copyOf(slotsToContainerSlot);
+        initWithSlots(inventories, slots.build());
     }
 
     /**
@@ -238,9 +239,15 @@ public abstract class AbstractContainer extends AbstractChildrenInventory implem
     }
 
     @Override
-    void queryInventories(Set<AbstractMutableInventory> inventories, Predicate<AbstractMutableInventory> predicate) {
-        super.queryInventories(inventories, inventory -> !(inventory instanceof AbstractSlot) && predicate.test(inventory));
-        getSlots().stream().filter(predicate::test).forEach(inventories::add);
+    protected void queryInventories(QueryInventoryAdder adder) throws QueryInventoryAdder.Stop {
+        getSlots().forEach(adder::add);
+        super.queryInventories(inventory -> {
+            // Don't process the slots twice
+            if (inventory instanceof Slot) {
+                return;
+            }
+            adder.add(inventory);
+        });
     }
 
     @Override

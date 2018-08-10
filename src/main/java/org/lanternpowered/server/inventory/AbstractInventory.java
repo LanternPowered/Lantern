@@ -65,9 +65,11 @@ import org.spongepowered.api.text.translation.Translation;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -320,21 +322,24 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
 
     // Queries
 
-    static final class ChildrenInventoryQuery extends AbstractChildrenInventory {
+    static final class ChildrenInventoryQuery extends AbstractChildrenInventory implements IQueryInventory {
     }
 
-    protected abstract Collection<? extends Inventory> queryInventories(Predicate<AbstractMutableInventory> predicate);
-
     @Override
-    public IInventory query(QueryOperation<?>... operations) {
-        final Collection<? extends Inventory> inventories = queryInventories(inventory -> {
-            for (QueryOperation operation : operations) {
-                if (((LanternQueryOperation) operation).test(inventory)) {
-                    return true;
+    public IQueryInventory query(QueryOperation<?>... operations) {
+        final Set<AbstractInventory> inventories = new LinkedHashSet<>();
+        try {
+            queryInventories(inventory -> {
+                checkNotNull(inventory, "inventory");
+                for (QueryOperation operation : operations) {
+                    if (((LanternQueryOperation) operation).test(inventory)) {
+                        inventories.add((AbstractInventory) inventory);
+                        return;
+                    }
                 }
-            }
-            return false;
-        });
+            });
+        } catch (QueryInventoryAdder.Stop ignored) {
+        }
         if (inventories.isEmpty()) {
             return genericEmpty();
         }
@@ -343,11 +348,46 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
         return result;
     }
 
+    private static final class FirstQueriedInventoryFunction<T extends Inventory> implements QueryInventoryAdder {
+
+        private final Predicate<T> predicate;
+        @Nullable T inventory;
+
+        private FirstQueriedInventoryFunction(Predicate<T> predicate) {
+            this.predicate = predicate;
+        }
+
+        @Override
+        public void add(Inventory inventory) {
+            checkNotNull(inventory, "inventory");
+            if (this.inventory != null) {
+                throw Stop.INSTANCE;
+            } else if (this.predicate.test((T) inventory)) {
+                this.inventory = (T) inventory;
+                throw Stop.INSTANCE;
+            }
+        }
+    }
+
     @Override
     public <T extends Inventory> Optional<T> query(Class<T> inventoryType) {
-        final Collection<? extends Inventory> inventories = queryInventories(inventoryType::isInstance);
-        return inventories.isEmpty() ? Optional.empty() : Optional.of((T) inventories.iterator().next());
+        final FirstQueriedInventoryFunction<T> function = new FirstQueriedInventoryFunction<>(inventoryType::isInstance);
+        try {
+            queryInventories(function);
+        } catch (QueryInventoryAdder.Stop ignored) {
+        }
+        return Optional.ofNullable(function.inventory);
     }
+
+    /**
+     * Queries for {@link Inventory}s that are located within this inventory. The inventories
+     * should be added through the given adder function.
+     * <p>The adder can throw {@link QueryInventoryAdder.Stop} to indicate that it's no
+     * longer needed to add more inventories. See {@link QueryInventoryAdder#add(Inventory)}.
+     *
+     * @param adder The adder function
+     */
+    protected abstract void queryInventories(QueryInventoryAdder adder) throws QueryInventoryAdder.Stop;
 
     @Override
     public boolean offerFast(ItemStack stack) {

@@ -37,7 +37,6 @@ import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResu
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -49,21 +48,8 @@ public interface IInventory extends Inventory {
     @Override
     IInventory root();
 
-    /**
-     * Gets the first child of this inventory.
-     *
-     * @return The first child
-     * @throws IllegalStateException If there are no children
-     */
-    default IInventory first() {
-        final List<Inventory> children = children();
-        if (children.isEmpty()) {
-            throw new IllegalStateException("No children");
-        }
-        return (IInventory) children.get(0);
-    }
-
-    IInventory query(QueryOperation<?>... operations);
+    @Override
+    IQueryInventory query(QueryOperation<?>... operations);
 
     /**
      * Gets the {@link EmptyInventory} that should be used by this

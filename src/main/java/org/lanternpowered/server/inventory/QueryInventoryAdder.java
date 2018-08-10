@@ -23,41 +23,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.query;
+package org.lanternpowered.server.inventory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.inventory.AbstractInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.query.QueryOperation;
-import org.spongepowered.api.item.inventory.query.QueryOperationType;
 
-@SuppressWarnings("unchecked")
-public final class LanternQueryOperation<T> implements QueryOperation<T> {
+/**
+ * Represents a adder that will be used to collect
+ * {@link Inventory}s for query operations.
+ */
+@FunctionalInterface
+public interface QueryInventoryAdder {
 
-    private final LanternQueryOperationType<T> type;
-    private final T arg;
+    /**
+     * Adds the given {@link Inventory} to be checked and possibly
+     * added as query result if valid.
+     * <p>A {@link Stop} control flow exception will be thrown when it's
+     * no longer needed to add more {@link Inventory}s.
+     *
+     * @param inventory The inventory to add
+     * @throws Stop When it's no longer needed to add more inventories
+     */
+    void add(Inventory inventory) throws Stop;
 
-    LanternQueryOperation(LanternQueryOperationType<T> type, T arg) {
-        this.type = type;
-        this.arg = arg;
-    }
+    /**
+     * Represents a flow control exception that will be thrown when
+     * it is no longer needed to add {@link Inventory}s to a
+     * specific adder.
+     */
+    final class Stop extends RuntimeException {
 
-    @Override
-    public QueryOperationType<T> getType() {
-        return this.type;
-    }
+        final static Stop INSTANCE = new Stop(); // Internal access only
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("type", this.type.getId())
-                .add("arg", this.arg)
-                .toString();
-    }
+        private Stop() {
+        }
 
-    public boolean test(Inventory inventory) {
-        return this.type.queryOperator.test(this.arg, (AbstractInventory) inventory);
+        @Override
+        public Throwable fillInStackTrace() {
+            setStackTrace(new StackTraceElement[0]);
+            return this;
+        }
     }
 }

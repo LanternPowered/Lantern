@@ -58,10 +58,8 @@ import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -124,13 +122,17 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
         for (AbstractMutableInventory inventory : this.children) {
             if (inventory instanceof AbstractSlot) {
                 final AbstractSlot slot = (AbstractSlot) inventory;
-                slotsBuilder.add(slot);
-                slotsToIndex.put(slot, index++);
+                // Don't include duplicate slots, e.g. from queries
+                if (slotsToIndex.putIfAbsent(slot, index++) == INVALID_SLOT_INDEX) {
+                    slotsBuilder.add(slot);
+                }
             } else if (inventory instanceof AbstractChildrenInventory) {
                 final AbstractChildrenInventory childrenInventory = (AbstractChildrenInventory) inventory;
                 for (AbstractSlot slot : childrenInventory.getSlots()) {
-                    slotsBuilder.add(slot);
-                    slotsToIndex.put(slot, index++);
+                    // Don't include duplicate slots, e.g. from queries
+                    if (slotsToIndex.putIfAbsent(slot, index++) == INVALID_SLOT_INDEX) {
+                        slotsBuilder.add(slot);
+                    }
                 }
             } else {
                 throw new IllegalArgumentException("All the children inventories must be ordered.");
@@ -199,23 +201,11 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
     }
 
     @Override
-    protected Collection<? extends Inventory> queryInventories(Predicate<AbstractMutableInventory> predicate) {
-        final Set<AbstractMutableInventory> inventories = new LinkedHashSet<>();
-        queryInventories(inventories, predicate);
-        return inventories;
-    }
-
-    void queryInventories(Set<AbstractMutableInventory> inventories, Predicate<AbstractMutableInventory> predicate) {
+    protected void queryInventories(QueryInventoryAdder adder) throws QueryInventoryAdder.Stop {
         // First test direct children
-        getChildren().stream().filter(predicate).forEach(inventories::add);
+        getChildren().forEach(adder::add);
         // Then children of children
-        for (AbstractMutableInventory child : getChildren()) {
-            if (child instanceof AbstractChildrenInventory) {
-                ((AbstractChildrenInventory) child).queryInventories(inventories, predicate);
-            } else {
-                inventories.addAll((List) child.queryInventories(predicate));
-            }
-        }
+        getChildren().forEach(child -> child.queryInventories(adder));
     }
 
     @Override

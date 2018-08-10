@@ -40,7 +40,6 @@ import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -116,8 +115,8 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    protected Collection<? extends Inventory> queryInventories(Predicate<AbstractMutableInventory> predicate) {
-        return getForwardingSlot().queryInventories(predicate);
+    protected void queryInventories(QueryInventoryAdder adder) {
+        getForwardingSlot().queryInventories(adder);
     }
 
     @Override
@@ -327,5 +326,26 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     @Override
     public void removeTracker(SlotChangeTracker tracker) {
         getForwardingSlot().removeTracker(tracker);
+    }
+
+    @Override
+    public int hashCode() {
+        return getForwardingSlot().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AbstractSlot)) {
+            return false;
+        }
+        final AbstractSlot slot = unwrap((AbstractSlot) obj);
+        return slot.equals(unwrap(getForwardingSlot()));
+    }
+
+    private static AbstractSlot unwrap(AbstractSlot slot) {
+        while (slot instanceof AbstractForwardingSlot) {
+            slot = ((AbstractForwardingSlot) slot).getForwardingSlot();
+        }
+        return slot;
     }
 }

@@ -31,6 +31,7 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.ContainerProvidedWrappedInventory;
 import org.lanternpowered.server.inventory.ICarriedInventory;
 import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.QueryInventoryAdder;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.spongepowered.api.entity.living.player.User;
@@ -46,10 +47,6 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractChil
 
     private static final class Holder {
 
-        private static final QueryOperation<?> MAIN_INVENTORY_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(LanternPrimaryPlayerInventory.class);
-        private static final QueryOperation<?> ARMOR_INVENTORY_OPERATION =
-                QueryOperationTypes.INVENTORY_TYPE.of(LanternPlayerArmorInventory.class);
         private static final QueryOperation<?> OFF_HAND_OPERATION =
                 QueryOperationTypes.INVENTORY_PROPERTY.of(EquipmentSlotType.of(EquipmentTypes.OFF_HAND));
     }
@@ -69,8 +66,8 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractChil
         super.init();
 
         // Search the the inventories for the helper methods
-        this.mainInventory = (LanternPrimaryPlayerInventory) query(Holder.MAIN_INVENTORY_OPERATION).first();
-        this.armorInventory = (LanternPlayerArmorInventory) query(Holder.ARMOR_INVENTORY_OPERATION).first();
+        this.mainInventory = query(LanternPrimaryPlayerInventory.class).get();
+        this.armorInventory = query(LanternPlayerArmorInventory.class).get();
         this.offhandSlot = (AbstractSlot) query(Holder.OFF_HAND_OPERATION).first();
 
         this.priorityHotbar = AbstractChildrenInventory.viewBuilder()
@@ -96,6 +93,15 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractChil
             return this.priorityHotbar;
         }
         return super.transform(transformation);
+    }
+
+    @Override
+    protected void queryInventories(QueryInventoryAdder adder) throws QueryInventoryAdder.Stop {
+        // Complete equipment has higher priority over armor
+        if (this.equipmentInventory != null) {
+            adder.add(this.equipmentInventory);
+        }
+        super.queryInventories(adder);
     }
 
     @Override

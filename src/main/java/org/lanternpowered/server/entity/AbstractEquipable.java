@@ -29,7 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IEquipmentInventory;
-import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.IQueryInventory;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.entity.Equipable;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -40,8 +41,6 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
 public interface AbstractEquipable extends Equipable {
@@ -54,18 +53,18 @@ public interface AbstractEquipable extends Equipable {
 
     @Override
     default boolean canEquip(EquipmentType type) {
-        return canEquip(type, null);
+        return canEquip(type, LanternItemStack.empty());
     }
 
     @Override
-    default boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
+    default boolean canEquip(EquipmentType type, ItemStack equipment) {
         checkNotNull(type, "type");
-        final IInventory inventory = (IInventory) getInventory().query(Holder.EQUIPMENT_INVENTORY_OPERATION);
+        final IQueryInventory inventory = (IQueryInventory) getInventory().query(Holder.EQUIPMENT_INVENTORY_OPERATION);
         if (inventory instanceof EmptyInventory) {
             return false;
         }
         final AbstractSlot slot = (AbstractSlot) ((IEquipmentInventory) inventory.first()).getSlot(type).orElse(null);
-        return slot != null && (equipment == null || slot.isValidItem(equipment));
+        return slot != null && slot.isValidItem(equipment);
     }
 
     @Override
@@ -79,9 +78,9 @@ public interface AbstractEquipable extends Equipable {
     }
 
     @Override
-    default boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
+    default boolean equip(EquipmentType type, ItemStack equipment) {
         checkNotNull(type, "type");
-        final IInventory inventory = (IInventory) getInventory().query(Holder.EQUIPMENT_INVENTORY_OPERATION);
+        final IQueryInventory inventory = (IQueryInventory) getInventory().query(Holder.EQUIPMENT_INVENTORY_OPERATION);
         if (inventory instanceof EmptyInventory) {
             return false;
         }

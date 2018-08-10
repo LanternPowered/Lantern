@@ -78,6 +78,7 @@ import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -289,10 +290,10 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final ClickInventoryEvent.Drop event;
             if (mouseButton == MouseButton.LEFT) {
                 event = SpongeEventFactory.createClickInventoryEventDropOutsidePrimary(
-                        causeStack.getCurrentCause(), cursorTransaction, entities, this.container, new ArrayList<>());
+                        causeStack.getCurrentCause(), cursorTransaction, entities, this.container, Collections.emptyList());
             } else {
                 event = SpongeEventFactory.createClickInventoryEventDropOutsideSecondary(
-                        causeStack.getCurrentCause(), cursorTransaction, entities, this.container, new ArrayList<>());
+                        causeStack.getCurrentCause(), cursorTransaction, entities, this.container, Collections.emptyList());
             }
             finishInventoryEvent(event);
             return;
@@ -316,7 +317,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             }
 
             final ClickInventoryEvent.Middle event = SpongeEventFactory.createClickInventoryEventMiddle(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container, new ArrayList<>());
+                    causeStack.getCurrentCause(), cursorTransaction, this.container, Collections.emptyList());
             finishInventoryEvent(event);
         } else {
             // Crafting slots have special click behavior
@@ -588,7 +589,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(oldCursorItem, newCursorItem);
 
             final ClickInventoryEvent.Drag.Primary event = SpongeEventFactory.createClickInventoryEventDragPrimary(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container, transactions);
+                    causeStack.getCurrentCause(), cursorTransaction, this.container, this.container.transformSlots(transactions));
             finishInventoryEvent(event);
         } else if (mouseButton == MouseButton.RIGHT) {
             int quantity = cursorItem.getQuantity();

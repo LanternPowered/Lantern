@@ -23,43 +23,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.persistence;
+package org.lanternpowered.server.data.persistence.mojangson;
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.HeaderMode;
-import org.lanternpowered.server.data.translator.ConfigurateTranslator;
+import com.google.common.io.CharStreams;
+import org.lanternpowered.server.data.persistence.AbstractStringDataFormat;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-public final class HoconDataFormat extends AbstractStringDataFormat {
+public class MojangsonDataFormat extends AbstractStringDataFormat {
 
-    public HoconDataFormat(String identifier) {
+    private final int flags;
+
+    public MojangsonDataFormat(String identifier, int flags) {
         super(identifier);
+        this.flags = flags;
+    }
+
+    @Override
+    public DataContainer read(String input) throws InvalidDataException {
+        final Object value = Mojangson.parse(input, this.flags);
+        if (value instanceof DataContainer) {
+            return (DataContainer) value;
+        }
+        throw new MojangsonParseException("Expected a DataContainer but got: " + value.getClass().getName());
     }
 
     @Override
     public DataContainer readFrom(Reader input) throws InvalidDataException, IOException {
-        final HoconConfigurationLoader loader = HoconConfigurationLoader.builder()
-                .setSource(() -> ensureBuffered(input))
-                .build();
-        final CommentedConfigurationNode node = loader.load();
-        return ConfigurateTranslator.instance().translate(node);
+        return read(CharStreams.toString(input));
+    }
+
+    @Override
+    public String write(DataView data) {
+        return Mojangson.to(data, this.flags);
     }
 
     @Override
     public void writeTo(Writer output, DataView data) throws IOException {
-        final HoconConfigurationLoader loader = HoconConfigurationLoader.builder()
-                .setHeaderMode(HeaderMode.NONE)
-                .setSink(() -> ensureBuffered(output))
-                .build();
-        final ConfigurationNode node = ConfigurateTranslator.instance().translate(data);
-        loader.save(node);
+        try (BufferedWriter writer = ensureBuffered(output)) {
+            writer.write(write(data));
+        }
     }
 }

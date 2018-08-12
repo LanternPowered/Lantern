@@ -23,29 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data.persistence;
+package org.lanternpowered.server.data.persistence.mojangson;
 
-import org.lanternpowered.server.data.persistence.HoconDataFormat;
-import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
-import org.lanternpowered.server.data.persistence.mojangson.Mojangson;
-import org.lanternpowered.server.data.persistence.mojangson.MojangsonDataFormat;
-import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
-import org.spongepowered.api.data.persistence.DataFormat;
-import org.spongepowered.api.data.persistence.DataFormats;
+import java.util.HashMap;
+import java.util.Map;
 
-public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<DataFormat> {
+import javax.annotation.Nullable;
 
-    public DataFormatRegistryModule() {
-        super(DataFormats.class);
+enum ExtendedObjectType {
+    BOOLEAN         ("Boolean"), // Boolean is for parsing only, to be compatible with the NBT format
+    BOOLEAN_ARRAY   ("boolean[]"),
+    SHORT_ARRAY     ("short[]"),
+    FLOAT_ARRAY     ("float[]"),
+    DOUBLE_ARRAY    ("double[]"),
+    STRING_ARRAY    ("string[]"),
+    CHAR            ("char"),
+    CHAR_ARRAY      ("char[]"),
+    VIEW_ARRAY      ("compound[]"),
+    MAP             ("map"),
+    MAP_ARRAY       ("map[]"),
+    ;
+
+    static final String mapKeyName = "K";
+    static final String mapValueName = "V";
+
+    static final Map<String, ExtendedObjectType> bySuffix = new HashMap<>();
+
+    @Nullable final String suffix;
+
+    ExtendedObjectType(@Nullable String suffix) {
+        this.suffix = suffix;
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new HoconDataFormat("hocon"));
-        register(new JsonDataFormat("json"));
-        register(new NbtDataFormat("nbt"));
-        register(new MojangsonDataFormat("mojangson", Mojangson.Flags.MOJANGSON));
-        register(new MojangsonDataFormat("lanterson", Mojangson.Flags.LANTERSON));
+    static {
+        for (ExtendedObjectType nbtType : values()) {
+            bySuffix.put(nbtType.suffix, nbtType);
+        }
     }
 }

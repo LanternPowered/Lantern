@@ -23,29 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data.persistence;
+package org.lanternpowered.server.data.persistence.mojangson;
 
-import org.lanternpowered.server.data.persistence.HoconDataFormat;
-import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
-import org.lanternpowered.server.data.persistence.mojangson.Mojangson;
-import org.lanternpowered.server.data.persistence.mojangson.MojangsonDataFormat;
-import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
-import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
-import org.spongepowered.api.data.persistence.DataFormat;
-import org.spongepowered.api.data.persistence.DataFormats;
+public class MojangsonParseException extends RuntimeException {
 
-public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<DataFormat> {
-
-    public DataFormatRegistryModule() {
-        super(DataFormats.class);
+    public MojangsonParseException() {
+        super();
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new HoconDataFormat("hocon"));
-        register(new JsonDataFormat("json"));
-        register(new NbtDataFormat("nbt"));
-        register(new MojangsonDataFormat("mojangson", Mojangson.Flags.MOJANGSON));
-        register(new MojangsonDataFormat("lanterson", Mojangson.Flags.LANTERSON));
+    public MojangsonParseException(String message) {
+        super(message);
     }
+
+    public MojangsonParseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public MojangsonParseException(Throwable cause) {
+        super(cause);
+    }
+
 }

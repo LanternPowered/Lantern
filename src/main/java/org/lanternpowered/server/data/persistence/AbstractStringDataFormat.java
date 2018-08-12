@@ -25,11 +25,66 @@
  */
 package org.lanternpowered.server.data.persistence;
 
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.StringDataFormat;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 public abstract class AbstractStringDataFormat extends AbstractDataFormat implements StringDataFormat {
 
     public AbstractStringDataFormat(String identifier) {
         super(identifier);
+    }
+
+    @Override
+    public DataContainer readFrom(InputStream input) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
+            return readFrom(reader);
+        }
+    }
+
+    @Override
+    public DataContainer read(String input) throws IOException {
+        return readFrom(new StringReader(input));
+    }
+
+    @Override
+    public void writeTo(OutputStream output, DataView data) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8))) {
+            writeTo(writer, data);
+        }
+    }
+
+    @Override
+    public String write(DataView data) throws IOException {
+        final StringWriter writer = new StringWriter();
+        writeTo(writer, data);
+        return writer.toString();
+    }
+
+    protected static BufferedReader ensureBuffered(Reader reader) {
+        if (reader instanceof BufferedReader) {
+            return (BufferedReader) reader;
+        }
+        return new BufferedReader(reader);
+    }
+
+    protected static BufferedWriter ensureBuffered(Writer writer) {
+        if (writer instanceof BufferedWriter) {
+            return (BufferedWriter) writer;
+        }
+        return new BufferedWriter(writer);
     }
 }

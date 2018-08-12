@@ -36,53 +36,19 @@ import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
 public class JsonDataFormat extends AbstractStringDataFormat {
-
-    private static final String DOUBLE_SUFFIX = "d";
-    private static final String DOUBLE_SUFFIX_UNTYPED = ".0";
-    private static final String FLOAT_SUFFIX = "f";
-    private static final String LONG_SUFFIX = "l";
-    private static final String BYTE_SUFFIX = "b";
-    private static final String SHORT_SUFFIX = "s";
-
-    private static String upperOrLower(String value) {
-        return value + value.toUpperCase();
-    }
-
-    private static final Pattern DOUBLE =
-            Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[" + upperOrLower(DOUBLE_SUFFIX) + "]$");
-    private static final Pattern DOUBLE_UNTYPED =
-            Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+$");
-    private static final Pattern FLOAT =
-            Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[" + upperOrLower(FLOAT_SUFFIX) + "]$");
-    private static final Pattern LONG =
-            Pattern.compile("^[-+]?[0-9]+[" + upperOrLower(LONG_SUFFIX) + "]$");
-    private static final Pattern BYTE =
-            Pattern.compile("^[-+]?[0-9]+[" + upperOrLower(BYTE_SUFFIX) + "]$");
-    private static final Pattern SHORT =
-            Pattern.compile("^[-+]?[0-9]+[" + upperOrLower(SHORT_SUFFIX) + "]$");
-    private static final Pattern INTEGER =
-            Pattern.compile("^[-+]?[0-9]+$");
 
     public JsonDataFormat(String identifier) {
         super(identifier);
@@ -91,20 +57,6 @@ public class JsonDataFormat extends AbstractStringDataFormat {
     @Override
     public DataContainer readFrom(Reader input) throws InvalidDataException, IOException {
         try (JsonReader reader = new JsonReader(input)) {
-            return readContainer(reader);
-        }
-    }
-
-    @Override
-    public DataContainer readFrom(InputStream input) throws IOException {
-        try (JsonReader reader = new JsonReader(new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)))) {
-            return readContainer(reader);
-        }
-    }
-
-    @Override
-    public DataContainer read(String input) throws IOException {
-        try (JsonReader reader = new JsonReader(new StringReader(input))) {
             return readContainer(reader);
         }
     }
@@ -196,37 +148,11 @@ public class JsonDataFormat extends AbstractStringDataFormat {
                 reader.nextNull();
                 return null;
             case STRING:
-                return readString(reader);
+                return reader.nextString();
             case NUMBER:
                 return readNumber(reader);
             default:
                 throw new IOException("Unexpected token: " + token);
-        }
-    }
-
-    private static Object readString(JsonReader reader) throws IOException {
-        final String value = reader.nextString();
-        if (DOUBLE.matcher(value).matches()) {
-            return Double.parseDouble(value.substring(0, value.length() - 1));
-        } else if (FLOAT.matcher(value).matches()) {
-            return Float.parseFloat(value.substring(0, value.length() - 1));
-        } else if (LONG.matcher(value).matches()) {
-            return Long.parseLong(value.substring(0, value.length() - 1));
-        } else if (SHORT.matcher(value).matches()) {
-            return Short.parseShort(value.substring(0, value.length() - 1));
-        } else if (BYTE.matcher(value).matches()) {
-            return Byte.parseByte(value.substring(0, value.length() - 1));
-        } else if (INTEGER.matcher(value).matches()) {
-            return Integer.parseInt(value);
-        } else if (DOUBLE_UNTYPED.matcher(value).matches()) {
-            return Double.parseDouble(value);
-        } else {
-            if ("true".equalsIgnoreCase(value)) {
-                return true;
-            } else if ("false".equalsIgnoreCase(value)) {
-                return false;
-            }
-            return value;
         }
     }
 
@@ -258,26 +184,10 @@ public class JsonDataFormat extends AbstractStringDataFormat {
     }
 
     @Override
-    public void writeTo(OutputStream output, DataView data) throws IOException {
-        try (JsonWriter writer = new JsonWriter(new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8)))) {
-            writeView(writer, data);
-        }
-    }
-
-    @Override
     public void writeTo(Writer output, DataView data) throws IOException {
         try (JsonWriter writer = new JsonWriter(output)) {
             writeView(writer, data);
         }
-    }
-
-    @Override
-    public String write(DataView data) throws IOException {
-        final StringWriter writer = new StringWriter();
-        try (JsonWriter jsonWriter = new JsonWriter(writer)) {
-            writeView(jsonWriter, data);
-        }
-        return writer.toString();
     }
 
     private static void writeView(JsonWriter writer, DataView view) throws IOException {
@@ -308,24 +218,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
         } else if (value instanceof Boolean) {
             writer.value((Boolean) value);
         } else if (value instanceof Number) {
-            if (value instanceof Double) {
-                String dbl = Double.toString((Double) value);
-                if (dbl.indexOf('.') == -1) {
-                    dbl += DOUBLE_SUFFIX_UNTYPED;
-                }
-                // Writes a raw json value, without quotes
-                writer.jsonValue(dbl);
-            } else if (value instanceof Float) {
-                writer.value(value + FLOAT_SUFFIX);
-            } else if (value instanceof Long) {
-                writer.value(value + LONG_SUFFIX);
-            } else if (value instanceof Byte) {
-                writer.value(value + BYTE_SUFFIX);
-            } else if (value instanceof Short) {
-                writer.value(value + SHORT_SUFFIX);
-            } else {
-                writer.value((Number) value);
-            }
+            writer.value((Number) value);
         } else if (value instanceof String) {
             writer.value((String) value);
         } else if (value instanceof Iterable) {

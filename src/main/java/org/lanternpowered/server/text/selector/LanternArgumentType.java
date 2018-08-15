@@ -27,44 +27,64 @@ package org.lanternpowered.server.text.selector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.util.LambdaFactory;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.text.selector.ArgumentType;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T>> implements ArgumentType<T> {
 
-    private static final Map<String, Function<String, ?>> converters = new HashMap<>();
+    private static final Map<String, Function<String, ?>> converters = Maps.newHashMap();
 
     static {
         converters.put(String.class.getName(), Function.identity());
-        converters.put(EntityType.class.getName(), input ->
-                Sponge.getRegistry().getType(EntityType.class, CatalogKey.resolve(input)).orElse(null));
+        converters.put(EntityType.class.getName(), (Function<String, EntityType>) input ->
+                EntityTypeRegistryModule.get().get(CatalogKey.resolve(input.toLowerCase())).orElse(null));
+        converters.put(GameMode.class.getName(), input -> {
+            switch (input) {
+                case "s": return GameModes.SURVIVAL;
+                case "c": return GameModes.CREATIVE;
+                case "a": return GameModes.ADVENTURE;
+                case "sp": return GameModes.SPECTATOR;
+            }
+            try {
+                final int i = Integer.parseInt(input);
+                return GameModeRegistryModule.get().getByInternalId(i).orElse(GameModes.NOT_SET);
+            } catch (NumberFormatException e) {
+                return GameModeRegistryModule.get().get(CatalogKey.resolve(input)).orElse(GameModes.NOT_SET);
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Function<String, T> getConverter(final Class<T> type, String converterKey) {
+    static <T> Function<String, T> getConverter(Class<T> type, String converterKey) {
         if (!converters.containsKey(converterKey)) {
             try {
                 final Method valueOf = type.getMethod("valueOf", String.class);
-                converters.put(converterKey, LanternSelectorFactory.<String, T>methodAsFunction(valueOf, true));
+                converters.put(converterKey, LambdaFactory.<String, T>createFunction(valueOf));
             } catch (NoSuchMethodException ignored) {
                 if (CatalogType.class.isAssignableFrom(type)) {
-                    Class<? extends CatalogType> type2 = type.asSubclass(CatalogType.class);
-                    converters.put(converterKey, input -> Sponge.getRegistry()
-                            .getType(type2, CatalogKey.resolve(input)).get());
+                    final Class<? extends CatalogType> type2 = type.asSubclass(CatalogType.class);
+                    converters.put(converterKey, (Function<String, T>) input -> {
+                        // assume it exists for now
+                        return (T) Lantern.getGame().getRegistry().getType(type2, CatalogKey.resolve(input)).get();
+                    });
                 } else {
                     throw new IllegalStateException("Can't convert " + type);
                 }
             } catch (SecurityException e) {
-                Lantern.getLogger().warn("There occurred a security exception", e);
+                Lantern.getLogger().warn("Unable to create converter for: " + type, e);
             }
         }
         return (Function<String, T>) converters.get(converterKey);
@@ -123,6 +143,6 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
         public Invertible(String key, Function<String, T> converter) {
             super(key, converter);
         }
-    }
 
+    }
 }

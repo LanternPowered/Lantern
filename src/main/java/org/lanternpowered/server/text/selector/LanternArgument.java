@@ -52,14 +52,14 @@ public class LanternArgument<T> implements Argument<T> {
 
         @Override
         public Argument.Invertible<T> invert() {
-            return new LanternArgument.Invertible<T>((ArgumentType.Invertible<T>) this.getType(), this.getValue(), !this.isInverted());
+            return new LanternArgument.Invertible<>((ArgumentType.Invertible<T>) this.getType(), this.getValue(), !this.isInverted());
         }
 
     }
 
     private static String toSelectorArgument(Object val) {
         if (val instanceof CatalogType) {
-            return ((CatalogType) val).getKey().getValue();
+            return ((CatalogType) val).getName();
         }
         return String.valueOf(val);
     }

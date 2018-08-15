@@ -33,6 +33,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.util.LambdaFactory;
 import org.spongepowered.api.text.selector.ArgumentHolder;
 import org.spongepowered.api.text.selector.ArgumentType;
 
@@ -73,16 +74,16 @@ public class LanternArgumentHolder<T extends ArgumentHolder<?>> implements Argum
         private static final SetMultimap<Class<?>, Function<?, ?>> extractFunctionSets = HashMultimap.create();
 
         static {
-            List<Class<?>> vectors = Arrays.<Class<?>>asList(Vector3i.class, Vector3l.class, Vector3f.class, Vector3d.class);
+            final List<Class<?>> vectors = Arrays.asList(Vector3i.class, Vector3l.class, Vector3f.class, Vector3d.class);
             for (Class<?> vec : vectors) {
-                Set<Function<?, ?>> set = Sets.newLinkedHashSet();
+                final Set<Function<?, ?>> set = Sets.newLinkedHashSet();
                 try {
-                    set.add(LanternSelectorFactory.methodAsFunction(vec.getDeclaredMethod("getX"), false));
-                    set.add(LanternSelectorFactory.methodAsFunction(vec.getDeclaredMethod("getY"), false));
-                    set.add(LanternSelectorFactory.methodAsFunction(vec.getDeclaredMethod("getZ"), false));
+                    set.add(LambdaFactory.createFunction(vec.getDeclaredMethod("getX")));
+                    set.add(LambdaFactory.createFunction(vec.getDeclaredMethod("getY")));
+                    set.add(LambdaFactory.createFunction(vec.getDeclaredMethod("getZ")));
                 } catch (Exception e) {
                     // should support getX/Y/Z
-                    throw new AssertionError("bad vector3 type");
+                    throw new AssertionError("Bad vector3 type: " + vec.getName());
                 }
                 extractFunctionSets.putAll(vec, set);
             }

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
@@ -37,8 +36,7 @@ public final class SelectorFactoryRegistryModule implements RegistryModule {
 
     @Override
     public void registerDefaults() {
-        this.selectorFactory = new LanternSelectorFactory(Lantern.getGame().getRegistry()
-                .getRegistryModule(SelectorTypeRegistryModule.class).get());
+        this.selectorFactory = new LanternSelectorFactory();
     }
 
     public LanternSelectorFactory getFactory() {

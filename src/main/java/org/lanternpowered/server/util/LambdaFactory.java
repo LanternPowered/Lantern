@@ -40,11 +40,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
 public final class LambdaFactory {
 
+    private static final FunctionalInterface<Function> functionInterface = FunctionalInterface.of(Function.class);
     private static final FunctionalInterface<Supplier> supplierInterface = FunctionalInterface.of(Supplier.class);
     private static final FunctionalInterface<Consumer> consumerInterface = FunctionalInterface.of(Consumer.class);
     private static final FunctionalInterface<BiConsumer> biConsumerInterface = FunctionalInterface.of(BiConsumer.class);
@@ -73,6 +75,17 @@ public final class LambdaFactory {
     }
 
     /**
+     * Creates a {@link Function} from the given {@link Method}.
+     *
+     * @param method The method
+     * @param <T> The object type
+     * @return The function
+     */
+    public static <T, R> Function<T, R> createFunction(Method method) {
+        return create(functionInterface, method);
+    }
+
+    /**
      * Creates a {@link Supplier} to create objects of the type
      * {@link T}. The target method must be static and have zero
      * parameters.
@@ -82,12 +95,6 @@ public final class LambdaFactory {
      * @return The supplier
      */
     public static <T> Supplier<T> createSupplier(Method method) {
-        checkMethodArgument(Modifier.isStatic(method.getModifiers()),
-                "The method \"%s\" must be static.", method);
-        checkMethodArgument(method.getParameterCount() == 0,
-                "The method \"%s\" may not have any parameters.", method);
-        checkMethodArgument(method.getReturnType().equals(void.class),
-                "The method \"%s\" return type must not be void.", method);
         return create(supplierInterface, method);
     }
 
@@ -102,15 +109,6 @@ public final class LambdaFactory {
      * @return The bi consumer
      */
     public static <A> Consumer<A> createConsumer(Method method) {
-        if (Modifier.isStatic(method.getModifiers())) {
-            checkMethodArgument(method.getParameterCount() == 1,
-                    "The method \"%s\" doesn't have exactly one parameter, this must be the case for static methods.", method);
-        } else {
-            checkMethodArgument(method.getParameterCount() == 0,
-                    "The method \"%s\" doesn't have exactly zero parameters, this must be the case for non static methods.", method);
-        }
-        checkMethodArgument(method.getReturnType().equals(void.class),
-                "The method \"%s\" return type must be void.", method);
         return create(consumerInterface, method);
     }
 
@@ -126,15 +124,6 @@ public final class LambdaFactory {
      * @return The bi consumer
      */
     public static <A, B> BiConsumer<A, B> createBiConsumer(Method method) {
-        if (Modifier.isStatic(method.getModifiers())) {
-            checkMethodArgument(method.getParameterCount() == 2,
-                    "The method \"%s\" doesn't have exactly two parameters, this must be the case for static methods.", method);
-        } else {
-            checkMethodArgument(method.getParameterCount() == 1,
-                    "The method \"%s\" doesn't have exactly one parameter, this must be the case for non static methods.", method);
-        }
-        checkMethodArgument(method.getReturnType().equals(void.class),
-                "The method \"%s\" return type must be void.", method);
         return create(biConsumerInterface, method);
     }
 

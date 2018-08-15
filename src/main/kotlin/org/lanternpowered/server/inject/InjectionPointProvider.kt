@@ -70,14 +70,15 @@ class InjectionPointProvider : AbstractMatcher<Binding<*>>(), Module, ProvisionL
                 val source = spiInjectionPoint.declaringType.type.typeToken
                 val member = spiInjectionPoint.member
                 return when (member) {
-                    is Field -> LanternInjectionPoint(source, member.genericType.typeToken, member.annotations)
+                    is Field -> LanternInjectionPoint.Field(source, member.genericType.typeToken, member.annotations, member)
                     is Executable -> {
                         val parameterAnnotations = member.parameterAnnotations
                         val parameterTypes = member.genericParameterTypes
                         val index = dependency.parameterIndex
-                        LanternInjectionPoint(source, parameterTypes[index].typeToken, parameterAnnotations[index])
+                        LanternInjectionPoint.Parameter(source, parameterTypes[index].typeToken,
+                                parameterAnnotations[index], member, index)
                     }
-                    else -> throw IllegalStateException("Unsupported Member type: " + member.javaClass.name)
+                    else -> throw IllegalStateException("Unsupported Member type: ${member.javaClass.name}")
                 }
             }
         }

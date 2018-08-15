@@ -28,8 +28,6 @@
 
 package org.lanternpowered.api.text.title
 
-import org.lanternpowered.api.util.Unused
-
 typealias Title = org.spongepowered.api.text.title.Title
 typealias TitleBuilder = org.spongepowered.api.text.title.Title.Builder
 
@@ -48,4 +46,4 @@ inline fun Title(fn: TitleBuilder.() -> Unit): Title = TitleBuilder().apply(fn).
  * @return The constructed title builder
  */
 @JvmName("builder")
-inline fun TitleBuilder(unused: Unused = null): TitleBuilder = Title.builder()
+inline fun TitleBuilder(): TitleBuilder = Title.builder()

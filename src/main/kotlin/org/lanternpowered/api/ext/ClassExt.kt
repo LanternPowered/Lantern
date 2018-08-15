@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.api.ext
 
+import com.google.inject.TypeLiteral
 import org.lanternpowered.api.util.TypeToken
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
@@ -45,6 +46,8 @@ val <T : Any> Class<T>.typeToken: TypeToken<T> get() = TypeToken.of(this)
  * Constructs a [TypeToken] for the [Type].
  */
 val Type.typeToken: TypeToken<*> get() = TypeToken.of(this)
+
+val <T : Any> TypeToken<T>.typeLiteral: TypeLiteral<T> get() = TypeLiteral.get(this.type).uncheckedCast()
 
 /**
  * Constructs a [TypeToken] for type [T].

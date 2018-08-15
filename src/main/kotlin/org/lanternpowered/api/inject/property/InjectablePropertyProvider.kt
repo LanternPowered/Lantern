@@ -23,19 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.ext
+package org.lanternpowered.api.inject.property
 
-import org.lanternpowered.api.util.property.InitOnceProperty
-import org.lanternpowered.api.util.property.ServiceProperty
-import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
+import com.google.inject.Inject
+import com.google.inject.Injector
+import com.google.inject.Key
+import com.google.inject.Provider
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.inject.InjectionPoint
 
-/**
- * A property that can only be written once.
- */
-inline fun <reified T> initOnce(): ReadWriteProperty<Any, T> = InitOnceProperty()
+class InjectablePropertyProvider<T : Any> : Provider<InjectableProperty<T>> {
 
-/**
- * A property that provides a service from the service manager.
- */
-inline fun <reified T> service(): ReadOnlyProperty<Any, T> = ServiceProperty(T::class.java)
+    @Inject private lateinit var injector: Injector
+    @Inject private lateinit var point: InjectionPoint
+
+    override fun get(): InjectableProperty<T> {
+        // Extract the value type from the injection point
+        val valueType = Key.get(InjectionPoint.getLazyOrPropertyValueType<T>(this.point).typeLiteral)
+        return InjectedProperty(this.injector.getInstance(valueType))
+    }
+}

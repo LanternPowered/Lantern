@@ -32,11 +32,6 @@ import kotlin.reflect.KProperty
 class InitOnceProperty<T> : ReadWriteProperty<Any, T> {
 
     /**
-     * A object which represents "empty".
-     */
-    private object Empty
-
-    /**
      * The actual value.
      */
     private var value: Any = Empty
@@ -47,5 +42,13 @@ class InitOnceProperty<T> : ReadWriteProperty<Any, T> {
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
         this.value = if (this.value == Empty) value as Any else throw IllegalStateException("Value is initialized")
+    }
+
+    companion object {
+
+        /**
+         * A object which represents "empty".
+         */
+        private object Empty
     }
 }

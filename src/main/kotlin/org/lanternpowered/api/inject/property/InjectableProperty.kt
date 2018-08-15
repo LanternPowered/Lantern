@@ -23,19 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.ext
+package org.lanternpowered.api.inject.property
 
-import org.lanternpowered.api.util.property.InitOnceProperty
-import org.lanternpowered.api.util.property.ServiceProperty
+import com.google.inject.ProvidedBy
 import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
- * A property that can only be written once.
+ * A property that can be injected.
  */
-inline fun <reified T> initOnce(): ReadWriteProperty<Any, T> = InitOnceProperty()
+@ProvidedBy(InjectablePropertyProvider::class)
+interface InjectableProperty<T> : ReadOnlyProperty<Any, T>
 
 /**
- * A property that provides a service from the service manager.
+ * A [InjectableProperty] that didn't get injected yet.
  */
-inline fun <reified T> service(): ReadOnlyProperty<Any, T> = ServiceProperty(T::class.java)
+object NotInjectedProperty : InjectableProperty<Any> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+            throw IllegalStateException("Not yet injected.")
+}
+
+/**
+ * A [InjectableProperty] that already got injected.
+ */
+class InjectedProperty<T>(val value: T) : InjectableProperty<T> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>): T = this.value
+}

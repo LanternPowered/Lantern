@@ -27,33 +27,21 @@ package org.lanternpowered.api.inject.lazy
 
 import com.google.inject.Inject
 import com.google.inject.Injector
+import com.google.inject.Key
 import com.google.inject.Provider
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.inject.InjectionPoint
-import java.lang.reflect.TypeVariable
 
 /**
  * A provider for [Lazy] values.
  */
-internal class LazyProvider<T> : Provider<Lazy<T>> {
+internal class LazyProvider<T : Any> : Provider<Lazy<T>> {
 
     @Inject private lateinit var injector: Injector
     @Inject private lateinit var point: InjectionPoint
 
     override fun get(): Lazy<T> {
-        // Extract the value type from the injection point
-        val valueType = this.point.type.resolveType(VALUE_VARIABLE).rawType.uncheckedCast<Class<T>>()
-        // Must be present, so not the object class
-        if (valueType == Object::class.java) {
-            throw IllegalStateException("Missing value type.")
-        }
-        return object : Lazy<T> {
-            override val value: T by lazy { injector.getInstance(valueType) }
-        }
-    }
-
-    companion object {
-
-        private val VALUE_VARIABLE: TypeVariable<*> = Lazy::class.java.typeParameters[0]
+        val valueType = Key.get(InjectionPoint.getLazyOrPropertyValueType<T>(this.point).typeLiteral)
+        return Lazy.of { injector.getInstance(valueType) }
     }
 }

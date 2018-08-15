@@ -29,9 +29,11 @@ import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.inject.InjectionPoint
 import org.lanternpowered.server.util.ToStringHelper
+import java.lang.reflect.Executable
+import java.lang.reflect.Field
 import java.util.Arrays
 
-internal class LanternInjectionPoint(
+internal abstract class LanternInjectionPoint(
         override val source: TypeToken<*>,
         override val type: TypeToken<*>,
         private val annotations: Array<Annotation>
@@ -50,4 +52,19 @@ internal class LanternInjectionPoint(
                 .add("annotations", Arrays.toString(this.annotations))
                 .toString()
     }
+
+    internal class Field(
+            source: TypeToken<*>,
+            type: TypeToken<*>,
+            annotations: Array<Annotation>,
+            override val field: java.lang.reflect.Field
+    ) : LanternInjectionPoint(source, type, annotations), InjectionPoint.Field
+
+    internal class Parameter(
+            source: TypeToken<*>,
+            type: TypeToken<*>,
+            annotations: Array<Annotation>,
+            override val executable: Executable,
+            override val parameterIndex: Int
+    ) : LanternInjectionPoint(source, type, annotations), InjectionPoint.Parameter
 }

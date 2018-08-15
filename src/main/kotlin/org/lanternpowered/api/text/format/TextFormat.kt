@@ -29,7 +29,6 @@
 package org.lanternpowered.api.text.format
 
 import org.lanternpowered.api.Lantern
-import org.lanternpowered.api.util.Unused
 
 typealias TextColor = org.spongepowered.api.text.format.TextColor
 typealias TextColors = org.spongepowered.api.text.format.TextColors
@@ -58,7 +57,7 @@ inline fun TextStyle(
  * @return The constructed text format
  */
 @JvmName("of")
-inline fun TextFormat(color: TextColor = TextColors.NONE, style: TextStyle = TextStyles.NONE, unused: Unused = null): TextFormat =
+inline fun TextFormat(color: TextColor = TextColors.NONE, style: TextStyle = TextStyles.NONE): TextFormat =
         if (style == TextStyles.NONE && color == TextColors.NONE) TextFormat.of() else TextFormat.of(color, style)
 
 /**

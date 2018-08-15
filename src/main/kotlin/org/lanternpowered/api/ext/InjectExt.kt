@@ -25,17 +25,9 @@
  */
 package org.lanternpowered.api.ext
 
-import org.lanternpowered.api.util.property.InitOnceProperty
-import org.lanternpowered.api.util.property.ServiceProperty
-import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
+import org.lanternpowered.api.inject.lazy.Lazy
+import org.lanternpowered.api.inject.property.InjectableProperty
+import org.lanternpowered.api.inject.property.NotInjectedProperty
 
-/**
- * A property that can only be written once.
- */
-inline fun <reified T> initOnce(): ReadWriteProperty<Any, T> = InitOnceProperty()
-
-/**
- * A property that provides a service from the service manager.
- */
-inline fun <reified T> service(): ReadOnlyProperty<Any, T> = ServiceProperty(T::class.java)
+inline fun <reified T> lazyInjected() = Lazy.of<T> { throw IllegalStateException("Not yet injected.") }
+inline fun <reified T> injected() = NotInjectedProperty.uncheckedCast<InjectableProperty<T>>()

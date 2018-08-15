@@ -23,21 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.world;
+package org.lanternpowered.api.text.action
 
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.extra.modifier.empty.VoidWorldGeneratorModifier;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
-import org.spongepowered.api.world.gen.WorldGeneratorModifiers;
-
-public final class GeneratorModifierRegistryModule extends AdditionalPluginCatalogRegistryModule<WorldGeneratorModifier> {
-
-    public GeneratorModifierRegistryModule() {
-        super(WorldGeneratorModifiers.class);
-    }
-
-    @Override
-    public void registerDefaults() {
-        register(new VoidWorldGeneratorModifier());
-    }
-}
+typealias TextAction<R> = org.spongepowered.api.text.action.TextAction<R>

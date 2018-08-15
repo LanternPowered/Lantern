@@ -28,12 +28,14 @@
 
 package org.lanternpowered.api.text.format
 
+import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.util.Unused
 
 typealias TextColor = org.spongepowered.api.text.format.TextColor
 typealias TextColors = org.spongepowered.api.text.format.TextColors
 typealias TextFormat = org.spongepowered.api.text.format.TextFormat
 typealias TextStyle = org.spongepowered.api.text.format.TextStyle
+typealias TextStyleBase = org.spongepowered.api.text.format.TextStyle.Base
 typealias TextStyles = org.spongepowered.api.text.format.TextStyles
 
 /**
@@ -42,9 +44,13 @@ typealias TextStyles = org.spongepowered.api.text.format.TextStyles
  * @return The constructed text style
  */
 @JvmName("of")
-inline fun TextStyle(bold: Boolean? = null, italic: Boolean? = null, underline: Boolean? = null,
-              strikethrough: Boolean? = null, obfuscated: Boolean? = null, unused: Unused = null): TextStyle =
-        org.spongepowered.api.text.format.TextStyle(bold, italic, underline, strikethrough, obfuscated)
+inline fun TextStyle(
+        bold: Boolean? = null,
+        italic: Boolean? = null,
+        underline: Boolean? = null,
+        strikethrough: Boolean? = null,
+        obfuscated: Boolean? = null
+): TextStyle = Lantern.registry.textFactory.style(bold, italic, underline, strikethrough, obfuscated)
 
 /**
  * Constructs a new [TextFormat].
@@ -53,7 +59,7 @@ inline fun TextStyle(bold: Boolean? = null, italic: Boolean? = null, underline: 
  */
 @JvmName("of")
 inline fun TextFormat(color: TextColor = TextColors.NONE, style: TextStyle = TextStyles.NONE, unused: Unused = null): TextFormat =
-        if (style == TextStyles.NONE && color == TextColors.NONE) TextFormat.NONE else TextFormat.of(color, style)
+        if (style == TextStyles.NONE && color == TextColors.NONE) TextFormat.of() else TextFormat.of(color, style)
 
 /**
  * Constructs a new [TextFormat].
@@ -61,7 +67,7 @@ inline fun TextFormat(color: TextColor = TextColors.NONE, style: TextStyle = Tex
  * @return The constructed text format
  */
 @JvmName("of")
-inline fun TextFormat(color: TextColor): TextFormat = if (color == TextColors.NONE) TextFormat.NONE else TextFormat.of(color)
+inline fun TextFormat(color: TextColor): TextFormat = if (color == TextColors.NONE) TextFormat.of() else TextFormat.of(color)
 
 /**
  * Constructs a new [TextFormat].
@@ -69,4 +75,4 @@ inline fun TextFormat(color: TextColor): TextFormat = if (color == TextColors.NO
  * @return The constructed text format
  */
 @JvmName("of")
-inline fun TextFormat(style: TextStyle): TextFormat = if (style == TextStyles.NONE) TextFormat.NONE else TextFormat.of(style)
+inline fun TextFormat(style: TextStyle): TextFormat = if (style == TextStyles.NONE) TextFormat.of() else TextFormat.of(style)

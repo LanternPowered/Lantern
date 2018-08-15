@@ -65,11 +65,10 @@ public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegis
     }
 
     @Override
-    protected void register(EntityType catalogType, boolean disallowInbuiltPluginIds) {
-        checkNotNull(catalogType, "catalogType");
-        checkArgument(!this.entityTypeByClass.containsKey(catalogType.getClass()), "There is already a EntityType registered for the class: %s",
-                catalogType.getEntityClass().getName());
-        super.register(catalogType, disallowInbuiltPluginIds);
+    protected void doRegistration(EntityType catalogType, boolean disallowInbuiltPluginIds) {
+        checkArgument(!this.entityTypeByClass.containsKey(catalogType.getClass()),
+                "There is already a EntityType registered for the class: %s", catalogType.getEntityClass().getName());
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         this.entityTypeByClass.put(catalogType.getEntityClass(), catalogType);
     }
 

@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.api.catalog.CatalogKeys;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.portal.LanternPortalAgentType;
@@ -193,7 +192,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     public LanternWorldArchetypeBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
         final Set<WorldGeneratorModifier> entries = new HashSet<>();
-        final GeneratorModifierRegistryModule registry = Lantern.getGame().getRegistry().getWorldGeneratorModifierRegistry();
+        final GeneratorModifierRegistryModule registry = GeneratorModifierRegistryModule.INSTANCE;
         for (WorldGeneratorModifier modifier : modifiers) {
             checkNotNull(modifier, "modifier");
             checkState(registry.get(modifier.getKey()).isPresent(), "Modifier not registered: " + modifier.getKey()

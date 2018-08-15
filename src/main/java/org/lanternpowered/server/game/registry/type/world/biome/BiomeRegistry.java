@@ -45,7 +45,7 @@ public interface BiomeRegistry extends CatalogRegistryModule<BiomeType> {
      *
      * @param biomeType the biome type
      */
-    void register(BiomeType biomeType);
+    <A extends BiomeType> A register(A biomeType);
 
     /**
      * Gets the internal id of the biome type.

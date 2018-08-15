@@ -23,21 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inject;
+package org.lanternpowered.api.inject
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.google.common.reflect.TypeToken
+import java.lang.reflect.AnnotatedElement
 
 /**
- * Used to mark a {@link Option} as a flag. This can only
- * be used on {@code boolean} options. The flag will be set
- * if the option is present.
+ * Represents a point where a specific
+ * value is being injected.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER, ElementType.FIELD })
-public @interface Flag {
+interface InjectionPoint : AnnotatedElement {
 
+    /**
+     * The source class where the injection
+     * point is located.
+     */
+    val source: TypeToken<*>
+
+    /**
+     * The value type of the field/parameter
+     * at this injection point.
+     */
+    val type: TypeToken<*>
 }
-

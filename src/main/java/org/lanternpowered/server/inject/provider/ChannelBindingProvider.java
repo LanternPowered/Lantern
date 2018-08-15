@@ -29,7 +29,7 @@ import static org.lanternpowered.server.inject.provider.ProviderHelper.provideNa
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.lanternpowered.server.inject.InjectionPoint;
+import org.lanternpowered.api.inject.InjectionPoint;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelId;
 import org.spongepowered.api.network.ChannelRegistrar;

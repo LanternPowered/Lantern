@@ -35,6 +35,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.inject.lazy.Lazy;
 import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.config.GlobalConfig;
@@ -145,7 +146,7 @@ public final class LanternWorldManager {
     @Inject private Logger logger;
 
     // The global configuration file
-    @Inject private GlobalConfig globalConfig;
+    @Inject private Lazy<GlobalConfig> globalConfig;
 
     // The game instance
     @Inject private LanternGame game;
@@ -692,10 +693,10 @@ public final class LanternWorldManager {
      */
     private WorldConfigResult getOrCreateWorldConfig(String worldName) throws IOException {
         checkNotNull(worldName, "worldName");
-        final Path path = this.globalConfig.getPath().getParent().resolve("worlds")
+        final Path path = this.globalConfig.get().getPath().getParent().resolve("worlds")
                 .resolve(worldName).resolve(WORLD_CONFIG);
         boolean newCreated = !Files.exists(path);
-        final WorldConfig config = new WorldConfig(this.globalConfig, path);
+        final WorldConfig config = new WorldConfig(this.globalConfig.get(), path);
         config.load();
         return new WorldConfigResult(config, newCreated);
     }

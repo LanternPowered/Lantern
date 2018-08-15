@@ -43,7 +43,7 @@ final class JsonTextSelectorSerializer extends JsonTextBaseSerializer<SelectorTe
     public SelectorText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject obj = json.getAsJsonObject();
         final Selector selector = Selector.parse(obj.get(SELECTOR).getAsString());
-        final SelectorText.Builder builder = SelectorText.builder(selector);
+        final SelectorText.Builder builder = SelectorText.builder().selector(selector);
         deserialize(obj, builder, context);
         return builder.build();
     }

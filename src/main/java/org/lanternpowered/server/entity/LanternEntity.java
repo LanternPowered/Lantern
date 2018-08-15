@@ -212,7 +212,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
 
     public void registerKeys() {
         final ValueCollection c = getValueCollection();
-        c.register(Keys.DISPLAY_NAME, Text.EMPTY);
+        c.register(Keys.DISPLAY_NAME, Text.empty());
         c.register(Keys.CUSTOM_NAME_VISIBLE, true);
         c.registerNonRemovable(Keys.TAGS, new HashSet<>());
         c.registerNonRemovable(Keys.VELOCITY, Vector3d.ZERO);

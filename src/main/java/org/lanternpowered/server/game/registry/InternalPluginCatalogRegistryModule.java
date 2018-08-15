@@ -26,7 +26,6 @@
 package org.lanternpowered.server.game.registry;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -63,12 +62,11 @@ public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends 
     }
 
     @Override
-    protected void register(T catalogType, boolean disallowInbuiltPluginIds) {
-        checkNotNull(catalogType, "catalogType");
+    protected void doRegistration(T catalogType, boolean disallowInbuiltPluginIds) {
         final int internalId = ((InternalCatalogType) catalogType).getInternalId();
         checkArgument(isDuplicateInternalIdAllowed() || !this.byInternalId.containsKey(internalId),
                 "The internal id %s is already in use", internalId);
-        super.register(catalogType, disallowInbuiltPluginIds);
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         this.byInternalId.putIfAbsent(internalId, catalogType);
     }
 

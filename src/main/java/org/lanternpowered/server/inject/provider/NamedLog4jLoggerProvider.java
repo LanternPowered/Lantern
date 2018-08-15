@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lanternpowered.server.inject.InjectionPoint;
+import org.lanternpowered.api.inject.InjectionPoint;
 
 public class NamedLog4jLoggerProvider implements Provider<Logger> {
 

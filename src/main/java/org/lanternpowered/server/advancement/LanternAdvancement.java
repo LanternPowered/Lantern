@@ -94,7 +94,7 @@ public class LanternAdvancement extends DefaultCatalogType implements Advancemen
             final Text.Builder hoverBuilder = Text.builder()
                     .append(title.toBuilder().format(format).build());
             if (!description.isEmpty()) {
-                hoverBuilder.append(Text.NEW_LINE, description);
+                hoverBuilder.append(Text.newLine(), description);
             }
             this.text = Text.builder()
                     .append(Text.of("["))

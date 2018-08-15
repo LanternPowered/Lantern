@@ -36,7 +36,7 @@ public class LanternRecipeRegistryModule<T extends CatalogType & Recipe> extends
     }
 
     @Override
-    protected void register(T catalogType) {
-        super.register(catalogType);
+    protected <A extends T> A register(A catalogType) {
+        return super.register(catalogType);
     }
 }

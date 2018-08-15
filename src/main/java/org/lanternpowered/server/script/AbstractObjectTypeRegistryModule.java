@@ -43,8 +43,8 @@ public abstract class AbstractObjectTypeRegistryModule<O, T extends ObjectType<O
     }
 
     @Override
-    protected void register(T catalogType, boolean disallowInbuiltPluginIds) {
-        super.register(catalogType, disallowInbuiltPluginIds);
+    protected void doRegistration(T catalogType, boolean disallowInbuiltPluginIds) {
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         this.byClass.put(catalogType.getType(), catalogType);
     }
 

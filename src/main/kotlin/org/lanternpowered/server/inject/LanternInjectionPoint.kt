@@ -23,52 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.service;
+package org.lanternpowered.server.inject
 
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.ProviderRegistration;
+import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.inject.InjectionPoint
+import org.lanternpowered.server.util.ToStringHelper
+import java.util.Arrays
 
-import java.util.Optional;
+internal class LanternInjectionPoint(
+        override val source: TypeToken<*>,
+        override val type: TypeToken<*>,
+        private val annotations: Array<Annotation>
+) : InjectionPoint {
 
-@FunctionalInterface
-public interface Service<T> {
+    override fun <A : Annotation> getAnnotation(annotationClass: Class<A>): A? =
+            this.annotations.firstOrNull { annotationClass.isInstance(it) }.uncheckedCast()
 
-    /**
-     * Gets the {@link ProviderRegistration<T>}.
-     *
-     * @return The registration
-     */
-    ProviderRegistration<T> getRegistration();
+    override fun getAnnotations(): Array<Annotation> = Arrays.copyOf(this.annotations, this.annotations.size)
+    override fun getDeclaredAnnotations(): Array<Annotation> = getAnnotations()
 
-    /**
-     * Gets the service instance.
-     *
-     * @return The service instance
-     */
-    default T get() {
-        return getRegistration().getProvider();
-    }
-
-    /**
-     * Gets the service type.
-     *
-     * @return The service type
-     */
-    default Class<T> getType() {
-        return getRegistration().getService();
-    }
-
-    /**
-     * Gets the {@link PluginContainer} that registered the service instance.
-     *
-     * @return The plugin container for this service
-     */
-    default PluginContainer getPlugin() {
-        return getRegistration().getPlugin();
-    }
-
-    default <E> Optional<E> as(Class<E> type) {
-        final T instance = get();
-        return type.isInstance(instance) ? Optional.of(type.cast(instance)) : Optional.empty();
+    override fun toString(): String {
+        return ToStringHelper("InjectionPoint")
+                .add("source", this.source)
+                .add("type", this.type)
+                .add("annotations", Arrays.toString(this.annotations))
+                .toString()
     }
 }

@@ -45,8 +45,8 @@ public class CareerRegistryModule extends DefaultCatalogRegistryModule<Career> {
     }
 
     @Override
-    protected void register(Career catalogType, boolean disallowInbuiltPluginIds) {
-        super.register(catalogType, disallowInbuiltPluginIds);
+    protected void doRegistration(Career catalogType, boolean disallowInbuiltPluginIds) {
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         ((LanternProfession) catalogType.getProfession()).addCareer(catalogType);
     }
 

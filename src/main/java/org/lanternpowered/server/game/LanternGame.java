@@ -35,6 +35,9 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.inject.lazy.Lazy;
+import org.lanternpowered.api.inject.option.Option;
+import org.lanternpowered.api.inject.service.ServiceRef;
 import org.lanternpowered.launch.Environment;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.LanternAssetManager;
@@ -53,7 +56,6 @@ import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.game.version.MinecraftVersionCache;
-import org.lanternpowered.server.inject.Option;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.rcon.EmptyRconService;
@@ -63,7 +65,6 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceListeners;
-import org.lanternpowered.server.service.Service;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
@@ -194,18 +195,18 @@ public class LanternGame implements Game {
     @Inject @Named(DirectoryKeys.ROOT_WORLD) private Provider<Path> rootWorldFolder;
 
     // The global config
-    @Inject private GlobalConfig globalConfig;
+    @Inject private Lazy<GlobalConfig> globalConfig;
     // The ops config
-    @Inject private OpsConfig opsConfig;
+    @Inject private Lazy<OpsConfig> opsConfig;
 
     /// Services
 
-    @Inject private Service<WhitelistService> whitelistService;
-    @Inject private Service<BanService> banService;
-    @Inject private Service<UserStorageService> userStorageService;
-    @Inject private Service<PaginationService> paginationService;
-    @Inject private Service<SqlService> sqlService;
-    @Inject private Service<PermissionService> permissionService;
+    @Inject private ServiceRef<WhitelistService> whitelistService;
+    @Inject private ServiceRef<BanService> banService;
+    @Inject private ServiceRef<UserStorageService> userStorageService;
+    @Inject private ServiceRef<PaginationService> paginationService;
+    @Inject private ServiceRef<SqlService> sqlService;
+    @Inject private ServiceRef<PermissionService> permissionService;
 
     // The minecraft version cache
     @Inject private MinecraftVersionCache minecraftVersionCache;
@@ -263,9 +264,11 @@ public class LanternGame implements Game {
         this.gameRegistry.earlyRegistry();
 
         // Load the global configuration
-        this.globalConfig.load();
+        getGlobalConfig().load();
         // Save missing settings
-        this.globalConfig.save();
+        getGlobalConfig().save();
+
+        getOpsConfig().load();
 
         // They should not be replaced by now
         this.whitelistService.as(WhitelistConfig.class).get().load();
@@ -279,7 +282,7 @@ public class LanternGame implements Game {
         this.gameRegistry.preRegistry();
 
         // Register temporarily a empty rcon service
-        registerService(RconService.class, new EmptyRconService(this.globalConfig.getRconPassword()));
+        registerService(RconService.class, new EmptyRconService(getGlobalConfig().getRconPassword()));
 
         // Create the cause to post events...
         final CauseStack causeStack = CauseStack.current();
@@ -398,7 +401,7 @@ public class LanternGame implements Game {
      * @return The global configuration
      */
     public GlobalConfig getGlobalConfig() {
-        return this.globalConfig;
+        return this.globalConfig.get();
     }
 
     /**
@@ -407,7 +410,7 @@ public class LanternGame implements Game {
      * @return The ops configuration
      */
     public UserConfig<OpsEntry> getOpsConfig() {
-        return this.opsConfig;
+        return this.opsConfig.get();
     }
 
     @Override

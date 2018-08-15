@@ -44,10 +44,10 @@ object SelectorTypeRegistryModule : AdditionalPluginCatalogRegistryModule<Select
         register(LanternSelectorType(CatalogKeys.minecraft("random"), "r"))
     }
 
-    override fun register(selectorType: SelectorType, disallowInbuiltPluginIds: Boolean) {
+    override fun doRegistration(selectorType: SelectorType, disallowInbuiltPluginIds: Boolean) {
         selectorType as LanternSelectorType
         check(selectorType.code !in this.byCode) { "The code ${selectorType.code} is already in use."}
-        super.register(selectorType, disallowInbuiltPluginIds)
+        super.doRegistration(selectorType, disallowInbuiltPluginIds)
         this.byCode[selectorType.code] = selectorType
     }
 

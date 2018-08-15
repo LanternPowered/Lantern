@@ -26,7 +26,6 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.type.LanternBannerPatternShape;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
@@ -53,12 +52,11 @@ public final class BannerPatternShapeRegistryModule extends DefaultCatalogRegist
     }
 
     @Override
-    protected void register(BannerPatternShape catalogType, boolean disallowInbuiltPluginIds) {
-        checkNotNull(catalogType, "catalogType");
+    protected void doRegistration(BannerPatternShape catalogType, boolean disallowInbuiltPluginIds) {
         final String internalId = ((LanternBannerPatternShape) catalogType).getInternalId();
         checkArgument(!this.byInternalId.containsKey(internalId),
                 "The internal id %s is already in use", internalId);
-        super.register(catalogType, disallowInbuiltPluginIds);
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         this.byInternalId.put(internalId, catalogType);
     }
 

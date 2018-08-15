@@ -138,12 +138,12 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
     }
 
     @Override
-    protected void register(Key key, boolean disallowInbuiltPluginIds) {
-        super.register(key, disallowInbuiltPluginIds);
+    protected void doRegistration(Key key, boolean disallowInbuiltPluginIds) {
+        super.doRegistration(key, disallowInbuiltPluginIds);
         this.byQuery.putIfAbsent(key.getQuery(), key);
         final LanternKey optionalUnwrappedKey = ((LanternKey) key).getOptionalUnwrappedKey();
         if (optionalUnwrappedKey != null) {
-            register(optionalUnwrappedKey, disallowInbuiltPluginIds);
+            doRegistration(optionalUnwrappedKey, disallowInbuiltPluginIds);
         }
     }
 

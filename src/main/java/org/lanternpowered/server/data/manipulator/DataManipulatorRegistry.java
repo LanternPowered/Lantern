@@ -483,7 +483,7 @@ public class DataManipulatorRegistry {
                     c.register(Keys.LAST_COMMAND_OUTPUT, Optional.empty());
                 });
         register(DisplayNameData.class, ImmutableDisplayNameData.class,
-                c -> c.register(Keys.DISPLAY_NAME, Text.EMPTY));
+                c -> c.register(Keys.DISPLAY_NAME, Text.empty()));
         register(FireworkRocketData.class, ImmutableFireworkRocketData.class,
                 c -> c.register(Keys.FIREWORK_FLIGHT_MODIFIER, 0));
         register(RepresentedItemData.class, ImmutableRepresentedItemData.class,
@@ -852,7 +852,7 @@ public class DataManipulatorRegistry {
 
         /// normal containers
         register(AuthorData.class, ImmutableAuthorData.class,
-                c -> c.register(Keys.BOOK_AUTHOR, Text.EMPTY));
+                c -> c.register(Keys.BOOK_AUTHOR, Text.empty()));
         register(BlockItemData.class, ImmutableBlockItemData.class,
                 c -> c.register(Keys.ITEM_BLOCKSTATE, BlockTypes.AIR.getDefaultState()));
         register(BreakableData.class, ImmutableBreakableData.class,

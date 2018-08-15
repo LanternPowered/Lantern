@@ -28,5 +28,4 @@ package org.lanternpowered.api.text.serializer
 typealias SafeTextSerializer = org.spongepowered.api.text.serializer.SafeTextSerializer
 typealias TextParseException = org.spongepowered.api.text.serializer.TextParseException
 typealias TextSerializer = org.spongepowered.api.text.serializer.TextSerializer
-typealias TextSerializerFactory = org.spongepowered.api.text.serializer.TextSerializerFactory
 typealias TextSerializers = org.spongepowered.api.text.serializer.TextSerializers

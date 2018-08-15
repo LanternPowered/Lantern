@@ -43,6 +43,8 @@ import org.lanternpowered.api.script.function.condition.ConditionType;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
 import org.lanternpowered.api.script.function.value.FloatValueProviderType;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
+import org.lanternpowered.api.x.XGameRegistry;
+import org.lanternpowered.api.x.text.XTextFactory;
 import org.lanternpowered.server.advancement.LanternAdvancementBuilder;
 import org.lanternpowered.server.advancement.LanternAdvancementTreeBuilder;
 import org.lanternpowered.server.advancement.LanternDisplayInfoBuilder;
@@ -202,8 +204,7 @@ import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryM
 import org.lanternpowered.server.game.registry.type.text.SelectorFactoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.SelectorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TextColorRegistryModule;
-import org.lanternpowered.server.game.registry.type.text.TextFormatRegistryModule;
-import org.lanternpowered.server.game.registry.type.text.TextSerializersRegistryModule;
+import org.lanternpowered.server.game.registry.type.text.TextSerializerRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TextStyleRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TranslationManagerRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.BanTypeRegistryModule;
@@ -274,6 +275,22 @@ import org.lanternpowered.server.statistic.builder.BlockStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.EntityStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.ItemStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.StatisticBuilder;
+import org.lanternpowered.server.text.LanternLiteralText;
+import org.lanternpowered.server.text.LanternScoreText;
+import org.lanternpowered.server.text.LanternSelectorText;
+import org.lanternpowered.server.text.LanternTextFactory;
+import org.lanternpowered.server.text.LanternTextTemplate;
+import org.lanternpowered.server.text.LanternTranslatableText;
+import org.lanternpowered.server.text.action.ChangePageClickActionBuilder;
+import org.lanternpowered.server.text.action.ExecuteCallbackClickActionBuilder;
+import org.lanternpowered.server.text.action.InsertTextShiftClickActionBuilder;
+import org.lanternpowered.server.text.action.OpenUrlClickActionBuilder;
+import org.lanternpowered.server.text.action.RunCommandClickActionBuilder;
+import org.lanternpowered.server.text.action.ShowEntityHoverActionBuilder;
+import org.lanternpowered.server.text.action.ShowEntityRefBuilder;
+import org.lanternpowered.server.text.action.ShowItemHoverActionBuilder;
+import org.lanternpowered.server.text.action.ShowTextHoverActionBuilder;
+import org.lanternpowered.server.text.action.SuggestCommandClickActionBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
@@ -288,7 +305,6 @@ import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.AdvancementType;
@@ -454,13 +470,20 @@ import org.spongepowered.api.statistic.EntityStatistic;
 import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.StatisticType;
+import org.spongepowered.api.text.LiteralText;
+import org.spongepowered.api.text.ScoreText;
+import org.spongepowered.api.text.SelectorText;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.TranslatableText;
+import org.spongepowered.api.text.action.ClickAction;
+import org.spongepowered.api.text.action.HoverAction;
+import org.spongepowered.api.text.action.ShiftClickAction;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorType;
-import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.util.RespawnLocation;
@@ -505,7 +528,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 @Singleton
-public class LanternGameRegistry implements GameRegistry {
+public class LanternGameRegistry implements XGameRegistry {
 
     private final LanternGame game;
     private final LanternResourcePackFactory resourcePackFactory = new LanternResourcePackFactory();
@@ -583,6 +606,22 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(InventoryTransactionResult.Builder.class, LanternInventoryTransactionResult.Builder::new)
                 .registerBuilderSupplier(EnchantmentTypeBuilder.class, LanternEnchantmentTypeBuilder::new)
                 .registerBuilderSupplier(CatalogKey.Builder.class, LanternCatalogKeyBuilder::new)
+                // Text
+                .registerBuilderSupplier(ScoreText.Builder.class, LanternScoreText.Builder::new)
+                .registerBuilderSupplier(LiteralText.Builder.class, LanternLiteralText.Builder::new)
+                .registerBuilderSupplier(SelectorText.Builder.class, LanternSelectorText.Builder::new)
+                .registerBuilderSupplier(TranslatableText.Builder.class, LanternTranslatableText.Builder::new)
+                .registerBuilderSupplier(ClickAction.ChangePage.Builder.class, ChangePageClickActionBuilder::new)
+                .registerBuilderSupplier(ClickAction.ExecuteCallback.Builder.class, ExecuteCallbackClickActionBuilder::new)
+                .registerBuilderSupplier(ClickAction.OpenUrl.Builder.class, OpenUrlClickActionBuilder::new)
+                .registerBuilderSupplier(ClickAction.RunCommand.Builder.class, RunCommandClickActionBuilder::new)
+                .registerBuilderSupplier(ClickAction.SuggestCommand.Builder.class, SuggestCommandClickActionBuilder::new)
+                .registerBuilderSupplier(HoverAction.ShowEntity.Builder.class, ShowEntityHoverActionBuilder::new)
+                .registerBuilderSupplier(HoverAction.ShowEntity.Ref.Builder.class, ShowEntityRefBuilder::new)
+                .registerBuilderSupplier(HoverAction.ShowItem.Builder.class, ShowItemHoverActionBuilder::new)
+                .registerBuilderSupplier(HoverAction.ShowText.Builder.class, ShowTextHoverActionBuilder::new)
+                .registerBuilderSupplier(ShiftClickAction.InsertText.Builder.class, InsertTextShiftClickActionBuilder::new)
+                .registerBuilderSupplier(TextTemplate.Arg.Builder.class, LanternTextTemplate.Arg.Builder::new)
                 // Inventory properties
                 .registerBuilderSupplier(SlotPos.Builder.class, LanternSlotPos.Builder::new)
                 .registerBuilderSupplier(SlotSide.Builder.class, LanternSlotSide.Builder::new)
@@ -703,18 +742,17 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(ChatVisibility.class, ChatVisibilityRegistryModule.get())
                 .registerModule(new SelectorFactoryRegistryModule())
                 .registerModule(SelectorType.class, SelectorTypeRegistryModule.INSTANCE)
-                .registerModule(TextColor.class, new TextColorRegistryModule())
-                .registerModule(new TextFormatRegistryModule())
-                .registerModule(new TextSerializersRegistryModule())
-                .registerModule(TextStyle.Base.class, new TextStyleRegistryModule())
-                .registerModule(new TranslationManagerRegistryModule())
+                .registerModule(TextColor.class, TextColorRegistryModule.INSTANCE)
+                .registerModule(TextSerializerRegistryModule.INSTANCE)
+                .registerModule(TextStyle.Base.class, TextStyleRegistryModule.INSTANCE)
+                .registerModule(TranslationManagerRegistryModule.INSTANCE)
                 .registerModule(BanType.class, new BanTypeRegistryModule())
                 .registerModule(Rotation.class, RotationRegistryModule.get())
                 .registerModule(BiomeType.class, BiomeRegistryModule.get())
                 .registerModule(new DefaultGameRulesRegistryModule())
                 .registerModule(Difficulty.class, DifficultyRegistryModule.get())
                 .registerModule(DimensionType.class, new DimensionTypeRegistryModule())
-                .registerModule(WorldGeneratorModifier.class, new GeneratorModifierRegistryModule())
+                .registerModule(WorldGeneratorModifier.class, GeneratorModifierRegistryModule.INSTANCE)
                 .registerModule(GeneratorType.class, new GeneratorTypeRegistryModule())
                 .registerModule(PortalAgentType.class, new PortalAgentTypeRegistryModule())
                 .registerModule(SerializationBehavior.class, new SerializationBehaviorRegistryModule())
@@ -1110,15 +1148,6 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     /**
-     * Gets the {@link GeneratorModifierRegistryModule}.
-     *
-     * @return the world generator modifier registry
-     */
-    public GeneratorModifierRegistryModule getWorldGeneratorModifierRegistry() {
-        return getRegistryModule(GeneratorModifierRegistryModule.class).get();
-    }
-
-    /**
      * Gets the {@link AttributeRegistryModule}.
      *
      * @return the attribute registry
@@ -1281,10 +1310,9 @@ public class LanternGameRegistry implements GameRegistry {
         return null;
     }
 
-    @Deprecated
     @Override
-    public TextSerializerFactory getTextSerializerFactory() {
-        return getRegistryModule(TextSerializersRegistryModule.class).get().getTextSerializerFactory();
+    public XTextFactory getTextFactory() {
+        return LanternTextFactory.INSTANCE;
     }
 
     @Deprecated

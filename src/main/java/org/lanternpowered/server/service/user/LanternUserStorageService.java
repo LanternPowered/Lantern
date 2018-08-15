@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.lanternpowered.api.inject.service.ServiceRef;
 import org.lanternpowered.server.config.user.OpsConfig;
 import org.lanternpowered.server.config.user.UserEntry;
 import org.lanternpowered.server.config.user.WhitelistConfig;
@@ -44,7 +45,6 @@ import org.lanternpowered.server.data.io.UserIO;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ProxyUser;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.service.Service;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.util.UncheckedThrowables;
@@ -85,8 +85,8 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
     @Inject private Server server;
     @Inject private GameProfileManager profileManager;
     @Inject private OpsConfig opsConfig;
-    @Inject private Service<WhitelistService> whitelistService;
-    @Inject private Service<BanService> banService;
+    @Inject private ServiceRef<WhitelistService> whitelistService;
+    @Inject private ServiceRef<BanService> banService;
 
     @Inject
     private LanternUserStorageService() {

@@ -47,8 +47,8 @@ public class LanternFuelRegistryModule extends DefaultCatalogRegistryModule<IFue
     }
 
     @Override
-    public void register(IFuel fuel) {
-        super.register(fuel);
+    public <A extends IFuel> A register(A fuel) {
+        return super.register(fuel);
     }
 
     @Override

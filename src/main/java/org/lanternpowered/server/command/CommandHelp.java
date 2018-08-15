@@ -113,7 +113,7 @@ public final class CommandHelp extends CommandProvider {
                             // command name in the usage message
                             if (callable instanceof CommandSpec) {
                                 Text.Builder builder = Text.builder();
-                                callable.getShortDescription(src).ifPresent(des -> builder.append(des, Text.NEW_LINE));
+                                callable.getShortDescription(src).ifPresent(des -> builder.append(des, Text.newLine()));
                                 builder.append(t("commands.generic.usage", t("/%s %s", command.get(), callable.getUsage(src))));
                                 Text extendedDescription;
                                 try {
@@ -123,7 +123,7 @@ public final class CommandHelp extends CommandProvider {
                                     throw UncheckedThrowables.thrOw(e);
                                 }
                                 if (extendedDescription != null) {
-                                    builder.append(Text.NEW_LINE, extendedDescription);
+                                    builder.append(Text.newLine(), extendedDescription);
                                 }
                                 src.sendMessage(builder.build());
                             } else if ((desc = callable.getHelp(src)).isPresent()) {

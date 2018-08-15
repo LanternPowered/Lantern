@@ -59,13 +59,18 @@ public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryMo
     }
 
     @Override
+    public <A extends BiomeType> A register(A biomeType) {
+        return register(biomeType);
+    }
+
+    @Override
     public void register(byte internalId, BiomeType biomeType) {
         this.register((short) (internalId & 0xff), biomeType);
     }
 
     private void register(short internalId, BiomeType biomeType) {
         checkState(!this.biomeTypeByInternalId.containsKey(internalId), "The internal id is already used: %s", internalId);
-        super.register(biomeType);
+        super.doRegistration(biomeType, false);
         this.biomeTypeByInternalId.put(internalId, biomeType);
         this.internalIdByBiomeType.put(biomeType, internalId);
     }
@@ -79,8 +84,8 @@ public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryMo
     }
 
     @Override
-    public void register(BiomeType biomeType) {
-        this.register((short) this.nextInternalId(), biomeType);
+    protected void doRegistration(BiomeType biomeType, boolean disallowInbuiltPluginIds) {
+        register((short) this.nextInternalId(), biomeType);
     }
 
     @Override

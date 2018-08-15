@@ -64,11 +64,10 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
     }
 
     @Override
-    protected void register(TileEntityType catalogType, boolean disallowInbuiltPluginIds) {
-        checkNotNull(catalogType, "catalogType");
+    protected void doRegistration(TileEntityType catalogType, boolean disallowInbuiltPluginIds) {
         checkArgument(!this.tileEntityTypesByClass.containsKey(catalogType.getClass()),
                 "There is already a TileEntityType registered for the class: %s", catalogType.getTileEntityType().getName());
-        super.register(catalogType, disallowInbuiltPluginIds);
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         this.tileEntityTypesByClass.put(catalogType.getTileEntityType(), catalogType);
     }
 

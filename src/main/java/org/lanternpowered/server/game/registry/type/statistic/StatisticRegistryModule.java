@@ -53,17 +53,8 @@ public final class StatisticRegistryModule extends AdditionalPluginCatalogRegist
     }
 
     @Override
-    protected void register(Statistic catalogType) {
-        super.register(catalogType);
-    }
-
-    @Override
-    protected void register(Statistic catalogType, boolean disallowInbuiltPluginIds) {
-        internalRegister(catalogType, disallowInbuiltPluginIds);
-    }
-
-    void internalRegister(Statistic catalogType, boolean disallowInbuiltPluginIds) {
-        super.register(catalogType, disallowInbuiltPluginIds);
+    protected void doRegistration(Statistic catalogType, boolean disallowInbuiltPluginIds) {
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         this.byInternalId.put(((LanternStatistic) catalogType).getInternalId(), catalogType);
     }
 

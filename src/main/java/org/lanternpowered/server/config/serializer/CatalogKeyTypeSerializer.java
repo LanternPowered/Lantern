@@ -23,35 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inject;
+package org.lanternpowered.server.config.serializer;
 
-import com.google.inject.BindingAnnotation;
+import com.google.common.reflect.TypeToken;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.spongepowered.api.CatalogKey;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public final class CatalogKeyTypeSerializer implements TypeSerializer<CatalogKey> {
 
-/**
- * Represents a option that can be provided through the launch parameters. The
- * type of the field or parameter defines which type that is being parsed.
- */
-@BindingAnnotation
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER, ElementType.FIELD })
-public @interface Option {
+    @Override
+    public CatalogKey deserialize(TypeToken<?> type, ConfigurationNode value) {
+        return CatalogKey.resolve(value.getString());
+    }
 
-    /**
-     * The keys of the option.
-     *
-     * @return The keys
-     */
-    String[] value();
-
-    /**
-     * The description of the option.
-     *
-     * @return The description
-     */
-    String description() default "";
+    @Override
+    public void serialize(TypeToken<?> type, CatalogKey obj, ConfigurationNode value) {
+        value.setValue(obj.toString());
+    }
 }

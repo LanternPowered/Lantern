@@ -30,7 +30,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
-import org.lanternpowered.server.text.FormattingCodeTextSerializer;
+import org.lanternpowered.server.text.LanternFormattingCodeTextSerializer;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.text.Text;
@@ -67,7 +67,7 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
             buf.writeString(message1.getCollisionRule().getName());
             final TextColor c = message1.getColor();
             buf.writeByte((byte) (c == TextColors.NONE || c == TextColors.RESET ? -1 :
-                            FormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(c)));
+                            LanternFormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(c)));
         } else {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Remove ? 1 :
                     message instanceof MessagePlayOutTeams.AddMembers ? 3 : 4));

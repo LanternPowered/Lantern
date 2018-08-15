@@ -34,8 +34,7 @@ open class LanternTextColor(key: CatalogKey, private val color: Color) : Default
 
     override fun getColor() = this.color
 
-    class Formatting(key: CatalogKey, color: Color, override val code: Char) :
-            LanternTextColor(key, color), FormattingCodeHolder {
+    class Formatting(key: CatalogKey, color: Color, override val code: Char) : LanternTextColor(key, color), FormattingCodeHolder {
 
         override fun toStringHelper() = super.toStringHelper()
                 .add("code", this.code)

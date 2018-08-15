@@ -125,8 +125,9 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
      *
      * @param catalogType The catalog type to register
      */
-    protected void register(T catalogType) {
-        register(catalogType, false);
+    protected <A extends T> A register(A catalogType) {
+        doRegistration(catalogType, false);
+        return catalogType;
     }
 
     /**
@@ -136,20 +137,35 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
      * @param disallowInbuiltPluginIds Whether inbuilt plugin ids aren't allowed
      */
     @SuppressWarnings("ConstantConditions")
-    protected void register(T catalogType, boolean disallowInbuiltPluginIds) {
+    protected final <A extends T> A register(A catalogType, boolean disallowInbuiltPluginIds) {
+        doRegistration(catalogType, disallowInbuiltPluginIds);
+        return catalogType;
+    }
+
+    /**
+     * Attempts to do the registration for the given catalog type.
+     *
+     * @param catalogType The catalog type
+     * @param disallowInbuiltPluginIds Whether inbuilt plugin ids (namespaces) aren't allowed
+     */
+    @SuppressWarnings("ConstantConditions")
+    protected void doRegistration(T catalogType, boolean disallowInbuiltPluginIds) {
         checkState(this.values == null, "The content is finalized and doesn't allow any new entries.");
         checkNotNull(catalogType, "catalogType");
         final CatalogKey key = catalogType.getKey();
-        checkArgument(key != null, "The catalog type id may not be null!");
-        checkArgument(catalogType.getName() != null, "The catalog type name may not be null!");
         checkArgument(this.keyPattern.matcher(key.toString()).matches(),
                 "The catalog type id %s must match the regex: %s", key, this.keyPatternValue);
         checkState(!this.types.containsKey(key), "There is already a catalog type registered with the id: %s", key);
-        if (disallowInbuiltPluginIds) {
-            checkArgument(!InternalPluginsInfo.IDENTIFIERS.contains(key.getNamespace()),
-                    "Plugin trying to register a fake %s catalog type!", key.getNamespace());
-        }
+        checkInbuiltPluginIds(catalogType, disallowInbuiltPluginIds);
         this.types.put(key, catalogType);
+    }
+
+    protected void checkInbuiltPluginIds(T catalogType, boolean disallowInbuiltPluginIds) {
+        final String namespace = catalogType.getKey().getNamespace();
+        if (disallowInbuiltPluginIds) {
+            checkArgument(!InternalPluginsInfo.IDENTIFIERS.contains(namespace),
+                    "Plugin trying to register a fake %s catalog type!", namespace);
+        }
     }
 
     @Override

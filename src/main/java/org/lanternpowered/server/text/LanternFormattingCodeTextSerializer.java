@@ -40,6 +40,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.text.serializer.FormattingCodeTextSerializer;
 import org.spongepowered.api.text.serializer.TextParseException;
 
 import java.util.ArrayList;
@@ -52,8 +53,7 @@ import javax.annotation.Nullable;
 /**
  * TODO: Separate the usage of {@link TextColors#RESET} and {@link TextStyles#RESET}.
  */
-public class FormattingCodeTextSerializer extends DefaultCatalogType
-        implements org.spongepowered.api.text.serializer.FormattingCodeTextSerializer, LanternTextSerializer {
+public class LanternFormattingCodeTextSerializer extends DefaultCatalogType implements FormattingCodeTextSerializer, LanternTextSerializer {
 
     public static final Object2CharMap<Object> FORMATS_TO_CODE = new Object2CharOpenHashMap<>();
     public static final Char2ObjectMap<Object> CODE_TO_FORMATS = new Char2ObjectOpenHashMap<>();
@@ -107,7 +107,7 @@ public class FormattingCodeTextSerializer extends DefaultCatalogType
 
     private final char formattingCode;
 
-    public FormattingCodeTextSerializer(CatalogKey key, char formattingCode) {
+    public LanternFormattingCodeTextSerializer(CatalogKey key, char formattingCode) {
         super(key);
         this.formattingCode = formattingCode;
     }

@@ -27,8 +27,6 @@ package org.lanternpowered.server.inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.reflect.TypeParameter;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Exposed;
@@ -44,6 +42,7 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import joptsimple.OptionParser;
 import org.apache.logging.log4j.LogManager;
+import org.lanternpowered.api.inject.option.Option;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.asset.LanternAssetManager;
@@ -68,7 +67,6 @@ import org.lanternpowered.server.inject.provider.NamedLog4jLoggerProvider;
 import org.lanternpowered.server.inject.provider.NamedSlf4jLoggerProvider;
 import org.lanternpowered.server.inject.provider.PluginAssetProvider;
 import org.lanternpowered.server.inject.provider.PluginContainerProvider;
-import org.lanternpowered.server.inject.provider.ServiceObjectProvider;
 import org.lanternpowered.server.inject.provider.SpongeExecutorServiceProvider;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.InternalPluginContainer;
@@ -77,7 +75,6 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceManager;
-import org.lanternpowered.server.service.Service;
 import org.lanternpowered.server.util.PathUtils;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.LanternTeleportHelper;
@@ -108,13 +105,6 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.service.ServiceManager;
-import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.rcon.RconService;
-import org.spongepowered.api.service.sql.SqlService;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.world.TeleportHelper;
 
 import java.io.BufferedReader;
@@ -236,15 +226,6 @@ public class LanternModule extends PrivateModule {
         bindAndExpose(CauseStackManager.class)
                 .toInstance(LanternCauseStackManager.INSTANCE);
 
-        // Services
-        bindService(PermissionService.class);
-        bindService(BanService.class);
-        bindService(WhitelistService.class);
-        bindService(UserStorageService.class);
-        bindService(SqlService.class);
-        bindService(PaginationService.class);
-        bindService(RconService.class);
-
         // The Indexed Channel Binding
         bindAndExpose(ChannelBinding.IndexedMessageChannel.class)
                 .toProvider(ChannelBindingProvider.Indexed.class);
@@ -292,14 +273,6 @@ public class LanternModule extends PrivateModule {
                 .toProvider(SpongeExecutorServiceProvider.Synchronous.class);
         bindAndExpose(SpongeExecutorService.class, AsynchronousExecutor.class)
                 .toProvider(SpongeExecutorServiceProvider.Asynchronous.class);
-    }
-
-    private <T> void bindService(Class<T> clazz) {
-        final TypeToken<Service<T>> token = new TypeToken<Service<T>>() {}
-                .where(new TypeParameter<T>() {}, clazz);
-        final TypeLiteral literal = TypeLiteral.get(token.getType());
-        //noinspection unchecked
-        bindAndExpose(literal).toProvider(ServiceObjectProvider.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindAndExpose(Class<T> clazz, Annotation annotation) {

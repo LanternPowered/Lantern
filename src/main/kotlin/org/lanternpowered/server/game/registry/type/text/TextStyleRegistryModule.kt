@@ -26,24 +26,28 @@
 package org.lanternpowered.server.game.registry.type.text
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.text.format.TextStyleBase
+import org.lanternpowered.api.text.format.TextStyles
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.lanternpowered.server.game.registry.EarlyRegistration
 import org.lanternpowered.server.text.TextConstants
 import org.lanternpowered.server.text.format.LanternTextStyle
-import org.spongepowered.api.text.format.TextStyle
-import org.spongepowered.api.text.format.TextStyles
 
-class TextStyleRegistryModule : DefaultCatalogRegistryModule<TextStyle.Base>(TextStyles::class) {
+object TextStyleRegistryModule : DefaultCatalogRegistryModule<TextStyleBase>(TextStyles::class) {
+
+    var NONE: LanternTextStyle by initOnce()
+        private set
 
     @EarlyRegistration
     override fun registerDefaults() {
-        register(LanternTextStyle.Formatting(CatalogKey.minecraft("bold"), TextConstants.BOLD, bold = true))
-        register(LanternTextStyle.Formatting(CatalogKey.minecraft("italic"), TextConstants.ITALIC, italic = true))
-        register(LanternTextStyle.Formatting(CatalogKey.minecraft("underline"), TextConstants.UNDERLINE, underline = true))
-        register(LanternTextStyle.Formatting(CatalogKey.minecraft("strikethrough"), TextConstants.STRIKETHROUGH, strikethrough = true))
-        register(LanternTextStyle.Formatting(CatalogKey.minecraft("obfuscated"), TextConstants.OBFUSCATED, obfuscated = true))
-        register(LanternTextStyle.Formatting(CatalogKey.minecraft("reset"), TextConstants.RESET,
+        register(LanternTextStyle.Real(CatalogKey.minecraft("bold"), TextConstants.BOLD, bold = true))
+        register(LanternTextStyle.Real(CatalogKey.minecraft("italic"), TextConstants.ITALIC, italic = true))
+        register(LanternTextStyle.Real(CatalogKey.minecraft("underline"), TextConstants.UNDERLINE, underline = true))
+        register(LanternTextStyle.Real(CatalogKey.minecraft("strikethrough"), TextConstants.STRIKETHROUGH, strikethrough = true))
+        register(LanternTextStyle.Real(CatalogKey.minecraft("obfuscated"), TextConstants.OBFUSCATED, obfuscated = true))
+        register(LanternTextStyle.Real(CatalogKey.minecraft("reset"), TextConstants.RESET,
                 false, false, false, false, false))
-        register(LanternTextStyle(CatalogKey.minecraft("none")))
+        NONE = register(LanternTextStyle.None(CatalogKey.minecraft("none")))
     }
 }

@@ -212,8 +212,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     }
 
     @Override
-    public void register(BlockType catalogType) {
+    public <A extends BlockType> A register(A catalogType) {
         register(nextInternalId(), catalogType);
+        return catalogType;
     }
 
     private int nextInternalId() {

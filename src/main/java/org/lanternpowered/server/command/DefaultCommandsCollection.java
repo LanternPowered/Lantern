@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.lanternpowered.server.command.test.CommandOpenTestContainer;
-import org.lanternpowered.server.service.Service;
+import org.lanternpowered.api.inject.service.ServiceRef;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.spongepowered.api.command.CommandManager;
@@ -46,7 +46,7 @@ import java.util.Map;
 public final class DefaultCommandsCollection {
 
     @Inject private CommandManager commandManager;
-    @Inject private Service<PermissionService> permissionService;
+    @Inject private ServiceRef<PermissionService> permissionService;
 
     @Inject @Named(InternalPluginsInfo.Minecraft.IDENTIFIER) private PluginContainer minecraft;
     @Inject @Named(InternalPluginsInfo.Implementation.IDENTIFIER) private PluginContainer implementation;

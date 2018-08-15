@@ -23,33 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.text;
+package org.lanternpowered.api.text.template
 
-import org.lanternpowered.server.game.registry.EarlyRegistration;
-import org.lanternpowered.server.util.ReflectionHelper;
-import org.lanternpowered.server.util.UncheckedThrowables;
-import org.spongepowered.api.registry.RegistryModule;
-import org.spongepowered.api.registry.util.RegistrationDependency;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextFormat;
-import org.spongepowered.api.text.format.TextStyles;
-
-import java.lang.reflect.Field;
-
-@RegistrationDependency({ TextColorRegistryModule.class, TextStyleRegistryModule.class })
-public class TextFormatRegistryModule implements RegistryModule {
-
-    @EarlyRegistration
-    @Override
-    public void registerDefaults() {
-        try {
-            // Make sure that the color is updated properly
-            final Field colorField = TextFormat.class.getDeclaredField("color");
-            final Field styleField = TextFormat.class.getDeclaredField("style");
-            ReflectionHelper.setField(colorField, TextFormat.NONE, TextColors.NONE);
-            ReflectionHelper.setField(styleField, TextFormat.NONE, TextStyles.NONE);
-        } catch (Exception e) {
-            throw UncheckedThrowables.thrOw(e);
-        }
-    }
-}
+typealias TextTemplate = org.spongepowered.api.text.TextTemplate
+typealias TemplateArg = org.spongepowered.api.text.TextTemplate.Arg
+typealias TemplateArgBuilder = org.spongepowered.api.text.TextTemplate.Arg.Builder
+typealias TextTemplateArgumentException = org.spongepowered.api.text.TextTemplateArgumentException

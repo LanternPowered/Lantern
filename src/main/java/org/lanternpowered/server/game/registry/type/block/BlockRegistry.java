@@ -71,7 +71,7 @@ public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
      *
      * @param blockType the block type
      */
-    void register(BlockType blockType);
+    <A extends BlockType> A register(A blockType);
 
     /**
      * Registers a new catalog type in the registry.

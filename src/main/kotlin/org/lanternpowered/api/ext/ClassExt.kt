@@ -26,6 +26,7 @@
 package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.util.TypeToken
+import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
 // Utilities related to classes and type tokens
@@ -34,6 +35,16 @@ import kotlin.reflect.KClass
  * Constructs a [TypeToken] for the [KClass].
  */
 val <T : Any> KClass<T>.typeToken: TypeToken<T> get() = TypeToken.of(java)
+
+/**
+ * Constructs a [TypeToken] for the [Class].
+ */
+val <T : Any> Class<T>.typeToken: TypeToken<T> get() = TypeToken.of(this)
+
+/**
+ * Constructs a [TypeToken] for the [Type].
+ */
+val Type.typeToken: TypeToken<*> get() = TypeToken.of(this)
 
 /**
  * Constructs a [TypeToken] for type [T].

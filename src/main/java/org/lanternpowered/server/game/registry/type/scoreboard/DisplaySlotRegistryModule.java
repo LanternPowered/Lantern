@@ -29,9 +29,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.type.text.TextColorRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
-import org.lanternpowered.server.text.FormattingCodeTextSerializer;
+import org.lanternpowered.server.text.format.LanternTextColor;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.text.format.TextColor;
@@ -41,6 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@RegistrationDependency(TextColorRegistryModule.class)
 public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<DisplaySlot> {
 
     private final Map<TextColor, DisplaySlot> byTeamColors = new HashMap<>();
@@ -50,8 +53,8 @@ public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCat
     }
 
     @Override
-    protected void register(DisplaySlot catalogType, boolean disallowInbuiltPluginIds) {
-        super.register(catalogType, disallowInbuiltPluginIds);
+    protected void doRegistration(DisplaySlot catalogType, boolean disallowInbuiltPluginIds) {
+        super.doRegistration(catalogType, disallowInbuiltPluginIds);
         catalogType.getTeamColor().ifPresent(color -> this.byTeamColors.putIfAbsent(color, catalogType));
     }
 
@@ -65,7 +68,7 @@ public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCat
             if (textColor == TextColors.NONE) {
                 continue;
             }
-            final char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(textColor);
+            final char character = ((LanternTextColor.Formatting) textColor).getCode();
             final String id = "below_name_" + textColor.getName().toLowerCase();
             final String name = "sidebar.team." + textColor.getName().toLowerCase();
             register(new LanternDisplaySlot(CatalogKeys.minecraft(id, name), textColor, 3 + character));

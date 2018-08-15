@@ -942,11 +942,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 builder.append(t("multiplayer.disconnect.ban.ip_banned"));
             }
             // There is optionally a reason
-            optReason.ifPresent(reason -> builder.append(Text.NEW_LINE).append(t("multiplayer.disconnect.ban.reason", reason)));
+            optReason.ifPresent(reason -> builder.append(Text.newLine()).append(t("multiplayer.disconnect.ban.reason", reason)));
             // And a expiration date if present
             optExpirationDate.ifPresent(expirationDate -> {
                 final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(tr("multiplayer.disconnect.ban.expiration_date_format").get());
-                builder.append(Text.NEW_LINE).append(t("multiplayer.disconnect.ban.expiration", formatter.format(expirationDate)));
+                builder.append(Text.newLine()).append(t("multiplayer.disconnect.ban.expiration", formatter.format(expirationDate)));
             });
 
             kickReason = builder.build();

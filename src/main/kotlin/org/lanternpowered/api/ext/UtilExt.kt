@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+
 package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.util.Tuple
@@ -33,3 +35,5 @@ operator fun <K, V> Tuple<K, V>.component2(): V = second
 
 fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
 fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
+
+inline fun <T> Any?.uncheckedCast(): T = this as T

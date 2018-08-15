@@ -45,6 +45,8 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.profile.LanternGameProfileBuilder;
 import org.lanternpowered.server.profile.LanternProfilePropertyBuilder;
+import org.lanternpowered.server.text.serializer.BookViewConfigSerializer;
+import org.lanternpowered.server.text.serializer.TextConfigSerializer;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -76,8 +78,6 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.BookViewDataBuilder;
-import org.spongepowered.api.text.serializer.TextConfigSerializer;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RespawnLocation;
 
@@ -135,7 +135,7 @@ public class DataRegistrar {
         // Register the data builders
         dataManager.registerBuilder(PatternLayer.class, new LanternPatternLayer.Builder(game));
         dataManager.registerBuilder(Text.class, new TextConfigSerializer());
-        dataManager.registerBuilder(BookView.class, new BookViewDataBuilder());
+        dataManager.registerBuilder(BookView.class, new BookViewConfigSerializer());
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
         dataManager.registerBuilder(Enchantment.class, new LanternEnchantmentBuilder());

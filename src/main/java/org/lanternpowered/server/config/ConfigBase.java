@@ -38,6 +38,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
+import org.lanternpowered.server.config.serializer.CatalogKeyTypeSerializer;
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.DataViewTypeSerializer;
 import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
@@ -48,7 +49,10 @@ import org.lanternpowered.server.config.serializer.TextTypeSerializer;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternProfileProperty;
+import org.lanternpowered.server.text.serializer.TextTemplateArgConfigSerializer;
+import org.lanternpowered.server.text.serializer.TextTemplateConfigSerializer;
 import org.lanternpowered.server.util.IpSet;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -56,7 +60,6 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
-import org.spongepowered.api.text.serializer.TextTemplateConfigSerializer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -72,9 +75,12 @@ public abstract class ConfigBase {
     static {
         final TypeSerializerCollection typeSerializers = TypeSerializers.getDefaultSerializers();
         final DataViewTypeSerializer dataViewTypeSerializer = new DataViewTypeSerializer();
-        typeSerializers.registerType(TypeToken.of(Text.class), new TextTypeSerializer())
+        typeSerializers
+                .registerType(TypeToken.of(Text.class), new TextTypeSerializer())
                 .registerType(TypeToken.of(TextTemplate.class), new TextTemplateConfigSerializer())
+                .registerType(TypeToken.of(TextTemplate.Arg.class), new TextTemplateArgConfigSerializer())
                 .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
+                .registerType(TypeToken.of(CatalogKey.class), new CatalogKeyTypeSerializer())
                 .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
                 .registerType(TypeToken.of(GameProfile.class), (TypeSerializer) typeSerializers.get(
                         TypeToken.of(LanternGameProfile.class)))

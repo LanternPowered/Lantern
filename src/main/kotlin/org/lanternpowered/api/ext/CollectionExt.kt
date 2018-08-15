@@ -46,4 +46,7 @@ inline fun <K, V> Multimap<K, V>.toImmutableMultimap(): ImmutableMultimap<K, V> 
 inline fun immutableListOf(vararg args: Any) = args.asList().toImmutableList()
 inline fun immutableSetOf(vararg args: Any) = args.asList().toImmutableSet()
 
+inline fun <T> immutableListBuilderOf() = ImmutableList.builder<T>()
+inline fun <T> immutableSetBuilderOf() = ImmutableSet.builder<T>()
+
 inline fun <reified K : Enum<K>, V> enumMapOf(): MutableMap<K, V> = EnumMap(K::class.java)

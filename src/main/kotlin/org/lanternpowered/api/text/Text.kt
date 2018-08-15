@@ -30,7 +30,6 @@ package org.lanternpowered.api.text
 
 import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
-import org.lanternpowered.api.util.Unused
 
 typealias LiteralText = org.spongepowered.api.text.LiteralText
 typealias LiteralTextBuilder = org.spongepowered.api.text.LiteralText.Builder
@@ -40,8 +39,6 @@ typealias Text = org.spongepowered.api.text.Text
 typealias TextBuilder = org.spongepowered.api.text.Text.Builder
 typealias TextElement = org.spongepowered.api.text.TextElement
 typealias TextRepresentable = org.spongepowered.api.text.TextRepresentable
-typealias TextTemplate = org.spongepowered.api.text.TextTemplate
-typealias TextTemplateArgumentException = org.spongepowered.api.text.TextTemplateArgumentException
 typealias TranslatableText = org.spongepowered.api.text.TranslatableText
 typealias TranslatableTextBuilder = org.spongepowered.api.text.TranslatableText.Builder
 
@@ -72,7 +69,7 @@ inline fun Text(content: String, fn: LiteralTextBuilder.() -> Unit): LiteralText
  * @return The constructed text
  */
 @JvmName("literalOf")
-inline fun LiteralText(content: String, unused: Unused = null): LiteralText = Text.of(content)
+inline fun LiteralText(content: String): LiteralText = Text.of(content)
 
 /**
  * Constructs a new [LiteralText] from the given content and builder function.

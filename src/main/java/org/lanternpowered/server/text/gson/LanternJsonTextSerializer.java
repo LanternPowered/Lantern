@@ -51,11 +51,11 @@ public final class LanternJsonTextSerializer extends DefaultCatalogType implemen
     public LanternJsonTextSerializer(CatalogKey key, TranslationManager translationManager) {
         super(key);
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(Text.class, new JsonTextSerializer())
-                .registerTypeAdapter(LiteralText.class, new JsonTextLiteralSerializer())
-                .registerTypeAdapter(ScoreText.class, new JsonTextScoreSerializer())
-                .registerTypeAdapter(SelectorText.class, new JsonTextSelectorSerializer())
-                .registerTypeAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(translationManager))
+                .registerTypeHierarchyAdapter(Text.class, new JsonTextSerializer())
+                .registerTypeHierarchyAdapter(LiteralText.class, new JsonTextLiteralSerializer())
+                .registerTypeHierarchyAdapter(ScoreText.class, new JsonTextScoreSerializer())
+                .registerTypeHierarchyAdapter(SelectorText.class, new JsonTextSelectorSerializer())
+                .registerTypeHierarchyAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(translationManager))
                 .create();
     }
 

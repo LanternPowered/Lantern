@@ -33,7 +33,7 @@ import java.util.OptionalInt;
 
 public interface IFuelRegistry {
 
-    void register(IFuel fuel);
+    <A extends IFuel> A register(A fuel);
 
     Collection<IFuel> getAll();
 

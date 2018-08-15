@@ -42,8 +42,8 @@ public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> 
     }
 
     @Override
-    public void serialize(TypeToken<?> type, CatalogType obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(obj.getKey());
+    public void serialize(TypeToken<?> type, CatalogType obj, ConfigurationNode value) {
+        value.setValue(obj.getKey().toString());
     }
 
 }

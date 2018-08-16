@@ -23,23 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.inject.property
+package org.lanternpowered.api.inject
 
-import com.google.inject.Inject
-import com.google.inject.Injector
-import com.google.inject.Key
-import com.google.inject.Provider
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.inject.InjectionPoint
-
-class InjectablePropertyProvider<T : Any> : Provider<InjectableProperty<T>> {
-
-    @Inject private lateinit var injector: Injector
-    @Inject private lateinit var point: InjectionPoint
-
-    override fun get(): InjectableProperty<T> {
-        // Extract the value type from the injection point
-        val valueType = Key.get(InjectionPoint.getLazyOrPropertyValueType<T>(this.point).typeLiteral)
-        return InjectedProperty(this.injector.getInstance(valueType))
-    }
-}
+/**
+ * A named annotation that can be used in
+ * combination with kotlin properties. It
+ * will converted to the guice named when
+ * injecting.
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.PROPERTY)
+annotation class Named(val value: String)

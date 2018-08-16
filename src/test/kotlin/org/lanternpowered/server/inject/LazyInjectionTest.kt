@@ -27,12 +27,12 @@ package org.lanternpowered.server.inject
 
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
-import com.google.inject.Inject
+import com.google.inject.Provider
+import com.google.inject.name.Named
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.lanternpowered.api.ext.*
-import javax.inject.Provider
 
 class LazyInjectionTest {
 
@@ -43,12 +43,12 @@ class LazyInjectionTest {
 
     class TestObject {
 
-        @delegate:Inject val service: MyAwesomeService by lazyInjected()
+        val service: MyAwesomeService by injectLazily()
     }
 
     class TestObject1 {
 
-        @delegate:Inject val service: MyAwesomeService by injected()
+        val service: MyAwesomeService by inject()
     }
 
     @Test
@@ -56,6 +56,7 @@ class LazyInjectionTest {
         val module = object : AbstractModule() {
             override fun configure() {
                 install(InjectionPointProvider())
+                install(InjectablePropertyProvider())
                 bind(MyAwesomeService::class.java).toProvider(Provider { MyAwesomeService() })
             }
         }
@@ -68,6 +69,7 @@ class LazyInjectionTest {
             testObject.service.get()
             assertTrue(false)
         } catch (e: Exception) {
+            e.printStackTrace()
         }
 
         var testObject1 = TestObject1()

@@ -26,14 +26,15 @@
 package org.lanternpowered.api.inject.lazy
 
 import com.google.inject.ProvidedBy
-import org.lanternpowered.api.ext.*
 
 /**
  * Represents a value that will be instantiated lazily.
  */
 @FunctionalInterface
 @ProvidedBy(LazyProvider::class)
-interface Lazy<T> : kotlin.Lazy<T> {
+interface Lazy<T> {
+
+    val value: T
 
     // Some convenient methods to access the value
     operator fun invoke(): T = this.value
@@ -44,28 +45,8 @@ interface Lazy<T> : kotlin.Lazy<T> {
         /**
          * Constructs a new [Lazy] with the given initializer.
          */
-        fun <T> of(initializer: () -> T): Lazy<T> = LazyImpl(initializer)
-    }
-}
-
-internal class LazyImpl<T>(initializer: () -> T) : Lazy<T> {
-
-    private var backing: Any? = uninitializedValue
-    private var initializer: (() -> T)? = initializer
-
-    override val value: T
-        get() {
-            if (this.backing === uninitializedValue) {
-                this.backing = this.initializer!!()
-                this.initializer = null
-            }
-            return this.backing.uncheckedCast()
+        fun <T> of(initializer: () -> T) = object : Lazy<T> {
+            override val value: T by lazy(initializer)
         }
-
-    override fun isInitialized() = this.backing !== uninitializedValue
-    override fun toString() = if (isInitialized()) this.backing.toString() else "Lazy value not initialized yet."
-
-    companion object {
-        private val uninitializedValue = Object()
     }
 }

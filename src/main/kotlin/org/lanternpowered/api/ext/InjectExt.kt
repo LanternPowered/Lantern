@@ -25,9 +25,8 @@
  */
 package org.lanternpowered.api.ext
 
-import org.lanternpowered.api.inject.lazy.Lazy
-import org.lanternpowered.api.inject.property.InjectableProperty
-import org.lanternpowered.api.inject.property.NotInjectedProperty
+import org.lanternpowered.api.inject.property.DefaultInjectedProperty
+import org.lanternpowered.api.inject.property.LazyInjectedProperty
 
-inline fun <reified T> lazyInjected() = Lazy.of<T> { throw IllegalStateException("Not yet injected.") }
-inline fun <reified T> injected() = NotInjectedProperty.uncheckedCast<InjectableProperty<T>>()
+inline fun <reified T> injectLazily() = LazyInjectedProperty<T>()
+inline fun <reified T> inject() = DefaultInjectedProperty<T>()

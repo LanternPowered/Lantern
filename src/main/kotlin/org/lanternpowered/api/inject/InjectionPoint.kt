@@ -26,14 +26,8 @@
 package org.lanternpowered.api.inject
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Executable
-import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.jvm.javaField
-import kotlin.reflect.jvm.javaGetter
 
 /**
  * Represents a point where a specific
@@ -53,7 +47,11 @@ interface InjectionPoint : AnnotatedElement {
      */
     val type: TypeToken<*>
 
-    interface Field {
+    /**
+     * Represents a injection point which targets
+     * a [java.lang.reflect.Field].
+     */
+    interface Field : InjectionPoint {
 
         /**
          * The backing field of the injection point.
@@ -61,7 +59,13 @@ interface InjectionPoint : AnnotatedElement {
         val field: java.lang.reflect.Field
     }
 
-    interface Parameter {
+    /**
+     * Represents a injection point which targets a
+     * [java.lang.reflect.Method] or
+     * [java.lang.reflect.Constructor]
+     * parameter.
+     */
+    interface Parameter : InjectionPoint {
 
         /**
          * The backing executable of the injection point.
@@ -72,48 +76,5 @@ interface InjectionPoint : AnnotatedElement {
          * The index of the parameter.
          */
         val parameterIndex: Int
-    }
-
-    companion object {
-
-        private val lazyTypeVariable = Lazy::class.java.typeParameters[0]
-
-        /**
-         * Gets the type for the field/property at the given [InjectionPoint].
-         */
-        fun <T : Any> getLazyOrPropertyValueType(injectionPoint: InjectionPoint): TypeToken<T> {
-            var valueType = injectionPoint.type.uncheckedCast<TypeToken<T>>()
-            val valueRawType = valueType.rawType.uncheckedCast<Class<T>>()
-            val lazy = Lazy::class.java.isAssignableFrom(valueRawType)
-            if (lazy || ReadOnlyProperty::class.java.isAssignableFrom(valueRawType) ||
-                    ReadWriteProperty::class.java.isAssignableFrom(valueRawType)) {
-                if (lazy) {
-                    valueType = injectionPoint.type.resolveType(lazyTypeVariable).uncheckedCast()
-                    if (valueType.rawType !== Object::class.java) {
-                        return valueType
-                    }
-                }
-                if (injectionPoint is InjectionPoint.Field) {
-                    val name = injectionPoint.field.name
-                    // Check if it's a delegate property, kotlin doesn't keep the generic signature
-                    // for delegate fields stored in the field at the moment, so look at the property
-                    val theClass = injectionPoint.source.rawType.uncheckedCast<Class<T>>().kotlin
-                    theClass.declaredMemberProperties.forEach foreach@ {
-                        val field = it.javaField
-                        if (field != null && name == field.name) {
-                            val getter = it.javaGetter
-                            if (getter != null) {
-                                valueType = getter.genericReturnType.typeToken.uncheckedCast()
-                            }
-                            return@foreach
-                        }
-                    }
-                }
-            }
-            if (valueType.rawType === Object::class.java) {
-                throw IllegalStateException("Missing value type.")
-            }
-            return valueType
-        }
     }
 }

@@ -157,6 +157,7 @@ public class LanternModule extends PrivateModule {
 
         // Injection Points
         install(new InjectionPointProvider());
+        install(new InjectablePropertyProvider());
 
         // The logger
         bind(Logger.class)

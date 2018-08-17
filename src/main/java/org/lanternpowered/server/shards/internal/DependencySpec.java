@@ -26,7 +26,7 @@
 package org.lanternpowered.server.shards.internal;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.shards.Shard;
+import org.lanternpowered.api.shard.Shard;
 import org.lanternpowered.server.shards.dependency.Requirement;
 
 import java.util.ArrayList;

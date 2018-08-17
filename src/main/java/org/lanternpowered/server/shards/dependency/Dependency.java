@@ -27,8 +27,8 @@ package org.lanternpowered.server.shards.dependency;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import org.lanternpowered.server.shards.Shard;
-import org.lanternpowered.server.shards.ShardHolder;
+import org.lanternpowered.api.shard.Shard;
+import org.lanternpowered.api.shard.ShardHolder;
 import org.lanternpowered.server.shards.InjectionRegistry;
 
 import java.lang.annotation.Retention;

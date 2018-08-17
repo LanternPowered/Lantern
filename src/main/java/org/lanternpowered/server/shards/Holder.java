@@ -29,6 +29,9 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import org.lanternpowered.api.shard.Shard;
+import org.lanternpowered.api.shard.ShardHolder;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

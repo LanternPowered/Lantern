@@ -34,7 +34,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.shards.NetworkShard;
+import org.lanternpowered.server.entity.shard.NetworkShard;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.text.Text;

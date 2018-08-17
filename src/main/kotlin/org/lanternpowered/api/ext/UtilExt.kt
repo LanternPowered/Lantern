@@ -37,3 +37,16 @@ fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
 fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
 
 inline fun <T> Any?.uncheckedCast(): T = this as T
+
+inline fun <T> T?.ifNotNull(fn: (T) -> Unit) {
+    if (this != null) {
+        fn(this)
+    }
+}
+
+inline fun <T, R> T?.mapIfNotNull(fn: (T) -> R): R? {
+    if (this != null) {
+        return fn(this)
+    }
+    return null
+}

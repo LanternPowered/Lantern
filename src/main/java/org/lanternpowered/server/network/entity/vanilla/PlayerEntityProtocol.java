@@ -53,7 +53,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
-import org.lanternpowered.server.shards.event.Shardevent;
+import org.lanternpowered.api.shard.event.Shardevent;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.entity.Entity;
@@ -364,7 +364,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, Shardevent event) {
         if (event instanceof SpectateEntityShardevent) {
-            final Entity entity = ((SpectateEntityShardevent) event).getSpectatedEntity().orElse(null);
+            final Entity entity = ((SpectateEntityShardevent) event).getSpectatedEntity();
             if (entity == null) {
                 context.sendToSelf(() -> new MessagePlayOutSetCamera(getRootEntityId()));
             } else {

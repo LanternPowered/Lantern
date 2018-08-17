@@ -30,6 +30,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.lanternpowered.api.shard.Shard;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

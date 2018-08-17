@@ -27,7 +27,7 @@ package org.lanternpowered.server.effect.entity.animation;
 
 import org.lanternpowered.server.effect.entity.EntityEffect;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.EntityDamagedShardevent;
+import org.lanternpowered.api.entity.event.animation.DamageEntityAnimation;
 
 /**
  * Plays a entity hurt animation. This will make a
@@ -37,6 +37,6 @@ public class DefaultLivingHurtAnimation implements EntityEffect {
 
     @Override
     public void play(LanternEntity entity) {
-        entity.getShardeventBus().post(new EntityDamagedShardevent());
+        entity.getShardeventBus().post(new DamageEntityAnimation());
     }
 }

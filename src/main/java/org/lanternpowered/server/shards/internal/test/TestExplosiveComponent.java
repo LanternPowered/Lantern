@@ -26,9 +26,8 @@
 package org.lanternpowered.server.shards.internal.test;
 
 import com.google.inject.Inject;
-import org.lanternpowered.server.entity.shards.AIShard;
-import org.lanternpowered.server.entity.shards.ExplosiveShard;
-import org.lanternpowered.server.shards.DefaultShardImpl;
+import org.lanternpowered.api.entity.shard.AIShard;
+import org.lanternpowered.api.entity.shard.ExplosiveShard;
 import org.lanternpowered.server.shards.Holder;
 import org.lanternpowered.server.shards.Opt;
 import org.spongepowered.api.entity.Entity;

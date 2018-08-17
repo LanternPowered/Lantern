@@ -34,7 +34,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.lanternpowered.server.shards.Holder;
 import org.lanternpowered.server.shards.InjectableType;
-import org.lanternpowered.server.shards.Shard;
+import org.lanternpowered.api.shard.Shard;
 import org.lanternpowered.server.shards.dependency.AutoAttach;
 import org.lanternpowered.server.shards.dependency.Dependencies;
 import org.lanternpowered.server.shards.dependency.Dependency;

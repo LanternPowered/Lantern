@@ -50,7 +50,7 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.shards.NetworkShard;
+import org.lanternpowered.server.entity.shard.NetworkShard;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;

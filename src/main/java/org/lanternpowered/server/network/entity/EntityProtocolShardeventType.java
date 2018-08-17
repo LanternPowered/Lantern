@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.entity;
 
-import org.lanternpowered.server.shards.event.Shardevent;
+import org.lanternpowered.api.shard.event.Shardevent;
 import org.spongepowered.api.entity.Entity;
 
 public enum EntityProtocolShardeventType {

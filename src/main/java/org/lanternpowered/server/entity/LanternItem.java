@@ -32,8 +32,8 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.particle.item.ItemDeathParticleEffect;
-import org.lanternpowered.server.entity.shards.NetworkShard;
-import org.lanternpowered.server.entity.event.CollectEntityShardevent;
+import org.lanternpowered.server.entity.shard.NetworkShard;
+import org.lanternpowered.api.entity.event.animation.CollectEntityAnimation;
 import org.lanternpowered.server.event.LanternEventContextKeys;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -230,7 +230,7 @@ public class LanternItem extends LanternEntity implements Item {
                     .forEach(transaction -> transaction.getSlot().set(transaction.getFinal().createStack()));
             final int added = originalStack.getQuantity() - stack.getQuantity();
             if (added != 0 && entity instanceof Living) {
-                getShardeventBus().post(new CollectEntityShardevent((Living) entity, added));
+                getShardeventBus().post(new CollectEntityAnimation((Living) entity, added));
             }
             if (isRemoved()) {
                 stack.clear();

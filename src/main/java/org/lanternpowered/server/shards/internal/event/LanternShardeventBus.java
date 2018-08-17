@@ -34,9 +34,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.shards.event.Shardevent;
-import org.lanternpowered.server.shards.event.ShardeventBus;
-import org.lanternpowered.server.shards.event.ShardeventListener;
+import org.lanternpowered.api.shard.event.Shardevent;
+import org.lanternpowered.api.shard.event.ShardeventBus;
+import org.lanternpowered.api.shard.event.ShardeventListener;
 import org.lanternpowered.server.util.LambdaFactory;
 
 import java.lang.reflect.Method;

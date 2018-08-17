@@ -36,7 +36,7 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.event.SwingHandEntityShardevent;
+import org.lanternpowered.api.entity.event.animation.SwingHandAnimation;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.AbstractSlot;
@@ -383,8 +383,8 @@ public final class PlayerInteractionHandler {
     }
 
     static class SwingHandEntityShardevents {
-        static final SwingHandEntityShardevent MAIN_HAND = new SwingHandEntityShardevent(HandTypes.MAIN_HAND);
-        static final SwingHandEntityShardevent OFF_HAND = new SwingHandEntityShardevent(HandTypes.OFF_HAND);
+        static final SwingHandAnimation MAIN_HAND = new SwingHandAnimation(HandTypes.MAIN_HAND);
+        static final SwingHandAnimation OFF_HAND = new SwingHandAnimation(HandTypes.OFF_HAND);
     }
 
     public void handleSwingArm(MessagePlayInPlayerSwingArm message) {

@@ -26,8 +26,8 @@
 package org.lanternpowered.server;
 
 import org.junit.Test;
-import org.lanternpowered.server.shards.event.Shardevent;
-import org.lanternpowered.server.shards.event.ShardeventListener;
+import org.lanternpowered.api.shard.event.Shardevent;
+import org.lanternpowered.api.shard.event.ShardeventListener;
 import org.lanternpowered.server.shards.internal.event.LanternShardeventBus;
 import org.lanternpowered.server.util.FieldAccessFactory;
 

@@ -28,7 +28,6 @@ package org.lanternpowered.server.inject
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
 import com.google.inject.Provider
-import com.google.inject.name.Named
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

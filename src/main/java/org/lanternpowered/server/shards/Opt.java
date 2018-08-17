@@ -27,6 +27,9 @@ package org.lanternpowered.server.shards;
 
 import static java.util.Objects.requireNonNull;
 
+import org.lanternpowered.api.shard.Shard;
+import org.lanternpowered.api.shard.ShardHolder;
+
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Consumer;

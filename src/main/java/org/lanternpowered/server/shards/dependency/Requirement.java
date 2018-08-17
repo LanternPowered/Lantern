@@ -26,8 +26,8 @@
 package org.lanternpowered.server.shards.dependency;
 
 import org.lanternpowered.server.shards.Opt;
-import org.lanternpowered.server.shards.Shard;
-import org.lanternpowered.server.shards.ShardHolder;
+import org.lanternpowered.api.shard.Shard;
+import org.lanternpowered.api.shard.ShardHolder;
 
 import javax.annotation.Nullable;
 

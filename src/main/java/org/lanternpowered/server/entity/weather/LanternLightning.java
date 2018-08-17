@@ -31,7 +31,7 @@ import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.sound.weather.LightningSoundEffect;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.shards.NetworkShard;
+import org.lanternpowered.server.entity.shard.NetworkShard;
 import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
 import org.lanternpowered.server.entity.interfaces.weather.ILightning;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;

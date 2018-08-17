@@ -30,12 +30,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.shards.Shard;
-import org.lanternpowered.server.shards.ShardHolder;
+import org.lanternpowered.api.shard.Shard;
+import org.lanternpowered.api.shard.ShardHolder;
 import org.lanternpowered.server.shards.InjectionRegistry;
-import org.lanternpowered.server.shards.dependency.Requirement;
-import org.lanternpowered.server.shards.event.Shardevent;
-import org.lanternpowered.server.shards.event.ShardeventBus;
+import org.lanternpowered.api.shard.event.Shardevent;
+import org.lanternpowered.api.shard.event.ShardeventBus;
 import org.lanternpowered.server.shards.internal.event.LanternShardeventBus;
 
 import java.util.ArrayList;

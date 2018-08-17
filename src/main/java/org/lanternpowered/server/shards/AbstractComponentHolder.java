@@ -25,13 +25,18 @@
  */
 package org.lanternpowered.server.shards;
 
-import org.lanternpowered.server.shards.event.ShardeventBus;
+import kotlin.reflect.KClass;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.lanternpowered.api.shard.Shard;
+import org.lanternpowered.api.shard.ShardHolder;
+import org.lanternpowered.api.shard.event.ShardeventBus;
 import org.lanternpowered.server.shards.internal.ComponentContainer;
 
 import java.util.Collection;
 import java.util.Optional;
 
-public abstract class AbstractComponentHolder implements ShardHolder {
+public class AbstractComponentHolder implements ShardHolder {
 
     private final ComponentContainer componentContainer = new ComponentContainer(this);
 
@@ -72,4 +77,33 @@ public abstract class AbstractComponentHolder implements ShardHolder {
         return null;
     }
 
+    @Nullable @Override public <T extends Shard> T getShard(@NotNull KClass<T> type) {
+        return null;
+    }
+
+    @NotNull @Override public <T> Optional<T> getShardOfType(@NotNull Class<T> type) {
+        return Optional.empty();
+    }
+
+    @Nullable @Override public <T> T getShardOfType(@NotNull KClass<T> type) {
+        return null;
+    }
+
+    @NotNull @Override public <T> Collection<T> getShardsOfType(@NotNull KClass<T> type) {
+        return null;
+    }
+
+    @NotNull @Override public <T extends Shard> Optional<T> addShard(@NotNull KClass<T> type) {
+        return Optional.empty();
+    }
+
+    @Override public <T extends Shard, I extends T> boolean replaceShard(@NotNull KClass<T> type, @NotNull I component)
+            throws IllegalArgumentException {
+        return false;
+    }
+
+    @Nullable @Override public <T extends Shard, I extends T> I replaceShard(@NotNull KClass<T> type, @NotNull Class<I> component)
+            throws IllegalArgumentException {
+        return null;
+    }
 }

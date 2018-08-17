@@ -27,15 +27,15 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.EntityDamagedShardevent;
-import org.lanternpowered.server.entity.event.SwingHandEntityShardevent;
+import org.lanternpowered.api.entity.event.animation.DamageEntityAnimation;
+import org.lanternpowered.api.entity.event.animation.SwingHandAnimation;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAddPotionEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
-import org.lanternpowered.server.shards.event.Shardevent;
+import org.lanternpowered.api.shard.event.Shardevent;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
@@ -147,10 +147,10 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, Shardevent event) {
-        if (event instanceof EntityDamagedShardevent) {
+        if (event instanceof DamageEntityAnimation) {
             context.sendToAll(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 1));
-        } else if (event instanceof SwingHandEntityShardevent) {
-            final HandType handType = ((SwingHandEntityShardevent) event).getHandType();
+        } else if (event instanceof SwingHandAnimation) {
+            final HandType handType = ((SwingHandAnimation) event).getHandType();
             if (handType == HandTypes.MAIN_HAND) {
                 context.sendToAllExceptSelf(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 0));
             } else if (handType == HandTypes.OFF_HAND) {

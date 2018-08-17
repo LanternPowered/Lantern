@@ -50,7 +50,7 @@ import org.lanternpowered.server.effect.entity.sound.player.PlayerHurtSoundEffec
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternLiving;
-import org.lanternpowered.server.entity.shards.NetworkShard;
+import org.lanternpowered.server.entity.shard.NetworkShard;
 import org.lanternpowered.server.entity.event.SpectateEntityShardevent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;

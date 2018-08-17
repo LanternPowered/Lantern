@@ -36,7 +36,7 @@ import it.unimi.dsi.fastutil.ints.IntSets;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.entity.event.CollectEntityShardevent;
+import org.lanternpowered.api.entity.event.animation.CollectEntityAnimation;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
@@ -54,7 +54,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
-import org.lanternpowered.server.shards.event.Shardevent;
+import org.lanternpowered.api.shard.event.Shardevent;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -263,10 +263,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, Shardevent event) {
-        if (event instanceof CollectEntityShardevent) {
-            final LanternLiving collector = (LanternLiving) ((CollectEntityShardevent) event).getCollector();
+        if (event instanceof CollectEntityAnimation) {
+            final LanternLiving collector = (LanternLiving) ((CollectEntityAnimation) event).getCollector();
             context.getId(collector).ifPresent(id -> {
-                final int count = ((CollectEntityShardevent) event).getCollectedItemsCount();
+                final int count = ((CollectEntityAnimation) event).getCollectedItemsCount();
                 context.sendToAll(() -> new MessagePlayOutEntityCollectItem(id, getRootEntityId(), count));
             });
         } else {

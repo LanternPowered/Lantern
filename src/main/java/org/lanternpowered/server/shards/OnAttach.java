@@ -28,6 +28,9 @@ package org.lanternpowered.server.shards;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import org.lanternpowered.api.shard.Shard;
+import org.lanternpowered.api.shard.ShardHolder;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

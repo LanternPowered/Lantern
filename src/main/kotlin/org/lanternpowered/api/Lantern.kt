@@ -27,6 +27,7 @@ package org.lanternpowered.api
 
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.plugin.PluginManager
+import org.lanternpowered.api.shard.ShardRegistry
 import org.lanternpowered.api.x.XGameRegistry
 import org.lanternpowered.api.x.cause.XCauseStackManager
 import org.spongepowered.api.scheduler.Scheduler
@@ -42,4 +43,5 @@ object Lantern {
     @JvmStatic inline val eventManager: EventManager get() = Sponge.getEventManager()
     @JvmStatic inline val scheduler: Scheduler get() = Sponge.getScheduler()
     @JvmStatic inline val serviceManager: ServiceManager get() = Sponge.getServiceManager()
+    @JvmStatic inline val shardRegistry: ShardRegistry get() = this.registry.shardRegistry
 }

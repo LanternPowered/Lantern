@@ -37,7 +37,7 @@ import java.util.Optional
 /**
  * The [AIShard] shard type.
  */
-abstract class AIShard : Shard() {
+abstract class AIShard : Shard<AIShard>() {
 
     /**
      * The current target, usually according to the various
@@ -53,6 +53,6 @@ abstract class AIShard : Shard() {
      * @param type GoalType to lookup
      * @param <T> Inferred agent type
      * @return The goal or [Optional.empty] if not found.
-    </T> */
-    abstract fun <T : Agent> getGoal(type: GoalType): Optional<Goal<T>>
+     */
+    abstract fun <T : Agent> getGoal(type: GoalType): Goal<T>?
 }

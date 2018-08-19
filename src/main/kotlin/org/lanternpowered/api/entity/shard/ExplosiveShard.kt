@@ -31,7 +31,7 @@ import org.spongepowered.api.entity.Entity
 /**
  * The [ExplosiveShard] shard type.
  */
-abstract class ExplosiveShard : Shard() {
+abstract class ExplosiveShard : Shard<ExplosiveShard>() {
 
     /**
      * The direct detonator of the [ExplosiveShard].

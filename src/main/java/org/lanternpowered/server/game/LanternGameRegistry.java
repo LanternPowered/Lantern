@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.jetbrains.annotations.NotNull;
 import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder;
@@ -43,6 +44,7 @@ import org.lanternpowered.api.script.function.condition.ConditionType;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
 import org.lanternpowered.api.script.function.value.FloatValueProviderType;
 import org.lanternpowered.api.script.function.value.IntValueProviderType;
+import org.lanternpowered.api.shard.ShardRegistry;
 import org.lanternpowered.api.x.XGameRegistry;
 import org.lanternpowered.api.x.text.XTextFactory;
 import org.lanternpowered.server.advancement.LanternAdvancementBuilder;
@@ -271,6 +273,7 @@ import org.lanternpowered.server.script.function.condition.ConditionTypeRegistry
 import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
+import org.lanternpowered.server.shard.LanternShardRegistry;
 import org.lanternpowered.server.statistic.builder.BlockStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.EntityStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.ItemStatisticBuilder;
@@ -1324,5 +1327,10 @@ public class LanternGameRegistry implements XGameRegistry {
     @Override
     public Locale getLocale(String locale) {
         return LocaleCache.get(locale);
+    }
+
+    @Override
+    public ShardRegistry getShardRegistry() {
+        return LanternShardRegistry.INSTANCE;
     }
 }

@@ -30,16 +30,54 @@ import kotlin.reflect.KClass
 interface ShardRegistry {
 
     /**
-     * Registers the default implementation for the [Shard] type. Multiple default
+     * Gets the [ShardType] for the given shard class.
+     *
+     * The generic [Shard] type must be resolvable, otherwise is the
+     * given shard class invalid to have a [ShardType], and a
+     * [IllegalArgumentException] will be thrown.
+     */
+    fun <T : Shard<T>> getType(shardClass: KClass<out T>) = getType(shardClass.java)
+
+    /**
+     * Gets the [ShardType] for the given shard class.
+     *
+     * The generic [Shard] type must be resolvable, otherwise is the
+     * given shard class invalid to have a [ShardType], and a
+     * [IllegalArgumentException] will be thrown.
+     */
+    fun <T : Shard<T>> getType(shardClass: Class<out T>): ShardType<T>
+
+    /**
+     * Registers the default implementation for the [ShardType]. Multiple default
      * implementations can be registered, the first applicable one will
      * be used when a default one is requested.
      */
-    fun <T : Shard, I : T> registerDefault(shardType: KClass<T>, defaultImpl: KClass<I>)
+    fun <T : Shard<T>, I : T> registerDefault(shardType: ShardType<T>, defaultImpl: Class<I>)
+
+    /**
+     * Registers the default implementation for the [ShardType]. Multiple default
+     * implementations can be registered, the first applicable one will
+     * be used when a default one is requested.
+     */
+    fun <T : Shard<T>, I : T> registerDefault(shardType: ShardType<T>, defaultImpl: KClass<I>) {
+        registerDefault(shardType, defaultImpl.java)
+    }
 
     /**
      * Registers the default implementation for the [Shard] type. Multiple default
      * implementations can be registered, the first applicable one will
      * be used when a default one is requested.
      */
-    fun <T : Shard, I : T> registerDefault(shardType: Class<T>, defaultImpl: Class<I>)
+    fun <T : Shard<T>, I : T> registerDefault(shardType: KClass<T>, defaultImpl: KClass<I>) {
+        registerDefault(getType(shardType), defaultImpl)
+    }
+
+    /**
+     * Registers the default implementation for the [Shard] type. Multiple default
+     * implementations can be registered, the first applicable one will
+     * be used when a default one is requested.
+     */
+    fun <T : Shard<T>, I : T> registerDefault(shardType: Class<T>, defaultImpl: Class<I>) {
+        registerDefault(getType(shardType), defaultImpl)
+    }
 }

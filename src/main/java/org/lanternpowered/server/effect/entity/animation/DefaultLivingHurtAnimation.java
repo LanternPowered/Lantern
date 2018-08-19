@@ -37,6 +37,6 @@ public class DefaultLivingHurtAnimation implements EntityEffect {
 
     @Override
     public void play(LanternEntity entity) {
-        entity.getShardeventBus().post(new DamageEntityAnimation());
+        entity.getShardeventBus().post(DamageEntityAnimation.INSTANCE);
     }
 }

@@ -31,7 +31,7 @@ import org.lanternpowered.api.shard.Shard
 /**
  * The [BossShard] shard type.
  */
-abstract class BossShard : Shard() {
+abstract class BossShard : Shard<BossShard>() {
 
     /**
      * The [BossBar] that will be used by the boss.

@@ -25,18 +25,22 @@
  */
 package org.lanternpowered.server.shard
 
-import org.lanternpowered.api.entity.shard.MerchantShard
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.entity.shard.ExplosiveShard
+import org.lanternpowered.api.entity.shard.MerchantShard
 import org.spongepowered.api.entity.living.Humanoid
-import org.spongepowered.api.entity.living.Villager
+import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.text.Text
 
-class TestMerchantShard(override var customer: Humanoid?) : MerchantShard() {
+class YouWishItWasAMerchantShard() : MerchantShard() {
 
-    private val villager: Villager by requireHolderOfType()
-    private val explosiveShard: ExplosiveShard? by optionalShard()
+    private val explosiveShard by optionalShard<ExplosiveShard>()
 
-    fun onInit() {
-        this.explosiveShard.ifNotNull { it.detonate() }
-    }
+    override var customer: Humanoid?
+        set(value) {
+            this.explosiveShard?.detonate()
+            if (value is Player) {
+                value.sendMessage(Text.of("Boom!"))
+            }
+        }
+        get() = null
 }

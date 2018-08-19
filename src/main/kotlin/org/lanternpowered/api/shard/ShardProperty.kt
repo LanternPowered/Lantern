@@ -30,44 +30,50 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.cast
 
-class RequiredHolderOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard, T> {
+class RequiredHolderOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard<*>, T> {
 
-    override fun getValue(thisRef: Shard, property: KProperty<*>): T {
+    override fun getValue(thisRef: Shard<*>, property: KProperty<*>): T {
         return type.cast(thisRef.holder)
     }
 }
 
-class OptionalFirstShardOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard, T?> {
+class OptionalFirstShardOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard<*>, T?> {
 
-    override fun getValue(thisRef: Shard, property: KProperty<*>): T? {
+    override fun getValue(thisRef: Shard<*>, property: KProperty<*>): T? {
         return thisRef.holder.getShardOfType(this.type)
     }
 }
 
-class RequiredFirstShardOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard, T> {
+class RequiredFirstShardOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard<*>, T> {
 
-    override fun getValue(thisRef: Shard, property: KProperty<*>): T {
+    override fun getValue(thisRef: Shard<*>, property: KProperty<*>): T {
         return thisRef.holder.getShardOfType(this.type) ?: throw ShardNotAvailableException("No shard of type $type is available.")
     }
 }
 
-class ShardsOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard, Collection<T>> {
+class ShardsOfTypeProperty<T : Any>(private val type: KClass<T>) : ReadOnlyProperty<Shard<*>, Collection<T>> {
 
-    override fun getValue(thisRef: Shard, property: KProperty<*>): Collection<T> {
+    override fun getValue(thisRef: Shard<*>, property: KProperty<*>): Collection<T> {
         return thisRef.holder.getShardsOfType(this.type)
     }
 }
 
-class OptionalShardProperty<T : Shard>(private val type: KClass<T>) : ReadOnlyProperty<Shard, T?> {
+class OptionalShardProperty<T : Shard<T>>(
+        private val type: KClass<T>,
+        private val autoAttach: AutoAttach<T>
+) : ReadOnlyProperty<Shard<*>, T?> {
 
-    override fun getValue(thisRef: Shard, property: KProperty<*>): T? {
+    override fun getValue(thisRef: Shard<*>, property: KProperty<*>): T? {
         return thisRef.holder.getShard(this.type)
     }
 }
 
-class RequiredShardProperty<T : Shard>(private val type: KClass<T>) : ReadOnlyProperty<Shard, T> {
+class RequiredShardProperty<T : Shard<T>>(
+        private val type: KClass<T>,
+        private val autoAttach: AutoAttach<T>
+) : ReadOnlyProperty<Shard<*>, T> {
 
-    override fun getValue(thisRef: Shard, property: KProperty<*>): T {
+    override fun getValue(thisRef: Shard<*>, property: KProperty<*>): T {
         return thisRef.holder.getShard(this.type) ?: throw ShardNotAvailableException("No shard of type $type is available.")
     }
 }

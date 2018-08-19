@@ -37,25 +37,25 @@ import org.spongepowered.api.entity.living.Living
 interface IExplosive : Explosive, IEntity {
 
     @JvmDefault override fun detonate() {
-        getShard<ExplosiveShard>().ifNotNull { it.detonate() }
+        getShard<ExplosiveShard>()?.detonate()
     }
 }
 
 interface IFusedExplosive : IExplosive, FusedExplosive {
 
-    @JvmDefault override fun isPrimed() = getShard<FusedExplosiveShard>().mapIfNotNull { it.primed } ?: false
+    @JvmDefault override fun isPrimed() = getShardOfType<FusedExplosiveShard>()?.primed ?: false
 
     @JvmDefault override fun prime() {
-        getShard<FusedExplosiveShard>().ifNotNull { it.prime() }
+        getShardOfType<FusedExplosiveShard>()?.prime()
     }
 
     @JvmDefault override fun defuse() {
-        getShard<FusedExplosiveShard>().ifNotNull { it.defuse() }
+        getShardOfType<FusedExplosiveShard>()?.defuse()
     }
 }
 
 
 interface IPrimedTNT : IFusedExplosive, PrimedTNT {
 
-    @JvmDefault override fun getDetonator() = getShard<ExplosiveShard>().mapIfNotNull { it.detonator as? Living }.optional()
+    @JvmDefault override fun getDetonator() = (getShard<ExplosiveShard>()?.detonator as? Living).optional()
 }

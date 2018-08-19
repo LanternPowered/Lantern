@@ -33,6 +33,11 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
+import kotlin.reflect.KClass;
+import org.jetbrains.annotations.NotNull;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.api.shard.event.Shardevent;
 import org.lanternpowered.api.shard.event.ShardeventBus;
@@ -52,6 +57,30 @@ import java.util.function.Supplier;
 
 @SuppressWarnings({"unchecked", "ConstantConditions"})
 public class LanternShardeventBus implements ShardeventBus {
+
+    @Override public <T extends Shardevent> void post(@NotNull Class<T> eventType, @NotNull Function0<? extends T> supplier) {
+
+    }
+
+    @Override public <T extends Shardevent> void register(@NotNull Class<T> eventType, @NotNull Function1<? super T, Unit> handler) {
+
+    }
+
+    @Override public <T extends Shardevent> void unregister(@NotNull Class<T> eventType, @NotNull Function1<? super T, Unit> handler) {
+
+    }
+
+    @Override public <T extends Shardevent> void post(@NotNull KClass<T> eventType, @NotNull Function0<? extends T> supplier) {
+
+    }
+
+    @Override public <T extends Shardevent> void register(@NotNull KClass<T> eventType, @NotNull Function1<? super T, Unit> handler) {
+
+    }
+
+    @Override public <T extends Shardevent> void unregister(@NotNull KClass<T> eventType, @NotNull Function1<? super T, Unit> handler) {
+
+    }
 
     /**
      * A handler that isn't targeting a specific handler object. This means
@@ -148,6 +177,7 @@ public class LanternShardeventBus implements ShardeventBus {
         post(event, this.handlerCache.get(event.getClass()));
     }
 
+    /*
     @Override
     public <T extends Shardevent> void post(Class<T> eventType, Supplier<T> supplier) {
         checkNotNull(eventType, "eventType");
@@ -156,7 +186,7 @@ public class LanternShardeventBus implements ShardeventBus {
         if (!handlers.isEmpty()) {
             post(supplier.get(), handlers);
         }
-    }
+    }*/
 
     private void post(Shardevent event, List<ShardeventHandler> handlers) {
         checkNotNull(event, "event");
@@ -185,7 +215,7 @@ public class LanternShardeventBus implements ShardeventBus {
         }
         this.handlerCache.invalidateAll();
     }
-
+/*
     @Override
     public <T extends Shardevent> void register(Class<T> eventType, Consumer<? super T> handler) {
         checkNotNull(eventType, "eventType");
@@ -199,7 +229,7 @@ public class LanternShardeventBus implements ShardeventBus {
             });
         }
         this.handlerCache.invalidateAll();
-    }
+    }*/
 
     @Override
     public void unregister(Object object) {
@@ -210,6 +240,7 @@ public class LanternShardeventBus implements ShardeventBus {
         this.handlerCache.invalidateAll();
     }
 
+    /*
     @Override
     public <T extends Shardevent> void unregister(Class<T> eventType, Consumer<? super T> handler) {
         checkNotNull(eventType, "eventType");
@@ -218,5 +249,5 @@ public class LanternShardeventBus implements ShardeventBus {
             this.handlersByClass.get(eventType).removeIf(shardeventHandler -> shardeventHandler.handle == handler);
         }
         this.handlerCache.invalidateAll();
-    }
+    }*/
 }

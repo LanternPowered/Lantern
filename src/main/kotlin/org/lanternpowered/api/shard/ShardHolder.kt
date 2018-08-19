@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.api.shard
 
-import org.lanternpowered.server.shards.InjectionRegistry
+import org.lanternpowered.api.Lantern
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.shard.event.ShardeventBus
 import java.util.Optional
 import kotlin.reflect.KClass
@@ -42,24 +43,36 @@ interface ShardHolder {
      * if there is already a shard of the given type, then that instance will be returned.
      *
      * This method expects that when the [Shard] is either abstract or an interface,
-     * a default implementation is provided through the [InjectionRegistry].
+     * a default implementation is provided through the [ShardRegistry].
      *
      * @param type The shard type to attach
      * @return The shard instance
      */
-    fun <T : Shard> addShard(type: Class<T>): Optional<T>
+    fun <T : Shard<T>> addShard(type: Class<T>) = addShard(Lantern.shardRegistry.getType(type)).optional()
 
     /**
      * Attempts to attach a [Shard] of the given type to this [ShardHolder],
      * if there is already a shard of the given type, then that instance will be returned.
      *
      * This method expects that when the [Shard] is either abstract or an interface,
-     * a default implementation is provided through the [InjectionRegistry].
+     * a default implementation is provided through the [ShardRegistry].
      *
      * @param type The shard type to attach
      * @return The shard instance
      */
-    fun <T : Shard> addShard(type: KClass<T>): Optional<T>
+    fun <T : Shard<T>> addShard(type: KClass<T>): T? = addShard(Lantern.shardRegistry.getType(type))
+
+    /**
+     * Attempts to attach a [Shard] of the given type to this [ShardHolder],
+     * if there is already a shard of the given type, then that instance will be returned.
+     *
+     * This method expects that when the [Shard] is either abstract or an interface,
+     * a default implementation is provided through the [ShardRegistry].
+     *
+     * @param type The shard type to attach
+     * @return The shard instance
+     */
+    fun <T : Shard<T>> addShard(type: ShardType<T>): T
 
     /**
      * Attempts to attach the given [Shard] to this [ShardHolder]. The method
@@ -71,7 +84,7 @@ interface ShardHolder {
      * @throws IllegalArgumentException If the given shard instance is already attached
      */
     @Throws(IllegalArgumentException::class)
-    fun addShard(shard: Shard): Boolean
+    fun addShard(shard: Shard<*>): Boolean
 
     /**
      * Attempts to replace the [Shard] attached to the given type. If there are multiple
@@ -84,7 +97,7 @@ interface ShardHolder {
      * @throws IllegalArgumentException If the given shard instance is already attached
      */
     @Throws(IllegalArgumentException::class)
-    fun <T : Shard, I : T> replaceShard(type: Class<T>, component: I): Boolean
+    fun <T : Shard<T>, I : T> replaceShard(type: Class<T>, component: I): Boolean
 
     /**
      * Attempts to replace the [Shard] attached to the given type. If there are multiple
@@ -97,7 +110,7 @@ interface ShardHolder {
      * @throws IllegalArgumentException If the given shard instance is already attached
      */
     @Throws(IllegalArgumentException::class)
-    fun <T : Shard, I : T> replaceShard(type: KClass<T>, component: I): Boolean
+    fun <T : Shard<T>, I : T> replaceShard(type: KClass<T>, component: I): Boolean
 
     /**
      * Attempts to replace the [Shard] attached to the given type. If there are multiple
@@ -110,7 +123,7 @@ interface ShardHolder {
      * @throws IllegalArgumentException If the given shard instance is already attached
      */
     @Throws(IllegalArgumentException::class)
-    fun <T : Shard, I : T> replaceShard(type: Class<T>, component: Class<I>): Optional<I>
+    fun <T : Shard<T>, I : T> replaceShard(type: Class<T>, component: Class<I>): Optional<I>
 
     /**
      * Attempts to replace the [Shard] attached to the given type. If there are multiple
@@ -123,7 +136,7 @@ interface ShardHolder {
      * @throws IllegalArgumentException If the given shard instance is already attached
      */
     @Throws(IllegalArgumentException::class)
-    fun <T : Shard, I : T> replaceShard(type: KClass<T>, component: Class<I>): I?
+    fun <T : Shard<T>, I : T> replaceShard(type: KClass<T>, component: Class<I>): I?
 
     /**
      * Gets the [Shard] of the given type if present, otherwise [Optional.empty].
@@ -134,7 +147,7 @@ interface ShardHolder {
      * @param type The shard type
      * @return The shard instance if present
      */
-    fun <T : Shard> getShard(type: Class<T>): Optional<T>
+    fun <T : Shard<T>> getShard(type: Class<T>): Optional<T>
 
     /**
      * Gets the [Shard] of the given type if present, otherwise [Optional.empty].
@@ -145,7 +158,7 @@ interface ShardHolder {
      * @param type The shard type
      * @return The shard instance if present
      */
-    fun <T : Shard> getShard(type: KClass<T>): T?
+    fun <T : Shard<T>> getShard(type: KClass<T>): T?
 
     /**
      * Attempts to remove all the [Shard]s that match the given type, all the shards
@@ -154,7 +167,7 @@ interface ShardHolder {
      * @param type The shard type
      * @return A collection with the removed shards
      */
-    fun <T : Shard> removeShard(type: Class<T>): Optional<T>
+    fun <T : Shard<T>> removeShard(type: Class<T>): Optional<T>
 
     /**
      * Gets the first [Shard] of the given type.

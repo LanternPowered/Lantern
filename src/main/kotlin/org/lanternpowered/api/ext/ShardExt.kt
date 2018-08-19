@@ -28,5 +28,7 @@ package org.lanternpowered.api.ext
 import org.lanternpowered.api.shard.ShardHolder
 import org.lanternpowered.api.shard.Shard
 
-inline fun <reified T : Shard> ShardHolder.getShard() = getShard(T::class)
-inline fun <reified T : Shard> ShardHolder.addShard() = addShard(T::class)
+inline fun <reified T : Shard<T>> ShardHolder.getShard() = getShard(T::class)
+inline fun <reified T : Shard<T>> ShardHolder.addShard() = addShard(T::class)
+inline fun <reified T : Any> ShardHolder.getShardOfType() = getShardOfType(T::class)
+inline fun <reified T : Any> ShardHolder.getShardsOfType() = getShardsOfType(T::class)

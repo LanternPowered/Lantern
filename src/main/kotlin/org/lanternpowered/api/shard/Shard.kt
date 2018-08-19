@@ -38,8 +38,11 @@ package org.lanternpowered.api.shard
  * If you want multiple [Shard] to implement a specific type,
  * use a interface instead, there are also utilities in the [ShardHolder]
  * to get all the instances of this type.
+ *
+ * @param T The type of the shard, this should
+ *          always be the direct subclass of shard.
  */
-abstract class Shard {
+abstract class Shard<T : Shard<T>> {
 
     /**
      * Provides access to the [ShardHolder] of this [Shard],
@@ -53,13 +56,16 @@ abstract class Shard {
     /**
      * Provides a read only property that provides the holder as the given type. A
      * cast [Exception] will be thrown if the holder is of the wrong type.
-     * <p>This property will also cause the component attachment to fail early when
+     *
+     * This property will also cause the component attachment to fail early when
      * the holder isn't of the required type.
      */
     protected inline fun <reified T : Any> requireHolderOfType() = RequiredHolderOfTypeProperty(T::class)
 
     /**
-     * Provides a read only property that provides the first [Shard] that is of the given type. This
+     * Provides a read only property that provides the first [Shard] that is of the given type.
+     *                   Will only be attached when the shard is requested
+     *                   through this property.This
      * type doesn't have to be a shard type, it can be any available interface. A [ShardNotAvailableException]
      * will be thrown if no shard was found.
      */
@@ -81,14 +87,26 @@ abstract class Shard {
     /**
      * Provides a read only property that provides the [Shard] of the given shard type.
      * A [ShardNotAvailableException] will be thrown if no shard was found.
+     *
+     * @param autoAttach The auto attach feature that should be used if the
+     *                   given shard isn't present on the shard holder.
+     *                   Will only be attached when the shard is requested
+     *                   through this property.
      */
-    protected inline fun <reified T : Shard> requiredShard() = RequiredShardProperty(T::class)
+    protected inline fun <reified T : Shard<T>> requiredShard(autoAttach: AutoAttach<T> = AutoAttach.disabled()) =
+            RequiredShardProperty(T::class, autoAttach)
 
     /**
      * Provides a read only property that provides the [Shard] of the given shard type.
      * A null will be returned if no shard was found.
+     *
+     * @param autoAttach The auto attach feature that should be used if the
+     *                   given shard isn't present on the shard holder.
+     *                   Will only be attached when the shard is requested
+     *                   through this property.
      */
-    protected inline fun <reified T : Shard> optionalShard() = OptionalShardProperty(T::class)
+    protected inline fun <reified T : Shard<T>> optionalShard(autoAttach: AutoAttach<T> = AutoAttach.disabled()) =
+            OptionalShardProperty(T::class, autoAttach)
 
     // The following fields have only internal access only, DO NOT MODIFY!
 

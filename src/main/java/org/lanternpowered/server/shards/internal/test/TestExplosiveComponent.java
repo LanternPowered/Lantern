@@ -44,8 +44,8 @@ public class TestExplosiveComponent extends ExplosiveShard {
     @Holder public Entity entity;
 
     @Override
-    public Optional<Entity> getDetonator() {
-        return Optional.empty();
+    public Entity getDetonator() {
+        return null;
     }
 
     @Override

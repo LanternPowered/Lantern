@@ -41,8 +41,6 @@ import org.spongepowered.api.world.World;
 
 public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayerAbilities> {
 
-    private static final RequestPlayerAbilitiesRefreshShardevent ABILITIES_REFRESH_SHARDEVENT = new RequestPlayerAbilitiesRefreshShardevent();
-
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerAbilities message) {
         final boolean flying = message.isFlying();
@@ -96,7 +94,7 @@ public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayer
                     }
                 }
             }
-            player.getShardeventBus().post(ABILITIES_REFRESH_SHARDEVENT);
+            player.getShardeventBus().post(RequestPlayerAbilitiesRefreshShardevent.INSTANCE);
         }
     }
 }

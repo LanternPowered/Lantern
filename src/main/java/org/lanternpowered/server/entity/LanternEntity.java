@@ -42,7 +42,6 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
-import org.lanternpowered.api.entity.event.animation.DamageEntityAnimation;
 import org.lanternpowered.server.entity.interfaces.IEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventContextKeys;
@@ -712,8 +711,6 @@ public class LanternEntity extends AbstractComponentHolder implements IEntity, I
     public Random getRandom() {
         return this.random;
     }
-
-    private static final DamageEntityAnimation ENTITY_DAMAGED_SHARDEVENT = new DamageEntityAnimation();
 
     @Override
     public boolean damage(double damage, DamageSource damageSource) {

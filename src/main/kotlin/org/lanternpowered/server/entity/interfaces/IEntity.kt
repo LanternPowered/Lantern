@@ -53,8 +53,8 @@ interface ITamerEntity : IEntity, Tamer
 interface IMerchantEntity : IEntity, Merchant {
 
     @JvmDefault override fun setCustomer(humanoid: Humanoid?) {
-        getShard<MerchantShard>().ifNotNull { it.customer = humanoid }
+        getShard<MerchantShard>()?.customer = humanoid
     }
 
-    @JvmDefault override fun getCustomer() = getShard<MerchantShard>().mapIfNotNull { it.customer }.optional()
+    @JvmDefault override fun getCustomer() = getShard<MerchantShard>()?.customer.optional()
 }

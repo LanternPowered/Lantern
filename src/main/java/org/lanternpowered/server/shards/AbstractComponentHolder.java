@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lanternpowered.api.shard.Shard;
 import org.lanternpowered.api.shard.ShardHolder;
+import org.lanternpowered.api.shard.ShardType;
 import org.lanternpowered.api.shard.event.ShardeventBus;
 import org.lanternpowered.server.shards.internal.ComponentContainer;
 
@@ -45,40 +46,44 @@ public class AbstractComponentHolder implements ShardHolder {
         return this.componentContainer.getShardeventBus();
     }
 
-    @Override
-    public <T extends Shard> Optional<T> addShard(Class<T> type) {
-        return Optional.empty();
+    @NotNull @Override public <T extends Shard<T>> T addShard(@NotNull ShardType<T> type) {
+        return null;
     }
 
-    @Override
-    public boolean addShard(Shard shard) throws IllegalArgumentException {
+    @Override public boolean addShard(@NotNull Shard<?> shard) throws IllegalArgumentException {
         return false;
     }
 
-    @Override
-    public <T extends Shard, I extends T> boolean replaceShard(Class<T> type, I component) throws IllegalArgumentException {
-        return this.componentContainer.replaceComponent(type, component);
+    @Override public <T extends Shard<T>, I extends T> boolean replaceShard(@NotNull Class<T> type, @NotNull I component)
+            throws IllegalArgumentException {
+        return false;
     }
 
-    @Override public <T extends Shard, I extends T> Optional<I> replaceShard(Class<T> type, Class<I> component) throws IllegalArgumentException {
+    @Override public <T extends Shard<T>, I extends T> boolean replaceShard(@NotNull KClass<T> type, @NotNull I component)
+            throws IllegalArgumentException {
+        return false;
+    }
+
+    @NotNull @Override public <T extends Shard<T>, I extends T> Optional<I> replaceShard(@NotNull Class<T> type, @NotNull Class<I> component)
+            throws IllegalArgumentException {
+        return Optional.empty();
+    }
+
+    @Nullable @Override public <T extends Shard<T>, I extends T> I replaceShard(@NotNull KClass<T> type, @NotNull Class<I> component)
+            throws IllegalArgumentException {
         return null;
     }
 
-    @Override
-    public <T extends Shard> Optional<T> getShard(Class<T> type) {
-        return this.componentContainer.getComponent(type);
+    @NotNull @Override public <T extends Shard<T>> Optional<T> getShard(@NotNull Class<T> type) {
+        return Optional.empty();
     }
 
-    @Override public <T extends Shard> Optional<T> removeShard(Class<T> type) {
+    @Nullable @Override public <T extends Shard<T>> T getShard(@NotNull KClass<T> type) {
         return null;
     }
 
-    @Override public <T> Collection<T> getShardsOfType(Class<T> type) {
-        return null;
-    }
-
-    @Nullable @Override public <T extends Shard> T getShard(@NotNull KClass<T> type) {
-        return null;
+    @NotNull @Override public <T extends Shard<T>> Optional<T> removeShard(@NotNull Class<T> type) {
+        return Optional.empty();
     }
 
     @NotNull @Override public <T> Optional<T> getShardOfType(@NotNull Class<T> type) {
@@ -89,21 +94,19 @@ public class AbstractComponentHolder implements ShardHolder {
         return null;
     }
 
+    @NotNull @Override public <T> Collection<T> getShardsOfType(@NotNull Class<T> type) {
+        return null;
+    }
+
     @NotNull @Override public <T> Collection<T> getShardsOfType(@NotNull KClass<T> type) {
         return null;
     }
 
-    @NotNull @Override public <T extends Shard> Optional<T> addShard(@NotNull KClass<T> type) {
+    @NotNull @Override public <T extends Shard<T>> Optional<T> addShard(@NotNull Class<T> type) {
         return Optional.empty();
     }
 
-    @Override public <T extends Shard, I extends T> boolean replaceShard(@NotNull KClass<T> type, @NotNull I component)
-            throws IllegalArgumentException {
-        return false;
-    }
-
-    @Nullable @Override public <T extends Shard, I extends T> I replaceShard(@NotNull KClass<T> type, @NotNull Class<I> component)
-            throws IllegalArgumentException {
+    @Nullable @Override public <T extends Shard<T>> T addShard(@NotNull KClass<T> type) {
         return null;
     }
 }

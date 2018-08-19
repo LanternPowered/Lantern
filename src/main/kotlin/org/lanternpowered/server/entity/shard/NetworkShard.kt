@@ -53,7 +53,7 @@ import kotlin.reflect.KClass
  * this component will be client never know about the [Entity].
  */
 @ConfigSerializable
-class NetworkShard : Shard {
+class NetworkShard : Shard<NetworkShard> {
 
     private val entity: LanternEntity by requireHolderOfType()
 

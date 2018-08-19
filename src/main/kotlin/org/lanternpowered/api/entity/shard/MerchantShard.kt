@@ -31,7 +31,7 @@ import org.spongepowered.api.entity.living.Humanoid
 /**
  * The [MerchantShard] shard type.
  */
-abstract class MerchantShard : Shard() {
+abstract class MerchantShard : Shard<MerchantShard>() {
 
     /**
      * The customer that is currently trading with

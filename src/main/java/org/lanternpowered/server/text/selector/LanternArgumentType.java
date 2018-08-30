@@ -28,10 +28,11 @@ package org.lanternpowered.server.text.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Primitives;
+import org.lanternpowered.lmbda.LmbdaFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
-import org.lanternpowered.server.util.LambdaFactory;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.entity.EntityType;
@@ -39,6 +40,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.text.selector.ArgumentType;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
@@ -71,8 +73,8 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
     static <T> Function<String, T> getConverter(Class<T> type, String converterKey) {
         if (!converters.containsKey(converterKey)) {
             try {
-                final Method valueOf = type.getMethod("valueOf", String.class);
-                converters.put(converterKey, LambdaFactory.<String, T>createFunction(valueOf));
+                final Method valueOf = Primitives.wrap(type).getMethod("valueOf", String.class);
+                converters.put(converterKey, LmbdaFactory.createFunction(MethodHandles.publicLookup().unreflect(valueOf)));
             } catch (NoSuchMethodException ignored) {
                 if (CatalogType.class.isAssignableFrom(type)) {
                     final Class<? extends CatalogType> type2 = type.asSubclass(CatalogType.class);
@@ -83,7 +85,7 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
                 } else {
                     throw new IllegalStateException("Can't convert " + type);
                 }
-            } catch (SecurityException e) {
+            } catch (Exception e) {
                 Lantern.getLogger().warn("Unable to create converter for: " + type, e);
             }
         }

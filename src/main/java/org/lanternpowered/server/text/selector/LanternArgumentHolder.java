@@ -33,10 +33,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.util.LambdaFactory;
+import org.lanternpowered.lmbda.LmbdaFactory;
 import org.spongepowered.api.text.selector.ArgumentHolder;
 import org.spongepowered.api.text.selector.ArgumentType;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -78,9 +79,10 @@ public class LanternArgumentHolder<T extends ArgumentHolder<?>> implements Argum
             for (Class<?> vec : vectors) {
                 final Set<Function<?, ?>> set = Sets.newLinkedHashSet();
                 try {
-                    set.add(LambdaFactory.createFunction(vec.getDeclaredMethod("getX")));
-                    set.add(LambdaFactory.createFunction(vec.getDeclaredMethod("getY")));
-                    set.add(LambdaFactory.createFunction(vec.getDeclaredMethod("getZ")));
+                    final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+                    set.add(LmbdaFactory.createFunction(lookup.unreflect(vec.getMethod("getX"))));
+                    set.add(LmbdaFactory.createFunction(lookup.unreflect(vec.getMethod("getY"))));
+                    set.add(LmbdaFactory.createFunction(lookup.unreflect(vec.getMethod("getZ"))));
                 } catch (Exception e) {
                     // should support getX/Y/Z
                     throw new AssertionError("Bad vector3 type: " + vec.getName());

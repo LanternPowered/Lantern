@@ -38,6 +38,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.lanternpowered.server.config.category.MetricsCategory;
 import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
@@ -297,6 +298,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         }
     }
 
+    @Setting(value = "metrics")
+    private MetricsCategory metricsCategory = new MetricsCategory();
+
     @Override
     public void load() throws IOException {
         // An ugly fix, but good enough for now,
@@ -458,5 +462,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public String getDefaultResourcePack() {
         return this.server.defaultResourcePack;
+    }
+
+    public MetricsCategory getMetricsCategory() {
+        return this.metricsCategory;
     }
 }

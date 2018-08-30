@@ -99,9 +99,9 @@ class TextTemplateConfigSerializer : TypeSerializer<TextTemplate> {
     private fun parseArg(parserData: ParserData, source: LiteralText, into: MutableList<Any>) {
         val name = unwrap(parserData, source.content)
         val optional = parserData.root.getNode(NODE_ARGS, name, NODE_OPT).boolean
-        val defaultValue = parserData.root.getNode(NODE_ARGS, name, NODE_DEF_VAL).getValue(TOKEN_TEXT)!!
-        val format = source.format
-        into.add(TextTemplate.arg(name).format(format).optional(optional).defaultValue(defaultValue).build())
+        val builder = TextTemplate.arg(name).format(source.format).optional(optional)
+        parserData.root.getNode(NODE_ARGS, name, NODE_DEF_VAL).getValue(TOKEN_TEXT)?.let { builder.defaultValue(it) }
+        into.add(builder.build())
     }
 
     private fun isArg(parserData: ParserData, element: Text): Boolean {

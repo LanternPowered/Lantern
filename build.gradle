@@ -13,7 +13,7 @@ plugins {
     id 'net.minecrell.licenser' version '0.4'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id 'org.spongepowered.plugin' version '0.8.1'
-    id 'org.jetbrains.kotlin.jvm' version '1.2.60'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.61'
 }
 
 apply from: rootProject.file('gradle/lantern.gradle')
@@ -92,6 +92,9 @@ dependencies {
 
     // Network
     compile 'io.netty:netty-all:4.1.24.Final'
+
+    // Lambda generation
+    compile 'org.lanternpowered:lmbda:-SNAPSHOT'
 
     // Logging
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
@@ -346,7 +349,7 @@ if (project.hasProperty('lanternRepo')) {
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.8.1'
+    gradleVersion = '4.10'
 }
 
 // A custom update wrapper task, using a custom task prevents

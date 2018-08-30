@@ -77,6 +77,7 @@ import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.util.PathUtils;
 import org.lanternpowered.server.util.UncheckedThrowables;
+import org.lanternpowered.server.util.metric.LanternMetricsConfigManager;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -105,6 +106,7 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.service.ServiceManager;
+import org.spongepowered.api.util.metric.MetricsConfigManager;
 import org.spongepowered.api.world.TeleportHelper;
 
 import java.io.BufferedReader;
@@ -226,6 +228,8 @@ public class LanternModule extends PrivateModule {
                 .to(LanternPropertyRegistry.class);
         bindAndExpose(CauseStackManager.class)
                 .toInstance(LanternCauseStackManager.INSTANCE);
+        bindAndExpose(MetricsConfigManager.class)
+                .to(LanternMetricsConfigManager.class);
 
         // The Indexed Channel Binding
         bindAndExpose(ChannelBinding.IndexedMessageChannel.class)

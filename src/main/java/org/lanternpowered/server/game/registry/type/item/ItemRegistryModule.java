@@ -1737,8 +1737,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         try {
             ReflectionHelper.setField(LanternItemStack.class.getDeclaredField("empty"), null, emptyStack);
             ReflectionHelper.setField(ItemStackSnapshot.class.getField("NONE"), null, emptySnapshot);
-        } catch (Exception e) {
-            throw UncheckedThrowables.thrOw(e);
+        } catch (Throwable t) {
+            throw UncheckedThrowables.thrOw(t);
         }
     }
 

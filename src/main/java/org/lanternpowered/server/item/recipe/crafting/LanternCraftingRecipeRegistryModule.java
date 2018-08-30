@@ -56,7 +56,7 @@ public class LanternCraftingRecipeRegistryModule extends LanternRecipeRegistryMo
         try {
             ReflectionHelper.setField(Ingredient.class.getField("NONE"), null,
                     IIngredient.builder().with(ItemStack::isEmpty).withDisplay(ItemTypes.NONE).build());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw UncheckedThrowables.thrOw(e);
         }
         PluginContainer plugin = Lantern.getMinecraftPlugin();

@@ -39,7 +39,9 @@ import com.google.inject.spi.TypeListener
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.inject.Named
 import org.lanternpowered.api.inject.property.InjectedProperty
-import org.lanternpowered.server.util.FieldAccessFactory
+import org.lanternpowered.lmbda.LmbdaFactory
+import org.lanternpowered.lmbda.MethodHandlesX
+import java.lang.invoke.MethodHandles
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.javaField
@@ -52,43 +54,55 @@ class InjectablePropertyProvider : Module, TypeListener {
     }
 
     override fun <I : Any> hear(type: TypeLiteral<I>, encounter: TypeEncounter<I>) {
-        val javaTarget = type.rawType.uncheckedCast<Class<I>>()
-        try {
-            val target = javaTarget.kotlin
-            target.declaredMemberProperties.forEach { property ->
-                val field = property.javaField
-                if (field != null && InjectedProperty::class.java.isAssignableFrom(field.type)) {
-                    // Found a valid field, register a member injector
+        var javaTarget = type.rawType.uncheckedCast<Class<*>>()
+        while (javaTarget != Any::class.java && !javaTarget.isArray && !javaTarget.isPrimitive) {
+            try {
+                val target = javaTarget.kotlin
+                val lookup by lazy { MethodHandlesX.privateLookupIn(javaTarget, lookup) }
 
-                    // Extract the value type from the property
-                    val valueType = property.returnType.javaType.typeToken.typeLiteral
+                target.declaredMemberProperties.forEach { property ->
+                    val field = property.javaField
+                    if (field != null && InjectedProperty::class.java.isAssignableFrom(field.type)) {
+                        // Found a valid field, register a member injector
 
-                    // Search for binding annotations
-                    val bindingAnnotations = property.annotations.filter { it.annotationClass.findAnnotation<BindingAnnotation>() != null }
-                    val key = when {
-                        bindingAnnotations.size > 1 -> throw IllegalStateException("Only only BindingAnnotation is allowed on: $property")
-                        bindingAnnotations.size == 1 -> {
-                            var bindingAnnotation = bindingAnnotations[0]
-                            // Translate the kotlin named to the guice one
-                            if (bindingAnnotation is Named) {
-                                bindingAnnotation = Names.named(bindingAnnotation.value)
+                        // Extract the value type from the property
+                        val valueType = property.returnType.javaType.typeToken.typeLiteral
+
+                        // Search for binding annotations
+                        val bindingAnnotations = property.annotations.filter { it.annotationClass.findAnnotation<BindingAnnotation>() != null }
+                        val key = when {
+                            bindingAnnotations.size > 1 -> throw IllegalStateException("Only only BindingAnnotation is allowed on: $property")
+                            bindingAnnotations.size == 1 -> {
+                                var bindingAnnotation = bindingAnnotations[0]
+                                // Translate the kotlin named to the guice one
+                                if (bindingAnnotation is Named) {
+                                    bindingAnnotation = Names.named(bindingAnnotation.value)
+                                }
+                                Key.get(valueType, bindingAnnotation)
                             }
-                            Key.get(valueType, bindingAnnotation)
+                            else -> Key.get(valueType)
                         }
-                        else -> Key.get(valueType)
-                    }
 
-                    val getter = FieldAccessFactory.createGetter<I, InjectedProperty<Any>>(field)
-                    val injectorProvider = encounter.getProvider(Injector::class.java)
-                    encounter.register(MembersInjector {
-                        val injector = injectorProvider.get()
-                        val propInstance = getter.apply(it).uncheckedCast<InjectedProperty<Any>>()
-                        propInstance.inject { injector.getInstance(key) }
-                    })
+                        val getterHandle = lookup.unreflectGetter(field)
+                        val getter = LmbdaFactory.createFunction<Any, Any>(getterHandle)
+
+                        val injectorProvider = encounter.getProvider(Injector::class.java)
+                        encounter.register(MembersInjector {
+                            val injector = injectorProvider.get()
+                            val propInstance = getter.apply(it).uncheckedCast<InjectedProperty<Any>>()
+                            propInstance.inject { injector.getInstance(key) }
+                        })
+                    }
                 }
+            } catch (e: UnsupportedOperationException) {
+                continue
             }
-        } catch (e: UnsupportedOperationException) {
-            return
+            javaTarget = javaTarget.superclass
         }
+    }
+
+    companion object {
+
+        private val lookup = MethodHandles.lookup()
     }
 }

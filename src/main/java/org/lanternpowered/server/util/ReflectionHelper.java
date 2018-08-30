@@ -28,8 +28,11 @@ package org.lanternpowered.server.util;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.ClassUtils.isAssignable;
 
+import org.lanternpowered.lmbda.MethodHandlesX;
 import org.lanternpowered.server.game.Lantern;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -42,11 +45,16 @@ import javax.annotation.Nullable;
 
 public final class ReflectionHelper {
 
-    public static void setField(Field field, @Nullable Object target, @Nullable Object object) throws Exception {
-        // Make the field accessible
-        FieldAccessFactory.makeAccessible(field);
-        // Set the value
-        field.set(target, object);
+    private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
+
+    public static void setField(Field field, @Nullable Object target, @Nullable Object object) throws Throwable {
+        field.setAccessible(true);
+        final MethodHandle methodHandle = MethodHandlesX.unreflectFinalSetter(lookup, field);
+        if (target == null) {
+            methodHandle.invoke(object);
+        } else {
+            methodHandle.invoke(target, object);
+        }
     }
 
     public static <T> T createUnsafeInstance(final Class<T> objectClass, @Nullable Object... args)

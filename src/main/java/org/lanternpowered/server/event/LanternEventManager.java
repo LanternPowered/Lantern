@@ -36,13 +36,15 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.lmbda.LmbdaFactory;
+import org.lanternpowered.lmbda.MethodHandlesX;
 import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.DefineableClassLoader;
-import org.lanternpowered.server.util.FieldAccessFactory;
 import org.lanternpowered.server.util.SystemProperties;
 import org.lanternpowered.server.util.TypeTokenHelper;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.functions.ThrowableConsumer;
 import org.slf4j.Logger;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -59,6 +61,8 @@ import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.event.impl.AbstractValueChangeEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -107,6 +111,8 @@ public class LanternEventManager implements EventManager {
 
     private static final class ShouldFireField {
 
+        private final static MethodHandles.Lookup lookup = MethodHandlesX.privateLookupIn(ShouldFire.class, MethodHandles.lookup());
+
         private final Class<? extends Event> eventClass;
 
         /**
@@ -120,8 +126,14 @@ public class LanternEventManager implements EventManager {
         private final Supplier<Boolean> getter;
 
         private ShouldFireField(Class<? extends Event> eventClass, Field field) {
-            this.setter = FieldAccessFactory.createStaticSetter(field);
-            this.getter = FieldAccessFactory.createStaticGetter(field);
+            try {
+                final MethodHandle setter = lookup.unreflectSetter(field);
+                final MethodHandle getter = lookup.unreflectGetter(field);
+                this.setter = LmbdaFactory.createConsumer(setter);
+                this.getter = LmbdaFactory.createSupplier(getter);
+            } catch (IllegalAccessException e) {
+                throw UncheckedThrowables.thrOw(e);
+            }
             this.eventClass = eventClass;
         }
 

@@ -73,10 +73,8 @@ public final class RegistryHelper {
                     continue;
                 }
                 ReflectionHelper.setField(f, null, value);
-            } catch (Exception e) {
-                if (!ignore) {
-                    Lantern.getLogger().error("Error while mapping {}.{}", f.getDeclaringClass().getName(), f.getName(), e);
-                }
+            } catch (Throwable e) {
+                Lantern.getLogger().error("Error while mapping {}.{}", f.getDeclaringClass().getName(), f.getName(), e);
                 mappingSuccess = false;
             }
         }
@@ -87,7 +85,7 @@ public final class RegistryHelper {
         try {
             ReflectionHelper.setField(apiClass.getDeclaredField("factory"), null, factory);
             return true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Lantern.getLogger().error("Error while setting factory on {}", apiClass, e);
             return false;
         }

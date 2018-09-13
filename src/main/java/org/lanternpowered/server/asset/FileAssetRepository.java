@@ -96,7 +96,7 @@ class FileAssetRepository extends AbstractAssetRepository implements Closeable {
             // Generate a URL that targets a file inside a zip file
             return new URL("jar:" + this.fileUrl + "!/" + path);
         } catch (MalformedURLException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 

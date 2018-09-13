@@ -160,7 +160,7 @@ final class LanternIndexedMessageChannel extends LanternChannelBinding implement
             constructor = messageClass.getConstructor();
         } catch (NoSuchMethodException ignored) {
         } catch (SecurityException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
         checkState(constructor != null, "%s is missing a empty public constructor", messageClass.getName());
         final RegistrationLookup registrations = getRegistrations(Platform.Type.CLIENT);

@@ -23,37 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.util.functions;
 
-import org.lanternpowered.server.util.functions.ThrowableConsumer;
-import org.lanternpowered.server.util.functions.ThrowableSupplier;
+@FunctionalInterface
+public interface ThrowableSupplier<T, E extends Throwable> {
 
-public final class UncheckedThrowables {
-
-    /**
-     * Throws the {@link Throwable} as an unchecked exception.
-     *
-     * @param t The throwable to throw
-     * @return A runtime exception
-     */
-    public static RuntimeException throwUnchecked(Throwable t) {
-        throw0(t);
-        throw new AssertionError("Unreachable.");
-    }
-
-    public static <T> T doUnchecked(ThrowableSupplier<T, ? extends Throwable> supplier) {
-        try {
-            return supplier.get();
-        } catch (Throwable throwable) {
-            throw throwUnchecked(throwable);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Throwable> void throw0(Throwable t) throws T {
-        throw (T) t;
-    }
-
-    private UncheckedThrowables() {
-    }
+    T get() throws E;
 }

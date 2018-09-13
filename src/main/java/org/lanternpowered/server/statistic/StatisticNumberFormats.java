@@ -149,7 +149,7 @@ public final class StatisticNumberFormats {
                 try {
                     return parser.apply(source);
                 } catch (ParseException e) {
-                    throw UncheckedThrowables.thrOw(e);
+                    throw UncheckedThrowables.throwUnchecked(e);
                 }
             }
         };

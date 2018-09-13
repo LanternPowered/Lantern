@@ -275,7 +275,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
         try {
             return service.exists(chunk1) && service.exists(chunk2) && service.exists(chunk3) && service.exists(chunk4);
         } catch (IOException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 

@@ -36,7 +36,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.lmbda.LmbdaFactory;
+import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.lmbda.MethodHandlesX;
 import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
@@ -111,7 +111,8 @@ public class LanternEventManager implements EventManager {
 
     private static final class ShouldFireField {
 
-        private final static MethodHandles.Lookup lookup = MethodHandlesX.privateLookupIn(ShouldFire.class, MethodHandles.lookup());
+        private final static MethodHandles.Lookup lookup = UncheckedThrowables.doUnchecked(() ->
+                MethodHandlesX.privateLookupIn(ShouldFire.class, MethodHandles.lookup()));
 
         private final Class<? extends Event> eventClass;
 
@@ -129,10 +130,10 @@ public class LanternEventManager implements EventManager {
             try {
                 final MethodHandle setter = lookup.unreflectSetter(field);
                 final MethodHandle getter = lookup.unreflectGetter(field);
-                this.setter = LmbdaFactory.createConsumer(setter);
-                this.getter = LmbdaFactory.createSupplier(getter);
+                this.setter = LambdaFactory.createConsumer(setter);
+                this.getter = LambdaFactory.createSupplier(getter);
             } catch (IllegalAccessException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
             this.eventClass = eventClass;
         }

@@ -100,7 +100,7 @@ final class RegionFileCache {
                         try {
                             ((RegionFile) value).close();
                         } catch (IOException e) {
-                            throw UncheckedThrowables.thrOw(e);
+                            throw UncheckedThrowables.throwUnchecked(e);
                         }
                     }
                 })
@@ -111,7 +111,7 @@ final class RegionFileCache {
         try {
             return Files.list(this.regionDir).filter(file -> this.filePattern.matcher(file.getFileName().toString()).matches()).toArray(Path[]::new);
         } catch (IOException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 
@@ -128,7 +128,7 @@ final class RegionFileCache {
                 return new RegionFile(this.regionDir.resolve("r." + regionX + "." + regionZ + "." + this.extension), regionX, regionZ);
             } catch (IOException e) {
                 Lantern.getLogger().error("Failed to load the region file (%s;%s)", regionX, regionZ);
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         });
     }

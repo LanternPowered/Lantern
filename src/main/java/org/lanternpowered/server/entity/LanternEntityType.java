@@ -88,7 +88,7 @@ public final class LanternEntityType extends DefaultCatalogType implements Entit
             try {
                 return constructor.newInstance(uuid);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         };
     }
@@ -101,7 +101,7 @@ public final class LanternEntityType extends DefaultCatalogType implements Entit
             BYPASS_FIELD.set(null, false);
             return clazz;
         } catch (IllegalAccessException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 
@@ -112,7 +112,7 @@ public final class LanternEntityType extends DefaultCatalogType implements Entit
             BYPASS_FIELD = LanternEntity.class.getDeclaredField("bypassEntityTypeLookup");
             BYPASS_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 

@@ -54,7 +54,7 @@ public final class PropertyKeySetter {
             mField.set(ABSTRACT_PROPERTY_KEY, ABSTRACT_PROPERTY_KEY.getModifiers() & ~Modifier.FINAL);
             mField.set(ABSTRACT_INVENTORY_PROPERTY_KEY, ABSTRACT_INVENTORY_PROPERTY_KEY.getModifiers() & ~Modifier.FINAL);
         } catch (Exception e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 
@@ -70,7 +70,7 @@ public final class PropertyKeySetter {
                 return;
             }
         } catch (Exception e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
         throw new IllegalArgumentException("Unsupported property type: " + property.getClass().getName());
     }

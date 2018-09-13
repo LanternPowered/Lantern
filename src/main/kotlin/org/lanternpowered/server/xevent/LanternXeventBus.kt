@@ -32,8 +32,8 @@ import org.lanternpowered.api.xevent.Xevent
 import org.lanternpowered.api.xevent.XeventBus
 import org.lanternpowered.api.xevent.XeventHandler
 import org.lanternpowered.api.xevent.XeventListener
-import org.lanternpowered.lmbda.LmbdaFactory
-import org.lanternpowered.lmbda.LmbdaType
+import org.lanternpowered.lmbda.LambdaFactory
+import org.lanternpowered.lmbda.LambdaType
 import org.lanternpowered.lmbda.MethodHandlesX
 import org.lanternpowered.server.game.Lantern
 import java.lang.invoke.MethodHandles
@@ -53,7 +53,7 @@ class LanternXeventBus : XeventBus {
         }
 
         private val lookup = MethodHandles.lookup()
-        private val untargetedHandlerType = object : LmbdaType<UntargetedHandler>() {}
+        private val untargetedHandlerType = object : LambdaType<UntargetedHandler>() {}
 
         /**
          * A handler that isn't targeting a specific handler object. This means
@@ -95,7 +95,7 @@ class LanternXeventBus : XeventBus {
                 val methodHandler = this.untargetedMethodHandlerByMethod.computeIfAbsent(method) { _ ->
                     // Convert the method to a method handle
                     val methodHandle = MethodHandlesX.privateLookupIn(method.declaringClass, this.lookup).unreflect(method)
-                    UntargetedMethodHandler(method.parameterTypes[0], LmbdaFactory.create(this.untargetedHandlerType, methodHandle))
+                    UntargetedMethodHandler(method.parameterTypes[0], LambdaFactory.create(this.untargetedHandlerType, methodHandle))
                 }
                 handlers.add(methodHandler)
             }

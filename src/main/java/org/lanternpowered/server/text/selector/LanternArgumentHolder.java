@@ -33,7 +33,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import org.lanternpowered.lmbda.LmbdaFactory;
+import org.lanternpowered.lmbda.LambdaFactory;
 import org.spongepowered.api.text.selector.ArgumentHolder;
 import org.spongepowered.api.text.selector.ArgumentType;
 
@@ -80,9 +80,9 @@ public class LanternArgumentHolder<T extends ArgumentHolder<?>> implements Argum
                 final Set<Function<?, ?>> set = Sets.newLinkedHashSet();
                 try {
                     final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-                    set.add(LmbdaFactory.createFunction(lookup.unreflect(vec.getMethod("getX"))));
-                    set.add(LmbdaFactory.createFunction(lookup.unreflect(vec.getMethod("getY"))));
-                    set.add(LmbdaFactory.createFunction(lookup.unreflect(vec.getMethod("getZ"))));
+                    set.add(LambdaFactory.createFunction(lookup.unreflect(vec.getMethod("getX"))));
+                    set.add(LambdaFactory.createFunction(lookup.unreflect(vec.getMethod("getY"))));
+                    set.add(LambdaFactory.createFunction(lookup.unreflect(vec.getMethod("getZ"))));
                 } catch (Exception e) {
                     // should support getX/Y/Z
                     throw new AssertionError("Bad vector3 type: " + vec.getName());

@@ -240,7 +240,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
         try {
             return this.userCache.get(profile.getUniqueId(), () -> new ProxyUser(profile));
         } catch (ExecutionException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 

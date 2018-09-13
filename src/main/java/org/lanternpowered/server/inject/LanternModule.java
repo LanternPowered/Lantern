@@ -347,7 +347,7 @@ public class LanternModule extends PrivateModule {
                 return new LanternAssetManager(gson.fromJson(reader, AssetRepository.class));
             }
         } catch (IOException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 

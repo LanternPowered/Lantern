@@ -504,7 +504,7 @@ final class LanternWorldPropertiesIO {
                 dataView.set(GENERATOR_OPTIONS_EXTRA, JsonDataFormat.writeAsString(
                         properties.getGeneratorSettings().copy().remove(AbstractFlatGeneratorType.SETTINGS)));
             } catch (IOException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         } else {
             dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings());

@@ -431,7 +431,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
                 try {
                     object = field.get(null);
                 } catch (IllegalAccessException e) {
-                    throw UncheckedThrowables.thrOw(e);
+                    throw UncheckedThrowables.throwUnchecked(e);
                 }
                 if (object instanceof Key) {
                     register((Key) object);

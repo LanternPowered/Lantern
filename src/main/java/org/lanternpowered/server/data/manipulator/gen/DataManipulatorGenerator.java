@@ -88,7 +88,7 @@ public final class DataManipulatorGenerator {
             base.immutableManipulatorTypeImpl.getField(AbstractVariantDataTypeGenerator.KEY).set(null, key);
             base.immutableManipulatorTypeImpl.getField(AbstractVariantDataTypeGenerator.VALUE).set(null, defaultValue);
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
         return base.supplier.get();
     }
@@ -106,7 +106,7 @@ public final class DataManipulatorGenerator {
             base.immutableManipulatorTypeImpl.getField(AbstractListDataTypeGenerator.LIST_SUPPLIER).set(null,
                     (Supplier<List>) () -> ImmutableList.copyOf(listSupplier.get()));
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
         return base.supplier.get();
     }
@@ -140,7 +140,7 @@ public final class DataManipulatorGenerator {
 
             return registration;
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 
@@ -255,7 +255,7 @@ public final class DataManipulatorGenerator {
                         .getConstructor(PluginContainer.class, String.class, String.class)
                         .newInstance(pluginContainer, id, name);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         }, manipulatorTypeImpl, immutableManipulatorTypeImpl);
     }

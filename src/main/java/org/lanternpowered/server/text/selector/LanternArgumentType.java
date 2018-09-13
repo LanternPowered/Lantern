@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Primitives;
-import org.lanternpowered.lmbda.LmbdaFactory;
+import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
@@ -74,7 +74,7 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
         if (!converters.containsKey(converterKey)) {
             try {
                 final Method valueOf = Primitives.wrap(type).getMethod("valueOf", String.class);
-                converters.put(converterKey, LmbdaFactory.createFunction(MethodHandles.publicLookup().unreflect(valueOf)));
+                converters.put(converterKey, LambdaFactory.createFunction(MethodHandles.publicLookup().unreflect(valueOf)));
             } catch (NoSuchMethodException ignored) {
                 if (CatalogType.class.isAssignableFrom(type)) {
                     final Class<? extends CatalogType> type2 = type.asSubclass(CatalogType.class);

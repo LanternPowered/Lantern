@@ -93,7 +93,7 @@ public class LanternTriggerBuilder<C extends FilteredTriggerConfiguration> imple
                 final DataView dataView = JsonDataFormat.serialize(GSON, jsonObject);
                 return builder.build(dataView).get();
             } catch (IOException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         }
     }
@@ -132,7 +132,7 @@ public class LanternTriggerBuilder<C extends FilteredTriggerConfiguration> imple
                 final ConfigurationNode node = loader.load();
                 return this.typeSerializerCollection.get(this.typeToken).deserialize(this.typeToken, node);
             } catch (IOException | ObjectMappingException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         }
     }

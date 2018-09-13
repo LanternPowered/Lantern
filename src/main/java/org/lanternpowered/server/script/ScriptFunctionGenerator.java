@@ -83,13 +83,13 @@ final class ScriptFunctionGenerator {
         try {
             constructor = functionClass.getConstructor(LanternScript.class);
         } catch (NoSuchMethodException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
         return function -> {
             try {
                 return constructor.newInstance(function);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         };
     }

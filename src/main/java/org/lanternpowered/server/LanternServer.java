@@ -644,7 +644,7 @@ public final class LanternServer implements Server {
             final Map<Class<?>, ProviderRegistration<?>> map = (Map<Class<?>, ProviderRegistration<?>>) field.get(serviceManager);
             serviceRegistrations = map.values();
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
 
         // Close all the services if possible

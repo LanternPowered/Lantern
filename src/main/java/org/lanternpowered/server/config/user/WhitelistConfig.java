@@ -81,7 +81,7 @@ public final class WhitelistConfig extends SimpleUserConfig implements Whitelist
         try {
             load();
         } catch (IOException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 

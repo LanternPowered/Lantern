@@ -188,7 +188,7 @@ final class JsonTextEventHelper {
             try {
                 return new RawAction("show_entity", JsonDataFormat.writeAsString(dataContainer));
             } catch (IOException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         } else if (hoverAction instanceof HoverAction.ShowItem) {
             final ItemStackSnapshot itemStackSnapshot = ((HoverAction.ShowItem) hoverAction).getResult();
@@ -201,7 +201,7 @@ final class JsonTextEventHelper {
             try {
                 return new RawAction("show_item", JsonDataFormat.writeAsString(dataView));
             } catch (IOException e) {
-                throw UncheckedThrowables.thrOw(e);
+                throw UncheckedThrowables.throwUnchecked(e);
             }
         } else {
             throw new IllegalArgumentException("Unknown hover action type: " + hoverAction.getClass().getName());

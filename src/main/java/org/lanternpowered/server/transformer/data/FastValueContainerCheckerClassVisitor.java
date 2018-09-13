@@ -94,7 +94,7 @@ class FastValueContainerCheckerClassVisitor extends ClassVisitor {
 
             return classVisitor.result;
         } catch (ClassNotFoundException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 

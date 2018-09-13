@@ -500,7 +500,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                     return data;
                 } catch (IOException e) {
                     // This shouldn't happen
-                    throw UncheckedThrowables.thrOw(e);
+                    throw UncheckedThrowables.throwUnchecked(e);
                 }
             }
 

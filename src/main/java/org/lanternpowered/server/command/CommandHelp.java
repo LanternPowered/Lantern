@@ -68,7 +68,7 @@ public final class CommandHelp extends CommandProvider {
             extendedDescriptionField = CommandSpec.class.getDeclaredField("extendedDescription");
             extendedDescriptionField.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw UncheckedThrowables.thrOw(e);
+            throw UncheckedThrowables.throwUnchecked(e);
         }
     }
 
@@ -120,7 +120,7 @@ public final class CommandHelp extends CommandProvider {
                                     // TODO: Why is there no method :(
                                     extendedDescription = (Text) extendedDescriptionField.get(callable);
                                 } catch (IllegalAccessException e) {
-                                    throw UncheckedThrowables.thrOw(e);
+                                    throw UncheckedThrowables.throwUnchecked(e);
                                 }
                                 if (extendedDescription != null) {
                                     builder.append(Text.newLine(), extendedDescription);

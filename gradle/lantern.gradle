@@ -12,7 +12,6 @@ repositories {
     mavenCentral()
     maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://oss.sonatype.org/content/groups/public' }
-    maven { url 'https://jitpack.io' }
 }
 
 ext.api = rootProject.project('SpongeAPI')

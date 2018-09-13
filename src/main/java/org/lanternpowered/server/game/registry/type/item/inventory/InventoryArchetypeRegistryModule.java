@@ -72,7 +72,7 @@ public class InventoryArchetypeRegistryModule extends DefaultCatalogRegistryModu
                     try {
                         register((InventoryArchetype) field.get(null));
                     } catch (IllegalAccessException e) {
-                        throw UncheckedThrowables.thrOw(e);
+                        throw UncheckedThrowables.throwUnchecked(e);
                     }
                 }
             }

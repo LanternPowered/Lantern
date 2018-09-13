@@ -39,7 +39,7 @@ import com.google.inject.spi.TypeListener
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.inject.Named
 import org.lanternpowered.api.inject.property.InjectedProperty
-import org.lanternpowered.lmbda.LmbdaFactory
+import org.lanternpowered.lmbda.LambdaFactory
 import org.lanternpowered.lmbda.MethodHandlesX
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.full.declaredMemberProperties
@@ -84,7 +84,7 @@ class InjectablePropertyProvider : Module, TypeListener {
                         }
 
                         val getterHandle = lookup.unreflectGetter(field)
-                        val getter = LmbdaFactory.createFunction<Any, Any>(getterHandle)
+                        val getter = LambdaFactory.createFunction<Any, Any>(getterHandle)
 
                         val injectorProvider = encounter.getProvider(Injector::class.java)
                         encounter.register(MembersInjector {

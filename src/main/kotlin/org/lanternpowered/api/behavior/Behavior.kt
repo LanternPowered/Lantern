@@ -79,8 +79,8 @@ interface Behavior {
      */
     @JvmDefault
     fun andThen(behavior: Behavior) = Behavior { type, ctx ->
-        apply(type, ctx)
-        behavior.apply(type, ctx)
+        tryApply(type, ctx)
+        behavior.tryApply(type, ctx)
     }
 
     /**
@@ -94,7 +94,7 @@ interface Behavior {
      * @return The combined behavior
      */
     @JvmDefault
-    fun andThenIfSuccessful(behavior: Behavior) = Behavior { type, ctx -> apply(type, ctx) && behavior.apply(type, ctx) }
+    fun andThenIfSuccessful(behavior: Behavior) = Behavior { type, ctx -> tryApply(type, ctx) && behavior.tryApply(type, ctx) }
 
     /**
      * Returns a new [Behavior] that will be executed
@@ -107,5 +107,5 @@ interface Behavior {
      * @return The combined behavior
      */
     @JvmDefault
-    fun andThenIfFailure(behavior: Behavior) = Behavior { type, ctx -> !apply(type, ctx) && behavior.apply(type, ctx) }
+    fun andThenIfFailure(behavior: Behavior) = Behavior { type, ctx -> !tryApply(type, ctx) && behavior.tryApply(type, ctx) }
 }

@@ -71,7 +71,7 @@ class InjectablePropertyProvider : Module, TypeListener {
                         // Search for binding annotations
                         val bindingAnnotations = property.annotations.filter { it.annotationClass.findAnnotation<BindingAnnotation>() != null }
                         val key = when {
-                            bindingAnnotations.size > 1 -> throw IllegalStateException("Only only BindingAnnotation is allowed on: $property")
+                            bindingAnnotations.size > 1 -> throw IllegalStateException("Only one BindingAnnotation is allowed on: $property")
                             bindingAnnotations.size == 1 -> {
                                 var bindingAnnotation = bindingAnnotations[0]
                                 // Translate the kotlin named to the guice one

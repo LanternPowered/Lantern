@@ -47,7 +47,7 @@ import org.spongepowered.api.text.Text;
 /**
  * A fancy view container that allows specific chest slots to be assigned to an actual
  * slot. The slots that aren't assigned won't be usable and will replaced by a dummy
- * item. By default white glass pane because it fit's nicely with the inventory layout.
+ * item. By default white glass pane because it fits nicely with the inventory layout.
  */
 public abstract class FancyTopBottomGridViewContainer extends PlayerTopBottomContainer {
 

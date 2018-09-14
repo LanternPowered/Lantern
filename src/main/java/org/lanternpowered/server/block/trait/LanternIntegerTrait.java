@@ -115,7 +115,7 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
     }
 
     public static IntegerTrait minecraftRange(String id, Key<? extends Value<Integer>> valueKey, int min, int max) {
-        return of(CatalogKey.minecraft(id), valueKey, min, max);
+        return ofRange(CatalogKey.minecraft(id), valueKey, min, max);
     }
 
     @Override

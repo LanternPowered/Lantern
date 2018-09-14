@@ -23,22 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior.neww;
+@file:Suppress("FunctionName")
 
-public interface Behavior {
+package org.lanternpowered.api.behavior
+
+/**
+ * A convenient constructor to allow to construct the [Behavior]
+ * through a SAM like conversion.
+ */
+inline fun Behavior(crossinline fn: (BehaviorType, BehaviorContext) -> Boolean) = object : Behavior {
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean = fn(type, ctx)
+}
+
+@FunctionalInterface
+interface Behavior {
 
     /**
-     * Applies this behavior to the given {@link BehaviorContext}. Returns
+     * Applies this behavior to the given [BehaviorContext]. Returns
      * whether the behavior was applied successfully.
      *
      * @param type The behavior type which is currently being executed
      * @param ctx The behavior context
      * @return Whether the behavior was applied successfully
      */
-    boolean apply(BehaviorType type, BehaviorContext ctx);
+    fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean
 
     /**
-     * Tries to apply this behavior to the given {@link BehaviorContext}. Returns
+     * Tries to apply this behavior to the given [BehaviorContext]. Returns
      * whether the behavior was applied successfully. When this behavior fails,
      * the context will be reset to the state before it was executed.
      *
@@ -46,54 +57,55 @@ public interface Behavior {
      * @param ctx The behavior context
      * @return Whether the behavior was applied successfully
      */
-    default boolean tryApply(BehaviorType type, BehaviorContext ctx) {
-        final BehaviorContext.Snapshot snapshot = ctx.createSnapshot();
+    @JvmDefault
+    fun tryApply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        val snapshot = ctx.createSnapshot()
         if (apply(type, ctx)) {
-            return true;
+            return true
         }
-        ctx.restoreSnapshot(snapshot);
-        return false;
+        ctx.restoreSnapshot(snapshot)
+        return false
     }
 
     /**
-     * Returns a new {@link Behavior} that will be
+     * Returns a new [Behavior] that will be
      * executed when this behavior is executed.
-     * <p>The result of the combined behavior will
+     *
+     * The result of the combined behavior will
      * be true if BOTH of the behaviors were successful.
      *
      * @param behavior The other behavior
      * @return The combined behavior
      */
-    default Behavior andThen(Behavior behavior) {
-        return (type, ctx) -> {
-            apply(type, ctx);
-            return behavior.apply(type, ctx);
-        };
+    @JvmDefault
+    fun andThen(behavior: Behavior) = Behavior { type, ctx ->
+        apply(type, ctx)
+        behavior.apply(type, ctx)
     }
 
     /**
-     * Returns a new {@link Behavior} that will be executed
+     * Returns a new [Behavior] that will be executed
      * if the current behavior was executed successfully.
-     * <p>The result of the combined behavior will
+     *
+     * The result of the combined behavior will
      * be the result of the other behavior.
      *
      * @param behavior The other behavior
      * @return The combined behavior
      */
-    default Behavior andThenIfSuccessful(Behavior behavior) {
-        return (type, ctx) -> apply(type, ctx) && behavior.apply(type, ctx);
-    }
+    @JvmDefault
+    fun andThenIfSuccessful(behavior: Behavior) = Behavior { type, ctx -> apply(type, ctx) && behavior.apply(type, ctx) }
 
     /**
-     * Returns a new {@link Behavior} that will be executed
+     * Returns a new [Behavior] that will be executed
      * if the current behavior was executed successfully.
-     * <p>The result of the combined behavior will
+     *
+     * The result of the combined behavior will
      * be the result of the other behavior.
      *
      * @param behavior The other behavior
      * @return The combined behavior
      */
-    default Behavior andThenIfFailure(Behavior behavior) {
-        return (type, ctx) -> !apply(type, ctx) && behavior.apply(type, ctx);
-    }
+    @JvmDefault
+    fun andThenIfFailure(behavior: Behavior) = Behavior { type, ctx -> !apply(type, ctx) && behavior.apply(type, ctx) }
 }

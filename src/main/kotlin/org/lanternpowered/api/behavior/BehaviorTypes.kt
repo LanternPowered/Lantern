@@ -23,26 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior.neww;
+package org.lanternpowered.api.behavior
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+object BehaviorTypes {
 
-final class LanternBehaviorType implements BehaviorType {
+    /**
+     * Block related behavior types.
+     */
+    object Block {
 
-    static LanternBehaviorType get(String name) {
-        return types.computeIfAbsent(name, LanternBehaviorType::new);
+        /**
+         * The block break behavior type, this behavior will be invoked
+         * when a block at a specific location is being broken.
+         */
+        object Break : BehaviorType("break_block")
     }
 
-    private static Map<String, LanternBehaviorType> types = new ConcurrentHashMap<>();
-    private final String name;
-
-    private LanternBehaviorType(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
+    /**
+     * Item related behavior types.
+     */
+    object Item
 }

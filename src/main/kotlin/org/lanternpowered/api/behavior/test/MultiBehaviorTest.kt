@@ -23,50 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior.neww;
+package org.lanternpowered.api.behavior.test
 
-/**
- * An exception that is thrown when something unexpected
- * happened within a {@link Behavior}.
- */
-public class BehaviorException extends RuntimeException {
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.BehaviorTypes
+import org.lanternpowered.api.behavior.MultiBehavior
 
-    /**
-     * Constructs a new {@link BehaviorException}.
-     */
-    public BehaviorException() {
-        super();
+class MultiBehaviorTest : MultiBehavior() {
+
+    @BehaviorMethod(BehaviorTypes.Block.Break::class)
+    fun applyBlockBreak(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        return true
     }
 
-    /**
-     * Constructs a new {@link BehaviorException} with the
-     * given message.
-     *
-     * @param message The message
-     */
-    public BehaviorException(String message) {
-        super(message);
+    @BehaviorMethod(BehaviorTypes.Block.Break::class)
+    fun applyBlockBreakAgain(ctx: BehaviorContext): Boolean {
+        return true
     }
-
-    /**
-     * Constructs a new {@link BehaviorException} with the
-     * given message and underlying cause.
-     *
-     * @param message The message
-     * @param cause The underlying cause
-     */
-    public BehaviorException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Constructs a new {@link BehaviorException} with the
-     * underlying cause.
-     *
-     * @param cause The underlying cause
-     */
-    public BehaviorException(Throwable cause) {
-        super(cause);
-    }
-
 }

@@ -23,30 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior.neww;
+package org.lanternpowered.api.behavior.test
 
-public final class BehaviorTypes {
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorType
 
-    /**
-     * Block related behavior types.
-     */
-    public static final class Block {
+/**
+ * This behavior opens a sign at a target location to a player.
+ */
+class OpenSignBehavior : Behavior {
 
-        /**
-         * The name of the {@link #BREAK_TYPE} behavior type.
-         * <p>The block break behavior type, this behavior will be invoked
-         * when a block at a specific location is being broken.
-         */
-        public static final String BREAK = "break_block";
-
-        /**
-         * The block break behavior type, this behavior will be invoked
-         * when a block at a specific location is being broken.
-         */
-        public static final BehaviorType BREAK_TYPE = BehaviorType.of(BREAK);
-    }
-
-    public static final class Item {
-
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        return false
     }
 }

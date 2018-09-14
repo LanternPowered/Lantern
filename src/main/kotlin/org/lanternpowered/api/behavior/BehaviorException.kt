@@ -23,22 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior.neww.test;
+package org.lanternpowered.api.behavior
 
-import org.lanternpowered.server.behavior.neww.BehaviorContext;
-import org.lanternpowered.server.behavior.neww.BehaviorType;
-import org.lanternpowered.server.behavior.neww.BehaviorTypes;
-import org.lanternpowered.server.behavior.neww.MultiBehavior;
+/**
+ * An exception that is thrown when something unexpected
+ * happened within a [Behavior].
+ */
+class BehaviorException : RuntimeException {
 
-public class MultiBehaviorTest extends MultiBehavior {
+    /**
+     * Constructs a new [BehaviorException].
+     */
+    constructor() : super()
 
-    @BehaviorMethod(BehaviorTypes.Block.BREAK)
-    public boolean applyBlockBreak(BehaviorType type, BehaviorContext ctx) {
-        return true;
-    }
+    /**
+     * Constructs a new [BehaviorException] with the
+     * given message.
+     *
+     * @param message The message
+     */
+    constructor(message: String) : super(message)
 
-    @BehaviorMethod(BehaviorTypes.Block.BREAK)
-    public boolean applyBlockBreakAgain(BehaviorContext ctx) {
-        return true;
-    }
+    /**
+     * Constructs a new [BehaviorException] with the
+     * given message and underlying cause.
+     *
+     * @param message The message
+     * @param cause The underlying cause
+     */
+    constructor(message: String, cause: Throwable) : super(message, cause)
+
+    /**
+     * Constructs a new [BehaviorException] with the
+     * underlying cause.
+     *
+     * @param cause The underlying cause
+     */
+    constructor(cause: Throwable) : super(cause)
+
 }

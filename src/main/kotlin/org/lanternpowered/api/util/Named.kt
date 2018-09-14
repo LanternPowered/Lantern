@@ -32,5 +32,5 @@ package org.lanternpowered.api.util
  * injecting.
  */
 @Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.PROPERTY)
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
 annotation class Named(val value: String)

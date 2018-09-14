@@ -25,16 +25,21 @@
  */
 package org.lanternpowered.server.behavior.neww;
 
+import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
+
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import org.lanternpowered.server.util.FunctionalInterface;
-import org.lanternpowered.server.util.LambdaFactory;
+import org.lanternpowered.lmbda.LambdaFactory;
+import org.lanternpowered.lmbda.LambdaType;
+import org.lanternpowered.lmbda.MethodHandlesX;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -68,10 +73,8 @@ import java.util.Set;
  */
 public abstract class MultiBehavior implements Behavior {
 
-    private static final FunctionalInterface<InternalBehavior> internalBehaviorInterface =
-            FunctionalInterface.of(InternalBehavior.class);
-    private static final FunctionalInterface<SimpleInternalBehavior> simpleInternalBehaviorInterface =
-            FunctionalInterface.of(SimpleInternalBehavior.class);
+    private static final LambdaType<InternalBehavior> internalBehaviorInterface = LambdaType.of(InternalBehavior.class);
+    private static final LambdaType<SimpleInternalBehavior> simpleInternalBehaviorInterface = LambdaType.of(SimpleInternalBehavior.class);
 
     private final Multimap<BehaviorType, InternalBehavior> behaviors = LinkedListMultimap.create();
 
@@ -82,6 +85,8 @@ public abstract class MultiBehavior implements Behavior {
         Class<?> theClass = getClass();
         final Set<String> added = new HashSet<>();
         do {
+            final Class<?> target = theClass;
+            final MethodHandles.Lookup lookup = doUnchecked(() -> MethodHandlesX.privateLookupIn(target, MethodHandles.lookup()));
             final Method[] methods = theClass.getDeclaredMethods();
             for (Method method : methods) {
                 final BehaviorMethods behaviorMethods = method.getAnnotation(BehaviorMethods.class);
@@ -111,11 +116,12 @@ public abstract class MultiBehavior implements Behavior {
                     throw new IllegalStateException(String.format("The second (or first) parameter must be BehaviorContext. "
                             + "Found invalid method %s in class %s", method.getName(), theClass.getName()));
                 }
+                final MethodHandle methodHandle = doUnchecked(() -> lookup.unreflect(method));
                 final InternalBehavior internalBehavior;
                 if (params.length == 1) {
-                    internalBehavior = LambdaFactory.create(simpleInternalBehaviorInterface, method);
+                    internalBehavior = LambdaFactory.create(simpleInternalBehaviorInterface, methodHandle);
                 } else {
-                    internalBehavior = LambdaFactory.create(internalBehaviorInterface, method);
+                    internalBehavior = LambdaFactory.create(internalBehaviorInterface, methodHandle);
                 }
                 for (BehaviorMethod behaviorMethod : behaviorMethods.value()) {
                     this.behaviors.put(BehaviorType.of(behaviorMethod.value()), internalBehavior);

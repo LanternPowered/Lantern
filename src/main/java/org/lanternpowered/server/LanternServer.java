@@ -216,7 +216,7 @@ public final class LanternServer implements Server {
         }
         if (globalConfig.getProxyType() == ProxyType.NONE && !globalConfig.isOnlineMode()) {
             this.logger.warn("It is not recommend to run the server in offline mode, this allows people to");
-            this.logger.warn("choose any username they want. The server does will use the account attached");
+            this.logger.warn("choose any username they want. The server will use the account that is attached");
             this.logger.warn("to the username, it doesn't care if it's in offline mode, this will only");
             this.logger.warn("disable the authentication and allow non registered usernames to be used.");
         }

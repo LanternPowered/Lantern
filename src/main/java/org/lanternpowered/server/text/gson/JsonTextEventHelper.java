@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.text.gson;
 
+import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
+
 import com.google.gson.JsonParseException;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
@@ -33,7 +35,6 @@ import org.lanternpowered.server.network.buffer.contextual.ItemStackContextualVa
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.lanternpowered.server.text.translation.TranslationContext;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -188,7 +189,7 @@ final class JsonTextEventHelper {
             try {
                 return new RawAction("show_entity", JsonDataFormat.writeAsString(dataContainer));
             } catch (IOException e) {
-                throw UncheckedThrowables.throwUnchecked(e);
+                throw throwUnchecked(e);
             }
         } else if (hoverAction instanceof HoverAction.ShowItem) {
             final ItemStackSnapshot itemStackSnapshot = ((HoverAction.ShowItem) hoverAction).getResult();
@@ -201,7 +202,7 @@ final class JsonTextEventHelper {
             try {
                 return new RawAction("show_item", JsonDataFormat.writeAsString(dataView));
             } catch (IOException e) {
-                throw UncheckedThrowables.throwUnchecked(e);
+                throw throwUnchecked(e);
             }
         } else {
             throw new IllegalArgumentException("Unknown hover action type: " + hoverAction.getClass().getName());

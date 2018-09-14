@@ -35,6 +35,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makePatternLi
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeWeightedCollectionKey;
+import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
 import static org.spongepowered.api.data.DataQuery.of;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -45,7 +46,6 @@ import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataQuery;
@@ -427,12 +427,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         // Register the lantern keys
         for (Field field : LanternKeys.class.getFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
-                final Object object;
-                try {
-                    object = field.get(null);
-                } catch (IllegalAccessException e) {
-                    throw UncheckedThrowables.throwUnchecked(e);
-                }
+                final Object object = doUnchecked(() -> field.get(null));
                 if (object instanceof Key) {
                     register((Key) object);
                 }

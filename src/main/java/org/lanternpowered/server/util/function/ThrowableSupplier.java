@@ -23,10 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.functions;
+package org.lanternpowered.server.util.function;
 
 @FunctionalInterface
-public interface ThrowablePredicate<T, E extends Throwable> {
+public interface ThrowableSupplier<T, X extends Throwable> {
 
-    boolean test(T object) throws E;
+    T get() throws X;
 }

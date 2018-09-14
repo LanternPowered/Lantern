@@ -27,10 +27,11 @@ package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
+import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.util.ToStringHelper;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -38,7 +39,6 @@ import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -84,25 +84,17 @@ public final class LanternEntityType extends DefaultCatalogType implements Entit
             throw new IllegalArgumentException("The entity class is missing the constructor: "
                     + entityClass.getSimpleName() + "(UUID uniqueId)");
         }
-        return uuid -> {
-            try {
-                return constructor.newInstance(uuid);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw UncheckedThrowables.throwUnchecked(e);
-            }
-        };
+        return uuid -> doUnchecked(() -> constructor.newInstance(uuid));
     }
 
     private static <E extends LanternEntity> Class<E> getEntityClass(Function<UUID, E> entityConstructor) {
-        try {
+        return doUnchecked(() -> {
             BYPASS_FIELD.set(null, true);
             //noinspection unchecked
             final Class<E> clazz = (Class<E>) entityConstructor.apply(UUID.randomUUID()).getClass();
             BYPASS_FIELD.set(null, false);
             return clazz;
-        } catch (IllegalAccessException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
-        }
+        });
     }
 
     private static final Field BYPASS_FIELD;
@@ -112,7 +104,7 @@ public final class LanternEntityType extends DefaultCatalogType implements Entit
             BYPASS_FIELD = LanternEntity.class.getDeclaredField("bypassEntityTypeLookup");
             BYPASS_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
+            throw throwUnchecked(e);
         }
     }
 

@@ -46,7 +46,7 @@ import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.util.IpSet;
-import org.lanternpowered.server.util.functions.Predicates;
+import org.lanternpowered.server.util.function.Predicates;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;

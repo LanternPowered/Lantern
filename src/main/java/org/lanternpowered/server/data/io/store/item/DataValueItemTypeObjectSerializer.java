@@ -29,7 +29,7 @@ import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.InternalCatalogRegistryModule;
-import org.lanternpowered.server.util.functions.Int2IntFunction;
+import org.lanternpowered.server.util.function.Int2IntFunction;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;

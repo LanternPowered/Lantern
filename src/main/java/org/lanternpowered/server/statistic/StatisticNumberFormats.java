@@ -25,10 +25,11 @@
  */
 package org.lanternpowered.server.statistic;
 
+import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
+
 import org.apache.commons.lang3.StringUtils;
-import org.lanternpowered.server.util.UncheckedThrowables;
-import org.lanternpowered.server.util.functions.Long2ObjectFunction;
-import org.lanternpowered.server.util.functions.Object2LongThrowableFunction;
+import org.lanternpowered.server.util.function.Long2ObjectFunction;
+import org.lanternpowered.server.util.function.Object2LongThrowableFunction;
 
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
@@ -146,11 +147,7 @@ public final class StatisticNumberFormats {
 
             @Override
             public Number parse(String source, ParsePosition parsePosition) {
-                try {
-                    return parser.apply(source);
-                } catch (ParseException e) {
-                    throw UncheckedThrowables.throwUnchecked(e);
-                }
+                return doUnchecked(() -> parser.apply(source));
             }
         };
     }

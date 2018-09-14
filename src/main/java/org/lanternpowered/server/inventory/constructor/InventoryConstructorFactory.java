@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.constructor;
 
+import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
+import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
 import static org.objectweb.asm.Opcodes.V1_8;
@@ -35,7 +37,6 @@ import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.ICarriedInventory;
 import org.lanternpowered.server.inventory.IViewableInventory;
 import org.lanternpowered.server.util.BytecodeUtils;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -87,14 +88,14 @@ public final class InventoryConstructorFactory {
             if (Modifier.isFinal(inventoryType.getModifiers()) && !(isCarried || isViewable)) {
                 throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be final.");
             }
-            final MethodHandles.Lookup lookup = UncheckedThrowables.doUnchecked(() -> MethodHandlesX.privateLookupIn(inventoryType, this.lookup));
+            final MethodHandles.Lookup lookup = doUnchecked(() -> MethodHandlesX.privateLookupIn(inventoryType, this.lookup));
             final MethodHandle constructorHandle;
             try {
                 constructorHandle = lookup.findConstructor(inventoryType, MethodType.methodType(void.class));
             } catch (NoSuchMethodException e) {
                 throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' must have a empty constructor.");
             } catch (IllegalAccessException e) {
-                throw UncheckedThrowables.throwUnchecked(e);
+                throw throwUnchecked(e);
             }
 
             final Supplier<T> supplier = LambdaFactory.createSupplier(constructorHandle);
@@ -105,31 +106,20 @@ public final class InventoryConstructorFactory {
             if (!isCarried) {
                 final Class<T> carriedType = (Class<T>) generateCarriedClass(lookup, inventoryType);
                 classes.add(carriedType);
-                try {
-                    carriedSupplier = LambdaFactory.createSupplier(lookup.findConstructor(carriedType, MethodType.methodType(void.class)));
-                } catch (NoSuchMethodException | IllegalAccessException e) {
-                    throw UncheckedThrowables.throwUnchecked(e);
-                }
+                carriedSupplier = doUnchecked(() -> LambdaFactory.createSupplier(
+                        lookup.findConstructor(carriedType, MethodType.methodType(void.class))));
                 carriedViewableSupplier = carriedSupplier;
                 if (!isViewable) {
                     final Class<T> carriedViewableType = (Class<T>) generateViewableClass(lookup, carriedType);
                     classes.add(carriedViewableType);
-                    try {
-                        carriedViewableSupplier = LambdaFactory.createSupplier(lookup.findConstructor(
-                                carriedViewableType, MethodType.methodType(void.class)));
-                    } catch (NoSuchMethodException | IllegalAccessException e) {
-                        throw UncheckedThrowables.throwUnchecked(e);
-                    }
+                    carriedViewableSupplier = doUnchecked(() -> LambdaFactory.createSupplier(
+                            lookup.findConstructor(carriedViewableType, MethodType.methodType(void.class))));
                 }
             } else if (!isViewable) {
                 final Class<T> viewableType = (Class<T>) generateViewableClass(lookup, inventoryType);
                 classes.add(viewableType);
-                try {
-                    viewableSupplier = LambdaFactory.createSupplier(lookup.findConstructor(
-                            viewableType, MethodType.methodType(void.class)));
-                } catch (NoSuchMethodException | IllegalAccessException e) {
-                    throw UncheckedThrowables.throwUnchecked(e);
-                }
+                viewableSupplier = doUnchecked(() -> LambdaFactory.createSupplier(
+                        lookup.findConstructor(viewableType, MethodType.methodType(void.class))));
             }
             final Supplier<T> carriedSupplier0 = carriedSupplier;
             final Supplier<T> carriedViewableSupplier0 = carriedViewableSupplier;
@@ -173,7 +163,7 @@ public final class InventoryConstructorFactory {
         BytecodeUtils.visitEmptyConstructor(cw, inventoryType);
 
         cw.visitEnd();
-        return (Class<? extends AbstractInventory>) UncheckedThrowables.doUnchecked(() -> MethodHandlesX.defineClass(lookup, cw.toByteArray()));
+        return (Class<? extends AbstractInventory>) doUnchecked(() -> MethodHandlesX.defineClass(lookup, cw.toByteArray()));
     }
 
     // Will generate a carried class like the following:
@@ -201,6 +191,6 @@ public final class InventoryConstructorFactory {
         BytecodeUtils.visitEmptyConstructor(cw, inventoryType);
 
         cw.visitEnd();
-        return (Class<? extends AbstractInventory>) UncheckedThrowables.doUnchecked(() -> MethodHandlesX.defineClass(lookup, cw.toByteArray()));
+        return (Class<? extends AbstractInventory>) doUnchecked(() -> MethodHandlesX.defineClass(lookup, cw.toByteArray()));
     }
 }

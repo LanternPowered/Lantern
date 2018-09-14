@@ -23,10 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.functions;
+package org.lanternpowered.server.util.function;
 
 @FunctionalInterface
-public interface ThrowableConsumer<T, E extends Throwable> {
+public interface Object2LongFunction<O> {
 
-    void accept(T object) throws E;
+    long apply(O object);
 }

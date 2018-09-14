@@ -34,7 +34,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.util.Reloadable;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 
@@ -81,7 +80,7 @@ public final class WhitelistConfig extends SimpleUserConfig implements Whitelist
         try {
             load();
         } catch (IOException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
+            Lantern.getLogger().error("A error occurred while reloading the white-list config.", e);
         }
     }
 

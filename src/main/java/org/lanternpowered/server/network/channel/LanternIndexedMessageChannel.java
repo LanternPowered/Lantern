@@ -28,13 +28,13 @@ package org.lanternpowered.server.network.channel;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelBinding;
@@ -160,7 +160,7 @@ final class LanternIndexedMessageChannel extends LanternChannelBinding implement
             constructor = messageClass.getConstructor();
         } catch (NoSuchMethodException ignored) {
         } catch (SecurityException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
+            throw throwUnchecked(e);
         }
         checkState(constructor != null, "%s is missing a empty public constructor", messageClass.getName());
         final RegistrationLookup registrations = getRegistrations(Platform.Type.CLIENT);

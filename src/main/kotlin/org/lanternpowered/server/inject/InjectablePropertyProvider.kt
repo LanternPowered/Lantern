@@ -95,7 +95,8 @@ class InjectablePropertyProvider : Module, TypeListener {
                     }
                 }
             } catch (e: UnsupportedOperationException) {
-                continue
+                // Class doesn't support kotlin metadata, so assume
+                // that it's not injectable.
             }
             javaTarget = javaTarget.superclass
         }

@@ -50,6 +50,7 @@ package org.lanternpowered.server.data.io.anvil;
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_AREA;
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_MASK;
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_SIZE;
+import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 import static org.lanternpowered.server.world.chunk.LanternChunk.fixEntityYSection;
 
 import com.flowpowered.math.vector.Vector3i;
@@ -500,7 +501,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                     return data;
                 } catch (IOException e) {
                     // This shouldn't happen
-                    throw UncheckedThrowables.throwUnchecked(e);
+                    throw throwUnchecked(e);
                 }
             }
 

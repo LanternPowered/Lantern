@@ -46,6 +46,7 @@ class ArgumentTypeRegistryModule : RegistryModule {
     private val argumentTypeMap = HashMap<String, ArgumentHolder<*>>()
 
     override fun registerDefaults() {
+        @Suppress("DEPRECATION")
         val factory = Lantern.getGame().registry.selectorFactory
 
         // POSITION

@@ -26,10 +26,10 @@
 package org.lanternpowered.server.transformer.data;
 
 import static java.util.Objects.requireNonNull;
+import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
 import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.server.data.ICompositeValueStore;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
@@ -94,7 +94,7 @@ class FastValueContainerCheckerClassVisitor extends ClassVisitor {
 
             return classVisitor.result;
         } catch (ClassNotFoundException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
+            throw throwUnchecked(e);
         }
     }
 

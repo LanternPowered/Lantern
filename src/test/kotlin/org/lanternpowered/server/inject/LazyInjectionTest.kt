@@ -54,6 +54,7 @@ class LazyInjectionTest {
     @Test
     fun test() {
         val module = object : AbstractModule() {
+
             override fun configure() {
                 install(InjectionPointProvider())
                 install(InjectablePropertyProvider())
@@ -69,7 +70,6 @@ class LazyInjectionTest {
             testObject.service.get()
             assertTrue(false)
         } catch (e: Exception) {
-            e.printStackTrace()
         }
 
         var testObject1 = TestObject1()

@@ -28,6 +28,7 @@ package org.lanternpowered.server.world.pregen;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
+import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
 
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
@@ -36,7 +37,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -52,7 +52,6 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -272,11 +271,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
         // because they set up an async method which we need to get sync anyway, we just bypass it.
         // This results in a extremely noticeable speed improvement.
         final ChunkIOService service = (ChunkIOService) this.world.getWorldStorage();
-        try {
-            return service.exists(chunk1) && service.exists(chunk2) && service.exists(chunk3) && service.exists(chunk4);
-        } catch (IOException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
-        }
+        return doUnchecked(() -> service.exists(chunk1) && service.exists(chunk2) && service.exists(chunk3) && service.exists(chunk4));
     }
 
     private void unregisterListener() {

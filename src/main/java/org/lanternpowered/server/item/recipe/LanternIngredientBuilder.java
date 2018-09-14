@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.util.functions.Predicates;
+import org.lanternpowered.server.util.function.Predicates;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;

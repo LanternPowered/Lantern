@@ -27,6 +27,8 @@ package org.lanternpowered.server.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
+import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
+import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -44,8 +46,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.DefineableClassLoader;
 import org.lanternpowered.server.util.SystemProperties;
 import org.lanternpowered.server.util.TypeTokenHelper;
-import org.lanternpowered.server.util.UncheckedThrowables;
-import org.lanternpowered.server.util.functions.ThrowableConsumer;
+import org.lanternpowered.server.util.function.ThrowableConsumer;
 import org.slf4j.Logger;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
@@ -111,7 +112,7 @@ public class LanternEventManager implements EventManager {
 
     private static final class ShouldFireField {
 
-        private final static MethodHandles.Lookup lookup = UncheckedThrowables.doUnchecked(() ->
+        private final static MethodHandles.Lookup lookup = doUnchecked(() ->
                 MethodHandlesX.privateLookupIn(ShouldFire.class, MethodHandles.lookup()));
 
         private final Class<? extends Event> eventClass;
@@ -133,7 +134,7 @@ public class LanternEventManager implements EventManager {
                 this.setter = LambdaFactory.createConsumer(setter);
                 this.getter = LambdaFactory.createSupplier(getter);
             } catch (IllegalAccessException e) {
-                throw UncheckedThrowables.throwUnchecked(e);
+                throw throwUnchecked(e);
             }
             this.eventClass = eventClass;
         }

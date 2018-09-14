@@ -23,10 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.functions;
+package org.lanternpowered.server.util.function;
 
 @FunctionalInterface
-public interface TriFunction<A, B, C, R> {
+public interface Int2IntFunction {
 
-    R apply(A a, B b, C c);
+    int apply(int value);
 }

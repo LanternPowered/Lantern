@@ -23,22 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.test
+package org.lanternpowered.api.inject
 
-import org.lanternpowered.api.behavior.BehaviorContext
-import org.lanternpowered.api.behavior.BehaviorType
-import org.lanternpowered.api.behavior.BehaviorTypes
-import org.lanternpowered.api.behavior.MultiBehavior
-
-class MultiBehaviorTest : MultiBehavior() {
-
-    @BehaviorMethod(BehaviorTypes.Block.Break::class)
-    fun applyBlockBreak(type: BehaviorType, ctx: BehaviorContext): Boolean {
-        return true
-    }
-
-    @BehaviorMethod(BehaviorTypes.Block.Break::class)
-    fun applyBlockBreakAgain(ctx: BehaviorContext): Boolean {
-        return true
-    }
-}
+/**
+ * A named annotation that can be used in
+ * combination with kotlin properties. It
+ * will converted to the guice named when
+ * injecting.
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.PROPERTY)
+annotation class Named(val value: String)

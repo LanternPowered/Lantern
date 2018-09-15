@@ -23,14 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.util
+package org.lanternpowered.server.behavior
 
-/**
- * A named annotation that can be used in
- * combination with kotlin properties. It
- * will converted to the guice named when
- * injecting.
- */
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
-annotation class Named(val value: String)
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.TargetedBehavior
+
+class LanternTargetedBehavior(override val defaultType: BehaviorType, private val behavior: Behavior) : TargetedBehavior {
+
+    override fun apply(type: BehaviorType, ctx: BehaviorContext) = this.behavior.tryApply(type, ctx)
+    override fun tryApply(type: BehaviorType, ctx: BehaviorContext) = this.behavior.tryApply(type, ctx)
+}

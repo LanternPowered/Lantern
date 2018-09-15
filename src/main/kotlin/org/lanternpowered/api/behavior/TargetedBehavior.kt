@@ -27,15 +27,14 @@ package org.lanternpowered.api.behavior
 
 /**
  * A [Behavior] which has a predefined [BehaviorType] that will be used as default.
- *
- * @see apply
- * @see tryApply
  */
-class TargetedBehavior(private val type: BehaviorType, private val behavior: Behavior) : Behavior {
+interface TargetedBehavior : Behavior {
 
-    fun apply(ctx: BehaviorContext) = this.behavior.tryApply(this.type, ctx)
-    fun tryApply(ctx: BehaviorContext) = this.behavior.tryApply(this.type, ctx)
+    /**
+     * The default [BehaviorType].
+     */
+    val defaultType: BehaviorType
 
-    override fun apply(type: BehaviorType, ctx: BehaviorContext) = this.behavior.apply(type, ctx)
-    override fun tryApply(type: BehaviorType, ctx: BehaviorContext) = this.behavior.tryApply(type, ctx)
+    fun apply(ctx: BehaviorContext) = apply(this.defaultType, ctx)
+    fun tryApply(ctx: BehaviorContext) = tryApply(this.defaultType, ctx)
 }

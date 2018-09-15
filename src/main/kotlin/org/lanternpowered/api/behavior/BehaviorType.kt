@@ -26,7 +26,7 @@
 package org.lanternpowered.api.behavior
 
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.util.Named
+import org.lanternpowered.api.inject.Named
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation

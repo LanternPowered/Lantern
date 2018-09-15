@@ -29,7 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.api.Lantern;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.entity.spawn.EntitySpawnEntry;
+import org.lanternpowered.api.util.collect.NonNullMutableList;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffect;
@@ -42,9 +45,6 @@ import org.lanternpowered.server.effect.entity.sound.DefaultLivingSoundEffect;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.util.collect.Lists2;
-import org.lanternpowered.server.world.EntitySpawningEntry;
-import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Key;
@@ -224,7 +224,7 @@ public class LanternLiving extends LanternEntity implements Living {
             if (exp > 0) {
                 frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
                 // Spawn a experience orb with the experience value
-                LanternWorld.handleEntitySpawning(EntityTypes.EXPERIENCE_ORB, getTransform(),
+                Lantern.getEntitySpawner().spawn(EntityTypes.EXPERIENCE_ORB, getTransform(),
                         entity -> entity.offer(Keys.CONTAINED_EXPERIENCE, exp));
             }
 
@@ -233,19 +233,19 @@ public class LanternLiving extends LanternEntity implements Living {
             collectDrops(causeStack, itemStackSnapshots);
             if (!itemStackSnapshots.isEmpty()) {
                 final DropItemEvent.Pre preDropEvent = SpongeEventFactory.createDropItemEventPre(
-                        frame.getCurrentCause(), ImmutableList.copyOf(itemStackSnapshots), Lists2.nonNullOf(itemStackSnapshots));
-                Sponge.getEventManager().post(preDropEvent);
+                        frame.getCurrentCause(), ImmutableList.copyOf(itemStackSnapshots), new NonNullMutableList<>(itemStackSnapshots));
+                Lantern.getEventManager().post(preDropEvent);
                 if (!preDropEvent.isCancelled()) {
                     final Transform<World> transform = getTransform().setPosition(
                             getBoundingBox().map(AABB::getCenter).orElse(Vector3d.ZERO));
-                    final List<EntitySpawningEntry> entries = itemStackSnapshots.stream()
+                    final List<EntitySpawnEntry> entries = itemStackSnapshots.stream()
                             .filter(snapshot -> !snapshot.isEmpty())
-                            .map(snapshot -> new EntitySpawningEntry(EntityTypes.ITEM, transform, entity -> {
+                            .map(snapshot -> new EntitySpawnEntry(EntityTypes.ITEM, transform, entity -> {
                                 entity.offer(Keys.REPRESENTED_ITEM, snapshot);
                                 entity.offer(Keys.PICKUP_DELAY, 15);
                             }))
                             .collect(Collectors.toList());
-                    LanternWorld.handleEntitySpawning(entries, SpongeEventFactory::createDropItemEventDestruct);
+                    Lantern.getEntitySpawner().spawn(entries, SpongeEventFactory::createDropItemEventDestruct);
                 }
             }
         }

@@ -23,41 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world;
+package org.lanternpowered.api.x
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.world.World;
+import org.lanternpowered.api.Server
+import org.lanternpowered.api.entity.spawn.EntitySpawner
 
-import java.util.function.Consumer;
-
-public final class EntitySpawningEntry {
-
-    final EntityType entityType;
-    final Transform<World> transform;
-    final Consumer<Entity> entityConsumer;
+interface XServer : Server {
 
     /**
-     * Constructs a new {@link EntitySpawningEntry}.
-     *
-     * @param entityType The entity type that will be constructed
-     * @param transform The transform that should be applied to the entity
+     * The [EntitySpawner].
      */
-    public EntitySpawningEntry(EntityType entityType, Transform<World> transform) {
-        this(entityType, transform, entity -> {});
-    }
-
-    /**
-     * Constructs a new {@link EntitySpawningEntry}.
-     *
-     * @param entityType The entity type that will be constructed
-     * @param transform The transform that should be applied to the entity
-     * @param entityConsumer The consumer that can be used to apply properties to the entity
-     */
-    public EntitySpawningEntry(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
-        this.entityConsumer = entityConsumer;
-        this.entityType = entityType;
-        this.transform = transform;
-    }
+    val entitySpawner: EntitySpawner
 }

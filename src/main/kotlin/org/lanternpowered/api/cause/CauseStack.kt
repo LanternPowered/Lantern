@@ -73,6 +73,8 @@ interface CauseStack : CauseStackManager {
     override fun pushCause(obj: Any): CauseStack
     override fun <T> addContext(key: CauseContextKey<T>, value: T): CauseStack
 
+    fun <T> addContextIfAbsent(key: CauseContextKey<T>, valueProvider: () -> T): T
+
     interface Frame : CauseStackManagerFrame {
 
         override fun pushCause(obj: Any): Frame

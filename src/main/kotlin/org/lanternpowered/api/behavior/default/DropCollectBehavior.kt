@@ -23,20 +23,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.world;
+package org.lanternpowered.api.behavior.default
 
-import org.lanternpowered.api.world.weather.WeatherUniverse;
-import org.spongepowered.api.world.Dimension;
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.cause.CauseContextKey
+import org.lanternpowered.api.util.collect.NonNullArrayList
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
-import java.util.Optional;
-
-public interface World extends org.spongepowered.api.world.World {
+/**
+ * A behavior base for collection of drops.
+ */
+interface DropCollectBehavior : Behavior {
 
     /**
-     * Gets the {@link WeatherUniverse} of this world if the
-     * {@link Dimension} supports weathers.
-     *
-     * @return The weather universe
+     * Collects all the drops for the given [BehaviorContext] into the [MutableList].
      */
-    Optional<WeatherUniverse> getWeatherUniverse();
+    fun apply(type: BehaviorType, ctx: BehaviorContext, itemDrops: MutableList<ItemStackSnapshot>)
+
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        val list = ctx.addContextIfAbsent(DropsCollectionKey) { NonNullArrayList() }
+        apply(type, ctx, list)
+        return true
+    }
+
+    companion object {
+
+        /**
+         * A [CauseContextKey] which contains all the dropped items.
+         */
+        val DropsCollectionKey = CauseContextKey<MutableList<ItemStackSnapshot>>(CatalogKey.minecraft("dropped_items"))
+    }
 }

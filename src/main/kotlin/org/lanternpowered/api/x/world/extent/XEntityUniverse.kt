@@ -23,20 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.script.transformer;
+package org.lanternpowered.api.x.world.extent
 
-import org.lanternpowered.api.script.Import;
-import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.x.world.XWorld;
-import org.lanternpowered.server.script.LanternRandom;
+import com.flowpowered.math.vector.Vector3d
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.EntityType
+import org.spongepowered.api.world.extent.EntityUniverse
+import java.util.function.Consumer
 
-public class AdditionalImportsScriptTransformer implements Transformer {
+interface XEntityUniverse : EntityUniverse {
 
-    @Override
-    public boolean transform(ScriptTransformerContext context) throws TransformerException {
-        context.addImport(Import.ofField(LanternRandom.class, "$random"));
-        context.addImport(Import.ofClass(XWorld.class));
-        context.addImport(Import.ofClass(Parameters.class));
-        return true;
-    }
+    @JvmDefault
+    override fun createEntity(type: EntityType, position: Vector3d): Entity
+            = createEntity(type, position) {}
+
+    @JvmDefault
+    override fun createEntityNaturally(type: EntityType, position: Vector3d): Entity
+            = createEntityNaturally(type, position) {}
+
+    @JvmDefault
+    fun createEntity(type: EntityType, position: Vector3d, fn: Consumer<Entity>): Entity
+            = createEntity(type, position, fn::accept)
+
+    fun createEntity(type: EntityType, position: Vector3d, fn: Entity.() -> Unit): Entity
+
+    @JvmDefault
+    fun createEntityNaturally(type: EntityType, position: Vector3d, fn: Consumer<Entity>): Entity
+            = createEntityNaturally(type, position, fn::accept)
+
+    fun createEntityNaturally(type: EntityType, position: Vector3d, fn: Entity.() -> Unit): Entity
 }

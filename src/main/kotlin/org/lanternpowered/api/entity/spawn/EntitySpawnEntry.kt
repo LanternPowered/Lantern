@@ -23,20 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.script.transformer;
+package org.lanternpowered.api.entity.spawn
 
-import org.lanternpowered.api.script.Import;
-import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.x.world.XWorld;
-import org.lanternpowered.server.script.LanternRandom;
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.EntityType
+import org.spongepowered.api.entity.Transform
+import org.spongepowered.api.world.World
+import java.util.function.Consumer
 
-public class AdditionalImportsScriptTransformer implements Transformer {
+/**
+ * Represents a spawning entry that can be spawned through the [EntitySpawner].
+ *
+ * @param entityType The entity type that will be constructed
+ * @param transform The transform that should be applied to the entity
+ * @param entityPopulator The populator that can be used to apply properties to the entity
+ */
+class EntitySpawnEntry @JvmOverloads constructor(
+        internal val entityType: EntityType,
+        internal val transform: Transform<World>,
+        internal val entityPopulator: Entity.() -> Unit = {}
+) {
 
-    @Override
-    public boolean transform(ScriptTransformerContext context) throws TransformerException {
-        context.addImport(Import.ofField(LanternRandom.class, "$random"));
-        context.addImport(Import.ofClass(XWorld.class));
-        context.addImport(Import.ofClass(Parameters.class));
-        return true;
-    }
+    constructor(
+            entityType: EntityType,
+            transform: Transform<World>,
+            entityConsumer: Consumer<Entity>
+    ) : this(entityType, transform, entityConsumer::accept)
 }

@@ -39,11 +39,20 @@ import java.util.function.Function
 interface BehaviorContext : CauseStack {
 
     /**
-     * Gets the current [CauseStack].
+     * The [BehaviorCollection] for which this [BehaviorContext]
+     * was constructed to process [Behavior]s.
      *
-     * @return The cause stack
+     * This collection can be used to
+     * trigger new behavior pipelines.
      */
-    val causeStack: CauseStack
+    val behaviorCollection: BehaviorCollection
+
+    /**
+     * Adds a finalizer task that will be executed when
+     * the whole pipeline is processed. Finalizers may
+     * also be reverted by [Snapshot]s.
+     */
+    fun addFinalizer(fn: () -> Unit)
 
     /**
      * Gets all the [BlockSnapshot]s.

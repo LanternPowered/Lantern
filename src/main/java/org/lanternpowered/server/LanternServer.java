@@ -35,11 +35,14 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import org.lanternpowered.api.entity.spawn.EntitySpawner;
+import org.lanternpowered.api.x.XServer;
 import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
+import org.lanternpowered.server.entity.LanternEntitySpawner;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
@@ -60,7 +63,6 @@ import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
-import org.spongepowered.api.Server;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -110,7 +112,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 @Singleton
-public final class LanternServer implements Server {
+public final class LanternServer implements XServer {
 
     // The executor service for the server ticks
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
@@ -733,4 +735,8 @@ public final class LanternServer implements Server {
         return this.worldManager;
     }
 
+    @Override
+    public EntitySpawner getEntitySpawner() {
+        return LanternEntitySpawner.INSTANCE;
+    }
 }

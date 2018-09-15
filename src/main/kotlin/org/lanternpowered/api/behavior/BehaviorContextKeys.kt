@@ -23,20 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.script.transformer;
+package org.lanternpowered.api.behavior
 
-import org.lanternpowered.api.script.Import;
-import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.x.world.XWorld;
-import org.lanternpowered.server.script.LanternRandom;
+import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.cause.CauseContextKey
+import org.lanternpowered.api.world.Location
+import org.lanternpowered.api.world.World
 
-public class AdditionalImportsScriptTransformer implements Transformer {
+/**
+ * A collection of [CauseContextKey]s related to [BehaviorContext]s.
+ */
+object BehaviorContextKeys {
 
-    @Override
-    public boolean transform(ScriptTransformerContext context) throws TransformerException {
-        context.addImport(Import.ofField(LanternRandom.class, "$random"));
-        context.addImport(Import.ofClass(XWorld.class));
-        context.addImport(Import.ofClass(Parameters.class));
-        return true;
-    }
+    val BlockLocation = CauseContextKey<Location<World>>(CatalogKeys.minecraft("block_location"))
 }

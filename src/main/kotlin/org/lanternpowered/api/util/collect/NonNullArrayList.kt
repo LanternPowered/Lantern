@@ -23,20 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.script.transformer;
+package org.lanternpowered.api.util.collect
 
-import org.lanternpowered.api.script.Import;
-import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.x.world.XWorld;
-import org.lanternpowered.server.script.LanternRandom;
+/**
+ * A [ArrayList] that does not accept null values.
+ */
+open class NonNullArrayList<E> : NonNullMutableList<E> {
 
-public class AdditionalImportsScriptTransformer implements Transformer {
-
-    @Override
-    public boolean transform(ScriptTransformerContext context) throws TransformerException {
-        context.addImport(Import.ofField(LanternRandom.class, "$random"));
-        context.addImport(Import.ofClass(XWorld.class));
-        context.addImport(Import.ofClass(Parameters.class));
-        return true;
-    }
+    constructor(): super(ArrayList<E>())
+    constructor(initialCapacity: Int): super(ArrayList<E>(initialCapacity))
+    constructor(collection: Collection<E>): super(collection.map { it!! } as MutableList<E>)
 }

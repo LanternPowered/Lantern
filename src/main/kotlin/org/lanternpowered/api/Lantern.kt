@@ -25,16 +25,18 @@
  */
 package org.lanternpowered.api
 
+import org.lanternpowered.api.entity.spawn.EntitySpawner
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.plugin.PluginManager
 import org.lanternpowered.api.x.XGameRegistry
+import org.lanternpowered.api.x.XServer
 import org.lanternpowered.api.x.cause.XCauseStackManager
 import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.service.ServiceManager
 
 object Lantern {
 
-    @JvmStatic inline val server: Server get() = Sponge.getServer()
+    @JvmStatic inline val server: XServer get() = Sponge.getServer() as XServer
     @JvmStatic inline val game: Game get() = Sponge.getGame()
     @JvmStatic inline val registry: XGameRegistry get() = Sponge.getRegistry() as XGameRegistry
     @JvmStatic inline val causeStackManager: XCauseStackManager get() = Sponge.getCauseStackManager() as XCauseStackManager
@@ -42,4 +44,5 @@ object Lantern {
     @JvmStatic inline val eventManager: EventManager get() = Sponge.getEventManager()
     @JvmStatic inline val scheduler: Scheduler get() = Sponge.getScheduler()
     @JvmStatic inline val serviceManager: ServiceManager get() = Sponge.getServiceManager()
+    @JvmStatic inline val entitySpawner: EntitySpawner get() = this.server.entitySpawner
 }

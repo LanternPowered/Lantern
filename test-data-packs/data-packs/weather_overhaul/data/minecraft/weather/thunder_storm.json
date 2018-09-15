@@ -13,7 +13,7 @@
     "duration": "@ 200 + $random.nextInt(300)",
     "action": {
         "condition": [
-            "@ $context.get(Parameters.WORLD).get().weatherUniverse.get().darkness > 0.8"
+            "@ ($context.get(Parameters.WORLD).get().weatherUniverse?.darkness ?: 0.0) > 0.8"
         ],
         "action": {
             "type": "lantern:lightning_weather_spawner",

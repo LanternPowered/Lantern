@@ -25,11 +25,22 @@
  */
 package org.lanternpowered.api.ext
 
+import com.flowpowered.math.vector.Vector3d
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.weather.WeatherUniverse
 import org.lanternpowered.api.x.world.XWorld
+import org.lanternpowered.api.x.world.extent.XEntityUniverse
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.EntityType
+import org.spongepowered.api.world.extent.EntityUniverse
 
 /**
  * The weather universe of the world, if supported.
  */
 val World.weatherUniverse: WeatherUniverse? get() = (this as XWorld).weatherUniverse
+
+fun EntityUniverse.createEntity(type: EntityType, position: Vector3d, fn: Entity.() -> Unit): Entity
+        = (this as XEntityUniverse).createEntity(type, position, fn)
+
+fun EntityUniverse.createEntityNaturally(type: EntityType, position: Vector3d, fn: Entity.() -> Unit): Entity
+        = (this as XEntityUniverse).createEntityNaturally(type, position, fn)

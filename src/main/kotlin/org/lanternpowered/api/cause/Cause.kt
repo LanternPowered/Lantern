@@ -23,7 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("FunctionName")
+
 package org.lanternpowered.api.cause
+
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ext.*
 
 typealias Cause = org.spongepowered.api.event.cause.Cause
 typealias CauseContextKey<T> = org.spongepowered.api.event.cause.EventContextKey<T>
@@ -31,3 +36,6 @@ typealias CauseContextKeys = org.spongepowered.api.event.cause.EventContextKeys
 typealias CauseContext = org.spongepowered.api.event.cause.EventContext
 typealias CauseStackManager = org.spongepowered.api.event.CauseStackManager
 typealias CauseStackManagerFrame = org.spongepowered.api.event.CauseStackManager.StackFrame
+
+inline fun <reified T> CauseContextKey(key: CatalogKey, name: String = key.name): CauseContextKey<T>
+        = CauseContextKey.builder(T::class.java).id(key).name(name).build()

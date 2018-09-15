@@ -23,20 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.script.transformer;
+package org.lanternpowered.api.ext
 
-import org.lanternpowered.api.script.Import;
-import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.x.world.XWorld;
-import org.lanternpowered.server.script.LanternRandom;
+import org.lanternpowered.api.Server
+import org.lanternpowered.api.entity.spawn.EntitySpawner
+import org.lanternpowered.api.x.XServer
 
-public class AdditionalImportsScriptTransformer implements Transformer {
-
-    @Override
-    public boolean transform(ScriptTransformerContext context) throws TransformerException {
-        context.addImport(Import.ofField(LanternRandom.class, "$random"));
-        context.addImport(Import.ofClass(XWorld.class));
-        context.addImport(Import.ofClass(Parameters.class));
-        return true;
-    }
-}
+val Server.entitySpawner: EntitySpawner get() = (this as XServer).entitySpawner

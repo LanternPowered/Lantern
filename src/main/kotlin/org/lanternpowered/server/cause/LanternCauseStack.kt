@@ -30,6 +30,7 @@ import org.lanternpowered.api.cause.CauseContext
 import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManagerFrame
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.SystemProperties
@@ -232,6 +233,14 @@ class LanternCauseStack : CauseStack {
             }
         }
         return this
+    }
+
+    override fun <T> addContextIfAbsent(key: CauseContextKey<T>, valueProvider: () -> T): T {
+        return this.ctx.computeIfAbsent(key) { _ ->
+            this.cachedCtx = null
+            this.frames.peek()?.markNew(key)
+            valueProvider() as Any
+        }.uncheckedCast()
     }
 
     override fun <T> getContext(key: CauseContextKey<T>): Optional<T> {

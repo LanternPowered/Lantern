@@ -51,7 +51,10 @@ public class CommandToggleDownfall extends CommandProvider {
                 )
                 .executor((src, args) -> {
                     final LanternWorldProperties world = CommandHelper.getWorldProperties(src, args);
-                    final WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse().orElse(null);
+                    final WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse();
+                    if (weatherUniverse == null) {
+                        return CommandResult.empty();
+                    }
                     final LanternWeather weather = (LanternWeather) weatherUniverse.getWeather();
                     if (weather.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0) {
                         weatherUniverse.setWeather(Weathers.CLEAR);

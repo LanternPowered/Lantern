@@ -27,6 +27,15 @@ package org.lanternpowered.api.behavior
 
 object BehaviorTypes {
 
+    object Generic {
+
+        /**
+         * The drops collection behavior type, this behavior will be invoked
+         * when drops are being collected. E.g. when a block is being broken.
+         */
+        object CollectDrops : BehaviorType("collect_drops")
+    }
+
     /**
      * Block related behavior types.
      */

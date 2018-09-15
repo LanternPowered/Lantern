@@ -23,20 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.script.transformer;
+@file:Suppress("NOTHING_TO_INLINE")
 
-import org.lanternpowered.api.script.Import;
-import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.x.world.XWorld;
-import org.lanternpowered.server.script.LanternRandom;
+package org.lanternpowered.api.ext
 
-public class AdditionalImportsScriptTransformer implements Transformer {
+import com.flowpowered.math.vector.Vector3i
+import org.lanternpowered.api.x.entity.player.XPlayer
+import org.spongepowered.api.entity.living.player.Player
 
-    @Override
-    public boolean transform(ScriptTransformerContext context) throws TransformerException {
-        context.addImport(Import.ofField(LanternRandom.class, "$random"));
-        context.addImport(Import.ofClass(XWorld.class));
-        context.addImport(Import.ofClass(Parameters.class));
-        return true;
-    }
-}
+/**
+ * Attempts to open the sign at the given position and returns
+ * whether it was successful.
+ *
+ * @param position The position
+ * @return Whether opening the sign was successful
+ */
+inline fun Player.openSignAt(position: Vector3i): Boolean = (this as XPlayer).openSignAt(position)

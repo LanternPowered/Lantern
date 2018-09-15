@@ -28,6 +28,8 @@ package org.lanternpowered.server.world.weather.action;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import org.lanternpowered.api.Lantern;
+import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.script.function.action.Action;
@@ -86,13 +88,11 @@ public class LightningSpawnerAction implements Action {
                     pos = targetEntity.getLocation().getPosition();
                 }
 
-                LanternWorld.handleEntitySpawning(EntityTypes.LIGHTNING, new Transform<>(world, pos), entity -> {}, constructEvent -> {
-                    final LightningEvent.Pre lightningPreEvent = SpongeEventFactory.createLightningEventPre(constructEvent.getCause());
-                    Sponge.getEventManager().post(lightningPreEvent);
-                    if (lightningPreEvent.isCancelled()) { // Cancel entity construction if the pre lighting is cancelled
-                        constructEvent.setCancelled(true);
-                    }
-                });
+                final LightningEvent.Pre lightningPreEvent = SpongeEventFactory.createLightningEventPre(CauseStack.current().getCurrentCause());
+                Sponge.getEventManager().post(lightningPreEvent);
+                if (!lightningPreEvent.isCancelled()) {
+                    Lantern.getEntitySpawner().spawn(EntityTypes.LIGHTNING, new Transform<>(world, pos));
+                }
             }
         }
     }

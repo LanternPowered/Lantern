@@ -25,16 +25,16 @@
  */
 package org.lanternpowered.api.script.context;
 
-import org.lanternpowered.api.world.World;
+import org.lanternpowered.api.x.world.XWorld;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 import org.spongepowered.api.world.Location;
 
 @SuppressWarnings("unchecked")
 public final class Parameters {
 
-    public static final Parameter<Location<World>> TARGET_LOCATION = DummyObjectProvider.createFor(Parameter.class, "TARGET_LOCATION");
+    public static final Parameter<Location<XWorld>> TARGET_LOCATION = DummyObjectProvider.createFor(Parameter.class, "TARGET_LOCATION");
 
-    public static final Parameter<World> WORLD = DummyObjectProvider.createFor(Parameter.class, "WORLD");
+    public static final Parameter<XWorld> WORLD = DummyObjectProvider.createFor(Parameter.class, "WORLD");
 
     private Parameters() {
     }

@@ -66,7 +66,7 @@ interface BehaviorCollection {
      * @param type The behavior type
      * @return The behavior, if found
      */
-    operator fun get(type: BehaviorType): Behavior?
+    operator fun get(type: BehaviorType): TargetedBehavior?
 
     /**
      * Gets the [Behavior] for the given [BehaviorType] if present. When it's
@@ -75,5 +75,12 @@ interface BehaviorCollection {
      * @param type The behavior type
      * @return The behavior
      */
-    fun getOrEmpty(type: BehaviorType): Behavior
+    fun getOrEmpty(type: BehaviorType): TargetedBehavior
+
+    /**
+     * Creates a copy of this [BehaviorCollection].
+     *
+     * @return The copy
+     */
+    fun copy(): BehaviorCollection
 }

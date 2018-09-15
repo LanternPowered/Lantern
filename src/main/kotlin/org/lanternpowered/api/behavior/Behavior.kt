@@ -32,7 +32,7 @@ package org.lanternpowered.api.behavior
  * through a SAM like conversion.
  */
 inline fun Behavior(crossinline fn: (BehaviorType, BehaviorContext) -> Boolean) = object : Behavior {
-    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean = fn(type, ctx)
+    override fun apply(type: BehaviorType, ctx: BehaviorContext) = fn(type, ctx)
 }
 
 @FunctionalInterface
@@ -68,6 +68,17 @@ interface Behavior {
     }
 
     /**
+     * Returns this [Behavior] as a optional [Behavior],
+     * this means that it will always return as if it was
+     * successful.
+     */
+    @JvmDefault
+    fun optional() = Behavior { type, ctx ->
+        tryApply(type, ctx)
+        true
+    }
+
+    /**
      * Returns a new [Behavior] that will be
      * executed when this behavior is executed.
      *
@@ -78,9 +89,10 @@ interface Behavior {
      * @return The combined behavior
      */
     @JvmDefault
-    fun andThen(behavior: Behavior) = Behavior { type, ctx ->
-        tryApply(type, ctx)
-        behavior.tryApply(type, ctx)
+    fun then(behavior: Behavior) = Behavior { type, ctx ->
+        val thisSuccess = tryApply(type, ctx)
+        val thatSuccess = behavior.tryApply(type, ctx)
+        thisSuccess && thatSuccess
     }
 
     /**
@@ -94,7 +106,7 @@ interface Behavior {
      * @return The combined behavior
      */
     @JvmDefault
-    fun andThenIfSuccessful(behavior: Behavior) = Behavior { type, ctx -> tryApply(type, ctx) && behavior.tryApply(type, ctx) }
+    fun thenIfSuccessful(behavior: Behavior) = Behavior { type, ctx -> tryApply(type, ctx) && behavior.tryApply(type, ctx) }
 
     /**
      * Returns a new [Behavior] that will be executed
@@ -107,5 +119,5 @@ interface Behavior {
      * @return The combined behavior
      */
     @JvmDefault
-    fun andThenIfFailure(behavior: Behavior) = Behavior { type, ctx -> !tryApply(type, ctx) && behavior.tryApply(type, ctx) }
+    fun thenIfFailure(behavior: Behavior) = Behavior { type, ctx -> !tryApply(type, ctx) && behavior.tryApply(type, ctx) }
 }

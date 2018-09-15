@@ -23,5 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.api.world;
+package org.lanternpowered.api.behavior
+
+/**
+ * A [Behavior] which has a predefined [BehaviorType] that will be used as default.
+ *
+ * @see apply
+ * @see tryApply
+ */
+class TargetedBehavior(private val type: BehaviorType, private val behavior: Behavior) : Behavior {
+
+    fun apply(ctx: BehaviorContext) = this.behavior.tryApply(this.type, ctx)
+    fun tryApply(ctx: BehaviorContext) = this.behavior.tryApply(this.type, ctx)
+
+    override fun apply(type: BehaviorType, ctx: BehaviorContext) = this.behavior.apply(type, ctx)
+    override fun tryApply(type: BehaviorType, ctx: BehaviorContext) = this.behavior.tryApply(type, ctx)
+}

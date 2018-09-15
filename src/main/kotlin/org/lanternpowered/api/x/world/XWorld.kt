@@ -27,11 +27,12 @@ package org.lanternpowered.api.x.world
 
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.weather.WeatherUniverse
+import org.lanternpowered.api.x.world.extent.XEntityUniverse
 
 /**
  * An extended [World].
  */
-interface XWorld : World {
+interface XWorld : World, XEntityUniverse {
 
     /**
      * The weather universe of this world, or null if this

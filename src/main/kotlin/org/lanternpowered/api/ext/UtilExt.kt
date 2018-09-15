@@ -28,6 +28,7 @@
 package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.util.Tuple
+import org.lanternpowered.api.util.collect.NonNullMutableList
 
 // Deconstructing declaration support for tuples
 operator fun <K, V> Tuple<K, V>.component1(): K = first
@@ -37,3 +38,7 @@ fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
 fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
 
 inline fun <T> Any?.uncheckedCast(): T = this as T
+
+inline fun <E> List<E>.asNonNullList(): List<E> = NonNullMutableList(this as MutableList<E>)
+@JvmName("toMutableNonNullList")
+inline fun <E> MutableList<E>.asNonNullList(): MutableList<E> = NonNullMutableList(this)

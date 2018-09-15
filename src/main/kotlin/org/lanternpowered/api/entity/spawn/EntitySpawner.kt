@@ -104,7 +104,7 @@ interface EntitySpawner {
      * Performs [ConstructEntityEvent]s followed by a bulk [SpawnEntityEvent] and returns the constructed [Entity], if constructed.
      */
     fun spawn(entityType: EntityType, transform: Transform<World>, eventProvider: SpawnEventProvider, fn: (Entity) -> Unit = {})
-            = spawn(Collections.singleton(EntitySpawnEntry(entityType, transform, fn)), eventProvider).firstOrNull()
+            = spawn(singletonListOf(EntitySpawnEntry(entityType, transform, fn)), eventProvider).firstOrNull()
 
     /**
      * Finishes the [SpawnEntityEvent] by moving all the [Entity]s
@@ -112,7 +112,6 @@ interface EntitySpawner {
      */
     fun finishSpawnEvent(event: SpawnEntityEvent)
 }
-
 
 /**
  * A convenient constructor to allow to construct the [Behavior]

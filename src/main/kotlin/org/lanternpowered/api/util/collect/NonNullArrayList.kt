@@ -32,5 +32,5 @@ open class NonNullArrayList<E> : NonNullMutableList<E> {
 
     constructor(): super(ArrayList<E>())
     constructor(initialCapacity: Int): super(ArrayList<E>(initialCapacity))
-    constructor(collection: Collection<E>): super(collection.map { it!! } as MutableList<E>)
+    constructor(collection: Collection<E>): super(collection.map { checkElement(it) } as MutableList<E>)
 }

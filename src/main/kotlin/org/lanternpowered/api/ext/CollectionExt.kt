@@ -32,6 +32,8 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Multimap
+import org.lanternpowered.api.util.collect.NonNullMutableList
+import java.util.Collections
 import java.util.EnumMap
 
 inline fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
@@ -50,3 +52,10 @@ inline fun <T> immutableListBuilderOf() = ImmutableList.builder<T>()
 inline fun <T> immutableSetBuilderOf() = ImmutableSet.builder<T>()
 
 inline fun <reified K : Enum<K>, V> enumMapOf(): MutableMap<K, V> = EnumMap(K::class.java)
+
+inline fun <E> List<E>.asNonNullList(): List<E> = NonNullMutableList(this as MutableList<E>)
+@JvmName("toMutableNonNullList")
+inline fun <E> MutableList<E>.asNonNullList(): MutableList<E> = NonNullMutableList(this)
+
+inline fun <E> singletonListOf(element: E): List<E> = Collections.singletonList(element)
+inline fun <E> singletonSetOf(element: E): Set<E> = Collections.singleton(element)

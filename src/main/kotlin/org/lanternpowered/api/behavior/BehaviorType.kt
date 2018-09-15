@@ -25,59 +25,12 @@
  */
 package org.lanternpowered.api.behavior
 
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.inject.Named
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
-
 /**
  * Represents a behavior type. For each type will a
  * behavior pipeline be available that can be invoked.
  *
  * All the [BehaviorType]s should be a kotlin object.
+ *
+ * @property name The name of this behavior type
  */
-abstract class BehaviorType {
-
-    /**
-     * The name of this behavior type
-     */
-    val name: String
-
-    /**
-     * Constructs a new [BehaviorType] with the given name.
-     */
-    constructor(name: String) {
-        this.name = name
-    }
-
-    /**
-     * Constructs a new [BehaviorType] with the name of
-     * the class or [Named] annotation if present.
-     */
-    constructor() {
-        @Suppress("LeakingThis") // Not leaking anything
-        val clazz = this::class
-        this.name = clazz.findAnnotation<Named>()?.value ?: clazz.simpleName ?: clazz.java.simpleName
-    }
-}
-
-private val types = ConcurrentHashMap<Class<*>, Any>()
-
-/**
- * Extracts the [BehaviorType] instance from the
- */
-@JvmName("getType")
-fun <T : BehaviorType> KClass<T>.getBehaviorType(): T {
-    return types.computeIfAbsent(this::class.java) {
-        val objInstance = this::objectInstance.get()
-        if (objInstance != null) {
-            objInstance
-        } else {
-            // Alternatively instantiate the behavior type by using a empty constructor
-            val constructor = this.java.getDeclaredConstructor()
-            constructor.isAccessible = true // In case it's not accessible
-            constructor.newInstance()
-        }
-    }.uncheckedCast()
-}
+data class BehaviorType(val name: String)

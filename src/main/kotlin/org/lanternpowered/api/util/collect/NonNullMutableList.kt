@@ -23,24 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.lanternpowered.api.util.collect
+
+import org.lanternpowered.api.ext.*
 
 /**
  * A [MutableList] that doesn't allow null values to be passed into the backing list.
  */
 open class NonNullMutableList<E>(private val backing: MutableList<E>) : MutableList<E> by backing {
 
-    override fun add(element: E) = this.backing.add(element!!)
-    override fun add(index: Int, element: E) = this.backing.add(index, element!!)
-    override fun set(index: Int, element: E) = this.backing.set(index, element!!)
+    override fun add(element: E) = this.backing.add(checkElement(element))
+    override fun add(index: Int, element: E) = this.backing.add(index, checkElement(element))
+    override fun set(index: Int, element: E) = this.backing.set(index, checkElement(element))
 
     override fun addAll(index: Int, elements: Collection<E>): Boolean {
-        elements.forEach { element -> element!! }
+        elements.forEach { checkElement(it) }
         return this.backing.addAll(index, elements)
     }
 
     override fun addAll(elements: Collection<E>): Boolean {
-        elements.forEach { element -> element!! }
+        elements.forEach { checkElement(it) }
         return this.backing.addAll(elements)
     }
 
@@ -51,7 +55,12 @@ open class NonNullMutableList<E>(private val backing: MutableList<E>) : MutableL
 
     class NonNullMutableListIterator<E>(private val backing: MutableListIterator<E>) : MutableListIterator<E> by backing {
 
-        override fun add(element: E) = this.backing.add(element!!)
-        override fun set(element: E) = this.backing.set(element!!)
+        override fun add(element: E) = this.backing.add(checkElement(element))
+        override fun set(element: E) = this.backing.set(checkElement(element))
+    }
+
+    companion object {
+
+        internal inline fun <E> checkElement(element: E): E = checkNotNull(element as Any) { "element" }.uncheckedCast()
     }
 }

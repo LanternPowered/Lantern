@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.api.entity.spawn
 
+import org.lanternpowered.api.entity.Transform
+import org.lanternpowered.api.world.World
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
-import org.spongepowered.api.entity.Transform
-import org.spongepowered.api.world.World
 import java.util.function.Consumer
 
 /**

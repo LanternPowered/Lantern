@@ -25,7 +25,20 @@
  */
 package org.lanternpowered.api.ext
 
+import org.lanternpowered.api.entity.Transform
+import org.lanternpowered.api.entity.spawn.EntitySpawnEntry
 import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.ItemStackSnapshot
+import org.lanternpowered.api.world.Location
+import org.lanternpowered.api.world.World
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.EntityTypes
+
+/**
+ * The default dropped item despawn delay.
+ */
+const val DROPPED_ITEM_DESPAWN_DELAY = 40
 
 /**
  * Will return {@code null} if the stack is empty.
@@ -37,4 +50,16 @@ operator fun ItemStack.not(): ItemStack? = if (isEmpty) null else this
  */
 inline fun ItemStack.ifNotEmpty(fn: (ItemStack) -> Unit) {
     if (!isEmpty) fn(this)
+}
+
+fun ItemStackSnapshot.toDroppedItemSpawnEntry(location: Location<World>, fn: Entity.() -> Unit = {})
+        = toDroppedItemSpawnEntry(Transform(location), fn)
+
+fun ItemStackSnapshot.toDroppedItemSpawnEntry(transform: Transform<World>, fn: Entity.() -> Unit = {}): EntitySpawnEntry {
+    val snapshot = this
+    return EntitySpawnEntry(EntityTypes.ITEM, transform) {
+        offer(Keys.REPRESENTED_ITEM, snapshot)
+        offer(Keys.DESPAWN_DELAY, DROPPED_ITEM_DESPAWN_DELAY)
+        fn(this)
+    }
 }

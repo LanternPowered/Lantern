@@ -32,16 +32,10 @@ import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
 import org.lanternpowered.api.behavior.BehaviorTypes
 import org.lanternpowered.api.behavior.default.DropCollectBehavior
-import org.lanternpowered.api.entity.spawn.EntitySpawnEntry
 import org.lanternpowered.api.entity.spawn.SpawnEventProvider
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.util.collect.NonNullArrayList
-import org.lanternpowered.api.world.World
-import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.entity.EntityTypes
-import org.spongepowered.api.entity.Transform
 
 
 /**
@@ -57,21 +51,16 @@ class SpawnBlockDropsBehavior : Behavior {
         behavior.apply(ctx)
         // Add a finalizer which will handle the drop events and spawn dropped items in the world
         ctx.addFinalizer {
-            val drops = ctx[DropCollectBehavior.DropsCollectionKey] ?: emptyList<ItemStackSnapshot>()
+            val drops = ctx[DropCollectBehavior.DropsCollectionKey] ?: NonNullArrayList()
             // Throw events
             val preDropEvent = LanternEventFactory.createDropItemEventPre(ctx.currentCause, drops.toImmutableList(), drops)
             Lantern.eventManager.post(preDropEvent)
             if (!preDropEvent.isCancelled) {
                 // The event was successful, now create entities for all the dropped items
-                val location = ctx.requireContext(BehaviorContextKeys.BlockLocation)
-                val position = location.position.add(0.5, 0.5, 0.5)
-                val transform = Transform<World>(location.extent, position)
+                val transform = ctx.requireContext(BehaviorContextKeys.BlockLocation).add(0.5, 0.5, 0.5).toTransform()
                 // Drop entities
-                Lantern.entitySpawner.spawn(drops.map { drop ->
-                    EntitySpawnEntry(EntityTypes.ITEM, transform) {
-                        offer(Keys.REPRESENTED_ITEM, drop)
-                    }
-                }, SpawnEventProvider(LanternEventFactory::createDropItemEventDestruct))
+                Lantern.entitySpawner.spawn(drops.map { it.toDroppedItemSpawnEntry(transform) },
+                        SpawnEventProvider(LanternEventFactory::createDropItemEventDestruct))
             }
         }
         return true

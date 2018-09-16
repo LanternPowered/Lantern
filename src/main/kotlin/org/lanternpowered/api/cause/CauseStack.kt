@@ -81,6 +81,26 @@ interface CauseStack : CauseStackManager {
         override fun <T> addContext(key: CauseContextKey<T>, value: T): Frame
     }
 
+    /**
+     * Represents a snapshot of the [CauseStack]. Unlike [Frame]s, you
+     * can always reset to a specific [Snapshot].
+     */
+    interface Snapshot
+
+    /**
+     * Creates a [Snapshot] of the current state of the [CauseStack].
+     *
+     * @return The snapshot
+     */
+    fun createSnapshot(): Snapshot
+
+    /**
+     * Reverts this [CauseStack] to the given [Snapshot].
+     *
+     * @param snapshot The snapshot to revert to
+     */
+    fun restoreSnapshot(snapshot: Snapshot)
+
     companion object {
 
         /**

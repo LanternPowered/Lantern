@@ -23,19 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+package org.lanternpowered.api.behavior.basic.block.drop
 
-package org.lanternpowered.api.ext
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.basic.DropsCollectionBehavior
+import org.lanternpowered.api.block.entity.BlockEntity
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.Carrier
+import org.spongepowered.api.item.inventory.crafting.CraftingOutput
 
-import org.lanternpowered.api.util.Tuple
+/**
+ * Collects drops from the [BlockEntity] if it's a [Carrier].
+ */
+class BlockEntityDropCollectionBehavior : DropsCollectionBehavior {
 
-// Deconstructing declaration support for tuples
-operator fun <K, V> Tuple<K, V>.component1(): K = first
-operator fun <K, V> Tuple<K, V>.component2(): V = second
-
-fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
-fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
-
-inline fun <T> Any?.uncheckedCast(): T = this as T
-
-inline infix fun <T> T?.ifNull(fn: () -> T): T = this ?: fn()
+    override fun apply(type: BehaviorType, ctx: BehaviorContext, itemDrops: MutableList<ItemStackSnapshot>) {
+        val blockEntity = ctx[BehaviorContextKeys.BlockLocation]?.blockEntity
+        if (blockEntity is Carrier) {
+            val inventory = blockEntity.inventory
+            inventory.slots().stream()
+                    .filter { it !is CraftingOutput }
+                    .forEach { slot -> slot.peek().ifNotEmpty { itemDrops.add(it.createSnapshot()) } }
+        }
+    }
+}

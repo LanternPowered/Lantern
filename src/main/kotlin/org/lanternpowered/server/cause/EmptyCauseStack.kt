@@ -38,6 +38,7 @@ internal object EmptyCauseStack : CauseStack {
 
     private val obj = Any()
     private val cause by lazy { Cause.of(EventContext.empty(), Lantern.game) }
+    private val snapshot = object : CauseStack.Snapshot {}
     private val frame = object : CauseStack.Frame {
 
         override fun close() {}
@@ -49,6 +50,9 @@ internal object EmptyCauseStack : CauseStack {
         override fun <T> addContext(key: EventContextKey<T>, value: T) = this
         override fun <T> removeContext(key: EventContextKey<T>) = Optional.empty<T>()
     }
+
+    override fun restoreSnapshot(snapshot: CauseStack.Snapshot) {}
+    override fun createSnapshot() = this.snapshot
 
     override fun getCurrentCause(): Cause = cause
     override fun getCurrentContext(): EventContext = EventContext.empty()

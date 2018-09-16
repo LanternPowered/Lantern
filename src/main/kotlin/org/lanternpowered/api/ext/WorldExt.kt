@@ -28,10 +28,10 @@
 package org.lanternpowered.api.ext
 
 import com.flowpowered.math.vector.Vector3d
+import org.lanternpowered.api.block.entity.BlockEntity
 import org.lanternpowered.api.entity.Transform
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
-import org.lanternpowered.api.world.weather.WeatherUniverse
 import org.lanternpowered.api.x.world.XWorld
 import org.lanternpowered.api.x.world.extent.XEntityUniverse
 import org.lanternpowered.api.x.world.weather.XWeatherUniverse
@@ -53,3 +53,5 @@ inline fun EntityUniverse.createEntityNaturally(type: EntityType, position: Vect
 
 inline fun <E : Extent> Location<E>.toTransform(rotation: Vector3d = Vector3d.ZERO, scale: Vector3d = Vector3d.ONE)
         = Transform(this, rotation, scale)
+
+inline val Location<*>.blockEntity: BlockEntity? get() = !this.tileEntity

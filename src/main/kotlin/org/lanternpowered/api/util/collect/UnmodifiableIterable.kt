@@ -23,19 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+package org.lanternpowered.api.util.collect
 
-package org.lanternpowered.api.ext
+/**
+ * A [Iterable] that doesn't allow modifications to its backing iterable.
+ */
+class UnmodifiableIterable<T>(private val backing: Iterable<T>) : Iterable<T> {
 
-import org.lanternpowered.api.util.Tuple
-
-// Deconstructing declaration support for tuples
-operator fun <K, V> Tuple<K, V>.component1(): K = first
-operator fun <K, V> Tuple<K, V>.component2(): V = second
-
-fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
-fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
-
-inline fun <T> Any?.uncheckedCast(): T = this as T
-
-inline infix fun <T> T?.ifNull(fn: () -> T): T = this ?: fn()
+    override fun iterator(): Iterator<T> = UnmodifiableIterator(this.backing.iterator())
+}

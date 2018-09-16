@@ -35,6 +35,10 @@ inline fun Behavior(crossinline fn: (BehaviorType, BehaviorContext) -> Boolean) 
     override fun apply(type: BehaviorType, ctx: BehaviorContext) = fn(type, ctx)
 }
 
+inline fun Behavior(crossinline fn: (BehaviorContext) -> Boolean) = object : Behavior {
+    override fun apply(type: BehaviorType, ctx: BehaviorContext) = fn(ctx)
+}
+
 @FunctionalInterface
 interface Behavior {
 

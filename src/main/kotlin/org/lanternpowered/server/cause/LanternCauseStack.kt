@@ -38,17 +38,23 @@ import java.util.ArrayDeque
 import java.util.HashMap
 import java.util.HashSet
 import java.util.Optional
-import java.util.function.Consumer
 
 class LanternCauseStack : CauseStack {
 
-    private val cause = ArrayDeque<Any>()
-    private val frames = ArrayDeque<CauseStackFrameImpl>()
-    private val ctx = HashMap<CauseContextKey<*>, Any>()
+    private var cause = ArrayDeque<Any>()
+    private var frames = ArrayDeque<CauseStackFrameImpl>()
+    private var ctx = HashMap<CauseContextKey<*>, Any>()
 
     private var minDepth = 0
     private var cachedCause: Cause? = null
     private var cachedCtx: CauseContext? = null
+
+    // Snapshot related
+
+    private var cachedSnapshot: LanternSnapshot? = null
+    private var cachedSnapshotCause: ArrayDeque<Any>? = null
+    private var cachedSnapshotFrames: ArrayDeque<CauseStackFrameImpl>? = null
+    private var cachedSnapshotCtx: HashMap<CauseContextKey<*>, Any>? = null
 
     override fun getCurrentCause(): Cause {
         if (this.cachedCause == null || this.cachedCtx == null) {
@@ -70,6 +76,8 @@ class LanternCauseStack : CauseStack {
 
     override fun pushCause(obj: Any): CauseStack = apply {
         this.cachedCause = null
+        this.cachedSnapshotCause = null
+        this.cachedSnapshot = null
         this.cause.push(obj)
     }
 
@@ -79,6 +87,8 @@ class LanternCauseStack : CauseStack {
                     + this.cause.size + " but mid depth is " + this.minDepth + ")")
         }
         this.cachedCause = null
+        this.cachedSnapshotCause = null
+        this.cachedSnapshot = null
         return this.cause.pop()
     }
 
@@ -115,15 +125,49 @@ class LanternCauseStack : CauseStack {
         while (iterator.hasNext()) {
             val cause = iterator.next()
             if (target.isInstance(cause)) {
-                return Optional.of(target.cast(cause))
+                return target.cast(cause).optional()
             }
         }
         return Optional.empty()
     }
 
+    private class LanternSnapshot(
+            val cause: ArrayDeque<Any>,
+            val frames: ArrayDeque<CauseStackFrameImpl>,
+            val ctx: HashMap<CauseContextKey<*>, Any>,
+            val minDepth: Int,
+            val cachedCause: Cause?,
+            val cachedCtx: CauseContext?
+    ) : CauseStack.Snapshot
+
+    override fun createSnapshot(): CauseStack.Snapshot {
+        val snapshot = this.cachedSnapshot
+        if (snapshot != null) return snapshot
+
+        val cause = this.cachedSnapshotCause.ifNull { ArrayDeque(this.cause).also { this.cachedSnapshotCause = it } }
+        val frames = this.cachedSnapshotFrames.ifNull { ArrayDeque(this.frames).also { this.cachedSnapshotFrames = it } }
+        val ctx = this.cachedSnapshotCtx.ifNull { HashMap(this.ctx).also { this.cachedSnapshotCtx = it } }
+
+        return LanternSnapshot(cause, frames, ctx, this.minDepth, this.cachedCause, this.cachedCtx)
+                .also { this.cachedSnapshot = it }
+    }
+
+    override fun restoreSnapshot(snapshot: CauseStack.Snapshot) {
+        if (this.cachedSnapshot == snapshot) return
+        snapshot as LanternSnapshot
+        this.cause = snapshot.cause
+        this.frames = snapshot.frames
+        this.ctx = snapshot.ctx
+        this.minDepth = snapshot.minDepth
+        this.cachedCause = snapshot.cachedCause
+        this.cachedCtx = snapshot.cachedCtx
+    }
+
     override fun pushCauseFrame(): CauseStack.Frame {
         val frame = CauseStackFrameImpl(this, this.minDepth)
         this.frames.push(frame)
+        this.cachedSnapshotFrames = null
+        this.cachedSnapshot = null
         this.minDepth = this.cause.size
         if (DEBUG_CAUSE_FRAMES) {
             // Attach an exception to the frame so that if there is any frame
@@ -132,6 +176,12 @@ class LanternCauseStack : CauseStack {
             frame.debugStack = Exception("")
         }
         return frame
+    }
+
+    private fun invalidateCachedCtx() {
+        this.cachedCtx = null
+        this.cachedSnapshotCtx = null
+        this.cachedSnapshot = null
     }
 
     override fun popCauseFrame(oldFrame: CauseStackManagerFrame) {
@@ -161,12 +211,12 @@ class LanternCauseStack : CauseStack {
                 // if we're not debugging the cause frames then throw an error
                 // immediately otherwise let the pretty printer output the frame
                 // that was erroneously popped.
-                throw IllegalStateException("Cause Stack Frame Corruption on the Thread \"" + name +
-                        "\"! Attempted to pop a frame that was not on the stack.")
+                throw IllegalStateException("Cause Stack Frame Corruption on the Thread \"$name\"! " +
+                        "Attempted to pop a frame that was not on the stack.")
             }
             val printer = PrettyPrinter(100)
-                    .add("Cause Stack Frame Corruption on the Thread \"%s\"!", name).centre().hr()
-                    .add("Found %d frames left on the stack. Clearing them all.", arrayOf(offset + 1))
+                    .add("Cause Stack Frame Corruption on the Thread \"$name\"!").centre().hr()
+                    .add("Found ${arrayOf(offset + 1)} frames left on the stack. Clearing them all.")
             if (!DEBUG_CAUSE_FRAMES) {
                 printer.add().add("Please add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.")
                 Lantern.getLogger().warn("  Add -Dsponge.debugcauseframes=true to your startup flags to enable further debugging output.")
@@ -198,10 +248,12 @@ class LanternCauseStack : CauseStack {
             return
         }
         this.frames.pop()
+        this.cachedSnapshotFrames = null
+        this.cachedSnapshot = null
         // Remove new values
         var ctxInvalid = false
         if (frame.hasNew()) {
-            frame.newCtxValues!!.forEach(Consumer<CauseContextKey<*>> { this.ctx.remove(it) })
+            frame.newCtxValues!!.forEach { this.ctx.remove(it) }
             ctxInvalid = true
         }
         // Restore old values
@@ -212,7 +264,7 @@ class LanternCauseStack : CauseStack {
             ctxInvalid = true
         }
         if (ctxInvalid) {
-            this.cachedCtx = null
+            invalidateCachedCtx()
         }
         // If there were any objects left on the stack then we pop them off
         while (this.cause.size > this.minDepth) {
@@ -222,7 +274,7 @@ class LanternCauseStack : CauseStack {
     }
 
     override fun <T> addContext(key: CauseContextKey<T>, value: T): CauseStack {
-        this.cachedCtx = null
+        invalidateCachedCtx()
         val existing = this.ctx.put(key, value as Any)
         if (!this.frames.isEmpty()) {
             val frame = this.frames.peek()
@@ -237,18 +289,18 @@ class LanternCauseStack : CauseStack {
 
     override fun <T> addContextIfAbsent(key: CauseContextKey<T>, valueProvider: () -> T): T {
         return this.ctx.computeIfAbsent(key) { _ ->
-            this.cachedCtx = null
+            invalidateCachedCtx()
             this.frames.peek()?.markNew(key)
             valueProvider() as Any
         }.uncheckedCast()
     }
 
     override fun <T> getContext(key: CauseContextKey<T>): Optional<T> {
-        return Optional.ofNullable(key.allowedType.cast(this.ctx[key]))
+        return key.allowedType.cast(this.ctx[key]).optional()
     }
 
     override fun <T> removeContext(key: CauseContextKey<T>): Optional<T> {
-        this.cachedCtx = null
+        invalidateCachedCtx()
         val existing = key.allowedType.cast(this.ctx.remove(key))
         if (existing != null && !this.frames.isEmpty()) {
             val frame = this.frames.peek()
@@ -256,7 +308,7 @@ class LanternCauseStack : CauseStack {
                 frame.store(key, existing)
             }
         }
-        return Optional.ofNullable(existing)
+        return existing.optional()
     }
 
     private class CauseStackFrameImpl internal constructor(

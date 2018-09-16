@@ -37,7 +37,6 @@ import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.collect.NonNullArrayList
 
-
 /**
  * A behavior to spawn drops for a block.
  */

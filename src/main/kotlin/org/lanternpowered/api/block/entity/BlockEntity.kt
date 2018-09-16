@@ -23,19 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+package org.lanternpowered.api.block.entity
 
-package org.lanternpowered.api.ext
-
-import org.lanternpowered.api.util.Tuple
-
-// Deconstructing declaration support for tuples
-operator fun <K, V> Tuple<K, V>.component1(): K = first
-operator fun <K, V> Tuple<K, V>.component2(): V = second
-
-fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
-fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
-
-inline fun <T> Any?.uncheckedCast(): T = this as T
-
-inline infix fun <T> T?.ifNull(fn: () -> T): T = this ?: fn()
+typealias BlockEntity = org.spongepowered.api.block.tileentity.TileEntity

@@ -25,16 +25,8 @@
  */
 package org.lanternpowered.api.behavior
 
-import com.google.common.collect.ImmutableList
+import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.server.block.BlockSnapshotBuilder
-import org.spongepowered.api.block.BlockSnapshot
-import org.spongepowered.api.entity.Entity
-import org.spongepowered.api.entity.EntitySnapshot
-import org.spongepowered.api.event.cause.EventContextKey
-import org.spongepowered.api.item.inventory.transaction.SlotTransaction
-import java.util.function.BiConsumer
-import java.util.function.Function
 
 interface BehaviorContext : CauseStack {
 
@@ -54,6 +46,18 @@ interface BehaviorContext : CauseStack {
      */
     fun addFinalizer(fn: () -> Unit)
 
+    // Snapshots
+
+    interface Snapshot : CauseStack.Snapshot
+
+    override fun createSnapshot(): Snapshot
+
+    // Cause related
+
+    override fun pushCause(obj: Any): BehaviorContext
+    override fun <T> addContext(key: CauseContextKey<T>, value: T): BehaviorContext
+
+    /*
     /**
      * Gets all the [BlockSnapshot]s.
      *
@@ -67,26 +71,6 @@ interface BehaviorContext : CauseStack {
      * @return The slot transactions
      */
     val slotChanges: List<SlotTransaction>
-
-    /**
-     * Represents a snapshot of the [BehaviorContext].
-     */
-    interface Snapshot
-
-    override fun pushCause(obj: Any): BehaviorContext
-    override fun <T> addContext(key: EventContextKey<T>, value: T): BehaviorContext
-
-    /**
-     * Creates a [Snapshot] of the current state of the [BehaviorContext].
-     *
-     * @return The snapshot
-     */
-    fun createSnapshot(): Snapshot
-
-    /**
-     * Reverts this [BehaviorContext] to the given [Snapshot].
-     */
-    fun restoreSnapshot(snapshot: Snapshot)
 
     fun addEntity(entitySnapshot: EntitySnapshot)
 
@@ -137,5 +121,5 @@ interface BehaviorContext : CauseStack {
      *
      * @param builder The builder to populate
      */
-    fun populateBlockSnapshot(builder: BlockSnapshot.Builder, populationFlags: Int)
+    fun populateBlockSnapshot(builder: BlockSnapshot.Builder, populationFlags: Int)*/
 }

@@ -1014,6 +1014,16 @@ public class LanternWorld implements AbstractExtent, XWorld, AbstractViewer, Rul
     }
 
     @Override
+    public double getDarkness() {
+        return this.weatherUniverse == null ? 0 : this.weatherUniverse.getDarkness();
+    }
+
+    @Override
+    public double getRainStrength() {
+        return this.weatherUniverse == null ? 0 : this.weatherUniverse.getRainStrength();
+    }
+
+    @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
         checkNotNull(particleEffect, "particleEffect");
         checkNotNull(position, "position");

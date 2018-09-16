@@ -33,7 +33,7 @@ object BehaviorTypes {
          * The drops collection behavior type, this behavior will be invoked
          * when drops are being collected. E.g. when a block is being broken.
          */
-        val CollectDrops = BehaviorType("collect_drops")
+        @JvmStatic val CollectDrops = BehaviorType("collect_drops")
     }
 
     /**
@@ -45,7 +45,7 @@ object BehaviorTypes {
          * The block break behavior type, this behavior will be invoked
          * when a block at a specific location is being broken.
          */
-        val Break = BehaviorType("break_block")
+        @JvmStatic val Break = BehaviorType("break_block")
     }
 
     /**

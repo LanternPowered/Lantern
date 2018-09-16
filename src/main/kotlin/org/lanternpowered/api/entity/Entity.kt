@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.api.entity
 
+import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.Transform
 
 typealias Transform<E> = Transform<E>
+typealias Entity = Entity

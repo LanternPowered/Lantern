@@ -32,7 +32,7 @@ import org.lanternpowered.api.x.world.weather.XWeatherUniverse
 /**
  * An extended [World].
  */
-interface XWorld : World, XEntityUniverse {
+interface XWorld : World, XEntityUniverse, XWeatherUniverse {
 
     /**
      * The weather universe of this world, or null if this

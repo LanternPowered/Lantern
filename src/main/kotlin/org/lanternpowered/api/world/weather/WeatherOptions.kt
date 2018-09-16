@@ -42,4 +42,9 @@ object WeatherOptions {
      * Affects how hard it is raining. A value of 0 means no rain.
      */
     @JvmStatic val RAIN_STRENGTH = weatherOptionOf(CatalogKey.minecraft("rain_strength"), 0.0)
+
+    /**
+     * A provider which provides the duration (in seconds) when the weather is naturally switched.
+     */
+    @JvmStatic val DURATION = weatherOptionOf(CatalogKey.minecraft("duration")) { random.nextDouble(300.0 .. 900.0) }
 }

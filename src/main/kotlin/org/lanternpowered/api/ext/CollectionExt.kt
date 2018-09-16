@@ -33,6 +33,8 @@ import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Multimap
 import org.lanternpowered.api.util.collect.NonNullMutableList
+import org.lanternpowered.api.util.collect.UnmodifiableIterable
+import org.lanternpowered.api.util.collect.UnmodifiableIterator
 import java.util.Collections
 import java.util.EnumMap
 
@@ -59,3 +61,35 @@ inline fun <E> MutableList<E>.asNonNullList(): MutableList<E> = NonNullMutableLi
 
 inline fun <E> singletonListOf(element: E): List<E> = Collections.singletonList(element)
 inline fun <E> singletonSetOf(element: E): Set<E> = Collections.singleton(element)
+
+// Unmodifiable views
+
+/**
+ * Creates a unmodifiable [Collection] view for this collection.
+ */
+inline fun <K, V> Map<K, V>.asUnmodifiable(): Map<K, V> = Collections.unmodifiableMap(this)
+
+/**
+ * Creates a unmodifiable [Collection] view for this collection.
+ */
+inline fun <T> Collection<T>.asUnmodifiable(): Collection<T> = Collections.unmodifiableCollection(this)
+
+/**
+ * Creates a unmodifiable [Set] view for this set.
+ */
+inline fun <T> Set<T>.asUnmodifiable(): Set<T> = Collections.unmodifiableSet(this)
+
+/**
+ * Creates a unmodifiable [List] view for this list.
+ */
+inline fun <T> List<T>.asUnmodifiable(): List<T> = Collections.unmodifiableList(this)
+
+/**
+ * Creates a unmodifiable [Iterable] view for this iterable.
+ */
+inline fun <T> Iterable<T>.asUnmodifiable(): Iterable<T> = UnmodifiableIterable(this)
+
+/**
+ * Creates a unmodifiable [Iterator] view for this iterator.
+ */
+inline fun <T> Iterator<T>.asUnmodifiable(): Iterator<T> = UnmodifiableIterator(this)

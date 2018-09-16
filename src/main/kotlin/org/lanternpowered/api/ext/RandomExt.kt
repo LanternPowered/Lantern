@@ -23,19 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
-
 package org.lanternpowered.api.ext
 
-import org.lanternpowered.api.util.Tuple
+import com.flowpowered.math.GenericMath
+import java.util.Random
+import java.util.concurrent.ThreadLocalRandom
 
-// Deconstructing declaration support for tuples
-operator fun <K, V> Tuple<K, V>.component1(): K = first
-operator fun <K, V> Tuple<K, V>.component2(): V = second
+/**
+ * The global [Random] instance. Doesn't supports
+ * its seed to be modified.
+ */
+val random: Random = ThreadLocalRandom.current()
 
-fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
-fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
+/**
+ * Gets a random value between [ClosedRange.start] and [ClosedRange.endInclusive] (inclusive).
+ */
+fun Random.nextDouble(range: ClosedRange<Int>)
+        = range.start + nextInt(range.endInclusive + 1 - range.start)
 
-inline fun <T> Any?.uncheckedCast(): T = this as T
+/**
+ * Gets a random double value between [ClosedRange.start] and [ClosedRange.endInclusive] (inclusive).
+ */
+fun Random.nextDouble(range: ClosedRange<Double>): Double {
+    val value = range.start + nextDouble() * (range.endInclusive - range.start + GenericMath.DBL_EPSILON)
+    return if (value > range.endInclusive) range.endInclusive else value
+}
 
-inline infix fun <T> T?.ifNull(fn: () -> T): T = this ?: fn()
+/**
+ * Gets a random double value between [ClosedRange.start] and [ClosedRange.endInclusive] (inclusive).
+ */
+fun Random.nextDouble(range: ClosedRange<Float>): Float {
+    val value = range.start + nextFloat() * (range.endInclusive - range.start + GenericMath.FLT_EPSILON)
+    return if (value > range.endInclusive) range.endInclusive else value
+}

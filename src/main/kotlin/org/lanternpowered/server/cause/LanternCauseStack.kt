@@ -39,7 +39,7 @@ import java.util.HashMap
 import java.util.HashSet
 import java.util.Optional
 
-class LanternCauseStack : CauseStack {
+class LanternCauseStack : SnapshotCauseStack {
 
     private val cause = ArrayDeque<Any>()
     private val frames = ArrayDeque<CauseStackFrameImpl>()
@@ -134,9 +134,9 @@ class LanternCauseStack : CauseStack {
             val minDepth: Int,
             val cachedCause: Cause?,
             val cachedCtx: CauseContext?
-    ) : CauseStack.Snapshot
+    ) : SnapshotCauseStack.Snapshot
 
-    override fun createSnapshot(): CauseStack.Snapshot {
+    override fun createSnapshot(): SnapshotCauseStack.Snapshot {
         val snapshot = this.cachedSnapshot
         if (snapshot != null) return snapshot
 
@@ -148,24 +148,29 @@ class LanternCauseStack : CauseStack {
                 .also { this.cachedSnapshot = it }
     }
 
-    override fun restoreSnapshot(snapshot: CauseStack.Snapshot) {
-        if (this.cachedSnapshot == snapshot) return
+    override fun restoreSnapshot(snapshot: SnapshotCauseStack.Snapshot) {
+        if (this.cachedSnapshot === snapshot) return
         snapshot as LanternSnapshot
-        this.cause.clear()
-        this.cause.addAll(snapshot.cause)
-        this.frames.clear()
-        this.frames.addAll(snapshot.frames)
-        this.ctx.clear()
-        this.ctx.putAll(snapshot.ctx)
+        this.cachedSnapshot = snapshot
+        if (this.cachedSnapshotCause !== snapshot.cause) {
+            this.cause.clear()
+            this.cause.addAll(snapshot.cause)
+            this.cachedSnapshotCause = snapshot.cause
+        }
+        if (this.cachedSnapshotFrames !== snapshot.frames) {
+            this.frames.clear()
+            this.frames.addAll(snapshot.frames)
+            this.cachedSnapshotFrames = snapshot.frames
+        }
+        if (this.cachedSnapshotCtx !== snapshot.ctx) {
+            this.ctx.clear()
+            this.ctx.putAll(snapshot.ctx)
+            this.cachedSnapshotCtx = snapshot.ctx
+        }
         this.minDepth = snapshot.minDepth
         // Cached values
         this.cachedCause = snapshot.cachedCause
         this.cachedCtx = snapshot.cachedCtx
-        // Snapshot
-        this.cachedSnapshot = snapshot
-        this.cachedSnapshotCause = snapshot.cause
-        this.cachedSnapshotFrames = snapshot.frames
-        this.cachedSnapshotCtx = snapshot.ctx
     }
 
     override fun pushCauseFrame(): CauseStack.Frame {

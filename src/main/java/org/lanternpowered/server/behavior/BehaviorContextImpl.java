@@ -152,14 +152,6 @@ public class BehaviorContextImpl implements BehaviorContext {
         return this.causeStack.addContextIfAbsent(key, valueProvider);
     }
 
-    @NotNull @Override public CauseStack.Snapshot createSnapshot() {
-        return null;
-    }
-
-    @Override public void restoreSnapshot(@NotNull CauseStack.Snapshot snapshot) {
-
-    }
-
     private final class Snapshot implements BehaviorContext.Snapshot {
 
         private final Int2ObjectMap<Object> parameterValues;

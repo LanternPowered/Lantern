@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("DeprecatedCallableAddReplaceWith")
+
 package org.lanternpowered.api.behavior
 
 import org.lanternpowered.api.cause.CauseContextKey
@@ -48,9 +50,25 @@ interface BehaviorContext : CauseStack {
 
     // Snapshots
 
-    interface Snapshot : CauseStack.Snapshot
+    /**
+     * Represents a snapshot of the [BehaviorContext]. The snapshot
+     * also contains the state of the [CauseStack].
+     */
+    interface Snapshot
 
-    override fun createSnapshot(): Snapshot
+    /**
+     * Reverts this [CauseStack] to the given [Snapshot].
+     *
+     * @param snapshot The snapshot to revert to
+     */
+    fun restoreSnapshot(snapshot: Snapshot)
+
+    /**
+     * Creates a [Snapshot] of the current state of the [BehaviorContext].
+     *
+     * @return The snapshot
+     */
+    fun createSnapshot(): Snapshot
 
     // Cause related
 

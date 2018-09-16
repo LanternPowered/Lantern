@@ -23,18 +23,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.test
+package org.lanternpowered.api.behavior.default
 
 import org.lanternpowered.api.behavior.Behavior
 import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.ext.*
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.living.player.gamemode.GameModes
 
 /**
- * This behavior opens a sign at a target location to a player.
+ * Consumes one item from the used item stack. Ignored when
+ * used by a player in creative.
+ *
+ * Returns whether the quantity was successfully removed.
  */
-class OpenSignBehavior : Behavior {
+class ConsumeUsedItemBehavior(
+        private val quantityToDecrease: Int = 1,
+        private val ignoreCreative: Boolean = true
+) : Behavior {
 
     override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
-        return false
+        ctx[BehaviorContextKeys.Player]?.let {
+            if (this.ignoreCreative && it.require(Keys.GAME_MODE) == GameModes.CREATIVE) return true
+        }
+        val usedItem = ctx[BehaviorContextKeys.UsedItem]?.createStack()
+        if (usedItem != null) {
+            val newQuantity = usedItem.quantity - this.quantityToDecrease
+            if (newQuantity < 0) return false
+            usedItem.quantity = newQuantity
+            ctx[BehaviorContextKeys.UsedItem] = usedItem.createSnapshot()
+        }
+        val slot = ctx[BehaviorContextKeys.UsedSlot]
+        if (slot != null) {
+            if (usedItem == null && slot.stackSize < this.quantityToDecrease) return false
+            ctx.addFinalizer {
+                // Apply changes to the slot if the behavior is accepted
+                if (usedItem != null) {
+                    slot.set(usedItem)
+                } else {
+                    slot.poll(this.quantityToDecrease)
+                }
+            }
+        }
+        return true
     }
 }

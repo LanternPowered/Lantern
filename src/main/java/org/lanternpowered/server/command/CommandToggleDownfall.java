@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.command;
 
-import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
@@ -33,6 +32,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.world.weather.WeatherUniverse;
 import org.spongepowered.api.world.weather.Weathers;
 
 public class CommandToggleDownfall extends CommandProvider {

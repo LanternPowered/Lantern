@@ -29,4 +29,4 @@ import org.lanternpowered.api.Server
 import org.lanternpowered.api.entity.spawn.EntitySpawner
 import org.lanternpowered.api.x.XServer
 
-val Server.entitySpawner: EntitySpawner get() = (this as XServer).entitySpawner
+inline val Server.entitySpawner: EntitySpawner get() = (this as XServer).entitySpawner

@@ -41,8 +41,8 @@ import com.google.common.collect.Sets;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.api.x.world.XWorld;
+import org.lanternpowered.api.x.world.weather.XWeatherUniverse;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
 import org.lanternpowered.server.behavior.ContextKeys;
@@ -295,7 +295,7 @@ public class LanternWorld implements AbstractExtent, XWorld, AbstractViewer, Rul
 
     @Nullable
     @Override
-    public WeatherUniverse getWeatherUniverse() {
+    public XWeatherUniverse getWeatherUniverse() {
         return this.weatherUniverse;
     }
 

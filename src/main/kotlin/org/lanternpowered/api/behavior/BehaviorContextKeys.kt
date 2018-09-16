@@ -30,12 +30,15 @@ import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.Slot
 
 /**
  * A collection of [CauseContextKey]s related to [BehaviorContext]s.
  */
 object BehaviorContextKeys {
+
+    val Player = CauseContextKey<Player>(CatalogKeys.minecraft("player"))
 
     val BlockLocation = CauseContextKey<Location<World>>(CatalogKeys.minecraft("block_location"))
 

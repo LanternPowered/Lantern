@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.lanternpowered.api.ext
 
 import com.flowpowered.math.vector.Vector3d
@@ -32,6 +34,7 @@ import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.weather.WeatherUniverse
 import org.lanternpowered.api.x.world.XWorld
 import org.lanternpowered.api.x.world.extent.XEntityUniverse
+import org.lanternpowered.api.x.world.weather.XWeatherUniverse
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
 import org.spongepowered.api.world.extent.EntityUniverse
@@ -40,13 +43,13 @@ import org.spongepowered.api.world.extent.Extent
 /**
  * The weather universe of the world, if supported.
  */
-val World.weatherUniverse: WeatherUniverse? get() = (this as XWorld).weatherUniverse
+inline val World.weatherUniverse: XWeatherUniverse? get() = (this as XWorld).weatherUniverse
 
-fun EntityUniverse.createEntity(type: EntityType, position: Vector3d, fn: Entity.() -> Unit): Entity
+inline fun EntityUniverse.createEntity(type: EntityType, position: Vector3d, noinline fn: Entity.() -> Unit): Entity
         = (this as XEntityUniverse).createEntity(type, position, fn)
 
-fun EntityUniverse.createEntityNaturally(type: EntityType, position: Vector3d, fn: Entity.() -> Unit): Entity
+inline fun EntityUniverse.createEntityNaturally(type: EntityType, position: Vector3d, noinline fn: Entity.() -> Unit): Entity
         = (this as XEntityUniverse).createEntityNaturally(type, position, fn)
 
-fun <E : Extent> Location<E>.toTransform(rotation: Vector3d = Vector3d.ZERO, scale: Vector3d = Vector3d.ONE)
+inline fun <E : Extent> Location<E>.toTransform(rotation: Vector3d = Vector3d.ZERO, scale: Vector3d = Vector3d.ONE)
         = Transform(this, rotation, scale)

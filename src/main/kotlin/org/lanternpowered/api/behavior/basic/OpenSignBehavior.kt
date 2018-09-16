@@ -23,5 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.api.world.weather;
+package org.lanternpowered.api.behavior.default
+
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
+import org.lanternpowered.api.behavior.BehaviorException
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.ext.*
+
+/**
+ * This behavior opens a sign at a target location to a player.
+ *
+ * Returns true when the sign was successfully for a
+ * player, if a player is present in the context.
+ */
+class OpenSignBehavior : Behavior {
+
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        ctx[BehaviorContextKeys.Player]?.let {
+            val location = ctx[BehaviorContextKeys.BlockLocation]
+            if (location == null) {
+                return false
+            } else if (location.extent != it.world) {
+                throw BehaviorException("World mismatch between player " +
+                        "(${it.world.name}) and block location (${location.extent.name}).")
+            }
+            return it.openSignAt(location.blockPosition)
+        }
+        return false
+    }
+}

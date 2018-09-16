@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.world.weather.WeatherUniverse;
+import org.lanternpowered.api.x.world.weather.XWeatherUniverse;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.script.context.ContextImpl;
 import org.lanternpowered.server.world.rules.RuleTypes;
@@ -47,7 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public final class LanternWeatherUniverse implements WeatherUniverse {
+public final class LanternWeatherUniverse implements XWeatherUniverse {
 
     private static final float FADE_SPEED = 0.01f;
 
@@ -211,5 +211,10 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
     @Override
     public double getDarkness() {
         return this.darkness;
+    }
+
+    @Override
+    public double getRainStrength() {
+        return this.rainStrength;
     }
 }

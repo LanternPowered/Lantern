@@ -23,36 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.default.block
-
-import org.lanternpowered.api.behavior.Behavior
-import org.lanternpowered.api.behavior.BehaviorContext
-import org.lanternpowered.api.behavior.BehaviorContextKeys
-import org.lanternpowered.api.behavior.BehaviorType
-import org.lanternpowered.api.catalog.CatalogKeys
-import org.lanternpowered.api.cause.CauseContextKey
-import org.lanternpowered.api.ext.*
-import org.spongepowered.api.block.BlockSnapshot
+package org.lanternpowered.api.util
 
 /**
- * The block placement behavior base.
+ * A named annotation that can be used in
+ * combination with kotlin properties. It
+ * will converted to the guice named when
+ * injecting.
  */
-class PlaceBlockBehavior : Behavior {
-
-    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
-        val slot = ctx[BehaviorContextKeys.UsedSlot]
-        val stack = (ctx[BehaviorContextKeys.UsedItem]?.createStack() ?: slot?.peek()).orEmpty()
-        // A used item or slot is expected for this behavior to work
-        if (stack.isEmpty) return false
-        // Convert the stack into a snapshot that can be placed
-        return false
-    }
-
-    companion object {
-
-        /**
-         * A list of [BlockSnapshot]s that are being placed by the placement behavior.
-         */
-        val PlacedSnapshots = CauseContextKey<MutableList<BlockSnapshot.Builder>>(CatalogKeys.minecraft("placed_blocks"))
-    }
-}
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.PROPERTY)
+annotation class Named(val value: String)

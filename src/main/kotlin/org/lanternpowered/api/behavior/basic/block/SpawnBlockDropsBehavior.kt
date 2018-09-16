@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.default.block
+package org.lanternpowered.api.behavior.basic.block
 
 import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.behavior.Behavior
@@ -31,7 +31,7 @@ import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
 import org.lanternpowered.api.behavior.BehaviorTypes
-import org.lanternpowered.api.behavior.default.DropsCollectionBehavior
+import org.lanternpowered.api.behavior.basic.DropsCollectionBehavior
 import org.lanternpowered.api.entity.spawn.SpawnEventProvider
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.ext.*

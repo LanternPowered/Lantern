@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.default
+package org.lanternpowered.api.behavior.basic
 
 import org.lanternpowered.api.behavior.Behavior
 import org.lanternpowered.api.behavior.BehaviorContext

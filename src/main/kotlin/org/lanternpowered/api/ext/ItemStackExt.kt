@@ -45,6 +45,8 @@ const val DROPPED_ITEM_DESPAWN_DELAY = 40
  */
 operator fun ItemStack.not(): ItemStack? = if (isEmpty) null else this
 
+fun ItemStack?.orEmpty(): ItemStack = this ?: ItemStack.empty()
+
 /**
  * Executes the given function if the stack isn't empty.
  */

@@ -23,29 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior
+package org.lanternpowered.api.behavior.default.block
 
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
+import org.lanternpowered.api.behavior.BehaviorType
 import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.cause.CauseContextKey
-import org.lanternpowered.api.item.inventory.ItemStackSnapshot
-import org.lanternpowered.api.world.Location
-import org.lanternpowered.api.world.World
-import org.spongepowered.api.item.inventory.Slot
+import org.lanternpowered.api.ext.*
+import org.spongepowered.api.block.BlockSnapshot
 
 /**
- * A collection of [CauseContextKey]s related to [BehaviorContext]s.
+ * The block placement behavior base.
  */
-object BehaviorContextKeys {
+class PlaceBlockBehavior : Behavior {
 
-    val BlockLocation = CauseContextKey<Location<World>>(CatalogKeys.minecraft("block_location"))
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        val slot = ctx[BehaviorContextKeys.UsedSlot]
+        val stack = (ctx[BehaviorContextKeys.UsedItem]?.createStack() ?: slot?.peek()).orEmpty()
+        // A used item or slot is expected for this behavior to work
+        if (stack.isEmpty) return false
+        // Convert the stack into a snapshot that can be placed
+        return false
+    }
 
-    /**
-     * The [ItemStackSnapshot] that was interacted with.
-     */
-    val UsedItem = CauseContextKey<ItemStackSnapshot>(CatalogKeys.minecraft("interacted_item"))
+    companion object {
 
-    /**
-     * The [Slot] from which its item was being interacted with.
-     */
-    val UsedSlot = CauseContextKey<Slot>(CatalogKeys.minecraft("interacted_slot"))
+        /**
+         * A list of [BlockSnapshot]s that are being placed by the placement behavior.
+         */
+        val PlacedSnapshots = CauseContextKey<MutableList<BlockSnapshot.Builder>>(CatalogKeys.minecraft("placed_blocks"))
+    }
 }

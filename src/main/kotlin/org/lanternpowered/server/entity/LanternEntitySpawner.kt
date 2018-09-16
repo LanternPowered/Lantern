@@ -48,9 +48,13 @@ object LanternEntitySpawner : EntitySpawner {
                     cause, entry.entityType, entry.transform)
             Lantern.eventManager.post(preConstructEvent)
             if (!preConstructEvent.isCancelled) {
+                val transform = entry.transform
                 // Calls the post construction event
-                entities.add(entry.transform.extent.createEntity(
-                        entry.entityType, entry.transform.position, entry.entityPopulator))
+                entities.add(transform.extent.createEntity(entry.entityType, transform.position) {
+                    this.rotation = transform.rotation
+                    this.scale = transform.scale
+                    entry.entityPopulator(this)
+                })
             }
         }
         return entities

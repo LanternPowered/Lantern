@@ -36,7 +36,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 /**
  * A behavior base for collection of drops.
  */
-interface DropCollectBehavior : Behavior {
+interface DropsCollectionBehavior : Behavior {
 
     /**
      * Collects all the drops for the given [BehaviorContext] into the [MutableList].

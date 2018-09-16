@@ -31,7 +31,7 @@ import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
 import org.lanternpowered.api.behavior.BehaviorTypes
-import org.lanternpowered.api.behavior.default.DropCollectBehavior
+import org.lanternpowered.api.behavior.default.DropsCollectionBehavior
 import org.lanternpowered.api.entity.spawn.SpawnEventProvider
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.ext.*
@@ -45,13 +45,13 @@ class SpawnBlockDropsBehavior : Behavior {
 
     override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
         // Add the drops collection to the context, just in case
-        ctx.addContextIfAbsent(DropCollectBehavior.DropsCollectionKey) { NonNullArrayList() }
+        ctx.addContextIfAbsent(DropsCollectionBehavior.DropsCollectionKey) { NonNullArrayList() }
         // Process the drop collecting behavior
         val behavior = ctx.behaviorCollection.getOrEmpty(BehaviorTypes.Generic.CollectDrops)
         behavior.apply(ctx)
         // Add a finalizer which will handle the drop events and spawn dropped items in the world
         ctx.addFinalizer {
-            val drops = ctx[DropCollectBehavior.DropsCollectionKey] ?: NonNullArrayList()
+            val drops = ctx[DropsCollectionBehavior.DropsCollectionKey] ?: NonNullArrayList()
             // Throw events
             val preDropEvent = LanternEventFactory.createDropItemEventPre(ctx.currentCause, drops.toImmutableList(), drops)
             Lantern.eventManager.post(preDropEvent)

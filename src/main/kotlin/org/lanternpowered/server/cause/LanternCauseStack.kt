@@ -41,9 +41,9 @@ import java.util.Optional
 
 class LanternCauseStack : CauseStack {
 
-    private var cause = ArrayDeque<Any>()
-    private var frames = ArrayDeque<CauseStackFrameImpl>()
-    private var ctx = HashMap<CauseContextKey<*>, Any>()
+    private val cause = ArrayDeque<Any>()
+    private val frames = ArrayDeque<CauseStackFrameImpl>()
+    private val ctx = HashMap<CauseContextKey<*>, Any>()
 
     private var minDepth = 0
     private var cachedCause: Cause? = null
@@ -67,12 +67,8 @@ class LanternCauseStack : CauseStack {
         return this.cachedCause!!
     }
 
-    override fun getCurrentContext(): CauseContext {
-        if (this.cachedCtx == null) {
-            this.cachedCtx = CauseContext.of(this.ctx)
-        }
-        return this.cachedCtx!!
-    }
+    override fun getCurrentContext(): CauseContext
+            = this.cachedCtx ?: run { CauseContext.of(this.ctx).also { this.cachedCtx = it } }
 
     override fun pushCause(obj: Any): CauseStack = apply {
         this.cachedCause = null
@@ -155,12 +151,21 @@ class LanternCauseStack : CauseStack {
     override fun restoreSnapshot(snapshot: CauseStack.Snapshot) {
         if (this.cachedSnapshot == snapshot) return
         snapshot as LanternSnapshot
-        this.cause = snapshot.cause
-        this.frames = snapshot.frames
-        this.ctx = snapshot.ctx
+        this.cause.clear()
+        this.cause.addAll(snapshot.cause)
+        this.frames.clear()
+        this.frames.addAll(snapshot.frames)
+        this.ctx.clear()
+        this.ctx.putAll(snapshot.ctx)
         this.minDepth = snapshot.minDepth
+        // Cached values
         this.cachedCause = snapshot.cachedCause
         this.cachedCtx = snapshot.cachedCtx
+        // Snapshot
+        this.cachedSnapshot = snapshot
+        this.cachedSnapshotCause = snapshot.cause
+        this.cachedSnapshotFrames = snapshot.frames
+        this.cachedSnapshotCtx = snapshot.ctx
     }
 
     override fun pushCauseFrame(): CauseStack.Frame {

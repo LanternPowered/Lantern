@@ -144,9 +144,9 @@ class LanternCauseStack : CauseStack {
         val snapshot = this.cachedSnapshot
         if (snapshot != null) return snapshot
 
-        val cause = this.cachedSnapshotCause.ifNull { ArrayDeque(this.cause).also { this.cachedSnapshotCause = it } }
-        val frames = this.cachedSnapshotFrames.ifNull { ArrayDeque(this.frames).also { this.cachedSnapshotFrames = it } }
-        val ctx = this.cachedSnapshotCtx.ifNull { HashMap(this.ctx).also { this.cachedSnapshotCtx = it } }
+        val cause = this.cachedSnapshotCause ?: run { ArrayDeque(this.cause).also { this.cachedSnapshotCause = it } }
+        val frames = this.cachedSnapshotFrames ?: run { ArrayDeque(this.frames).also { this.cachedSnapshotFrames = it } }
+        val ctx = this.cachedSnapshotCtx ?: run { HashMap(this.ctx).also { this.cachedSnapshotCtx = it } }
 
         return LanternSnapshot(cause, frames, ctx, this.minDepth, this.cachedCause, this.cachedCtx)
                 .also { this.cachedSnapshot = it }

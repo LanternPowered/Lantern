@@ -518,7 +518,7 @@ public class LanternWorld implements AbstractExtent, XWorld, AbstractViewer, Rul
     }
 
     @Override
-    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+    public boolean hasIntersectingEntities(AABB box, Function1<? super Entity, Boolean> filter) {
         checkNotNull(box, "box");
         checkNotNull(filter, "filter");
         final int maxX = ((int) Math.ceil(box.getMax().getX() + 2.0)) >> 4;

@@ -42,6 +42,9 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import org.jetbrains.annotations.NotNull;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
@@ -1341,7 +1344,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+    public boolean hasIntersectingEntities(AABB box, Function1<? super Entity, Boolean> filter) {
         checkNotNull(box, "box");
         final int maxYSection = fixEntityYSection(((int) Math.ceil(box.getMax().getY() + 2.0)) >> 4);
         final int minYSection = fixEntityYSection(((int) Math.floor(box.getMin().getY() - 2.0)) >> 4);
@@ -1363,7 +1366,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return section < 0 ? 0 : section >= CHUNK_SECTIONS ? CHUNK_SECTIONS - 1 : section;
     }
 
-    public boolean hasIntersectingEntities(int maxYSection, int minYSection, AABB box, @Nullable Predicate<Entity> filter) {
+    public boolean hasIntersectingEntities(int maxYSection, int minYSection, AABB box, @Nullable Function1<? super Entity, Boolean> filter) {
         for (int i = minYSection; i <= maxYSection; i++) {
             final Iterator<LanternEntity> iterator = this.entities[i].iterator();
             while (iterator.hasNext()) {
@@ -1375,10 +1378,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 } else {
                     final Optional<AABB> aabb = entity.getBoundingBox();
                     if (aabb.isPresent()) {
-                        if (aabb.get().intersects(box) && (filter == null || filter.test(entity))) {
+                        if (aabb.get().intersects(box) && (filter == null || filter.invoke(entity))) {
                             return true;
                         }
-                    } else if (box.contains(entity.getPosition()) && (filter == null || filter.test(entity))) {
+                    } else if (box.contains(entity.getPosition()) && (filter == null || filter.invoke(entity))) {
                         return true;
                     }
                 }
@@ -1491,21 +1494,18 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return getEntities().stream().filter(filter).collect(ImmutableList.toImmutableList());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Entity createEntity(EntityType type, Vector3d position) {
+    public Entity createEntity(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
         checkNotNull(position, "position");
-        final LanternEntityType entityType = (LanternEntityType) checkNotNull(type, "type");
         checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
-        //noinspection unchecked
-        final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(UUID.randomUUID());
-        entity.setPositionAndWorld(this.world, position);
-        return entity;
+        return this.world.createEntity(type, position, fn);
     }
 
-    @Override
-    public Entity createEntityNaturally(EntityType type, Vector3d position) throws IllegalArgumentException, IllegalStateException {
-        return createEntity(type, position); // TODO: Naturally
+    @NotNull @Override
+    public Entity createEntityNaturally(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
+        checkNotNull(position, "position");
+        checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
+        return this.world.createEntityNaturally(type, position, fn);
     }
 
     @Override

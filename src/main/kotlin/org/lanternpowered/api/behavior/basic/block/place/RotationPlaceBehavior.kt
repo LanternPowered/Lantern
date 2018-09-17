@@ -32,7 +32,6 @@ import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
 import org.lanternpowered.api.block.BlockSnapshotBuilder
 import org.lanternpowered.api.data.key.Keys
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.behavior.ContextKeys
 import org.spongepowered.api.util.Direction
 
 /**
@@ -48,7 +47,7 @@ class RotationPlaceBehavior(
     override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
         val player = ctx[BehaviorContextKeys.PLAYER]
         val face = if (player != null) {
-            if (!this.horizontalOnly && player.position.y - ctx.requireContext(ContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
+            if (!this.horizontalOnly && player.position.y - ctx.requireContext(BehaviorContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
                 player.getDirection(Direction.Division.CARDINAL)
             } else {
                 player.getHorizontalDirection(Direction.Division.CARDINAL)

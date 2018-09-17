@@ -56,7 +56,7 @@ class SpawnBlockDropsBehavior : Behavior {
             Lantern.eventManager.post(preDropEvent)
             if (!preDropEvent.isCancelled) {
                 // The event was successful, now create entities for all the dropped items
-                val transform = ctx.requireContext(BehaviorContextKeys.BlockLocation).add(0.5, 0.5, 0.5).toTransform()
+                val transform = ctx.requireContext(BehaviorContextKeys.BLOCK_LOCATION).add(0.5, 0.5, 0.5).toTransform()
                 // Drop entities
                 Lantern.entitySpawner.spawn(drops.map { it.toDroppedItemSpawnEntry(transform) },
                         SpawnEventProvider(LanternEventFactory::createDropItemEventDestruct))

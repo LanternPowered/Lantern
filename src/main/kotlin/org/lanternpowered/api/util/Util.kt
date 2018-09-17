@@ -31,7 +31,6 @@ typealias AxisDirection = org.spongepowered.api.util.AxisDirection
 typealias Coerce = org.spongepowered.api.util.Coerce
 typealias Color = org.spongepowered.api.util.Color
 typealias Cycleable<T> = org.spongepowered.api.util.Cycleable<T>
-typealias Direction = org.spongepowered.api.util.Direction
 typealias DiscreteTransform2 = org.spongepowered.api.util.DiscreteTransform2
 typealias DiscreteTransform3 = org.spongepowered.api.util.DiscreteTransform3
 typealias Identifiable = org.spongepowered.api.util.Identifiable

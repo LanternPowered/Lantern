@@ -23,16 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
+@file:Suppress("NOTHING_TO_INLINE")
 
-package org.lanternpowered.api.block
+package org.lanternpowered.api.ext
 
-import org.lanternpowered.api.x.block.XBlockSnapshotBuilder
+import org.spongepowered.api.data.ImmutableDataBuilder
+import org.spongepowered.api.data.ImmutableDataHolder
+import org.spongepowered.api.data.value.BaseValue
 
-typealias BlockState = org.spongepowered.api.block.BlockState
-typealias BlockType = org.spongepowered.api.block.BlockType
-typealias BlockTypes = org.spongepowered.api.block.BlockTypes
-typealias BlockSnapshot = org.spongepowered.api.block.BlockSnapshot
-typealias BlockSnapshotBuilder = org.spongepowered.api.block.BlockSnapshot.Builder
-
-inline fun BlockSnapshotBuilder(): XBlockSnapshotBuilder = BlockSnapshot.builder() as XBlockSnapshotBuilder
+inline fun <H : ImmutableDataHolder<H>, E : ImmutableDataBuilder<H, E>> ImmutableDataBuilder<H, E>.add(value: BaseValue<*>): E
+        = add(value.key.uncheckedCast(), value.get())

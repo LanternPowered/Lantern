@@ -23,37 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.basic.block
+package org.lanternpowered.api.entity.living
 
-import org.lanternpowered.api.behavior.Behavior
-import org.lanternpowered.api.behavior.BehaviorContext
-import org.lanternpowered.api.behavior.BehaviorContextKeys
-import org.lanternpowered.api.behavior.BehaviorType
-import org.lanternpowered.api.catalog.CatalogKeys
-import org.lanternpowered.api.cause.CauseContextKey
-import org.lanternpowered.api.ext.*
-import org.spongepowered.api.block.BlockSnapshot
-
-/**
- * The block placement behavior base.
- */
-class PlaceBlockBehavior : Behavior {
-
-    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
-        val slot = ctx[BehaviorContextKeys.UsedSlot]
-        val stack = (ctx[BehaviorContextKeys.UsedItem]?.createStack() ?: slot?.peek()).orEmpty()
-        // A used item or slot is expected for this behavior to work
-        if (stack.isEmpty) return false
-        // Convert the stack into a snapshot that can be placed
-
-        return false
-    }
-
-    companion object {
-
-        /**
-         * A list of [BlockSnapshot]s that are being placed by the placement behavior.
-         */
-        val PlacedSnapshots = CauseContextKey<MutableList<BlockSnapshot.Builder>>(CatalogKeys.minecraft("placed_blocks"))
-    }
-}
+typealias Living = org.spongepowered.api.entity.living.Living

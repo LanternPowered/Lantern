@@ -23,16 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
+package org.lanternpowered.api.text.chat
 
-package org.lanternpowered.api.block
-
-import org.lanternpowered.api.x.block.XBlockSnapshotBuilder
-
-typealias BlockState = org.spongepowered.api.block.BlockState
-typealias BlockType = org.spongepowered.api.block.BlockType
-typealias BlockTypes = org.spongepowered.api.block.BlockTypes
-typealias BlockSnapshot = org.spongepowered.api.block.BlockSnapshot
-typealias BlockSnapshotBuilder = org.spongepowered.api.block.BlockSnapshot.Builder
-
-inline fun BlockSnapshotBuilder(): XBlockSnapshotBuilder = BlockSnapshot.builder() as XBlockSnapshotBuilder
+typealias ChatType = org.spongepowered.api.text.chat.ChatType
+typealias ChatTypes = org.spongepowered.api.text.chat.ChatTypes
+typealias ChatVisibility = org.spongepowered.api.text.chat.ChatVisibility
+typealias ChatVisibilities = org.spongepowered.api.text.chat.ChatVisibilities

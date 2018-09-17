@@ -30,25 +30,33 @@ import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
+import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.Slot
+import org.spongepowered.api.util.Direction
 
 /**
  * A collection of [CauseContextKey]s related to [BehaviorContext]s.
  */
 object BehaviorContextKeys {
 
-    val Player = CauseContextKey<Player>(CatalogKeys.minecraft("player"))
+    @JvmStatic val PLAYER = CauseContextKey<Player>(CatalogKeys.minecraft("player"))
 
-    val BlockLocation = CauseContextKey<Location<World>>(CatalogKeys.minecraft("block_location"))
+    @JvmStatic val BLOCK_LOCATION = CauseContextKey<Location<World>>(CatalogKeys.minecraft("block_location"))
 
     /**
      * The [ItemStackSnapshot] that was interacted with.
      */
-    val UsedItem = CauseContextKey<ItemStackSnapshot>(CatalogKeys.minecraft("interacted_item"))
+    @JvmStatic val USED_ITEM = CauseContextKey<ItemStackSnapshot>(CatalogKeys.minecraft("used_item"))
 
     /**
      * The [Slot] from which its item was being interacted with.
      */
-    val UsedSlot = CauseContextKey<Slot>(CatalogKeys.minecraft("interacted_slot"))
+    @JvmStatic val USED_SLOT = CauseContextKey<Slot>(CatalogKeys.minecraft("used_slot"))
+
+    @JvmStatic val USED_HAND = CauseContextKey<HandType>(CatalogKeys.minecraft("used_hand"))
+
+    @JvmStatic val INTERACTION_LOCATION = CauseContextKey<Location<World>>(CatalogKeys.minecraft("interacted_location"))
+
+    @JvmStatic val INTERACTION_FACE = CauseContextKey<Direction>(CatalogKeys.minecraft("interacted_face"))
 }

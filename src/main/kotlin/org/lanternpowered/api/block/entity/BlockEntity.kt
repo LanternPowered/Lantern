@@ -26,3 +26,4 @@
 package org.lanternpowered.api.block.entity
 
 typealias BlockEntity = org.spongepowered.api.block.tileentity.TileEntity
+typealias BlockEntityArchetype = org.spongepowered.api.block.tileentity.TileEntityArchetype

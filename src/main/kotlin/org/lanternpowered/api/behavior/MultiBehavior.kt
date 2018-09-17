@@ -51,4 +51,12 @@ abstract class MultiBehavior protected constructor() : Behavior {
     protected fun bind(type: BehaviorType, optional: Boolean = false, fn: (BehaviorContext) -> Boolean) {
         bind(type, optional) { _, ctx -> fn(ctx) }
     }
+
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        var success = true
+        this.behaviors[type].forEach {
+            success = it.tryApply(type, ctx)
+        }
+        return success
+    }
 }

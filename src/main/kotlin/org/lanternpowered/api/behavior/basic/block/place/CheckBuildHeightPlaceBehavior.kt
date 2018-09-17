@@ -23,34 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.basic
+package org.lanternpowered.api.behavior.basic.block.place
 
 import org.lanternpowered.api.behavior.Behavior
 import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
-import org.lanternpowered.api.behavior.BehaviorException
 import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.text.chat.ChatTypes
+import org.lanternpowered.server.text.translation.TranslationHelper.t
 
 /**
- * This behavior opens a sign at a target location to a player.
+ * This behavior checks whether all the placed snapshots
+ * ([PlaceBlockBehaviorBase.PlacedSnapshots]) are located
+ * without the build limits of the world.
  *
- * Returns true when the sign was successfully for a
- * player, if a player is present in the context.
+ * This behavior returns the result of the backing [behavior].
+ *
+ * @property behavior The behavior for which the build height will be checked
  */
-class OpenSignBehavior : Behavior {
+class CheckBuildHeightPlaceBehavior(val behavior: Behavior) : Behavior {
 
     override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
-        ctx[BehaviorContextKeys.PLAYER]?.let {
-            val location = ctx[BehaviorContextKeys.BLOCK_LOCATION]
-            if (location == null) {
-                return false
-            } else if (location.extent != it.world) {
-                throw BehaviorException("World mismatch between player " +
-                        "(${it.world.name}) and block location (${location.extent.name}).")
+        val ctxSnapshot = ctx.createSnapshot()
+        if (!this.behavior.tryApply(type, ctx)) return false
+        val snapshots = ctx[PlaceBlockBehaviorBase.PlacedSnapshots] ?: return true
+        for (snapshot in snapshots) {
+            val location = snapshot.location
+            val buildHeight = location.extent.dimension.buildHeight
+            if (location.y >= buildHeight) {
+                ctx.restoreSnapshot(ctxSnapshot)
+                ctx.addFinalizer {
+                    ctx[BehaviorContextKeys.PLAYER]?.sendMessage(ChatTypes.ACTION_BAR, t("build.tooHigh", buildHeight))
+                }
+                break
             }
-            return it.openSignAt(location.blockPosition)
         }
-        return false
+        return true
     }
 }

@@ -23,16 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
+package org.lanternpowered.api.behavior.basic
 
-package org.lanternpowered.api.block
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.block.BlockSnapshotBuilder
+import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.cause.CauseContextKey
+import org.lanternpowered.api.util.collect.NonNullArrayList
 
-import org.lanternpowered.api.x.block.XBlockSnapshotBuilder
+/**
+ * A [Behavior] type which already prepares the [PlacedSnapshots] collection.
+ */
+interface PlaceBlockBehaviorBase : Behavior {
 
-typealias BlockState = org.spongepowered.api.block.BlockState
-typealias BlockType = org.spongepowered.api.block.BlockType
-typealias BlockTypes = org.spongepowered.api.block.BlockTypes
-typealias BlockSnapshot = org.spongepowered.api.block.BlockSnapshot
-typealias BlockSnapshotBuilder = org.spongepowered.api.block.BlockSnapshot.Builder
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean =
+            apply(type, ctx, ctx.addContextIfAbsent(PlacedSnapshots) { NonNullArrayList() })
 
-inline fun BlockSnapshotBuilder(): XBlockSnapshotBuilder = BlockSnapshot.builder() as XBlockSnapshotBuilder
+    fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean
+
+    companion object {
+
+        /**
+         * A list of [BlockSnapshotBuilder]s that are being placed by the placement behavior.
+         */
+        val PlacedSnapshots = CauseContextKey<MutableList<BlockSnapshotBuilder>>(CatalogKeys.minecraft("placed_blocks"))
+    }
+}

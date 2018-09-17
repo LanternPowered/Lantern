@@ -23,16 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
+package org.lanternpowered.api.behavior.basic.block.place
 
-package org.lanternpowered.api.block
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
+import org.lanternpowered.api.block.BlockSnapshotBuilder
+import org.lanternpowered.api.data.key.Keys
+import org.lanternpowered.api.ext.*
 
-import org.lanternpowered.api.x.block.XBlockSnapshotBuilder
+/**
+ * Rotates the placed block based on the clicked face.
+ *
+ * Always returns true.
+ */
+class FaceDirectionalPlaceBehavior : PlaceBlockBehaviorBase {
 
-typealias BlockState = org.spongepowered.api.block.BlockState
-typealias BlockType = org.spongepowered.api.block.BlockType
-typealias BlockTypes = org.spongepowered.api.block.BlockTypes
-typealias BlockSnapshot = org.spongepowered.api.block.BlockSnapshot
-typealias BlockSnapshotBuilder = org.spongepowered.api.block.BlockSnapshot.Builder
-
-inline fun BlockSnapshotBuilder(): XBlockSnapshotBuilder = BlockSnapshot.builder() as XBlockSnapshotBuilder
+    override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
+        val face = ctx[BehaviorContextKeys.INTERACTION_FACE] ?: return true
+        for (builder in placed) {
+            val state = builder.blockState
+            builder.blockState = state.with(Keys.DIRECTION, face).orElse(state)
+        }
+        return true
+    }
+}

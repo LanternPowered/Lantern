@@ -23,45 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.ext
+package org.lanternpowered.api.x.block
 
-import org.lanternpowered.api.entity.Transform
-import org.lanternpowered.api.entity.spawn.EntitySpawnEntry
-import org.lanternpowered.api.item.inventory.ItemStack
-import org.lanternpowered.api.item.inventory.ItemStackSnapshot
+import org.lanternpowered.api.block.BlockSnapshotBuilder
+import org.lanternpowered.api.block.BlockState
+import org.lanternpowered.api.block.entity.BlockEntityArchetype
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
-import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.entity.Entity
-import org.spongepowered.api.entity.EntityTypes
+import java.util.UUID
 
 /**
- * The default dropped item despawn delay.
+ * An extension of the [BlockSnapshotBuilder].
  */
-const val DROPPED_ITEM_DESPAWN_DELAY = 40
+interface XBlockSnapshotBuilder : BlockSnapshotBuilder {
 
-/**
- * Will return {@code null} if the stack is empty.
- */
-operator fun ItemStack?.not(): ItemStack? = if (this == null || isEmpty) null else this
+    /**
+     * The location.
+     */
+    var location: Location<World>
 
-fun ItemStack?.orEmpty(): ItemStack = this ?: ItemStack.empty()
+    /**
+     * The block state.
+     */
+    var blockState: BlockState
 
-/**
- * Executes the given function if the stack isn't empty.
- */
-inline fun ItemStack.ifNotEmpty(fn: (ItemStack) -> Unit) {
-    if (!isEmpty) fn(this)
-}
+    /**
+     * The [BlockEntityArchetype] that holds extra data. Cannot
+     * be modified directly, will be available based
+     * on the [blockState].
+     */
+    val blockEntity: BlockEntityArchetype?
 
-fun ItemStackSnapshot.toDroppedItemSpawnEntry(location: Location<World>, fn: Entity.() -> Unit = {})
-        = toDroppedItemSpawnEntry(Transform(location), fn)
+    /**
+     * The creator of the block.
+     */
+    var creator: UUID?
 
-fun ItemStackSnapshot.toDroppedItemSpawnEntry(transform: Transform<World>, fn: Entity.() -> Unit = {}): EntitySpawnEntry {
-    val snapshot = this
-    return EntitySpawnEntry(EntityTypes.ITEM, transform) {
-        offer(Keys.REPRESENTED_ITEM, snapshot)
-        offer(Keys.DESPAWN_DELAY, DROPPED_ITEM_DESPAWN_DELAY)
-        fn(this)
-    }
+    /**
+     * The notifier of the block.
+     */
+    var notifier: UUID?
+
+    fun location(location: Location<World>): XBlockSnapshotBuilder
 }

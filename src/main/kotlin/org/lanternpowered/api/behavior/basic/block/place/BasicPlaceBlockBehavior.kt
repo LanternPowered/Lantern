@@ -23,50 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.basic
+package org.lanternpowered.api.behavior.basic.block.place
 
-import org.lanternpowered.api.behavior.Behavior
 import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
+import org.lanternpowered.api.block.BlockSnapshotBuilder
 import org.lanternpowered.api.ext.*
-import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.entity.living.player.gamemode.GameModes
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.world.BlockChangeFlags
 
 /**
- * Consumes one item from the used item stack. Ignored when
- * used by a player in creative.
- *
- * Returns whether the quantity was successfully removed.
+ * The block placement behavior base.
  */
-class ConsumeUsedItemBehavior(
-        private val quantityToDecrease: Int = 1,
-        private val ignoreCreative: Boolean = true
-) : Behavior {
+open class BasicPlaceBlockBehavior : PlaceBlockBehaviorBase {
 
-    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
-        ctx[BehaviorContextKeys.PLAYER]?.let {
-            if (this.ignoreCreative && it.require(Keys.GAME_MODE) == GameModes.CREATIVE) return true
-        }
-        val usedItem = ctx[BehaviorContextKeys.USED_ITEM]?.createStack()
-        if (usedItem != null) {
-            val newQuantity = usedItem.quantity - this.quantityToDecrease
-            if (newQuantity < 0) return false
-            usedItem.quantity = newQuantity
-            ctx[BehaviorContextKeys.USED_ITEM] = usedItem.createSnapshot()
-        }
+    override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
         val slot = ctx[BehaviorContextKeys.USED_SLOT]
-        if (slot != null) {
-            if (usedItem == null && slot.stackSize < this.quantityToDecrease) return false
-            ctx.addFinalizer {
-                // Apply changes to the slot if the behavior is accepted
-                if (usedItem != null) {
-                    slot.set(usedItem)
-                } else {
-                    slot.poll(this.quantityToDecrease)
-                }
+        val stack = (ctx[BehaviorContextKeys.USED_ITEM]?.createStack() ?: slot?.peek()).orEmpty()
+        // A used item or slot is expected for this behavior to work
+        if (stack.isEmpty) return false
+        // Add a finalizer which will actually place the blocks in the world
+        ctx.addFinalizer {
+            for (builder in placed) {
+                val snapshot = builder.build()
+                snapshot.restore(false, BlockChangeFlags.ALL)
             }
         }
+        return place(type, ctx, stack, placed)
+    }
+
+    open fun place(type: BehaviorType, ctx: BehaviorContext, placedItem: ItemStack, placed: MutableList<BlockSnapshotBuilder>): Boolean {
+        val blockType = !placedItem.type.block ?: return false
+        val location = ctx[BehaviorContextKeys.BLOCK_LOCATION] ?: return false
+        // Convert the stack into a snapshot that can be placed
+        val builder = BlockSnapshotBuilder()
+                .location(location)
+                .blockState(blockType.defaultState)
+        placedItem.values.forEach { builder.add(it) }
+        placed.add(builder)
         return true
     }
 }

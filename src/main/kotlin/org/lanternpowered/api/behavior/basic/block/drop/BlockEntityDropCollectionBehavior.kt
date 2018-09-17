@@ -41,7 +41,7 @@ import org.spongepowered.api.item.inventory.crafting.CraftingOutput
 class BlockEntityDropCollectionBehavior : DropsCollectionBehavior {
 
     override fun apply(type: BehaviorType, ctx: BehaviorContext, itemDrops: MutableList<ItemStackSnapshot>) {
-        val blockEntity = ctx[BehaviorContextKeys.BlockLocation]?.blockEntity
+        val blockEntity = ctx[BehaviorContextKeys.BLOCK_LOCATION]?.blockEntity
         if (blockEntity is Carrier) {
             val inventory = blockEntity.inventory
             inventory.slots().stream()

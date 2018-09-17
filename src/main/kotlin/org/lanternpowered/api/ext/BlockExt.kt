@@ -38,7 +38,7 @@ import java.util.UUID
 /**
  * The location.
  */
-inline var BlockSnapshotBuilder.location: Location<World>
+inline var BlockSnapshotBuilder.location: Location<World>?
     get() = (this as XBlockSnapshotBuilder).location
     set(value) { (this as XBlockSnapshotBuilder).location = value }
 

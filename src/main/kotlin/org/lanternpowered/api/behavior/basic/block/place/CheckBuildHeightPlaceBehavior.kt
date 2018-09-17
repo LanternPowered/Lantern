@@ -50,7 +50,7 @@ class CheckBuildHeightPlaceBehavior(val behavior: Behavior) : Behavior {
         if (!this.behavior.tryApply(type, ctx)) return false
         val snapshots = ctx[PlaceBlockBehaviorBase.PlacedSnapshots] ?: return true
         for (snapshot in snapshots) {
-            val location = snapshot.location
+            val location = snapshot.location ?: continue
             val buildHeight = location.extent.dimension.buildHeight
             if (location.y >= buildHeight) {
                 ctx.restoreSnapshot(ctxSnapshot)

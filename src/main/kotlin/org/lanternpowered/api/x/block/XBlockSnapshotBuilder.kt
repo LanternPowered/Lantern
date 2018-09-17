@@ -40,7 +40,7 @@ interface XBlockSnapshotBuilder : BlockSnapshotBuilder {
     /**
      * The location.
      */
-    var location: Location<World>
+    var location: Location<World>?
 
     /**
      * The block state.

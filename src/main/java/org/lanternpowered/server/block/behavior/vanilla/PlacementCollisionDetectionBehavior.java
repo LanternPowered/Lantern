@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.behavior.vanilla;
 
+import org.lanternpowered.api.x.world.extent.XExtent;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -33,7 +34,6 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.lanternpowered.server.world.extent.IExtent;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.entity.ExperienceOrb;
@@ -62,7 +62,7 @@ public class PlacementCollisionDetectionBehavior implements PlaceBlockBehavior, 
             if (collisionBoxesProvider != null) {
                 final Collection<AABB> collisionBoxes = collisionBoxesProvider.get(blockState, null, null);
                 for (AABB collisionBox : collisionBoxes) {
-                    if (((IExtent) loc.getExtent()).hasIntersectingEntities(collisionBox.offset(loc.getBlockPosition()),
+                    if (((XExtent) loc.getExtent()).hasIntersectingEntities(collisionBox.offset(loc.getBlockPosition()),
                             entity -> !(entity instanceof Item || entity instanceof ExperienceOrb))) { // TODO: Configure this filter somewhere?
                         return BehaviorResult.FAIL;
                     }

@@ -69,6 +69,9 @@ interface CauseStack : CauseStackManager {
      */
     operator fun contains(any: Any): Boolean
 
+    @JvmDefault
+    fun <T> require(key: CauseContextKey<T>): T = requireContext(key)
+
     override fun pushCauseFrame(): Frame
     override fun pushCause(obj: Any): CauseStack
     override fun <T> addContext(key: CauseContextKey<T>, value: T): CauseStack

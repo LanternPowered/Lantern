@@ -47,7 +47,7 @@ class RotationPlaceBehavior(
     override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
         val player = ctx[BehaviorContextKeys.PLAYER]
         val face = if (player != null) {
-            if (!this.horizontalOnly && player.position.y - ctx.requireContext(BehaviorContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
+            if (!this.horizontalOnly && player.position.y - ctx.require(BehaviorContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
                 player.getDirection(Direction.Division.CARDINAL)
             } else {
                 player.getHorizontalDirection(Direction.Division.CARDINAL)

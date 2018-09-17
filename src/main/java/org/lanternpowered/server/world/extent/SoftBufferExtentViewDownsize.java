@@ -31,6 +31,9 @@ import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import org.lanternpowered.api.x.world.extent.XExtent;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -76,7 +79,7 @@ import javax.annotation.Nullable;
 
 public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
-    private final IExtent extent;
+    private final XExtent extent;
     private final Vector3i blockMin;
     private final Vector3i blockMax;
     private final Vector3i blockSize;
@@ -88,7 +91,7 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     private final Vector3i hardBiomeMin;
     private final Vector3i hardBiomeMax;
 
-    public SoftBufferExtentViewDownsize(IExtent extent, Vector3i blockMin, Vector3i blockMax, Vector3i hardMin, Vector3i hardMax) {
+    public SoftBufferExtentViewDownsize(XExtent extent, Vector3i blockMin, Vector3i blockMax, Vector3i hardMin, Vector3i hardMax) {
         this.extent = extent;
         this.blockMin = blockMin;
         this.blockMax = blockMax;
@@ -521,15 +524,15 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Entity createEntity(EntityType type, Vector3d position) {
+    public Entity createEntity(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
         checkRange(position);
-        return this.extent.createEntity(type, position);
+        return this.extent.createEntity(type, position, fn);
     }
 
     @Override
-    public Entity createEntityNaturally(EntityType type, Vector3d position) {
+    public Entity createEntityNaturally(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
         checkRange(position);
-        return this.extent.createEntityNaturally(type, position);
+        return this.extent.createEntityNaturally(type, position, fn);
     }
 
     @Override
@@ -669,7 +672,7 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+    public boolean hasIntersectingEntities(AABB box, Function1<? super Entity, Boolean> filter) {
         final Vector3d min = getBlockMin().toDouble().max(box.getMin());
         final Vector3d max = getBlockMin().toDouble().min(box.getMax());
         // Check if the AABB is within the extent
@@ -678,9 +681,10 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
                 min.getZ() == max.getZ()) {
             return false;
         }
-        return this.extent.hasIntersectingEntities(new AABB(min, max), Functional.predicateAnd(input -> {
-            final Vector3d pos = ((LanternEntity) input).getPosition();
-            return VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax);
-        }, filter));
+        return this.extent.hasIntersectingEntities(new AABB(min, max), entity -> {
+            final Vector3d pos = ((LanternEntity) entity).getPosition();
+            return VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(),
+                    this.blockMin, this.blockMax) && filter.invoke(entity);
+        });
     }
 }

@@ -28,6 +28,10 @@ package org.lanternpowered.server.world.extent;
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import org.jetbrains.annotations.NotNull;
+import org.lanternpowered.api.x.world.extent.XExtent;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -74,7 +78,7 @@ import javax.annotation.Nullable;
 
 public class ExtentViewDownsize implements AbstractExtent {
 
-    private final IExtent extent;
+    private final XExtent extent;
     private final Vector3i blockMin;
     private final Vector3i blockMax;
     private final Vector3i blockSize;
@@ -82,7 +86,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     private final Vector3i biomeMax;
     private final Vector3i biomeSize;
 
-    public ExtentViewDownsize(IExtent extent, Vector3i blockMin, Vector3i blockMax) {
+    public ExtentViewDownsize(XExtent extent, Vector3i blockMin, Vector3i blockMax) {
         this.extent = extent;
         this.blockMin = blockMin;
         this.blockMax = blockMax;
@@ -553,15 +557,15 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Entity createEntity(EntityType type, Vector3i position) {
+    public Entity createEntity(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
         checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.createEntity(type, position);
+        return this.extent.createEntity(type, position, fn);
     }
 
-    @Override
-    public Entity createEntityNaturally(EntityType type, Vector3d position) throws IllegalArgumentException, IllegalStateException {
+    @NotNull @Override
+    public Entity createEntityNaturally(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
         checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.createEntityNaturally(type, position);
+        return this.extent.createEntityNaturally(type, position, fn);
     }
 
     @Override
@@ -682,7 +686,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+    public boolean hasIntersectingEntities(AABB box, Function1<? super Entity, Boolean> filter) {
         final Vector3d min = getBlockMin().toDouble().max(box.getMin());
         final Vector3d max = getBlockMin().toDouble().min(box.getMax());
         // Check if the AABB is within the extent
@@ -691,10 +695,11 @@ public class ExtentViewDownsize implements AbstractExtent {
                 min.getZ() == max.getZ()) {
             return false;
         }
-        return this.extent.hasIntersectingEntities(new AABB(min, max), Functional.predicateAnd(input -> {
-            final Vector3d pos = ((LanternEntity) input).getPosition();
-            return VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax);
-        }, filter));
+        return this.extent.hasIntersectingEntities(new AABB(min, max), entity -> {
+            final Vector3d pos = ((LanternEntity) entity).getPosition();
+            return VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(),
+                    this.blockMin, this.blockMax) && filter.invoke(entity);
+        });
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {

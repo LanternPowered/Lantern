@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.api.x.world.extent.XExtent;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
@@ -56,7 +57,7 @@ import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
-public interface AbstractExtent extends IExtent {
+public interface AbstractExtent extends XExtent {
 
     default void checkBiomeBounds(int x, int y, int z) {
         if (!containsBiome(x, y, z)) {

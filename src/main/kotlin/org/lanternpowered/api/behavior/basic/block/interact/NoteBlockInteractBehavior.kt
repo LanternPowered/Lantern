@@ -23,37 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.basic.block.place
+package org.lanternpowered.api.behavior.basic.block.interact
 
+import org.lanternpowered.api.behavior.Behavior
 import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
-import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
-import org.lanternpowered.api.block.BlockSnapshotBuilder
-import org.lanternpowered.api.data.key.Keys
 import org.lanternpowered.api.ext.*
-import org.spongepowered.api.util.Direction
+import org.spongepowered.api.block.tileentity.Note
+import org.spongepowered.api.data.key.Keys
 
-/**
- * A behavior that rotates the blocks based on the
- * direction the player is looking.
- *
- * @property horizontalOnly Whether the block should only be rotated in the horizontal plane (around the y axis)
- */
-class RotationPlaceBehavior(
-        private val horizontalOnly: Boolean = false
-) : PlaceBlockBehaviorBase {
+class NoteBlockInteractBehavior : Behavior {
 
-    override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
-        val player = ctx[BehaviorContextKeys.PLAYER]
-        val face = if (player != null) {
-            if (!this.horizontalOnly && player.position.y - ctx.require(BehaviorContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
-                player.getDirection(Direction.Division.CARDINAL)
-            } else {
-                player.getHorizontalDirection(Direction.Division.CARDINAL)
-            }.opposite
-        } else Direction.NORTH
-        placed.forEach { it.add(Keys.DIRECTION, face) }
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        val note = ctx[BehaviorContextKeys.INTERACTION_LOCATION]?.blockEntity as? Note ?: return false
+
+        // Cycle to the next note
+        note.transform(Keys.NOTE_PITCH) { it.cycleNext() }
+        note.playNote()
         return true
     }
 }

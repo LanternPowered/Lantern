@@ -41,10 +41,7 @@ class HopperPlaceBehavior : PlaceBlockBehaviorBase {
         val direction = if (face != null) {
             if (face == Direction.UP) Direction.DOWN else face
         } else Direction.DOWN
-        for (builder in placed) {
-            val state = builder.blockState
-            builder.blockState = state.with(Keys.DIRECTION, direction).orElse(state)
-        }
+        placed.forEach { it.add(Keys.DIRECTION, direction) }
         return true
     }
 }

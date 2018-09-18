@@ -32,27 +32,16 @@ import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
 import org.lanternpowered.api.block.BlockSnapshotBuilder
 import org.lanternpowered.api.data.key.Keys
 import org.lanternpowered.api.ext.*
-import org.spongepowered.api.util.Direction
 
 /**
- * A behavior that rotates the blocks based on the
- * direction the player is looking.
+ * Rotates the placed block based on the clicked face.
  *
- * @property horizontalOnly Whether the block should only be rotated in the horizontal plane (around the y axis)
+ * Always returns true.
  */
-class RotationPlaceBehavior(
-        private val horizontalOnly: Boolean = false
-) : PlaceBlockBehaviorBase {
+class FaceBasedRotationPlaceBehavior : PlaceBlockBehaviorBase {
 
     override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
-        val player = ctx[BehaviorContextKeys.PLAYER]
-        val face = if (player != null) {
-            if (!this.horizontalOnly && player.position.y - ctx.require(BehaviorContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
-                player.getDirection(Direction.Division.CARDINAL)
-            } else {
-                player.getHorizontalDirection(Direction.Division.CARDINAL)
-            }.opposite
-        } else Direction.NORTH
+        val face = ctx[BehaviorContextKeys.INTERACTION_FACE] ?: return true
         placed.forEach { it.add(Keys.DIRECTION, face) }
         return true
     }

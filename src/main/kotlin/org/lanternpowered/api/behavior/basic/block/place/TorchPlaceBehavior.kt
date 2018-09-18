@@ -28,32 +28,36 @@ package org.lanternpowered.api.behavior.basic.block.place
 import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
-import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
 import org.lanternpowered.api.block.BlockSnapshotBuilder
 import org.lanternpowered.api.data.key.Keys
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.server.block.property.SolidSideProperty
 import org.spongepowered.api.util.Direction
 
-/**
- * A behavior that rotates the blocks based on the
- * direction the player is looking.
- *
- * @property horizontalOnly Whether the block should only be rotated in the horizontal plane (around the y axis)
- */
-class RotationPlaceBehavior(
-        private val horizontalOnly: Boolean = false
-) : PlaceBlockBehaviorBase {
+class TorchPlaceBehavior : BasicPlaceBlockBehavior() {
 
-    override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
-        val player = ctx[BehaviorContextKeys.PLAYER]
-        val face = if (player != null) {
-            if (!this.horizontalOnly && player.position.y - ctx.require(BehaviorContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
-                player.getDirection(Direction.Division.CARDINAL)
-            } else {
-                player.getHorizontalDirection(Direction.Division.CARDINAL)
-            }.opposite
-        } else Direction.NORTH
-        placed.forEach { it.add(Keys.DIRECTION, face) }
+    private val horizontalDirections = arrayOf(Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST)
+
+    override fun place(type: BehaviorType, ctx: BehaviorContext, placedItem: ItemStack, placed: MutableList<BlockSnapshotBuilder>): Boolean {
+        val location = ctx[BehaviorContextKeys.BLOCK_LOCATION] ?: return false
+        var face = ctx[BehaviorContextKeys.INTERACTION_FACE] ?: Direction.UP
+        // Cannot place a torch on the top face
+        if (face == Direction.DOWN) return false
+        val clickLocation = ctx[BehaviorContextKeys.INTERACTION_LOCATION] ?: location
+        var foundSolidSide = clickLocation.extent.getProperty(clickLocation.blockPosition, face, SolidSideProperty::class.java).get().value ?: false
+        if (!foundSolidSide) {
+            for (direction in horizontalDirections) {
+                foundSolidSide = location.extent.getProperty(location.getBlockRelative(direction).blockPosition,
+                        direction.opposite, SolidSideProperty::class.java).get().value ?: false
+                if (foundSolidSide) {
+                    face = direction
+                    break
+                }
+            }
+        }
+        super.place(type, ctx, placedItem, placed)
+        if (foundSolidSide) placed.forEach { it.add(Keys.DIRECTION, face.opposite) }
         return true
     }
 }

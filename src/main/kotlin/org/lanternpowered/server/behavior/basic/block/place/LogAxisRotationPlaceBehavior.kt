@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.basic.block.place
+package org.lanternpowered.server.behavior.basic.block.place
 
 import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
@@ -32,28 +32,16 @@ import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
 import org.lanternpowered.api.block.BlockSnapshotBuilder
 import org.lanternpowered.api.data.key.Keys
 import org.lanternpowered.api.ext.*
-import org.spongepowered.api.util.Direction
+import org.lanternpowered.server.data.type.LanternLogAxis
 
-/**
- * A behavior that rotates the blocks based on the
- * direction the player is looking.
- *
- * @property horizontalOnly Whether the block should only be rotated in the horizontal plane (around the y axis)
- */
-class RotationPlaceBehavior(
-        private val horizontalOnly: Boolean = false
-) : PlaceBlockBehaviorBase {
+class LogAxisRotationPlaceBehavior : PlaceBlockBehaviorBase {
 
     override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
-        val player = ctx[BehaviorContextKeys.PLAYER]
-        val face = if (player != null) {
-            if (!this.horizontalOnly && player.position.y - ctx.require(BehaviorContextKeys.BLOCK_LOCATION).blockPosition.y >= 0.5) {
-                player.getDirection(Direction.Division.CARDINAL)
-            } else {
-                player.getHorizontalDirection(Direction.Division.CARDINAL)
-            }.opposite
-        } else Direction.NORTH
-        placed.forEach { it.add(Keys.DIRECTION, face) }
+        val face = ctx[BehaviorContextKeys.INTERACTION_FACE] ?: return true
+        for (builder in placed) {
+            val state = builder.blockState
+            builder.blockState = state.with(Keys.LOG_AXIS, LanternLogAxis.fromDirection(face.opposite)).orElse(state)
+        }
         return true
     }
 }

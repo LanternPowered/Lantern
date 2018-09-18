@@ -23,29 +23,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.behavior.basic.block.place
+package org.lanternpowered.api.behavior.basic.block.interact.jukebox
 
+import org.lanternpowered.api.behavior.Behavior
 import org.lanternpowered.api.behavior.BehaviorContext
 import org.lanternpowered.api.behavior.BehaviorContextKeys
 import org.lanternpowered.api.behavior.BehaviorType
-import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
-import org.lanternpowered.api.block.BlockSnapshotBuilder
-import org.lanternpowered.api.data.key.Keys
 import org.lanternpowered.api.ext.*
+import org.spongepowered.api.block.tileentity.Jukebox
+import org.spongepowered.api.data.property.item.RecordProperty
 
 /**
- * Rotates the placed block based on the clicked face.
+ * Handles interaction with the [Jukebox].
  *
- * Always returns true.
+ * Will always return true if a jukebox is present at the interaction location.
+ *
+ * Does not decrease the quantity of the music item.
  */
-class FaceDirectionalPlaceBehavior : PlaceBlockBehaviorBase {
+class JukeboxInteractInsertBehavior : Behavior {
 
-    override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
-        val face = ctx[BehaviorContextKeys.INTERACTION_FACE] ?: return true
-        for (builder in placed) {
-            val state = builder.blockState
-            builder.blockState = state.with(Keys.DIRECTION, face).orElse(state)
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        val jukebox = ctx[BehaviorContextKeys.INTERACTION_LOCATION]?.blockEntity as? Jukebox ?: return false
+
+        val item = ctx[BehaviorContextKeys.USED_ITEM] ?: return false
+        // Check whether the item is a valid record
+        if ((!item.getProperty(RecordProperty::class.java))?.value == null) return false
+
+        ctx.addFinalizer {
+            val musicDisc = item.createStack()
+            musicDisc.quantity = 1
+
+            jukebox.insertRecord(musicDisc)
+            jukebox.playRecord()
         }
+
         return true
     }
 }

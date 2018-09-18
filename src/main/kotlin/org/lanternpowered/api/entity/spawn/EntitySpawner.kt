@@ -35,6 +35,7 @@ import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.world.World
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
+import org.spongepowered.api.entity.weather.Lightning
 import org.spongepowered.api.event.entity.ConstructEntityEvent
 import org.spongepowered.api.event.entity.SpawnEntityEvent
 import java.util.Collections

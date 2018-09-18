@@ -26,6 +26,7 @@
 package org.lanternpowered.api.world.weather
 
 import org.lanternpowered.api.util.builder.TranslatableCatalogBuilder
+import org.lanternpowered.api.world.World
 import org.lanternpowered.api.x.world.weather.XWeather
 
 /**
@@ -41,4 +42,11 @@ interface WeatherBuilder : TranslatableCatalogBuilder<XWeather, WeatherBuilder> 
      * @return This builder, for chaining
      */
     fun <V> option(option: WeatherOption<V>, value: V): WeatherBuilder
+
+    /**
+     * Adds a action that will be executed every tick that the weather is active
+     *
+     * @param fn The action function
+     */
+    fun action(fn: (World) -> Unit)
 }

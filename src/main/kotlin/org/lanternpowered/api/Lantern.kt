@@ -28,6 +28,7 @@ package org.lanternpowered.api
 import org.lanternpowered.api.entity.spawn.EntitySpawner
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.plugin.PluginManager
+import org.lanternpowered.api.text.translation.TranslationRegistry
 import org.lanternpowered.api.x.XGameRegistry
 import org.lanternpowered.api.x.XServer
 import org.lanternpowered.api.x.cause.XCauseStackManager
@@ -45,4 +46,5 @@ object Lantern {
     @JvmStatic inline val scheduler: Scheduler get() = Sponge.getScheduler()
     @JvmStatic inline val serviceManager: ServiceManager get() = Sponge.getServiceManager()
     @JvmStatic inline val entitySpawner: EntitySpawner get() = this.server.entitySpawner
+    @JvmStatic inline val translationRegistry: TranslationRegistry get() = this.registry.translations
 }

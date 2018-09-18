@@ -93,3 +93,19 @@ inline fun <T> Iterable<T>.asUnmodifiable(): Iterable<T> = UnmodifiableIterable(
  * Creates a unmodifiable [Iterator] view for this iterator.
  */
 inline fun <T> Iterator<T>.asUnmodifiable(): Iterator<T> = UnmodifiableIterator(this)
+
+// Random
+
+fun <E> Collection<E>.pickRandom(): E? {
+    val size = this.size
+    if (size == 0) {
+        return null
+    }
+    val index = random.nextInt(size)
+    forEachIndexed { i, element ->
+        if (i == index) {
+            return element
+        }
+    }
+    throw IllegalStateException("Should never be reached")
+}

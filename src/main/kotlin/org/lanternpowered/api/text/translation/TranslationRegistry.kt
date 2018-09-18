@@ -23,9 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.entity
+package org.lanternpowered.api.text.translation
 
+interface TranslationRegistry {
 
-typealias Transform<E> = org.spongepowered.api.entity.Transform<E>
-typealias Entity = org.spongepowered.api.entity.Entity
-typealias EntityTypes = org.spongepowered.api.entity.EntityTypes
+    operator fun get(id: String): Translation
+}

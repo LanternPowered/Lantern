@@ -23,9 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.entity
+package org.lanternpowered.api.script
 
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.catalog.CatalogTypeProperty
+import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
+import org.lanternpowered.api.world.weather.WeatherBuilder
 
-typealias Transform<E> = org.spongepowered.api.entity.Transform<E>
-typealias Entity = org.spongepowered.api.entity.Entity
-typealias EntityTypes = org.spongepowered.api.entity.EntityTypes
+// These methods are only allowed to be called in scripts
+
+// TODO: Error when called anywhere else
+
+inline fun <reified T : CatalogType> catalogRef(key: CatalogKey): CatalogTypeProperty<T> = CatalogTypeProperty(key, T::class)
+
+/**
+ * Gets a read only property which provides access to a [CatalogType]
+ * of a specific type. This can be used when a specific catalog type
+ * isn't available yet.
+ */
+inline fun <reified T : CatalogType> catalogRef(key: String): CatalogTypeProperty<T> = CatalogTypeProperty(CatalogKey.resolve(key), T::class)
+
+fun weather(fn: WeatherBuilder.() -> Unit) = WeatherBuilder().apply(fn)
+
+fun enchantment(vararg parentScripts: String, fn: EnchantmentTypeBuilder.() -> Unit) = EnchantmentTypeBuilder().apply(fn)
+fun enchantment(vararg parentScripts: CatalogKey, fn: EnchantmentTypeBuilder.() -> Unit) = EnchantmentTypeBuilder().apply(fn)
+fun enchantment(fn: EnchantmentTypeBuilder.() -> Unit) = EnchantmentTypeBuilder().apply(fn)

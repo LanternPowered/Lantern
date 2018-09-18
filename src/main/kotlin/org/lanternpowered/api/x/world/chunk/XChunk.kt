@@ -23,9 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.entity
+package org.lanternpowered.api.x.world.chunk
 
+import org.lanternpowered.api.world.chunk.Chunk
 
-typealias Transform<E> = org.spongepowered.api.entity.Transform<E>
-typealias Entity = org.spongepowered.api.entity.Entity
-typealias EntityTypes = org.spongepowered.api.entity.EntityTypes
+interface XChunk : Chunk {
+
+    val x: Int
+    val z: Int
+}

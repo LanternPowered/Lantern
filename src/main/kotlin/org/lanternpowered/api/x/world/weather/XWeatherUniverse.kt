@@ -35,7 +35,7 @@ interface XWeatherUniverse : WeatherUniverse {
     /**
      * The current darkness of the sky.
      */
-    val darkness: Double
+    val skyDarkness: Double
 
     /**
      * The current rain strength.

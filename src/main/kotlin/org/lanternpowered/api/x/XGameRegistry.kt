@@ -26,9 +26,12 @@
 package org.lanternpowered.api.x
 
 import org.lanternpowered.api.GameRegistry
+import org.lanternpowered.api.text.translation.TranslationRegistry
 import org.lanternpowered.api.x.text.XTextFactory
 
 interface XGameRegistry : GameRegistry {
 
     override fun getTextFactory(): XTextFactory
+
+    val translations: TranslationRegistry
 }

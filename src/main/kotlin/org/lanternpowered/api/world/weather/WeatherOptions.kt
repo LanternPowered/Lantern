@@ -27,6 +27,7 @@ package org.lanternpowered.api.world.weather
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
+import org.spongepowered.api.util.weighted.WeightedTable
 
 /**
  * An iteration with all the default [WeatherOption]s.
@@ -47,4 +48,10 @@ object WeatherOptions {
      * A provider which provides the duration (in seconds) when the weather is naturally switched.
      */
     @JvmStatic val DURATION = weatherOptionOf(CatalogKey.minecraft("duration")) { random.nextDouble(300.0 .. 900.0) }
+
+    /**
+     * All weathers have a weight, when they are put in a [WeightedTable]
+     * it will be used to determine the next [Weather].
+     */
+    @JvmStatic val WEIGHT = weatherOptionOf(CatalogKey.minecraft("weight"), 500)
 }

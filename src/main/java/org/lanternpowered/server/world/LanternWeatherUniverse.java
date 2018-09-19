@@ -209,7 +209,7 @@ public final class LanternWeatherUniverse implements XWeatherUniverse {
     }
 
     @Override
-    public double getDarkness() {
+    public double getSkyDarkness() {
         return this.darkness;
     }
 

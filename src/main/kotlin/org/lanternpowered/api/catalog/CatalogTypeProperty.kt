@@ -23,9 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.entity
+package org.lanternpowered.api.catalog
 
+import org.lanternpowered.api.Lantern
+import org.lanternpowered.api.ext.*
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 
-typealias Transform<E> = org.spongepowered.api.entity.Transform<E>
-typealias Entity = org.spongepowered.api.entity.Entity
-typealias EntityTypes = org.spongepowered.api.entity.EntityTypes
+class CatalogTypeProperty<T : CatalogType>(
+        private val key: CatalogKey,
+        private val type: KClass<T>
+) : ReadOnlyProperty<Nothing?, T> {
+
+    override fun getValue(thisRef: Nothing?, property: KProperty<*>): T = Lantern.registry.getType(this.type, this.key)
+            ?: throw MissingCatalogTypeException("Missing catalog \"$key\" of type ${type.qualifiedName ?: type.java.name}")
+}

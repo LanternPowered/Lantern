@@ -51,7 +51,7 @@ inline val WeatherUniverse.rainStrength: Double get() = (this as XWeatherUnivers
 /**
  * The current darkness of the sky.
  */
-inline val WeatherUniverse.darkness: Double get() = (this as XWeatherUniverse).darkness
+inline val WeatherUniverse.skyDarkness: Double get() = (this as XWeatherUniverse).skyDarkness
 
 // We cannot call typeTokenOf here, chaining reified calls and using
 // anonymous classes can end up in weird errors. But only in specific

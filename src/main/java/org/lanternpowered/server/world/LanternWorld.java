@@ -1014,8 +1014,8 @@ public class LanternWorld implements AbstractExtent, XWorld, AbstractViewer, Rul
     }
 
     @Override
-    public double getDarkness() {
-        return this.weatherUniverse == null ? 0 : this.weatherUniverse.getDarkness();
+    public double getSkyDarkness() {
+        return this.weatherUniverse == null ? 0 : this.weatherUniverse.getSkyDarkness();
     }
 
     @Override

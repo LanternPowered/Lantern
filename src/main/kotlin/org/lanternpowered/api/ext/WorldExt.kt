@@ -32,7 +32,9 @@ import org.lanternpowered.api.block.entity.BlockEntity
 import org.lanternpowered.api.entity.Transform
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
+import org.lanternpowered.api.world.chunk.Chunk
 import org.lanternpowered.api.x.world.XWorld
+import org.lanternpowered.api.x.world.chunk.XChunk
 import org.lanternpowered.api.x.world.extent.XEntityUniverse
 import org.lanternpowered.api.x.world.extent.XExtent
 import org.lanternpowered.api.x.world.weather.XWeatherUniverse
@@ -87,3 +89,6 @@ fun Extent.hasIntersectingEntities(box: AABB)
  */
 fun Extent.hasIntersectingEntities(box: AABB, filter: (Entity) -> Boolean)
         = (this as XExtent).hasIntersectingEntities(box, filter)
+
+val Chunk.x: Int get() = (this as XChunk).x
+val Chunk.z: Int get() = (this as XChunk).z

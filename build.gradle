@@ -13,7 +13,7 @@ plugins {
     id 'net.minecrell.licenser' version '0.4'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id 'org.spongepowered.plugin' version '0.8.1'
-    id 'org.jetbrains.kotlin.jvm' version '1.2.61'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.70'
 }
 
 apply from: rootProject.file('gradle/lantern.gradle')
@@ -76,6 +76,9 @@ dependencies {
     // Kotlin
     compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
+    compile 'org.jetbrains.kotlin:kotlin-script-util'
+    compile 'org.jetbrains.kotlin:kotlin-script-runtime'
+    compile 'org.jetbrains.kotlin:kotlin-compiler-embeddable'
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
@@ -222,6 +225,7 @@ task theJar(type: ShadowJar) {
 
     def dependencyEntries = new ArrayList<>()
     dependencyArtifacts.each { ResolvedArtifact a -> dependencyEntries.add(a.moduleVersion.id.toString()) }
+    dependencyEntries.sort()
 
     def data = new HashMap<>()
     data['repositories'] = []

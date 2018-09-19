@@ -27,12 +27,14 @@
 
 package org.lanternpowered.api.ext
 
+import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.serializer.TextSerializers
+import org.lanternpowered.api.text.translation.Translation
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.TextActions
@@ -69,3 +71,5 @@ inline operator fun TextFormat.plus(that: TextColor): TextFormat = color(that)
 inline operator fun TextStyle.plus(that: TextStyle): TextStyle = and(that)
 inline operator fun TextStyle.minus(that: TextStyle): TextStyle = andNot(that)
 inline operator fun TextStyle.unaryMinus(): TextStyle = negate()
+
+fun translationOf(id: String): Translation = Lantern.translationRegistry[id]

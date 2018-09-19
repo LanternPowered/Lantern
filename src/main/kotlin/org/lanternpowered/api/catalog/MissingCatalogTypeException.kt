@@ -23,9 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.entity
+package org.lanternpowered.api.catalog
 
+/**
+ * An exception that is thrown when something a catalog type is missing.
+ */
+class MissingCatalogTypeException : RuntimeException {
 
-typealias Transform<E> = org.spongepowered.api.entity.Transform<E>
-typealias Entity = org.spongepowered.api.entity.Entity
-typealias EntityTypes = org.spongepowered.api.entity.EntityTypes
+    /**
+     * Constructs a new [MissingCatalogTypeException].
+     */
+    constructor() : super()
+
+    /**
+     * Constructs a new [MissingCatalogTypeException] with the
+     * given message.
+     *
+     * @param message The message
+     */
+    constructor(message: String) : super(message)
+
+    /**
+     * Constructs a new [MissingCatalogTypeException] with the
+     * given message and underlying cause.
+     *
+     * @param message The message
+     * @param cause The underlying cause
+     */
+    constructor(message: String, cause: Throwable) : super(message, cause)
+
+    /**
+     * Constructs a new [MissingCatalogTypeException] with the
+     * underlying cause.
+     *
+     * @param cause The underlying cause
+     */
+    constructor(cause: Throwable) : super(cause)
+
+}

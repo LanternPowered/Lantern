@@ -30,6 +30,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.action.LightningEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -75,5 +76,11 @@ public class LanternEventFactory {
             @NotNull EntityType targetType,
             @NotNull Transform transform) {
         return SpongeEventFactory.createConstructEntityEventPre(cause, targetType, transform);
+    }
+
+    @NotNull
+    public static LightningEvent.Pre createLightningEventPre(
+            @NotNull Cause cause) {
+        return SpongeEventFactory.createLightningEventPre(cause);
     }
 }

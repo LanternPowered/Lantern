@@ -938,5 +938,25 @@
     {
         "version": 401,
         "name": "1.13.1"
+    },
+    {
+        "version": 402,
+        "name": "1.13.2-pre1"
+    },
+    {
+        "version": 403,
+        "name": "1.13.2-pre2"
+    },
+    {
+        "version": 404,
+        "name": "1.13.2"
+    },
+    {
+        "version": 440,
+        "name": "18w43a"
+    },
+    {
+        "version": 441,
+        "name": "18w44b"
     }
 ]

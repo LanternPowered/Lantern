@@ -143,8 +143,8 @@ public final class ItemStackContextualValueType implements ContextualValueType<I
 
     @Override
     public void write(CodecContext ctx, @Nullable ItemStack object, ByteBuffer buf) throws CodecException {
-        if (object == null) {
-            buf.writeShort((short) -1);
+        if (object == null || object.isEmpty()) {
+            buf.writeBoolean(false);
         } else {
             final int[] ids = NetworkItemTypeRegistry.itemTypeToInternalAndNetworkId.get(object.getType());
             if (ids == null) {
@@ -155,7 +155,8 @@ public final class ItemStackContextualValueType implements ContextualValueType<I
                     .locale(ctx.getSession().getLocale())) {
                 dataView = serializeForNetwork(object, ids);
             }
-            buf.writeShort((short) ids[1]); // Network id
+            buf.writeBoolean(true);
+            buf.writeVarInt(ids[1]); // Network id
             buf.writeByte((byte) object.getQuantity());
             buf.writeDataView(dataView.getView(ItemStackStore.TAG).orElse(null));
         }
@@ -164,7 +165,11 @@ public final class ItemStackContextualValueType implements ContextualValueType<I
     @Nullable
     @Override
     public ItemStack read(CodecContext ctx, ByteBuffer buf) throws CodecException {
-        final short networkId = buf.readShort();
+        final boolean isPresent = buf.readBoolean();
+        if (!isPresent) {
+            return null;
+        }
+        final int networkId = buf.readVarInt();
         if (networkId == -1) {
             return null;
         }

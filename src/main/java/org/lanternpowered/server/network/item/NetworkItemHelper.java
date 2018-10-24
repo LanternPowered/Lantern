@@ -45,7 +45,11 @@ public final class NetworkItemHelper {
 
     @Nullable
     public static RawItemStack readRawFrom(ByteBuffer buf) {
-        final short networkId = buf.readShort();
+        final boolean exists = buf.readBoolean();
+        if (!exists) {
+            return null;
+        }
+        final int networkId = buf.readVarInt();
         if (networkId == -1) {
             return null;
         }
@@ -60,13 +64,14 @@ public final class NetworkItemHelper {
 
     public static void writeRawTo(ByteBuffer buf, @Nullable RawItemStack itemStack) {
         if (itemStack == null || itemStack.getAmount() <= 0) {
-            buf.writeShort((short) -1);
+            buf.writeBoolean(false);
         } else {
             final int networkId = NetworkItemTypeRegistry.normalToNetworkId.getInt(itemStack.getType());
             if (networkId == -1) {
                 throw new EncoderException("Invalid vanilla/modded item type id: " + itemStack.getType());
             }
-            buf.writeShort((short) networkId);
+            buf.writeBoolean(true);
+            buf.writeVarInt(networkId);
             buf.writeByte((byte) itemStack.getAmount());
             buf.writeDataView(itemStack.getDataView());
         }

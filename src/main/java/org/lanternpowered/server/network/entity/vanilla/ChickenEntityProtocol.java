@@ -34,7 +34,7 @@ public class ChickenEntityProtocol<E extends LanternEntity> extends AnimalEntity
     }
 
     @Override
-    protected int getMobType() {
-        return 93;
+    protected String getMobType() {
+        return "minecraft:chicken";
     }
 }

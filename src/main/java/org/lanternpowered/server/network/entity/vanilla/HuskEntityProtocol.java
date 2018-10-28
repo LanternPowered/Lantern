@@ -34,7 +34,7 @@ public class HuskEntityProtocol<E extends LanternEntity> extends AbstractZombieE
     }
 
     @Override
-    protected int getMobType() {
-        return 23;
+    protected String getMobType() {
+        return "minecraft:husk";
     }
 }

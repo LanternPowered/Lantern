@@ -30,8 +30,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.server.data.ICompositeValueStore;
 import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.data.processor.ValueProcessor;
+import org.lanternpowered.server.data.processor.ValueProcessorBuilder;
 import org.lanternpowered.server.effect.entity.EntityEffect;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
@@ -46,8 +50,13 @@ import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.world.EntitySpawningEntry;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
+import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.manipulator.mutable.FoodData;
 import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -150,6 +159,20 @@ public class LanternLiving extends LanternEntity implements Living {
                 });
         c.register((Key<BoundedValue.Mutable<Double>>) (Key) Keys.ABSORPTION, 0.0, 0.0, 1024.0);
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
+        c.registerProcessor(Keys.IS_SNEAKING).add(ValueProcessorBuilder.create(Keys.IS_SNEAKING)
+                .applicableTester((valueContainer, key) -> valueContainer.supports(LanternKeys.POSE))
+                .offerHandler((valueContainer, key, element) -> {
+                    final Pose pose = valueContainer.get(LanternKeys.POSE).get();
+                    if (pose == Pose.SNEAKING && !element) {
+                        offer(LanternKeys.POSE, Pose.STANDING);
+                    } else if (element) {
+                        offer(LanternKeys.POSE, Pose.SNEAKING);
+                    }
+                    return DataTransactionResult.successNoData();
+                })
+                .retrieveHandler((valueContainer, key) -> Optional.of(valueContainer.get(LanternKeys.POSE).orElse(null) == Pose.SNEAKING))
+                .failAlwaysRemoveHandler()
+                .build());
     }
 
     protected void setRawHeadRotation(Vector3d rotation) {

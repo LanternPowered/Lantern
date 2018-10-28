@@ -154,7 +154,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
      */
     @Nullable private RemoveState removeState;
 
-    private boolean onGround;
+    private boolean onGround = true;
 
     @Nullable private volatile Vector3i lastChunkCoords;
 

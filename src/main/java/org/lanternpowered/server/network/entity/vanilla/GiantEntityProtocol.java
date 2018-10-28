@@ -34,8 +34,8 @@ public class GiantEntityProtocol<E extends LanternEntity> extends InsentientEnti
     }
 
     @Override
-    protected int getMobType() {
-        return 53;
+    protected String getMobType() {
+        return "minecraft:giant";
     }
 
     @Override

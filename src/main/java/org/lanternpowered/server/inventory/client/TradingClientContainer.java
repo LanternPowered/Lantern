@@ -51,8 +51,7 @@ public class TradingClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.VILLAGER,
-                getTitle(), TOP_SLOT_FLAGS.length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.MERCHANT, getTitle());
     }
 
     @Override

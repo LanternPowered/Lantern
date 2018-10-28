@@ -75,8 +75,7 @@ public class FurnaceClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.FURNACE,
-                getTitle(), TOP_SLOT_FLAGS.length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.FURNACE, getTitle());
     }
 
     @Override

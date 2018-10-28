@@ -55,8 +55,7 @@ public class AnvilClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.ANVIL,
-                getTitle(), TOP_SLOT_FLAGS.length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.ANVIL, getTitle());
     }
 
     @Override

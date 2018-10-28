@@ -32,6 +32,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.lanternpowered.server.command.test.CommandOpenTestContainer;
 import org.lanternpowered.api.inject.service.ServiceRef;
+import org.lanternpowered.server.command.test.CommandSpawnEntity;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.spongepowered.api.command.CommandManager;
@@ -94,6 +95,7 @@ public final class DefaultCommandsCollection {
         commandProviders.put(this.minecraft, new CommandWhitelist());
         // Testing Commands
         commandProviders.put(this.implementation, new CommandOpenTestContainer());
+        commandProviders.put(this.implementation, new CommandSpawnEntity());
 
         for (Map.Entry<PluginContainer, CommandProvider> entry : commandProviders.entries()) {
             final PluginContainer plugin = entry.getKey();

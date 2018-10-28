@@ -52,4 +52,4 @@ val <T : Any> TypeToken<T>.typeLiteral: TypeLiteral<T> get() = TypeLiteral.get(t
 /**
  * Constructs a [TypeToken] for type [T].
  */
-inline fun <reified T> typeTokenOf(): TypeToken<T> = object: TypeToken<T>() {}
+inline fun <reified T> typeTokenOf(): TypeToken<T> = object : TypeToken<T>() {}

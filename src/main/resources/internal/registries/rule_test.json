@@ -1,0 +1,8 @@
+[
+  "minecraft:always_true",
+  "minecraft:block_match",
+  "minecraft:blockstate_match",
+  "minecraft:tag_match",
+  "minecraft:random_block_match",
+  "minecraft:random_blockstate_match"
+]

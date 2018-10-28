@@ -37,7 +37,7 @@ public final class CodecPlayInDataRequestBlock implements Codec<MessagePlayInDat
     @Override
     public MessagePlayInDataRequest.Block decode(CodecContext context, ByteBuffer buf) throws CodecException {
         final int transactionId = buf.readVarInt();
-        final Vector3i position = buf.readVector3i();
+        final Vector3i position = buf.readPosition();
         return new MessagePlayInDataRequest.Block(transactionId, position);
     }
 }

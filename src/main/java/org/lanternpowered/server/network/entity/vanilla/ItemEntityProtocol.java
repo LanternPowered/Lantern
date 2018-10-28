@@ -28,6 +28,8 @@ package org.lanternpowered.server.network.entity.vanilla;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Objects;
@@ -43,7 +45,8 @@ public class ItemEntityProtocol<E extends LanternEntity> extends ObjectEntityPro
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
-        parameterList.add(EntityParameters.Item.ITEM, this.entity.get(Keys.REPRESENTED_ITEM).map(ItemStackSnapshot::createStack).orElse(null));
+        parameterList.add(EntityParameters.Item.ITEM, this.entity.get(Keys.REPRESENTED_ITEM)
+                .map(ItemStackSnapshot::createStack).orElseGet(() -> ItemStack.of(ItemTypes.APPLE, 1)));
     }
 
     @Override
@@ -58,8 +61,8 @@ public class ItemEntityProtocol<E extends LanternEntity> extends ObjectEntityPro
     }
 
     @Override
-    protected int getObjectType() {
-        return 2;
+    protected String getObjectType() {
+        return "minecraft:item";
     }
 
     @Override

@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
@@ -54,7 +55,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
 
     private float lastHealth;
     private int lastArrowsInEntity;
-    private byte lastHandData;
+    private byte lastLivingFlags;
 
     @Nullable private Map<PotionEffectType, PotionEffect> lastPotionEffects;
     private long lastPotionSendTime = -1L;
@@ -63,16 +64,17 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
         super(entity);
     }
 
-    private byte getHandData() {
+    private byte getLivingFlags() {
         final Optional<HandType> activeHand = this.entity.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
-        byte value;
+        byte value = 0;
         if (activeHand.isPresent()) {
             value = 0x1;
             if (activeHand.get() == HandTypes.OFF_HAND) {
                 value |= 0x2;
             }
-        } else {
-            value = 0;
+        }
+        if (getPose() == Pose.SPIN_ATTACK) {
+            value |= 0x4;
         }
         return value;
     }
@@ -80,7 +82,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
-        parameterList.add(EntityParameters.Living.HAND_DATA, getHandData());
+        parameterList.add(EntityParameters.Living.FLAGS, getLivingFlags());
         parameterList.add(EntityParameters.Living.HEALTH, this.entity.get(Keys.HEALTH).map(Double::floatValue).orElse(1f));
         parameterList.add(EntityParameters.Living.ARROWS_IN_ENTITY, this.entity.get(LanternKeys.ARROWS_IN_ENTITY).orElse(0));
         parameterList.add(EntityParameters.Living.POTION_EFFECT_COLOR, 0);
@@ -100,10 +102,10 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
             parameterList.add(EntityParameters.Living.ARROWS_IN_ENTITY, arrowsInEntity);
             this.lastArrowsInEntity = arrowsInEntity;
         }
-        final byte handData = getHandData();
-        if (handData != this.lastHandData) {
-            parameterList.add(EntityParameters.Living.HAND_DATA, handData);
-            this.lastHandData = handData;
+        final byte livingFlags = getLivingFlags();
+        if (livingFlags != this.lastLivingFlags) {
+            parameterList.add(EntityParameters.Living.FLAGS, livingFlags);
+            this.lastLivingFlags = livingFlags;
         }
     }
 

@@ -42,6 +42,7 @@ import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Coerce;
 
 import java.lang.reflect.TypeVariable;

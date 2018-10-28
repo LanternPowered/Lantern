@@ -36,7 +36,7 @@ public final class CodecPlayOutBlockChange implements Codec<MessagePlayOutBlockC
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutBlockChange message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVector3i(message.getPosition());
+        buf.writePosition(message.getPosition());
         buf.writeVarInt(message.getBlockState());
         return buf;
     }

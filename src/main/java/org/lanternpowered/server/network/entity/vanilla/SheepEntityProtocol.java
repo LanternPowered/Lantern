@@ -42,8 +42,8 @@ public class SheepEntityProtocol<E extends LanternEntity> extends AnimalEntityPr
     }
 
     @Override
-    protected int getMobType() {
-        return 91;
+    protected String getMobType() {
+        return "minecraft:sheep";
     }
 
     @Override

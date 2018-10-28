@@ -34,7 +34,7 @@ public class ZombieEntityProtocol<E extends LanternEntity> extends AbstractZombi
     }
 
     @Override
-    protected int getMobType() {
-        return 54;
+    protected String getMobType() {
+        return "minecraft:zombie";
     }
 }

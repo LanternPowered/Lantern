@@ -46,9 +46,9 @@ public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegist
     public void registerDefaults() {
         final Gson gson = new Gson();
         final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
-                .getResourceAsStream("/internal/sound_events.json"))), JsonArray.class);
+                .getResourceAsStream("/internal/registries/sound_event.json"))), JsonArray.class);
         for (int i = 0; i < array.size(); i++) {
-            final String name = array.get(i).getAsString();
+            final String name = array.get(i).getAsString().replace("minecraft:", "");
             final String id = name.replaceAll("\\.", "_");
             register(new LanternSoundType(CatalogKeys.minecraft(id, name), i));
         }

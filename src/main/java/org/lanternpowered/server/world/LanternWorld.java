@@ -472,7 +472,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     @Override
     public int getViewDistance() {
-        return this.worldConfig.getViewDistance();
+        int viewDistance = this.worldConfig.getViewDistance();
+        if (viewDistance == WorldConfig.USE_SERVER_VIEW_DISTANCE) {
+            viewDistance = Lantern.getGame().getGlobalConfig().getViewDistance();
+        }
+        return viewDistance;
     }
 
     @Override

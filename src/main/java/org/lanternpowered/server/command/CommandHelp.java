@@ -29,7 +29,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.Collections2;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -50,7 +49,6 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.StartsWithPredicate;
 
-import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -60,17 +58,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 public final class CommandHelp extends CommandProvider {
-
-    private static final Field extendedDescriptionField;
-
-    static {
-        try {
-            extendedDescriptionField = CommandSpec.class.getDeclaredField("extendedDescription");
-            extendedDescriptionField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw UncheckedThrowables.throwUnchecked(e);
-        }
-    }
 
     public CommandHelp() {
         super(0, "help", "?");
@@ -115,16 +102,8 @@ public final class CommandHelp extends CommandProvider {
                                 Text.Builder builder = Text.builder();
                                 callable.getShortDescription(src).ifPresent(des -> builder.append(des, Text.newLine()));
                                 builder.append(t("commands.generic.usage", t("/%s %s", command.get(), callable.getUsage(src))));
-                                Text extendedDescription;
-                                try {
-                                    // TODO: Why is there no method :(
-                                    extendedDescription = (Text) extendedDescriptionField.get(callable);
-                                } catch (IllegalAccessException e) {
-                                    throw UncheckedThrowables.throwUnchecked(e);
-                                }
-                                if (extendedDescription != null) {
-                                    builder.append(Text.newLine(), extendedDescription);
-                                }
+                                final Optional<Text> extendedDescription = ((CommandSpec) callable).getExtendedDescription(src);
+                                extendedDescription.ifPresent(text -> builder.append(Text.newLine(), text));
                                 src.sendMessage(builder.build());
                             } else if ((desc = callable.getHelp(src)).isPresent()) {
                                 src.sendMessage(desc.get());

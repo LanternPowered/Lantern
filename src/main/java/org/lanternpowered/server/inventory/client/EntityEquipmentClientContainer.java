@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenHorseWindow;
 import org.spongepowered.api.text.Text;
 
 import java.util.Arrays;
@@ -70,8 +70,7 @@ public class EntityEquipmentClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.HORSE,
-                getTitle(), TOP_SLOT_FLAGS.length, this.entityId);
+        return new MessagePlayOutOpenHorseWindow(getContainerId(), TOP_SLOT_FLAGS.length, this.entityId);
     }
 
     @Override

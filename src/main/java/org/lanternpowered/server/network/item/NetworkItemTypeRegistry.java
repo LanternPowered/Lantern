@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -64,10 +65,11 @@ public final class NetworkItemTypeRegistry {
         normalToNetwork.defaultReturnValue(-1);
         final Int2ObjectMap<String> networkToNormal = new Int2ObjectOpenHashMap<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(InternalIDRegistries.class
-                .getResourceAsStream("/internal/item/item_type_indexes.json")))) {
+                .getResourceAsStream("/internal/registries/item.json")))) {
             final JsonArray jsonArray = gson.fromJson(reader, JsonArray.class);
             for (int i = 0; i < jsonArray.size(); i++) {
-                final String id = jsonArray.get(i).getAsString();
+                final JsonElement element = jsonArray.get(i);
+                final String id = element.isJsonPrimitive() ? element.getAsString() : element.getAsJsonObject().get("id").getAsString();
                 normalToNetwork.put(id, i);
                 networkToNormal.put(i, id);
             }

@@ -39,7 +39,7 @@ public final class CodecPlayOutSpawnObject implements Codec<MessagePlayOutSpawnO
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         buf.writeUniqueId(message.getUniqueId());
-        buf.writeByte((byte) message.getObjectType());
+        buf.writeVarInt((byte) message.getObjectType());
         buf.writeVector3d(message.getPosition());
         buf.writeByte((byte) message.getPitch());
         buf.writeByte((byte) message.getYaw());

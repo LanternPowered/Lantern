@@ -36,7 +36,7 @@ public final class CodecPlayInChangeSign implements Codec<MessagePlayInChangeSig
 
     @Override
     public MessagePlayInChangeSign decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final Vector3i position = buf.readVector3i();
+        final Vector3i position = buf.readPosition();
         final String[] lines = new String[4];
         for (int i = 0; i < lines.length; i++) {
             lines[i] = buf.readLimitedString(384);

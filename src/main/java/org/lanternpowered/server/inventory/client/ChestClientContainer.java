@@ -26,12 +26,14 @@
 package org.lanternpowered.server.inventory.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConstants.CHEST_COLUMNS;
 import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConstants.MAX_CHEST_ROWS;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.text.Text;
 
 import java.util.Arrays;
@@ -68,8 +70,9 @@ public class ChestClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.CONTAINER,
-                getTitle(), getTopSlotFlags().length, 0);
+        final ClientWindowType windowType = ClientWindowTypes.INSTANCE.get(CatalogKey.minecraft("generic_9x" + this.rowIndex));
+        checkState(windowType != null, "Window type for %s rows is currently not supported."); // TODO
+        return new MessagePlayOutOpenWindow(getContainerId(), windowType, getTitle());
     }
 
     @Override

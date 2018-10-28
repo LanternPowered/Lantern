@@ -35,7 +35,6 @@ import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueType;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.DataContainer;
@@ -123,14 +122,13 @@ public final class ItemStackContextualValueType implements ContextualValueType<I
             });
             displayView.get(ItemStackStore.LORE).ifPresent(value -> {
                 final List<Text> lore = itemStack.get(Keys.ITEM_LORE).get();
-                try (TranslationContext ignored = TranslationContext.enter()
-                        .enableForcedTranslations()) {
-                    final List<String> loreLines = lore.stream()
-                            .map(LanternTexts::toLegacy)
-                            .collect(Collectors.toList());
-                    if (!loreLines.equals(value)) {
-                        displayView.set(TEMP_LORE, value);
-                        displayView.set(ItemStackStore.LORE, loreLines);
+                if (lore.stream().anyMatch(TranslationHelper::containsNonMinecraftTranslation)) {
+                    displayView.set(TEMP_LORE, value);
+                    try (TranslationContext ignored = TranslationContext.enter()
+                            .enableForcedTranslations()) {
+                        displayView.set(ItemStackStore.LORE, lore.stream()
+                                .map(TextSerializers.JSON::serialize)
+                                .collect(Collectors.toList()));
                     }
                 }
             });

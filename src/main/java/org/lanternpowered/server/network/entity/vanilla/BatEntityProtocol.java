@@ -38,8 +38,8 @@ public class BatEntityProtocol<E extends LanternEntity> extends InsentientEntity
     }
 
     @Override
-    protected int getMobType() {
-        return 65;
+    protected String getMobType() {
+        return "minecraft:bat";
     }
 
     @Override

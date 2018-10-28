@@ -44,7 +44,7 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
      *
      * @return The mob type
      */
-    protected abstract int getMobType();
+    protected abstract String getMobType();
 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
@@ -57,7 +57,9 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
         final double pitch = headRot != null ? headRot.getX() : rot.getX();
         final double headYaw = headRot != null ? headRot.getY() : 0;
 
-        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnMob(getRootEntityId(), this.entity.getUniqueId(), getMobType(),
+        final int entityTypeId = NetworkIDs.REGISTRY.require(getMobType());
+
+        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnMob(getRootEntityId(), this.entity.getUniqueId(), entityTypeId,
                 pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel, fillSpawnParameters()));
         spawnWithEquipment(context);
     }

@@ -58,6 +58,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemTypes;
 
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -73,6 +74,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     private boolean lastCanFly;
     private float lastFlySpeed;
+    private boolean lastFlying;
     private float lastFieldOfView;
 
     private int[] passengerStack = new int[13];
@@ -277,20 +279,19 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         final boolean canFly = canFly();
         final float flySpeed = getFlySpeed();
         final float fieldOfView = getFovModifier();
-        if (gameMode != this.lastGameMode) {
-            context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+        final boolean flying = this.entity.get(Keys.IS_FLYING).orElse(false);
+        if (gameMode != this.lastGameMode || canFly != this.lastCanFly || flySpeed != this.lastFlySpeed
+                || fieldOfView != this.lastFieldOfView || flying != this.lastFlying) {
+            if (gameMode != this.lastGameMode) {
+                context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+            }
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, fieldOfView));
+                    flying, canFly, false, gameMode == GameModes.CREATIVE, flySpeed, fieldOfView));
             this.lastGameMode = gameMode;
             this.lastCanFly = canFly;
             this.lastFlySpeed = flySpeed;
             this.lastFieldOfView = fieldOfView;
-        } else if (canFly != this.lastCanFly || flySpeed != this.lastFlySpeed || fieldOfView != this.lastFieldOfView) {
-            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, fieldOfView));
-            this.lastCanFly = canFly;
-            this.lastFlySpeed = flySpeed;
-            this.lastFieldOfView = fieldOfView;
+            this.lastFlying = flying;
         }
         final float health = this.entity.get(Keys.HEALTH).get().floatValue();
         final int foodLevel = this.entity.get(Keys.FOOD_LEVEL).get();
@@ -349,7 +350,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 // Write the item to a parameter list
                 final DefaultParameterList parameterList = new DefaultParameterList();
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
-                parameterList.add(EntityParameters.Fireworks.ELYTRA_BOOST_PLAYER, getRootEntityId());
+                parameterList.add(EntityParameters.Fireworks.ELYTRA_BOOST_PLAYER, OptionalInt.of(getEntity().getNetworkId()));
 
                 context.sendToAll(() -> new MessagePlayOutSpawnObject(this.elytraRocketId, UUID.randomUUID(), 76, 0,
                         this.entity.getPosition(), 0, 0, Vector3d.ZERO));
@@ -378,6 +379,11 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         } else {
             super.handleEvent(context, event);
         }
+    }
+
+    @Override
+    protected boolean isSprinting() {
+        return this.entity.get(Keys.IS_SPRINTING).orElse(false);
     }
 
     private float getFovModifier() {

@@ -126,7 +126,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     @Override
     protected void doRegistration(BlockType blockType, boolean disallowInbuiltPluginIds) {
-        int internalId = InternalIDRegistries.BLOCK_TYPE_IDS.getInt(blockType.getKey().toString());
+        int internalId = InternalIDRegistries.BLOCK_STATE_START_IDS.getInt(blockType.getKey().toString());
         checkState(internalId != -1, "No internal id could be found for the block id: " + blockType.getKey());
         super.doRegistration(blockType, disallowInbuiltPluginIds);
         final LanternBlockType type = (LanternBlockType) blockType;
@@ -1140,11 +1140,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(shulkerBoxBuilder().build("minecraft", "green_shulker_box"));
         register(shulkerBoxBuilder().build("minecraft", "red_shulker_box"));
         register(shulkerBoxBuilder().build("minecraft", "black_shulker_box"));
-
-
-        //////////////
-        ///  Sign  ///
-        //////////////
+        //////////////////
+        ///  Oak Sign  ///
+        //////////////////
         register(simpleBuilder()
                         .traits(LanternIntegerTraits.ROTATION, LanternBooleanTraits.WATERLOGGED)
                         .defaultState(state -> state
@@ -1156,7 +1154,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .behaviors(pipeline -> pipeline
                                 .add(new SignInteractionBehavior()))
                         .tileEntityType(() -> TileEntityTypes.SIGN)
-                        .build("minecraft", "sign"));
+                        .build("minecraft", "oak_sign"));
         register(simpleBuilder()
                         .traits(LanternEnumTraits.HORIZONTAL_FACING, LanternBooleanTraits.WATERLOGGED)
                         .defaultState(state -> state
@@ -1168,7 +1166,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .behaviors(pipeline -> pipeline
                                 .add(new SignInteractionBehavior()))
                         .tileEntityType(() -> TileEntityTypes.SIGN)
-                        .build("minecraft", "wall_sign"));
+                        .build("minecraft", "oak_wall_sign"));
         /////////////////
         ///  Banners  ///
         /////////////////
@@ -1197,6 +1195,23 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .tileEntityType(() -> TileEntityTypes.BANNER)
                         .build("minecraft", colorName + "_wall_banner"));
         }
+        /////////////////////
+        ///   Grindstone  ///
+        /////////////////////
+        /*
+        register(simpleBuilder()
+                        .traits(LanternEnumTraits.HORIZONTAL_FACING, LanternEnumTraits.)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(1200.0)))
+                        // .tileEntityType(() -> TileEntityTypes.DISPENSER)
+                        .behaviors(pipeline -> pipeline
+                                .add(new RotationPlacementBehavior()))
+                        .build("minecraft", "grindstone"));
+                        */
 
         // @formatter:on
     }

@@ -32,6 +32,8 @@ import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementContextualValueType;
 import org.lanternpowered.server.network.vanilla.recipe.NetworkRecipe;
 import org.lanternpowered.server.network.vanilla.recipe.NetworkRecipeContextualValueType;
+import org.lanternpowered.server.network.vanilla.trade.NetworkTradeOffer;
+import org.lanternpowered.server.network.vanilla.trade.NetworkTradeOfferContextualValueType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
@@ -65,6 +67,11 @@ public final class ContextualValueTypes {
      * A serializer for {@link NetworkAdvancement} objects.
      */
     public static final ContextualValueType<NetworkAdvancement> ADVANCEMENT = new NetworkAdvancementContextualValueType();
+
+    /**
+     * A serializer for {@link NetworkTradeOffer} objects.
+     */
+    public static final ContextualValueType<NetworkTradeOffer> TRADE_OFFER = new NetworkTradeOfferContextualValueType();
 
     private ContextualValueTypes() {
     }

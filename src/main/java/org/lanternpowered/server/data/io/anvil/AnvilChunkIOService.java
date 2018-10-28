@@ -181,11 +181,15 @@ public class AnvilChunkIOService implements ChunkIOService {
         for (DataView sectionTag : sectionList) {
             final int y = sectionTag.getInt(Y).get();
 
+            /* TODO
             final byte[] blockLight = (byte[]) sectionTag.get(BLOCK_LIGHT).get();
             final byte[] skyLight = (byte[]) sectionTag.get(SKY_LIGHT).get();
 
             final NibbleArray blockLightNibbleArray = new NibbleArray(blockLight.length * 2, blockLight, true);
-            final NibbleArray skyLightNibbleArray = new NibbleArray(skyLight.length * 2, skyLight, true);
+            final NibbleArray skyLightNibbleArray = new NibbleArray(skyLight.length * 2, skyLight, true);*/
+
+            final NibbleArray blockLightNibbleArray = new NibbleArray(LanternChunk.CHUNK_SECTION_VOLUME);
+            final NibbleArray skyLightNibbleArray = new NibbleArray(LanternChunk.CHUNK_SECTION_VOLUME);
 
             tileEntitySections[y] = new Short2ObjectOpenHashMap<>();
             blockStateArray[y] = ChunkBlockStateArray.deserializeFrom(sectionTag);
@@ -300,7 +304,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         levelDataView.set(INHABITED_TIME, chunk.getLongInhabitedTime());
 
         // Chunk sections
-        final ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(true);
+        final ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots();
         final List<DataView> sectionDataViews = new ArrayList<>();
         final List<DataView> tileEntityDataViews = new ArrayList<>();
 
@@ -317,11 +321,12 @@ public class AnvilChunkIOService implements ChunkIOService {
             ChunkBlockStateArray.serializeTo(sectionDataView, section.blockStates);
 
             // Serialize light nibble arrays
+            /* TODO
             sectionDataView.set(BLOCK_LIGHT, section.lightFromBlock);
             final byte[] lightFromSky = section.lightFromSky;
             if (lightFromSky != null) {
                 sectionDataView.set(SKY_LIGHT, lightFromSky);
-            }
+            }*/
 
             sectionDataViews.add(sectionDataView);
 

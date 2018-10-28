@@ -33,8 +33,6 @@ import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
-import org.spongepowered.api.data.type.HandTypes;
 
 public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCustomPayload {
 
@@ -43,10 +41,6 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
         if (message instanceof MessagePlayInOutBrand) {
             return new MessageResult("minecraft:brand", context.byteBufAlloc().buffer()
                     .writeString(((MessagePlayInOutBrand) message).getBrand()));
-        } else if (message instanceof MessagePlayOutOpenBook) {
-            final ByteBuffer buf = context.byteBufAlloc().buffer();
-            buf.writeVarInt(((MessagePlayOutOpenBook) message).getHandType() == HandTypes.MAIN_HAND ? 0 : 1);
-            return new MessageResult("minecraft:book_open", buf);
         }
         throw new EncoderException("Unsupported message type: " + message);
     }

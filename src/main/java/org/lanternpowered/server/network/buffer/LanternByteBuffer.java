@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.network.buffer;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
@@ -41,20 +39,26 @@ import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStrea
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.network.item.NetworkItemHelper;
 import org.lanternpowered.server.network.item.RawItemStack;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class LanternByteBuffer implements ByteBuffer {
+
+    private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
     private final ByteBuf buf;
 
@@ -563,6 +567,36 @@ public final class LanternByteBuffer implements ByteBuffer {
         return this.buf.getDoubleLE(index);
     }
 
+    /**
+     * Writes a optional int to the {@link ByteBuf}.
+     *
+     * @param byteBuf The byte buffer
+     * @param optValue The optional int value
+     */
+    public static void writeOptVarInt(ByteBuf byteBuf, OptionalInt optValue) {
+        long value = 0;
+        if (optValue.isPresent()) {
+            value = optValue.getAsInt() << 1 | 1;
+        }
+        writeVarLong(byteBuf, value);
+    }
+
+    /**
+     * Reads a optional int from the {@link ByteBuf}.
+     *
+     * @param byteBuf The byte buffer
+     * @return The optional int value
+     */
+    public static OptionalInt readOptVarInt(ByteBuf byteBuf) {
+        // We have a max of 35 bits, so we have 3 extra we can use,
+        // one is now used to represent "empty".
+        long value = readVarLong(byteBuf, 35);
+        if ((value & 0x1) != 0) {
+            return OptionalInt.of((int) (value >>> 1));
+        }
+        return OptionalInt.empty();
+    }
+
     public static void writeVarInt(ByteBuf byteBuf, int value) {
         while ((value & 0xFFFFFF80) != 0L) {
             byteBuf.writeByte((value & 0x7F) | 0x80);
@@ -583,6 +617,46 @@ public final class LanternByteBuffer implements ByteBuffer {
             }
         }
         return value | (b << i);
+    }
+
+    /**
+     * Reads a long value from the given {@link ByteBuf} in the varlong encoding.
+     *
+     * @param byteBuf The byte buf
+     * @return The read long value
+     */
+    public static long readVarLong(ByteBuf byteBuf) {
+        return readVarLong(byteBuf, 63);
+    }
+
+    /**
+     * Reads a long value from the given {@link ByteBuf} in the varlong encoding. The
+     * amount of read bits may not exceed the given limit.
+     *
+     * @param byteBuf The byte buf
+     * @param maxBits The maximum amount of bits
+     * @return The read long value
+     */
+    public static long readVarLong(ByteBuf byteBuf, int maxBits) {
+        long value = 0L;
+        int i = 0;
+        long b;
+        while (((b = byteBuf.readByte()) & 0x80L) != 0) {
+            value |= (b & 0x7F) << i;
+            i += 7;
+            if (i > maxBits) {
+                throw new DecoderException("Variable length is too long!");
+            }
+        }
+        return value | (b << i);
+    }
+
+    public static void writeVarLong(ByteBuf byteBuf, long value) {
+        while ((value & 0xFFFFFFFFFFFFFF80L) != 0L) {
+            byteBuf.writeByte(((int) value & 0x7F) | 0x80);
+            value >>>= 7;
+        }
+        byteBuf.writeByte((int) value & 0x7F);
     }
 
     @Override
@@ -616,19 +690,19 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer writeString(String data) {
-        writeByteArray(data.getBytes(StandardCharsets.UTF_8));
+        writeByteArray(data.getBytes(UTF_8));
         return this;
     }
 
     @Override
     public LanternByteBuffer setString(int index, String data) {
-        setByteArray(index, data.getBytes(StandardCharsets.UTF_8));
+        setByteArray(index, data.getBytes(UTF_8));
         return this;
     }
 
     @Override
     public String readLimitedString(int maxLength) throws DecoderException {
-        return new String(readLimitedByteArray(maxLength * 4), StandardCharsets.UTF_8);
+        return new String(readLimitedByteArray(maxLength * 4), UTF_8);
     }
 
     @Override
@@ -638,12 +712,12 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public String getString(int index) {
-        return new String(readByteArray(index), StandardCharsets.UTF_8);
+        return new String(readByteArray(index), UTF_8);
     }
 
     @Override
     public LanternByteBuffer writeUTF(String data) {
-        final byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+        final byte[] bytes = data.getBytes(UTF_8);
         if (bytes.length > 32767) {
             throw new EncoderException("String too big (was " + data.length() + " bytes encoded, max " + 32767 + ")");
         }
@@ -654,27 +728,18 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setUTF(int index, String data) {
-        checkNotNull(data, "data");
-        final int oldIndex = this.buf.writerIndex();
-        this.buf.writerIndex(index);
-        writeUTF(data);
-        this.buf.writerIndex(oldIndex);
-        return this;
+        return setAt(index, data, this::writeUTF);
     }
 
     @Override
     public String readUTF() {
         final int length = readShort();
-        return new String(readBytes(length), StandardCharsets.UTF_8);
+        return new String(readBytes(length), UTF_8);
     }
 
     @Override
     public String getUTF(int index) {
-        final int oldIndex = this.buf.readerIndex();
-        this.buf.readerIndex(index);
-        final String data = readUTF();
-        this.buf.readerIndex(oldIndex);
-        return data;
+        return getAt(index, this::readUTF);
     }
 
     @Override
@@ -686,11 +751,7 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setUniqueId(int index, UUID data) {
-        final int oldIndex = this.buf.writerIndex();
-        this.buf.writerIndex(index);
-        writeUniqueId(data);
-        this.buf.writerIndex(oldIndex);
-        return this;
+        return setAt(index, data, this::writeUniqueId);
     }
 
     @Override
@@ -721,11 +782,7 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setDataView(int index, @Nullable DataView data) {
-        final int oldIndex = this.buf.writerIndex();
-        this.buf.writerIndex(index);
-        writeDataView(data);
-        this.buf.writerIndex(oldIndex);
-        return this;
+        return setAt(index, data, this::writeDataView);
     }
 
     @Nullable
@@ -790,11 +847,7 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer writeVarLong(long value) {
-        while ((value & 0xFFFFFFFFFFFFFF80L) != 0L) {
-            this.buf.writeByte(((int) value & 0x7F) | 0x80);
-            value >>>= 7;
-        }
-        this.buf.writeByte((int) value & 0x7F);
+        writeVarLong(this.buf, value);
         return this;
     }
 
@@ -809,17 +862,7 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public long readVarLong() {
-        long value = 0L;
-        int i = 0;
-        long b;
-        while (((b = this.buf.readByte()) & 0x80L) != 0) {
-            value |= (b & 0x7F) << i;
-            i += 7;
-            if (i > 63) {
-                throw new DecoderException("Variable length is too long!");
-            }
-        }
-        return value | (b << i);
+        return readVarLong(this.buf);
     }
 
     @Override
@@ -843,22 +886,53 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public Vector3i readVector3i() {
-        final long value = this.buf.readLong();
-        final int x = (int) (value >> 38);
-        final int y = (int) (value << 26 >> 52);
-        final int z = (int) (value << 38 >> 38);
+        final int x = readInteger();
+        final int y = readInteger();
+        final int z = readInteger();
         return new Vector3i(x, y, z);
     }
 
     @Override
     public LanternByteBuffer writeVector3i(int x, int y, int z) {
-        this.buf.writeLong(((long) x & 0x3ffffff) << 38 | ((long) y & 0xfff) << 26 | ((long) z & 0x3ffffff));
+        writeInteger(x);
+        writeInteger(y);
+        writeInteger(z);
         return this;
     }
 
     @Override
     public LanternByteBuffer writeVector3i(Vector3i vector) {
         return writeVector3i(vector.getX(), vector.getY(), vector.getZ());
+    }
+
+    @Override
+    public Vector3i getPosition(int index) {
+        return getAt(index, this::readPosition);
+    }
+
+    @Override
+    public LanternByteBuffer setPosition(int index, Vector3i vector) {
+        return setAt(index, vector, this::writePosition);
+    }
+
+    @Override
+    public Vector3i readPosition() {
+        final long value = this.buf.readLong();
+        final int x = (int) (value >> 38);
+        final int y = (int) (value & 0xfff);
+        final int z = (int) (value << 38 >> 38) >> 12;
+        return new Vector3i(x, y, z);
+    }
+
+    @Override
+    public LanternByteBuffer writePosition(int x, int y, int z) {
+        this.buf.writeLong(((long) x & 0x3ffffff) << 38 | ((long) z & 0x3ffffff) << 12 | ((long) y & 0xfff));
+        return this;
+    }
+
+    @Override
+    public LanternByteBuffer writePosition(Vector3i vector) {
+        return writePosition(vector.getX(), vector.getY(), vector.getZ());
     }
 
     @Override
@@ -923,6 +997,30 @@ public final class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer writeVector3d(Vector3d vector) {
         return writeVector3d(vector.getX(), vector.getY(), vector.getZ());
+    }
+
+    @Override
+    public CatalogKey getCatalogKey(int index) {
+        return getAt(index, this::readCatalogKey);
+    }
+
+    @Override
+    public LanternByteBuffer setCatalogKey(int index, CatalogKey catalogKey) {
+        return setAt(index, catalogKey, this::writeCatalogKey);
+    }
+
+    @Override
+    public CatalogKey readCatalogKey() {
+        return CatalogKey.resolve(readString());
+    }
+
+    @Override
+    public LanternByteBuffer writeCatalogKey(CatalogKey catalogKey) {
+        if (catalogKey.getNamespace().equals(CatalogKey.MINECRAFT_NAMESPACE)) {
+            return writeString(catalogKey.getValue());
+        } else {
+            return writeString(catalogKey.toString());
+        }
     }
 
     @Nullable

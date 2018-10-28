@@ -34,7 +34,7 @@ public class MagmaCubeEntityProtocol<E extends LanternEntity> extends AbstractSl
     }
 
     @Override
-    protected int getMobType() {
-        return 62;
+    protected String getMobType() {
+        return "minecraft:magma_cube";
     }
 }

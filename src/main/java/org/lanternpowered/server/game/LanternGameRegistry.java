@@ -672,7 +672,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
                 .registerModule(QueryOperationType.class, new QueryOperationRegistryModule())
                 .registerModule(new InventoryTransformationRegistryModule())
-                .registerModule(GuiId.class, ClientContainerRegistryModule.get())
+                .registerModule(GuiId.class, ClientContainerRegistryModule.INSTANCE)
                 .registerModule(DyeColor.class, DyeColorRegistryModule.get())
                 .registerModule(PickupRule.class, PickupRuleRegistryModule.get())
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())

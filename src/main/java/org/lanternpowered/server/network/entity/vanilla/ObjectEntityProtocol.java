@@ -42,7 +42,7 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
         super(entity);
     }
 
-    protected abstract int getObjectType();
+    protected abstract String getObjectType();
 
     protected abstract int getObjectData();
 
@@ -58,7 +58,7 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
         double pitch = rot.getX();
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnObject(entityId, this.entity.getUniqueId(),
-                this.getObjectType(), this.getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
+                NetworkIDs.REGISTRY.require(getObjectType()), getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
         final ParameterList parameterList = fillSpawnParameters();
         if (!parameterList.isEmpty()) {
             context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));

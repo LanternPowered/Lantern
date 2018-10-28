@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import org.lanternpowered.server.data.MemoryDataContainer;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -68,6 +69,7 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             sectionBitmask |= 1 << i;
             final MessagePlayOutChunkData.Section section = sections[i];
             final VariableValueArray types = section.getTypes();
+            dataBuf.writeShort((short) section.getNonAirBlockCount());
             dataBuf.writeByte((byte) types.getBitsPerValue());
             final int[] palette = section.getPalette();
             if (palette != null) {
@@ -78,16 +80,9 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             }
             final long[] backing = types.getBacking();
             dataBuf.writeVarInt(backing.length);
-            final byte[] blockLight = section.getBlockLight();
-            final byte[] skyLight = section.getSkyLight();
-            dataBuf.ensureWritable(backing.length * 8 + blockLight.length +
-                    (skyLight != null ? skyLight.length : 0));
+            dataBuf.ensureWritable(backing.length * Long.BYTES);
             for (long value : backing) {
                 dataBuf.writeLong(value);
-            }
-            dataBuf.writeBytes(blockLight);
-            if (skyLight != null) {
-                dataBuf.writeBytes(skyLight);
             }
             final Short2ObjectMap<DataView> tileEntities = section.getTileEntities();
             if (!tileEntities.isEmpty() && tileEntitiesBuf == null) {
@@ -112,6 +107,7 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
         }
 
         buf.writeVarInt(sectionBitmask);
+        buf.writeDataView(new MemoryDataContainer());
         buf.writeVarInt(dataBuf.writerIndex());
         try {
             buf.writeBytes(dataBuf);

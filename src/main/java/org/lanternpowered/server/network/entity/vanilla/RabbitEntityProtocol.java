@@ -44,8 +44,8 @@ public class RabbitEntityProtocol<E extends LanternEntity> extends AnimalEntityP
     }
 
     @Override
-    protected int getMobType() {
-        return 101;
+    protected String getMobType() {
+        return "minecraft:rabbit";
     }
 
     @Override

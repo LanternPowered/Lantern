@@ -27,11 +27,11 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.google.common.base.Joiner;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
@@ -46,12 +46,13 @@ import org.spongepowered.api.command.args.PatternMatchingCommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -71,7 +72,36 @@ public final class CommandSetData extends CommandProvider {
 
         specBuilder
                 .arguments(
-                        GenericArguments.playerOrSource(Text.of("player")),
+                        new CommandElement(Text.of("target")) {
+                            private final CommandElement player = GenericArguments.player(Text.of("target"));
+                            private final CommandElement entity = GenericArguments.entityOrTarget(Text.of("target"));
+
+                            @Override
+                            public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
+                                final CommandArgs.Snapshot snapshot = args.getSnapshot();
+                                try {
+                                    this.entity.parse(source, args, context);
+                                } catch (ArgumentParseException ex) {
+                                    args.applySnapshot(snapshot);
+                                    try {
+                                        this.player.parse(source, args, context);
+                                    } catch (ArgumentParseException ex2) {
+                                        throw ex;
+                                    }
+                                }
+                            }
+
+                            @Nullable
+                            @Override
+                            protected Object parseValue(CommandSource source, CommandArgs args) {
+                                throw new UnsupportedOperationException();
+                            }
+
+                            @Override
+                            public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+                                return this.player.complete(src, args, context);
+                            }
+                        },
                         new PatternMatchingCommandElement(Text.of("key")) {
                             @Override
                             protected Iterable<String> getChoices(CommandSource source) {
@@ -132,11 +162,12 @@ public final class CommandSetData extends CommandProvider {
                         }
                 )
                 .executor((src, args) -> {
-                    final Player target = args.<Player>getOne("player").get();
+                    final Collection<Entity> targets = args.getAll("target");
                     final Key key = args.<Key>getOne("key").get();
                     final Object data = args.<ValueHolder>getOne("data").get().data;
-                    target.offer(key, data);
-                    src.sendMessage(t("Successfully offered the data for the key %s to the player %s", key.getKey(), target.getName()));
+                    targets.forEach(target -> target.offer(key, data));
+                    src.sendMessage(t("Successfully offered the data for the key %s to the targets: %s", key.getKey(),
+                            Joiner.on(",").join(targets.stream().map(entity -> entity.getTranslation().get()).collect(Collectors.toList()))));
                     return CommandResult.success();
                 });
     }

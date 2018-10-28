@@ -57,8 +57,7 @@ public class BeaconClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.BEACON,
-                getTitle(), TOP_SLOT_FLAGS.length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.BEACON, getTitle());
     }
 
     @Override

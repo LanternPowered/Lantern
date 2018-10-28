@@ -46,8 +46,8 @@ public class VillagerEntityProtocol<E extends LanternEntity> extends AgeableEnti
     }
 
     @Override
-    protected int getMobType() {
-        return 120;
+    protected String getMobType() {
+        return "minecraft:villager";
     }
 
     @Override

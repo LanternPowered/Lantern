@@ -64,21 +64,21 @@ public class LanternSelectorFactory implements SelectorFactory {
     private static final Pattern keyValueListPattern = Pattern.compile("\\G(\\w+)=([-!]?[\\w-]*)(?:$|,)");
     private final static String argumentNamesLookup = "xyzr";
 
-    private static final Map<String, SelectorType> idToType;
+    private final Map<String, ArgumentHolder.Limit<ArgumentType<Integer>>> scoreToTypeMap = Maps.newLinkedHashMap();
+    private final Map<String, ArgumentType<?>> argumentLookupMap = Maps.newLinkedHashMap();
 
-    static {
+    private final Map<String, SelectorType> idToType;
+
+    public LanternSelectorFactory() {
         ImmutableMap.Builder<String, SelectorType> builder =
                 ImmutableMap.builder();
 
         for (SelectorType type : Sponge.getRegistry().getAllOf(SelectorType.class)) {
-            builder.put(type.getName(), type);
+            builder.put(((LanternSelectorType) type).getCode(), type);
         }
 
         idToType = builder.build();
     }
-
-    private final Map<String, ArgumentHolder.Limit<ArgumentType<Integer>>> scoreToTypeMap = Maps.newLinkedHashMap();
-    private final Map<String, ArgumentType<?>> argumentLookupMap = Maps.newLinkedHashMap();
 
     @Override
     public Selector.Builder createBuilder() {

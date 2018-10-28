@@ -35,8 +35,8 @@ public class ArmorStandEntityProtocol<E extends LanternEntity> extends CreatureE
     }
 
     @Override
-    protected int getMobType() {
-        return 30;
+    protected String getMobType() {
+        return "minecraft:armor_stand";
     }
 
     @Override

@@ -126,6 +126,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
     freeCompilerArgs = [
             '-Xuse-experimental=kotlin.ExperimentalUnsignedTypes',
             '-Xuse-experimental=kotlin.contracts.ExperimentalContracts',
+            '-XXLanguage:+InlineClasses',
             '-Xjvm-default=enable'
     ]
 }

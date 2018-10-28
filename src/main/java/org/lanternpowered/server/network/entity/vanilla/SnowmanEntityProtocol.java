@@ -38,8 +38,8 @@ public class SnowmanEntityProtocol<E extends LanternEntity> extends InsentientEn
     }
 
     @Override
-    protected int getMobType() {
-        return 97;
+    protected String getMobType() {
+        return "minecraft:snow_golem";
     }
 
     @Override

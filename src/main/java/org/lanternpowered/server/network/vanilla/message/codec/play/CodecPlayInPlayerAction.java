@@ -59,15 +59,14 @@ public final class CodecPlayInPlayerAction implements Codec<Message> {
         // Leave bed button is pressed
         } else if (action == 2) {
             return new MessagePlayInLeaveBed();
-        // Horse jump power action
+        // Horse jump start
         } else if (action == 5) {
+            return UnknownMessage.INSTANCE;
+        // Horse jump stop
+        } else if (action == 6) {
             // Make sure that the vehicle movement message doesn't add the jump message as well
             context.getChannel().attr(CANCEL_NEXT_JUMP_MESSAGE).set(true);
             return new MessagePlayInPlayerVehicleJump(false, ((float) value) / 100f);
-        } else if (action == 6) {
-            // Open inventory, there is another message that sends this and this one will
-            // be removed in 1.9, so ignoring it.
-            return UnknownMessage.INSTANCE;
         } else if (action == 7) {
             return new MessagePlayInRequestHorseInventory();
         } else if (action == 8) {

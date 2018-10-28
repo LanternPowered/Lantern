@@ -96,8 +96,7 @@ public class EnchantmentTableClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.ENCHANTING_TABLE,
-                getTitle(), TOP_SLOT_FLAGS.length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.ENCHANTMENT, getTitle());
     }
 
     @Override

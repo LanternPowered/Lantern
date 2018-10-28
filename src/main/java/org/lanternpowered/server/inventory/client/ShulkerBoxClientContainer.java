@@ -43,7 +43,6 @@ public class ShulkerBoxClientContainer extends ChestClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.SHULKER_BOX,
-                getTitle(), getSlotFlags().length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.SHULKER_BOX, getTitle());
     }
 }

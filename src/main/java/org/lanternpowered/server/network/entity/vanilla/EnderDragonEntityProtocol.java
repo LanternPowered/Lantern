@@ -51,8 +51,8 @@ public class EnderDragonEntityProtocol<E extends LanternEntity> extends Creature
     }
 
     @Override
-    protected int getMobType() {
-        return 63;
+    protected String getMobType() {
+        return "minecraft:ender_dragon";
     }
 
     @Override

@@ -34,7 +34,7 @@ public class SilverfishEntityProtocol<E extends LanternEntity> extends Insentien
     }
 
     @Override
-    protected int getMobType() {
-        return 60;
+    protected String getMobType() {
+        return "minecraft:silverfish";
     }
 }

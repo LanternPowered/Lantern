@@ -1,0 +1,12 @@
+[
+  "minecraft:core",
+  "minecraft:idle",
+  "minecraft:work",
+  "minecraft:play",
+  "minecraft:rest",
+  "minecraft:meet",
+  "minecraft:panic",
+  "minecraft:raid",
+  "minecraft:pre_raid",
+  "minecraft:hide"
+]

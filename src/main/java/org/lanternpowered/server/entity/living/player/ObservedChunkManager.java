@@ -26,7 +26,6 @@
 package org.lanternpowered.server.entity.living.player;
 
 import static org.lanternpowered.server.world.chunk.LanternChunk.ALL_SECTIONS_BIT_MASK;
-import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_VOLUME;
 
 import com.flowpowered.math.vector.Vector2i;
@@ -62,7 +61,6 @@ import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -157,18 +155,16 @@ public final class ObservedChunkManager implements WorldEventListener {
     }
 
     private static final VariableValueArray EMPTY_SECTION_TYPES = new VariableValueArray(4, CHUNK_SECTION_VOLUME);
+    /*
     private static final byte[] EMPTY_SECTION_LIGHT = new byte[CHUNK_SECTION_SIZE];
     private static final byte[] EMPTY_SECTION_SKY_LIGHT = new byte[CHUNK_SECTION_SIZE];
 
     static {
         Arrays.fill(EMPTY_SECTION_SKY_LIGHT, (byte) 255);
-    }
-
-    private static final MessagePlayOutChunkData.Section EMPTY_SECTION_SKYLIGHT = new MessagePlayOutChunkData.Section(
-            EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, EMPTY_SECTION_SKY_LIGHT, new Short2ObjectOpenHashMap<>());
+    }*/
 
     private static final MessagePlayOutChunkData.Section EMPTY_SECTION = new MessagePlayOutChunkData.Section(
-            EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, null, new Short2ObjectOpenHashMap<>());
+            EMPTY_SECTION_TYPES, new int[1], 0, new Short2ObjectOpenHashMap<>());
 
     private static Map<Vector3i, LanternTileEntity> getMappedTileEntities(LanternChunk chunk) {
         return chunk.getTileEntities().stream().collect(Collectors.toMap(
@@ -389,10 +385,7 @@ public final class ObservedChunkManager implements WorldEventListener {
         }
 
         private List<Message> createLoadChunkMessages(LanternChunk chunk, int sectionsBitMask, boolean biomes) {
-            // Whether we should send sky light
-            final boolean skyLight = world.getDimension().hasSky();
-
-            final LanternChunk.ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(skyLight, sectionsBitMask);
+            final LanternChunk.ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(sectionsBitMask);
             final MessagePlayOutChunkData.Section[] msgSections = new MessagePlayOutChunkData.Section[sections.length];
 
             final List<Message> messages = new ArrayList<>();
@@ -423,13 +416,13 @@ public final class ObservedChunkManager implements WorldEventListener {
                             TileEntityProtocolHelper.init(protocol, initContext);
                         }
                     }
-                    msgSections[i] = new MessagePlayOutChunkData.Section(blockStates.getBacking(), intPalette,
-                            section.lightFromBlock, section.lightFromSky, tileEntityInitData);
+                    msgSections[i] = new MessagePlayOutChunkData.Section(
+                            blockStates.getBacking(), intPalette, section.nonAirBlockCount, tileEntityInitData);
                 // The insert entry setting is used to send a "null" chunk
                 // after the chunk is already send to the client
                 // TODO: Better way to do this?
                 } else if (!biomes && ((1 << i) & sectionsBitMask) != 0) {
-                    msgSections[i] = skyLight ? EMPTY_SECTION_SKYLIGHT : EMPTY_SECTION;
+                    msgSections[i] = EMPTY_SECTION;
                 }
             }
 
@@ -439,7 +432,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                 // TODO: Only allow non-custom biome types to be send and maybe the ones supported by forge mods?
             }
 
-            messages.add(0, new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), skyLight, msgSections, biomesArray));
+            messages.add(0, new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
             return messages;
         }
 

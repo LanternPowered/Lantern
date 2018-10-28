@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.entity.parameter;
 
 import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
@@ -38,12 +39,13 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Direction;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 public final class ParameterValueTypes {
 
     public static final ParameterValueType<Byte> BYTE = new ParameterValueType<>(ByteBuffer::writeByte);
-    public static final ParameterValueType<Integer> INTEGER = new ParameterValueType<>(ByteBuffer::writeVarInt);
+    public static final ParameterValueType<Integer> INT = new ParameterValueType<>(ByteBuffer::writeVarInt);
     public static final ParameterValueType<Float> FLOAT = new ParameterValueType<>(ByteBuffer::writeFloat);
     public static final ParameterValueType<String> STRING = new ParameterValueType<>(ByteBuffer::writeString);
     public static final ParameterValueType<Text> TEXT = new ParameterValueType<>(
@@ -56,10 +58,10 @@ public final class ParameterValueTypes {
             (ctx, buf, value) -> ctx.write(buf, ContextualValueTypes.ITEM_STACK, value));
     public static final ParameterValueType<Boolean> BOOLEAN = new ParameterValueType<>(ByteBuffer::writeBoolean);
     public static final ParameterValueType<Vector3f> VECTOR_3F = new ParameterValueType<>(ByteBuffer::writeVector3f);
-    public static final ParameterValueType<Vector3i> VECTOR_3I = new ParameterValueType<>(ByteBuffer::writeVector3i);
+    public static final ParameterValueType<Vector3i> VECTOR_3I = new ParameterValueType<>(ByteBuffer::writePosition);
     public static final ParameterValueType<Optional<Vector3i>> OPTIONAL_VECTOR_3I = new ParameterValueType<>((buf, value) -> {
         buf.writeBoolean(value.isPresent());
-        value.ifPresent(buf::writeVector3i);
+        value.ifPresent(buf::writePosition);
     });
     public static final ParameterValueType<Direction> DIRECTION = new ParameterValueType<>(
             (buf, value) -> buf.writeVarInt(CodecUtils.encodeDirection(value)));
@@ -71,5 +73,18 @@ public final class ParameterValueTypes {
             (buf, value) -> buf.writeVarInt(value.map(v -> BlockRegistryModule.get().getStateInternalId(v)).orElse(0)));
     public static final ParameterValueType<Optional<DataView>> NBT_TAG = new ParameterValueType<>(
             (buf, value) -> buf.writeDataView(value.orElse(null)));
-    // TODO: Another parameter type, particle type based?
+    public static final ParameterValueType<Void> PARTICLE = new ParameterValueType<>(
+            (ctx, buf, value) -> { throw new UnsupportedOperationException("TODO"); }); // TODO
+    public static final ParameterValueType<Void> VILLAGER_DATA = new ParameterValueType<>(
+            (ctx, buf, value) -> { throw new UnsupportedOperationException("TODO"); }); // TODO
+    public static final ParameterValueType<OptionalInt> OPTIONAL_INT = new ParameterValueType<>((buf, value) -> {
+        if (value.isPresent()) {
+            // What about -1? And Integer.MAX_VALUE?
+            buf.writeVarInt(value.getAsInt() + 1);
+        } else {
+            buf.writeVarInt(0);
+        }
+    });
+    public static final ParameterValueType<Pose> POSE = new ParameterValueType<>(
+            (buf, value) -> buf.writeVarInt(value.ordinal()));
 }

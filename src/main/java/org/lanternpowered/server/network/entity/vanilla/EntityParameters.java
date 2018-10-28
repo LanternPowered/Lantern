@@ -26,14 +26,17 @@
 package org.lanternpowered.server.network.entity.vanilla;
 
 import com.flowpowered.math.vector.Vector3f;
+import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.network.entity.parameter.ParameterType;
 import org.lanternpowered.server.network.entity.parameter.ParameterTypeCollection;
 import org.lanternpowered.server.network.entity.parameter.ParameterValueTypes;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 public final class EntityParameters {
@@ -57,7 +60,7 @@ public final class EntityParameters {
         /**
          * The air level of the entity.
          */
-        public static final ParameterType<Integer> AIR_LEVEL = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> AIR_LEVEL = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         /**
          * The custom name of the entity.
@@ -79,6 +82,8 @@ public final class EntityParameters {
          */
         public static final ParameterType<Boolean> NO_GRAVITY = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
+        public static final ParameterType<Pose> POSE = PARAMETERS.newParameterType(ParameterValueTypes.POSE);
+
         private Base() {
         }
     }
@@ -91,8 +96,9 @@ public final class EntityParameters {
          * Bit mask Meaning
          * 0x01     Is hand active
          * 0x02     Active hand (0 = main hand, 1 = offhand)
+         * 0x04     In riptide spin attack
          */
-        public static final ParameterType<Byte> HAND_DATA = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
+        public static final ParameterType<Byte> FLAGS = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
 
         /**
          * The health of the entity.
@@ -102,7 +108,7 @@ public final class EntityParameters {
         /**
          * The potion effect color of the particles that spawn around the player.
          */
-        public static final ParameterType<Integer> POTION_EFFECT_COLOR = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> POTION_EFFECT_COLOR = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         /**
          * Whether the potion effect particles are ambient.
@@ -112,7 +118,9 @@ public final class EntityParameters {
         /**
          * The amount of arrows that are in the entity.
          */
-        public static final ParameterType<Integer> ARROWS_IN_ENTITY = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> ARROWS_IN_ENTITY = PARAMETERS.newParameterType(ParameterValueTypes.INT);
+
+        public static final ParameterType<Optional<BlockState>> UNKNOWN = PARAMETERS.newParameterType(ParameterValueTypes.OPTIONAL_BLOCK_STATE);
 
         private Living() {
         }
@@ -174,7 +182,7 @@ public final class EntityParameters {
         /**
          * The score of the player. This is displayed on the respawn screen.
          */
-        public static final ParameterType<Integer> SCORE = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> SCORE = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         /**
          * The displayed skin parts.
@@ -207,7 +215,7 @@ public final class EntityParameters {
         /**
          * The size of the slime.
          */
-        public static final ParameterType<Integer> SIZE = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> SIZE = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private AbstractSlime() {
         }
@@ -286,9 +294,9 @@ public final class EntityParameters {
 
         public static final ParameterTypeCollection PARAMETERS = AbstractHorse.PARAMETERS.copy();
 
-        public static final ParameterType<Integer> VARIANT = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> VARIANT = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
-        public static final ParameterType<Integer> ARMOR = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> ARMOR = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private Horse() {
         }
@@ -340,7 +348,7 @@ public final class EntityParameters {
 
         public static final ParameterTypeCollection PARAMETERS = Ageable.PARAMETERS.copy();
 
-        public static final ParameterType<Integer> UNUSED = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> UNUSED = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         public static final ParameterType<Boolean> HANDS_UP = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
@@ -362,7 +370,7 @@ public final class EntityParameters {
 
         public static final ParameterType<Boolean> IS_CONVERTING = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
-        public static final ParameterType<Integer> PROFESSION = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> PROFESSION = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private ZombieVillager() {
         }
@@ -416,7 +424,7 @@ public final class EntityParameters {
 
         public static final ParameterType<Boolean> IS_RETRACTING_SPIKES = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
-        public static final ParameterType<Integer> TARGET = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> TARGET = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private AbstractGuardian() {
         }
@@ -452,7 +460,7 @@ public final class EntityParameters {
 
         public static final ParameterTypeCollection PARAMETERS = Ageable.PARAMETERS.copy();
 
-        public static final ParameterType<Integer> VARIANT = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> VARIANT = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private Rabbit() {
         }
@@ -503,14 +511,29 @@ public final class EntityParameters {
 
     public static final class Ocelot {
 
-        public static final ParameterTypeCollection PARAMETERS = TameableAnimal.PARAMETERS.copy();
+        public static final ParameterTypeCollection PARAMETERS = Ageable.PARAMETERS.copy();
 
-        public static final ParameterType<Integer> VARIANT = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Boolean> TRUSTING = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
         private Ocelot() {
         }
     }
 
+    public static final class Cat {
+
+        public static final ParameterTypeCollection PARAMETERS = TameableAnimal.PARAMETERS.copy();
+
+        public static final ParameterType<Integer> VARIANT = PARAMETERS.newParameterType(ParameterValueTypes.INT);
+
+        public static final ParameterType<Boolean> UNKNOWN_1 = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
+
+        public static final ParameterType<Boolean> UNKNOWN_2 = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
+
+        public static final ParameterType<Integer> COLLAR_COLOR = PARAMETERS.newParameterType(ParameterValueTypes.INT);
+
+        private Cat() {
+        }
+    }
     public static final class Wolf {
 
         public static final ParameterTypeCollection PARAMETERS = TameableAnimal.PARAMETERS.copy();
@@ -522,7 +545,7 @@ public final class EntityParameters {
 
         public static final ParameterType<Boolean> IS_BEGGING = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
-        public static final ParameterType<Integer> COLLAR_COLOR = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> COLLAR_COLOR = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private Wolf() {
         }
@@ -532,7 +555,7 @@ public final class EntityParameters {
 
         public static final ParameterTypeCollection PARAMETERS = Ageable.PARAMETERS.copy();
 
-        public static final ParameterType<Integer> PROFESSION = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> PROFESSION = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private Villager() {
         }
@@ -597,7 +620,7 @@ public final class EntityParameters {
         /**
          * The phase of the dragon.
          */
-        public static final ParameterType<Integer> PHASE = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<Integer> PHASE = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
         private EnderDragon() {
         }
@@ -609,7 +632,9 @@ public final class EntityParameters {
 
         public static final ParameterType<ItemStack> ITEM = PARAMETERS.newParameterType(ParameterValueTypes.ITEM_STACK);
 
-        public static final ParameterType<Integer> ELYTRA_BOOST_PLAYER = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+        public static final ParameterType<OptionalInt> ELYTRA_BOOST_PLAYER = PARAMETERS.newParameterType(ParameterValueTypes.OPTIONAL_INT);
+
+        public static final ParameterType<Boolean> SHOT_AT_ANGLE = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
         private Fireworks() {
         }

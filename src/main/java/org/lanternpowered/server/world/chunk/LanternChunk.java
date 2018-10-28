@@ -41,8 +41,6 @@ import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
-import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
@@ -63,7 +61,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
-import org.lanternpowered.server.util.collect.array.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.TrackerIdAllocator;
 import org.lanternpowered.server.world.extent.AbstractExtent;
@@ -108,13 +105,11 @@ import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -184,10 +179,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
         /**
          * The light level arrays.
          */
+        // TODO: Move these to a separate system
         final NibbleArray lightFromSky;
         final NibbleArray lightFromBlock;
 
         final Short2ObjectMap<LanternTileEntity> tileEntities;
+
+        /**
+         * The amount of non empty (air with index 0, no cave/void air) blocks in this chunk section.
+         */
+        int nonEmptyCount;
 
         /**
          * The amount of non air blocks in this chunk section.
@@ -246,21 +247,24 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
 
         /**
-         * Recounts the amount of non air blocks.
+         * Recounts the amount of non empty blocks.
          */
         private void recountTypes() {
+            this.nonEmptyCount = 0;
             this.nonAirCount = 0;
-            final VariableValueArray states = this.blocks.getBacking();
             for (int i = 0; i < this.blocks.getCapacity(); i++) {
-                if (states.get(i) != AIR_ID) {
+                final LanternBlockType type = (LanternBlockType) this.blocks.get(i).getType();
+                if (type != BlockTypes.AIR) {
+                    this.nonEmptyCount++;
+                }
+                if (!type.isAir()) {
                     this.nonAirCount++;
                 }
             }
         }
 
-        private ChunkSectionSnapshot asSnapshot(boolean skylight) {
-            return new ChunkSectionSnapshot(this.blocks.copy(), new Short2ObjectOpenHashMap<>(this.tileEntities),
-                    this.lightFromBlock.getPackedArray(), skylight ? this.lightFromSky.getPackedArray() : null);
+        private ChunkSectionSnapshot asSnapshot() {
+            return new ChunkSectionSnapshot(this.blocks.copy(), new Short2ObjectOpenHashMap<>(this.tileEntities), this.nonAirCount);
         }
     }
 
@@ -271,16 +275,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
         // The tile entities
         public final Short2ObjectMap<LanternTileEntity> tileEntities;
 
-        // The light level arrays
-        @Nullable public final byte[] lightFromSky;
-        public final byte[] lightFromBlock;
+        public final int nonAirBlockCount;
 
-        private ChunkSectionSnapshot(ChunkBlockStateArray blockStates, Short2ObjectMap<LanternTileEntity> tileEntities,
-                byte[] lightFromBlock, @Nullable byte[] lightFromSky) {
-            this.lightFromBlock = lightFromBlock;
-            this.lightFromSky = lightFromSky;
+        private ChunkSectionSnapshot(ChunkBlockStateArray blockStates, Short2ObjectMap<LanternTileEntity> tileEntities, int nonAirBlockCount) {
             this.tileEntities = tileEntities;
             this.blockStates = blockStates;
+            this.nonAirBlockCount = nonAirBlockCount;
         }
     }
 
@@ -511,11 +511,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return this.lightPopulated;
     }
 
-    public ChunkSectionSnapshot[] getSectionSnapshots(boolean skylight) {
-        return this.getSectionSnapshots(skylight, ALL_SECTIONS_BIT_MASK);
+    public ChunkSectionSnapshot[] getSectionSnapshots() {
+        return this.getSectionSnapshots(ALL_SECTIONS_BIT_MASK);
     }
 
-    public ChunkSectionSnapshot[] getSectionSnapshots(boolean skylight, int sectionBitMask) {
+    public ChunkSectionSnapshot[] getSectionSnapshots(int sectionBitMask) {
         final ChunkSectionSnapshot[] array = new ChunkSectionSnapshot[CHUNK_SECTIONS];
         for (int i = 0; i < array.length; i++) {
             if ((sectionBitMask & (1 << i)) == 0) {
@@ -524,7 +524,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             final int index = i;
             this.chunkSections.work(index, section -> {
                 if (section != null) {
-                    array[index] = section.asSnapshot(skylight);
+                    array[index] = section.asSnapshot();
                 }
             }, false, true);
         }
@@ -843,15 +843,17 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
 
         final BlockState[] changeData = new BlockState[1];
-        final boolean air = state.getType() == BlockTypes.AIR;
+        final LanternBlockType type = (LanternBlockType) state.getType();
+        final boolean empty = type == BlockTypes.AIR;
+        final boolean air = type.isAir(); // All types of air
 
         final int rx = x & 0xf;
         final int rz = z & 0xf;
         this.chunkSections.work(y >> 4, section -> {
             if (section == null) {
-                // The section is already filled with air,
+                // The section is already filled with empty air (non cave/void air),
                 // so we can fail fast
-                if (air) {
+                if (empty) {
                     return null;
                 }
                 // Create a new section
@@ -863,7 +865,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (state == oldState) {
                 return section;
             }
-            final boolean oldAir = oldState.getType() == BlockTypes.AIR;
+            final LanternBlockType oldType = (LanternBlockType) oldState.getType();
+            final boolean oldEmpty = oldType == BlockTypes.AIR;
+            if (oldEmpty != empty) {
+                if (empty) {
+                    section.nonEmptyCount--;
+                } else {
+                    section.nonEmptyCount++;
+                }
+            }
+            final boolean oldAir = oldType.isAir();
             if (oldAir != air) {
                 if (air) {
                     section.nonAirCount--;
@@ -873,7 +884,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
             changeData[0] = oldState;
             // The section is empty, destroy it
-            if (section.nonAirCount <= 0) {
+            if (section.nonEmptyCount <= 0) {
                 return null;
             }
             final LanternTileEntity tileEntity = section.tileEntities.get((short) index);

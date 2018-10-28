@@ -1,0 +1,15 @@
+[
+  "minecraft:empty",
+  "minecraft:structure_starts",
+  "minecraft:structure_references",
+  "minecraft:biomes",
+  "minecraft:noise",
+  "minecraft:surface",
+  "minecraft:carvers",
+  "minecraft:liquid_carvers",
+  "minecraft:features",
+  "minecraft:light",
+  "minecraft:spawn",
+  "minecraft:heightmaps",
+  "minecraft:full"
+]

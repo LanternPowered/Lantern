@@ -41,7 +41,7 @@ public final class CodecPlayOutSpawnPainting implements Codec<MessagePlayOutSpaw
         buf.writeVarInt(message.getEntityId());
         buf.writeUniqueId(message.getUniqueId());
         buf.writeVarInt(((LanternArt) message.getArt()).getInternalId());
-        buf.writeVector3i(message.getX(), message.getY(), message.getZ());
+        buf.writePosition(message.getX(), message.getY(), message.getZ());
         buf.writeByte(toId(message.getDirection()));
         return buf;
     }

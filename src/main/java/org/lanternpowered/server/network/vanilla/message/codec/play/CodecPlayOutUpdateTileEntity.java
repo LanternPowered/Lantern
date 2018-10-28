@@ -56,14 +56,16 @@ public final class CodecPlayOutUpdateTileEntity implements Codec<MessagePlayOutT
             "minecraft:end_gateway",
             "minecraft:sign",
             "minecraft:shulker_box",
-            "minecraft:bed"
+            "minecraft:bed",
+            "minecraft:jigsaw",
+            "minecraft:campfire"
     );
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutTileEntity message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         final Vector3i pos = message.getPosition();
-        buf.writeVector3i(pos);
+        buf.writePosition(pos);
         final String id = message.getType();
         buf.writeByte((byte) (hardcodedTypes.indexOf(id) + 1));
         final DataView dataView = message.getTileData();

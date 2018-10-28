@@ -37,7 +37,7 @@ public final class CodecPlayOutBlockBreakAnimation implements Codec<MessagePlayO
     public ByteBuffer encode(CodecContext context, MessagePlayOutBlockBreakAnimation message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getId());
-        buf.writeVector3i(message.getPosition());
+        buf.writePosition(message.getPosition());
         // Make sure that the state fits in the byte
         int state = message.getState();
         buf.writeByte((byte) (state >= 0 && state <= 9 ? state : 10));

@@ -43,13 +43,13 @@ public final class CodecPlayOutEffect implements Codec<Message> {
         if (message instanceof MessagePlayOutEffect) {
             final MessagePlayOutEffect message1 = (MessagePlayOutEffect) message;
             buf.writeInteger(message1.getType());
-            buf.writeVector3i(message1.getPosition());
+            buf.writePosition(message1.getPosition());
             buf.writeInteger(message1.getData());
             buf.writeBoolean(message1.isBroadcast());
         } else if (message instanceof MessagePlayOutRecord) {
             final MessagePlayOutRecord message1 = (MessagePlayOutRecord) message;
             buf.writeInteger(1010);
-            buf.writeVector3i(message1.getPosition());
+            buf.writePosition(message1.getPosition());
             buf.writeInteger(message1.getMusicDisc()
                     .map(type -> 2256 + ((LanternMusicDisc) type).getInternalId()).orElse(0));
             buf.writeBoolean(false);

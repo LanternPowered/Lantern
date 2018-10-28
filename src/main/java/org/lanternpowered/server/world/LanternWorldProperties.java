@@ -522,7 +522,7 @@ public final class LanternWorldProperties implements WorldProperties {
     public void setDifficulty(Difficulty difficulty) {
         checkNotNull(difficulty, "difficulty");
         if (this.getDifficulty() != difficulty && this.world != null) {
-            this.world.broadcast(() -> new MessagePlayOutSetDifficulty((LanternDifficulty) difficulty));
+            this.world.broadcast(() -> new MessagePlayOutSetDifficulty(difficulty, true));
         }
         this.worldConfig.setDifficulty(difficulty);
     }

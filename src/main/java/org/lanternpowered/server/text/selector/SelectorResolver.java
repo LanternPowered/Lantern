@@ -75,7 +75,7 @@ import javax.annotation.Nullable;
 /**
  * A resolver that acts like Vanilla Minecraft in many regards.
  */
-public class SelectorResolver {
+final class SelectorResolver {
 
     private static final Collection<SelectorType> INFINITE_TYPES = ImmutableSet.of(SelectorTypes.ALL_ENTITIES, SelectorTypes.ALL_PLAYERS);
     private static final Set<ArgumentType<?>> LOCATION_BASED_ARGUMENTS;
@@ -103,11 +103,11 @@ public class SelectorResolver {
     private final Selector selector;
     private final Predicate<Entity> selectorFilter;
 
-    public SelectorResolver(Selector selector, Collection<? extends Extent> extents) {
+    SelectorResolver(Selector selector, Collection<? extends Extent> extents) {
         this(selector, extents, null, null);
     }
 
-    public SelectorResolver(Selector selector, CommandSource origin) {
+    SelectorResolver(Selector selector, CommandSource origin) {
         this(selector, Sponge.getGame().getServer().getWorlds(), origin, positionFromSource(origin));
     }
 

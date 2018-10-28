@@ -1,0 +1,11 @@
+[
+  "minecraft:mined",
+  "minecraft:crafted",
+  "minecraft:used",
+  "minecraft:broken",
+  "minecraft:picked_up",
+  "minecraft:dropped",
+  "minecraft:killed",
+  "minecraft:killed_by",
+  "minecraft:custom"
+]

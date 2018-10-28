@@ -34,8 +34,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.ints.IntSets;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
+import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.inventory.IInventory;
@@ -104,7 +106,6 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     protected byte lastYaw;
     protected byte lastPitch;
-
     protected byte lastHeadYaw;
 
     private double lastVelX;
@@ -117,6 +118,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private boolean lastCustomNameVisible;
 
     @Nullable private Optional<Text> lastCustomName;
+    @Nullable private Pose lastPose;
 
     protected IntSet lastPassengers = IntSets.EMPTY_SET;
 
@@ -132,6 +134,9 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     protected void spawnWithEquipment(EntityProtocolUpdateContext context) {
+        if (this.entity.isOnGround()) {
+            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityRelativeMove(getRootEntityId(), 0, 0, 0, true));
+        }
         if (hasEquipment() && this.entity instanceof Carrier) {
             final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
@@ -163,6 +168,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         boolean dirtyRot = yaw != this.lastYaw || pitch != this.lastPitch;
 
         // TODO: On ground state
+        boolean onGround = this.entity.isOnGround();
 
         final int entityId = getRootEntityId();
         final boolean passenger = this.entity.getVehicle().isPresent();
@@ -186,23 +192,23 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                 if (Math.abs(dxu) <= Short.MAX_VALUE && Math.abs(dyu) <= Short.MAX_VALUE && Math.abs(dzu) <= Short.MAX_VALUE) {
                     if (dirtyRot) {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
-                                (int) dxu, (int) dyu, (int) dzu, yaw, pitch, this.entity.isOnGround()));
+                                (int) dxu, (int) dyu, (int) dzu, yaw, pitch, onGround));
                         // The rotation is already send
                         dirtyRot = false;
                     } else {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityRelativeMove(entityId,
-                                (int) dxu, (int) dyu, (int) dzu, this.entity.isOnGround()));
+                                (int) dxu, (int) dyu, (int) dzu, onGround));
                     }
                 } else {
                     context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
-                            pos, yaw, pitch, this.entity.isOnGround()));
+                            pos, yaw, pitch, onGround));
                     // The rotation is already send
                     dirtyRot = false;
                 }
             }
         }
         if (dirtyRot) {
-            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, yaw, pitch, this.entity.isOnGround()));
+            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, yaw, pitch, onGround));
         } else if (!passenger) {
             if (headRot != null) {
                 final byte headYaw = wrapAngle(headRot.getY());
@@ -310,14 +316,6 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         return parameterList;
     }
 
-    protected boolean isSneaking() {
-        return false;
-    }
-
-    protected boolean isUsingItem() {
-        return false;
-    }
-
     protected boolean isSprinting() {
         return false;
     }
@@ -335,6 +333,11 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         parameterList.add(EntityParameters.Base.CUSTOM_NAME_VISIBLE, isCustomNameVisible());
         parameterList.add(EntityParameters.Base.IS_SILENT, isSilent());
         parameterList.add(EntityParameters.Base.NO_GRAVITY, hasNoGravity());
+        parameterList.add(EntityParameters.Base.POSE, getPose());
+    }
+
+    Pose getPose() {
+        return this.entity.get(LanternKeys.POSE).orElse(Pose.STANDING);
     }
 
     boolean isCustomNameVisible() {
@@ -360,13 +363,14 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (this.entity.get(Keys.FIRE_TICKS).orElse(0) > 0) {
             flags |= 0x01;
         }
-        if (isSneaking()) {
+        final Pose pose = getPose();
+        if (pose == Pose.SNEAKING) {
             flags |= 0x02;
         }
         if (isSprinting()) {
             flags |= 0x08;
         }
-        if (isUsingItem()) {
+        if (pose == Pose.SWIMMING) {
             flags |= 0x10;
         }
         if (this.entity.get(Keys.INVISIBLE).orElse(false)) {
@@ -412,6 +416,11 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (airLevel != this.lastAirLevel) {
             parameterList.add(EntityParameters.Base.AIR_LEVEL, airLevel);
             this.lastAirLevel = airLevel;
+        }
+        final Pose pose = getPose();
+        if (!Objects.equal(pose, this.lastPose)) {
+            parameterList.add(EntityParameters.Base.POSE, pose);
+            this.lastPose = pose;
         }
     }
 

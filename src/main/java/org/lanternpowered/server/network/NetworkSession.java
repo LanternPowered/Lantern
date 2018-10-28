@@ -906,7 +906,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // the client settings to be send to the server, respawn
         // messages will be send afterwards with the proper values
         send(new MessagePlayOutPlayerJoinGame(GameModes.SURVIVAL, DimensionTypes.OVERWORLD,
-                Difficulties.NORMAL, this.player.getNetworkId(), getServer().getMaxPlayers(), false, false, false));
+                this.player.getNetworkId(), getServer().getMaxPlayers(), false, false, false,
+                this.player.getServerViewDistance()));
     }
 
     /**

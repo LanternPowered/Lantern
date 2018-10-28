@@ -50,7 +50,7 @@ public final class GlobalBlockPalette implements BlockPalette {
 
     @Override
     public int getHighestId() {
-        return InternalIDRegistries.BLOCK_TYPE_IDS.size() - 1; // Not all blocks may be assigned yet
+        return InternalIDRegistries.BLOCK_STATE_START_IDS.size() - 1; // Not all blocks may be assigned yet
     }
 
     @Override

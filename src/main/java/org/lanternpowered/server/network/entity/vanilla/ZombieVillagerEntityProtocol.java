@@ -48,8 +48,8 @@ public class ZombieVillagerEntityProtocol<E extends LanternEntity> extends Abstr
     }
 
     @Override
-    protected int getMobType() {
-        return 27;
+    protected String getMobType() {
+        return "minecraft:zombie_villager";
     }
 
     @Override

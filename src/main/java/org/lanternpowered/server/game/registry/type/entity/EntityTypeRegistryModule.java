@@ -29,7 +29,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.entity.LanternEntityType;
+import org.lanternpowered.server.entity.LanternHuman;
 import org.lanternpowered.server.entity.LanternItem;
+import org.lanternpowered.server.entity.LanternZombie;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.OfflineUser;
 import org.lanternpowered.server.entity.weather.LanternLightning;
@@ -79,6 +81,8 @@ public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegis
 
     @Override
     public void registerDefaults() {
+        register(LanternEntityType.of(CatalogKey.sponge("human"), "entity.human.name", LanternHuman::new));
+        register(LanternEntityType.of(CatalogKey.minecraft("zombie"), "entity.zombie.name", LanternZombie::new));
         register(LanternEntityType.of(CatalogKey.minecraft("player"), "entity.player.name", LanternPlayer.class,
                 uuid -> { throw new UnsupportedOperationException("You cannot construct a Player."); }));
         register(LanternEntityType.of(CatalogKey.minecraft("offline_user"), "entity.player.name", OfflineUser.class,

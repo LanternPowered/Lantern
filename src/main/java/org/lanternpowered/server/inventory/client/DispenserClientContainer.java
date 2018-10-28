@@ -43,6 +43,6 @@ public class DispenserClientContainer extends ChestClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), MessagePlayOutOpenWindow.WindowType.DISPENSER, getTitle(), getSlotFlags().length, 0);
+        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.GENERIC_3x3, getTitle());
     }
 }

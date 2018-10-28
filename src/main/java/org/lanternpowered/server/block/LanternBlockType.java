@@ -92,6 +92,9 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, A
      */
     private BlockSoundGroup blockSoundGroup = BlockSoundGroups.STONE;
 
+    // TODO: A better way to handle this?
+    private final boolean isAir;
+
     LanternBlockType(CatalogKey key, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
             @Nullable TileEntityProvider tileEntityProvider) {
@@ -102,6 +105,7 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, A
         this.tickRandomly = !behaviorPipeline.pipeline(RandomTickBehavior.class).getBehaviors().isEmpty();
         this.blockStateBase = new LanternBlockStateMap(this, blockTraits);
         this.defaultBlockState = this.blockStateBase.getBaseState();
+        this.isAir = key.getValue().contains("air");
     }
 
     void setItemType(ItemType itemType) {
@@ -240,4 +244,7 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, A
         this.collisionBoxesProvider = boundingBoxProvider;
     }
 
+    public boolean isAir() {
+        return this.isAir;
+    }
 }

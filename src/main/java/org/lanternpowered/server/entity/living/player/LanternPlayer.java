@@ -32,7 +32,6 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
@@ -91,11 +90,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateViewDistance;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateViewPosition;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.chat.LanternChatType;
@@ -105,7 +107,6 @@ import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
-import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.CatalogKey;
@@ -145,7 +146,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
@@ -217,7 +217,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     // The (client) render distance of the player
     // When specified -1, the render distance will match the server one
-    private int viewDistance = -1;
+    private int viewDistance = WorldConfig.USE_SERVER_VIEW_DISTANCE;
 
     // The chat visibility
     private ChatVisibility chatVisibility = ChatVisibilities.FULL;
@@ -404,6 +404,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public void registerKeys() {
         super.registerKeys();
+
         final ValueCollection c = getValueCollection();
         ((ElementKeyRegistration<?, Optional<AdvancementTree>>) c.get(LanternKeys.OPEN_ADVANCEMENT_TREE).get())
                 .addListener((oldElement, newElement) -> {
@@ -421,6 +422,20 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             return;
         }
         setWorld(oldWorld, world);
+    }
+
+    public int getServerViewDistance() {
+        final LanternWorld world = getWorld();
+        int viewDistance;
+        if (world != null) {
+            viewDistance = world.getViewDistance();
+        } else {
+            viewDistance = Lantern.getGame().getGlobalConfig().getViewDistance();
+        }
+        if (this.viewDistance != WorldConfig.USE_SERVER_VIEW_DISTANCE) {
+            viewDistance = Math.min(viewDistance, this.viewDistance);
+        }
+        return viewDistance;
     }
 
     private void setWorld(@Nullable LanternWorld oldWorld, @Nullable LanternWorld world) {
@@ -450,13 +465,12 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (world != null) {
             final LanternGameMode gameMode = (LanternGameMode) get(Keys.GAME_MODE).get();
             final LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
-            final LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
             final boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
             final boolean lowHorizon = world.getProperties().getConfig().isLowHorizon();
             // The player has joined the server
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
-                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
+                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
@@ -514,11 +528,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     if (oldDimensionType == dimensionType) {
                         oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ?
                                 DimensionTypes.NETHER : DimensionTypes.OVERWORLD);
-                        this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, difficulty, lowHorizon));
+                        this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, lowHorizon));
                     }
                 }
                 // Send a respawn message
-                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
+                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
             // Send the first chunks
@@ -527,6 +541,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
+            // Update the difficulty
+            this.session.send(new MessagePlayOutSetDifficulty(world.getDifficulty(), true));
+            this.session.send(new MessagePlayOutUpdateViewDistance(getServerViewDistance()));
             // Update the player inventory
             this.inventoryContainer.initClientContainer();
             if (oldWorld != world) {
@@ -855,18 +872,12 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         }
 
         this.lastChunkPos = new Vector2i(centralX, centralZ);
-
-        // Get the radius of visible chunks
-        int radius = world.getProperties().getConfig().getViewDistance();
-        if (radius == WorldConfig.USE_SERVER_VIEW_DISTANCE) {
-            radius = Lantern.getGame().getGlobalConfig().getViewDistance();
-        }
-        if (this.viewDistance != -1) {
-            radius = Math.min(radius, this.viewDistance + 1);
-        }
+        this.session.send(new MessagePlayOutUpdateViewPosition(centralX, centralZ));
 
         final Set<Vector2i> previousChunks = new HashSet<>(this.knownChunks);
         final List<Vector2i> newChunks = new ArrayList<>();
+
+        int radius = getServerViewDistance();
 
         for (int x = (centralX - radius); x <= (centralX + radius); x++) {
             for (int z = (centralZ - radius); z <= (centralZ + radius); z++) {
@@ -1108,6 +1119,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     public void setViewDistance(int viewDistance) {
         this.viewDistance = viewDistance;
+        this.session.send(new MessagePlayOutUpdateViewDistance(getServerViewDistance()));
     }
 
     @Override

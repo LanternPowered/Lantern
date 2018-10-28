@@ -49,30 +49,23 @@ final class ClientItemStackSizes {
     static {
         final Gson gson = new Gson();
 
-        final InputStream is = ClientItemStackSizes.class.getResourceAsStream("/internal/max_stack_sizes.json");
+        final InputStream is = ClientItemStackSizes.class.getResourceAsStream("/internal/registries/item.json");
         final JsonObject json = gson.fromJson(new BufferedReader(new InputStreamReader(is)), JsonObject.class);
 
         for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
-            STACK_SIZES.put(entry.getKey(), entry.getValue().getAsInt());
+            final JsonElement element = entry.getValue();
+            final String id;
+            int maxStackSize = 64;
+            if (element.isJsonPrimitive()) {
+                id = element.getAsString();
+            } else {
+                final JsonObject object = element.getAsJsonObject();
+                id = object.get("id").getAsString();
+                if (object.has("max_stack_size")) {
+                    maxStackSize = object.get("max_stack_size").getAsInt();
+                }
+            }
+            STACK_SIZES.put(id, maxStackSize);
         }
     }
-
-    /*
-    public static void save() {
-        final Gson gson = new Gson();
-        final JsonObject jsonObject = new JsonObject();
-
-        for (ItemType itemType : ItemRegistryModule.get().getAll()) {
-            jsonObject.addProperty(itemType.getId(), itemType.getMaxStackQuantity());
-        }
-
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get("max_stack_sizes.json"))) {
-            gson.toJson(jsonObject, writer);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    */
 }

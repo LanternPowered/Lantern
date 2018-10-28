@@ -36,6 +36,7 @@ import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.lanternpowered.server.effect.potion.PotionType;
+import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.lanternpowered.server.item.recipe.RecipeBookState;
@@ -165,6 +166,9 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("ConnectedEast"), "connected_east");
     public static final Key<Value<Boolean>> CONNECTED_WEST =
             makeValueKey(Boolean.class, DataQuery.of("ConnectedWest"), "connected_west");
+
+    public static final Key<Value<Pose>> POSE =
+            makeValueKey(Pose.class, DataQuery.of("Pose"), "pose");
 
     private LanternKeys() {
     }

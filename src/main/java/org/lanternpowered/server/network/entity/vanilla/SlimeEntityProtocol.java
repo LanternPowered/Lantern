@@ -34,7 +34,7 @@ public class SlimeEntityProtocol<E extends LanternEntity> extends AbstractSlimeE
     }
 
     @Override
-    protected int getMobType() {
-        return 55;
+    protected String getMobType() {
+        return "minecraft:slime";
     }
 }

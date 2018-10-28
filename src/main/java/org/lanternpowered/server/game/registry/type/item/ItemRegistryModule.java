@@ -556,9 +556,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .maxStackQuantity(16)
                 .behaviors(pipeline -> pipeline
                         .add(WallOrStandingPlacementBehavior.ofTypes(
-                                () -> BlockTypes.WALL_SIGN,
-                                () -> BlockTypes.SIGN)))
-                .build("minecraft", "sign"));
+                                () -> BlockTypes.OAK_WALL_SIGN,
+                                () -> BlockTypes.OAK_SIGN)))
+                .build("minecraft", "oak_sign"));
         ////////////////////
         ///   Oak Door   ///
         ////////////////////
@@ -773,26 +773,41 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////
         register(builder()
                 .build("minecraft", "ink_sac"));
-        ////////////////////
-        ///   Rose Red   ///
-        ////////////////////
-        register(builder()
-                .build("minecraft", "rose_red"));
-        ////////////////////////
-        ///   Cactus Green   ///
-        ////////////////////////
-        register(builder()
-                .build("minecraft", "cactus_green"));
-        ///////////////////////
-        ///   Cocoa Beans   ///
-        ///////////////////////
-        register(builder()
-                .build("minecraft", "cocoa_beans"));
         ////////////////////////
         ///   Lapis Lazuli   ///
         ////////////////////////
         register(builder()
                 .build("minecraft", "lapis_lazuli"));
+        ///////////////////////
+        ///   Cocoa Beans   ///
+        ///////////////////////
+        register(builder()
+                .build("minecraft", "cocoa_beans"));
+        /////////////////////
+        ///   Black Dye   ///
+        /////////////////////
+        register(builder()
+                .build("minecraft", "black_dye"));
+        ////////////////////
+        ///   Red Dye   ///
+        ////////////////////
+        register(builder()
+                .build("minecraft", "red_dye"));
+        ////////////////////
+        ///   Green Dye  ///
+        ////////////////////
+        register(builder()
+                .build("minecraft", "green_dye"));
+        /////////////////////
+        ///   Brown Dye   ///
+        /////////////////////
+        register(builder()
+                .build("minecraft", "brown_dye"));
+        ////////////////////
+        ///   Blue Dye   ///
+        ////////////////////
+        register(builder()
+                .build("minecraft", "blue_dye"));
         //////////////////////
         ///   Purple Dye   ///
         //////////////////////
@@ -823,11 +838,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////
         register(builder()
                 .build("minecraft", "lime_dye"));
-        ////////////////////////////
-        ///   Dandelion Yellow   ///
-        ////////////////////////////
+        //////////////////////
+        ///   Yellow Dye   ///
+        //////////////////////
         register(builder()
-                .build("minecraft", "dandelion_yellow"));
+                .build("minecraft", "yellow_dye"));
         //////////////////////////
         ///   Light Blue Dye   ///
         //////////////////////////
@@ -843,6 +858,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////
         register(builder()
                 .build("minecraft", "orange_dye"));
+        /////////////////////
+        ///   White Dye   ///
+        /////////////////////
+        register(builder()
+                .build("minecraft", "white_dye"));
         /////////////////////
         ///   Bone Meal   ///
         /////////////////////

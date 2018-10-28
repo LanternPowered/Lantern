@@ -34,7 +34,7 @@ public class EndermiteEntityProtocol<E extends LanternEntity> extends Insentient
     }
 
     @Override
-    protected int getMobType() {
-        return 67;
+    protected String getMobType() {
+        return "minecraft:endermite";
     }
 }

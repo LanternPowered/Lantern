@@ -38,8 +38,8 @@ public class PigEntityProtocol<E extends LanternEntity> extends AnimalEntityProt
     }
 
     @Override
-    protected int getMobType() {
-        return 90;
+    protected String getMobType() {
+        return "minecraft:pig";
     }
 
     @Override

@@ -36,7 +36,7 @@ public final class CodecPlayInEditCommandBlockBlock implements Codec<MessagePlay
 
     @Override
     public MessagePlayInEditCommandBlock.Block decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final Vector3i pos = buf.readVector3i();
+        final Vector3i pos = buf.readPosition();
         final String command = buf.readString();
         final MessagePlayInEditCommandBlock.Block.Mode mode = MessagePlayInEditCommandBlock.Block.Mode.values()[buf.readVarInt()];
         final byte flags = buf.readByte();

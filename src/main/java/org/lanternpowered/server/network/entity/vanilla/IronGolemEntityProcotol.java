@@ -54,8 +54,8 @@ public class IronGolemEntityProcotol<E extends LanternEntity> extends Insentient
     }
 
     @Override
-    protected int getMobType() {
-        return 99;
+    protected String getMobType() {
+        return "minecraft:iron_golem";
     }
 
     @Override

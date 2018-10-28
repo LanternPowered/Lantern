@@ -44,7 +44,7 @@ public final class CodecPlayInPlayerDigging implements Codec<Message> {
     @Override
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         int action = buf.readByte();
-        Vector3i position = buf.readVector3i();
+        Vector3i position = buf.readPosition();
         int face = buf.readByte();
         switch (action) {
             case 0:

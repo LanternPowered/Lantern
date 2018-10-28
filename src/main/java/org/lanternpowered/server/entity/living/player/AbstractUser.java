@@ -31,7 +31,9 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.io.store.entity.UserStore;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.LanternHumanoid;
+import org.lanternpowered.server.entity.AbstractArmorEquipable;
+import org.lanternpowered.server.entity.LanternLiving;
+import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
@@ -59,6 +61,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -66,7 +69,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-public abstract class AbstractUser extends LanternHumanoid implements IUser {
+public abstract class AbstractUser extends LanternLiving implements IUser, AbstractArmorEquipable {
 
     public static final double DEFAULT_EXHAUSTION = 0.0;
     public static final double DEFAULT_SATURATION = 5.0;
@@ -111,7 +114,6 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
         c.registerNonRemovable(Keys.WALKING_SPEED, 0.1);
         c.registerNonRemovable(LanternKeys.FIELD_OF_VIEW_MODIFIER, 1.0);
         c.registerNonRemovable(Keys.IS_FLYING, false);
-        c.registerNonRemovable(Keys.IS_SNEAKING, false);
         c.registerNonRemovable(Keys.IS_SPRINTING, false);
         c.registerNonRemovable(Keys.FLYING_SPEED, 0.1);
         c.registerNonRemovable(Keys.CAN_FLY, false);
@@ -149,6 +151,8 @@ public abstract class AbstractUser extends LanternHumanoid implements IUser {
                 .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
                 .failAlwaysRemoveHandler());
         c.registerNonRemovable(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty());
+        c.registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
+        c.registerNonRemovable(LanternKeys.POSE, Pose.STANDING);
     }
 
     @Nullable

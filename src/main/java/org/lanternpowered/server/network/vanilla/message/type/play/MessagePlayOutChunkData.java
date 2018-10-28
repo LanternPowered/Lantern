@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
@@ -43,14 +42,8 @@ public final class MessagePlayOutChunkData implements Message {
     private final Section[] sections;
     @Nullable private final int[] biomes;
 
-    public MessagePlayOutChunkData(int x, int z, boolean skylight, Section[] sections, @Nullable int[] biomes) {
+    public MessagePlayOutChunkData(int x, int z, Section[] sections, @Nullable int[] biomes) {
         checkNotNull(sections, "sections");
-        for (Section section : sections) {
-            if (section != null) {
-                checkArgument((section.skyLight != null) == skylight,
-                        "Skylight must be present in every section if skylight is to true, and absent if false.");
-            }
-        }
         this.sections = sections;
         this.biomes = biomes;
         this.x = x;
@@ -85,26 +78,18 @@ public final class MessagePlayOutChunkData implements Message {
 
         private final VariableValueArray types;
         @Nullable private final int[] palette;
-        private final byte[] blockLight;
-        @Nullable private final byte[] skyLight;
+        private final int nonAirBlockCount;
         private final Short2ObjectMap<DataView> tileEntities;
 
-        public Section(VariableValueArray types, @Nullable int[] palette, byte[] blockLight, @Nullable byte[] skyLight,
-                Short2ObjectMap<DataView> tileEntities) {
+        public Section(VariableValueArray types, @Nullable int[] palette, int nonAirBlockCount, Short2ObjectMap<DataView> tileEntities) {
+            this.nonAirBlockCount = nonAirBlockCount;
             this.tileEntities = tileEntities;
-            this.blockLight = blockLight;
-            this.skyLight = skyLight;
             this.palette = palette;
             this.types = types;
         }
 
-        public byte[] getBlockLight() {
-            return this.blockLight;
-        }
-
-        @Nullable
-        public byte[] getSkyLight() {
-            return this.skyLight;
+        public int getNonAirBlockCount() {
+            return this.nonAirBlockCount;
         }
 
         public VariableValueArray getTypes() {

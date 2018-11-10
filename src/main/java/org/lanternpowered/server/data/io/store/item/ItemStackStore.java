@@ -143,6 +143,8 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         add(ItemTypes.LEATHER_CHESTPLATE, leatherSerializer);
         add(ItemTypes.LEATHER_HELMET, leatherSerializer);
         add(ItemTypes.LEATHER_LEGGINGS, leatherSerializer);
+        add(ItemTypes.FIREWORK_STAR, new FireworkChargeItemTypeObjectSerializer());
+        add(ItemTypes.FIREWORK_ROCKET, new FireworkRocketItemTypeObjectSerializer());
 
         final BannerItemTypeSerializer bannerSerializer = new BannerItemTypeSerializer();
         final ShulkerBoxItemObjectSerializer shulkerBoxSerializer = new ShulkerBoxItemObjectSerializer();

@@ -112,6 +112,7 @@ public class LanternFavicon implements Favicon {
      * @return the favicon
      */
     public static Favicon load(String raw) throws IOException {
+        raw = raw.replace("\n", "");
         return new LanternFavicon(decode(checkNotNull(raw, "raw")), raw);
     }
 
@@ -157,11 +158,10 @@ public class LanternFavicon implements Favicon {
         checkArgument(image.getWidth() == 64, "favicon must be 64 pixels wide");
         checkArgument(image.getHeight() == 64, "favicon must be 64 pixels high");
 
-        ByteBuf buf = Unpooled.buffer();
-
+        final ByteBuf buf = Unpooled.buffer();
         try {
             ImageIO.write(image, "PNG", new ByteBufOutputStream(buf));
-            ByteBuf base64 = Base64.encode(buf);
+            final ByteBuf base64 = Base64.encode(buf, false);
 
             try {
                 return FAVICON_PREFIX + base64.toString(StandardCharsets.UTF_8);
@@ -182,11 +182,11 @@ public class LanternFavicon implements Favicon {
     private static BufferedImage decode(String encoded) throws IOException {
         checkArgument(encoded.startsWith(FAVICON_PREFIX), "unknown favicon format");
 
-        ByteBuf base64 = Unpooled.copiedBuffer(encoded.substring(FAVICON_PREFIX.length()), StandardCharsets.UTF_8);
+        final ByteBuf base64 = Unpooled.copiedBuffer(encoded.substring(FAVICON_PREFIX.length()), StandardCharsets.UTF_8);
         try {
-            ByteBuf buf = Base64.decode(base64);
+            final ByteBuf buf = Base64.decode(base64);
             try {
-                BufferedImage result = ImageIO.read(new ByteBufInputStream(buf));
+                final BufferedImage result = ImageIO.read(new ByteBufInputStream(buf));
                 checkState(result.getWidth() == 64, "favicon must be 64 pixels wide");
                 checkState(result.getHeight() == 64, "favicon must be 64 pixels high");
                 return result;

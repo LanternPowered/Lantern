@@ -33,7 +33,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.stream.Collectors;
 
-public class FireworksItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+public class FireworkRocketItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     private static final DataQuery FIREWORKS = DataQuery.of("Fireworks");
     private static final DataQuery EXPLOSIONS = DataQuery.of("Explosions");

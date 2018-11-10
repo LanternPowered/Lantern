@@ -112,8 +112,8 @@ public class LanternFavicon implements Favicon {
      * @return the favicon
      */
     public static Favicon load(String raw) throws IOException {
-        raw = raw.replace("\n", "");
-        return new LanternFavicon(decode(checkNotNull(raw, "raw")), raw);
+        raw = checkNotNull(raw, "raw").replace("\n", "");
+        return new LanternFavicon(decode(raw), raw);
     }
 
     /**

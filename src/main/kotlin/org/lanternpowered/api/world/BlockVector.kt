@@ -104,7 +104,7 @@ inline class BlockVector(val value: Long) {
     /**
      * Whether this block vector is valid.
      */
-    val valid: Boolean @JvmName("isValid") get() = this.value == invalidBlockVectorValue
+    val valid: Boolean get() = this.value != invalidBlockVectorValue
 
     /**
      * The x value of this block vector.
@@ -157,14 +157,12 @@ inline class BlockVector(val value: Long) {
      * Adds the [Vector3i] values to this [BlockVector] and returns a new vector.
      * <p>Ignores the fact that one of the vectors could be invalid.
      */
-    @JvmName("add")
     operator fun plus(v: Vector3i) = add(v.x, v.y, v.z)
 
     /**
      * Adds the [Vector3i] values to this [BlockVector] and returns a new vector.
      * <p>Ignores the fact that one of the vectors could be invalid.
      */
-    @JvmName("add")
     operator fun plus(v: BlockVector) = add(v.x, v.y, v.z)
 
     /**
@@ -177,14 +175,12 @@ inline class BlockVector(val value: Long) {
      * Subtracts the [Vector3i] values from this [BlockVector] and returns a new vector.
      * <p>Ignores the fact that one of the vectors could be invalid.
      */
-    @JvmName("sub")
     operator fun minus(v: Vector3i) = sub(v.x, v.y, v.z)
 
     /**
      * Subtracts the [Vector3i] values from this [BlockVector] and returns a new vector.
      * <p>Ignores the fact that one of the vectors could be invalid.
      */
-    @JvmName("sub")
     operator fun minus(v: BlockVector) = sub(v.x, v.y, v.z)
 
     /**
@@ -197,14 +193,12 @@ inline class BlockVector(val value: Long) {
      * Multiplies the [Vector3i] values with this [BlockVector] and returns a new vector.
      * <p>Ignores the fact that one of the vectors could be invalid.
      */
-    @JvmName("mul")
     operator fun times(v: Vector3i) = mul(v.x, v.y, v.z)
 
     /**
      * Multiplies the [Vector3i] values with this [BlockVector] and returns a new vector.
      * <p>Ignores the fact that one of the vectors could be invalid.
      */
-    @JvmName("mul")
     operator fun times(v: BlockVector) = mul(v.x, v.y, v.z)
 
     /**
@@ -228,7 +222,6 @@ inline class BlockVector(val value: Long) {
     /**
      * Negates this [BlockVector].
      */
-    @JvmName("negate")
     operator fun unaryMinus() = BlockVector(-this.x, -this.y, -this.z)
 
     /**

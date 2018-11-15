@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.network.status;
 
+import org.lanternpowered.api.util.collect.NonNullArrayList;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.profile.LanternGameProfile;
-import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.profile.GameProfile;
@@ -65,9 +65,9 @@ public final class LanternStatusHelper {
         }
 
         // Get all the game profiles and create a copy
-        final List<GameProfile> gameProfiles = Lists2.nonNullOf(playersList.stream()
+        final List<GameProfile> gameProfiles = playersList.stream()
                 .map(player -> ((LanternGameProfile) player.getProfile()).copyWithoutProperties())
-                .collect(Collectors.toList()));
+                .collect(Collectors.toCollection(NonNullArrayList::new));
 
         return SpongeEventFactory.createClientPingServerEventResponsePlayers(gameProfiles, max, online);
     }

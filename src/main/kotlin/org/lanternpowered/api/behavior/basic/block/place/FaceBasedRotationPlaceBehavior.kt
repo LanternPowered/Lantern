@@ -23,11 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.util
+package org.lanternpowered.api.behavior.basic.block.place
+
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
+import org.lanternpowered.api.block.BlockSnapshotBuilder
+import org.lanternpowered.api.data.key.Keys
+import org.lanternpowered.api.ext.*
 
 /**
- * Used as a parameter type that represents something
- * that is unused, most likely a dummy. Or to prevent
- * conflicts with conflicting method signatures.
+ * Rotates the placed block based on the clicked face.
+ *
+ * Always returns true.
  */
-typealias Unused = Unit?
+class FaceBasedRotationPlaceBehavior : PlaceBlockBehaviorBase {
+
+    override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
+        val face = ctx[BehaviorContextKeys.INTERACTION_FACE] ?: return true
+        placed.forEach { it.add(Keys.DIRECTION, face) }
+        return true
+    }
+}

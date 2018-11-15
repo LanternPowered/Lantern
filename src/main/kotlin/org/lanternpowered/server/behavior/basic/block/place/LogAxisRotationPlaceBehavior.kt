@@ -23,14 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.world.weather;
+package org.lanternpowered.server.behavior.basic.block.place
 
-public interface WeatherUniverse extends org.spongepowered.api.world.weather.WeatherUniverse {
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.behavior.basic.PlaceBlockBehaviorBase
+import org.lanternpowered.api.block.BlockSnapshotBuilder
+import org.lanternpowered.api.data.key.Keys
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.type.LanternLogAxis
 
-    /**
-     * Gets the current darkness level of the sky.
-     *
-     * @return The current darkness level
-     */
-    double getDarkness();
+class LogAxisRotationPlaceBehavior : PlaceBlockBehaviorBase {
+
+    override fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean {
+        val face = ctx[BehaviorContextKeys.INTERACTION_FACE] ?: return true
+        for (builder in placed) {
+            val state = builder.blockState
+            builder.blockState = state.with(Keys.LOG_AXIS, LanternLogAxis.fromDirection(face.opposite)).orElse(state)
+        }
+        return true
+    }
 }

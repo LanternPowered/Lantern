@@ -41,17 +41,17 @@ import org.lanternpowered.api.x.world.weather.XWeatherUniverse
 /**
  * The options of the [Weather].
  */
-val Weather.options: WeatherOptionMap get() = (this as XWeather).options
+inline val Weather.options: WeatherOptionMap get() = (this as XWeather).options
 
 /**
  * The current rain strength.
  */
-val WeatherUniverse.rainStrength: Double get() = (this as XWeatherUniverse).rainStrength
+inline val WeatherUniverse.rainStrength: Double get() = (this as XWeatherUniverse).rainStrength
 
 /**
  * The current darkness of the sky.
  */
-val WeatherUniverse.darkness: Double get() = (this as XWeatherUniverse).darkness
+inline val WeatherUniverse.darkness: Double get() = (this as XWeatherUniverse).darkness
 
 // We cannot call typeTokenOf here, chaining reified calls and using
 // anonymous classes can end up in weird errors. But only in specific

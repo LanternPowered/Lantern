@@ -93,7 +93,7 @@ public final class CommandWeather extends CommandProvider {
                 )
                 .executor((src, args) -> {
                     LanternWorldProperties world = CommandHelper.getWorldProperties(src, args);
-                    WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse().orElse(null);
+                    WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse();
                     Weather type = args.<Weather>getOne("type").get();
                     if (weatherUniverse != null) {
                         if (args.hasAny("duration")) {

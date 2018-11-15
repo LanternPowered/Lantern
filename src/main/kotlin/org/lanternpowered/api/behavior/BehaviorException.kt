@@ -23,41 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world;
+package org.lanternpowered.api.behavior
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.world.World;
-
-import java.util.function.Consumer;
-
-public final class EntitySpawningEntry {
-
-    final EntityType entityType;
-    final Transform<World> transform;
-    final Consumer<Entity> entityConsumer;
+/**
+ * An exception that is thrown when something unexpected
+ * happened within a [Behavior].
+ */
+class BehaviorException : RuntimeException {
 
     /**
-     * Constructs a new {@link EntitySpawningEntry}.
-     *
-     * @param entityType The entity type that will be constructed
-     * @param transform The transform that should be applied to the entity
+     * Constructs a new [BehaviorException].
      */
-    public EntitySpawningEntry(EntityType entityType, Transform<World> transform) {
-        this(entityType, transform, entity -> {});
-    }
+    constructor() : super()
 
     /**
-     * Constructs a new {@link EntitySpawningEntry}.
+     * Constructs a new [BehaviorException] with the
+     * given message.
      *
-     * @param entityType The entity type that will be constructed
-     * @param transform The transform that should be applied to the entity
-     * @param entityConsumer The consumer that can be used to apply properties to the entity
+     * @param message The message
      */
-    public EntitySpawningEntry(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
-        this.entityConsumer = entityConsumer;
-        this.entityType = entityType;
-        this.transform = transform;
-    }
+    constructor(message: String) : super(message)
+
+    /**
+     * Constructs a new [BehaviorException] with the
+     * given message and underlying cause.
+     *
+     * @param message The message
+     * @param cause The underlying cause
+     */
+    constructor(message: String, cause: Throwable) : super(message, cause)
+
+    /**
+     * Constructs a new [BehaviorException] with the
+     * underlying cause.
+     *
+     * @param cause The underlying cause
+     */
+    constructor(cause: Throwable) : super(cause)
+
 }

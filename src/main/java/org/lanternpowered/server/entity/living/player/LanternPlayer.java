@@ -34,6 +34,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.x.entity.player.XPlayer;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.config.world.WorldConfig;
@@ -171,7 +172,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternPlayer extends AbstractUser implements Player, AbstractViewer, NetworkIdHolder {
+public class LanternPlayer extends AbstractUser implements XPlayer, AbstractViewer, NetworkIdHolder {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = LanternLiving.DEFAULT_EFFECT_COLLECTION.toBuilder()
             // Override the fall sound
@@ -335,13 +336,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         return Optional.ofNullable(this.openedSignPosition);
     }
 
-    /**
-     * Attempts to open the sign at the given position and returns
-     * whether it was successful.
-     *
-     * @param position The position
-     * @return Whether opening the sign was successful
-     */
+    @Override
     public boolean openSignAt(Vector3i position) {
         return getWorld().getTileEntity(position).map(tile -> {
             if (tile instanceof Sign) {
@@ -485,7 +480,10 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             // Send the first chunks
             pulseChunkChanges();
             // Update the sky, this contains the darkness and rain levels
-            world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
+            final LanternWeatherUniverse weatherUniverse = (LanternWeatherUniverse) world.getWeatherUniverse();
+            if (weatherUniverse != null) {
+                this.session.send(weatherUniverse.createSkyUpdateMessage());
+            }
             // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             // Update the player inventory

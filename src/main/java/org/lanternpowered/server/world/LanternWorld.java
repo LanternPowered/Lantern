@@ -38,8 +38,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.api.world.weather.WeatherUniverse;
+import org.lanternpowered.api.x.world.XWorld;
+import org.lanternpowered.api.x.world.weather.XWeatherUniverse;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
 import org.lanternpowered.server.behavior.ContextKeys;
@@ -114,12 +117,10 @@ import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
@@ -166,7 +167,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -176,7 +176,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public class LanternWorld implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer, RuleHolder {
+public class LanternWorld implements AbstractExtent, XWorld, AbstractViewer, RuleHolder {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -293,9 +293,10 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         getWorldBorder().updateCurrentTime();
     }
 
+    @Nullable
     @Override
-    public Optional<WeatherUniverse> getWeatherUniverse() {
-        return Optional.ofNullable(this.weatherUniverse);
+    public XWeatherUniverse getWeatherUniverse() {
+        return this.weatherUniverse;
     }
 
     public ObservedChunkManager getObservedChunkManager() {
@@ -517,7 +518,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter) {
+    public boolean hasIntersectingEntities(AABB box, Function1<? super Entity, Boolean> filter) {
         checkNotNull(box, "box");
         checkNotNull(filter, "filter");
         final int maxX = ((int) Math.ceil(box.getMax().getX() + 2.0)) >> 4;
@@ -663,16 +664,12 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public Entity createEntity(EntityType type, Vector3d position) {
-        return createEntity(type, position, entity -> {});
-    }
-
-    public Entity createEntity(EntityType type, Vector3d position, Consumer<Entity> entityConsumer) {
+    public Entity createEntity(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
         checkNotNull(position, "position");
         final LanternEntityType entityType = (LanternEntityType) checkNotNull(type, "type");
         final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(UUID.randomUUID());
         entity.setPositionAndWorld(this, position);
-        entityConsumer.accept(entity);
+        fn.invoke(entity);
         final CauseStack causeStack = CauseStack.current();
         // Only throw the post event, the pre event will
         // only be called in specific cases.
@@ -683,8 +680,8 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public Entity createEntityNaturally(EntityType type, Vector3d position) throws IllegalArgumentException, IllegalStateException {
-        return createEntity(type, position); // TODO: Naturally
+    public Entity createEntityNaturally(EntityType type, Vector3d position, Function1<? super Entity, Unit> fn) {
+        return createEntity(type, position, fn);
     }
 
     @Override
@@ -1017,6 +1014,16 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
+    public double getDarkness() {
+        return this.weatherUniverse == null ? 0 : this.weatherUniverse.getDarkness();
+    }
+
+    @Override
+    public double getRainStrength() {
+        return this.weatherUniverse == null ? 0 : this.weatherUniverse.getRainStrength();
+    }
+
+    @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
         checkNotNull(particleEffect, "particleEffect");
         checkNotNull(position, "position");
@@ -1234,103 +1241,6 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
             }
         }
         return builder.build();
-    }
-
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform) {
-        handleEntitySpawning(entityType, transform, entity -> {});
-    }
-
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
-        handleEntitySpawning(entityType, transform, entityConsumer, SpongeEventFactory::createSpawnEntityEvent);
-    }
-
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer,
-            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
-        handleEntitySpawning(entityType, transform, entityConsumer, SpongeEventFactory::createSpawnEntityEvent, constructEventChecker);
-    }
-
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform,
-            Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
-        handleEntitySpawning(Collections.singleton(
-                new EntitySpawningEntry(entityType, transform, entityConsumer)), spawnEventConstructor);
-    }
-
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform,
-            Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor,
-            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
-        handleEntitySpawning(Collections.singleton(
-                new EntitySpawningEntry(entityType, transform, entityConsumer)), spawnEventConstructor, constructEventChecker);
-    }
-
-    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries) {
-        handleEntitySpawning(entries, SpongeEventFactory::createSpawnEntityEvent);
-    }
-
-    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
-            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
-        handleEntitySpawning(entries, SpongeEventFactory::createSpawnEntityEvent, constructEventChecker);
-    }
-
-    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
-            BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
-        handleEntitySpawning(entries, spawnEventConstructor, constructEvent -> {});
-    }
-
-    public static void handleEntitySpawning(Iterable<EntitySpawningEntry> entries,
-            BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor,
-            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
-        final CauseStack causeStack = CauseStack.current();
-        final List<Entity> entities = handlePreEntitySpawning(causeStack, entries, constructEventChecker);
-        if (entities.isEmpty()) {
-            return;
-        }
-        final SpawnEntityEvent spawnEvent = spawnEventConstructor.apply(causeStack.getCurrentCause(), entities);
-        // Post the spawn event
-        Sponge.getEventManager().post(spawnEvent);
-        // Spawn the entities in the world
-        finishSpawnEntityEvent(spawnEvent);
-    }
-
-    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
-        return handlePreEntitySpawning(entityType, transform, entityConsumer, constructEvent -> {});
-    }
-
-    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer,
-            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
-        final List<Entity> entities = handlePreEntitySpawning(CauseStack.current(),
-                Collections.singleton(new EntitySpawningEntry(entityType, transform, entityConsumer)), constructEventChecker);
-        return entities.isEmpty() ? Optional.empty() : Optional.of(entities.get(0));
-    }
-
-    public static List<Entity> handlePreEntitySpawning(Iterable<EntitySpawningEntry> entries) {
-        return handlePreEntitySpawning(entries, constructEvent -> {});
-    }
-
-    public static List<Entity> handlePreEntitySpawning(Iterable<EntitySpawningEntry> entries,
-            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
-        return handlePreEntitySpawning(CauseStack.current(), entries, constructEventChecker);
-    }
-
-    private static List<Entity> handlePreEntitySpawning(CauseStack causeStack, Iterable<EntitySpawningEntry> entries,
-            Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
-        final List<Entity> entities = new ArrayList<>();
-        final Cause cause = causeStack.getCurrentCause();
-        for (EntitySpawningEntry entry : entries) {
-            // Call the pre construction event
-            final ConstructEntityEvent.Pre preConstructEvent = SpongeEventFactory.createConstructEntityEventPre(
-                    cause, entry.entityType, entry.transform);
-            Sponge.getEventManager().post(preConstructEvent);
-            if (!preConstructEvent.isCancelled()) {
-                // Apply the event checker, if anything else needs to block the construction
-                constructEventChecker.accept(preConstructEvent);
-                if (!preConstructEvent.isCancelled()) {
-                    // Calls the post construction event
-                    entities.add(((LanternWorld) entry.transform.getExtent())
-                            .createEntity(entry.entityType, entry.transform.getPosition(), entry.entityConsumer));
-                }
-            }
-        }
-        return entities;
     }
 
     @Override
@@ -1733,5 +1643,4 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
             chunk.addBlockAction(x, y, z, blockType, blockAction);
         }
     }
-
 }

@@ -27,16 +27,18 @@ package org.lanternpowered.server.cause
 
 import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManagerFrame
 import org.spongepowered.api.event.cause.EventContext
 import org.spongepowered.api.event.cause.EventContextKey
 import java.util.Optional
 
-internal object EmptyCauseStack : CauseStack {
+internal object EmptyCauseStack : SnapshotCauseStack {
 
     private val obj = Any()
     private val cause by lazy { Cause.of(EventContext.empty(), Lantern.game) }
+    private val snapshot = object : SnapshotCauseStack.Snapshot {}
     private val frame = object : CauseStack.Frame {
 
         override fun close() {}
@@ -48,6 +50,9 @@ internal object EmptyCauseStack : CauseStack {
         override fun <T> addContext(key: EventContextKey<T>, value: T) = this
         override fun <T> removeContext(key: EventContextKey<T>) = Optional.empty<T>()
     }
+
+    override fun restoreSnapshot(snapshot: SnapshotCauseStack.Snapshot) {}
+    override fun createSnapshot() = this.snapshot
 
     override fun getCurrentCause(): Cause = cause
     override fun getCurrentContext(): EventContext = EventContext.empty()
@@ -66,6 +71,8 @@ internal object EmptyCauseStack : CauseStack {
     override fun contains(any: Any) = false
 
     override fun <T> addContext(key: EventContextKey<T>, value: T) = this
+    override fun <T> addContextIfAbsent(key: CauseContextKey<T>, valueProvider: () -> T) = valueProvider()
+
     override fun <T> getContext(key: EventContextKey<T>) = Optional.empty<T>()
     override fun <T> removeContext(key: EventContextKey<T>) = Optional.empty<T>()
 }

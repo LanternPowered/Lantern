@@ -23,5 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.api.world;
+package org.lanternpowered.api.x
+
+import org.lanternpowered.api.Server
+import org.lanternpowered.api.entity.spawn.EntitySpawner
+
+interface XServer : Server {
+
+    /**
+     * The [EntitySpawner].
+     */
+    val entitySpawner: EntitySpawner
+}

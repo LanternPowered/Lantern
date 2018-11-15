@@ -23,14 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.inject
+package org.lanternpowered.api.ext
+
+import com.flowpowered.math.GenericMath
+import java.util.Random
+import java.util.concurrent.ThreadLocalRandom
 
 /**
- * A named annotation that can be used in
- * combination with kotlin properties. It
- * will converted to the guice named when
- * injecting.
+ * The global [Random] instance. Doesn't supports
+ * its seed to be modified.
  */
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.PROPERTY)
-annotation class Named(val value: String)
+val random: Random = ThreadLocalRandom.current()
+
+/**
+ * Gets a random value between [ClosedRange.start] and [ClosedRange.endInclusive] (inclusive).
+ */
+fun Random.nextDouble(range: ClosedRange<Int>)
+        = range.start + nextInt(range.endInclusive + 1 - range.start)
+
+/**
+ * Gets a random double value between [ClosedRange.start] and [ClosedRange.endInclusive] (inclusive).
+ */
+fun Random.nextDouble(range: ClosedRange<Double>): Double {
+    val value = range.start + nextDouble() * (range.endInclusive - range.start + GenericMath.DBL_EPSILON)
+    return if (value > range.endInclusive) range.endInclusive else value
+}
+
+/**
+ * Gets a random double value between [ClosedRange.start] and [ClosedRange.endInclusive] (inclusive).
+ */
+fun Random.nextDouble(range: ClosedRange<Float>): Float {
+    val value = range.start + nextFloat() * (range.endInclusive - range.start + GenericMath.FLT_EPSILON)
+    return if (value > range.endInclusive) range.endInclusive else value
+}

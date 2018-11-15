@@ -26,16 +26,17 @@
 package org.lanternpowered.api.x.world
 
 import org.lanternpowered.api.world.World
-import org.lanternpowered.api.world.weather.WeatherUniverse
+import org.lanternpowered.api.x.world.extent.XEntityUniverse
+import org.lanternpowered.api.x.world.weather.XWeatherUniverse
 
 /**
  * An extended [World].
  */
-interface XWorld : World {
+interface XWorld : World, XEntityUniverse, XWeatherUniverse {
 
     /**
      * The weather universe of this world, or null if this
      * world doesn't support weathers. E.g. The End.
      */
-    val weatherUniverse: WeatherUniverse?
+    val weatherUniverse: XWeatherUniverse?
 }

@@ -23,5 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.api.world.weather;
+package org.lanternpowered.api.entity.living
+
+typealias Living = org.spongepowered.api.entity.living.Living

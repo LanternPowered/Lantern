@@ -23,20 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.world;
+package org.lanternpowered.api.behavior.basic
 
-import org.lanternpowered.api.world.weather.WeatherUniverse;
-import org.spongepowered.api.world.Dimension;
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.block.BlockSnapshotBuilder
+import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.cause.CauseContextKey
+import org.lanternpowered.api.util.collect.NonNullArrayList
 
-import java.util.Optional;
+/**
+ * A [Behavior] type which already prepares the [PlacedSnapshots] collection.
+ */
+interface PlaceBlockBehaviorBase : Behavior {
 
-public interface World extends org.spongepowered.api.world.World {
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean =
+            apply(type, ctx, ctx.addContextIfAbsent(PlacedSnapshots) { NonNullArrayList() })
 
-    /**
-     * Gets the {@link WeatherUniverse} of this world if the
-     * {@link Dimension} supports weathers.
-     *
-     * @return The weather universe
-     */
-    Optional<WeatherUniverse> getWeatherUniverse();
+    fun apply(type: BehaviorType, ctx: BehaviorContext, placed: MutableList<BlockSnapshotBuilder>): Boolean
+
+    companion object {
+
+        /**
+         * A list of [BlockSnapshotBuilder]s that are being placed by the placement behavior.
+         */
+        val PlacedSnapshots = CauseContextKey<MutableList<BlockSnapshotBuilder>>(CatalogKeys.minecraft("placed_blocks"))
+    }
 }

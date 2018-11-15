@@ -23,31 +23,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.extent;
+package org.lanternpowered.api.behavior.basic.block.interact.jukebox
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.util.AABB;
-import org.spongepowered.api.world.extent.Extent;
+import org.lanternpowered.api.behavior.Behavior
+import org.lanternpowered.api.behavior.BehaviorContext
+import org.lanternpowered.api.behavior.BehaviorContextKeys
+import org.lanternpowered.api.behavior.BehaviorType
+import org.lanternpowered.api.ext.*
+import org.spongepowered.api.block.tileentity.Jukebox
+import org.spongepowered.api.data.property.item.RecordProperty
 
-import java.util.Collection;
-import java.util.function.Predicate;
+/**
+ * Handles interaction with the [Jukebox].
+ *
+ * Will always return true if a jukebox is present at the interaction location.
+ *
+ * Does not decrease the quantity of the music item.
+ */
+class JukeboxInteractInsertBehavior : Behavior {
 
-public interface IExtent extends Extent {
+    override fun apply(type: BehaviorType, ctx: BehaviorContext): Boolean {
+        val jukebox = ctx[BehaviorContextKeys.INTERACTION_LOCATION]?.blockEntity as? Jukebox ?: return false
 
-    /**
-     * Gets the collision boxes of the block
-     * at the given coordinates.
-     *
-     * @param x The x coordinate
-     * @param y The y coordinate
-     * @param z The z coordinate
-     * @return The collision boxes, or empty if none were found
-     */
-    Collection<AABB> getBlockCollisionBoxes(int x, int y, int z);
+        val item = ctx[BehaviorContextKeys.USED_ITEM] ?: return false
+        // Check whether the item is a valid record
+        if ((!item.getProperty(RecordProperty::class.java))?.value == null) return false
 
-    default boolean hasIntersectingEntities(AABB box) {
-        return hasIntersectingEntities(box, entity -> true);
+        ctx.addFinalizer {
+            val musicDisc = item.createStack()
+            musicDisc.quantity = 1
+
+            jukebox.insertRecord(musicDisc)
+            jukebox.playRecord()
+        }
+
+        return true
     }
-
-    boolean hasIntersectingEntities(AABB box, Predicate<Entity> filter);
 }

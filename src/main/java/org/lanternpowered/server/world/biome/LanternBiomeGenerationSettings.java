@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.biome;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.util.collect.Lists2;
+import org.lanternpowered.api.util.collect.NonNullMutableList;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.GroundCoverLayer;
 import org.spongepowered.api.world.gen.GenerationPopulator;
@@ -38,9 +38,9 @@ import java.util.List;
 public final class LanternBiomeGenerationSettings implements BiomeGenerationSettings {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...
-    private final List<GroundCoverLayer> groundCoverLayers = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
-    private final List<GenerationPopulator> generationPopulators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
-    private final List<Populator> populators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
+    private final List<GroundCoverLayer> groundCoverLayers = new NonNullMutableList<>(Lists.newCopyOnWriteArrayList());
+    private final List<GenerationPopulator> generationPopulators = new NonNullMutableList<>(Lists.newCopyOnWriteArrayList());
+    private final List<Populator> populators = new NonNullMutableList<>(Lists.newCopyOnWriteArrayList());
 
     private float minHeight;
     private float maxHeight;

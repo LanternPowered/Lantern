@@ -33,6 +33,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import kotlin.jvm.functions.Function0;
+import org.jetbrains.annotations.NotNull;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
@@ -143,6 +145,11 @@ public class BehaviorContextImpl implements BehaviorContext {
     public <T> BehaviorContextImpl addContext(EventContextKey<T> key, T value) {
         this.causeStack.addContext(key, value);
         return this;
+    }
+
+    @Override
+    public <T> T addContextIfAbsent(@NotNull EventContextKey<T> key, @NotNull Function0<? extends T> valueProvider) {
+        return this.causeStack.addContextIfAbsent(key, valueProvider);
     }
 
     private final class Snapshot implements BehaviorContext.Snapshot {

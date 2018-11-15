@@ -29,9 +29,11 @@ package org.lanternpowered.api.item.inventory
 
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
 typealias ItemStack = ItemStack
 typealias ItemStackBuilder = ItemStack.Builder
+typealias ItemStackSnapshot = ItemStackSnapshot
 
 /**
  * Constructs a new [ItemStack] with the given [ItemType], quantity and

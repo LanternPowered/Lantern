@@ -28,7 +28,7 @@ package org.lanternpowered.server.script.context;
 import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.script.context.Parameter;
 import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.world.World;
+import org.lanternpowered.api.x.world.XWorld;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.world.Location;
 
@@ -41,6 +41,6 @@ public class ContextParameterRegistryModule extends DefaultCatalogRegistryModule
     @Override
     public void registerDefaults() {
         this.register(new ContextParameterImpl<>(CatalogKeys.lantern("target_location"), Location.class));
-        this.register(new ContextParameterImpl<>(CatalogKeys.lantern("world"), World.class));
+        this.register(new ContextParameterImpl<>(CatalogKeys.lantern("world"), XWorld.class));
     }
 }

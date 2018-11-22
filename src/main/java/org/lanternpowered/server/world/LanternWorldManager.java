@@ -44,6 +44,7 @@ import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.util.SyncLanternThread;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
 import org.slf4j.Logger;
@@ -708,7 +709,7 @@ public final class LanternWorldManager {
         if (this.worldThreads.containsKey(world)) {
             return;
         }
-        final Thread thread = ThreadHelper.newThread(() -> {
+        final Thread thread = new SyncLanternThread(() -> {
             try {
                 // Initialize the world cause stack.
                 LanternCauseStackManager.INSTANCE.setCurrentCauseStack(new LanternCauseStack());

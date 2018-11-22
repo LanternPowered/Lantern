@@ -60,10 +60,12 @@ object LanternCauseStackManager : XCauseStackManager {
         }
     }
 
-    override fun currentStackOrNull(): CauseStack? {
-        val thread = Thread.currentThread()
-        return if (thread is LanternThread) thread.causeStack else this.fallbackCauseStacks.get()
-    }
+    override fun currentStackOrNull() = getCauseStackOrNull(Thread.currentThread())
+
+    fun getCauseStackOrNull(thread: Thread)
+            = if (thread is LanternThread) thread.causeStack else this.fallbackCauseStacks.get()
+
+    fun getCauseStackOrEmpty(thread: Thread) = getCauseStackOrNull(thread) ?: EmptyCauseStack
 
     override fun currentStackOrEmpty(): CauseStack = currentStackOrNull() ?: EmptyCauseStack
     override fun currentStack() = currentStackOrNull() ?: throw IllegalStateException("The current thread doesn't support a cause stack.")

@@ -41,6 +41,7 @@ import org.lanternpowered.server.inject.LanternModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.transformer.FinalFieldClassTransformer;
 import org.lanternpowered.server.transformer.data.FastValueContainerClassTransformer;
+import org.lanternpowered.server.util.SyncLanternThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Platform;
@@ -59,6 +60,11 @@ public final class LanternServerLaunch {
         classLoader.addTransformer(new FinalFieldClassTransformer());
         classLoader.addTransformer(new FastValueContainerClassTransformer());
 
+        final SyncLanternThread thread = new SyncLanternThread(() -> start(args), "init");
+        thread.start();
+    }
+
+    private void start(String[] args) {
         // Get the default logger
         final Logger logger = LoggerFactory.getLogger(InternalPluginsInfo.Implementation.IDENTIFIER);
         try {

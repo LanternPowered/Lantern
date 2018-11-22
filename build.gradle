@@ -348,8 +348,8 @@ if (project.hasProperty('lanternRepo')) {
 ////////////////////////////////////
 
 // Gradle version used for generating the Gradle wrapper
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10'
+wrapper {
+    gradleVersion = '4.10.2'
 }
 
 // A custom update wrapper task, using a custom task prevents

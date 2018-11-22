@@ -59,7 +59,7 @@ public class CommandGameMode extends CommandProvider {
             if (gameMode == GameModes.NOT_SET) {
                 continue;
             }
-            baseBuilder.put(gameMode.getName(), gameMode);
+            baseBuilder.put(gameMode.getKey().getValue(), gameMode);
             aliasesBuilder.put(((LanternGameMode) gameMode).getInternalId() + "", gameMode);
         }
         aliasesBuilder.put("s", GameModes.SURVIVAL);

@@ -42,6 +42,12 @@ public class LanternThread extends FastThreadLocalThread {
     @Nullable private CauseStack causeStack;
 
     /**
+     * A {@link Throwable} which points to where
+     * this {@link Thread} is constructed.
+     */
+    private final Throwable constructionSite;
+
+    /**
      * Constructs a new {@link LanternThread} with
      * the given {@link Runnable} task and name.
      *
@@ -50,6 +56,7 @@ public class LanternThread extends FastThreadLocalThread {
      */
     public LanternThread(Runnable target, String name) {
         super(target, name);
+        this.constructionSite = new Exception();
     }
 
     /**
@@ -60,6 +67,7 @@ public class LanternThread extends FastThreadLocalThread {
      */
     public LanternThread(Runnable target) {
         super(target);
+        this.constructionSite = new Exception();
     }
 
     /**
@@ -80,5 +88,13 @@ public class LanternThread extends FastThreadLocalThread {
      */
     public void setCauseStack(CauseStack causeStack) {
         this.causeStack = causeStack;
+    }
+
+    /**
+     * Gets the {@link Throwable} which points to where
+     * this {@link Thread} is constructed.
+     */
+    public Throwable getConstructionSite() {
+        return this.constructionSite;
     }
 }

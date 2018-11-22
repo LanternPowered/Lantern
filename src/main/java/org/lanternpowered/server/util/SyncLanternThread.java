@@ -23,22 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.x.world.weather
-
-import org.lanternpowered.api.world.weather.WeatherUniverse
+package org.lanternpowered.server.util;
 
 /**
- * An extended [WeatherUniverse].
+ * A thread type that is used for the main lantern threads, this means all the
+ * world update threads, the initialization and main thread.
  */
-interface XWeatherUniverse : WeatherUniverse {
+public class SyncLanternThread extends LanternThread {
 
-    /**
-     * The current darkness of the sky.
-     */
-    val skyDarkness: Double
+    public SyncLanternThread(Runnable target, String name) {
+        super(target, name);
+    }
 
-    /**
-     * The current rain strength.
-     */
-    val rainStrength: Double
+    public SyncLanternThread(Runnable target) {
+        super(target);
+    }
 }

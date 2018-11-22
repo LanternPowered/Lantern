@@ -52,11 +52,8 @@ final class AsyncScheduler extends SchedulerBase {
     // The dynamic thread pooling executor of asynchronous tasks.
     private ExecutorService executor;
     // Whether the scheduler is running
-    private volatile boolean running;
-
-    // Shutdown time
-    private long shutdownTimeout;
-    private TimeUnit shutdownTimeUnit;
+    private boolean running;
+    private final Thread thread;
 
     AsyncScheduler() {
         super(ScheduledTask.TaskSynchronicity.ASYNCHRONOUS);
@@ -64,9 +61,9 @@ final class AsyncScheduler extends SchedulerBase {
         // We are starting it
         this.running = true;
 
-        final Thread thread = ThreadHelper.newThread(AsyncScheduler.this::mainLoop, "async-scheduler");
-        thread.setDaemon(true);
-        thread.start();
+        this.thread = ThreadHelper.newThread(AsyncScheduler.this::mainLoop, "async-scheduler");
+        this.thread.setDaemon(true);
+        this.thread.start();
     }
 
     /**
@@ -77,13 +74,24 @@ final class AsyncScheduler extends SchedulerBase {
      * @param unit The time unit
      */
     void shutdown(long timeout, TimeUnit unit) {
-        if (!this.running) {
-            return;
+        this.lock.lock();
+        try {
+            if (!this.running) {
+                return;
+            }
+            this.running = false;
+            this.condition.signalAll();
+        } finally {
+            this.lock.unlock();
         }
-        this.shutdownTimeout = timeout;
-        this.shutdownTimeUnit = unit;
-        // Make the scheduler shutdown
-        this.running = false;
+        try {
+            this.thread.join();
+            this.executor.shutdown();
+            if (!this.executor.awaitTermination(timeout, unit)) {
+                this.executor.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
+        }
     }
 
     private void mainLoop() {
@@ -93,13 +101,6 @@ final class AsyncScheduler extends SchedulerBase {
         while (this.running) {
             recalibrateMinimumTimeout();
             runTick();
-        }
-        this.executor.shutdown();
-        try {
-            if (!this.executor.awaitTermination(this.shutdownTimeout, this.shutdownTimeUnit)) {
-                this.executor.shutdownNow();
-            }
-        } catch (InterruptedException ignored) {
         }
     }
 

@@ -40,10 +40,12 @@ import com.google.inject.Singleton;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.lmbda.MethodHandlesX;
+import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.DefineableClassLoader;
+import org.lanternpowered.server.util.SyncLanternThread;
 import org.lanternpowered.server.util.SystemProperties;
 import org.lanternpowered.server.util.TypeTokenHelper;
 import org.lanternpowered.server.util.function.ThrowableConsumer;
@@ -109,6 +111,11 @@ public class LanternEventManager implements EventManager {
             Caffeine.newBuilder().initialCapacity(150).build(this::bakeHandlers);
 
     private final Map<Class<?>, ShouldFireField> shouldFireFields = new HashMap<>();
+
+    /**
+     * A lock to synchronize events called from a {@link SyncLanternThread}.
+     */
+    private final Object syncPostLock = new Object();
 
     private static final class ShouldFireField {
 
@@ -524,8 +531,18 @@ public class LanternEventManager implements EventManager {
 
     private boolean post(Event event, Collection<RegisteredListener<?>> listeners,
             ThrowableConsumer<RegisteredListener, Exception> handler) {
-        checkNotNull(event, "event");
-        final CauseStack causeStack = CauseStack.currentOrEmpty();
+        final Thread thread = Thread.currentThread();
+        final CauseStack causeStack = LanternCauseStackManager.INSTANCE.getCauseStackOrEmpty(thread);
+        if (thread instanceof SyncLanternThread) {
+            synchronized (this.syncPostLock) {
+                return post(causeStack, event, listeners, handler);
+            }
+        }
+        return post(causeStack, event, listeners, handler);
+    }
+
+    private boolean post(CauseStack causeStack, Event event, Collection<RegisteredListener<?>> listeners,
+            ThrowableConsumer<RegisteredListener, Exception> handler) {
         for (RegisteredListener listener : listeners) {
             // Add the calling plugin to the cause stack
             causeStack.pushCause(listener.getPlugin());

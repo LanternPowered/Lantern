@@ -28,26 +28,25 @@ package org.lanternpowered.server.util;
 import org.lanternpowered.server.game.Lantern;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Thread started on shutdown that monitors for and kills rogue non-daemon threads.
  */
 public class ShutdownMonitorThread extends Thread {
 
-    /**
-     * The delay in milliseconds until leftover threads are killed.
-     */
-    private static final int DELAY = 8000;
+    private final long timeoutMillis;
 
-    public ShutdownMonitorThread() {
-        this.setName("shutdown-monitor");
-        this.setDaemon(true);
+    public ShutdownMonitorThread(long timeout, TimeUnit unit) {
+        this.timeoutMillis = unit.toMillis(timeout);
+        setName("shutdown-monitor");
+        setDaemon(true);
     }
 
     @Override
     public void run() {
         try {
-            Thread.sleep(DELAY);
+            Thread.sleep(this.timeoutMillis);
         } catch (InterruptedException e) {
             Lantern.getLogger().error("Shutdown monitor interrupted", e);
             System.exit(0);
@@ -66,9 +65,20 @@ public class ShutdownMonitorThread extends Thread {
                 continue;
             }
 
-            Lantern.getLogger().warn("Rogue thread: " + thread);
+            if (thread instanceof LanternThread) {
+                final LanternThread lanternThread = (LanternThread) thread;
+                Lantern.getLogger().warn("Rogue thread (lantern): " + lanternThread);
+                Lantern.getLogger().warn("    construction location:");
+                final Throwable constructionSource = lanternThread.getConstructionSite();
+                for (StackTraceElement trace : constructionSource.getStackTrace()) {
+                    Lantern.getLogger().warn("        at " + trace);
+                }
+            } else {
+                Lantern.getLogger().warn("Rogue thread: " + thread);
+            }
+            Lantern.getLogger().warn("    interrupt location:");
             for (StackTraceElement trace : stack) {
-                Lantern.getLogger().warn("    at " + trace);
+                Lantern.getLogger().warn("        at " + trace);
             }
 
             // ask nicely to kill them

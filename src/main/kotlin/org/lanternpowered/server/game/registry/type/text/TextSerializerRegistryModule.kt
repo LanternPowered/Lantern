@@ -36,7 +36,7 @@ import org.spongepowered.api.registry.util.RegistrationDependency
 import org.spongepowered.api.text.serializer.TextSerializer
 import org.spongepowered.api.text.serializer.TextSerializers
 
-@RegistrationDependency(TranslationManagerRegistryModule::class)
+@RegistrationDependency(TranslationManagerRegistryModule::class, TextStyleRegistryModule::class, TextColorRegistryModule::class)
 object TextSerializerRegistryModule : AdditionalPluginCatalogRegistryModule<TextSerializer>(TextSerializers::class) {
 
     @EarlyRegistration

@@ -28,12 +28,13 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import org.lanternpowered.server.data.property.PropertyKeySetter;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -42,8 +43,8 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -60,48 +61,39 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
 
     private static class InventoryListeners implements EventListener<InteractInventoryEvent> {
 
-        private final AbstractInventory inventory;
-        private final Class<? extends InteractInventoryEvent> eventType;
-        private final List<Consumer<InteractInventoryEvent>> consumers;
+        private final WeakReference<AbstractInventory> inventory;
+        private final List<Consumer<? super Event>> consumers;
 
         @SuppressWarnings({"unchecked", "rawtypes"})
-        InventoryListeners(AbstractInventory inventory,
-                Class<? extends InteractInventoryEvent> eventType,
-                List<Consumer<? extends InteractInventoryEvent>> consumers) {
-            this.eventType = eventType;
-            this.consumers = (List) ImmutableList.copyOf(consumers);
-            this.inventory = inventory;
+        InventoryListeners(AbstractInventory inventory, Collection<Consumer<? super Event>> consumers) {
+            this.consumers = ImmutableList.copyOf(consumers);
+            this.inventory = new WeakReference<>(inventory);
         }
 
         @Override
         public void handle(InteractInventoryEvent event) {
             final AbstractContainer container = (AbstractContainer) event.getTargetInventory();
-            if (container.containsInventory(this.inventory)) {
-                for (Consumer<InteractInventoryEvent> consumer : this.consumers) {
-                    consumer.accept(event);
+            final AbstractInventory inventory = this.inventory.get();
+            if (inventory != null) {
+                if (container.containsInventory(inventory)) {
+                    for (Consumer<? super Event> consumer : this.consumers) {
+                        consumer.accept(event);
+                    }
                 }
+            } else {
+                // Remove the listeners if the inventory is no longer in use
+                Sponge.getEventManager().unregisterListeners(this);
             }
         }
     }
-
-    private static final Cache<AbstractInventory, List<InventoryListeners>> inventoryListeners =
-            Caffeine.<AbstractInventory, List<InventoryListeners>>newBuilder()
-                    .weakKeys()
-                    .removalListener((RemovalListener<AbstractInventory, List<InventoryListeners>>) (key, value, cause) -> {
-                        if (value != null) {
-                            for (InventoryListeners listeners : value) {
-                                Sponge.getEventManager().unregisterListeners(listeners);
-                            }
-                        }
-                    })
-                    .build();
 
     @Nullable private LanternInventoryArchetype<T> inventoryArchetype;
     @Nullable private AbstractBuilder builder;
     @Nullable private Carrier carrier;
     @Nullable private Class<? extends Carrier> forCarrierType;
     @Nullable private Carrier forCarrier;
-    private final Map<Class<? extends InteractInventoryEvent>, List<Consumer<? extends InteractInventoryEvent>>> listeners = new HashMap<>();
+
+    private final Multimap<Class<? extends Event>, Consumer<? super Event>> listeners = LinkedHashMultimap.create();
 
     private LanternInventoryBuilder() {
     }
@@ -109,11 +101,12 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
     @Override
     public LanternInventoryBuilder<T> from(Inventory value) {
         checkNotNull(value, "value");
+        final AbstractInventory inventory = (AbstractInventory) value;
         this.inventoryArchetype = (LanternInventoryArchetype<T>) value.getArchetype();
         this.listeners.clear();
-        final List<InventoryListeners> listeners = inventoryListeners.getIfPresent(value);
+        final Multimap<Class<? extends Event>, Consumer<? super Event>> listeners = inventory.getEventListeners();
         if (listeners != null) {
-            listeners.forEach(l -> this.listeners.computeIfAbsent(l.eventType, type -> new ArrayList<>()).addAll(l.consumers));
+            this.listeners.putAll(listeners);
         }
         this.builder = null; // Regenerate the builder if needed
         return this;
@@ -211,12 +204,11 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
             ((AbstractCarrier) this.carrier).setInventory((CarriedInventory<?>) inventory);
         }
         if (!this.listeners.isEmpty()) {
-            final List<InventoryListeners> listenersList = new ArrayList<>();
-            for (Map.Entry<Class<? extends InteractInventoryEvent>, List<Consumer<? extends InteractInventoryEvent>>> entry : this.listeners.entrySet()) {
-                final InventoryListeners listeners = new InventoryListeners(inventory, entry.getKey(), entry.getValue());
-                Sponge.getEventManager().registerListener(plugin, entry.getKey(), listeners);
+            inventory.setEventListeners(ImmutableMultimap.copyOf(this.listeners));
+            for (Map.Entry<Class<? extends Event>, Collection<Consumer<? super Event>>> entry : this.listeners.asMap().entrySet()) {
+                final InventoryListeners listeners = new InventoryListeners(inventory, entry.getValue());
+                Sponge.getEventManager().registerListener(plugin, (Class<? extends InteractInventoryEvent>) entry.getKey(), listeners);
             }
-            inventoryListeners.put(inventory, listenersList);
         }
         return (T) inventory;
     }
@@ -225,7 +217,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
     public <E extends InteractInventoryEvent> LanternInventoryBuilder<T> listener(Class<E> type, Consumer<E> listener) {
         checkNotNull(type, "type");
         checkNotNull(listener, "listener");
-        this.listeners.computeIfAbsent(type, type1 -> new ArrayList<>()).add(listener);
+        this.listeners.put(type, (Consumer) listener);
         return this;
     }
 

@@ -31,6 +31,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
@@ -43,6 +44,8 @@ import org.lanternpowered.server.item.predicate.ItemPredicate;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
@@ -114,6 +117,11 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
      */
     @Nullable private Map<Player, AbstractContainer> viewers;
 
+    /**
+     * A map with all the event listeners attached to this inventory.
+     */
+    @Nullable private Multimap<Class<? extends Event>, Consumer<? super Event>> eventListeners;
+
     protected AbstractInventory() {
         if (this instanceof ICarriedInventory) {
             this.carrierReference = CarrierReference.of(carrierTypeCache.get(getClass()));
@@ -121,6 +129,15 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
         if (this instanceof IViewableInventory) {
             this.viewers = new ConcurrentHashMap<>();
         }
+    }
+
+    @Nullable
+    Multimap<Class<? extends Event>, Consumer<? super Event>> getEventListeners() {
+        return this.eventListeners;
+    }
+
+    void setEventListeners(@Nullable Multimap<Class<? extends Event>, Consumer<? super Event>> eventListeners) {
+        this.eventListeners = eventListeners;
     }
 
     /**

@@ -244,7 +244,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             if (event.isCancelled()) {
                 session.disconnect(event.isMessageCancelled() ? t("multiplayer.disconnect.generic") : event.getMessage());
             } else {
-                session.messageReceived(new MessageLoginInFinish(gameProfile));
+                session.queueReceivedMessage(new MessageLoginInFinish(gameProfile));
             }
         } catch (Exception e) {
             Lantern.getLogger().error("Error in authentication thread", e);

@@ -49,9 +49,9 @@ package org.lanternpowered.server.network.vanilla.message.handler.login;
 
 import io.netty.util.AttributeKey;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.network.NettyThreadOnly;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
-import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
@@ -65,7 +65,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Async
 public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
 
     // The data that will be used for authentication.
@@ -74,6 +73,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
     // The spoofed game profile that may be provided by proxies
     public static final AttributeKey<LanternGameProfile> SPOOFED_GAME_PROFILE = AttributeKey.valueOf("spoofed-game-profile");
 
+    @NettyThreadOnly
     @Override
     public void handle(NetworkContext context, MessageLoginInStart message) {
         final NetworkSession session = context.getSession();
@@ -107,7 +107,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
                     profile = new LanternGameProfile(uniqueId, username);
                 }
             }
-            session.messageReceived(new MessageLoginInFinish(profile));
+            session.queueReceivedMessage(new MessageLoginInFinish(profile));
         }
     }
 }

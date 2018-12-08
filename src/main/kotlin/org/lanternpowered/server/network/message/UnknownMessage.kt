@@ -23,24 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network;
+package org.lanternpowered.server.network.message
 
-import io.netty.channel.Channel;
-
-public interface NetworkContext {
-
-    /**
-     * Gets the {@link NetworkSession} that is targeted.
-     *
-     * @return the session
-     */
-    NetworkSession getSession();
-
-    /**
-     * Gets the {@link Channel} that is targeted.
-     *
-     * @return the channel
-     */
-    Channel getChannel();
-
-}
+object UnknownMessage : Message

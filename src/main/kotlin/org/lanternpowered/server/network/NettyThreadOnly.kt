@@ -23,5 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.network.message.handler;
+package org.lanternpowered.server.network
+
+import org.lanternpowered.server.network.message.handler.Handler
+
+/**
+ * A annotation that can be applied to methods and
+ * fields to mark them as only supported on Netty threads.
+ *
+ * It can also be used to define whether a specific or [Handler]
+ * method should be handled on the netty thread.
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class NettyThreadOnly

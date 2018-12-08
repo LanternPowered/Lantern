@@ -35,7 +35,7 @@ import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.NullMessage;
+import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
@@ -165,6 +165,6 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             content.retain(); // Retain the content until we can process it
             return new MessagePlayInOutChannelPayload(channel, content);
         }
-        return NullMessage.INSTANCE;
+        return UnknownMessage.INSTANCE;
     }
 }

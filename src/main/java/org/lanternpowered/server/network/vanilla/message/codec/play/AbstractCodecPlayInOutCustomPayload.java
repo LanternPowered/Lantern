@@ -37,7 +37,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.NullMessage;
+import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
@@ -143,7 +143,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
         } else {
             return decode0(context, channel, content);
         }
-        return NullMessage.INSTANCE;
+        return UnknownMessage.INSTANCE;
     }
 
     protected abstract MessageResult encode0(CodecContext context, Message message) throws CodecException;

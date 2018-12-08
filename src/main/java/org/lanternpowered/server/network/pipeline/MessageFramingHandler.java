@@ -59,18 +59,16 @@ import java.util.List;
 public final class MessageFramingHandler extends ByteToMessageCodec<ByteBuf> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf buf, ByteBuf output) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, ByteBuf buf, ByteBuf output) {
         writeVarInt(output, buf.readableBytes());
         output.writeBytes(buf);
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> output) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> output) {
         int length;
         while ((length = readableMessage(buf)) != -1) {
-            final ByteBuf msg = ctx.alloc().buffer(length);
-            buf.readBytes(msg, length);
-            output.add(msg);
+            output.add(buf.readRetainedSlice(length));
         }
     }
 

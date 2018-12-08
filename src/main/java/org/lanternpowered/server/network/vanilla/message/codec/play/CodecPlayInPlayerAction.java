@@ -29,7 +29,7 @@ import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.NullMessage;
+import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInLeaveBed;
@@ -67,7 +67,7 @@ public final class CodecPlayInPlayerAction implements Codec<Message> {
         } else if (action == 6) {
             // Open inventory, there is another message that sends this and this one will
             // be removed in 1.9, so ignoring it.
-            return NullMessage.INSTANCE;
+            return UnknownMessage.INSTANCE;
         } else if (action == 7) {
             return new MessagePlayInRequestHorseInventory();
         } else if (action == 8) {

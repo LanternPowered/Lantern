@@ -23,22 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message;
+package org.lanternpowered.server.network.message
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import org.lanternpowered.server.network.message.handler.Handler;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import io.netty.util.ReferenceCounted
 
 /**
- * Can be used to define whether a specific {@link Message} or {@link Handler}
- * type should be handled asynchronous.
+ * A abstract [Message] implementation which
+ * can hold a [ReferenceCounted] object.
+ *
+ * @param T The reference counted object type
  */
-@Target(TYPE)
-@Retention(RUNTIME)
-public @interface Async {
-
-}
+abstract class AbstractReferenceCountedMessage<T : ReferenceCounted> protected constructor(
+        protected val refCounted: T
+) : Message, ReferenceCounted by refCounted

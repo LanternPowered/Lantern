@@ -23,12 +23,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message;
+package org.lanternpowered.server.network.message
 
-public final class NullMessage implements Message {
+import org.lanternpowered.server.network.NettyThreadOnlyHelper
+import org.lanternpowered.server.network.message.handler.Handler
 
-    public static final NullMessage INSTANCE = new NullMessage();
+data class HandlerMessage<M : Message> @JvmOverloads constructor(
+        val message: M,
+        val handler: Handler<in M>,
+        val handleThread: HandleThread = getDefaultHandleThread(handler)
+) : Message {
 
-    private NullMessage() {
+    enum class HandleThread {
+        /**
+         * The message is handled to the main (sync) server thread.
+         */
+        MAIN,
+        /**
+         * The message is handled on the netty thread.
+         */
+        NETTY,
+        /**
+         * The message is handled on a async thread.
+         */
+        ASYNC,
+    }
+}
+
+fun getDefaultHandleThread(handler: Handler<*>): HandlerMessage.HandleThread {
+    return if (NettyThreadOnlyHelper.isHandlerNettyThreadOnly(handler::class.java)) {
+        HandlerMessage.HandleThread.NETTY
+    } else {
+        HandlerMessage.HandleThread.MAIN
     }
 }

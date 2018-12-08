@@ -55,12 +55,11 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.lanternpowered.server.network.message.AsyncHelper;
 import org.lanternpowered.server.network.message.BulkMessage;
 import org.lanternpowered.server.network.message.HandlerMessage;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.NullMessage;
+import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
@@ -243,12 +242,14 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     private void handleKeepAlive(MessageInOutKeepAlive message) {
         if (this.keepAliveTime == message.getTime()) {
             final long time = currentTime();
+            final int latency = this.latency;
             // Calculate the latency
-            this.latency = (int) ((this.latency * 3 + (time - this.keepAliveTime)) / 4);
+            this.latency = (int) ((latency * 3 + (time - this.keepAliveTime)) / 4);
             this.keepAliveTime = -1L;
             if (this.gameProfile != null) {
                 // Update the global tab list
-                GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(this.latency));
+                messageReceived(new HandlerMessage<UnknownMessage>(UnknownMessage.INSTANCE, (context, initMessage) ->
+                        GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(this.latency))));
             }
         }
     }
@@ -264,7 +265,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             if (!this.firstClientSettingsMessage) {
                 this.firstClientSettingsMessage = true;
                 // Trigger the init
-                messageReceived(new HandlerMessage<>(new InitPlayerMessage(), (context, initMessage) -> finalizePlayer()));
+                messageReceived(new HandlerMessage<UnknownMessage>(UnknownMessage.INSTANCE,
+                        (context, initMessage) -> finalizePlayer()));
             }
         }
         messageReceived(message);
@@ -288,23 +290,40 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
+     * Queues the {@link Message} to be handled.
+     *
+     * @param message The message
+     */
+    public void queueReceivedMessage(Message message) {
+        final EventLoop eventLoop = this.channel.eventLoop();
+        if (eventLoop.inEventLoop()) {
+            messageReceived(message);
+        } else {
+            this.channel.eventLoop().execute(() -> messageReceived(message));
+        }
+    }
+
+    /**
      * Called when the server received a message from the client.
      *
      * @param message The message
      */
     @SuppressWarnings("unchecked")
-    public void messageReceived(Message message) {
+    @NettyThreadOnly
+    private void messageReceived(Message message) {
+        if (message == UnknownMessage.INSTANCE) {
+            return;
+        }
         if (message instanceof MessageInOutKeepAlive) { // Special case
             handleKeepAlive((MessageInOutKeepAlive) message);
-        } else if (message == NullMessage.INSTANCE) {
-            // Ignore
         } else if (message instanceof BulkMessage) {
             ((BulkMessage) message).getMessages().forEach(this::messageReceived);
         } else if (message instanceof HandlerMessage) {
             final HandlerMessage handlerMessage = (HandlerMessage) message;
-            if (AsyncHelper.isAsyncMessage(handlerMessage.getMessage()) ||
-                    AsyncHelper.isAsyncHandler(handlerMessage.getHandler())) {
+            if (handlerMessage.getHandleThread() == HandlerMessage.HandleThread.NETTY) {
                 handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage());
+            } else if (handlerMessage.getHandleThread() == HandlerMessage.HandleThread.ASYNC) {
+                Lantern.getScheduler().submitAsyncTask(() -> handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage()));
             } else {
                 this.messageQueue.add(handlerMessage);
             }
@@ -316,7 +335,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             }
             registration.getHandler().ifPresent(handler -> {
                 final Handler handler1 = (Handler) handler;
-                if (AsyncHelper.isAsyncMessage(message) || AsyncHelper.isAsyncHandler(handler1)) {
+                if (NettyThreadOnlyHelper.INSTANCE.isHandlerNettyThreadOnly((Class) handler1.getClass())) {
                     handleMessage(handler1, message);
                 } else {
                     this.messageQueue.add(new HandlerMessage(message, handler1));
@@ -334,6 +353,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 () -> disconnect(t("multiplayer.disconnect.slow_login")), 30, TimeUnit.SECONDS);
     }
 
+    @NettyThreadOnly
     private void initKeepAliveTask() {
         if (this.connectionTask != null) {
             this.connectionTask.cancel(true);
@@ -438,10 +458,10 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
     /**
      * Gets the {@link Locale}.
-     * <p>This method should only be accessed from the netty thread.
      *
      * @return The locale
      */
+    @NettyThreadOnly
     public Locale getLocale() {
         return this.locale;
     }
@@ -451,6 +471,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @return The protocol version
      */
+    @NettyThreadOnly
     public int getProtocolVersion() {
         return this.protocolVersion;
     }
@@ -460,6 +481,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @param protocolVersion The protocol version
      */
+    @NettyThreadOnly
     public void setProtocolVersion(int protocolVersion) {
         if (this.protocolVersion != -1) {
             throw new IllegalStateException("The protocol version may only be set once.");
@@ -543,6 +565,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @return The protocol
      */
+    @NettyThreadOnly
     public Protocol getProtocol() {
         return this.protocolState.getProtocol();
     }
@@ -552,6 +575,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @return The protocol state
      */
+    @NettyThreadOnly
     public ProtocolState getProtocolState() {
         return this.protocolState;
     }
@@ -561,6 +585,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @param state The protocol state
      */
+    @NettyThreadOnly
     public void setProtocolState(ProtocolState state) {
         this.protocolState = state;
     }
@@ -571,6 +596,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @param reason The reason
      */
+    @NettyThreadOnly
     private void closeChannel(Text reason) {
         this.disconnectReason = checkNotNull(reason, "reason");
         this.channel.close();
@@ -876,7 +902,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.player = new LanternPlayer(this.gameProfile, this);
         this.player.setNetworkId(EntityProtocolManager.acquireEntityId());
 
-        // Actually to early to send this, but we want to trigger
+        // Actually too early to send this, but we want to trigger
         // the client settings to be send to the server, respawn
         // messages will be send afterwards with the proper values
         send(new MessagePlayOutPlayerJoinGame(GameModes.SURVIVAL, DimensionTypes.OVERWORLD,

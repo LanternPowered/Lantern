@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.NullMessage;
+import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCraftingBookState;
@@ -47,6 +47,6 @@ public final class CodecPlayInCraftingBookData implements Codec<Message> {
             final boolean filter = buf.readBoolean();
             return new MessagePlayInCraftingBookState(open, filter);
         }
-        return NullMessage.INSTANCE;
+        return UnknownMessage.INSTANCE;
     }
 }

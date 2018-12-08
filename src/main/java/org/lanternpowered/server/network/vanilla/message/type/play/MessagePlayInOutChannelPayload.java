@@ -60,7 +60,7 @@ public final class MessagePlayInOutChannelPayload extends AbstractReferenceCount
      * @return The content
      */
     public ByteBuffer getContent() {
-        return this.object;
+        return getRefCounted();
     }
 
 }

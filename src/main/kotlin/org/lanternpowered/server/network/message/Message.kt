@@ -23,36 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message;
+package org.lanternpowered.server.network.message
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.network.message.handler.Handler;
-
-public final class HandlerMessage<M extends Message> implements Message {
-
-    private final M message;
-    private final Handler<? super M> handler;
-
-    public HandlerMessage(M message, Handler<? super M> handler) {
-        this.message = checkNotNull(message, "message");
-        this.handler = checkNotNull(handler, "handler");
-    }
-
-    public M getMessage() {
-        return this.message;
-    }
-
-    public Handler<? super M> getHandler() {
-        return this.handler;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("message", this.message)
-                .add("handler", this.handler)
-                .toString();
-    }
-}
+/**
+ * A message that can be send between the server and client.
+ */
+interface Message

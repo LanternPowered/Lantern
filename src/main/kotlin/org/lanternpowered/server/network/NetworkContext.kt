@@ -23,45 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message;
+package org.lanternpowered.server.network
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import io.netty.channel.Channel
 
-import io.netty.util.ReferenceCounted;
-import org.lanternpowered.server.network.IReferenceCounted;
+interface NetworkContext {
 
-/**
- * A abstract {@link Message} implementation which
- * can hold a {@link ReferenceCounted} object.
- *
- * @param <T> The reference counted object type
- */
-public abstract class AbstractReferenceCountedMessage<T extends ReferenceCounted> implements Message, IReferenceCounted {
+    /**
+     * The [NetworkSession] that is targeted.
+     */
+    val session: NetworkSession
 
-    protected final T object;
+    /**
+     * The [Channel] that is targeted.
+     */
+    val channel: Channel
 
-    protected AbstractReferenceCountedMessage(T object) {
-        checkNotNull(object, "object");
-        this.object = object;
-    }
-
-    @Override
-    public int refCnt() {
-        return this.object.refCnt();
-    }
-
-    @Override
-    public ReferenceCounted retain(int increment) {
-        return this.object.retain(increment);
-    }
-
-    @Override
-    public ReferenceCounted touch(Object hint) {
-        return this.object.touch(hint);
-    }
-
-    @Override
-    public boolean release(int decrement) {
-        return this.object.release(decrement);
-    }
 }

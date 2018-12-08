@@ -34,10 +34,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.network.NettyThreadOnly;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.ProxyType;
-import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginStart;
@@ -51,12 +51,12 @@ import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.UUID;
 
-@Async
 public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
 
     private static final String FML_MARKER = "\0FML\0";
     private static final Gson GSON = new Gson();
 
+    @NettyThreadOnly
     @Override
     public void handle(NetworkContext context, MessageHandshakeIn message) {
         final Optional<ProtocolState> optNextState = ProtocolState.getFromId(message.getNextState());

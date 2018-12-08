@@ -133,7 +133,7 @@ public final class NetworkManager extends AbstractServer {
                 .channel(getServerSocketChannelClass(channelType))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
+                    protected void initChannel(SocketChannel ch) {
                         final ChannelPipeline pipeline = ch.pipeline();
                         final NetworkSession networkSession = new NetworkSession(ch, server, NetworkManager.this);
                         final CodecContext codecContext = new SimpleCodecContext(new LanternByteBufferAllocator(ch.alloc()), ch, networkSession);

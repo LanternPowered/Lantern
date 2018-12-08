@@ -44,7 +44,7 @@ import org.lanternpowered.server.network.message.CodecRegistration;
 import org.lanternpowered.server.network.message.HandlerMessage;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.NullMessage;
+import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -135,7 +135,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
     }
 
     private void processMessage(Message message, List<Object> output, Protocol protocol, ProtocolState state, CodecContext context) {
-        if (message == NullMessage.INSTANCE) {
+        if (message == UnknownMessage.INSTANCE) {
             return;
         }
         if (message instanceof BulkMessage) {

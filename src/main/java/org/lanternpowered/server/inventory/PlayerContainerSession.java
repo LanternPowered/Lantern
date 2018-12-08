@@ -225,10 +225,9 @@ public class PlayerContainerSession {
         clientContainer.handleHeldItemChange(message.getSlot());
     }
 
-    public void handleRecipeClick(MessagePlayInClickRecipe message) {
-        final int windowId = message.getWindowId();
+    private void applyIfContainerMatches(int windowId, Runnable runnable) {
         if (this.openContainer == null) {
-            if (message.getWindowId() == 0) {
+            if (windowId == 0) {
                 openPlayerContainer();
             } else {
                 return;
@@ -236,9 +235,15 @@ public class PlayerContainerSession {
         } else if (windowId != getContainerId()) {
             return;
         }
-        // Just display the recipe for now, all the other behavior will be implemented later,
-        // this requires recipes to be added first
-        this.player.getConnection().send(new MessagePlayOutDisplayRecipe(message.getWindowId(), message.getRecipeId()));
+        runnable.run();
+    }
+
+    public void handleRecipeClick(MessagePlayInClickRecipe message) {
+        applyIfContainerMatches(message.getWindowId(), () -> {
+            // Just display the recipe for now, all the other behavior will be implemented later,
+            // this requires recipes to be added first
+            this.player.getConnection().send(new MessagePlayOutDisplayRecipe(message.getWindowId(), message.getRecipeId()));
+        });
     }
 
     public void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
@@ -288,18 +293,10 @@ public class PlayerContainerSession {
     }
 
     public void handleWindowClick(MessagePlayInClickWindow message) {
-        final int windowId = message.getWindowId();
-        if (this.openContainer == null) {
-            if (message.getWindowId() == 0) {
-                openPlayerContainer();
-            } else {
-                return;
-            }
-        } else if (windowId != getContainerId()) {
-            return;
-        }
-        final ClientContainer clientContainer = getClientContainer();
-        clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
+        applyIfContainerMatches(message.getWindowId(), () -> {
+            final ClientContainer clientContainer = getClientContainer();
+            clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
+        });
     }
 
     public void handlePickItem(MessagePlayInPickItem message) {

@@ -1,4 +1,3 @@
 rootProject.name = name
 include 'SpongeAPI'
-include 'test-data-packs'
-include 'test-plugins'
+include 'test-server'

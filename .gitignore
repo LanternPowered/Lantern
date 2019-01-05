@@ -74,8 +74,9 @@ nb-configuration.xml
 
 # Other Files #
 ###############
-/openCmd.bat
 /run
+/test-server/run
+!.gitkeep
 *.launch
 
 test\.nbt

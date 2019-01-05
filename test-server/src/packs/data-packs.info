@@ -6,7 +6,7 @@ pack format that is used. Currently are only the mc data pack
 '3' and the 'lantern' data pack versions supported.
 
 You can also add a 'plugin.info' to your data pack domain
-directory, for example'minecraft' or 'lantern' that you get
+directory, for example 'minecraft' or 'lantern' that you get
 'data/<domain>/path/to/asset.json'. This provides extra
 plugin information about what the features the package will
 provide and who designed the data pack. This is similar to

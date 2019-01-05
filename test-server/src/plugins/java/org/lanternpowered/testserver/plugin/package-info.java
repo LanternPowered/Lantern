@@ -23,5 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+/**
+ * A package with plugins that are used to test the
+ * functionality of the API and the implementation.
+ */
 @org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.test;
+package org.lanternpowered.testserver.plugin;

@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.test;
+package org.lanternpowered.testserver.plugin;
 
 import com.google.inject.Inject;
 import org.slf4j.Logger;

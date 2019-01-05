@@ -1,11 +1,26 @@
-apply from: rootProject.file('gradle/lantern-base.gradle')
-
 apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
 apply plugin: 'org.spongepowered.plugin'
 apply plugin: 'net.minecrell.licenser'
 
+// Basic information
+group = 'org.lanternpowered'
+
 // Setup the default tasks
 defaultTasks 'licenseFormat', 'build'
+
+// Environment variables for the build set by the build server
+ext {
+    buildNumber = System.env.BUILD_NUMBER ?: System.env.TRAVIS_BUILD_NUMBER ?: '0'
+    ciSystem = System.env.CI_SYSTEM ?: (System.env.TRAVIS ? 'travis' : null)
+    commit = System.env.GIT_COMMIT ?: System.env.TRAVIS_COMMIT
+    branch = System.env.GIT_BRANCH ?: System.env.TRAVIS_BRANCH
+    api = rootProject.project('SpongeAPI')
+}
+
+// IntelliJ IDEA resource fix
+idea.module.inheritOutputDirs = true
 
 // Repositories
 repositories {
@@ -14,7 +29,6 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/groups/public' }
 }
 
-ext.api = rootProject.project('SpongeAPI')
 if (!api.projectDir.exists() || api.projectDir.list().length == 0) {
     String part = api.projectDir.exists() ? 'empty' : 'missing'
     throw new IllegalStateException("The SpongeAPI project appears to be $part, was it cloned properly?")

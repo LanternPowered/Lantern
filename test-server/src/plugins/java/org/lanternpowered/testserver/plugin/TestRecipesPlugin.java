@@ -23,42 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.test;
+package org.lanternpowered.testserver.plugin;
 
 import com.google.inject.Inject;
 import org.slf4j.Logger;
+import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
+import org.spongepowered.api.item.recipe.crafting.Ingredient;
+import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.text.title.Title;
 
-@Plugin(id = "test_command", authors = "Meronat", version = "1.0.0")
-public class TestCommandPlugin {
+@Plugin(id = "test_recipes", name = "Test Recipes", authors = "Cybermaxke", version = "1.0.0")
+public class TestRecipesPlugin {
 
     @Inject
     private Logger logger;
 
     @Listener
     public void onStart(GameInitializationEvent event) {
-        this.logger.info("TestCommand plugin enabled!");
+        this.logger.info("Test Recipes plugin enabled!");
 
-        Sponge.getCommandManager().register(this, CommandSpec.builder()
-                .executor((src, args) -> {
-                    final Text message = Text.of(TextColors.GREEN, TextStyles.UNDERLINE, "Test", TextStyles.RESET, " 1234");
-                    if (src instanceof Player) {
-                        ((Player) src).sendTitle(Title.builder().subtitle(message).build());
-                    } else {
-                        src.sendMessage(message);
-                    }
-                    return CommandResult.success();
-                })
-                .build(), "test-command", "tc");
+        final GameRegistry gameRegistry = Sponge.getGame().getRegistry();
+        gameRegistry.getCraftingRecipeRegistry().register(CraftingRecipe.shapedBuilder()
+                .aisle("xy", "yx")
+                .where('x', Ingredient.of(ItemTypes.APPLE))
+                .where('y', Ingredient.of(ItemTypes.GOLD_NUGGET))
+                .result(ItemStack.of(ItemTypes.GOLDEN_APPLE, 2))
+                .build("golden_apples", this));
+        gameRegistry.getSmeltingRecipeRegistry().register(SmeltingRecipe.builder()
+                .ingredient(ItemTypes.GOLDEN_APPLE)
+                .result(ItemStack.of(ItemTypes.GOLD_NUGGET, 1))
+                .build());
     }
 }

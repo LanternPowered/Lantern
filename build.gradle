@@ -2,10 +2,12 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url = 'https://dl.bintray.com/lanternpowered/maven/' }
+        maven {
+            url = 'https://dl.bintray.com/lanternpowered/maven/'
+        }
     }
     dependencies {
-        classpath 'org.lanternpowered:lanterngradle:1.0.0'
+        classpath 'org.lanternpowered:lanterngradle:1.0.1'
     }
 }
 
@@ -20,7 +22,6 @@ apply from: rootProject.file('gradle/lantern.gradle')
 
 // Apply plugins
 apply plugin: 'org.lanternpowered.gradle'
-apply plugin: 'org.lanternpowered.run-configs'
 
 // Basic project information
 archivesBaseName = 'lanternserver'
@@ -58,16 +59,8 @@ configurations {
     compile.extendsFrom(compileExcluded, compileTinyJson)
 }
 
-ext.testDataPacks = project(':test-data-packs')
-ext.testPlugins = project(':test-plugins')
-evaluationDependsOn testPlugins.path
-
 // Project dependencies
 dependencies {
-    // Add the test plugins to the class path
-    compileExcluded testPlugins
-    // Add the test data packs to the class path
-    compileExcluded testDataPacks
     // Add the sponge api
     compileExcluded api
     // Add a tiny json library just to read the library files
@@ -133,14 +126,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
     freeCompilerArgs = [ '-Xuse-experimental=kotlin.ExperimentalUnsignedTypes' ]
 }
 
-runConfigurations {
-    theConfig {
-        name = 'Lantern Server'
-        mainClass = 'org.lanternpowered.launch.LanternLaunch'
-        workingDirectory = 'run'
-    }
-}
-
 // Always print full stack trace if something goes wrong in the unit tests
 test.testLogging.exceptionFormat = 'full'
 
@@ -164,8 +149,6 @@ processResources {
 def ignoredDependencyArtifacts = new HashSet<>()
 // Don't include the api again
 ignoredDependencyArtifacts.add "$api.group:$api.name"
-ignoredDependencyArtifacts.add "$testDataPacks.group:$testDataPacks.name"
-ignoredDependencyArtifacts.add "$testPlugins.group:$testPlugins.name"
 // We already include 'asm-all'
 ignoredDependencyArtifacts.add 'org.ow2.asm:asm'
 

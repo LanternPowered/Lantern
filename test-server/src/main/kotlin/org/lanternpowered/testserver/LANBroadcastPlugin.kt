@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.util
+package org.lanternpowered.testserver
 
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.serializer.TextSerializers

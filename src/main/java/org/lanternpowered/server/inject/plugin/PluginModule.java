@@ -26,6 +26,7 @@
 package org.lanternpowered.server.inject.plugin;
 
 import com.google.inject.AbstractModule;
+import org.lanternpowered.server.inject.InjectablePropertyProvider;
 import org.slf4j.Logger;
 import org.spongepowered.api.plugin.PluginContainer;
 
@@ -43,5 +44,6 @@ public abstract class PluginModule extends AbstractModule {
         bind(Logger.class).toInstance(this.container.getLogger());
 
         install(new PluginConfigurationModule());
+        install(new InjectablePropertyProvider());
     }
 }

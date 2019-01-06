@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.lanternpowered:lanterngradle:1.0.1'
+        classpath 'org.lanternpowered:lanterngradle:1.0.2'
     }
 }
 

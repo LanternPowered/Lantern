@@ -30,9 +30,9 @@ sourceSets {
 
 runConfigurations {
     theConfig {
-        name = 'Lantern Server'
+        name = 'Lantern Test Server'
         mainClass = 'org.lanternpowered.launch.LanternLaunch'
-        workingDirectory = 'test-server/run'
+        workingDirectory = 'run'
         targetSourceSet = sourceSets.plugins
     }
 }

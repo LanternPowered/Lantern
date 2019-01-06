@@ -227,7 +227,7 @@ public final class LanternClassLoader extends URLClassLoader {
             }
         }
         if (localRepoPath == null) {
-            localRepoPath = "~/.m/repository";
+            localRepoPath = "~/.m2/repository";
         }
         localRepoPath = localRepoPath.trim();
         if (localRepoPath.charAt(0) == '~') {

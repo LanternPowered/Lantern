@@ -42,6 +42,7 @@ import org.lanternpowered.server.data.property.item.SmeltablePropertyStore;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.profile.LanternGameProfileBuilder;
 import org.lanternpowered.server.profile.LanternProfilePropertyBuilder;
@@ -128,9 +129,9 @@ public class DataRegistrar {
 
         final LanternDataManager dataManager = game.getDataManager();
         // Register the data type serializers
-        DataTypeSerializers.registerSerializers(dataManager);
+        DataTypeSerializers.registerSerializers(DataSerializerRegistry.INSTANCE);
         // Register the data serializers
-        DataTranslators.registerSerializers(dataManager);
+        DataTranslators.registerSerializers(DataSerializerRegistry.INSTANCE);
 
         // Register the data builders
         dataManager.registerBuilder(PatternLayer.class, new LanternPatternLayer.Builder(game));

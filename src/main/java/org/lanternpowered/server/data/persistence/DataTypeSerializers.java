@@ -30,6 +30,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.util.roman.IllegalRomanNumberException;
 import org.lanternpowered.server.util.roman.RomanNumber;
 import org.spongepowered.api.CatalogKey;
@@ -59,20 +60,20 @@ import java.util.stream.Collectors;
 public final class DataTypeSerializers {
 
     @SuppressWarnings("unchecked")
-    public static void registerSerializers(LanternDataManager dataManager) {
-        dataManager.registerTypeSerializer(new TypeToken<Multimap<?,?>>() {}, new MultimapSerializer());
-        dataManager.registerTypeSerializer(new TypeToken<Map<?,?>>() {}, new MapSerializer());
-        dataManager.registerTypeSerializer(new TypeToken<List<?>>() {}, new ListSerializer());
-        dataManager.registerTypeSerializer(new TypeToken<Set<?>>() {}, new SetSerializer());
-        dataManager.registerTypeSerializer(new TypeToken<Optional<?>>() {}, new OptionalSerializer());
-        dataManager.registerTypeSerializer((TypeToken) new TypeToken<Enum<?>>() {}, new EnumSerializer());
-        dataManager.registerTypeSerializer(TypeToken.of(CatalogType.class), new CatalogTypeSerializer());
-        dataManager.registerTypeSerializer(TypeToken.of(Number.class), new NumberSerializer());
-        dataManager.registerTypeSerializer(TypeToken.of(String.class), new StringSerializer());
-        dataManager.registerTypeSerializer(TypeToken.of(Boolean.class), new BooleanSerializer());
-        dataManager.registerTypeSerializer(TypeToken.of(DataSerializable.class), new DataSerializableSerializer());
-        dataManager.registerTypeSerializer(TypeToken.of(DataView.class), new DataViewSerializer());
-        dataManager.registerTypeSerializer(TypeToken.of(CatalogKey.class), new CatalogKeySerializer());
+    public static void registerSerializers(DataSerializerRegistry registry) {
+        registry.registerTypeSerializer(new TypeToken<Multimap<?,?>>() {}, new MultimapSerializer());
+        registry.registerTypeSerializer(new TypeToken<Map<?,?>>() {}, new MapSerializer());
+        registry.registerTypeSerializer(new TypeToken<List<?>>() {}, new ListSerializer());
+        registry.registerTypeSerializer(new TypeToken<Set<?>>() {}, new SetSerializer());
+        registry.registerTypeSerializer(new TypeToken<Optional<?>>() {}, new OptionalSerializer());
+        registry.registerTypeSerializer((TypeToken) new TypeToken<Enum<?>>() {}, new EnumSerializer());
+        registry.registerTypeSerializer(TypeToken.of(CatalogType.class), new CatalogTypeSerializer());
+        registry.registerTypeSerializer(TypeToken.of(Number.class), new NumberSerializer());
+        registry.registerTypeSerializer(TypeToken.of(String.class), new StringSerializer());
+        registry.registerTypeSerializer(TypeToken.of(Boolean.class), new BooleanSerializer());
+        registry.registerTypeSerializer(TypeToken.of(DataSerializable.class), new DataSerializableSerializer());
+        registry.registerTypeSerializer(TypeToken.of(DataView.class), new DataViewSerializer());
+        registry.registerTypeSerializer(TypeToken.of(CatalogKey.class), new CatalogKeySerializer());
     }
 
     private static class CatalogKeySerializer implements DataTypeSerializer<CatalogKey, String> {

@@ -37,8 +37,9 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
-import org.lanternpowered.server.data.persistence.SimpleDataTypeSerializerCollection;
 import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
+import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.slf4j.Logger;
 import org.spongepowered.api.data.DataContainer;
@@ -67,7 +68,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Singleton
-public final class LanternDataManager extends SimpleDataTypeSerializerCollection implements DataManager {
+public final class LanternDataManager implements DataManager {
 
     private static final Comparator<DataContentUpdater> dataContentUpdaterComparator = (o1, o2) -> ComparisonChain.start()
                     .compare(o2.getInputVersion(), o1.getInputVersion())
@@ -216,6 +217,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         return Optional.ofNullable((DataManipulatorBuilder<T, I>) this.immutableBuilderMap.get(checkNotNull(immutableManipulatorClass)));
     }
 
+    @Deprecated
     @Override
     public <T> void registerTranslator(Class<T> objectClass, DataTranslator<T> serializer) {
         checkState(this.allowRegistrations, "Registrations are no longer allowed");
@@ -223,7 +225,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
         checkNotNull(serializer, "serializer");
         checkArgument(serializer.getToken().isSupertypeOf(objectClass),
                 "DataTranslator is not compatible with the target object class: " +objectClass);
-        registerTranslator(serializer);
+        DataTranslatorRegistryModule.INSTANCE.registerAdditionalCatalog(serializer);
     }
 
     <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> void validateRegistration(
@@ -264,7 +266,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
 
     @Override
     public <T> Optional<DataTranslator<T>> getTranslator(Class<T> objectClass) {
-        return super.getTranslator(objectClass);
+        return DataSerializerRegistry.INSTANCE.getTranslator(objectClass);
     }
 
     @Override

@@ -39,6 +39,7 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataContainer;
@@ -92,9 +93,9 @@ public final class DataHelper {
             final Key<?> key = registration.getKey();
             final DataQuery dataQuery = key.getQuery();
             final TypeToken<?> typeToken = key.getElementToken();
-            final DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
+            final DataTypeSerializer typeSerializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
-            final DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
+            final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
             // The value's shouldn't be null inside a data manipulator,
             // since it doesn't support removal of values
             dataContainer.set(dataQuery, typeSerializer.serialize(typeToken, context,
@@ -162,8 +163,7 @@ public final class DataHelper {
             Set<Key> ignoredKeys) {
         DataView view = null;
         final ValueCollection valueCollection = valueContainer.getValueCollection();
-        final LanternDataManager dataManager = Lantern.getGame().getDataManager();
-        final DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
+        final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
         for (KeyRegistration<?,?> registration : valueCollection.getAll()) {
             final Key<?> key = registration.getKey();
             if (!(registration instanceof Element)
@@ -174,7 +174,7 @@ public final class DataHelper {
             }
             final Element element = (Element) registration;
             final TypeToken<?> typeToken = key.getElementToken();
-            final DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
+            final DataTypeSerializer typeSerializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException(
                             "Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
             final Object object = element.get();
@@ -276,8 +276,7 @@ public final class DataHelper {
             return;
         }
         final ValueCollection valueCollection = valueContainer.getValueCollection();
-        final LanternDataManager dataManager = Lantern.getGame().getDataManager();
-        final DataTypeSerializerContext context = dataManager.getTypeSerializerContext();
+        final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
         for (KeyRegistration<?,?> registration : valueCollection.getAll()) {
             final Key<?> key = registration.getKey();
             if (!(registration instanceof Element)
@@ -291,7 +290,7 @@ public final class DataHelper {
             }
             dataView.remove(key.getQuery());
             final TypeToken<?> typeToken = key.getElementToken();
-            final DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
+            final DataTypeSerializer typeSerializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException(
                             "Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
             ((Element) registration).set(typeSerializer.deserialize(typeToken, context, data.get()));
@@ -304,7 +303,7 @@ public final class DataHelper {
                     continue;
                 }
                 final TypeToken<?> typeToken = key.getElementToken();
-                final DataTypeSerializer typeSerializer = dataManager.getTypeSerializer(typeToken)
+                final DataTypeSerializer typeSerializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken)
                         .orElseThrow(() -> new IllegalStateException(
                                 "Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
                 store.offer(key, typeSerializer.deserialize(typeToken, context, entry.getValue()));

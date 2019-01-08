@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
-import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.util.EqualsHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
@@ -71,12 +71,6 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("Duplicates")
 class MemoryDataView implements DataView {
-
-    @Nullable
-    private static LanternDataManager getDataManager() {
-        // Tests...
-        return Lantern.getGame() == null ? null : Lantern.getGame().getDataManager();
-    }
 
     protected final Map<String, Object> map = new LinkedHashMap<>();
     private final DataContainer container;
@@ -243,8 +237,6 @@ class MemoryDataView implements DataView {
         checkNotNull(path, "path");
         checkNotNull(value, "value");
 
-        final LanternDataManager manager = getDataManager();
-
         final List<String> parts = path.getParts();
         final String key = parts.get(0);
         if (parts.size() > 1) {
@@ -287,10 +279,10 @@ class MemoryDataView implements DataView {
                 value instanceof Boolean) {
             this.map.put(key, value);
             return this;
-        } else if (manager != null && (optDataTypeSerializer = manager.getTypeSerializer(
-                typeToken = TypeToken.of(value.getClass()))).isPresent()) {
+        } else if ((optDataTypeSerializer = DataSerializerRegistry.INSTANCE
+                .getTypeSerializer(typeToken = TypeToken.of(value.getClass()))).isPresent()) {
             final DataTypeSerializer serializer = optDataTypeSerializer.get();
-            final Object serialized = serializer.serialize(typeToken, manager.getTypeSerializerContext(), value);
+            final Object serialized = serializer.serialize(typeToken, DataSerializerRegistry.INSTANCE.getTypeSerializerContext(), value);
             if (serialized instanceof DataContainer) {
                 final DataContainer container = (DataContainer) serialized;
                 checkArgument(!container.equals(this), "Cannot insert self-referencing Objects!");
@@ -341,7 +333,6 @@ class MemoryDataView implements DataView {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void setCollection(String key, Collection<?> value) {
         final ImmutableList.Builder<Object> builder = ImmutableList.builder();
-        final LanternDataManager manager = getDataManager();
 
         for (Object object : value) {
             if (object instanceof DataSerializable) {
@@ -365,10 +356,9 @@ class MemoryDataView implements DataView {
                 builder.add(ensureSerialization((Collection) object));
             } else {
                 final TypeToken<?> typeToken = TypeToken.of(object.getClass());
-                final DataTypeSerializer serializer = manager == null ? null :
-                        manager.getTypeSerializer(typeToken).orElse(null);
+                final DataTypeSerializer serializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken).orElse(null);
                 if (serializer != null) {
-                    final Object result = serializer.serialize(typeToken, manager.getTypeSerializerContext(), object);
+                    final Object result = serializer.serialize(typeToken, DataSerializerRegistry.INSTANCE.getTypeSerializerContext(), object);
                     checkArgument(!result.equals(this), "Cannot insert self-referencing Objects!");
                     builder.add(result);
                 } else {
@@ -767,10 +757,9 @@ class MemoryDataView implements DataView {
     public <T> Optional<T> getObject(DataQuery path, Class<T> objectClass) {
         return get(path).flatMap(object -> {
             final TypeToken<T> typeToken = TypeToken.of(objectClass);
-            final LanternDataManager dataManager = Lantern.getGame().getDataManager();
-            return dataManager.getTypeSerializer(typeToken)
+            return DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken)
                     .flatMap(serializer -> Optional.of(serializer
-                            .deserialize(typeToken, dataManager.getTypeSerializerContext(), object)));
+                            .deserialize(typeToken, DataSerializerRegistry.INSTANCE.getTypeSerializerContext(), object)));
         });
     }
 
@@ -779,13 +768,12 @@ class MemoryDataView implements DataView {
     public <T> Optional<List<T>> getObjectList(DataQuery path, Class<T> objectClass) {
         return getList(path).flatMap(list -> {
             final TypeToken<T> typeToken = TypeToken.of(objectClass);
-            final LanternDataManager dataManager = Lantern.getGame().getDataManager();
-            final DataTypeSerializer serializer = dataManager.getTypeSerializer(typeToken).orElse(null);
+            final DataTypeSerializer serializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken).orElse(null);
             if (serializer == null) {
                 return Optional.empty();
             }
             return (Optional) Optional.of(list.stream()
-                    .map(object -> serializer.deserialize(typeToken, dataManager.getTypeSerializerContext(), object))
+                    .map(object -> serializer.deserialize(typeToken, DataSerializerRegistry.INSTANCE.getTypeSerializerContext(), object))
                     .collect(Collectors.toList()));
         });
     }

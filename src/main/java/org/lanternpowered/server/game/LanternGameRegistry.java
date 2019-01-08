@@ -140,6 +140,7 @@ import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
@@ -326,6 +327,7 @@ import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.DataFormat;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.BannerPatternShape;
@@ -787,6 +789,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(EventContextKey.class, (AdditionalPluginCatalogRegistryModule) EventContextKeysModule.get())
                 .registerModule(new BlockChangeFlagRegistryModule())
                 .registerModule(new ItemStackComparatorRegistryModule())
+                .registerModule(DataTranslator.class, (AdditionalPluginCatalogRegistryModule) DataTranslatorRegistryModule.INSTANCE)
                 // Advancements
                 .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
                 .registerModule(Advancement.class, AdvancementRegistryModule.get())

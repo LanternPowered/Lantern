@@ -39,6 +39,7 @@ import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -64,7 +65,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
             deserializeValues(object, simpleValueContainer, dataView);
             final Optional<DataView> optDataView = dataView.getView(VALUES);
             if (optDataView.isPresent()) {
-                final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
+                final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
                 final DataView valuesView = optDataView.get();
                 for (Map.Entry<DataQuery, Object> entry : valuesView.getValues(false).entrySet()) {
                     final Key key = KeyRegistryModule.get().get(CatalogKeys.resolve(entry.getKey().toString())).orElse(null);
@@ -73,7 +74,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                                 entry.getKey().toString());
                     } else {
                         final TypeToken<?> typeToken = key.getElementToken();
-                        final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager().getTypeSerializer(typeToken).orElse(null);
+                        final DataTypeSerializer dataTypeSerializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken).orElse(null);
                         if (dataTypeSerializer == null) {
                             Lantern.getLogger().warn("Unable to deserialize the data key value: {}, "
                                     + "no supported deserializer exists.", key.getKey().toString());
@@ -132,10 +133,10 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
             final Map<Key<?>, Object> values = simpleValueContainer.getValues();
             if (!values.isEmpty()) {
                 final DataView valuesView = dataView.createView(VALUES);
-                final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
+                final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
                 for (Map.Entry<Key<?>, Object> entry : values.entrySet()) {
                     final TypeToken<?> typeToken = entry.getKey().getElementToken();
-                    final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager().getTypeSerializer(typeToken).orElse(null);
+                    final DataTypeSerializer dataTypeSerializer = DataSerializerRegistry.INSTANCE.getTypeSerializer(typeToken).orElse(null);
                     if (dataTypeSerializer == null) {
                         Lantern.getLogger().warn("Unable to serialize the data key value: " + entry.getKey());
                     } else {

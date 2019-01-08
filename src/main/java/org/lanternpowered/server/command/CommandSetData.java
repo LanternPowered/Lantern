@@ -32,6 +32,7 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
@@ -108,13 +109,13 @@ public final class CommandSetData extends CommandProvider {
                                 if (content.isEmpty()) {
                                     return null;
                                 }
-                                final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager()
+                                final DataTypeSerializer dataTypeSerializer = DataSerializerRegistry.INSTANCE
                                         .getTypeSerializer(typeToken).orElse(null);
                                 if (dataTypeSerializer == null) {
                                     throw args.createError(Text.of("Unable to deserialize the data key value: {}, "
                                             + "no supported deserializer exists.", key.getKey()));
                                 } else {
-                                    final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
+                                    final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
                                     try {
                                         // Put it in a holder object, the command element separates iterable objects
                                         return new ValueHolder(dataTypeSerializer.deserialize(typeToken, context, data));

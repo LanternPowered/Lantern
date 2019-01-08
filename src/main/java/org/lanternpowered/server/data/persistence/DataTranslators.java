@@ -44,8 +44,9 @@ import com.flowpowered.math.vector.Vector4l;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.data.DataQueries;
+import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
+import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.Queries;
@@ -651,30 +652,30 @@ public final class DataTranslators {
         return () -> new InvalidDataException("Invalid data located at: " + query.toString());
     }
 
-    public static void registerSerializers(DataManager dataManager) {
-        dataManager.registerTranslator(UUID.class, UUID_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector2d.class, VECTOR_2_D_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector2f.class, VECTOR_2_F_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector2i.class, VECTOR_2_I_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector2l.class, VECTOR_2_L_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector3d.class, VECTOR_3_D_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector3f.class, VECTOR_3_F_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector3i.class, VECTOR_3_I_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector3l.class, VECTOR_3_L_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector4d.class, VECTOR_4_D_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector4f.class, VECTOR_4_F_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector4i.class, VECTOR_4_I_DATA_SERIALIZER);
-        dataManager.registerTranslator(Vector4l.class, VECTOR_4_L_DATA_SERIALIZER);
-        dataManager.registerTranslator(Complexd.class, COMPLEXD_DATA_SERIALIZER);
-        dataManager.registerTranslator(Complexf.class, COMPLEXF_DATA_SERIALIZER);
-        dataManager.registerTranslator(Quaterniond.class, QUATERNIOND_DATA_SERIALIZER);
-        dataManager.registerTranslator(Quaternionf.class, QUATERNIONF_DATA_SERIALIZER);
-        dataManager.registerTranslator(LocalTime.class, LOCAL_TIME_DATA_SERIALIZER);
-        dataManager.registerTranslator(LocalDate.class, LOCAL_DATE_DATA_SERIALIZER);
-        dataManager.registerTranslator(LocalDateTime.class, LOCAL_DATE_TIME_DATA_SERIALIZER);
-        dataManager.registerTranslator(ZonedDateTime.class, ZONED_DATE_TIME_DATA_SERIALIZER);
-        dataManager.registerTranslator(Instant.class, INSTANT_DATA_SERIALIZER);
-        dataManager.registerTranslator(Month.class, MONTH_DATA_SERIALIZER);
+    public static void registerSerializers(DataSerializerRegistry registry) {
+        registry.registerTranslator(UUID_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_2_D_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_2_F_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_2_I_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_2_L_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_3_D_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_3_F_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_3_I_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_3_L_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_4_D_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_4_F_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_4_I_DATA_SERIALIZER);
+        registry.registerTranslator(VECTOR_4_L_DATA_SERIALIZER);
+        registry.registerTranslator(COMPLEXD_DATA_SERIALIZER);
+        registry.registerTranslator(COMPLEXF_DATA_SERIALIZER);
+        registry.registerTranslator(QUATERNIOND_DATA_SERIALIZER);
+        registry.registerTranslator(QUATERNIONF_DATA_SERIALIZER);
+        registry.registerTranslator(LOCAL_TIME_DATA_SERIALIZER);
+        registry.registerTranslator(LOCAL_DATE_DATA_SERIALIZER);
+        registry.registerTranslator(LOCAL_DATE_TIME_DATA_SERIALIZER);
+        registry.registerTranslator(ZONED_DATE_TIME_DATA_SERIALIZER);
+        registry.registerTranslator(INSTANT_DATA_SERIALIZER);
+        registry.registerTranslator(MONTH_DATA_SERIALIZER);
     }
 
 }

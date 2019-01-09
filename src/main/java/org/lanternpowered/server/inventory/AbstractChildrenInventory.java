@@ -123,15 +123,17 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
             if (inventory instanceof AbstractSlot) {
                 final AbstractSlot slot = (AbstractSlot) inventory;
                 // Don't include duplicate slots, e.g. from queries
-                if (slotsToIndex.putIfAbsent(slot, index++) == INVALID_SLOT_INDEX) {
+                if (slotsToIndex.putIfAbsent(slot, index) == INVALID_SLOT_INDEX) {
                     slotsBuilder.add(slot);
+                    index++;
                 }
             } else if (inventory instanceof AbstractChildrenInventory) {
                 final AbstractChildrenInventory childrenInventory = (AbstractChildrenInventory) inventory;
                 for (AbstractSlot slot : childrenInventory.getSlots()) {
                     // Don't include duplicate slots, e.g. from queries
-                    if (slotsToIndex.putIfAbsent(slot, index++) == INVALID_SLOT_INDEX) {
+                    if (slotsToIndex.putIfAbsent(slot, index) == INVALID_SLOT_INDEX) {
                         slotsBuilder.add(slot);
+                        index++;
                     }
                 }
             } else {

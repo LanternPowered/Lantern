@@ -114,10 +114,7 @@ public final class LanternServer implements Server {
 
     // The executor service for the server ticks
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
-            runnable -> this.mainThread = new SyncLanternThread(runnable, "server"));
-
-    @SuppressWarnings("NullableProblems")
-    private Thread mainThread;
+            runnable -> new SyncLanternThread(runnable, "server"));
 
     // The world manager
     @Inject private LanternWorldManager worldManager;
@@ -716,7 +713,7 @@ public final class LanternServer implements Server {
 
     @Override
     public boolean isMainThread() {
-        return Thread.currentThread() == this.mainThread;
+        return Thread.currentThread() instanceof SyncLanternThread;
     }
 
     @Override

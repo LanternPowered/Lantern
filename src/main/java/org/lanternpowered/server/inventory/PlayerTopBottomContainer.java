@@ -117,7 +117,7 @@ public class PlayerTopBottomContainer extends AbstractContainer {
 
         Carried(LanternPlayerInventory playerInventory, AbstractChildrenInventory openInventory) {
             super(playerInventory, openInventory);
-            playerInventory.getCarrier().ifPresent(this::setCarrier);
+            playerInventory.getCarrier().ifPresent(carrier -> setCarrier(carrier, false));
         }
     }
 }

@@ -34,18 +34,25 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public final class LanternEventHelper {
 
     public static void handleDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
         LanternWorld.handleEntitySpawning(toSpawningEntries(entries));
+    }
+    public static void handleDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries,
+            BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
+        LanternWorld.handleEntitySpawning(toSpawningEntries(entries), spawnEventConstructor);
     }
 
     public static List<Entity> handlePreDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {

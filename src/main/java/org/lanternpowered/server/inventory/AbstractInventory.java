@@ -182,9 +182,11 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
      * Sets the {@link Carrier} of this {@link Inventory}.
      *
      * @param carrier The carrier
+     * @param override Whether the carrier should be overridden even if one was already assigned
      */
-    void setCarrier(Carrier carrier) {
-        if (this.carrierReference != null) {
+    void setCarrier(Carrier carrier, boolean override) {
+        if (this.carrierReference != null &&
+                (override || !this.carrierReference.get().isPresent())) {
             this.carrierReference.set(carrier);
         }
     }

@@ -25,41 +25,10 @@
  */
 package org.lanternpowered.server.inventory.vanilla.block;
 
-import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.ICarriedInventory;
 import org.lanternpowered.server.inventory.IViewableInventory;
-import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.type.LanternCraftingInventory;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.world.Locatable;
-import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@SuppressWarnings("unchecked")
 public class CraftingTableInventory extends LanternCraftingInventory implements ICarriedInventory<Carrier>, IViewableInventory {
-
-    @Override
-    protected void init() {
-        super.init();
-
-        addCloseListener(inventory -> getCarrier().ifPresent(carrier -> {
-            if (carrier instanceof Locatable) {
-                final Transform<World> transform = new Transform<>(((Locatable) carrier).getLocation());
-                final List<Tuple<ItemStackSnapshot, Transform<World>>> entries = new ArrayList<>();
-                getCraftingGrid().slots().forEach(slot -> {
-                    final ItemStack stack = slot.poll();
-                    if (!stack.isEmpty()) {
-                        entries.add(new Tuple<>(LanternItemStackSnapshot.wrap(stack), transform));
-                    }
-                });
-                LanternEventHelper.handleDroppedItemSpawning(entries);
-            }
-        }));
-    }
 }

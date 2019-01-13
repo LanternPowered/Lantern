@@ -211,9 +211,9 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
     }
 
     @Override
-    void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        getChildren().forEach(child -> child.setCarrier(carrier));
+    void setCarrier(Carrier carrier, boolean override) {
+        super.setCarrier(carrier, override);
+        getChildren().forEach(child -> child.setCarrier(carrier, override));
     }
 
     @Override

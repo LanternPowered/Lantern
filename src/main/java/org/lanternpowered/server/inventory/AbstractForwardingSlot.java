@@ -90,8 +90,8 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    protected void setCarrier(Carrier carrier) {
-        getForwardingSlot().setCarrier(carrier);
+    protected void setCarrier(Carrier carrier, boolean override) {
+        getForwardingSlot().setCarrier(carrier, override);
     }
 
     @Override

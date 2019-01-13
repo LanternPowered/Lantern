@@ -27,8 +27,8 @@ package org.lanternpowered.testserver
 
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.serializer.TextSerializers
-import org.lanternpowered.server.game.Lantern
 import org.slf4j.Logger
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.state.GameStartedServerEvent
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent
@@ -77,9 +77,10 @@ class LANBroadcastPlugin {
     }
 
     private fun broadcast() {
+        val server = Sponge.getServer()
         // Formatting codes are still supported by the LAN motd
-        val motd = TextSerializers.LEGACY_FORMATTING_CODE.serialize(Lantern.getServer().motd)
-        val port = Lantern.getGame().globalConfig.serverPort
+        val motd = TextSerializers.LEGACY_FORMATTING_CODE.serialize(server.motd)
+        val port = server.boundAddress.get().port
 
         val message = "[MOTD]$motd[/MOTD][AD]$port[/AD]"
         val data = message.toByteArray(Charsets.UTF_8)

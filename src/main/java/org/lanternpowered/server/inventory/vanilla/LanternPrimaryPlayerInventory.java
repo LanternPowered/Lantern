@@ -49,6 +49,7 @@ public class LanternPrimaryPlayerInventory extends AbstractChildrenInventory imp
     private AbstractGridInventory grid;
 
     private AbstractGridInventory priorityHotbar;
+    private AbstractChildrenInventory prioritySelectedSlotAndHotbar;
     private AbstractChildrenInventory reverse;
 
     @Override
@@ -62,6 +63,10 @@ public class LanternPrimaryPlayerInventory extends AbstractChildrenInventory imp
                 .row(0, this.hotbar) // Higher priority for the hotbar
                 .grid(this.hotbar.getRows(), this.storage)
                 .build();
+        this.prioritySelectedSlotAndHotbar = AbstractChildrenInventory.viewBuilder()
+                .inventory(this.hotbar.transform(InventoryTransforms.PRIORITY_SELECTED_SLOT_AND_HOTBAR)) // Higher priority for the hotbar
+                .inventory(this.storage)
+                .build();
         this.grid = AbstractGridInventory.rowsViewBuilder()
                 .grid(0, this.storage)
                 .row(this.storage.getRows(), this.hotbar)
@@ -74,6 +79,8 @@ public class LanternPrimaryPlayerInventory extends AbstractChildrenInventory imp
         // Cache some transformations that will be used often
         if (transformation == InventoryTransforms.PRIORITY_HOTBAR) {
             return this.priorityHotbar;
+        } else if (transformation == InventoryTransforms.PRIORITY_SELECTED_SLOT_AND_HOTBAR) {
+            return this.prioritySelectedSlotAndHotbar;
         } else if (transformation == InventoryTransforms.REVERSE) {
             return this.reverse;
         }

@@ -44,7 +44,7 @@ public class PlayerInventoryContainer extends PlayerTopBottomContainer implement
         super(playerInventory, topInventory);
 
         final Player player = playerInventory.getCarrier().get();
-        setCarrier(player);
+        setCarrier(player, false);
 
         // Construct the client container and attach the player
         this.clientContainer = new PlayerClientContainer(TextTranslation.toText(getName()));

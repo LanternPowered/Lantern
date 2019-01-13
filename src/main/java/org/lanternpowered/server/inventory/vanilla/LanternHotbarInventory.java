@@ -25,14 +25,18 @@
  */
 package org.lanternpowered.server.inventory.vanilla;
 
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractInventoryRow;
 import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.ISlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.VanillaHotbarBehavior;
 import org.lanternpowered.server.inventory.property.LanternEquipmentSlotType;
+import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
@@ -46,6 +50,18 @@ import javax.annotation.Nullable;
 public class LanternHotbarInventory extends AbstractInventoryRow implements Hotbar {
 
     private final HotbarBehavior hotbarBehavior = new VanillaHotbarBehavior();
+
+    private AbstractChildrenInventory prioritySelected;
+
+    @Override
+    protected void init() {
+        super.init();
+
+        this.prioritySelected = AbstractChildrenInventory.viewBuilder()
+                .inventory(new LanternHotbarSelectedSlot(this))
+                .inventories(slots())
+                .build();
+    }
 
     /**
      * Gets the {@link ISlot} that is currently selected.
@@ -64,6 +80,16 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
      */
     public HotbarBehavior getHotbarBehavior() {
         return this.hotbarBehavior;
+    }
+
+    @Override
+    public IInventory transform(InventoryTransformation transformation) {
+        if (transformation == InventoryTransforms.PRIORITY_SELECTED_SLOT_AND_HOTBAR) {
+            return this.prioritySelected;
+        } else if (transformation == InventoryTransforms.PRIORITY_HOTBAR) {
+            return this;
+        }
+        return super.transform(transformation);
     }
 
     @Override

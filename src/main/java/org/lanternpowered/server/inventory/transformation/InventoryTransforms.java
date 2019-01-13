@@ -55,6 +55,19 @@ public final class InventoryTransforms {
         return result.union(inventory);
     };
 
+    /**
+     * Prioritizes the {@link Hotbar} over the target {@link Inventory}. Within the {@link Hotbar} is the slot at
+     * {@link Hotbar#getSelectedSlotIndex()} prioritized over the other slots.
+     */
+    public static final InventoryTransformation PRIORITY_SELECTED_SLOT_AND_HOTBAR = inventory -> {
+        final Inventory result = inventory.query(QueryHolder.HOTBAR_OPERATION)
+                .transform(InventoryTransforms.PRIORITY_SELECTED_SLOT_AND_HOTBAR);
+        if (result instanceof EmptyInventory) {
+            return inventory;
+        }
+        return result.union(inventory);
+    };
+
     public static final InventoryTransformation REVERSE = inventory ->
             AbstractChildrenInventory.viewBuilder()
                     .inventories(Lists.reverse(Lists.newArrayList(inventory.slots())))

@@ -68,6 +68,7 @@ import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.PlayerTopBottomContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.vanilla.PlayerInventoryShiftClickBehavior;
+import org.lanternpowered.server.inventory.vanilla.PlayerReturnItemsInventoryCloseListener;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
@@ -131,8 +132,11 @@ import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
@@ -294,6 +298,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         .inventory(this.inventory.getOffhand())
                         .shiftClickBehavior(PlayerInventoryShiftClickBehavior.INSTANCE)
                         .build(Lantern.getMinecraftPlugin()));
+        // Drop/return items from the crafting grid when closing
+        this.inventoryContainer.addCloseListener(new PlayerReturnItemsInventoryCloseListener(
+                QueryOperationTypes.INVENTORY_TYPE.of(CraftingInventory.class)));
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
         // Load the advancements

@@ -198,7 +198,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         final AbstractInventory inventory = builder.build(this.carrier != null, plugin, inventoryArchetype);
         if (inventory instanceof AbstractMutableInventory && this.carrier != null) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
-            mutableInventory.setCarrier(this.carrier);
+            mutableInventory.setCarrier(this.carrier, false);
         }
         if (this.carrier instanceof AbstractCarrier) {
             ((AbstractCarrier) this.carrier).setInventory((CarriedInventory<?>) inventory);

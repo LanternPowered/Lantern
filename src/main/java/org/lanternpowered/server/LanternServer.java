@@ -597,7 +597,7 @@ public final class LanternServer implements Server {
         this.shuttingDown = true;
 
         // Stop the console
-        this.consoleManager.shutdown();
+        this.consoleManager.stop();
 
         final Cause gameCause = Cause.of(EventContext.empty(), this.game);
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppingServerEvent(gameCause));

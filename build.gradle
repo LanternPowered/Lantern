@@ -151,6 +151,10 @@ def ignoredDependencyArtifacts = new HashSet<>()
 ignoredDependencyArtifacts.add "$api.group:$api.name"
 // We already include 'asm-all'
 ignoredDependencyArtifacts.add 'org.ow2.asm:asm'
+ignoredDependencyArtifacts.add 'junit:junit'
+ignoredDependencyArtifacts.add 'org.hamcrest:hamcrest-core'
+ignoredDependencyArtifacts.add 'org.hamcrest:hamcrest-library'
+ignoredDependencyArtifacts.add 'org.mockito:mockito-core'
 
 def dependencyArtifacts = new ArrayList<>()
 

@@ -33,7 +33,6 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("ConstantConditions")
 abstract class LanternCraftingRecipe extends LanternRecipe implements ISimpleCraftingRecipe {
 
     @Nullable private final String group;
@@ -47,6 +46,4 @@ abstract class LanternCraftingRecipe extends LanternRecipe implements ISimpleCra
     public Optional<String> getGroup() {
         return Optional.ofNullable(this.group);
     }
-
-
 }

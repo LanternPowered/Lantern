@@ -102,7 +102,7 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
                         continue;
                     }
                     final int quantity = ingredient.getQuantity(itemStack);
-                    if (quantity < itemStack.getQuantity()) {
+                    if (itemStack.getQuantity() < quantity) {
                         continue;
                     }
                     itemQuantities[i][j] = quantity;

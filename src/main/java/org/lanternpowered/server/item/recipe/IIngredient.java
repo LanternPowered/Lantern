@@ -91,8 +91,8 @@ public interface IIngredient extends Ingredient {
     }
 
     /**
-     * Gets the quantity of input items that are required to
-     * smelt, for the given {@link ItemStack}.
+     * Gets the quantity of input items that are required
+     * for the given {@link ItemStack}.
      *
      * @param itemStack The item stack
      * @return The quantity

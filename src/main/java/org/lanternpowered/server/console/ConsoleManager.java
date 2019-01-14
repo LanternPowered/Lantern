@@ -54,9 +54,9 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("ConstantConditions")
 @Singleton
@@ -67,6 +67,7 @@ public final class ConsoleManager extends SimpleTerminalConsole {
     static final Set<String> IGNORE_FQCNS = new HashSet<>();
 
     private static final String HISTORY_FILE_NAME = "console_history.txt";
+    private static final Duration HISTORY_SAVE_INTERVAL = Duration.ofMinutes(2);
 
     private final Path consoleHistoryFile;
     private final Logger logger;
@@ -76,6 +77,8 @@ public final class ConsoleManager extends SimpleTerminalConsole {
 
     private volatile boolean active;
     private SpongeExecutorService syncExecutor;
+
+    private long lastHistoryWrite = System.currentTimeMillis();
 
     @Inject
     public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager,
@@ -109,10 +112,6 @@ public final class ConsoleManager extends SimpleTerminalConsole {
         final Thread thread = ThreadHelper.newThread(super::start, "console");
         thread.setDaemon(true);
         thread.start();
-
-        // Schedule to save the console history
-        this.scheduler.createAsyncExecutor(this.pluginContainer).scheduleAtFixedRate(
-                this::saveHistory, 120, 120, TimeUnit.SECONDS);
     }
 
     @Override
@@ -135,6 +134,11 @@ public final class ConsoleManager extends SimpleTerminalConsole {
         if (!command.isEmpty()) {
             final String runCommand = command.startsWith("/") ? command.substring(1) : command;
             this.syncExecutor.execute(() -> this.commandManager.process(LanternConsoleSource.INSTANCE, runCommand));
+        }
+        final long now = System.currentTimeMillis();
+        if ((now - this.lastHistoryWrite) > HISTORY_SAVE_INTERVAL.toMillis()) {
+            this.lastHistoryWrite = now;
+            saveHistory();
         }
     }
 

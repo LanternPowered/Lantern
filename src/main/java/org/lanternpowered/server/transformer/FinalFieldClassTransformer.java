@@ -60,33 +60,17 @@ public final class FinalFieldClassTransformer implements ClassTransformer {
     @Override
     public byte[] transform(ClassLoader loader, String className, byte[] byteCode) {
         final ClassReader classReader = new ClassReader(byteCode);
-        final ClassWriter classWriter = new ClassWriter(0);
-        try {
-            final FinalFieldClassVisitor classVisitor = new FinalFieldClassVisitor(classWriter);
-            classReader.accept(classVisitor, 0);
-            return classWriter.toByteArray();
-        } catch (StopTransformationException e) {
-            // Fail fast in case we don't need transformation
+
+        // Fail fast in case we don't need transformation
+        final int access = classReader.getAccess();
+        if ((access & ACC_ANNOTATION) != 0 ||
+                (access & ACC_INTERFACE) != 0) {
             return byteCode;
         }
-    }
 
-    /**
-     * A {@link Exception} that may be thrown to forcefully
-     * stop the transformation of a class.
-     */
-    static final class StopTransformationException extends RuntimeException {
-
-        static final StopTransformationException INSTANCE = new StopTransformationException();
-
-        private StopTransformationException() {
-            setStackTrace(new StackTraceElement[0]);
-        }
-
-        @Override
-        public Throwable fillInStackTrace() {
-            return this;
-        }
+        final ClassWriter classWriter = new ClassWriter(0);
+        classReader.accept(new FinalFieldClassVisitor(classWriter), 0);
+        return classWriter.toByteArray();
     }
 
     @SuppressWarnings("unchecked")
@@ -94,16 +78,6 @@ public final class FinalFieldClassTransformer implements ClassTransformer {
 
         FinalFieldClassVisitor(ClassVisitor classVisitor) {
             super(Opcodes.ASM5, classVisitor);
-        }
-
-        @Override
-        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-            // Don't bother transforming annotations or interfaces
-            if ((access & ACC_ANNOTATION) != 0 ||
-                    (access & ACC_INTERFACE) != 0) {
-                throw StopTransformationException.INSTANCE;
-            }
-            super.visit(version, access, name, signature, superName, interfaces);
         }
 
         @Override

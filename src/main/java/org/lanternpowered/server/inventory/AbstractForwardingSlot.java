@@ -51,27 +51,33 @@ import javax.annotation.Nullable;
 public abstract class AbstractForwardingSlot extends AbstractSlot {
 
     /**
-     * Gets the forwarding slot.
+     * Gets the delegate slot.
      *
      * @return The inventory slot
      */
-    protected abstract AbstractSlot getForwardingSlot();
+    protected abstract AbstractSlot getDelegateSlot();
 
     @Override
     void close(CauseStack causeStack) {
         super.close(causeStack);
         // Handle the listeners of both the slots
-        getForwardingSlot().close(causeStack);
+        getDelegateSlot().close(causeStack);
     }
 
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
-        return getForwardingSlot().tryGetProperty(property, key);
+        final Optional<T> optProperty = super.tryGetProperty(property, key);
+        if (optProperty.isPresent()) {
+            return optProperty;
+        }
+        return getDelegateSlot().tryGetProperty(property, key);
     }
 
     @Override
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
-        return getForwardingSlot().tryGetProperties(property);
+        final List<T> properties = super.tryGetProperties(property);
+        properties.addAll(getDelegateSlot().tryGetProperties(property));
+        return properties;
     }
 
     // Slot listeners should only be added directly to the inventory slot,
@@ -86,207 +92,207 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
 
     @Override
     public Translation getName() {
-        return getForwardingSlot().getName();
+        return getDelegateSlot().getName();
     }
 
     @Override
     protected void setCarrier(Carrier carrier, boolean override) {
-        getForwardingSlot().setCarrier(carrier, override);
+        getDelegateSlot().setCarrier(carrier, override);
     }
 
     @Override
     protected List<AbstractSlot> getSlots() {
-        return getForwardingSlot().getSlots();
+        return getDelegateSlot().getSlots();
     }
 
     @Override
     protected List<? extends AbstractInventory> getChildren() {
-        return getForwardingSlot().getChildren();
+        return getDelegateSlot().getChildren();
     }
 
     @Override
     protected void offer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
-        getForwardingSlot().offer(stack, transactionAdder);
+        getDelegateSlot().offer(stack, transactionAdder);
     }
 
     @Override
     protected void set(ItemStack stack, boolean force, @Nullable Consumer<SlotTransaction> transactionAdder) {
-        getForwardingSlot().set(stack, force, transactionAdder);
+        getDelegateSlot().set(stack, force, transactionAdder);
     }
 
     @Override
     protected void queryInventories(QueryInventoryAdder adder) {
-        getForwardingSlot().queryInventories(adder);
+        getDelegateSlot().queryInventories(adder);
     }
 
     @Override
     public boolean isValidItem(ItemStackSnapshot stack) {
-        return getForwardingSlot().isValidItem(stack);
+        return getDelegateSlot().isValidItem(stack);
     }
 
     @Override
     public boolean isValidItem(ItemType type) {
-        return getForwardingSlot().isValidItem(type);
+        return getDelegateSlot().isValidItem(type);
     }
 
     @Override
     public boolean isValidItem(EquipmentType type) {
-        return getForwardingSlot().isValidItem(type);
+        return getDelegateSlot().isValidItem(type);
     }
 
     @Override
     public LanternItemStack poll(Predicate<ItemStack> matcher) {
-        return getForwardingSlot().poll(matcher);
+        return getDelegateSlot().poll(matcher);
     }
 
     @Override
     public LanternItemStack poll(int limit, Predicate<ItemStack> matcher) {
-        return getForwardingSlot().poll(limit, matcher);
+        return getDelegateSlot().poll(limit, matcher);
     }
 
     @Override
     public LanternItemStack peek(Predicate<ItemStack> matcher) {
-        return getForwardingSlot().peek(matcher);
+        return getDelegateSlot().peek(matcher);
     }
 
     @Override
     public LanternItemStack peek(int limit, Predicate<ItemStack> matcher) {
-        return getForwardingSlot().peek(limit, matcher);
+        return getDelegateSlot().peek(limit, matcher);
     }
 
     @Override
     public PeekedPollTransactionResult peekPoll(Predicate<ItemStack> matcher) {
-        return getForwardingSlot().peekPoll(matcher);
+        return getDelegateSlot().peekPoll(matcher);
     }
 
     @Override
     public PeekedPollTransactionResult peekPoll(int limit, Predicate<ItemStack> matcher) {
-        return getForwardingSlot().peekPoll(limit, matcher);
+        return getDelegateSlot().peekPoll(limit, matcher);
     }
 
     @Override
     public PeekedOfferTransactionResult peekOffer(ItemStack itemStack) {
-        return getForwardingSlot().peekOffer(itemStack);
+        return getDelegateSlot().peekOffer(itemStack);
     }
 
     @Override
     public PeekedSetTransactionResult peekSet(ItemStack itemStack) {
-        return getForwardingSlot().peekSet(itemStack);
+        return getDelegateSlot().peekSet(itemStack);
     }
 
     @Override
     public boolean isValidItem(ItemStack stack) {
-        return getForwardingSlot().isValidItem(stack);
+        return getDelegateSlot().isValidItem(stack);
     }
 
     @Override
     public int getStackSize() {
-        return getForwardingSlot().getStackSize();
+        return getDelegateSlot().getStackSize();
     }
 
     @Override
     public InventoryTransactionResult set(ItemStack stack) {
-        return getForwardingSlot().set(stack);
+        return getDelegateSlot().set(stack);
     }
 
     @Override
     public InventoryTransactionResult set(ItemStack stack, boolean force) {
-        return getForwardingSlot().set(stack, force);
+        return getDelegateSlot().set(stack, force);
     }
 
     @Override
     public Optional<ItemStack> poll(SlotIndex index) {
-        return getForwardingSlot().poll(index);
+        return getDelegateSlot().poll(index);
     }
 
     @Override
     public Optional<ItemStack> poll(SlotIndex index, int limit) {
-        return getForwardingSlot().poll(index, limit);
+        return getDelegateSlot().poll(index, limit);
     }
 
     @Override
     public Optional<ItemStack> peek(SlotIndex index) {
-        return getForwardingSlot().peek(index);
+        return getDelegateSlot().peek(index);
     }
 
     @Override
     public Optional<ItemStack> peek(SlotIndex index, int limit) {
-        return getForwardingSlot().peek(index, limit);
+        return getDelegateSlot().peek(index, limit);
     }
 
     @Override
     public InventoryTransactionResult set(SlotIndex index, ItemStack stack) {
-        return getForwardingSlot().set(index, stack);
+        return getDelegateSlot().set(index, stack);
     }
 
     @Override
     public Optional<Slot> getSlot(SlotIndex index) {
-        return getForwardingSlot().getSlot(index);
+        return getDelegateSlot().getSlot(index);
     }
 
     @Override
     public InventoryTransactionResult setForced(ItemStack stack) {
-        return getForwardingSlot().setForced(stack);
+        return getDelegateSlot().setForced(stack);
     }
 
     @Override
     public Optional<ISlot> getSlot(int index) {
-        return getForwardingSlot().getSlot(index);
+        return getDelegateSlot().getSlot(index);
     }
 
     @Override
     public int getSlotIndex(Slot slot) {
-        return getForwardingSlot().getSlotIndex(slot);
+        return getDelegateSlot().getSlotIndex(slot);
     }
 
     @Override
     public void clear() {
-        getForwardingSlot().clear();
+        getDelegateSlot().clear();
     }
 
     @Override
     public int size() {
-        return getForwardingSlot().size();
+        return getDelegateSlot().size();
     }
 
     @Override
     public int totalItems() {
-        return getForwardingSlot().totalItems();
+        return getDelegateSlot().totalItems();
     }
 
     @Override
     public int capacity() {
-        return getForwardingSlot().capacity();
+        return getDelegateSlot().capacity();
     }
 
     @Override
     public boolean hasChildren() {
-        return getForwardingSlot().hasChildren();
+        return getDelegateSlot().hasChildren();
     }
 
     @Override
     public boolean contains(ItemStack stack) {
-        return getForwardingSlot().contains(stack);
+        return getDelegateSlot().contains(stack);
     }
 
     @Override
     public boolean contains(ItemType type) {
-        return getForwardingSlot().contains(type);
+        return getDelegateSlot().contains(type);
     }
 
     @Override
     public boolean containsAny(ItemStack stack) {
-        return getForwardingSlot().containsAny(stack);
+        return getDelegateSlot().containsAny(stack);
     }
 
     @Override
     public int getMaxStackSize() {
-        return getForwardingSlot().getMaxStackSize();
+        return getDelegateSlot().getMaxStackSize();
     }
 
     @Override
     public void setMaxStackSize(int size) {
-        getForwardingSlot().setMaxStackSize(size);
+        getDelegateSlot().setMaxStackSize(size);
     }
 
     @Override
@@ -294,43 +300,43 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
         if (inventoryType.isInstance(this)) {
             return Optional.of((T) this);
         }
-        return getForwardingSlot().query(inventoryType);
+        return getDelegateSlot().query(inventoryType);
     }
 
     @Override
     public boolean containsInventory(Inventory inventory) {
-        return inventory == this || getForwardingSlot().containsInventory(inventory);
+        return inventory == this || getDelegateSlot().containsInventory(inventory);
     }
 
     @Nullable
     @Override
     protected ViewableInventory toViewable() {
-        return getForwardingSlot().toViewable();
+        return getDelegateSlot().toViewable();
     }
 
     @Override
     public LanternItemStack getRawItemStack() {
-        return getForwardingSlot().getRawItemStack();
+        return getDelegateSlot().getRawItemStack();
     }
 
     @Override
     public void setRawItemStack(ItemStack itemStack) {
-        getForwardingSlot().setRawItemStack(itemStack);
+        getDelegateSlot().setRawItemStack(itemStack);
     }
 
     @Override
     public void addTracker(SlotChangeTracker tracker) {
-        getForwardingSlot().addTracker(tracker);
+        getDelegateSlot().addTracker(tracker);
     }
 
     @Override
     public void removeTracker(SlotChangeTracker tracker) {
-        getForwardingSlot().removeTracker(tracker);
+        getDelegateSlot().removeTracker(tracker);
     }
 
     @Override
     public int hashCode() {
-        return getForwardingSlot().hashCode();
+        return getDelegateSlot().hashCode();
     }
 
     @Override
@@ -339,12 +345,12 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
             return false;
         }
         final AbstractSlot slot = unwrap((AbstractSlot) obj);
-        return slot.equals(unwrap(getForwardingSlot()));
+        return slot.equals(unwrap(getDelegateSlot()));
     }
 
     private static AbstractSlot unwrap(AbstractSlot slot) {
         while (slot instanceof AbstractForwardingSlot) {
-            slot = ((AbstractForwardingSlot) slot).getForwardingSlot();
+            slot = ((AbstractForwardingSlot) slot).getDelegateSlot();
         }
         return slot;
     }

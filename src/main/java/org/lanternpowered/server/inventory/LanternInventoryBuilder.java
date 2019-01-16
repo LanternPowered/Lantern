@@ -109,6 +109,13 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
             this.listeners.putAll(listeners);
         }
         this.builder = null; // Regenerate the builder if needed
+        this.carrier = null;
+        this.forCarrier = null;
+        this.forCarrierType = null;
+        final CarrierReference<Carrier> carrierReference = ((AbstractInventory) value).getCarrierReference();
+        if (carrierReference != null) {
+            carrierReference.get().ifPresent(carrier -> this.carrier = carrier);
+        }
         return this;
     }
 
@@ -118,6 +125,8 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         this.listeners.clear();
         this.builder = null;
         this.carrier = null;
+        this.forCarrierType = null;
+        this.forCarrier = null;
         return this;
     }
 

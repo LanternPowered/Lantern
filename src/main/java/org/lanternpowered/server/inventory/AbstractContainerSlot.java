@@ -34,13 +34,13 @@ public abstract class AbstractContainerSlot extends AbstractForwardingSlot {
     @Nullable AbstractInventorySlot slot;
 
     @Override
-    protected AbstractInventorySlot getForwardingSlot() {
+    protected AbstractInventorySlot getDelegateSlot() {
         checkState(this.slot != null, "The inventory slot is not initialized yet.");
         return this.slot;
     }
 
     @Override
     public AbstractInventorySlot viewedSlot() {
-        return getForwardingSlot();
+        return getDelegateSlot();
     }
 }

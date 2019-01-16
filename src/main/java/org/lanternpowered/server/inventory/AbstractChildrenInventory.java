@@ -506,12 +506,13 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
         final List<SlotTransaction> transactions = new ArrayList<>();
         // Loop through the all the children inventories
         for (AbstractInventory inventory : getChildren()) {
-            // Check for the forwarded slot
-            while (inventory instanceof AbstractForwardingSlot) {
-                inventory = ((AbstractForwardingSlot) inventory).getForwardingSlot();
+            AbstractInventory delegate = inventory;
+            // Check for the delegate slot if present
+            while (delegate instanceof AbstractForwardingSlot) {
+                delegate = ((AbstractForwardingSlot) delegate).getDelegateSlot();
             }
             // Only process inventories that aren't processed before
-            if (!processed.add(inventory)) {
+            if (!processed.add(delegate)) {
                 continue;
             }
             // Peek for a offer operation, the stack will be consumed in the process
@@ -559,28 +560,29 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
         final Set<Inventory> processed = new HashSet<>();
         final Inventory inventory = query(QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY.of(stack));
         if (inventory instanceof AbstractChildrenInventory) {
-            ((AbstractChildrenInventory) inventory).offer(stack, processed, true, transactionAdder);
+            ((AbstractChildrenInventory) inventory).offer(stack, processed, transactionAdder);
             // Stack got consumed, stop fast
             if (stack.isEmpty()) {
                 return;
             }
         }
-        offer(stack, processed, false, transactionAdder);
+        offer(stack, processed, transactionAdder);
     }
 
-    private void offer(ItemStack stack, Set<Inventory> processed, boolean add,
-            @Nullable Consumer<SlotTransaction> transactionAdder) {
+    private void offer(ItemStack stack, Set<Inventory> processed, @Nullable Consumer<SlotTransaction> transactionAdder) {
         for (AbstractMutableInventory inventory : getChildren()) {
-            if (!add && processed.contains(inventory)) {
+            AbstractInventory delegate = inventory;
+            // Check for the delegate slot if present
+            while (delegate instanceof AbstractForwardingSlot) {
+                delegate = ((AbstractForwardingSlot) delegate).getDelegateSlot();
+            }
+            if (!processed.add(delegate)) {
                 continue;
             }
             inventory.offer(stack, transactionAdder);
             // Stack got consumed, stop fast
             if (stack.isEmpty()) {
                 return;
-            }
-            if (add) {
-                processed.add(inventory);
             }
         }
     }

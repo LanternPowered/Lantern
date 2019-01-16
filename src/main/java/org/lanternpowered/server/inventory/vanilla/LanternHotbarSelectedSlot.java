@@ -37,7 +37,7 @@ public class LanternHotbarSelectedSlot extends AbstractForwardingSlot {
     }
 
     @Override
-    protected AbstractSlot getForwardingSlot() {
+    protected AbstractSlot getDelegateSlot() {
         return this.hotbarInventory.getSelectedSlot();
     }
 }

@@ -47,8 +47,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -95,7 +93,6 @@ public final class LanternClassLoader extends URLClassLoader {
     private static final String ENVIRONMENT = "lantern.environment";
 
     private static final LanternClassLoader classLoader;
-    private static final Method findBootstrapClassMethod;
 
     private interface FileRepository {
 
@@ -371,10 +368,7 @@ public final class LanternClassLoader extends URLClassLoader {
     static {
         try {
             classLoader = load();
-
-            findBootstrapClassMethod = ClassLoader.class.getDeclaredMethod("findBootstrapClassOrNull", String.class);
-            findBootstrapClassMethod.setAccessible(true);
-        } catch (IOException | NoSuchMethodException e) {
+        } catch (IOException e) {
             sneakyThrow(e);
             throw new RuntimeException();
         }
@@ -535,23 +529,18 @@ public final class LanternClassLoader extends URLClassLoader {
     }
 
     /**
-     * Attempts to get a loaded {@link Class} for the given class name.
+     * Attempts to get a loaded {@link Class} for the given class
+     * name which is loaded by this {@link ClassLoader}.
+     *
+     * <p>Classes which are loaded by the bootstrap class loader
+     * will not be returned by this method.</p>
      *
      * @param className The class name
      * @return The loaded class, if found
      */
     public Optional<Class<?>> getLoadedClass(String className) {
         requireNonNull(className, "className");
-        Class<?> loadedClass = findLoadedClass(className);
-        if (loadedClass == null) {
-            try {
-                loadedClass = (Class<?>) findBootstrapClassMethod.invoke(this, className);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                sneakyThrow(e);
-                throw new RuntimeException();
-            }
-        }
-        return Optional.ofNullable(loadedClass);
+        return Optional.ofNullable(findLoadedClass(className));
     }
 
     /**

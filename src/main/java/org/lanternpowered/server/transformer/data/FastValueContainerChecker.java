@@ -26,24 +26,26 @@
 package org.lanternpowered.server.transformer.data;
 
 import static java.util.Objects.requireNonNull;
-import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
 import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.server.data.ICompositeValueStore;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nullable;
-
-class FastValueContainerCheckerClassVisitor extends ClassVisitor {
+class FastValueContainerChecker {
 
     private static final String COMPOSITE_VALUE_STORE_NAME = "org/spongepowered/api/data/value/mutable/CompositeValueStore";
     private static final String I_COMPOSITE_VALUE_STORE_NAME = "org/lanternpowered/server/data/ICompositeValueStore";
+
+    private static final int STATE_UNKNOWN = -1;
+    static final int STATE_NOT_STORE = 0;
+    static final int STATE_IS_STORE = 1;
+    static final int STATE_IS_I_STORE = 2;
+
+    private static final Map<String, Integer> processed = new ConcurrentHashMap<>();
 
     /**
      * Gets whether the target class name {@link CompositeValueStore} implements.
@@ -68,59 +70,48 @@ class FastValueContainerCheckerClassVisitor extends ClassVisitor {
         // One of the interfaces directly implements the CompositeValueStore,
         // directly return true
         if (className.equals(COMPOSITE_VALUE_STORE_NAME)) {
-            return 1;
+            return STATE_IS_STORE;
         } else if (className.equals(I_COMPOSITE_VALUE_STORE_NAME)) {
-            return 2;
+            return STATE_IS_I_STORE;
             // Don't process java packages
         } else if (className.startsWith("java.")) {
-            return 0;
+            return STATE_NOT_STORE;
         }
         final LanternClassLoader classLoader = LanternClassLoader.get();
         // If the class is already loaded, we might as well use it
         final Class<?> c = classLoader.getLoadedClass(className.replace('/', '.')).orElse(null);
         if (c != null) {
-            return ICompositeValueStore.class.isAssignableFrom(c) ? 2 :
-                    CompositeValueStore.class.isAssignableFrom(c) ? 1 : 0;
+            return ICompositeValueStore.class.isAssignableFrom(c) ? STATE_IS_I_STORE :
+                    CompositeValueStore.class.isAssignableFrom(c) ? STATE_IS_STORE : STATE_NOT_STORE;
         }
 
         try {
             // Read the bytecode of the class we need to analyze
             final byte[] byteCode = classLoader.readByteCode(className);
 
-            // Also check for interfaces, super classes, etc.
             final ClassReader classReader = new ClassReader(byteCode);
-            final FastValueContainerCheckerClassVisitor classVisitor = new FastValueContainerCheckerClassVisitor(null, false);
-            classReader.accept(classVisitor, ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
 
-            return classVisitor.result;
+            final String superName = classReader.getSuperName();
+            final String[] interfaces = classReader.getInterfaces();
+
+            return getCompositeValueStoreType(className, superName, interfaces, false);
         } catch (ClassNotFoundException e) {
-            throw throwUnchecked(e);
+            // Let's assume this is not a value store, since the bytecode
+            // wasn't available from our class loader
+            return STATE_NOT_STORE;
         }
     }
 
-    private static final Map<String, Integer> processed = new ConcurrentHashMap<>();
-
-    // A lazy option that doesn't force the all the super classes and interfaces
-    // to be loaded to check for the CompositeValueStore interface
-    // If it is already processed, great, take that result, otherwise
-    // ignore it until it is required
-    private final boolean lazy;
-    private Integer result;
-
-    FastValueContainerCheckerClassVisitor(@Nullable ClassVisitor cv, boolean lazy) {
-        super(Opcodes.ASM5, cv);
-        this.lazy = lazy;
-    }
-
-    @Override
-    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+    static int getCompositeValueStoreType(String className, String superName, String[] interfaces, boolean lazy) {
         // Check for super class and interfaces
         final String[] namesToCheck = new String[1 + interfaces.length];
         namesToCheck[0] = superName;
         System.arraycopy(interfaces, 0, namesToCheck, 1, interfaces.length);
 
+        int finalResult = STATE_UNKNOWN;
+
         // Process the super class and every interface
-        if (this.lazy) {
+        if (lazy) {
             int count = 0;
             int result = 0;
             for (String nameToCheck : namesToCheck) {
@@ -130,33 +121,33 @@ class FastValueContainerCheckerClassVisitor extends ClassVisitor {
                 }
                 if (result1 > result) {
                     result = result1;
-                    if (result1 == 2) {
+                    if (result1 == STATE_IS_I_STORE) {
                         break;
                     }
                 }
                 count++;
             }
-            if (result == 2 || count == namesToCheck.length) {
-                this.result = result;
+            if (result == STATE_IS_I_STORE || count == namesToCheck.length) {
+                finalResult = result;
             }
         } else {
-            this.result = 0;
+            finalResult = STATE_NOT_STORE;
             for (String nameToCheck : namesToCheck) {
                 final int result = isCompositeValueStore(nameToCheck);
-                if (result > 0) {
-                    this.result = result;
+                if (result != STATE_NOT_STORE) {
+                    finalResult = result;
                     // Don't stop until it may be a ICompositeValueStore
-                    if (result == 2) {
+                    if (result == STATE_IS_I_STORE) {
                         break;
                     }
                 }
             }
         }
 
-        if (this.result != null) {
-            processed.put(name, this.result);
+        if (finalResult != STATE_UNKNOWN) {
+            processed.put(className, finalResult);
         }
 
-        super.visit(version, access, name, signature, superName, interfaces);
+        return finalResult;
     }
 }

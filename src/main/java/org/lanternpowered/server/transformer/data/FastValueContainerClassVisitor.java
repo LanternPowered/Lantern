@@ -25,13 +25,22 @@
  */
 package org.lanternpowered.server.transformer.data;
 
+import static org.lanternpowered.server.transformer.data.FastValueContainerChecker.getCompositeValueStoreType;
+import static org.objectweb.asm.Opcodes.ASM5;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-final class FastValueContainerClassVisitor extends FastValueContainerCheckerClassVisitor {
+final class FastValueContainerClassVisitor extends ClassVisitor {
 
     FastValueContainerClassVisitor(ClassVisitor cv) {
-        super(cv, true);
+        super(ASM5, cv);
+    }
+
+    @Override
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        getCompositeValueStoreType(name, superName, interfaces, true);
+        super.visit(version, access, name, signature, superName, interfaces);
     }
 
     @Override

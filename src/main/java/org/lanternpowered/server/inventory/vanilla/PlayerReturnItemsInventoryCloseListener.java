@@ -38,6 +38,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -46,7 +47,6 @@ import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,13 +98,10 @@ public class PlayerReturnItemsInventoryCloseListener implements InventoryCloseLi
                 inventory = inventory.query(dropSelector);
             }
         }
-        final List<ItemStack> items = new ArrayList<>();
-        inventory.slots().forEach(slot -> {
-            final ItemStack item = slot.poll();
-            if (!item.isEmpty()) {
-                items.add(item);
-            }
-        });
+        final List<ItemStack> items = inventory.slots().stream()
+                .map(Slot::poll)
+                .filter(item -> !item.isEmpty())
+                .collect(Collectors.toList());
         if (carrier instanceof Player) {
             // Try to offer the dropped items back to the player inventory
             inventory = (IInventory) ((PlayerInventory) carrier.getInventory()).getPrimary()
@@ -112,9 +109,7 @@ public class PlayerReturnItemsInventoryCloseListener implements InventoryCloseLi
             // TODO: Event?
             // The following method consumes items that are added to the inventory,
             // the rest is afterwards dropped on the ground
-            for (ItemStack item : items) {
-                inventory.offerFast(item);
-            }
+            items.forEach(inventory::offerFast);
         }
         final Transform<World> transform = new Transform<>(location);
         final List<Tuple<ItemStackSnapshot, Transform<World>>> entries = items.stream()

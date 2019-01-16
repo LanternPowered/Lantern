@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.transformer.data;
 
+import static org.lanternpowered.server.transformer.data.FastValueContainerChecker.STATE_NOT_STORE;
+import static org.objectweb.asm.Opcodes.ASM5;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.POP;
@@ -35,7 +37,6 @@ import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.TypePath;
 
@@ -77,7 +78,7 @@ final class FastValueContainerMethodVisitor extends MethodVisitor {
     private boolean itf;
 
     FastValueContainerMethodVisitor(MethodVisitor mv) {
-        super(Opcodes.ASM5, mv);
+        super(ASM5, mv);
     }
 
     private void reset() {
@@ -243,7 +244,7 @@ final class FastValueContainerMethodVisitor extends MethodVisitor {
 
         final String key = name + ';' + desc;
         if (opcode == INVOKEVIRTUAL && (entry = entries.get(key)) != null &&
-                (store = FastValueContainerCheckerClassVisitor.isCompositeValueStore(owner)) > 0) {
+                (store = FastValueContainerChecker.isCompositeValueStore(owner)) != STATE_NOT_STORE) {
             this.store = store;
             this.entry = entry;
             this.opcode = opcode;

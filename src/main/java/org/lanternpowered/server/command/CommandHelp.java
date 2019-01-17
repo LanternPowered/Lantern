@@ -143,7 +143,9 @@ public final class CommandHelp extends CommandProvider {
 
 
                         final Text title = Text.builder("Available commands:").color(TextColors.DARK_GREEN).build();
-                        final List<Text> lines = commands.stream().map(c -> getDescription(src, c)).collect(Collectors.toList());
+                        final List<Text> lines = commands.stream()
+                                .map(c -> getDescription(src, c))
+                                .collect(Collectors.toList());
 
                         // Console sources cannot see/use the pagination
                         if (!(src instanceof ConsoleSource)) {
@@ -163,17 +165,15 @@ public final class CommandHelp extends CommandProvider {
                 });
     }
 
-    @SuppressWarnings("unchecked")
     private static Text getDescription(CommandSource source, CommandMapping mapping) {
         final Optional<Text> description = mapping.getCallable().getShortDescription(source);
-        Text.Builder text = Text.builder("/" + mapping.getPrimaryAlias());
+        final Text.Builder text = Text.builder("/" + mapping.getPrimaryAlias());
         text.color(TextColors.GREEN);
         //End with a space, so tab completion works immediately.
         text.onClick(TextActions.suggestCommand("/" + mapping.getPrimaryAlias() + " "));
-        Optional<? extends Text> longDescription = mapping.getCallable().getHelp(source);
-        if (longDescription.isPresent()) {
-            text.onHover(TextActions.showText(longDescription.get()));
-        }
+        mapping.getCallable().getHelp(source)
+                .filter(longDescription -> !longDescription.isEmpty())
+                .ifPresent(longDescription -> text.onHover(TextActions.showText(longDescription)));
         return Text.of(text, " ", description.orElse(mapping.getCallable().getUsage(source)));
     }
 }

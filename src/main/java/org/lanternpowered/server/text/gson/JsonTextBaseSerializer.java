@@ -124,7 +124,7 @@ abstract class JsonTextBaseSerializer<T extends Text> implements JsonSerializer<
     static void serialize(JsonObject json, Text text, JsonSerializationContext context) {
         final TextColor color = text.getColor();
         if (color != TextColors.NONE) {
-            json.addProperty(COLOR, color.getKey().toString());
+            json.addProperty(COLOR, color.getKey().getValue());
         }
         final TextStyle style = text.getStyle();
         style.isBold().ifPresent(v -> json.addProperty(BOLD, v));

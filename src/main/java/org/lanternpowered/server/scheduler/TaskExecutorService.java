@@ -49,7 +49,7 @@ class TaskExecutorService extends AbstractExecutorService implements SpongeExecu
     private final SchedulerBase scheduler;
     private final PluginContainer plugin;
 
-    protected TaskExecutorService(Supplier<Task.Builder> taskBuilderProvider, SchedulerBase scheduler, PluginContainer plugin) {
+    TaskExecutorService(Supplier<Task.Builder> taskBuilderProvider, SchedulerBase scheduler, PluginContainer plugin) {
         this.taskBuilderProvider = taskBuilderProvider;
         this.scheduler = scheduler;
         this.plugin = plugin;
@@ -83,20 +83,45 @@ class TaskExecutorService extends AbstractExecutorService implements SpongeExecu
     }
 
     @Override
-    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+    public boolean awaitTermination(long timeout, TimeUnit unit) {
         return false;
     }
 
     @Override
     public void execute(Runnable command) {
-        this.createTask(command).submit(this.plugin);
+        createTask(command).submit(this.plugin);
+    }
+
+    @Override
+    public SpongeFuture<?> submit(Runnable command) {
+        return submit(command, null);
+    }
+
+    @Override
+    public <T> SpongeFuture<T> submit(Callable<T> command) {
+        final FutureTask<T> runnable = new FutureTask<>(command);
+
+        final Task task = createTask(runnable)
+                .submit(this.plugin);
+
+        return new SpongeTaskFuture<>(runnable, (ScheduledTask) task, this.scheduler);
+    }
+
+    @Override
+    public <T> SpongeFuture<T> submit(Runnable command, @Nullable T result) {
+        final FutureTask<T> runnable = new FutureTask<>(command, result);
+
+        final Task task = createTask(runnable)
+                .submit(this.plugin);
+
+        return new SpongeTaskFuture<>(runnable, (ScheduledTask) task, this.scheduler);
     }
 
     @Override
     public SpongeFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
         final FutureTask<?> runnable = new FutureTask<>(command, null);
 
-        final Task task = this.createTask(runnable)
+        final Task task = createTask(runnable)
                 .delay(delay, unit)
                 .submit(this.plugin);
 
@@ -107,7 +132,7 @@ class TaskExecutorService extends AbstractExecutorService implements SpongeExecu
     public <V> SpongeFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
         final FutureTask<V> runnable = new FutureTask<>(callable);
 
-        final Task task = this.createTask(runnable)
+        final Task task = createTask(runnable)
                 .delay(delay, unit)
                 .submit(this.plugin);
 
@@ -118,7 +143,7 @@ class TaskExecutorService extends AbstractExecutorService implements SpongeExecu
     public SpongeFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
         final RepeatableFutureTask<?> runnable = new RepeatableFutureTask<>(command);
 
-        final Task task = this.createTask(runnable)
+        final Task task = createTask(runnable)
                 .delay(initialDelay, unit)
                 .interval(period, unit)
                 .submit(this.plugin);

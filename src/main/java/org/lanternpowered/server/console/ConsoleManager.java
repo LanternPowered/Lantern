@@ -38,6 +38,7 @@ import org.apache.logging.log4j.io.LoggerPrintStream;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
 import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
@@ -47,7 +48,6 @@ import org.lanternpowered.server.util.PrettyPrinter;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
@@ -57,6 +57,9 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Future;
+
+import javax.annotation.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 @Singleton
@@ -71,23 +74,25 @@ public final class ConsoleManager extends SimpleTerminalConsole {
 
     private final Path consoleHistoryFile;
     private final Logger logger;
-    private final Scheduler scheduler;
     private final CommandManager commandManager;
     private final PluginContainer pluginContainer;
 
-    private volatile boolean active;
-    private SpongeExecutorService syncExecutor;
+    private final SpongeExecutorService syncExecutor;
+    private final Object lock = new Object();
 
+    private volatile boolean active;
+    private Thread readerThread;
+    @Nullable private LineReader lineReader;
     private long lastHistoryWrite = System.currentTimeMillis();
 
     @Inject
     public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager,
             @Named(DirectoryKeys.CONFIG) Path configFolder,
             @Named(Implementation.IDENTIFIER) PluginContainer pluginContainer) {
+        this.syncExecutor = scheduler.createSyncExecutor(pluginContainer);
         this.consoleHistoryFile = configFolder.resolve(HISTORY_FILE_NAME);
         this.pluginContainer = pluginContainer;
         this.commandManager = commandManager;
-        this.scheduler = scheduler;
         this.logger = logger;
     }
 
@@ -106,21 +111,21 @@ public final class ConsoleManager extends SimpleTerminalConsole {
 
     @Override
     public void start() {
-        this.syncExecutor = this.scheduler.createSyncExecutor(this.pluginContainer);
         this.active = true;
-
-        final Thread thread = ThreadHelper.newThread(super::start, "console");
-        thread.setDaemon(true);
-        thread.start();
+        synchronized (this.lock) {
+            this.readerThread = ThreadHelper.newThread(super::start, "console");
+            this.readerThread.setDaemon(true);
+            this.readerThread.start();
+        }
     }
 
     @Override
     protected LineReader buildReader(LineReaderBuilder builder) {
-        final LineReader reader = super.buildReader(builder
+        this.lineReader = super.buildReader(builder
                 .appName(this.pluginContainer.getName())
                 .completer(new ConsoleCommandCompleter()));
-        reader.setVariable(LineReader.HISTORY_FILE, this.consoleHistoryFile);
-        return reader;
+        this.lineReader.setVariable(LineReader.HISTORY_FILE, this.consoleHistoryFile);
+        return this.lineReader;
     }
 
     @Override
@@ -148,14 +153,28 @@ public final class ConsoleManager extends SimpleTerminalConsole {
     }
 
     public void stop() {
-        this.active = false;
-        saveHistory();
+        synchronized (this.lock) {
+            if (this.readerThread == null) {
+                return;
+            }
+            this.active = false;
+            // Wait until the read thread finishes
+            this.readerThread.interrupt();
+            final Terminal terminal = TerminalConsoleAppender.getTerminal();
+            if (terminal != null) {
+                terminal.writer().println();
+            }
+            // Now we can safely save the history
+            saveHistory();
+            // Cleanup
+            this.lineReader = null;
+            this.readerThread = null;
+        }
     }
 
     private void saveHistory() {
-        final LineReader reader = TerminalConsoleAppender.getReader();
-        if (reader != null) {
-            final History history = reader.getHistory();
+        if (this.lineReader != null) {
+            final History history = this.lineReader.getHistory();
             try {
                 history.save();
             } catch (IOException e) {

@@ -40,7 +40,8 @@ final class SyncScheduler extends SchedulerBase {
      * The hook to update the Ticks known by the SyncScheduler.
      */
     void tick() {
-        this.counter++;
+        final long counter = this.counter;
+        this.counter = counter + 1;
         runTick();
     }
 

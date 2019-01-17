@@ -433,8 +433,6 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         }
 
         final LanternItemStack newStack = (LanternItemStack) stack.copy();
-        final InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder();
-
         final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
         final int quantity = stack.getQuantity();
         if (quantity > maxStackSize) {
@@ -442,17 +440,9 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
 
             // Consume the items that fit in the slot
             stack.setQuantity(quantity - maxStackSize);
-
-            // Reject the rest
-            resultBuilder
-                    .type(InventoryTransactionResult.Type.FAILURE) // Fail if not everything fits the slot
-                    .reject(Collections.singleton(stack.createSnapshot()));
         } else {
             // Consume the complete stack
             stack.setQuantity(0);
-
-            // Complete stack set, success
-            resultBuilder.type(InventoryTransactionResult.Type.SUCCESS);
         }
         if (transactionAdder != null) {
             transactionAdder.accept(new SlotTransaction(this, this.itemStack.toSnapshot(), newStack.toSnapshot()));

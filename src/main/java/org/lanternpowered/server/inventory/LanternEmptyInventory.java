@@ -151,6 +151,10 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory,
     }
 
     @Override
+    protected void peekOffer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
+    }
+
+    @Override
     protected void offer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
     }
 
@@ -206,6 +210,11 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory,
     @Override
     public InventoryTransactionResult offer(ItemStack stack) {
         return CachedInventoryTransactionResults.FAIL_NO_TRANSACTIONS;
+    }
+
+    @Override
+    public boolean canFit(ItemStack stack) {
+        return false;
     }
 
     @Override

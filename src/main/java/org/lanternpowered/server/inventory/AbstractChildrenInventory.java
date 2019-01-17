@@ -48,7 +48,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.property.GuiIds;
@@ -501,58 +500,36 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
         return stack == null ? LanternItemStack.empty() : stack;
     }
 
-    private PeekedOfferTransactionResult peekOffer(ItemStack stack, Set<Inventory> processed) {
-        PeekedOfferTransactionResult peekResult = null;
-        final List<SlotTransaction> transactions = new ArrayList<>();
-        // Loop through the all the children inventories
-        for (AbstractInventory inventory : getChildren()) {
+    @Override
+    protected void peekOffer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
+        final Set<Inventory> processed = new HashSet<>();
+        final Inventory inventory = query(QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY.of(stack));
+        if (inventory instanceof AbstractChildrenInventory) {
+            ((AbstractChildrenInventory) inventory).peekOffer(stack, processed, transactionAdder);
+            // Stack got consumed, stop fast
+            if (stack.isEmpty()) {
+                return;
+            }
+        }
+        peekOffer(stack, processed, transactionAdder);
+    }
+
+    private void peekOffer(ItemStack stack, Set<Inventory> processed, @Nullable Consumer<SlotTransaction> transactionAdder) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             AbstractInventory delegate = inventory;
             // Check for the delegate slot if present
             while (delegate instanceof AbstractForwardingSlot) {
                 delegate = ((AbstractForwardingSlot) delegate).getDelegateSlot();
             }
-            // Only process inventories that aren't processed before
             if (!processed.add(delegate)) {
                 continue;
             }
-            // Peek for a offer operation, the stack will be consumed in the process
-            peekResult = inventory.peekOffer(stack);
-            // Collect transaction results
-            transactions.addAll(peekResult.getTransactions());
-            // Check if the stack is completely consumed
+            inventory.peekOffer(stack, transactionAdder);
+            // Stack got consumed, stop fast
             if (stack.isEmpty()) {
-                return new PeekedOfferTransactionResult(transactions, ItemStackSnapshot.NONE);
+                return;
             }
         }
-        if (peekResult == null) {
-            return new PeekedOfferTransactionResult(ImmutableList.of(), stack.createSnapshot());
-        }
-        return new PeekedOfferTransactionResult(transactions, peekResult.getRejectedItem());
-    }
-
-    @Override
-    public PeekedOfferTransactionResult peekOffer(ItemStack stack) {
-        checkNotNull(stack, "stack");
-        PeekedOfferTransactionResult peekResult = null;
-        final Set<Inventory> processed = new HashSet<>();
-        final Inventory inventory = query(QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY.of(stack));
-        if (inventory instanceof AbstractChildrenInventory) {
-            peekResult = ((AbstractChildrenInventory) inventory).peekOffer(stack, processed);
-            // Stack got consumed
-            if (stack.isEmpty()) {
-                return peekResult;
-            }
-        }
-        final PeekedOfferTransactionResult peekResult1 = peekOffer(stack, processed);
-        if (peekResult == null) {
-            return peekResult1;
-        }
-        return new PeekedOfferTransactionResult(
-                ImmutableList.<SlotTransaction>builder()
-                        .addAll(peekResult.getTransactions())
-                        .addAll(peekResult1.getTransactions())
-                        .build(),
-                peekResult1.getRejectedItem());
     }
 
     @Override

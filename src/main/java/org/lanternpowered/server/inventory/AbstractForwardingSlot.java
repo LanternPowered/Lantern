@@ -111,6 +111,11 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
+    protected void peekOffer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
+        getDelegateSlot().peekOffer(stack, transactionAdder);
+    }
+
+    @Override
     protected void offer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
         getDelegateSlot().offer(stack, transactionAdder);
     }
@@ -188,6 +193,11 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     @Override
     public int getStackSize() {
         return getDelegateSlot().getStackSize();
+    }
+
+    @Override
+    public boolean canFit(ItemStack stack) {
+        return getDelegateSlot().canFit(stack);
     }
 
     @Override

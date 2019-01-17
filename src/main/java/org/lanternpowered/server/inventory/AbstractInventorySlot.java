@@ -196,6 +196,22 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     }
 
     @Override
+    public boolean canFit(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        if (stack.isEmpty()) {
+            return true;
+        }
+        if (!this.itemStack.isEmpty()) {
+            if (!this.itemStack.similarTo(stack)) {
+                return false;
+            }
+        } else if (!isValidItem(stack)) {
+            return false;
+        }
+        return stack.getQuantity() <= Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
+    }
+
+    @Override
     public LanternItemStack poll(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         final LanternItemStack itemStack = this.itemStack;
@@ -290,23 +306,22 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     }
 
     @Override
-    public PeekedOfferTransactionResult peekOffer(ItemStack stack) {
-        checkNotNull(stack, "itemStack");
+    protected void peekOffer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder) {
+        checkNotNull(stack, "stack");
         if (stack.isEmpty()) {
-            return new PeekedOfferTransactionResult(ImmutableList.of(), stack.createSnapshot());
+            return;
         }
         final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
         if ((this.itemStack.isFilled() && (!this.itemStack.similarTo(stack) || this.itemStack.getQuantity() >= maxStackSize)) ||
                 !isValidItem(stack)) {
-            return new PeekedOfferTransactionResult(ImmutableList.of(), stack.createSnapshot());
+            return;
         }
-        final List<SlotTransaction> transactions = new ArrayList<>();
         // Get the amount of space we have left
         final int availableSpace = maxStackSize - this.itemStack.getQuantity();
         final int quantity = stack.getQuantity();
+        final LanternItemStack newStack;
         if (quantity > availableSpace) {
             // Create a new item stack which will be the replacement of the current stack
-            final LanternItemStack newStack;
             if (this.itemStack.isEmpty()) {
                 newStack = (LanternItemStack) stack.copy();
             } else {
@@ -315,11 +330,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             newStack.setQuantity(maxStackSize);
             // Consume items from the input stack
             stack.setQuantity(quantity - availableSpace);
-            // Collect the transaction result
-            transactions.add(new SlotTransaction(this, this.itemStack.toSnapshot(), newStack.toWrappedSnapshot()));
-            return new PeekedOfferTransactionResult(transactions, stack.createSnapshot());
         } else {
-            final LanternItemStack newStack;
             if (this.itemStack.isEmpty()) {
                 newStack = (LanternItemStack) stack.copy();
             } else {
@@ -328,9 +339,9 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             }
             // Consume the complete input stack
             stack.setQuantity(0);
-            // Collect the transaction result
-            transactions.add(new SlotTransaction(this, this.itemStack.toSnapshot(), newStack.toWrappedSnapshot()));
-            return new PeekedOfferTransactionResult(transactions, ItemStackSnapshot.NONE);
+        }
+        if (transactionAdder != null) {
+            transactionAdder.accept(new SlotTransaction(this, this.itemStack.toSnapshot(), newStack.toWrappedSnapshot()));
         }
     }
 

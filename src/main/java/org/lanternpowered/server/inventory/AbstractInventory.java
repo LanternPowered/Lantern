@@ -254,10 +254,22 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
     protected abstract List<? extends AbstractInventory> getChildren();
 
     /**
-     * Attempts to offer the specified {@link ItemStack} to this inventory.
+     * Attempts to peek offer the specified {@link ItemStack} to this inventory.
+     *
+     * <p>The input stack will be (partially) consumed in the process.</p>
      *
      * @param stack The item stack
-     * @param transactionAdder The transaction adder
+     * @param transactionAdder The transaction adder, can be {@code null} if not collecting transactions
+     */
+    protected abstract void peekOffer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder);
+
+    /**
+     * Attempts to offer the specified {@link ItemStack} to this inventory.
+     *
+     * <p>The input stack will be (partially) consumed in the process.</p>
+     *
+     * @param stack The item stack
+     * @param transactionAdder The transaction adder, can be {@code null} if not collecting transactions
      */
     protected abstract void offer(ItemStack stack, @Nullable Consumer<SlotTransaction> transactionAdder);
 
@@ -266,7 +278,7 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
      *
      * @param stack The item stack
      * @param force With force, ignores any filter
-     * @param transactionAdder The transaction adder
+     * @param transactionAdder The transaction adder, can be {@code null} if not collecting transactions
      */
     protected abstract void set(ItemStack stack, boolean force, @Nullable Consumer<SlotTransaction> transactionAdder);
 
@@ -416,6 +428,14 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
     // Peek/poll operations
 
     @Override
+    public boolean canFit(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        final ItemStack copy = stack.copy();
+        peekOffer(copy, null);
+        return copy.isEmpty();
+    }
+
+    @Override
     public LanternItemStack poll() {
         return poll(stack -> true);
     }
@@ -493,6 +513,14 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
     public PeekedPollTransactionResult peekPoll(int limit, ItemPredicate itemPredicate) {
         checkNotNull(itemPredicate, "itemPredicate");
         return peekPoll(limit, itemPredicate.asStackPredicate());
+    }
+
+    @Override
+    public PeekedOfferTransactionResult peekOffer(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        final ImmutableList.Builder<SlotTransaction> transactionsBuilder = ImmutableList.builder();
+        peekOffer(stack, transactionsBuilder::add);
+        return new PeekedOfferTransactionResult(transactionsBuilder.build(), stack.createSnapshot());
     }
 
     @Override

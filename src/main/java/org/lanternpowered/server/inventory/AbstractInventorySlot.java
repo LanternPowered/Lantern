@@ -45,7 +45,6 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
@@ -319,23 +318,27 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         // Get the amount of space we have left
         final int availableSpace = maxStackSize - this.itemStack.getQuantity();
         final int quantity = stack.getQuantity();
-        final LanternItemStack newStack;
+        LanternItemStack newStack = null;
         if (quantity > availableSpace) {
-            // Create a new item stack which will be the replacement of the current stack
-            if (this.itemStack.isEmpty()) {
-                newStack = (LanternItemStack) stack.copy();
-            } else {
-                newStack = this.itemStack.copy();
+            if (transactionAdder != null) {
+                // Create a new item stack which will be the replacement of the current stack
+                if (this.itemStack.isEmpty()) {
+                    newStack = (LanternItemStack) stack.copy();
+                } else {
+                    newStack = this.itemStack.copy();
+                }
+                newStack.setQuantity(maxStackSize);
             }
-            newStack.setQuantity(maxStackSize);
             // Consume items from the input stack
             stack.setQuantity(quantity - availableSpace);
         } else {
-            if (this.itemStack.isEmpty()) {
-                newStack = (LanternItemStack) stack.copy();
-            } else {
-                newStack = this.itemStack.copy();
-                newStack.setQuantity(newStack.getQuantity() + quantity);
+            if (transactionAdder != null) {
+                if (this.itemStack.isEmpty()) {
+                    newStack = (LanternItemStack) stack.copy();
+                } else {
+                    newStack = this.itemStack.copy();
+                    newStack.setQuantity(newStack.getQuantity() + quantity);
+                }
             }
             // Consume the complete input stack
             stack.setQuantity(0);

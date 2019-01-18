@@ -430,9 +430,13 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
     @Override
     public boolean canFit(ItemStack stack) {
         checkNotNull(stack, "stack");
-        final ItemStack copy = stack.copy();
-        peekOffer(copy, null);
-        return copy.isEmpty();
+        final int quantity = stack.getQuantity();
+        peekOffer(stack, null);
+        try {
+            return stack.isEmpty();
+        } finally {
+            stack.setQuantity(quantity);
+        }
     }
 
     @Override

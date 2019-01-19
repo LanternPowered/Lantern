@@ -23,31 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.login;
+package org.lanternpowered.server.network.vanilla.message.type.login
 
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.AbstractReferenceCountedMessage;
+import io.netty.util.ReferenceCounted
+import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.message.Message
 
-public final class MessageLoginOutChannelRequest extends AbstractReferenceCountedMessage<ByteBuffer> {
-
-    private final int transactionId;
-    private final String channel;
-
-    public MessageLoginOutChannelRequest(int transactionId, String channel, ByteBuffer content) {
-        super(content);
-        this.transactionId = transactionId;
-        this.channel = channel;
-    }
-
-    public int getTransactionId() {
-        return this.transactionId;
-    }
-
-    public String getChannel() {
-        return this.channel;
-    }
-
-    public ByteBuffer getContent() {
-        return this.object;
-    }
-}
+/**
+ * A login channel response [Message] is send by the client after a
+ * [MessageLoginOutChannelRequest] message is send by the server.
+ * The transaction id in both messages should match to be valid.
+ */
+data class MessageLoginInChannelResponse(
+        val transactionId: Int,
+        val content: ByteBuffer
+) : Message, ReferenceCounted by content

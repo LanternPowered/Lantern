@@ -106,6 +106,7 @@ import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -135,7 +136,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
@@ -402,6 +402,19 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                                 newElement.map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
                     }
                 });
+        c.registerProcessor(Keys.ACTIVE_ITEM).add(builder -> builder
+                .valueOfferHandler((valueContainer, value) -> {
+                    final ItemStackSnapshot element = value.get();
+                    if (element.isEmpty()) {
+                        this.interactionHandler.cancelActiveItem();
+                        return DataTransactionResult.successResult(value.asImmutable());
+                    } else {
+                        // You cannot change the active item, only cancel it
+                        return DataTransactionResult.failResult(value.asImmutable());
+                    }
+                })
+                .retrieveHandler((valueContainer, key) -> Optional.of(this.interactionHandler.getActiveItem()))
+                .failAlwaysRemoveHandler());
     }
 
     @Override

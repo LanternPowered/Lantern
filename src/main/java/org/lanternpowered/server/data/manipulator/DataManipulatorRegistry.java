@@ -119,6 +119,7 @@ import org.spongepowered.api.data.manipulator.immutable.block.ImmutableTreeData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableWallData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableWireAttachmentData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableAbsorptionData;
+import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableActiveItemData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableAffectsSpawningData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableAgeableData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableAgentData;
@@ -280,6 +281,7 @@ import org.spongepowered.api.data.manipulator.mutable.block.TreeData;
 import org.spongepowered.api.data.manipulator.mutable.block.WallData;
 import org.spongepowered.api.data.manipulator.mutable.block.WireAttachmentData;
 import org.spongepowered.api.data.manipulator.mutable.entity.AbsorptionData;
+import org.spongepowered.api.data.manipulator.mutable.entity.ActiveItemData;
 import org.spongepowered.api.data.manipulator.mutable.entity.AffectsSpawningData;
 import org.spongepowered.api.data.manipulator.mutable.entity.AgeableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.AgentData;
@@ -594,6 +596,8 @@ public class DataManipulatorRegistry {
         /// normal containers
         register(AbsorptionData.class, ImmutableAbsorptionData.class,
                 c -> c.register(Keys.ABSORPTION, 0.0));
+        register(ActiveItemData.class, ImmutableActiveItemData.class,
+                c -> c.register(Keys.ACTIVE_ITEM, ItemStackSnapshot.NONE));
         register(AffectsSpawningData.class, ImmutableAffectsSpawningData.class,
                 c -> c.register(Keys.AFFECTS_SPAWNING, false));
         register(AgeableData.class, ImmutableAgeableData.class,

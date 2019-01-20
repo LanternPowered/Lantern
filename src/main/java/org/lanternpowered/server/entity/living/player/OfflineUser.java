@@ -25,10 +25,14 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.vanilla.LanternUserInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Optional;
 
@@ -40,6 +44,18 @@ public class OfflineUser extends AbstractUser {
         super(user);
         this.inventory = VanillaInventoryArchetypes.USER.builder()
                 .withCarrier(this).build(Lantern.getMinecraftPlugin());
+    }
+
+    @Override
+    public void registerKeys() {
+        super.registerKeys();
+
+        final ValueCollection c = getValueCollection();
+        // A offline can't have a active item, so always return none and reject offers
+        c.registerProcessor(Keys.ACTIVE_ITEM).add(builder -> builder
+                .valueOfferHandler((valueContainer, value) -> DataTransactionResult.errorResult(value.asImmutable()))
+                .retrieveHandler((valueContainer, key) -> Optional.of(ItemStackSnapshot.NONE))
+                .failAlwaysRemoveHandler());
     }
 
     @Override

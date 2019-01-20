@@ -41,6 +41,8 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.PlayerInventoryContainer;
+import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
@@ -64,6 +66,8 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -107,6 +111,10 @@ public final class PlayerInteractionHandler {
 
     public PlayerInteractionHandler(LanternPlayer player) {
         this.player = player;
+    }
+
+    ItemStackSnapshot getActiveItem() {
+        return this.lastActiveItemStack == null ? ItemStackSnapshot.NONE : this.lastActiveItemStack.createSnapshot();
     }
 
     /**
@@ -447,6 +455,16 @@ public final class PlayerInteractionHandler {
         this.lastActiveHand = null;
         this.activeHandStartTime = -1L;
         this.player.offer(LanternKeys.ACTIVE_HAND, Optional.empty());
+    }
+
+    void cancelActiveItem() {
+        // Refresh the active item slot
+        final PlayerInventoryContainer container = this.player.getInventoryContainer();
+        final ClientContainer clientContainer = container.getClientContainer();
+        final Slot activeSlot = container.getPlayerInventory().getHotbar().getSelectedSlot();
+        clientContainer.queueSlotChange(activeSlot);
+        // Reset use time
+        resetItemUseTime();
     }
 
     public void handleItemInteraction(MessagePlayInPlayerUseItem message) {

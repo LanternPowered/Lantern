@@ -37,7 +37,6 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
-import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.lanternpowered.server.util.copy.Copyable;
@@ -240,7 +239,7 @@ public final class LanternDataManager implements DataManager {
         checkState(!this.builders.containsKey(immutableClass), "ImmutableDataManipulator already registered!");
         checkState(!this.immutableBuilderMap.containsKey(immutableClass), "ImmutableDataManipulator already registered!");
         checkState(!this.immutableBuilderMap.containsValue(manipulatorBuilder), "DataManipulatorBuilder already registered!");
-        checkState(!DataManipulatorRegistryModule.get().get(registration.getKey()).isPresent(),
+        checkState(!DataRegistrationRegistryModule.INSTANCE.get(registration.getKey()).isPresent(),
                 "There is already a DataRegistration registered with the ID: " + registration.getKey());
     }
 
@@ -255,7 +254,6 @@ public final class LanternDataManager implements DataManager {
         this.registrations.put(registration.getManipulatorClass(), registration);
         this.registrations.put(registration.getImmutableManipulatorClass(), registration);
         registerBuilder(registration.getManipulatorClass(), registration.getDataManipulatorBuilder());
-        DataManipulatorRegistryModule.get().registerAdditionalCatalog(registration);
         Copyable.register(registration.getManipulatorClass(), DataManipulator::copy);
     }
 

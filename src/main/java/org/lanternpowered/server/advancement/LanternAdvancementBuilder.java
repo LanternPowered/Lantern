@@ -26,25 +26,37 @@
 package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
+import org.lanternpowered.server.text.translation.TextTranslation;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.text.translation.FixedTranslation;
+import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"NullableProblems", "ConstantConditions"})
-public class LanternAdvancementBuilder implements Advancement.Builder {
+public class LanternAdvancementBuilder extends AbstractCatalogBuilder<Advancement, Advancement.Builder> implements Advancement.Builder {
 
-    @Nullable Advancement parent;
-    AdvancementCriterion criterion;
-    @Nullable DisplayInfo displayInfo;
-    String id;
-    @Nullable String name;
+    @Nullable private Advancement parent;
+    private AdvancementCriterion criterion;
+    @Nullable private DisplayInfo displayInfo;
 
     public LanternAdvancementBuilder() {
         reset();
+    }
+
+    @Override
+    protected Translation getFinalName() {
+        if (getName() != null) {
+            return getName();
+        } else if (this.displayInfo != null) {
+            return TextTranslation.of(this.displayInfo.getTitle());
+        }
+        return new FixedTranslation(getKey().getValue());
     }
 
     @Override
@@ -67,32 +79,15 @@ public class LanternAdvancementBuilder implements Advancement.Builder {
     }
 
     @Override
-    public Advancement.Builder id(String id) {
-        checkNotNull(id, "id");
-        this.id = id;
-        return this;
-    }
-
-    @Override
-    public Advancement.Builder name(String name) {
-        checkNotNull(name, "name");
-        this.name = name;
-        return this;
-    }
-
-    @Override
-    public Advancement build() {
-        checkState(this.id != null, "The id must be set");
-        return new LanternAdvancement(this);
-    }
-
-    @Override
     public Advancement.Builder reset() {
         this.criterion = AdvancementCriterion.EMPTY;
         this.displayInfo = null;
         this.parent = null;
-        this.id = null;
-        this.name = null;
-        return this;
+        return super.reset();
+    }
+
+    @Override
+    protected Advancement build(CatalogKey key, Translation name) {
+        return new LanternAdvancement(key, name, this.parent, this.displayInfo, this.criterion);
     }
 }

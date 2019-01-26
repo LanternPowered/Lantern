@@ -25,27 +25,36 @@
  */
 package org.lanternpowered.server.item.recipe.crafting;
 
-import org.lanternpowered.server.item.recipe.LanternRecipeRegistry;
-import org.lanternpowered.server.item.recipe.LanternRecipeRegistryModule;
+import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.item.recipe.AbstractRecipeRegistry;
+import org.lanternpowered.server.item.recipe.IIngredient;
+import org.lanternpowered.server.util.ReflectionHelper;
+import org.lanternpowered.server.util.UncheckedThrowables;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.CraftingResult;
+import org.spongepowered.api.item.recipe.crafting.Ingredient;
+import org.spongepowered.api.registry.RegistrationPhase;
+import org.spongepowered.api.registry.util.DelayedRegistration;
+import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public class LanternCraftingRecipeRegistry extends LanternRecipeRegistry<CraftingRecipe, CraftingRecipe>
-        implements ICraftingRecipeRegistry {
-
-    public LanternCraftingRecipeRegistry(LanternRecipeRegistryModule<CraftingRecipe> registryModule) {
-        super(registryModule);
-    }
+@RegistrationDependency({ ItemRegistryModule.class })
+public class LanternCraftingRecipeRegistry extends AbstractRecipeRegistry<CraftingRecipe> implements ICraftingRecipeRegistry {
 
     @Override
     public Optional<CraftingRecipe> findMatchingRecipe(CraftingGridInventory grid, World world) {
         final CraftingMatrix craftingMatrix = CraftingMatrix.of(grid);
-        for (CraftingRecipe recipe : getRecipes()) {
+        for (CraftingRecipe recipe : getAll()) {
             final boolean result;
             if (recipe instanceof ICraftingRecipe) {
                 result = ((ICraftingRecipe) recipe).isValid(craftingMatrix, world);
@@ -62,7 +71,7 @@ public class LanternCraftingRecipeRegistry extends LanternRecipeRegistry<Craftin
     @Override
     public Optional<CraftingResult> getResult(CraftingGridInventory grid, World world) {
         final CraftingMatrix craftingMatrix = CraftingMatrix.of(grid);
-        for (CraftingRecipe recipe : getRecipes()) {
+        for (CraftingRecipe recipe : getAll()) {
             final Optional<CraftingResult> optResult;
             if (recipe instanceof ICraftingRecipe) {
                 optResult = ((ICraftingRecipe) recipe).getResult(craftingMatrix, world);
@@ -79,7 +88,7 @@ public class LanternCraftingRecipeRegistry extends LanternRecipeRegistry<Craftin
     @Override
     public Optional<ExtendedCraftingResult> getExtendedResult(CraftingGridInventory grid, World world, int timesLimit) {
         final CraftingMatrix craftingMatrix = CraftingMatrix.of(grid);
-        for (CraftingRecipe recipe : getRecipes()) {
+        for (CraftingRecipe recipe : getAll()) {
             final Optional<ExtendedCraftingResult> optResult;
             if (recipe instanceof ICraftingRecipe) {
                 optResult = ((ICraftingRecipe) recipe).getExtendedResult(craftingMatrix, world, timesLimit);
@@ -109,5 +118,61 @@ public class LanternCraftingRecipeRegistry extends LanternRecipeRegistry<Craftin
             }
         }
         return Optional.empty();
+    }
+
+    @DelayedRegistration(RegistrationPhase.POST_INIT)
+    @Override
+    public void registerDefaults() {
+        try {
+            ReflectionHelper.setField(Ingredient.class.getField("NONE"), null,
+                    IIngredient.builder().with(ItemStack::isEmpty).withDisplay(ItemTypes.NONE).build());
+        } catch (Throwable e) {
+            throw UncheckedThrowables.throwUnchecked(e);
+        }
+
+        final CauseStack causeStack = CauseStack.current();
+
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.pushCause(Lantern.getMinecraftPlugin());
+            register(ICraftingRecipe.shapedBuilder()
+                    .aisle("x", "x")
+                    .where('x', Ingredient.of(ItemTypes.PLANKS))
+                    .result(ItemStack.of(ItemTypes.STICK, 4))
+                    .id("stick")
+                    .build());
+        }
+
+        // Extra, testing stuff
+        try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+            frame.pushCause(Lantern.getImplementationPlugin());
+
+            // Euro?
+            ItemStack result = ItemStack.of(ItemTypes.GOLD_NUGGET, 4);
+            result.offer(Keys.DISPLAY_NAME, Text.of(TextColors.GOLD, "€1"));
+            register(ICraftingRecipe.shapedBuilder()
+                    .aisle("x", "y")
+                    .where('x', Ingredient.of(ItemTypes.GOLD_INGOT))
+                    .where('y', IIngredient.builder().with(ItemTypes.LAVA_BUCKET).withRemaining(ItemTypes.BUCKET).build())
+                    .result(result)
+                    .id("one_euro")
+                    .build());
+
+            // Two sticks?
+            register(ICraftingRecipe.shapelessBuilder()
+                    .addIngredients(Ingredient.of(ItemTypes.STICK), 2)
+                    .result(ItemStack.of(ItemTypes.STICK, 2))
+                    .id("two_sticks")
+                    .build());
+
+            // Two buckets?
+            result = ItemStack.of(ItemTypes.LAVA_BUCKET, 1);
+            result.offer(Keys.DISPLAY_NAME, Text.of(TextColors.GOLD, "¿Compressed Lava?"));
+            register(ICraftingRecipe.shapelessBuilder()
+                    .addIngredient(Ingredient.of(ItemTypes.LAVA_BUCKET))
+                    .addIngredient(IIngredient.builder().with(ItemTypes.LAVA_BUCKET).withRemaining(ItemTypes.BUCKET).build())
+                    .result(result)
+                    .id("compressed_lava")
+                    .build());
+        }
     }
 }

@@ -32,12 +32,14 @@ import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableDat
 import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipulator;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.translation.FixedTranslation;
 
 import java.util.Set;
 
@@ -50,14 +52,16 @@ public abstract class AbstractDataManipulatorRegistration<M extends DataManipula
     private final Set<Key<?>> requiredKeys;
     private final DataBuilder<I> immutableDataBuilder;
 
+    // TODO: Cleanup constructor
     protected AbstractDataManipulatorRegistration(PluginContainer plugin, String id, String name,
             Class<M> manipulatorClass, Class<I> immutableClass) {
         this(plugin, id, name, manipulatorClass, immutableClass, null);
     }
 
+    // TODO: Cleanup constructor
     AbstractDataManipulatorRegistration(PluginContainer plugin, String id, String name,
             Class<M> manipulatorClass, Class<I> immutableClass, @Nullable Set<Key<?>> requiredKeys) {
-        super(plugin, id, name, manipulatorClass, immutableClass, null);
+        super(CatalogKey.resolve(id), new FixedTranslation(name), plugin, manipulatorClass, null, immutableClass, null, null);
         this.requiredKeys = requiredKeys == null ? createMutable().getKeys() : requiredKeys;
         this.immutableDataBuilder = new RegistrationImmutableManipulatorDataBuilder(immutableClass, 1);
     }

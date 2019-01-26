@@ -158,6 +158,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         causeStack.pushCause(Lantern.getSpongePlugin());
 
         register(makeMutableBoundedValueKey(Double.class, DataQuery.of("Absorption"), "absorption"));
+        register(makeValueKey(ItemStackSnapshot.class, of("ActiveItem"), "active_item"));
         register(makeValueKey(Boolean.class, of("AffectsSpawning"), "affects_spawning"));
         register(makeMutableBoundedValueKey(Integer.class, of("Age"), "age"));
         register(makeValueKey(Boolean.class, of("AIEnabled"), "ai_enabled"));

@@ -45,15 +45,14 @@ import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -64,11 +63,10 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
 
     private static final TypeToken<ChangeDataHolderEvent.ValueChange> valueChangeEventTypeToken =
             TypeToken.of(ChangeDataHolderEvent.ValueChange.class);
-    private static Set<String> loggedPlugins = new HashSet<>();
 
     private final TypeToken<V> valueToken;
     private final CatalogKey key;
-    private final String name;
+    private final Translation name;
     private final DataQuery query;
     private final TypeToken<?> elementToken;
     private final List<RegisteredListener<ChangeDataHolderEvent.ValueChange>> listeners = new ArrayList<>();
@@ -86,42 +84,31 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
 
     private final int hashCode;
 
-    LanternKey(LanternKeyBuilder<?, V> builder) {
-        this.valueToken = builder.valueToken;
-        this.name = builder.name;
-        this.query = builder.query;
+    LanternKey(CatalogKey key, Translation name, DataQuery query, TypeToken<V> valueToken) {
+        this.valueToken = valueToken;
+        this.name = name;
+        this.query = query;
         this.elementToken = this.valueToken.resolveType(BaseValue.class.getTypeParameters()[0]);
-        final PluginContainer plugin = CauseStack.current().first(PluginContainer.class).get();
-        final String id = builder.id;
-        if (id.indexOf(':') == -1) {
-            this.key = CatalogKey.of(plugin.getId(), id);
-        } else {
-            this.key = CatalogKey.resolve(id);
-            if (loggedPlugins.add(plugin.getId())) {
-                Lantern.getLogger().warn(plugin.getId() + ": It is no longer required to include the plugin id when specifying a "
-                        + "Key id through Key.Builder#id. This is deprecated and may be removed later. The plugin id will be retrieved from the "
-                        + "current PluginContainer in the cause stack. ");
-            }
-        }
+        this.key = key;
         this.hashCode = Objects.hash(this.valueToken, this.key, this.name, this.query, this.elementToken);
-        TypeToken<?> elementToken = builder.valueToken.resolveType(elementType);
+        TypeToken<?> elementToken = valueToken.resolveType(elementType);
         if (Optional.class.isAssignableFrom(elementToken.getRawType())) {
             elementToken = elementToken.resolveType(optionalType);
             // Generate the unwrapped version
             final LanternKeyBuilder unwrappedBuilder = new LanternKeyBuilder();
-            if (ImmutableValue.class.isAssignableFrom(builder.valueToken.getRawType())) {
+            if (ImmutableValue.class.isAssignableFrom(valueToken.getRawType())) {
                 unwrappedBuilder.valueToken = createImmutableValueToken(elementToken);
             } else {
                 unwrappedBuilder.valueToken = createValueToken(elementToken);
             }
-            unwrappedBuilder.id = builder.id + "_non_optional";
-            unwrappedBuilder.name = builder.name + "NonOptional";
-            final List<String> parts = new ArrayList<>(builder.query.getParts());
+            unwrappedBuilder.key(CatalogKey.of(key.getNamespace(), key.getValue() + "_non_optional"));
+            unwrappedBuilder.name(name.get() + "NonOptional");
+            final List<String> parts = new ArrayList<>(query.getParts());
             final int index = parts.size() - 1;
             parts.set(index, parts.get(index) + "NonOptional");
             unwrappedBuilder.query = DataQuery.of(parts);
 
-            this.optionalUnwrappedKey = unwrappedBuilder.build();
+            this.optionalUnwrappedKey = (LanternKey) unwrappedBuilder.build();
             this.optionalUnwrappedKey.optionalWrappedKey = this;
         }
     }
@@ -187,7 +174,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
 
     @Override
     public String getName() {
-        return this.name;
+        return this.name.get();
     }
 
     @Override

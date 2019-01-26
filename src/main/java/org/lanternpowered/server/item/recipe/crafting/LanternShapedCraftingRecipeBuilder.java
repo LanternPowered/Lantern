@@ -28,16 +28,16 @@ package org.lanternpowered.server.item.recipe.crafting;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,8 +46,11 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public final class LanternShapedCraftingRecipeBuilder implements IShapedCraftingRecipe.Builder, IShapedCraftingRecipe.Builder.AisleStep.ResultStep,
-        IShapedCraftingRecipe.Builder.RowsStep.ResultStep, IShapedCraftingRecipe.Builder.EndStep {
+public final class LanternShapedCraftingRecipeBuilder extends AbstractCatalogBuilder<ShapedCraftingRecipe, ShapedCraftingRecipe.Builder> implements
+        IShapedCraftingRecipe.Builder,
+        IShapedCraftingRecipe.Builder.AisleStep.ResultStep,
+        IShapedCraftingRecipe.Builder.RowsStep.ResultStep,
+        IShapedCraftingRecipe.Builder.EndStep {
 
     private final List<String> aisle = new ArrayList<>();
     private final Map<Character, Ingredient> ingredientMap = new Char2ObjectArrayMap<>();
@@ -141,24 +144,41 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
     }
 
     @Override
-    public IShapedCraftingRecipe build(String id, Object plugin) {
+    public EndStep id(String id) {
+        super.id(id);
+        return this;
+    }
+
+    @Override
+    public EndStep name(String name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
+    public EndStep name(Translation name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
+    public EndStep key(CatalogKey key) {
+        super.key(key);
+        return this;
+    }
+
+    @Override
+    public IShapedCraftingRecipe build() {
+        return (IShapedCraftingRecipe) super.build();
+    }
+
+    @Override
+    protected ShapedCraftingRecipe build(CatalogKey key, Translation name) {
         checkState(!this.aisle.isEmpty(), "aisle has not been set");
         checkState(!this.ingredientMap.isEmpty(), "no ingredients set");
         checkState(this.resultProvider != null, "no result provider");
-        checkNotNull(id, "id");
-        checkNotNull(id, "plugin");
-
-        final PluginContainer container = checkPlugin(plugin, "plugin");
-        final int index = id.indexOf(':');
-        if (index != -1) {
-            final String pluginId = id.substring(0, index);
-            checkState(pluginId.equals(container.getId()), "Plugin ids mismatch, "
-                    + "found %s in the id but got %s from the container", pluginId, container.getId());
-            id = id.substring(index + 1);
-        }
 
         final int h = this.aisle.size();
-        checkState(h > 0, "The aisle cannot be empty.");
         final int w = this.aisle.get(0).length();
         checkState(w > 0, "The aisle cannot be empty.");
 
@@ -182,8 +202,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
 
         final ItemStackSnapshot exemplary = this.resultProvider.getSnapshot(
                 EmptyCraftingMatrix.INSTANCE, EmptyIngredientList.INSTANCE);
-        return new LanternShapedCraftingRecipe(CatalogKey.of(container.getId(), id), exemplary,
-                this.groupName, this.resultProvider, ingredients);
+        return new LanternShapedCraftingRecipe(key, exemplary, this.groupName, this.resultProvider, ingredients);
     }
 
     @Override
@@ -211,6 +230,7 @@ public final class LanternShapedCraftingRecipeBuilder implements IShapedCrafting
         this.ingredientMap.clear();
         this.resultProvider = null;
         this.groupName = null;
+        super.reset();
         return this;
     }
 }

@@ -28,10 +28,10 @@ package org.lanternpowered.server.advancement;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.advancement.layout.LanternTreeLayoutElement;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.AdvancementType;
@@ -41,6 +41,7 @@ import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Tuple;
 
 import java.util.ArrayList;
@@ -67,30 +68,30 @@ public class LanternAdvancement extends DefaultCatalogType implements Advancemen
     // Criteria data that will be used to sync criteria with the client
     final Tuple<List<AdvancementCriterion>, String[][]> clientCriteria;
 
-    LanternAdvancement(LanternAdvancementBuilder builder) {
-        super(CatalogKeys.activePlugin(builder.id,
-                builder.name == null ? (builder.displayInfo != null ? builder.displayInfo.getTitle().toPlain() : builder.id) : builder.name));
-        this.layoutElement = builder.displayInfo == null ? null : new LanternTreeLayoutElement(this);
-        this.displayInfo = builder.displayInfo;
-        this.criterion = builder.criterion;
-        this.parent = builder.parent;
+    LanternAdvancement(CatalogKey key, Translation name,
+            @Nullable Advancement parent, @Nullable DisplayInfo displayInfo, AdvancementCriterion criterion) {
+        super(key, name);
+        this.layoutElement = displayInfo == null ? null : new LanternTreeLayoutElement(this);
+        this.displayInfo = displayInfo;
+        this.criterion = criterion;
+        this.parent = parent;
         if (this.parent != null) {
             ((LanternAdvancement) this.parent).children.add(this);
         }
         // Cache the client criteria
-        this.clientCriteria = LanternPlayerAdvancements.createCriteria(builder.criterion);
+        this.clientCriteria = LanternPlayerAdvancements.createCriteria(criterion);
         final ImmutableList.Builder<Text> toastBuilder = ImmutableList.builder();
-        if (builder.displayInfo == null) {
+        if (displayInfo == null) {
             this.text = Text.of(getName());
             toastBuilder.add(Text.of("Achieved: ", this.text));
         } else {
-            final AdvancementType type = builder.displayInfo.getType();
+            final AdvancementType type = displayInfo.getType();
             final TextFormat format = type.getTextFormat();
             toastBuilder.add(Text.builder(tr("advancements.toast." + type.getName().toLowerCase()))
                     .format(format).build());
-            final Text title = builder.displayInfo.getTitle();
+            final Text title = displayInfo.getTitle();
             toastBuilder.add(title);
-            final Text description = builder.displayInfo.getDescription();
+            final Text description = displayInfo.getDescription();
             final Text.Builder hoverBuilder = Text.builder()
                     .append(title.toBuilder().format(format).build());
             if (!description.isEmpty()) {

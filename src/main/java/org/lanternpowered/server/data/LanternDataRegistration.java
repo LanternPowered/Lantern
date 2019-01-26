@@ -29,15 +29,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
-import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
@@ -58,29 +59,26 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
     private final Class<M> manipulatorClass;
     private final Class<I> immutableClass;
     private final DataManipulatorBuilder<M, I> manipulatorBuilder;
-    private final PluginContainer plugin;
+    private final PluginContainer pluginContainer;
     protected Class<? extends M> implementationClass;
     protected Class<? extends I> immutableImplementationClass;
 
-    protected LanternDataRegistration(PluginContainer plugin, String id, String name, Class<M> manipulatorClass, Class<I> immutableClass,
+    protected LanternDataRegistration(CatalogKey key, Translation name, PluginContainer pluginContainer,
+            Class<M> manipulatorClass,
+            @Nullable Class<? extends M> implementationClass,
+            Class<I> immutableClass,
+            @Nullable Class<? extends I> immutableImplementationClass,
             @Nullable DataManipulatorBuilder<M, I> manipulatorBuilder) {
-        super(CatalogKeys.of(plugin.getId(), fixId(plugin, id), name));
-        this.plugin = checkNotNull(plugin, "plugin");
-        this.manipulatorClass = checkNotNull(manipulatorClass, "manipulatorClass");
-        this.immutableClass = checkNotNull(immutableClass, "immutableClass");
-        this.manipulatorBuilder = manipulatorBuilder == null ? createDataManipulatorBuilder() : manipulatorBuilder;
-    }
-
-    LanternDataRegistration(LanternDataRegistrationBuilder<M, I> builder) {
-        super(CatalogKeys.of(checkNotNull(builder.plugin, "PluginContainer is null!").getId(),
-                checkNotNull(builder.id, "Data ID is null!"),
-                checkNotNull(builder.name, "Data name is null!")));
-        this.manipulatorClass = checkNotNull(builder.manipulatorClass, "DataManipulator class is null!");
-        this.immutableClass = checkNotNull(builder.immutableClass, "ImmutableDataManipulator class is null!");
-        this.manipulatorBuilder = checkNotNull(builder.manipulatorBuilder, "DataManipulatorBuilder is null!");
-        this.implementationClass = builder.implementationClass == null ? this.manipulatorClass : builder.implementationClass;
-        this.immutableImplementationClass = builder.immutableImplementationClass == null ? this.immutableClass : builder.immutableImplementationClass;
-        this.plugin = builder.plugin;
+        super(key, name);
+        this.manipulatorClass = checkNotNull(manipulatorClass, "DataManipulator class is null!");
+        this.immutableClass = checkNotNull(immutableClass, "ImmutableDataManipulator class is null!");
+        if (manipulatorBuilder == null) {
+            manipulatorBuilder = createDataManipulatorBuilder();
+        }
+        this.manipulatorBuilder = checkNotNull(manipulatorBuilder, "DataManipulatorBuilder is null!");
+        this.implementationClass = implementationClass == null ? this.manipulatorClass : implementationClass;
+        this.immutableImplementationClass = immutableImplementationClass == null ? this.immutableClass : immutableImplementationClass;
+        this.pluginContainer = pluginContainer;
     }
 
     protected void validate() {
@@ -91,8 +89,9 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
         Lantern.getGame().getDataManager().register(this);
     }
 
+    @Nullable
     protected DataManipulatorBuilder<M, I> createDataManipulatorBuilder() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -122,7 +121,7 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
 
     @Override
     public PluginContainer getPluginContainer() {
-        return this.plugin;
+        return this.pluginContainer;
     }
 
     @Override
@@ -138,7 +137,7 @@ public class LanternDataRegistration<M extends DataManipulator<M, I>, I extends 
                 && Objects.equal(this.manipulatorClass, that.manipulatorClass)
                 && Objects.equal(this.immutableClass, that.immutableClass)
                 && Objects.equal(this.manipulatorBuilder, that.manipulatorBuilder)
-                && Objects.equal(this.plugin, that.plugin)
+                && Objects.equal(this.pluginContainer, that.pluginContainer)
                 && Objects.equal(getKey(), that.getKey());
     }
 

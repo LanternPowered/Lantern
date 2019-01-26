@@ -25,32 +25,18 @@
  */
 package org.lanternpowered.server.item.recipe;
 
-import org.spongepowered.api.CatalogType;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.item.recipe.Recipe;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
 
-import java.util.Collection;
+public abstract class AbstractRecipeRegistry<T extends Recipe> extends DefaultCatalogRegistryModule<T> implements RecipeRegistry<T> {
 
-@SuppressWarnings("unchecked")
-public class LanternRecipeRegistry<T extends Recipe, I extends CatalogType & Recipe> implements RecipeRegistry<T> {
-
-    private final LanternRecipeRegistryModule<I> registryModule;
-
-    public LanternRecipeRegistry(LanternRecipeRegistryModule<I> registryModule) {
-        this.registryModule = registryModule;
+    public AbstractRecipeRegistry(Class<?>... catalogClasses) {
+        super(catalogClasses);
     }
 
     @Override
-    public void register(T recipe) {
-        this.registryModule.register((I) recipe);
-    }
-
-    @Override
-    public Collection<T> getRecipes() {
-        return (Collection) this.registryModule.getAll();
-    }
-
-    public LanternRecipeRegistryModule<I> getRegistryModule() {
-        return this.registryModule;
+    protected <A extends T> A register(A catalogType) {
+        return super.register(catalogType);
     }
 }

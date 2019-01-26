@@ -28,22 +28,33 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
+import org.lanternpowered.server.text.translation.TextTranslation;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
-
-import javax.annotation.Nullable;
+import org.spongepowered.api.text.translation.FixedTranslation;
+import org.spongepowered.api.text.translation.Translation;
 
 @SuppressWarnings({"NullableProblems", "ConstantConditions"})
-public class LanternAdvancementTreeBuilder implements AdvancementTree.Builder {
+public class LanternAdvancementTreeBuilder extends AbstractCatalogBuilder<AdvancementTree, AdvancementTree.Builder> implements AdvancementTree.Builder {
 
-    String id;
-    @Nullable String name;
-    Advancement rootAdvancement;
-    String background;
+    private Advancement rootAdvancement;
+    private String background;
 
     public LanternAdvancementTreeBuilder() {
         reset();
+    }
+
+    @Override
+    protected Translation getFinalName() {
+        if (getName() != null) {
+            return getName();
+        }
+        return this.rootAdvancement.getDisplayInfo()
+                .<Translation>map(displayInfo -> TextTranslation.of(displayInfo.getTitle()))
+                .orElseGet(() -> new FixedTranslation(getKey().getValue()));
     }
 
     @Override
@@ -70,34 +81,18 @@ public class LanternAdvancementTreeBuilder implements AdvancementTree.Builder {
     }
 
     @Override
-    public AdvancementTree.Builder id(String id) {
-        checkNotNull(id, "id");
-        this.id = id;
-        return this;
-    }
-
-    @Override
-    public AdvancementTree.Builder name(String name) {
-        checkNotNull(name, "name");
-        this.name = name;
-        return this;
-    }
-
-    @Override
-    public AdvancementTree build() {
-        checkState(this.id != null, "The id must be set");
+    protected AdvancementTree build(CatalogKey key, Translation name) {
         checkState(this.rootAdvancement != null, "The root advancement must be set");
         checkState(!this.rootAdvancement.getTree().isPresent(),
                 "The root advancement is already used by a different Advancement Tree.");
-        return new LanternAdvancementTree(this);
+        return new LanternAdvancementTree(key, name, this.rootAdvancement, this.background);
     }
 
     @Override
     public AdvancementTree.Builder reset() {
+        super.reset();
         this.background = "minecraft:textures/gui/advancements/backgrounds/stone.png";
         this.rootAdvancement = null;
-        this.name = null;
-        this.id = null;
         return this;
     }
 }

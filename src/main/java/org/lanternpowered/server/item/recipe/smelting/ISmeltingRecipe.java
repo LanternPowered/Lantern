@@ -26,7 +26,6 @@
 package org.lanternpowered.server.item.recipe.smelting;
 
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -34,11 +33,12 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
-public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
+public interface ISmeltingRecipe extends SmeltingRecipe {
 
     static Builder builder() {
         return Sponge.getRegistry().createBuilder(Builder.class);
@@ -130,6 +130,9 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
 
         interface EndStep extends Builder, SmeltingRecipe.Builder.EndStep {
 
+            @Override
+            Builder from(SmeltingRecipe value);
+
             Builder.EndStep smeltTime(ISmeltingTimeProvider smeltingTimeProvider);
 
             Builder.EndStep smeltTime(int smeltingTime);
@@ -138,16 +141,16 @@ public interface ISmeltingRecipe extends CatalogType, SmeltingRecipe {
             Builder.EndStep experience(double experience);
 
             @Override
-            ISmeltingRecipe build();
+            Builder.EndStep id(String id);
 
-            /**
-             * Builds the {@link ISmeltingRecipe} with the given id and plugin instance.
-             *
-             * @param id The id
-             * @param plugin The plugin instance
-             * @return The smelting recipe
-             */
-            ISmeltingRecipe build(String id, Object plugin);
+            @Override
+            Builder.EndStep name(String id);
+
+            @Override
+            Builder.EndStep name(Translation name);
+
+            @Override
+            ISmeltingRecipe build();
         }
     }
 }

@@ -23,30 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.data
 
-import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.data.DataRegistration;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
+import org.spongepowered.api.data.DataRegistration
 
-public final class DataManipulatorRegistryModule extends AdditionalPluginCatalogRegistryModule<DataRegistration> {
+object DataRegistrationRegistryModule : AdditionalPluginCatalogRegistryModule<DataRegistration<*, *>>() {
 
-    private static final DataManipulatorRegistryModule instance = new DataManipulatorRegistryModule();
-
-    public static DataManipulatorRegistryModule get() {
-        return instance;
-    }
-
-    private DataManipulatorRegistryModule() {
-        super();
-    }
-
-    @Override
-    public void registerAdditionalCatalog(DataRegistration catalogType) {
-        if (catalogType instanceof DataManipulatorRegistration) {
-            super.register(catalogType);
+    override fun registerAdditionalCatalog(catalogType: DataRegistration<*, *>) {
+        if (catalogType is DataManipulatorRegistration<*, *>) {
+            register(catalogType)
         } else {
-            super.registerAdditionalCatalog(catalogType);
+            super.registerAdditionalCatalog(catalogType)
         }
+    }
+
+    override fun <A : DataRegistration<*, *>> register(catalogType: A): A {
+        if (catalogType is LanternDataRegistration<*, *>) {
+            catalogType.validate()
+            catalogType.register()
+        }
+        return super.register(catalogType)
     }
 }

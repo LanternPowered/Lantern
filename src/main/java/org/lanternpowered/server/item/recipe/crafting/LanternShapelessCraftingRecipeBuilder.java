@@ -28,15 +28,15 @@ package org.lanternpowered.server.item.recipe.crafting;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternShapelessCraftingRecipeBuilder implements IShapelessCraftingRecipe.Builder.EndStep, IShapelessCraftingRecipe.Builder.ResultStep {
+public class LanternShapelessCraftingRecipeBuilder extends AbstractCatalogBuilder<ShapelessCraftingRecipe, ShapelessCraftingRecipe.Builder>
+        implements IShapelessCraftingRecipe.Builder.EndStep, IShapelessCraftingRecipe.Builder.ResultStep {
 
     @Nullable private ICraftingResultProvider resultProvider;
     private final List<Ingredient> ingredients = new ArrayList<>();
@@ -110,26 +111,43 @@ public class LanternShapelessCraftingRecipeBuilder implements IShapelessCrafting
         return result(new ConstantCraftingResultProvider(result.createSnapshot()));
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
-    public IShapelessCraftingRecipe build(String id, Object plugin) {
+    public IShapelessCraftingRecipe.Builder.EndStep id(String id) {
+        super.id(id);
+        return this;
+    }
+
+    @Override
+    public IShapelessCraftingRecipe.Builder.EndStep name(String name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
+    public IShapelessCraftingRecipe.Builder.EndStep name(Translation name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
+    public IShapelessCraftingRecipe.Builder.EndStep key(CatalogKey key) {
+        super.key(key);
+        return this;
+    }
+
+    @Override
+    public IShapelessCraftingRecipe build() {
+        return (IShapelessCraftingRecipe) super.build();
+    }
+
+    @Override
+    protected ShapelessCraftingRecipe build(CatalogKey key, Translation name) {
         checkState(this.resultProvider != null, "The result provider is not set.");
         checkState(!this.ingredients.isEmpty(), "The ingredients are not set.");
-        checkNotNull(id, "id");
-        checkNotNull(id, "plugin");
-
-        final PluginContainer container = checkPlugin(plugin, "plugin");
-        final int index = id.indexOf(':');
-        if (index != -1) {
-            final String pluginId = id.substring(0, index);
-            checkState(pluginId.equals(container.getId()), "Plugin ids mismatch, "
-                    + "found %s in the id but got %s from the container", pluginId, container.getId());
-            id = id.substring(index + 1);
-        }
 
         final ItemStackSnapshot exemplary = this.resultProvider.getSnapshot(
                 EmptyCraftingMatrix.INSTANCE, EmptyIngredientList.INSTANCE);
-        return new LanternShapelessCraftingRecipe(CatalogKey.of(container.getId(), id), exemplary,
+        return new LanternShapelessCraftingRecipe(key, exemplary,
                 this.groupName, this.resultProvider, ImmutableList.copyOf(this.ingredients));
     }
 }

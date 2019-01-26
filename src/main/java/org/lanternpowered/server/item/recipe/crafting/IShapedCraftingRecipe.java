@@ -31,6 +31,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Map;
 
@@ -106,10 +107,22 @@ public interface IShapedCraftingRecipe extends ICraftingRecipe, ShapedCraftingRe
         interface EndStep extends Builder, ShapedCraftingRecipe.Builder.EndStep {
 
             @Override
+            Builder from(ShapedCraftingRecipe value);
+
+            @Override
             Builder.EndStep group(@Nullable String name);
 
             @Override
-            IShapedCraftingRecipe build(String id, Object plugin);
+            Builder.EndStep id(String id);
+
+            @Override
+            Builder.EndStep name(String id);
+
+            @Override
+            Builder.EndStep name(Translation name);
+
+            @Override
+            IShapedCraftingRecipe build() throws IllegalStateException;
         }
     }
 }

@@ -29,13 +29,14 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.translation.Translatable
+import org.lanternpowered.api.text.translation.Translation
 
-open class DefaultCatalogType(key: CatalogKey) : AbstractCatalogType() {
+open class DefaultCatalogType @JvmOverloads constructor(key: CatalogKey, name: Translation? = null) : AbstractCatalogType() {
 
     private val key: CatalogKey
 
     private val theName: String by lazy {
-        (key as? NamedCatalogKey)?.name ?: (this as? Translatable)?.translation?.get() ?: key.value
+        name?.get() ?: (key as? NamedCatalogKey)?.name ?: (this as? Translatable)?.translation?.get() ?: key.value
     }
 
     init {

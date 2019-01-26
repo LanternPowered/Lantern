@@ -30,18 +30,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.reflect.TypeToken;
+import org.jetbrains.annotations.NotNull;
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Locale;
 
-public class LanternKeyBuilder<E, V extends BaseValue<E>> implements Key.Builder<E, V> {
+public class LanternKeyBuilder<E, V extends BaseValue<E>> extends AbstractCatalogBuilder<Key<V>, Key.Builder<E, V>> implements Key.Builder<E, V> {
 
     TypeToken<V> valueToken;
-    String id;
-    String name;
     DataQuery query;
 
     @SuppressWarnings("unchecked")
@@ -49,27 +50,6 @@ public class LanternKeyBuilder<E, V extends BaseValue<E>> implements Key.Builder
     public <T, B extends BaseValue<T>> Key.Builder<T, B> type(TypeToken<B> token) {
         this.valueToken = (TypeToken<V>) checkNotNull(token, "Value Token cannot be null!");
         return (Key.Builder<T, B>) this;
-    }
-
-    @Override
-    public Key.Builder<E, V> id(String id) {
-        checkState(this.valueToken != null, "Value Token must be set first!");
-        checkArgument(!checkNotNull(id, "ID cannot be null!").contains(" "), "Id cannot contain spaces!");
-        this.id = id.toLowerCase(Locale.ENGLISH);
-        return this;
-    }
-
-    @Override
-    public Key.Builder<E, V> name(String name) {
-        checkState(this.valueToken != null, "Value Token must be set first!");
-        checkArgument(!checkNotNull(name).isEmpty(), "Name cannot be empty!");
-        this.name = name;
-        return this;
-    }
-
-    @Override
-    public Key.Builder<E, V> key(CatalogKey key) { // No need for this? The active plugin provides the namespace
-        return id(key.getValue()); // TODO: Remove this method
     }
 
     @Override
@@ -81,19 +61,16 @@ public class LanternKeyBuilder<E, V extends BaseValue<E>> implements Key.Builder
     }
 
     @Override
-    public LanternKey<V> build() {
+    protected Key<V> build(CatalogKey key, Translation name) {
         checkState(this.valueToken != null, "Value Token must be set!");
-        checkState(this.id != null, "Key id must be set!");
         checkState(this.query != null, "DataQuery not set!");
-        checkState(this.name != null, "Name must be set");
-        return new LanternKey<>(this);
+        return new LanternKey<>(key, name, this.query, this.valueToken);
     }
 
     @Override
     public Key.Builder<E, V> reset() {
+        super.reset();
         this.valueToken = null;
-        this.id = null;
-        this.name = null;
         this.query = null;
         return this;
     }

@@ -38,7 +38,6 @@ import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.CatalogKey;
@@ -231,7 +230,7 @@ public final class DataHelper {
             String id;
             if (view.contains(DataQueries.MANIPULATOR_ID)) {
                 id = view.getString(DataQueries.MANIPULATOR_ID).get();
-                optRegistration = DataManipulatorRegistryModule.get().get(CatalogKey.resolve(id));
+                optRegistration = (Optional) DataRegistrationRegistryModule.INSTANCE.get(CatalogKey.resolve(id));
             } else if (view.contains(DATA_CLASS)) {
                 id = view.getString(DATA_CLASS).get();
                 optRegistration = dataManager.getLegacyRegistration(id);

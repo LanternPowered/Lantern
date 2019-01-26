@@ -25,26 +25,23 @@
  */
 package org.lanternpowered.server.advancement;
 
-import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
-import org.spongepowered.api.advancement.DisplayInfo;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.translation.Translation;
 
 public class LanternAdvancementTree extends DefaultCatalogType implements AdvancementTree {
 
     private final Advancement rootAdvancement;
     private final String background;
 
-    LanternAdvancementTree(LanternAdvancementTreeBuilder builder) {
-        super(CatalogKeys.activePlugin(builder.id,
-                builder.name == null ? builder.rootAdvancement.getDisplayInfo()
-                        .map(DisplayInfo::getTitle).map(Text::toPlain).orElse(builder.id) : builder.name));
-        this.rootAdvancement = builder.rootAdvancement;
-        this.background = builder.background;
-        applyTree(builder.rootAdvancement, this);
+    LanternAdvancementTree(CatalogKey key, Translation name, Advancement rootAdvancement, String background) {
+        super(key, name);
+        this.rootAdvancement = rootAdvancement;
+        this.background = background;
+        applyTree(rootAdvancement, this);
     }
 
     private static void applyTree(Advancement advancement, AdvancementTree tree) {

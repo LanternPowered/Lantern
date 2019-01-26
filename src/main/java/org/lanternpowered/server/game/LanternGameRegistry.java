@@ -139,7 +139,7 @@ import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegis
 import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
+import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
@@ -246,7 +246,6 @@ import org.lanternpowered.server.item.recipe.crafting.ICraftingRecipeRegistry;
 import org.lanternpowered.server.item.recipe.crafting.IShapedCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.IShapelessCraftingRecipe;
 import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistry;
-import org.lanternpowered.server.item.recipe.crafting.LanternCraftingRecipeRegistryModule;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapedCraftingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.crafting.LanternShapelessCraftingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.fuel.IFuel;
@@ -256,7 +255,6 @@ import org.lanternpowered.server.item.recipe.fuel.LanternFuelRegistryModule;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
-import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
@@ -538,12 +536,9 @@ public class LanternGameRegistry implements XGameRegistry {
     private final LanternResourcePackFactory resourcePackFactory = new LanternResourcePackFactory();
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
 
-    private final LanternSmeltingRecipeRegistry smeltingRecipeRegistry =
-            new LanternSmeltingRecipeRegistry(new LanternSmeltingRecipeRegistryModule());
-    private final LanternCraftingRecipeRegistry craftingRecipeRegistry =
-            new LanternCraftingRecipeRegistry(new LanternCraftingRecipeRegistryModule());
-    private final LanternFuelRegistryModule fuelRegistryModule =
-            new LanternFuelRegistryModule();
+    private final LanternSmeltingRecipeRegistry smeltingRecipeRegistry = new LanternSmeltingRecipeRegistry();
+    private final LanternCraftingRecipeRegistry craftingRecipeRegistry = new LanternCraftingRecipeRegistry();
+    private final LanternFuelRegistryModule fuelRegistryModule = new LanternFuelRegistryModule();
 
     private final Map<Class<? extends CatalogType>, CatalogRegistryModule<?>> catalogRegistryMap = new IdentityHashMap<>();
     private final Map<Class<? extends RegistryModule>, RegistryModule> classMap = new IdentityHashMap<>();
@@ -783,7 +778,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
-                .registerModule(DataRegistration.class, DataManipulatorRegistryModule.get())
+                .registerModule(DataRegistration.class, (AdditionalPluginCatalogRegistryModule) DataRegistrationRegistryModule.INSTANCE)
                 .registerModule(RecordType.class, RecordTypeRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
                 .registerModule(EventContextKey.class, (AdditionalPluginCatalogRegistryModule) EventContextKeysModule.get())
@@ -798,8 +793,8 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(new AdvancementTreeLayoutModule())
                 .registerModule(new AdvancementCriterionModule())
                 // Recipes
-                .registerModule(CraftingRecipe.class, this.craftingRecipeRegistry.getRegistryModule())
-                .registerModule(ISmeltingRecipe.class, this.smeltingRecipeRegistry.getRegistryModule())
+                .registerModule(CraftingRecipe.class, this.craftingRecipeRegistry)
+                .registerModule(SmeltingRecipe.class, this.smeltingRecipeRegistry)
                 .registerModule(IFuel.class, this.fuelRegistryModule)
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())

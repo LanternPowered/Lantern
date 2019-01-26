@@ -30,6 +30,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
+import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
@@ -84,10 +85,22 @@ public interface IShapelessCraftingRecipe extends ShapelessCraftingRecipe, ICraf
         interface EndStep extends Builder, ShapelessCraftingRecipe.Builder.EndStep {
 
             @Override
+            Builder from(ShapelessCraftingRecipe value);
+
+            @Override
             Builder.EndStep group(@Nullable String name);
 
             @Override
-            IShapelessCraftingRecipe build(String id, Object plugin);
+            Builder.EndStep id(String id);
+
+            @Override
+            Builder.EndStep name(String id);
+
+            @Override
+            Builder.EndStep name(Translation name);
+
+            @Override
+            IShapelessCraftingRecipe build() throws IllegalStateException;
         }
     }
 }

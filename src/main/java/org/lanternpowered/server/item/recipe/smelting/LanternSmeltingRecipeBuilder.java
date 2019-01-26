@@ -28,9 +28,8 @@ package org.lanternpowered.server.item.recipe.smelting;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
-import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.ItemType;
@@ -39,14 +38,12 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingResult;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.translation.Translation;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Predicate;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
+public class LanternSmeltingRecipeBuilder extends AbstractCatalogBuilder<SmeltingRecipe, SmeltingRecipe.Builder> implements ISmeltingRecipe.Builder,
         ISmeltingRecipe.Builder.EndStep, ISmeltingRecipe.Builder.ResultStep {
 
     private static final ISmeltingTimeProvider DEFAULT_SMELTING_TIME_PROVIDER = new ConstantSmeltingTimeProvider(200);
@@ -184,67 +181,49 @@ public class LanternSmeltingRecipeBuilder implements ISmeltingRecipe.Builder,
         return this;
     }
 
-    private static final Map<String, Integer> idCounters = new HashMap<>();
+    @Override
+    public ISmeltingRecipe.Builder.EndStep id(String id) {
+        super.id(id);
+        return this;
+    }
+
+    @Override
+    public ISmeltingRecipe.Builder.EndStep name(String name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
+    public ISmeltingRecipe.Builder.EndStep name(Translation name) {
+        super.name(name);
+        return this;
+    }
+
+    @Override
+    public ISmeltingRecipe.Builder.EndStep key(CatalogKey key) {
+        super.key(key);
+        return this;
+    }
 
     @Override
     public ISmeltingRecipe build() {
-        check();
-
-        // Attempt to generate a id for the smelting recipe
-        String ingredient = this.exemplaryIngredient.getType().getKey().toString();
-        ingredient = ingredient.substring(ingredient.indexOf(':') + 1);
-        final ItemStackSnapshot exemplaryResult = getResultProvider().get(this.exemplaryIngredient).getResult();
-        String result = exemplaryResult.getType().getKey().toString();
-        result = result.substring(result.indexOf(':') + 1);
-
-        final String id = ingredient + "_to_" + result;
-        final int count = idCounters.computeIfAbsent(id, s -> 0) + 1;
-        idCounters.put(id, count);
-
-        return build0(id + "_" + count, Lantern.getGame().getImplementationPlugin());
+        return (ISmeltingRecipe) super.build();
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
-    public ISmeltingRecipe build(String id, Object plugin) {
-        check();
-
-        checkNotNull(id, "id");
-        checkNotNull(plugin, "plugin");
-
-        final PluginContainer container = checkPlugin(plugin, "plugin");
-        final int index = id.indexOf(':');
-        if (index != -1) {
-            final String pluginId = id.substring(0, index);
-            checkState(pluginId.equals(container.getId()), "Plugin ids mismatch, "
-                    + "found %s in the id but got %s from the container", pluginId, container.getId());
-            id = id.substring(index + 1);
-        }
-
-        return build0(id, container);
-    }
-
-    private void check() {
+    protected SmeltingRecipe build(CatalogKey key, Translation name) {
         checkState(this.resultProvider != null || this.result != null, "The result provider is not set.");
         checkState(this.ingredient != null, "The ingredient is not set.");
-    }
-
-    private ISmeltingResultProvider getResultProvider() {
         ISmeltingResultProvider resultProvider = this.resultProvider;
         if (resultProvider == null) {
             resultProvider = new ConstantSmeltingResultProvider(new SmeltingResult(this.result, this.experience));
         }
-        return resultProvider;
-    }
-
-    private ISmeltingRecipe build0(String id, PluginContainer plugin) {
-        ISmeltingResultProvider resultProvider = getResultProvider();
         final ItemStackSnapshot exemplaryResult = resultProvider.get(this.exemplaryIngredient).getResult();
         ISmeltingTimeProvider smeltingTimeProvider = this.smeltingTimeProvider;
         if (smeltingTimeProvider == null) {
             smeltingTimeProvider = DEFAULT_SMELTING_TIME_PROVIDER;
         }
-        return new LanternSmeltingRecipe(CatalogKey.of(plugin.getId(), id), exemplaryResult,
+        return new LanternSmeltingRecipe(key, exemplaryResult,
                 this.exemplaryIngredient, this.ingredient, resultProvider, smeltingTimeProvider);
     }
 }

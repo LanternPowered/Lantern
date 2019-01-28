@@ -338,6 +338,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("PigSaddle"), "pig_saddle"));
         register(makeValueKey(PistonType.class, of("PistonType"), "piston_type"));
         register(makeSetKey(BlockType.class, of("PlaceableBlocks"), "placeable_blocks"));
+        register(makeListKey(String.class, of("PlainBookPages"), "plain_book_pages"));
         register(makeValueKey(PlantType.class, of("PlantType"), "plant_type"));
         register(makeValueKey(Boolean.class, of("PlayerCreated"), "player_created"));
         register(makeValueKey(PortionType.class, of("PortionType"), "portion_type"));

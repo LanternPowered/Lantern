@@ -47,12 +47,14 @@ public class HandlerPlayInSignBook implements Handler<MessagePlayInSignBook> {
 
         LanternItemStack itemStack = slot.peek();
         if (itemStack.isFilled() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
-            final ItemStack itemStack1 = new LanternItemStack(ItemTypes.WRITTEN_BOOK);
-            itemStack.getValues().forEach(itemStack1::offer);
-            itemStack1.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));
-            itemStack1.offer(Keys.BOOK_AUTHOR, Text.of(message.getAuthor()));
-            itemStack1.offer(Keys.DISPLAY_NAME, Text.of(message.getTitle()));
-            slot.set(itemStack1);
+            final ItemStack writtenBookStack = new LanternItemStack(ItemTypes.WRITTEN_BOOK);
+            itemStack.getValues().stream()
+                    .filter(value -> value.getKey() != Keys.PLAIN_BOOK_PAGES)
+                    .forEach(writtenBookStack::offer);
+            writtenBookStack.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));
+            writtenBookStack.offer(Keys.BOOK_AUTHOR, Text.of(message.getAuthor()));
+            writtenBookStack.offer(Keys.DISPLAY_NAME, Text.of(message.getTitle()));
+            slot.set(writtenBookStack);
         }
     }
 }

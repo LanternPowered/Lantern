@@ -33,9 +33,6 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.text.Text;
-
-import java.util.stream.Collectors;
 
 public class HandlerPlayInEditBook implements Handler<MessagePlayInEditBook> {
 
@@ -45,8 +42,8 @@ public class HandlerPlayInEditBook implements Handler<MessagePlayInEditBook> {
         final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
         final LanternItemStack itemStack = slot.peek();
-        if (itemStack.isFilled() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
-            itemStack.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));
+        if (!itemStack.isEmpty() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
+            itemStack.offer(Keys.PLAIN_BOOK_PAGES, message.getPages());
             slot.set(itemStack);
         }
     }

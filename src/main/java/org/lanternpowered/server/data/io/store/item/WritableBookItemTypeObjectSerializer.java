@@ -30,9 +30,6 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-
-import java.util.stream.Collectors;
 
 public class WritableBookItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
@@ -41,14 +38,12 @@ public class WritableBookItemTypeObjectSerializer extends ItemTypeObjectSerializ
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        valueContainer.remove(Keys.BOOK_PAGES).ifPresent(lines ->
-                dataView.set(PAGES, lines.stream().map(Text::toPlain).collect(Collectors.toList())));
+        valueContainer.remove(Keys.PLAIN_BOOK_PAGES).ifPresent(lines -> dataView.set(PAGES, lines));
     }
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.deserializeValues(itemStack, valueContainer, dataView);
-        dataView.getStringList(PAGES).ifPresent(lines -> valueContainer.set(Keys.BOOK_PAGES,
-                lines.stream().map(Text::of).collect(Collectors.toList())));
+        dataView.getStringList(PAGES).ifPresent(lines -> valueContainer.set(Keys.PLAIN_BOOK_PAGES, lines));
     }
 }

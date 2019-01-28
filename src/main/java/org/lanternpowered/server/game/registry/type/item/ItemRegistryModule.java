@@ -1143,7 +1143,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .translation("item.writingBook.name")
                 .maxStackQuantity(1)
                 .keysProvider(c -> c
-                        .register(Keys.BOOK_PAGES, null))
+                        .register(Keys.PLAIN_BOOK_PAGES, null))
                 .build("minecraft", "writable_book"));
         ////////////////////////
         ///   Written Book   ///

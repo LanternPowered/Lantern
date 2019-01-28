@@ -210,6 +210,7 @@ import org.spongepowered.api.data.manipulator.immutable.item.ImmutableLoreData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableMapItemData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutablePagedData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutablePlaceableData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutablePlainPagedData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableSpawnableData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableStoredEnchantmentData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBannerData;
@@ -372,6 +373,7 @@ import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
 import org.spongepowered.api.data.manipulator.mutable.item.MapItemData;
 import org.spongepowered.api.data.manipulator.mutable.item.PagedData;
 import org.spongepowered.api.data.manipulator.mutable.item.PlaceableData;
+import org.spongepowered.api.data.manipulator.mutable.item.PlainPagedData;
 import org.spongepowered.api.data.manipulator.mutable.item.SpawnableData;
 import org.spongepowered.api.data.manipulator.mutable.item.StoredEnchantmentData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.BannerData;
@@ -893,6 +895,7 @@ public class DataManipulatorRegistry {
         registerList(EnchantmentData.class, ImmutableEnchantmentData.class, Keys.ITEM_ENCHANTMENTS);
         registerList(LoreData.class, ImmutableLoreData.class, Keys.ITEM_LORE);
         registerList(PagedData.class, ImmutablePagedData.class, Keys.BOOK_PAGES);
+        registerList(PlainPagedData.class, ImmutablePlainPagedData.class, Keys.PLAIN_BOOK_PAGES);
         registerList(StoredEnchantmentData.class, ImmutableStoredEnchantmentData.class, Keys.STORED_ENCHANTMENTS);
 
         /// containers with special behavior

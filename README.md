@@ -1,4 +1,4 @@
-# LanternServer [![Build Status](https://travis-ci.org/LanternPowered/LanternServer.svg?branch=master)](https://travis-ci.org/LanternPowered/LanternServer) [![Discord](https://img.shields.io/badge/chat-on%20discord-6E85CF.svg)](https://discord.gg/ArSrsuU)
+# Lantern [![Build Status](https://travis-ci.org/LanternPowered/Lantern.svg?branch=master)](https://travis-ci.org/LanternPowered/Lantern) [![Discord](https://img.shields.io/badge/chat-on%20discord-6E85CF.svg)](https://discord.gg/ArSrsuU)
 
 A open source and compatible Minecraft server that implements the [SpongeAPI]. It is licensed under the [MIT License].
 
@@ -12,8 +12,8 @@ A open source and compatible Minecraft server that implements the [SpongeAPI]. I
 ## Clone
 The following steps will ensure your project is cloned properly.
 
-1. `git clone --recursive https://github.com/LanternPowered/LanternServer.git`
-2. `cd LanternServer`
+1. `git clone --recursive https://github.com/LanternPowered/Lantern.git`
+2. `cd Lantern`
 
 ## Building
 __Note:__ If you do not have [Gradle] installed then use ./gradlew for Unix systems or Git Bash and gradlew.bat for Windows systems in place of any 'gradle' command.

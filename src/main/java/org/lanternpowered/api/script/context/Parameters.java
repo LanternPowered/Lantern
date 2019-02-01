@@ -32,7 +32,7 @@ import org.spongepowered.api.world.Location;
 @SuppressWarnings("unchecked")
 public final class Parameters {
 
-    public static final Parameter<Location<World>> TARGET_LOCATION = DummyObjectProvider.createFor(Parameter.class, "TARGET_LOCATION");
+    public static final Parameter<Location> TARGET_LOCATION = DummyObjectProvider.createFor(Parameter.class, "TARGET_LOCATION");
 
     public static final Parameter<World> WORLD = DummyObjectProvider.createFor(Parameter.class, "WORLD");
 

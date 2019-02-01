@@ -331,7 +331,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
                 final CauseStack causeStack = CauseStack.current();
                 // TODO: Message channel?
                 final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEvent(causeStack.getCurrentCause(),
-                        MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, false);
+                        MessageChannel.TO_NONE, Optional.empty(), this, new MessageEvent.MessageFormatter(), false);
                 postDestructEvent(event);
             }
         }
@@ -460,15 +460,15 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     }
 
     @Override
-    public Location<World> getLocation() {
+    public Location getLocation() {
         checkState(this.world != null, "This entity doesn't have a world.");
-        return new Location<>(this.world, this.position);
+        return new Location(this.world, this.position);
     }
 
     @Override
-    public boolean setLocation(Location<World> location) {
+    public boolean setLocation(Location location) {
         checkNotNull(location, "location");
-        return setPositionAndWorld(location.getExtent(), location.getPosition());
+        return setPositionAndWorld(location.getWorld(), location.getPosition());
     }
 
     @Override
@@ -497,12 +497,12 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     }
 
     @Override
-    public Transform<World> getTransform() {
-        return new Transform<>(this.world, this.position, this.rotation);
+    public Transform getTransform() {
+        return new Transform(this.world, this.position, this.rotation);
     }
 
     @Override
-    public boolean setTransform(Transform<World> transform) {
+    public boolean setTransform(Transform transform) {
         checkNotNull(transform, "transform");
         setLocationAndRotation(transform.getLocation(), transform.getRotation());
         setScale(transform.getScale());
@@ -511,11 +511,11 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     }
 
     @Override
-    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation) {
+    public boolean setLocationAndRotation(Location location, Vector3d rotation) {
         checkNotNull(location, "location");
         checkNotNull(rotation, "rotation");
 
-        setWorld((LanternWorld) location.getExtent());
+        setWorld((LanternWorld) location.getWorld());
         setRawPosition(location.getPosition());
         setRawRotation(rotation);
         // TODO: Events
@@ -523,12 +523,12 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     }
 
     @Override
-    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+    public boolean setLocationAndRotation(Location location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
         checkNotNull(location, "location");
         checkNotNull(rotation, "rotation");
         checkNotNull(relativePositions, "relativePositions");
 
-        final World world = location.getExtent();
+        final World world = location.getWorld();
         final Vector3d pos = location.getPosition();
 
         double x = pos.getX();
@@ -753,8 +753,8 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.pushCause(damageSource);
             frame.addContext(EventContextKeys.DAMAGE_TYPE, damageSource.getType());
-            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(),
-                    damageFunctions.stream().map(Tuple::getFirst).collect(Collectors.toList()), this, damage);
+            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(), this,
+                    damageFunctions.stream().map(Tuple::getFirst).collect(Collectors.toList()), damage);
             event.setCancelled(cancelled);
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {
@@ -819,7 +819,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
             frame.addContext(LanternEventContextKeys.HEALING_TYPE, source.getHealingType());
 
             final HealEntityEvent event = SpongeEventFactory.createHealEntityEvent(
-                    frame.getCurrentCause(), new ArrayList<>(), this, amount);
+                    frame.getCurrentCause(), this, new ArrayList<>(), amount);
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {
                 return false;

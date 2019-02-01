@@ -48,7 +48,7 @@ public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final Location location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         BlockState state = location.getBlock();
         final int notePitch = (state.getTraitValue(LanternIntegerTraits.NOTE).get() + 1) % 25;
         state = state.withTrait(LanternIntegerTraits.NOTE, notePitch).get();
@@ -58,11 +58,11 @@ public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
         final InstrumentType instrumentType = location.getBlockRelative(Direction.DOWN).getProperty(InstrumentProperty.class)
                 .map(InstrumentProperty::getValue).orElse(InstrumentTypes.HARP);
         // Trigger the note play effect
-        ((LanternWorld) location.getExtent()).addBlockAction(
+        ((LanternWorld) location.getWorld()).addBlockAction(
                 location.getBlockPosition(), state.getType(), PlayNoteAction.INSTANCE);
         // Calculate the pitch value based on the note pitch
         final double pitch = Math.pow(2.0, ((double) notePitch - 12.0) / 12.0);
-        location.getExtent().playSound(instrumentType.getSound(), SoundCategories.BLOCK,
+        location.getWorld().playSound(instrumentType.getSound(), SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 3.0, pitch);
         context.addBlockChange(BlockSnapshot.builder()
                 .from(location)

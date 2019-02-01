@@ -41,7 +41,7 @@ public class ConstantObjectProvider<T> implements ObjectProvider<T> {
     }
 
     @Override
-    public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
+    public T get(BlockState blockState, @Nullable Location location, @Nullable Direction face) {
         return this.value;
     }
 }

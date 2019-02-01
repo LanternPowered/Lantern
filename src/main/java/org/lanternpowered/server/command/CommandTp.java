@@ -90,9 +90,9 @@ public final class CommandTp extends CommandProvider {
                         src.sendMessage(t("commands.tp.success", target.getName(), destination.getName()));
                     } else {
                         final RelativeVector3d coords = args.<RelativeVector3d>getOne("coordinates").get();
-                        final Transform<World> transform = target.getTransform();
+                        final Transform transform = target.getTransform();
                         World world = args.<WorldProperties>getOne(CommandHelper.WORLD_KEY)
-                                .flatMap(p -> Lantern.getServer().getWorld(p.getUniqueId())).orElse(transform.getExtent());
+                                .flatMap(p -> Lantern.getServer().getWorld(p.getUniqueId())).orElse(transform.getWorld());
                         Vector3d position = coords.applyToValue(transform.getPosition());
 
                         final Optional<RelativeDouble> optYRot = args.getOne("y-rot");

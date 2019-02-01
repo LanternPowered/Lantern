@@ -103,7 +103,7 @@ import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.scheduler.AsynchronousExecutor;
 import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.util.metric.MetricsConfigManager;
@@ -274,9 +274,9 @@ public class LanternModule extends PrivateModule {
                 .toProvider(PluginContainerProvider.class);
 
         // Sponge Executor Services
-        bindAndExpose(SpongeExecutorService.class, SynchronousExecutor.class)
+        bindAndExpose(TaskExecutorService.class, SynchronousExecutor.class)
                 .toProvider(SpongeExecutorServiceProvider.Synchronous.class);
-        bindAndExpose(SpongeExecutorService.class, AsynchronousExecutor.class)
+        bindAndExpose(TaskExecutorService.class, AsynchronousExecutor.class)
                 .toProvider(SpongeExecutorServiceProvider.Asynchronous.class);
     }
 

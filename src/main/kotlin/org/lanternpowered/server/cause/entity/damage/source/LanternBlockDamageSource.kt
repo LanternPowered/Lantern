@@ -32,10 +32,10 @@ import org.spongepowered.api.world.World
 
 internal class LanternBlockDamageSource(
         builder: LanternBlockDamageSourceBuilder,
-        private val location: Location<World>,
+        private val location: Location,
         private val blockSnapshot: BlockSnapshot
 ) : LanternDamageSource(builder), BlockDamageSource {
 
-    override fun getLocation(): Location<World> = this.location
+    override fun getLocation(): Location = this.location
     override fun getBlockSnapshot(): BlockSnapshot = this.blockSnapshot
 }

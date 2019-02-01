@@ -426,7 +426,7 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
         final Collection<TileEntity> tileEntities = this.extent.getTileEntities();
         for (Iterator<TileEntity> iterator = tileEntities.iterator(); iterator.hasNext(); ) {
             final TileEntity tileEntity = iterator.next();
-            final Location<World> block = tileEntity.getLocation();
+            final Location block = tileEntity.getLocation();
             if (!VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.blockMin, this.blockMax)) {
                 iterator.remove();
             }
@@ -438,7 +438,7 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
         return this.extent.getTileEntities(Functional.predicateAnd(input -> {
-            final Location<World> block = input.getLocation();
+            final Location block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.blockMin, this.blockMax);
         }, filter));
     }
@@ -451,7 +451,7 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     @Override
     public boolean spawnEntity(Entity entity) {
-        final Location<World> location = entity.getLocation();
+        final Location location = entity.getLocation();
         checkRange(location.getX(), location.getY(), location.getZ());
         return this.extent.spawnEntity(entity);
     }
@@ -562,7 +562,7 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
+    public Extent getWorldView(Vector3i newMin, Vector3i newMax) {
         checkSoftRange(newMin);
         checkSoftRange(newMax);
         return new SoftBufferExtentViewDownsize(this.extent, newMin, newMax, newMin.add(this.hardBlockMin.sub(this.blockMin)),

@@ -30,8 +30,8 @@ import com.google.common.collect.Iterables;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.function.Predicate;
@@ -52,12 +52,12 @@ public abstract class LanternBlockTrait<T extends Comparable<T>, V> extends Defa
         }
     };
 
-    private final Key<? extends Value<V>> valueKey;
+    private final Key<? extends BaseValue<V>> valueKey;
     private final ImmutableCollection<T> possibleValues;
     private final Class<T> valueClass;
     private final KeyTraitValueTransformer<T, V> keyTraitValueTransformer;
 
-    LanternBlockTrait(CatalogKey key, Key<? extends Value<V>> valueKey, Class<T> valueClass, ImmutableCollection<T> possibleValues,
+    LanternBlockTrait(CatalogKey key, Key<? extends BaseValue<V>> valueKey, Class<T> valueClass, ImmutableCollection<T> possibleValues,
             @Nullable KeyTraitValueTransformer<T, V> keyTraitValueTransformer) {
         super(key);
         this.keyTraitValueTransformer = keyTraitValueTransformer == null ? DEFAULT_TRANSFORMER : keyTraitValueTransformer;

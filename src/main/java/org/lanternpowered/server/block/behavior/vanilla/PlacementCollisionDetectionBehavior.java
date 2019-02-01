@@ -51,18 +51,18 @@ public class PlacementCollisionDetectionBehavior implements PlaceBlockBehavior, 
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final Collection<BlockSnapshot> snapshots = context.getBlockSnapshots();
         for (BlockSnapshot snapshot : snapshots) {
-            final Optional<Location<World>> optLoc = snapshot.getLocation();
+            final Optional<Location> optLoc = snapshot.getLocation();
             if (!optLoc.isPresent()) {
                 continue;
             }
-            final Location<World> loc = optLoc.get();
+            final Location loc = optLoc.get();
             final BlockState blockState = snapshot.getState();
             final ObjectProvider<Collection<AABB>> collisionBoxesProvider =
                     ((LanternBlockType) blockState.getType()).getCollisionBoxesProvider();
             if (collisionBoxesProvider != null) {
                 final Collection<AABB> collisionBoxes = collisionBoxesProvider.get(blockState, null, null);
                 for (AABB collisionBox : collisionBoxes) {
-                    if (((IExtent) loc.getExtent()).hasIntersectingEntities(collisionBox.offset(loc.getBlockPosition()),
+                    if (((IExtent) loc.getWorld()).hasIntersectingEntities(collisionBox.offset(loc.getBlockPosition()),
                             entity -> !(entity instanceof Item || entity instanceof ExperienceOrb))) { // TODO: Configure this filter somewhere?
                         return BehaviorResult.FAIL;
                     }

@@ -82,7 +82,7 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public TileEntityArchetype.Builder from(Location<World> location) {
+    public TileEntityArchetype.Builder from(Location location) {
         return tile(location.getTileEntity().orElseThrow(
                 () -> new IllegalArgumentException("There is no tile entity available at the provided location: " + location)));
     }

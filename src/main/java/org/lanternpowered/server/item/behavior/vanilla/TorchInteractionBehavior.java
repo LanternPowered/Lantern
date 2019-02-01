@@ -69,7 +69,7 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
     }
 
     @Nullable
-    private BlockSnapshotBuilder tryPlaceAt(LanternPlayer player, Location<World> location) {
+    private BlockSnapshotBuilder tryPlaceAt(LanternPlayer player, Location location) {
         Direction facing;
         if (player != null) {
             facing = player.getDirection(Direction.Division.CARDINAL).getOpposite();
@@ -81,13 +81,13 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
             facing = Direction.UP;
         }
         Direction direction = null;
-        if (facing == Direction.UP && location.getExtent().getProperty(
+        if (facing == Direction.UP && location.getWorld().getProperty(
                 location.getBlockRelative(Direction.DOWN).getBlockPosition(), Direction.UP, SolidSideProperty.class).get().getValue()) {
             direction = Direction.UP;
         }
         if (direction == null) {
             for (Direction dir : getHorizontalDirections(player.getHorizontalDirectionVector())) {
-                if (location.getExtent().getProperty(location.getBlockRelative(dir.getOpposite()).getBlockPosition(),
+                if (location.getWorld().getProperty(location.getBlockRelative(dir.getOpposite()).getBlockPosition(),
                         dir, SolidSideProperty.class).get().getValue()) {
                     direction = dir;
                     break;
@@ -115,15 +115,15 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
         final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE).getOpposite();
         final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
         BlockSnapshotBuilder builder = null;
-        Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
+        Location location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         // Check if the block can be replaced
-        if (location.getExtent().getProperty(location.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
+        if (location.getWorld().getProperty(location.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
             builder = tryPlaceAt(player, location);
         } else {
-            final Location<World> relLocation = location.getBlockRelative(face.getOpposite());
-            if (relLocation.getExtent().getProperty(relLocation.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
+            final Location relLocation = location.getBlockRelative(face.getOpposite());
+            if (relLocation.getWorld().getProperty(relLocation.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
                 // Check if the clicked face is solid, if so, place the block there
-                if (face != Direction.UP && location.getExtent().getProperty(
+                if (face != Direction.UP && location.getWorld().getProperty(
                         location.getBlockPosition(), face, SolidSideProperty.class).get().getValue()) {
                     builder = createBuilder(face.getOpposite());
                 } else {

@@ -38,12 +38,12 @@ public final class EmptyPortalAgent extends LanternPortalAgent {
     }
 
     @Override
-    public Optional<Location<World>> findPortal(Location<World> targetLocation) {
+    public Optional<Location> findPortal(Location targetLocation) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Location<World>> createPortal(Location<World> targetLocation) {
+    public Optional<Location> createPortal(Location targetLocation) {
         return Optional.empty();
     }
 }

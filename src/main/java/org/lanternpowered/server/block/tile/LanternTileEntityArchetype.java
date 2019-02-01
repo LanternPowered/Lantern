@@ -33,7 +33,6 @@ import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.world.WeakWorldReferencedLocation;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -43,7 +42,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -97,7 +95,7 @@ public class LanternTileEntityArchetype implements TileEntityArchetype, Abstract
     }
 
     @Override
-    public Optional<TileEntity> apply(Location<World> location) {
+    public Optional<TileEntity> apply(Location location) {
         checkNotNull(location, "location");
         final BlockState locState = location.getBlock();
         final BlockState archetypeState = getState();
@@ -113,16 +111,15 @@ public class LanternTileEntityArchetype implements TileEntityArchetype, Abstract
     }
 
     @Override
-    public BlockSnapshot toSnapshot(Location<World> location) {
+    public BlockSnapshot toSnapshot(Location location) {
         BlockState blockState = this.tileEntity.blockState;
         if (blockState == null) {
             blockState = getTileEntityType().getDefaultBlock();
         }
         final Vector3i pos = location.getBlockPosition();
-        final UUID notifier = location.getExtent().getNotifier(pos).orElse(null);
-        final UUID creator = location.getExtent().getCreator(pos).orElse(null);
-        return new LanternBlockSnapshot(new WeakWorldReferencedLocation(location), blockState,
-                creator, notifier, copy(this.tileEntity));
+        final UUID notifier = location.getWorld().getNotifier(pos).orElse(null);
+        final UUID creator = location.getWorld().getCreator(pos).orElse(null);
+        return new LanternBlockSnapshot(location, blockState, creator, notifier, copy(this.tileEntity));
     }
 
     public static LanternTileEntity copy(LanternTileEntity tileEntity) {

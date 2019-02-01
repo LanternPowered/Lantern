@@ -49,13 +49,13 @@ public abstract class InteractWithBlockItemBaseBehavior implements InteractWithI
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Location<World>> optLocation = context.getContext(ContextKeys.INTERACTION_LOCATION);
+        final Optional<Location> optLocation = context.getContext(ContextKeys.INTERACTION_LOCATION);
         if (!optLocation.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
 
         final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get();
-        Location<World> location = optLocation.get();
+        Location location = optLocation.get();
         if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
             location = location.add(blockFace.asBlockOffset());
         }
@@ -66,8 +66,8 @@ public abstract class InteractWithBlockItemBaseBehavior implements InteractWithI
 
         if (success) {
             for (BlockSnapshot blockSnapshot : context.getBlockSnapshots()) {
-                final Location<World> location1 = blockSnapshot.getLocation().get();
-                final int buildHeight = location1.getExtent().getDimension().getBuildHeight();
+                final Location location1 = blockSnapshot.getLocation().get();
+                final int buildHeight = location1.getWorld().getDimension().getBuildHeight();
                 // Check if the block is placed within the building limits
                 if (location1.getBlockY() >= buildHeight) {
                     context.popSnapshot(snapshot);

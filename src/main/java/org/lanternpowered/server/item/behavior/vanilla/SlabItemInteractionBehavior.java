@@ -51,7 +51,7 @@ import javax.annotation.Nullable;
 public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
 
     @Nullable
-    private BlockSnapshotBuilder tryPlaceSlabAt(Location<World> location, Direction blockFace,
+    private BlockSnapshotBuilder tryPlaceSlabAt(Location location, Direction blockFace,
             LanternBlockType blockType) {
         BlockState state = location.getBlock();
         // There is already a half/double slab placed
@@ -98,12 +98,12 @@ public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Optional<Location<World>> optLocation = context.getContext(ContextKeys.INTERACTION_LOCATION);
+        final Optional<Location> optLocation = context.getContext(ContextKeys.INTERACTION_LOCATION);
         if (!optLocation.isPresent()) {
             return BehaviorResult.CONTINUE;
         }
 
-        Location<World> location = optLocation.get();
+        Location location = optLocation.get();
 
         final Direction blockFace = context.getContext(ContextKeys.INTERACTION_FACE).get();
         final LanternBlockType blockType = (LanternBlockType) context.getContext(ContextKeys.ITEM_TYPE).get().getBlock().get();

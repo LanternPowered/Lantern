@@ -48,7 +48,7 @@ import org.lanternpowered.server.util.PrettyPrinter;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.io.IOException;
@@ -57,7 +57,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
@@ -77,7 +76,7 @@ public final class ConsoleManager extends SimpleTerminalConsole {
     private final CommandManager commandManager;
     private final PluginContainer pluginContainer;
 
-    private final SpongeExecutorService syncExecutor;
+    private final TaskExecutorService syncExecutor;
     private final Object lock = new Object();
 
     private volatile boolean active;

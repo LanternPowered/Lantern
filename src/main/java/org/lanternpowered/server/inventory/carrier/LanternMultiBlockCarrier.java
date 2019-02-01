@@ -47,13 +47,13 @@ import java.util.Optional;
 public class LanternMultiBlockCarrier<T extends CarriedInventory<?>> extends AbstractCarrier<T>
         implements MultiBlockCarrier {
 
-    private final Location<World> mainLocation;
-    private final Map<Location<World>, BlockCarrier> carriers;
+    private final Location mainLocation;
+    private final Map<Location, BlockCarrier> carriers;
 
     public LanternMultiBlockCarrier(List<BlockCarrier> carriers) {
         checkState(carriers.size() > 0, "At least one block carrier must be present");
         this.mainLocation = carriers.get(0).getLocation();
-        final ImmutableMap.Builder<Location<World>, BlockCarrier> builder = ImmutableMap.builder();
+        final ImmutableMap.Builder<Location, BlockCarrier> builder = ImmutableMap.builder();
         for (BlockCarrier carrier : carriers) {
             builder.put(carrier.getLocation(), carrier);
         }
@@ -61,19 +61,19 @@ public class LanternMultiBlockCarrier<T extends CarriedInventory<?>> extends Abs
     }
 
     @Override
-    public List<Location<World>> getLocations() {
+    public List<Location> getLocations() {
         return ImmutableList.copyOf(this.carriers.keySet());
     }
 
     @Override
-    public Optional<Inventory> getInventory(Location<World> at) {
+    public Optional<Inventory> getInventory(Location at) {
         checkNotNull(at, "at");
         final BlockCarrier carrier = this.carriers.get(at);
         return carrier == null ? Optional.empty() : Optional.of(carrier.getInventory());
     }
 
     @Override
-    public Optional<Inventory> getInventory(Location<World> at, Direction from) {
+    public Optional<Inventory> getInventory(Location at, Direction from) {
         checkNotNull(at, "at");
         checkNotNull(from, "from");
         final BlockCarrier carrier = this.carriers.get(at);
@@ -81,7 +81,7 @@ public class LanternMultiBlockCarrier<T extends CarriedInventory<?>> extends Abs
     }
 
     @Override
-    public Location<World> getLocation() {
+    public Location getLocation() {
         return this.mainLocation;
     }
 

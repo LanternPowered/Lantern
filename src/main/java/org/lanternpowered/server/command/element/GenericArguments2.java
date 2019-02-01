@@ -458,7 +458,7 @@ public final class GenericArguments2 {
         return delegateCompleter(vector3d(key), new Vector3dElementCompleter() {
 
             private List<String> complete(CommandContext context, Function<Vector3d, Double> function) {
-                final Optional<Location<World>> location = context.<Location<World>>getOne(CommandContext.TARGET_BLOCK_ARG);
+                final Optional<Location> location = context.<Location>getOne(CommandContext.TARGET_BLOCK_ARG);
                 if (location.isPresent() || defaultValue != null) {
                     final Vector3d pos = location.map(Location::getPosition).orElse(defaultValue);
                     return Collections.singletonList(Double.toString(function.apply(pos)));
@@ -487,7 +487,7 @@ public final class GenericArguments2 {
         return delegateCompleter(relativeVector3d(key), new Vector3dElementCompleter() {
 
             private List<String> complete(CommandContext context, Function<Vector3d, Double> function) {
-                final Optional<Location<World>> location = context.<Location<World>>getOne(CommandContext.TARGET_BLOCK_ARG);
+                final Optional<Location> location = context.<Location>getOne(CommandContext.TARGET_BLOCK_ARG);
                 if (location.isPresent() || defaultValue != null) {
                     final Vector3d pos = location.map(Location::getPosition).orElse(defaultValue);
                     return Collections.singletonList(Double.toString(function.apply(pos)));
@@ -521,7 +521,7 @@ public final class GenericArguments2 {
 
             private List<String> complete(CommandContext context, Function<Vector3d, Double> function,
                     @Nullable RelativeDouble defaultValue) {
-                final Optional<Location<World>> location = context.<Location<World>>getOne(CommandContext.TARGET_BLOCK_ARG);
+                final Optional<Location> location = context.<Location>getOne(CommandContext.TARGET_BLOCK_ARG);
                 if (location.isPresent() || defaultValue != null) {
                     return Collections.singletonList(location.isPresent() ? Double.toString(
                             function.apply(location.get().getPosition())) : relativeDoubleToString(defaultValue));

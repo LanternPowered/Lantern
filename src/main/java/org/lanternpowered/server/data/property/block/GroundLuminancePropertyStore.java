@@ -51,11 +51,11 @@ public final class GroundLuminancePropertyStore extends AbstractBlockPropertySto
     }
 
     @Override
-    protected Optional<GroundLuminanceProperty> getFor(BlockState blockState, @Nullable Location<World> location, @Nullable Direction direction) {
+    protected Optional<GroundLuminanceProperty> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction) {
         if (location == null) {
             return Optional.empty();
         }
-        final Optional<Chunk> optChunk = location.getExtent().getChunk(location.getChunkPosition());
+        final Optional<Chunk> optChunk = location.getWorld().getChunk(location.getChunkPosition());
         return optChunk.flatMap(chunk -> this.lookup[((LanternChunk) chunk).getBlockLight(
                 location.getBlockX(), location.getBlockY(), location.getBlockZ())]);
     }

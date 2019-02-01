@@ -54,7 +54,7 @@ public class OpenableDoorInteractionBehavior extends OpenableInteractionBehavior
             return result;
         }
 
-        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final BlockState baseState = location.getBlock();
         final LanternDoorHalf half = baseState.get(LanternKeys.DOOR_HALF).orElse(null);
         if (half == null) {
@@ -63,7 +63,7 @@ public class OpenableDoorInteractionBehavior extends OpenableInteractionBehavior
 
         final Direction dir = half == LanternDoorHalf.LOWER ? Direction.UP : Direction.DOWN;
         final LanternDoorHalf other = half == LanternDoorHalf.LOWER ? LanternDoorHalf.UPPER : LanternDoorHalf.LOWER;
-        final Location<World> loc = location.getBlockRelative(dir);
+        final Location loc = location.getBlockRelative(dir);
 
         BlockState otherState = loc.getBlock();
         if (otherState.get(LanternKeys.DOOR_HALF).orElse(null) == other &&

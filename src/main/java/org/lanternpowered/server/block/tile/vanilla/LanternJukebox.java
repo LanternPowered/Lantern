@@ -66,11 +66,11 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
             return;
         }
         this.playing = true;
-        final Location<World> location = getLocation();
+        final Location location = getLocation();
         final MusicDiscProperty property = recordItem.getProperty(MusicDiscProperty.class).orElse(null);
         final MusicDisc musicDisc = property == null ? null : property.getValue();
         if (musicDisc != null) {
-            location.getExtent().playMusicDisc(location.getBlockPosition(), musicDisc);
+            location.getWorld().playMusicDisc(location.getBlockPosition(), musicDisc);
         }
     }
 
@@ -80,8 +80,8 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
             return;
         }
         this.playing = false;
-        final Location<World> location = getLocation();
-        location.getExtent().stopMusicDisc(location.getBlockPosition());
+        final Location location = getLocation();
+        location.getWorld().stopMusicDisc(location.getBlockPosition());
     }
 
     @Override
@@ -90,7 +90,7 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
     }
 
     private void updateBlockState() {
-        final Location<World> location = getLocation();
+        final Location location = getLocation();
         final BlockState block = location.getBlock();
         location.setBlock(block.withTrait(LanternBooleanTraits.HAS_MUSIC_DISC, this.inventory.getRawItemStack() != null).orElse(block));
     }
@@ -107,9 +107,9 @@ public final class LanternJukebox extends LanternTileEntity implements Jukebox, 
             return Optional.empty();
         }
         stop();
-        final Location<World> location = getLocation();
+        final Location location = getLocation();
         final Vector3d entityPosition = location.getBlockPosition().toDouble().add(0.5, 0.9, 0.5);
-        final Entity item = location.getExtent().createEntity(EntityTypes.ITEM, entityPosition);
+        final Entity item = location.getWorld().createEntity(EntityTypes.ITEM, entityPosition);
         item.offer(Keys.VELOCITY, new Vector3d(0, 0.1, 0));
         item.offer(Keys.REPRESENTED_ITEM, recordItem.createSnapshot());
         this.inventory.clear();

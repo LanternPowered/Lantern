@@ -26,7 +26,7 @@
 package org.lanternpowered.server.scheduler;
 
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.HashSet;
@@ -39,17 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 abstract class SchedulerBase {
 
     // The simple queue of all pending (and running) ScheduledTasks
-    private final Map<UUID, ScheduledTask> taskMap = new ConcurrentHashMap<>();
-    private long sequenceNumber = 0L;
-    private final String taskNameFmt;
-
-    protected SchedulerBase(ScheduledTask.TaskSynchronicity type) {
-        this.taskNameFmt = "%s-" + (type == ScheduledTask.TaskSynchronicity.SYNCHRONOUS ? "S" : "A") + "-%d";
-    }
-
-    protected String nextName(PluginContainer plugin) {
-        return String.format(this.taskNameFmt, plugin.getId(), this.sequenceNumber++);
-    }
+    private final Map<UUID, LanternScheduledTask> taskMap = new ConcurrentHashMap<>();
 
     /**
      * Gets the timestamp to update the timestamp of a task. This method is task
@@ -62,9 +52,15 @@ abstract class SchedulerBase {
      * @param task The task
      * @return Timestamp for the task
      */
-    protected long getTimestamp(ScheduledTask task) {
+    protected long getTimestamp(LanternScheduledTask task) {
         // Supports wall clock time by default
         return System.nanoTime();
+    }
+
+    protected LanternScheduledTask submit(Task task) {
+        final LanternScheduledTask scheduledTask = new LanternScheduledTask(task);
+        addTask(scheduledTask);
+        return scheduledTask;
     }
 
     /**
@@ -73,7 +69,7 @@ abstract class SchedulerBase {
      *
      * @param task The task to add
      */
-    protected void addTask(ScheduledTask task) {
+    protected void addTask(LanternScheduledTask task) {
         task.setTimestamp(this.getTimestamp(task));
         this.taskMap.put(task.getUniqueId(), task);
     }
@@ -83,15 +79,15 @@ abstract class SchedulerBase {
      *
      * @param task The task to remove
      */
-    protected void removeTask(ScheduledTask task) {
+    protected void removeTask(LanternScheduledTask task) {
         this.taskMap.remove(task.getUniqueId());
     }
 
-    protected Optional<Task> getTask(UUID id) {
+    protected Optional<ScheduledTask> getTask(UUID id) {
         return Optional.ofNullable(this.taskMap.get(id));
     }
 
-    protected Set<Task> getScheduledTasks() {
+    protected Set<ScheduledTask> getScheduledTasks() {
         synchronized (this.taskMap) {
             return new HashSet<>(this.taskMap.values());
         }
@@ -130,56 +126,56 @@ abstract class SchedulerBase {
     }
 
     /**
-     * Processes the task.
+     * Processes the scheduled task.
      *
-     * @param task The task to process
+     * @param scheduled The scheduled task to process
      */
-    protected void processTask(ScheduledTask task) {
+    protected void processTask(LanternScheduledTask scheduled) {
         // If the task is now slated to be cancelled, we just remove it as if it
         // no longer exists.
-        if (task.getState() == ScheduledTask.ScheduledTaskState.CANCELED) {
-            removeTask(task);
+        if (scheduled.getState() == LanternScheduledTask.ScheduledTaskState.CANCELED) {
+            removeTask(scheduled);
             return;
         }
         long threshold = Long.MAX_VALUE;
         // Figure out if we start a delayed Task after threshold ticks or, start
-        // it after the interval (period) of the repeating task parameter.
-        if (task.getState() == ScheduledTask.ScheduledTaskState.WAITING) {
-            threshold = task.offset;
-        } else if (task.getState() == ScheduledTask.ScheduledTaskState.RUNNING) {
-            threshold = task.period;
+        // it after the interval (interval) of the repeating task parameter.
+        if (scheduled.getState() == LanternScheduledTask.ScheduledTaskState.WAITING) {
+            threshold = scheduled.task.delay;
+        } else if (scheduled.getState() == LanternScheduledTask.ScheduledTaskState.RUNNING) {
+            threshold = scheduled.task.interval;
         }
         // This moment is 'now'
-        long now = getTimestamp(task);
+        long now = getTimestamp(scheduled);
         // So, if the current time minus the timestamp of the task is greater
         // than the delay to wait before starting the task, then start the task.
         // Repeating tasks get a reset-timestamp each time they are set RUNNING
-        // If the task has a period of 0 (zero) this task will not repeat, and
+        // If the task has a interval of 0 (zero) this task will not repeat, and
         // is removed after we start it.
-        if (threshold <= (now - task.getTimestamp())) {
-            task.setState(ScheduledTask.ScheduledTaskState.SWITCHING);
-            task.setTimestamp(getTimestamp(task));
-            startTask(task);
+        if (threshold <= (now - scheduled.getTimestamp())) {
+            scheduled.setState(LanternScheduledTask.ScheduledTaskState.SWITCHING);
+            scheduled.setTimestamp(getTimestamp(scheduled));
+            startTask(scheduled);
             // If task is one time shot, remove it from the map.
-            if (task.period == 0L) {
-                removeTask(task);
+            if (scheduled.task.interval == 0L) {
+                removeTask(scheduled);
             }
         }
     }
 
     /**
-     * Begin the execution of a task. Exceptions are caught and logged.
+     * Begin the execution of a scheduled task. Exceptions are caught and logged.
      *
-     * @param task The task to start
+     * @param scheduled The scheduled task to start
      */
-    protected void startTask(final ScheduledTask task) {
-        executeTaskRunnable(task, () -> {
-            task.setState(ScheduledTask.ScheduledTaskState.RUNNING);
+    protected void startTask(final LanternScheduledTask scheduled) {
+        executeTaskRunnable(scheduled, () -> {
+            scheduled.setState(LanternScheduledTask.ScheduledTaskState.RUNNING);
             try {
-                task.getConsumer().accept(task);
+                scheduled.task.getConsumer().accept(scheduled);
             } catch (Throwable t) {
                 Lantern.getLogger().error("The Scheduler tried to run the task {} owned by {}, but an error occurred.",
-                        task.getName(), task.getOwner(), t);
+                        scheduled.getName(), scheduled.task.getOwner(), t);
             }
         });
     }
@@ -189,6 +185,6 @@ abstract class SchedulerBase {
      *
      * @param runnable The runnable to run
      */
-    protected abstract void executeTaskRunnable(ScheduledTask task, Runnable runnable);
+    protected abstract void executeTaskRunnable(LanternScheduledTask task, Runnable runnable);
 
 }

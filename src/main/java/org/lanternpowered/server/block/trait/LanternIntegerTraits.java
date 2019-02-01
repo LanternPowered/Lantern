@@ -28,21 +28,22 @@ package org.lanternpowered.server.block.trait;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
+import org.lanternpowered.server.state.LanternIntStateProperty;
 import org.spongepowered.api.block.trait.IntegerTrait;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.NotePitch;
 
 public final class LanternIntegerTraits {
 
-    public static final IntegerTrait SAPLING_GROWTH_STAGE = LanternIntegerTrait.minecraft("stage", Keys.GROWTH_STAGE, 0, 1);
+    public static final IntegerTrait SAPLING_GROWTH_STAGE = LanternIntStateProperty.Companion.minecraft("stage", Keys.GROWTH_STAGE, 0, 1);
 
-    public static final IntegerTrait POWER = LanternIntegerTrait.minecraftRange("power", Keys.POWER, 0, 15);
+    public static final IntegerTrait POWER = LanternIntStateProperty.Companion.minecraftRange("power", Keys.POWER, 0, 15);
 
-    public static final IntegerTrait MOISTURE = LanternIntegerTrait.minecraftRange("moisture", Keys.MOISTURE, 0, 7);
+    public static final IntegerTrait MOISTURE = LanternIntStateProperty.Companion.minecraftRange("moisture", Keys.MOISTURE, 0, 7);
 
-    public static final IntegerTrait ROTATION = LanternIntegerTrait.minecraftRange("rotation", LanternKeys.FINE_ROTATION, 0, 15);
+    public static final IntegerTrait ROTATION = LanternIntStateProperty.Companion.minecraftRange("rotation", LanternKeys.FINE_ROTATION, 0, 15);
 
-    public static final IntegerTrait NOTE = LanternIntegerTrait.minecraftRangeTransformed("note", Keys.NOTE_PITCH,
+    public static final IntegerTrait NOTE = LanternIntStateProperty.Companion.minecraftRangeTransformed("note", Keys.NOTE_PITCH,
             new KeyTraitValueTransformer<Integer, NotePitch>() {
                 @Override
                 public NotePitch toKeyValue(Integer traitValue) {
@@ -54,7 +55,7 @@ public final class LanternIntegerTraits {
                 }
             }, 0, 24);
 
-    public static final IntegerTrait DECAY_DISTANCE = LanternIntegerTrait.minecraftRange("moisture", Keys.MOISTURE, 1, 7);
+    public static final IntegerTrait DECAY_DISTANCE = LanternIntStateProperty.Companion.minecraftRange("moisture", Keys.MOISTURE, 1, 7);
 
     private LanternIntegerTraits() {
     }

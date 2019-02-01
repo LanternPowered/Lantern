@@ -25,36 +25,27 @@
  */
 package org.lanternpowered.server.scheduler;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.lanternpowered.server.util.ToStringHelper;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * An internal representation of a {@link Task} created by a plugin.
  */
-public class ScheduledTask implements Task {
+public class LanternScheduledTask implements ScheduledTask {
 
-    final long offset;
-    final long period;
-    final boolean delayIsTicks;
-    final boolean intervalIsTicks;
-    private final PluginContainer owner;
-    private final Consumer<Task> executor;
-    private long timestamp;
-    private ScheduledTaskState state;
-    private final UUID id;
+    private final UUID uniqueId;
+    final LanternTask task;
     private final String name;
-    final TaskSynchronicity syncType;
-    private final String stringRepresentation;
+    private long timestamp;
+    private ScheduledTaskState state = ScheduledTaskState.WAITING;
 
     // Internal Task state. Not for user-service use.
     public enum ScheduledTaskState {
         /**
-         * Never ran before, waiting for the offset to pass.
+         * Never ran before, waiting for the delay to pass.
          */
         WAITING(false),
         /**
@@ -77,71 +68,15 @@ public class ScheduledTask implements Task {
         }
     }
 
-    ScheduledTask(TaskSynchronicity syncType, Consumer<Task> executor, String taskName, long delay, boolean delayIsTicks, long interval,
-            boolean intervalIsTicks, PluginContainer pluginContainer) {
-        // All tasks begin waiting.
-        this.setState(ScheduledTaskState.WAITING);
-        this.offset = delay;
-        this.delayIsTicks = delayIsTicks;
-        this.period = interval;
-        this.intervalIsTicks = intervalIsTicks;
-        this.owner = pluginContainer;
-        this.executor = executor;
-        this.id = UUID.randomUUID();
-        this.name = taskName;
-        this.syncType = syncType;
-
-        this.stringRepresentation = MoreObjects.toStringHelper(this)
-                .add("name", this.name)
-                .add("delay", this.offset)
-                .add("interval", this.period)
-                .add("owner", this.owner)
-                .add("id", this.id)
-                .add("isAsync", this.isAsynchronous())
-                .toString();
-    }
-
-    @Override
-    public PluginContainer getOwner() {
-        return this.owner;
-    }
-
-    @Override
-    public long getDelay() {
-        if (this.delayIsTicks) {
-            return this.offset;
-        } else {
-            return TimeUnit.NANOSECONDS.toMillis(this.offset);
-        }
-    }
-
-    @Override
-    public long getInterval() {
-        if (this.intervalIsTicks) {
-            return this.period;
-        } else {
-            return TimeUnit.NANOSECONDS.toMillis(this.period);
-        }
-    }
-
-    @Override
-    public boolean cancel() {
-        boolean success = false;
-        if (this.getState() != ScheduledTask.ScheduledTaskState.RUNNING) {
-            success = true;
-        }
-        this.setState(ScheduledTask.ScheduledTaskState.CANCELED);
-        return success;
-    }
-
-    @Override
-    public Consumer<Task> getConsumer() {
-        return this.executor;
+    LanternScheduledTask(Task task) {
+        this.uniqueId = UUID.randomUUID();
+        this.task = (LanternTask) task;
+        this.name = task.getName() + "-" + this.task.scheduledCounter.incrementAndGet();
     }
 
     @Override
     public UUID getUniqueId() {
-        return this.id;
+        return this.uniqueId;
     }
 
     @Override
@@ -150,22 +85,32 @@ public class ScheduledTask implements Task {
     }
 
     @Override
-    public boolean isAsynchronous() {
-        return this.syncType == TaskSynchronicity.ASYNCHRONOUS;
+    public Task getTask() {
+        return this.task;
+    }
+
+    @Override
+    public boolean cancel() {
+        boolean success = false;
+        if (this.getState() != LanternScheduledTask.ScheduledTaskState.RUNNING) {
+            success = true;
+        }
+        this.setState(LanternScheduledTask.ScheduledTaskState.CANCELED);
+        return success;
     }
 
     /**
      * Returns a timestamp after which the next execution will take place.
      * Should only be compared to
-     * {@link SchedulerBase#getTimestamp(ScheduledTask)}.
+     * {@link SchedulerBase#getTimestamp(LanternScheduledTask)}.
      *
      * @return The next execution timestamp
     */
     long nextExecutionTimestamp() {
         if (this.state.isActive) {
-            return this.timestamp + this.period;
+            return this.timestamp + this.task.interval;
         } else {
-            return this.timestamp + this.offset;
+            return this.timestamp + this.task.delay;
         }
     }
 
@@ -187,11 +132,10 @@ public class ScheduledTask implements Task {
 
     @Override
     public String toString() {
-        return this.stringRepresentation;
-    }
-
-    public enum TaskSynchronicity {
-        SYNCHRONOUS,
-        ASYNCHRONOUS
+        return new ToStringHelper("ScheduledTask")
+                .add("uniqueId", this.uniqueId)
+                .add("name", this.name)
+                .add("task", this.task)
+                .toString();
     }
 }

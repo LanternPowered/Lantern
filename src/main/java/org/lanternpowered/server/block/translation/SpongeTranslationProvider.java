@@ -49,7 +49,7 @@ public class SpongeTranslationProvider implements TranslationProvider {
     }
 
     @Override
-    public Translation get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
+    public Translation get(BlockState blockState, @Nullable Location location, @Nullable Direction face) {
         return blockState.getTraitValue(LanternBooleanTraits.IS_WET).get() ? this.wetTranslation : this.dryTranslation;
     }
 }

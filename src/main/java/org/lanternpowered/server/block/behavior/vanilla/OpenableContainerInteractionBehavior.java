@@ -46,7 +46,7 @@ public class OpenableContainerInteractionBehavior implements InteractWithBlockBe
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final Location location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTileEntity = location.getTileEntity();
         if (!optTileEntity.isPresent()) {
             return BehaviorResult.CONTINUE;
@@ -70,7 +70,7 @@ public class OpenableContainerInteractionBehavior implements InteractWithBlockBe
         return BehaviorResult.CONTINUE;
     }
 
-    protected boolean validateOpenableSpace(BehaviorContext context, Location<World> location, List<Runnable> task) {
+    protected boolean validateOpenableSpace(BehaviorContext context, Location location, List<Runnable> task) {
         return true;
     }
 

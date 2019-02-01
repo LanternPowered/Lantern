@@ -33,13 +33,13 @@ import org.spongepowered.api.world.World;
 
 public class LanternScheduledBlockUpdate implements ScheduledBlockUpdate, Comparable<LanternScheduledBlockUpdate> {
 
-    private final Location<World> location;
+    private final Location location;
 
     private long endTicks;
     private int priority;
     private int entryId;
 
-    public LanternScheduledBlockUpdate(int entryId, Location<World> location, int ticks, int priority) {
+    public LanternScheduledBlockUpdate(int entryId, Location location, int ticks, int priority) {
         this.setTicks(ticks);
         this.priority = priority;
         this.location = location;
@@ -47,7 +47,7 @@ public class LanternScheduledBlockUpdate implements ScheduledBlockUpdate, Compar
     }
 
     @Override
-    public Location<World> getLocation() {
+    public Location getLocation() {
         return this.location;
     }
 

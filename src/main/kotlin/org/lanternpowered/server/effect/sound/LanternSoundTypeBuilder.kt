@@ -25,12 +25,14 @@
  */
 package org.lanternpowered.server.effect.sound
 
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder
+import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.effect.sound.SoundType
+import org.spongepowered.api.text.translation.Translation
 
-class LanternSoundTypeBuilder : SoundType.Builder {
+class LanternSoundTypeBuilder : AbstractCatalogBuilder<SoundType, SoundType.Builder>(), SoundType.Builder {
 
     override fun from(value: SoundType): SoundType.Builder = apply {}
     override fun reset(): SoundType.Builder = apply {}
-    override fun build(id: String): SoundType = LanternSoundType(CatalogKeys.sponge(id))
+    override fun build(key: CatalogKey, name: Translation): SoundType = LanternSoundType(key, name)
 }

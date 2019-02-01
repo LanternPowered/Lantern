@@ -28,8 +28,8 @@ package org.lanternpowered.server.world.portal
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.world.LanternWorld
-import org.spongepowered.api.world.PortalAgent
-import org.spongepowered.api.world.PortalAgentType
+import org.spongepowered.api.world.teleport.PortalAgent
+import org.spongepowered.api.world.teleport.PortalAgentType
 
 class LanternPortalAgentType<T : PortalAgent>(
         key: CatalogKey,

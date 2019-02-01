@@ -68,7 +68,9 @@ public class TestInventoryPlugin {
                 .title(Text.of("My Fancy Title"))
                 .property(InventoryDimension.builder().value(new Vector2i(9, 1)).build())
                 .property(GuiIdProperty.builder().value(GuiIds.CHEST).build())
-                .build("inventory_test:test", "Test Inventory");
+                .name("Test Inventory")
+                .id("test")
+                .build();
         Sponge.getCommandManager().register(this, CommandSpec.builder()
                 .executor((src, args) -> {
                     if (!(src instanceof Player)) {

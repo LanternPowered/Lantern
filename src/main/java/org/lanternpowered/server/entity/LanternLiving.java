@@ -163,7 +163,7 @@ public class LanternLiving extends LanternEntity implements Living {
 
         // Post the entity destruction event
         final DestructEntityEvent.Death event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
-                MessageChannel.TO_NONE, Optional.empty(), new MessageEvent.MessageFormatter(), this, keepsInventory, false);
+                MessageChannel.TO_NONE, Optional.empty(), this, new MessageEvent.MessageFormatter(), keepsInventory, false);
         postDestructEvent(event);
 
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
@@ -191,14 +191,8 @@ public class LanternLiving extends LanternEntity implements Living {
     protected void handleDeath(CauseStack causeStack) {
         final int exp = collectExperience(causeStack);
         // Humanoids get their own sub-interface for the event
-        final HarvestEntityEvent harvestEvent;
-        if (this instanceof Humanoid) {
-            harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetHumanoid(
-                    causeStack.getCurrentCause(), exp, exp, (Humanoid) this);
-        } else {
-            harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetLiving(
-                    causeStack.getCurrentCause(), exp, exp, this);
-        }
+        final HarvestEntityEvent harvestEvent = SpongeEventFactory.createHarvestEntityEvent(
+                causeStack.getCurrentCause(), exp, exp, this);
         Sponge.getEventManager().post(harvestEvent);
         // Finalize the harvest event
         finalizeHarvestEvent(causeStack, harvestEvent, new ArrayList<>());
@@ -236,7 +230,7 @@ public class LanternLiving extends LanternEntity implements Living {
                         frame.getCurrentCause(), ImmutableList.copyOf(itemStackSnapshots), Lists2.nonNullOf(itemStackSnapshots));
                 Sponge.getEventManager().post(preDropEvent);
                 if (!preDropEvent.isCancelled()) {
-                    final Transform<World> transform = getTransform().setPosition(
+                    final Transform transform = getTransform().setPosition(
                             getBoundingBox().map(AABB::getCenter).orElse(Vector3d.ZERO));
                     final List<EntitySpawningEntry> entries = itemStackSnapshots.stream()
                             .filter(snapshot -> !snapshot.isEmpty())

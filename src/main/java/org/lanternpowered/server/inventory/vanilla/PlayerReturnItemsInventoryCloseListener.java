@@ -92,7 +92,7 @@ public class PlayerReturnItemsInventoryCloseListener implements InventoryCloseLi
         if (!(carrier instanceof Locatable)) {
             throw new IllegalStateException("Cannot drop items for carrier without location.");
         }
-        final Location<World> location = ((Locatable) carrier).getLocation();
+        final Location location = ((Locatable) carrier).getLocation();
         if (this.dropSelectors != null) {
             for (QueryOperation<?> dropSelector : this.dropSelectors) {
                 inventory = inventory.query(dropSelector);
@@ -111,8 +111,8 @@ public class PlayerReturnItemsInventoryCloseListener implements InventoryCloseLi
             // the rest is afterwards dropped on the ground
             items.forEach(inventory::offerFast);
         }
-        final Transform<World> transform = new Transform<>(location);
-        final List<Tuple<ItemStackSnapshot, Transform<World>>> entries = items.stream()
+        final Transform transform = new Transform<>(location);
+        final List<Tuple<ItemStackSnapshot, Transform>> entries = items.stream()
                 .filter(item -> !item.isEmpty())
                 .map(item -> new Tuple<>((ItemStackSnapshot) LanternItemStackSnapshot.wrap(item), transform))
                 .collect(Collectors.toList());

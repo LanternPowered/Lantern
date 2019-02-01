@@ -57,13 +57,13 @@ public class ChestInteractionBehavior extends OpenableContainerInteractionBehavi
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    protected boolean validateOpenableSpace(BehaviorContext context, Location<World> location, List<Runnable> tasks) {
+    protected boolean validateOpenableSpace(BehaviorContext context, Location location, List<Runnable> tasks) {
         final TileEntity tileEntity = location.getTileEntity().get();
         if (tileEntity instanceof Chest) {
             final Set<Chest> chests = new HashSet<>(((Chest) tileEntity).getConnectedChests());
             chests.add((Chest) tileEntity);
             for (Chest chest : chests) {
-                final Location<World> loc = chest.getLocation();
+                final Location loc = chest.getLocation();
                 if (!validateOpenableChestSpace(context, loc, tasks)) {
                     return false;
                 }
@@ -72,12 +72,12 @@ public class ChestInteractionBehavior extends OpenableContainerInteractionBehavi
         return true;
     }
 
-    static boolean validateOpenableChestSpace(BehaviorContext context, Location<World> loc, List<Runnable> tasks) {
-        final Location<World> relLoc = loc.getBlockRelative(Direction.UP);
-        final AABB relAabb = relLoc.getExtent().getBlockSelectionBox(
+    static boolean validateOpenableChestSpace(BehaviorContext context, Location loc, List<Runnable> tasks) {
+        final Location relLoc = loc.getBlockRelative(Direction.UP);
+        final AABB relAabb = relLoc.getWorld().getBlockSelectionBox(
                 relLoc.getBlockPosition()).orElse(null);
         if (relAabb != null) {
-            AABB aabb = loc.getExtent().getBlockSelectionBox(
+            AABB aabb = loc.getWorld().getBlockSelectionBox(
                     loc.getBlockPosition()).get();
             aabb = aabb.offset(0, 1, 0);
             aabb = new AABB(aabb.getMin(), aabb.getMax().mul(1, 0, 1)

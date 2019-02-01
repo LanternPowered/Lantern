@@ -52,8 +52,8 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
         if (this.viewers.add(viewer) && this.viewers.size() == 1) {
             this.soundDelay = getOpenSoundDelay();
 
-            final Location<World> location = getLocation();
-            final LanternWorld world = (LanternWorld) location.getExtent();
+            final Location location = getLocation();
+            final LanternWorld world = (LanternWorld) location.getWorld();
             world.addBlockAction(location.getBlockPosition(), getBlock().getType(), ContainerAnimationAction.OPEN);
         }
     }
@@ -63,8 +63,8 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
         if (this.viewers.remove(viewer) && this.viewers.size() == 0) {
             this.soundDelay = getCloseSoundDelay();
 
-            final Location<World> location = getLocation();
-            final LanternWorld world = (LanternWorld) location.getExtent();
+            final Location location = getLocation();
+            final LanternWorld world = (LanternWorld) location.getWorld();
             world.addBlockAction(location.getBlockPosition(), getBlock().getType(), ContainerAnimationAction.CLOSE);
         }
     }
@@ -94,21 +94,21 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
      *
      * @param location The location
      */
-    protected abstract void playOpenSound(Location<World> location);
+    protected abstract void playOpenSound(Location location);
 
     /**
      * Plays the close sound at the {@link Location}.
      *
      * @param location The location
      */
-    protected abstract void playCloseSound(Location<World> location);
+    protected abstract void playCloseSound(Location location);
 
     @Override
     public void pulse() {
         super.pulse();
 
         if (this.soundDelay > 0 && --this.soundDelay == 0) {
-            final Location<World> location = getLocation();
+            final Location location = getLocation();
             if (this.viewers.size() > 0) {
                 playOpenSound(location);
             } else {

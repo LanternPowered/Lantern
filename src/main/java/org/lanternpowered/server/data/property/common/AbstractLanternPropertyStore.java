@@ -37,12 +37,12 @@ import java.util.Optional;
 public abstract class AbstractLanternPropertyStore<T extends Property<?, ?>> implements PropertyStore<T> {
 
     @Override
-    public Optional<T> getFor(Location<World> location) {
+    public Optional<T> getFor(Location location) {
         return getFor(location, Direction.NONE);
     }
 
     @Override
-    public Optional<T> getFor(Location<World> location, Direction direction) {
+    public Optional<T> getFor(Location location, Direction direction) {
         return getFor((PropertyHolder) location);
     }
 

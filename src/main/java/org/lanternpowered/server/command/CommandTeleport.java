@@ -67,7 +67,7 @@ public final class CommandTeleport extends CommandProvider {
                     // TODO: Replace with selected entities
                     final Entity target = args.<Entity>getOne("target").get();
                     final World world = CommandHelper.getWorld(src, args);
-                    final Location<World> location = new Location<>(world, args.<Vector3d>getOne("position").get());
+                    final Location location = new Location<>(world, args.<Vector3d>getOne("position").get());
 
                     if (args.hasAny("y-rot")) {
                         RelativeDouble yRot = args.<RelativeDouble>getOne("y-rot").get();

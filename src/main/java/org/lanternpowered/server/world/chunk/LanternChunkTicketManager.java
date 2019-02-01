@@ -39,7 +39,7 @@ import com.google.inject.Singleton;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.ChunkTicketManager;
+import org.spongepowered.api.world.chunk.ChunkTicketManager;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;

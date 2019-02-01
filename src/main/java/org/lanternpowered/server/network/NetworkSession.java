@@ -989,7 +989,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 kickReason != null ? kickReason : t("multiplayer.disconnect.not_allowed_to_join"));
 
         final Cause cause = Cause.builder().append(this).build(EventContext.builder().add(EventContextKeys.PLAYER, this.player).build());
-        final Transform<World> fromTransform = this.player.getTransform();
+        final Transform fromTransform = this.player.getTransform();
         final ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
                 fromTransform, fromTransform, this, messageFormatter, this.gameProfile, this.player, false);
 
@@ -1013,8 +1013,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.player.offer(Keys.FIRST_DATE_PLAYED, lastJoined);
         }
 
-        final Transform<World> toTransform = loginEvent.getToTransform();
-        world = (LanternWorld) toTransform.getExtent();
+        final Transform toTransform = loginEvent.getToTransform();
+        world = (LanternWorld) toTransform.getWorld();
         final WorldConfig config = world.getProperties().getConfig();
 
         // Update the game mode if necessary

@@ -116,7 +116,7 @@ public class LanternSelector implements Selector {
     }
 
     @Override
-    public ImmutableSet<Entity> resolve(Location<World> location) {
+    public ImmutableSet<Entity> resolve(Location location) {
         Builder selector = Selector.builder().from(this);
         if (!this.has(ArgumentTypes.POSITION.x())) {
             selector.add(ArgumentTypes.POSITION.x(), location.getPosition().getFloorX());
@@ -127,7 +127,7 @@ public class LanternSelector implements Selector {
         if (!this.has(ArgumentTypes.POSITION.z())) {
             selector.add(ArgumentTypes.POSITION.z(), location.getPosition().getFloorZ());
         }
-        return new SelectorResolver(selector.build(), ImmutableSet.of(location.getExtent())).resolve();
+        return new SelectorResolver(selector.build(), ImmutableSet.of(location.getWorld())).resolve();
     }
 
     @Override

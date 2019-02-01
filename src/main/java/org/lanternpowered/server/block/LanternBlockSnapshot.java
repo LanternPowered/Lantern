@@ -37,7 +37,6 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.world.WeakWorldReferencedLocation;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -53,7 +52,6 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,28 +65,23 @@ import javax.annotation.Nullable;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unchecked"})
 public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHolder {
 
-    @Nullable final WeakWorldReferencedLocation location;
+    @Nullable final Location location;
     private final BlockState state;
     @Nullable private final UUID notifier;
     @Nullable private final UUID creator;
     @Nullable final LanternTileEntity tileEntity;
 
-    public LanternBlockSnapshot(Location<World> location, BlockState blockState,
-            @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
-        this(new WeakWorldReferencedLocation(checkNotNull(location, "location")), blockState, creator, notifier, tileEntity);
-    }
-
     public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
-        this(new WeakWorldReferencedLocation(worldUUID, position), blockState, creator, notifier, tileEntity);
+        this(new Location(worldUUID, position), blockState, creator, notifier, tileEntity);
     }
 
     public LanternBlockSnapshot(BlockState blockState, @Nullable UUID notifier,
             @Nullable UUID creator, @Nullable TileEntity tileEntity) {
-        this((WeakWorldReferencedLocation) null, blockState, creator, notifier, tileEntity);
+        this(null, blockState, creator, notifier, tileEntity);
     }
 
-    public LanternBlockSnapshot(@Nullable WeakWorldReferencedLocation location, BlockState blockState,
+    public LanternBlockSnapshot(@Nullable Location location, BlockState blockState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
         this.state = checkNotNull(blockState, "blockState");
         this.tileEntity = (LanternTileEntity) tileEntity;
@@ -139,20 +132,13 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
     }
 
     @Override
-    public BlockState getExtendedState() {
-        // Extended block states are no more, got removed
-        // in 1.13, all states are now server side.
-        return this.state;
-    }
-
-    @Override
     public LanternBlockSnapshot copy() {
         return this;
     }
 
     @Override
-    public Optional<Location<World>> getLocation() {
-        return this.location == null ? Optional.empty() : this.location.asLocation();
+    public Optional<Location> getLocation() {
+        return Optional.ofNullable(this.location);
     }
 
     @Override
@@ -183,7 +169,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
             return false;
         }
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
-        return (Boolean) optRegistration.map(registration -> this.tileEntity.supports(registration.getManipulatorClass())).orElse(false);
+        return optRegistration.map(registration -> this.tileEntity.supports(registration.getManipulatorClass())).orElse(false);
     }
 
     @Override
@@ -407,7 +393,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
     }
 
     @Override
-    public BlockSnapshot withLocation(Location<World> location) {
+    public BlockSnapshot withLocation(Location location) {
         checkNotNull(location, "location");
         return new LanternBlockSnapshot(location, this.state,
                 this.creator, this.notifier, this.tileEntity);
@@ -420,19 +406,19 @@ public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHold
 
     @Override
     public boolean restore(boolean force, BlockChangeFlag flag) {
-        final Location<World> loc = getLocation().orElseThrow(() -> new IllegalStateException("This BlockSnapshot doesn't have a location."));
-        return restoreAt(loc.getExtent(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), force, flag);
+        final Location loc = getLocation().orElseThrow(() -> new IllegalStateException("This BlockSnapshot doesn't have a location."));
+        return restoreAt(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), force, flag);
     }
 
-    public boolean restoreAt(Extent extent, int x, int y, int z, boolean force, BlockChangeFlag flag) {
-        if (!force && extent.getBlockType(x, y, z) != this.state.getType()) {
+    public boolean restoreAt(World world, int x, int y, int z, boolean force, BlockChangeFlag flag) {
+        if (!force && world.getBlock(x, y, z).getType() != this.state.getType()) {
             return false;
         }
-        extent.setBlock(x, y, z, this.state, flag);
-        extent.setCreator(x, y, z, this.creator);
-        extent.setNotifier(x, y, z, this.notifier);
+        world.setBlock(x, y, z, this.state, flag);
+        world.setCreator(x, y, z, this.creator);
+        world.setNotifier(x, y, z, this.notifier);
         if (this.tileEntity != null) {
-            final LanternTileEntity tileEntity = (LanternTileEntity) extent.getTileEntity(x, y, z).orElse(null);
+            final LanternTileEntity tileEntity = (LanternTileEntity) world.getTileEntity(x, y, z).orElse(null);
             if (tileEntity != null) {
                 tileEntity.copyFromFastNoEvents(this.tileEntity);
             }

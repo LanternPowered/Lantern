@@ -148,13 +148,13 @@ public class BehaviorContextImpl implements BehaviorContext {
     private final class Snapshot implements BehaviorContext.Snapshot {
 
         private final Int2ObjectMap<Object> parameterValues;
-        private final Map<Location<World>, BlockSnapshot> blockSnapshots;
+        private final Map<Location, BlockSnapshot> blockSnapshots;
         private final Set<BlockSnapshot> positionlessBlockSnapshots;
         private final Set<SlotTransaction> slotTransactions;
         private final Set<EntitySnapshot> entitySnapshots;
         private final CauseStack.Frame causeStackFrame;
 
-        Snapshot(Int2ObjectMap<Object> parameterValues, Map<Location<World>, BlockSnapshot> blockSnapshots,
+        Snapshot(Int2ObjectMap<Object> parameterValues, Map<Location, BlockSnapshot> blockSnapshots,
                 Set<BlockSnapshot> positionlessBlockSnapshots, Set<SlotTransaction> slotTransactions,
                 Set<EntitySnapshot> entitySnapshots, CauseStack.Frame causeStackFrame) {
             this.parameterValues = parameterValues;
@@ -170,7 +170,7 @@ public class BehaviorContextImpl implements BehaviorContext {
     private final Deque<Snapshot> snapshots = new ArrayDeque<>();
 
     private Int2ObjectMap<Object> parameterValues = new Int2ObjectOpenHashMap<>();
-    private Map<Location<World>, BlockSnapshot> blockSnapshots = new HashMap<>();
+    private Map<Location, BlockSnapshot> blockSnapshots = new HashMap<>();
     private Set<BlockSnapshot> positionlessBlockSnapshots = new HashSet<>();
     private Set<SlotTransaction> slotTransactions = new HashSet<>();
     private Set<EntitySnapshot> entitySnapshots = new HashSet<>();
@@ -251,7 +251,7 @@ public class BehaviorContextImpl implements BehaviorContext {
         if (((LanternBlockSnapshot) blockSnapshot).isPositionless()) {
             this.positionlessBlockSnapshots.add(blockSnapshot);
         } else {
-            final Location<World> loc = blockSnapshot.getLocation().orElseThrow(
+            final Location loc = blockSnapshot.getLocation().orElseThrow(
                     () -> new IllegalArgumentException("Unable to retrieve the location of the block snapshot, is the world loaded?"));
             if (!force) {
                 checkArgument(this.blockSnapshots.putIfAbsent(loc, blockSnapshot) == null,
@@ -267,7 +267,7 @@ public class BehaviorContextImpl implements BehaviorContext {
         checkNotNull(snapshotTransformer, "snapshotTransformer");
 
         final Set<BlockSnapshot> newPositionlessBlockSnapshots = new HashSet<>();
-        final Map<Location<World>, BlockSnapshot> newBlockSnapshots = new HashMap<>();
+        final Map<Location, BlockSnapshot> newBlockSnapshots = new HashMap<>();
 
         final BlockSnapshotBuilder builder = BlockSnapshotBuilder.createPositionless();
 
@@ -278,7 +278,7 @@ public class BehaviorContextImpl implements BehaviorContext {
             if (((LanternBlockSnapshot) result).isPositionless()) {
                 newPositionlessBlockSnapshots.add(result);
             } else {
-                final Location<World> loc = blockSnapshot.getLocation().orElseThrow(
+                final Location loc = blockSnapshot.getLocation().orElseThrow(
                         () -> new IllegalArgumentException("Unable to retrieve the location of the block snapshot, is the world loaded?"));
                 checkArgument(newBlockSnapshots.putIfAbsent(loc, result) == null,
                         "There is already a block snapshot present for the location: %s", loc);
@@ -294,7 +294,7 @@ public class BehaviorContextImpl implements BehaviorContext {
         checkNotNull(snapshotTransformer, "snapshotTransformer");
 
         final Set<BlockSnapshot> newPositionlessBlockSnapshots = new HashSet<>();
-        final Map<Location<World>, BlockSnapshot> newBlockSnapshots = new HashMap<>();
+        final Map<Location, BlockSnapshot> newBlockSnapshots = new HashMap<>();
 
         final BlockSnapshotBuilder builder = BlockSnapshotBuilder.createPositionless();
 
@@ -307,7 +307,7 @@ public class BehaviorContextImpl implements BehaviorContext {
             if (((LanternBlockSnapshot) result).isPositionless()) {
                 newPositionlessBlockSnapshots.add(result);
             } else {
-                final Location<World> loc = blockSnapshot.getLocation().orElseThrow(
+                final Location loc = blockSnapshot.getLocation().orElseThrow(
                         () -> new IllegalArgumentException("Unable to retrieve the location of the block snapshot, is the world loaded?"));
                 checkArgument(newBlockSnapshots.putIfAbsent(loc, blockSnapshot) == null,
                         "There is already a block snapshot present for the location: %s", loc);
@@ -374,7 +374,7 @@ public class BehaviorContextImpl implements BehaviorContext {
     }
 
     public void accept() {
-        for (Map.Entry<Location<World>, BlockSnapshot> entry : this.blockSnapshots.entrySet()) {
+        for (Map.Entry<Location, BlockSnapshot> entry : this.blockSnapshots.entrySet()) {
             entry.getValue().restore(true, BlockChangeFlags.ALL);
         }
         for (SlotTransaction slotTransaction : this.slotTransactions) {

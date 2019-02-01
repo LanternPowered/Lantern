@@ -892,7 +892,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 tileEntity.setValid(false);
             }
             if (refresh) {
-                final Location<World> location = tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z);
+                final Location location = tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z);
                 final LanternTileEntity newTileEntity = (LanternTileEntity) tileEntityProvider.get().get(state, location, null);
                 section.tileEntities.put((short) index, newTileEntity);
                 newTileEntity.setLocation(location);
@@ -984,7 +984,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
         final BlockState state = getBlock(x, y, z);
-        final Location<World> loc = new Location<>(this.world, x, y, z);
+        final Location loc = new Location<>(this.world, x, y, z);
         final LanternTileEntity tileEntity = getTileEntity(x, y, z)
                 .map(tile -> LanternTileEntityArchetype.copy((LanternTileEntity) tile))
                 .orElse(null);
@@ -1049,7 +1049,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public ScheduledBlockUpdate addScheduledUpdate(int x, int y, int z, int priority, int ticks) {
         checkVolumeBounds(x, y, z);
         final int entryId = this.scheduledBlockUpdateCounter.getAndIncrement();
-        final Location<World> location = new Location<>(this.world, new Vector3i(x, y, z));
+        final Location location = new Location<>(this.world, new Vector3i(x, y, z));
         final LanternScheduledBlockUpdate update = new LanternScheduledBlockUpdate(entryId, location, ticks, priority);
         this.scheduledBlockUpdateQueue.add(update);
         return update;
@@ -1092,7 +1092,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
+    public Extent getWorldView(Vector3i newMin, Vector3i newMax) {
         checkVolumeBounds(newMin);
         checkVolumeBounds(newMax);
         return new ExtentViewDownsize(this, newMin, newMax);
@@ -1590,7 +1590,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Optional.empty();
         }
-        final Location<World> location = new Location<>(this.world, x, y, z);
+        final Location location = new Location<>(this.world, x, y, z);
         Optional<T> property;
         if (direction != null) {
             property = AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
@@ -1611,7 +1611,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Collections.emptyList();
         }
-        final Location<World> location = new Location<>(this.world, x, y, z);
+        final Location location = new Location<>(this.world, x, y, z);
         final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
         builder.addAll(Lantern.getGame().getPropertyRegistry().getPropertiesFor(location));
         getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
@@ -1625,7 +1625,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Collections.emptyList();
         }
-        final Location<World> location = new Location<>(this.world, x, y, z);
+        final Location location = new Location<>(this.world, x, y, z);
         //noinspection unchecked
         final Optional<PropertyStore<?>> store = (Optional) Lantern.getGame().getPropertyRegistry().getStore(propertyClass);
         //noinspection OptionalIsPresent

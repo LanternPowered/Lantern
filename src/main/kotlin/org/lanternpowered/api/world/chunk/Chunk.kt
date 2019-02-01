@@ -25,6 +25,6 @@
  */
 package org.lanternpowered.api.world.chunk
 
-typealias Chunk = org.spongepowered.api.world.Chunk
-typealias ChunkState = org.spongepowered.api.world.ChunkState
-typealias ChunkTicketManager = org.spongepowered.api.world.ChunkTicketManager
+typealias Chunk = org.spongepowered.api.world.chunk.Chunk
+typealias ChunkState = org.spongepowered.api.world.chunk.ChunkState
+typealias ChunkTicketManager = org.spongepowered.api.world.chunk.ChunkTicketManager

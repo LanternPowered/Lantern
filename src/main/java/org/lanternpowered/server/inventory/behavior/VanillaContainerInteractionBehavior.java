@@ -697,9 +697,9 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         final CauseStack causeStack = CauseStack.current();
         causeStack.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM);
 
-        final Transform<World> transform = player.getTransform();
+        final Transform transform = player.getTransform();
         final List<Entity> entities = LanternEventHelper.handlePreDroppedItemSpawning(matrixResult.getRest().stream()
-                .map(itemStack -> new Tuple<ItemStackSnapshot, Transform<World>>(
+                .map(itemStack -> new Tuple<ItemStackSnapshot, Transform>(
                         LanternItemStackSnapshot.wrap(itemStack), transform))
                 .collect(Collectors.toList()));
         final SpawnEntityEvent event = SpongeEventFactory.createDropItemEventDispense(causeStack.getCurrentCause(), entities);

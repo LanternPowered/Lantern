@@ -29,8 +29,8 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataView
-import org.spongepowered.api.world.GeneratorType
 import org.spongepowered.api.world.World
+import org.spongepowered.api.world.gen.GeneratorType
 import org.spongepowered.api.world.gen.WorldGenerator
 
 class DelegateGeneratorType(key: CatalogKey, generatorType: GeneratorType) : DefaultCatalogType(key), IGeneratorType {

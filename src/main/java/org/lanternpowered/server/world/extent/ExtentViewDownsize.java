@@ -531,7 +531,7 @@ public class ExtentViewDownsize implements AbstractExtent {
         final Collection<TileEntity> tileEntities = this.extent.getTileEntities();
         for (Iterator<TileEntity> iterator = tileEntities.iterator(); iterator.hasNext(); ) {
             final TileEntity tileEntity = iterator.next();
-            final Location<World> block = tileEntity.getLocation();
+            final Location block = tileEntity.getLocation();
             if (!VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.blockMin, this.blockMax)) {
                 iterator.remove();
             }
@@ -618,7 +618,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
+    public Extent getWorldView(Vector3i newMin, Vector3i newMax) {
         checkRange(newMin.getX(), newMin.getY(), newMin.getZ());
         checkRange(newMax.getX(), newMax.getY(), newMax.getZ());
         return new ExtentViewDownsize(this.extent, newMin, newMax);
@@ -709,7 +709,7 @@ public class ExtentViewDownsize implements AbstractExtent {
 
         @Override
         public boolean test(TileEntity input) {
-            final Location<World> block = input.getLocation();
+            final Location block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
         }
     }

@@ -69,14 +69,14 @@ public class LanternShulkerBox extends LanternContainerTile<ChestInventory> {
     }
 
     @Override
-    protected void playOpenSound(Location<World> location) {
-        location.getExtent().playSound(SoundTypes.BLOCK_SHULKER_BOX_OPEN, SoundCategories.BLOCK,
+    protected void playOpenSound(Location location) {
+        location.getWorld().playSound(SoundTypes.BLOCK_SHULKER_BOX_OPEN, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 
     @Override
-    protected void playCloseSound(Location<World> location) {
-        location.getExtent().playSound(SoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
+    protected void playCloseSound(Location location) {
+        location.getWorld().playSound(SoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, ThreadLocalRandom.current().nextDouble() * 0.1 + 0.9);
     }
 }

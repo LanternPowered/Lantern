@@ -75,7 +75,7 @@ import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.rcon.RconService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.world.ChunkTicketManager;
+import org.spongepowered.api.world.chunk.ChunkTicketManager;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.storage.ChunkLayout;

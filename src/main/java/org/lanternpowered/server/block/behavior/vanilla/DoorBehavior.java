@@ -60,20 +60,20 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
 
         // Door can only be placed by clicking in the floor
         if (face != Direction.DOWN) {
             return BehaviorResult.PASS;
         }
-        final Location<World> down = location.getBlockRelative(Direction.DOWN);
+        final Location down = location.getBlockRelative(Direction.DOWN);
         final SolidCubeProperty solidProp = down.getProperty(SolidCubeProperty.class).get();
         // The door must be placed on a solid block
         if (!solidProp.getValue()) {
             return BehaviorResult.PASS;
         }
-        final Location<World> up = location.getBlockRelative(Direction.UP);
+        final Location up = location.getBlockRelative(Direction.UP);
         final ReplaceableProperty replaceableProp = up.getProperty(ReplaceableProperty.class).get();
         if (!replaceableProp.getValue()) {
             return BehaviorResult.PASS;
@@ -112,7 +112,7 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
     @Override
     public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.getContext(ContextKeys.BLOCK_LOCATION).get();
+        final Location location = context.getContext(ContextKeys.BLOCK_LOCATION).get();
 
         final BlockState baseState = location.getBlock();
         final LanternDoorHalf half = baseState.get(LanternKeys.DOOR_HALF).get();
@@ -126,7 +126,7 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
         final Direction dir = half == LanternDoorHalf.LOWER ? Direction.UP : Direction.DOWN;
         final LanternDoorHalf other = half == LanternDoorHalf.LOWER ? LanternDoorHalf.UPPER : LanternDoorHalf.LOWER;
-        final Location<World> loc = location.getBlockRelative(dir);
+        final Location loc = location.getBlockRelative(dir);
 
         BlockState otherState = loc.getBlock();
         if (otherState.get(LanternKeys.DOOR_HALF).orElse(null) == other &&

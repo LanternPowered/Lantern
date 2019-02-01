@@ -240,7 +240,7 @@ public class AdvancementTest {
 
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event) {
-        final Player player = event.getTargetEntity();
+        final Player player = event.getPlayer();
         // Do this here for now, no block break event
         player.getProgress(this.loginAFewTimesAdvancement).get(this.loginAFewTimesCriterion).get().add(1);
         this.trigger.trigger(player);

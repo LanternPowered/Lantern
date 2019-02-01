@@ -29,7 +29,6 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import org.lanternpowered.server.data.DataQueries;
-import org.lanternpowered.server.world.WeakWorldReferencedLocation;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.Property;
@@ -41,7 +40,6 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,9 +50,9 @@ import java.util.function.Function;
 public class LanternLocatableBlock implements LocatableBlock {
 
     final BlockState blockState;
-    final WeakWorldReferencedLocation location;
+    final Location location;
 
-    LanternLocatableBlock(WeakWorldReferencedLocation location, BlockState blockState) {
+    LanternLocatableBlock(Location location, BlockState blockState) {
         this.blockState = blockState;
         this.location = location;
     }
@@ -65,8 +63,8 @@ public class LanternLocatableBlock implements LocatableBlock {
     }
 
     @Override
-    public Location<World> getLocation() {
-        return this.location.asLocation().orElseThrow(() -> new IllegalStateException("The world isn't available."));
+    public Location getLocation() {
+        return this.location;
     }
 
     @Override

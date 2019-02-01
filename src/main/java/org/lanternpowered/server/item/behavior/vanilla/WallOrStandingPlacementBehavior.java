@@ -75,9 +75,9 @@ public class WallOrStandingPlacementBehavior extends InteractWithBlockItemBaseBe
 
     @Override
     protected boolean place(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> loc = context.getContext(ContextKeys.BLOCK_LOCATION).get();
+        final Location loc = context.getContext(ContextKeys.BLOCK_LOCATION).get();
         final Direction face = context.getContext(ContextKeys.INTERACTION_FACE).orElse(Direction.UP);
-        final Location<World> solidFaceLoc = loc.getBlockRelative(face.getOpposite());
+        final Location solidFaceLoc = loc.getBlockRelative(face.getOpposite());
         final SolidMaterialProperty solidMaterialProperty = solidFaceLoc.getProperty(SolidMaterialProperty.class).get();
         if (!solidMaterialProperty.getValue()) {
             return false;

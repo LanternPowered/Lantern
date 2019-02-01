@@ -79,7 +79,7 @@ public class OpenableInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final Optional<Boolean> optIsOpen = location.get(Keys.OPEN);
         if (!optIsOpen.isPresent()) {
             return BehaviorResult.FAIL;

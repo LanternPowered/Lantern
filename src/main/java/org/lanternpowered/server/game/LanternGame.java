@@ -74,7 +74,6 @@ import org.lanternpowered.server.service.user.LanternUserStorageService;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
@@ -83,9 +82,8 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
-import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -99,7 +97,6 @@ import org.spongepowered.api.world.TeleportHelper;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -161,7 +158,7 @@ public class LanternGame implements Game {
     @Inject private LanternScheduler scheduler;
 
     // The sync scheduler service
-    @Inject @SynchronousExecutor private SpongeExecutorService syncExecutorService;
+    @Inject @SynchronousExecutor private TaskExecutorService syncExecutorService;
 
     // The chunk load service
     @Inject private LanternChunkTicketManager chunkTicketManager;
@@ -465,11 +462,6 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public Optional<GameDictionary> getGameDictionary() {
-        return Optional.empty();
-    }
-
-    @Override
     public LanternServiceManager getServiceManager() {
         return this.serviceManager;
     }
@@ -550,7 +542,7 @@ public class LanternGame implements Game {
         return this.gameProfileManager;
     }
 
-    public SpongeExecutorService getSyncExecutorService() {
+    public TaskExecutorService getSyncExecutorService() {
         return this.syncExecutorService;
     }
 

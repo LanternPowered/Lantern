@@ -55,7 +55,7 @@ inline fun DamageSource(type: DamageType, fn: DamageSourceBuilder.() -> Unit = {
 /**
  * Constructs a new [BlockDamageSource] with the given [DamageType], [Location] and builder function.
  */
-inline fun BlockDamageSource(type: DamageType, location: Location<World>,
+inline fun BlockDamageSource(type: DamageType, location: Location,
                              fn: BlockDamageSourceBuilder.() -> Unit = {}): BlockDamageSource =
         BlockDamageSource.builder().type(type).block(location).apply(fn).build()
 

@@ -51,7 +51,7 @@ public class JukeboxInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final Location location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final Optional<TileEntity> optTile = location.getTileEntity();
         if (optTile.isPresent()) {
             final TileEntity tile = optTile.get();

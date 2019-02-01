@@ -66,10 +66,10 @@ public class ShulkerBoxInteractionBehavior extends OpenableContainerInteractionB
     }
 
     @Override
-    protected boolean validateOpenableSpace(BehaviorContext context, Location<World> location, List<Runnable> tasks) {
+    protected boolean validateOpenableSpace(BehaviorContext context, Location location, List<Runnable> tasks) {
         final Direction facing = location.getBlock().getTraitValue(LanternEnumTraits.FACING).get();
-        final Location<World> relLocation = location.getBlockRelative(facing);
-        final AABB aabb = relLocation.getExtent().getBlockSelectionBox(
+        final Location relLocation = location.getBlockRelative(facing);
+        final AABB aabb = relLocation.getWorld().getBlockSelectionBox(
                 relLocation.getBlockPosition()).orElse(null);
         if (aabb != null && getExtendedAABB(facing).offset(
                 relLocation.getBlockPosition()).intersects(aabb)) {

@@ -50,11 +50,11 @@ public final class SkyLuminancePropertyStore extends AbstractBlockPropertyStore<
     }
 
     @Override
-    protected Optional<SkyLuminanceProperty> getFor(BlockState blockState, @Nullable Location<World> location, @Nullable Direction direction) {
+    protected Optional<SkyLuminanceProperty> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction) {
         if (location == null) {
             return Optional.empty();
         }
-        final Optional<Chunk> chunk = location.getExtent().getChunk(location.getChunkPosition());
+        final Optional<Chunk> chunk = location.getWorld().getChunk(location.getChunkPosition());
         return chunk.isPresent() ? this.lookup[((LanternChunk) chunk.get()).getSkyLight(
                 location.getBlockX(), location.getBlockY(), location.getBlockZ())] : Optional.empty();
     }

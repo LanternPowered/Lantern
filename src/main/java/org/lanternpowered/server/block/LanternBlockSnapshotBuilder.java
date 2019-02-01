@@ -47,7 +47,7 @@ public class LanternBlockSnapshotBuilder extends BlockSnapshotBuilder {
     }
 
     @Override
-    public BlockSnapshotBuilder from(Location<World> location) {
+    public BlockSnapshotBuilder from(Location location) {
         return super.from(checkNotNull(location, "location"));
     }
 

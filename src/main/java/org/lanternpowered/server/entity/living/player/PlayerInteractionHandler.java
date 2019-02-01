@@ -255,7 +255,7 @@ public final class PlayerInteractionHandler {
     }
 
     private void handleBrokenBlock() {
-        final Location<World> location = new Location<>(this.player.getWorld(), this.diggingBlock);
+        final Location location = new Location<>(this.player.getWorld(), this.diggingBlock);
 
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
@@ -330,7 +330,7 @@ public final class PlayerInteractionHandler {
         final double dy = Math.min(pos2.getY(), 0.999);
         final double dz = Math.min(pos2.getZ(), 0.999);
 
-        final Location<World> clickedLocation = new Location<>(this.player.getWorld(),
+        final Location clickedLocation = new Location<>(this.player.getWorld(),
                 message.getPosition().toDouble().add(dx, dy, dz));
         final Direction face = message.getFace();
 
@@ -341,7 +341,7 @@ public final class PlayerInteractionHandler {
             // Add context
             frame.addContext(ContextKeys.INTERACTION_FACE, face);
             frame.addContext(ContextKeys.INTERACTION_LOCATION, clickedLocation);
-            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(clickedLocation.getExtent(), message.getPosition()));
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(clickedLocation.getWorld(), message.getPosition()));
             frame.addContext(ContextKeys.PLAYER, this.player);
 
             final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);

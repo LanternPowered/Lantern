@@ -35,5 +35,5 @@ import javax.annotation.Nullable;
 @FunctionalInterface
 public interface ObjectProvider<T> {
 
-    T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face);
+    T get(BlockState blockState, @Nullable Location location, @Nullable Direction face);
 }

@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.world.WeakWorldReference;
-import org.lanternpowered.server.world.WeakWorldReferencedLocation;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
@@ -51,8 +50,7 @@ public class LanternLocatableBlockBuilder extends AbstractDataBuilder<LocatableB
     @Nullable public BlockState blockState;
     @Nullable public Vector3i position;
     @Nullable public WeakWorldReference world;
-
-    @Nullable public Location<World> location;
+    @Nullable public Location location;
 
     public LanternLocatableBlockBuilder() {
         super(LocatableBlock.class, 1);
@@ -65,11 +63,11 @@ public class LanternLocatableBlockBuilder extends AbstractDataBuilder<LocatableB
     }
 
     @Override
-    public LocatableBlock.Builder location(Location<World> location) {
+    public LocatableBlock.Builder location(Location location) {
         checkNotNull(location, "location");
         this.blockState = location.getBlock();
         this.position = location.getBlockPosition();
-        this.world = new WeakWorldReference(location.getExtent());
+        this.world = new WeakWorldReference(location.getWorld());
         this.location = location;
         return this;
     }
@@ -101,8 +99,9 @@ public class LanternLocatableBlockBuilder extends AbstractDataBuilder<LocatableB
         checkNotNull(value, "value");
         final LanternLocatableBlock block = (LanternLocatableBlock) value;
         this.blockState = block.blockState;
+        final Location location = block.location;
         this.position = block.location.getPosition().toInt();
-        this.world = block.location.getWorld();
+        this.world = location.getWorldIfAvailable().map(WeakWorldReference::new).orElse(null);
         this.location = null;
         return this;
     }
@@ -116,11 +115,11 @@ public class LanternLocatableBlockBuilder extends AbstractDataBuilder<LocatableB
             final World world = this.world.getWorld().orElseThrow(() -> new IllegalStateException("World is unavailable."));
             blockState = world.getBlock(this.position);
         }
-        final WeakWorldReferencedLocation location;
+        final Location location;
         if (this.location != null) {
-            location = new WeakWorldReferencedLocation(this.location);
+            location = this.location;
         } else {
-            location = new WeakWorldReferencedLocation(this.world, this.position);
+            location = this.world.toLocation(this.position);
         }
         return new LanternLocatableBlock(location, blockState);
     }
@@ -130,7 +129,7 @@ public class LanternLocatableBlockBuilder extends AbstractDataBuilder<LocatableB
         this.world = null;
         this.location = null;
         this.position = null;
-        this.position = null;
+        this.blockState = null;
         return this;
     }
 

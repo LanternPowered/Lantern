@@ -27,7 +27,7 @@ package org.lanternpowered.server.scheduler;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.ThreadHelper;
-import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scheduler.ScheduledTask;
 
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -56,8 +56,6 @@ final class AsyncScheduler extends SchedulerBase {
     private final Thread thread;
 
     AsyncScheduler() {
-        super(ScheduledTask.TaskSynchronicity.ASYNCHRONOUS);
-
         // We are starting it
         this.running = true;
 
@@ -107,26 +105,26 @@ final class AsyncScheduler extends SchedulerBase {
     private void recalibrateMinimumTimeout() {
         this.lock.lock();
         try {
-            final Set<Task> tasks = getScheduledTasks();
+            final Set<ScheduledTask> tasks = getScheduledTasks();
             this.minimumTimeout = Long.MAX_VALUE;
             long now = System.nanoTime();
-            for (Task tmpTask : tasks) {
-                ScheduledTask task = (ScheduledTask) tmpTask;
+            for (ScheduledTask tmpTask : tasks) {
+                LanternScheduledTask scheduled = (LanternScheduledTask) tmpTask;
                 // Recalibrate the wait delay for processing tasks before new
                 // tasks cause the scheduler to process pending tasks.
-                if (task.offset == 0 && task.period == 0) {
+                if (scheduled.task.delay == 0 && scheduled.task.interval == 0) {
                     this.minimumTimeout = 0;
                 }
                 // The time since the task last executed or was added to the map
-                long timeSinceLast = now - task.getTimestamp();
+                long timeSinceLast = now - scheduled.getTimestamp();
 
-                if (task.offset > 0 && task.getState() == ScheduledTask.ScheduledTaskState.WAITING) {
-                    // There is an offset and the task hasn't run yet
-                    this.minimumTimeout = Math.min(task.offset - timeSinceLast, this.minimumTimeout);
+                if (scheduled.task.delay > 0 && scheduled.getState() == LanternScheduledTask.ScheduledTaskState.WAITING) {
+                    // There is an delay and the task hasn't run yet
+                    this.minimumTimeout = Math.min(scheduled.task.delay - timeSinceLast, this.minimumTimeout);
                 }
-                if (task.period > 0 && task.getState().isActive) {
+                if (scheduled.task.interval > 0 && scheduled.getState().isActive) {
                     // The task repeats and has run after the initial delay
-                    this.minimumTimeout = Math.min(task.period - timeSinceLast, this.minimumTimeout);
+                    this.minimumTimeout = Math.min(scheduled.task.interval - timeSinceLast, this.minimumTimeout);
                 }
                 if (this.minimumTimeout <= 0) {
                     break;
@@ -166,12 +164,12 @@ final class AsyncScheduler extends SchedulerBase {
     }
 
     @Override
-    protected void executeTaskRunnable(ScheduledTask task, Runnable runnable) {
+    protected void executeTaskRunnable(LanternScheduledTask task, Runnable runnable) {
         this.executor.submit(runnable);
     }
 
     @Override
-    protected void addTask(ScheduledTask task) {
+    protected void addTask(LanternScheduledTask task) {
         this.lock.lock();
         try {
             super.addTask(task);

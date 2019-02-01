@@ -55,7 +55,7 @@ public class EnderChestInteractionBehavior implements InteractWithBlockBehavior 
                 context.requireContext(ContextKeys.BLOCK_LOCATION), tasks)) {
             return BehaviorResult.CONTINUE;
         }
-        final Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
+        final Location location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         final AbstractInventory inventory = player.getEnderChestInventory();
         final Optional<TileEntity> optTileEntity = location.getTileEntity();
         if (optTileEntity.isPresent() && optTileEntity.get() instanceof InventoryViewerListener) {

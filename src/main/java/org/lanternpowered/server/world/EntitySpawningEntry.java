@@ -35,7 +35,7 @@ import java.util.function.Consumer;
 public final class EntitySpawningEntry {
 
     final EntityType entityType;
-    final Transform<World> transform;
+    final Transform transform;
     final Consumer<Entity> entityConsumer;
 
     /**
@@ -44,7 +44,7 @@ public final class EntitySpawningEntry {
      * @param entityType The entity type that will be constructed
      * @param transform The transform that should be applied to the entity
      */
-    public EntitySpawningEntry(EntityType entityType, Transform<World> transform) {
+    public EntitySpawningEntry(EntityType entityType, Transform transform) {
         this(entityType, transform, entity -> {});
     }
 
@@ -55,7 +55,7 @@ public final class EntitySpawningEntry {
      * @param transform The transform that should be applied to the entity
      * @param entityConsumer The consumer that can be used to apply properties to the entity
      */
-    public EntitySpawningEntry(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
+    public EntitySpawningEntry(EntityType entityType, Transform transform, Consumer<Entity> entityConsumer) {
         this.entityConsumer = entityConsumer;
         this.entityType = entityType;
         this.transform = transform;

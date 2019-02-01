@@ -1230,7 +1230,7 @@ public class LanternGameRegistry implements XGameRegistry {
     }
 
     @Override
-    public ExtentBufferFactory getExtentBufferFactory() {
+    public ExtentBufferFactory getWorldBufferFactory() {
         return LanternExtentBufferFactory.INSTANCE;
     }
 

@@ -186,7 +186,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public BlockState withExtendedProperties(Location<World> location) {
+    public BlockState withExtendedProperties(Location location) {
         // Extended block states are no more, got removed
         // in 1.13, all states are now server side.
         return this;
@@ -337,8 +337,8 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public BlockSnapshot snapshotFor(Location<World> location) {
-        final World world = location.getExtent();
+    public BlockSnapshot snapshotFor(Location location) {
+        final World world = location.getWorld();
         final Vector3i pos = location.getBlockPosition();
         final LanternTileEntity tileEntity = (LanternTileEntity) getType().getTileEntityProvider()
                 .map(provider -> provider.get(this, location, null))

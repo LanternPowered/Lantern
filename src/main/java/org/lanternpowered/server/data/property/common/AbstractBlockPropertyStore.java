@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
 public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> extends AbstractLanternPropertyStore<T>
         implements DirectionRelativePropertyStore<T> {
 
-    protected abstract Optional<T> getFor(BlockState blockState, @Nullable Location<World> location, @Nullable Direction direction);
+    protected abstract Optional<T> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction);
 
     @Override
     public Optional<T> getFor(PropertyHolder propertyHolder) {
@@ -60,7 +60,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
     }
 
     @Override
-    public Optional<T> getFor(Location<World> location, Direction direction) {
+    public Optional<T> getFor(Location location, Direction direction) {
         return getFor0(location, checkNotNull(direction, "direction"));
     }
 
@@ -71,7 +71,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
         } else if (propertyHolder instanceof BlockType) {
             return getFor(((BlockType) propertyHolder).getDefaultState(), null, direction);
         } else if (propertyHolder instanceof Location) {
-            return getFor0((Location<World>) propertyHolder, direction);
+            return getFor0((Location) propertyHolder, direction);
         } else if (propertyHolder instanceof ItemType) {
             final Optional<BlockType> type = ((ItemType) propertyHolder).getBlock();
             if (type.isPresent()) {
@@ -86,7 +86,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
         return Optional.empty();
     }
 
-    private Optional<T> getFor0(Location<World> propertyHolder, @Nullable Direction direction) {
+    private Optional<T> getFor0(Location propertyHolder, @Nullable Direction direction) {
         try {
             return getFor(propertyHolder.getBlock(), propertyHolder, direction);
         // Can be thrown if the extent is gc

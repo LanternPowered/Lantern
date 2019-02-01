@@ -32,7 +32,7 @@ import org.lanternpowered.server.world.LanternWorld
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.world.Dimension
 import org.spongepowered.api.world.DimensionType
-import org.spongepowered.api.world.GeneratorType
+import org.spongepowered.api.world.gen.GeneratorType
 import java.util.function.BiFunction
 
 class LanternDimensionType<T : LanternDimension>(

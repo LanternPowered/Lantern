@@ -305,11 +305,11 @@ public class LanternCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition) {
+    public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location targetPosition) {
         return getSuggestions(source, arguments, targetPosition, false);
     }
 
-    public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition, boolean usingBlock) {
+    public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location targetPosition, boolean usingBlock) {
         final CauseStack causeStack = CauseStack.currentOrEmpty();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.pushCause(source);

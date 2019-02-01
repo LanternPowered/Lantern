@@ -100,7 +100,7 @@ public interface AbstractExtent extends IExtent {
 
     @Override
     default boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
-        final Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
+        final Location location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
         checkArgument(location != null, "location is not present in snapshot");
         return restoreSnapshot(location.getBlockPosition(), snapshot, force, flag);
     }

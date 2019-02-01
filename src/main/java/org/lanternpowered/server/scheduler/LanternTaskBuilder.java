@@ -25,35 +25,35 @@
  */
 package org.lanternpowered.server.scheduler;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.api.cause.CauseStack;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scheduler.TaskSynchronicity;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 public class LanternTaskBuilder implements Task.Builder {
 
-    private final LanternScheduler scheduler;
+    private static AtomicInteger taskCounter = new AtomicInteger();
 
-    @Nullable private Consumer<Task> consumer;
-    private ScheduledTask.TaskSynchronicity syncType;
+    @Nullable private Consumer<ScheduledTask> consumer;
+    private TaskSynchronicity synchronicity;
     @Nullable private String name;
-    private long delay;
-    private long interval;
-    private boolean delayIsTicks;
-    private boolean intervalIsTicks;
+    private Duration delay;
+    private Duration interval;
+    @Nullable private PluginContainer plugin;
 
-    public LanternTaskBuilder(LanternScheduler scheduler) {
-        this.scheduler = scheduler;
+    public LanternTaskBuilder() {
         reset();
     }
 
@@ -61,53 +61,33 @@ public class LanternTaskBuilder implements Task.Builder {
     public LanternTaskBuilder reset() {
         this.name = null;
         this.consumer = null;
-        this.syncType = ScheduledTask.TaskSynchronicity.SYNCHRONOUS;
-        this.delay = 0;
-        this.interval = 0;
+        this.synchronicity = TaskSynchronicity.SYNC;
+        this.delay = Duration.ofMillis(0);
+        this.interval = Duration.ofMillis(0);
         return this;
     }
 
     @Override
-    public LanternTaskBuilder async() {
-        this.syncType = ScheduledTask.TaskSynchronicity.ASYNCHRONOUS;
+    public Task.Builder synchronicity(TaskSynchronicity synchronicity) {
+        this.synchronicity = checkNotNull(synchronicity, "synchronicity");
         return this;
     }
 
     @Override
-    public LanternTaskBuilder execute(Consumer<Task> consumer) {
+    public LanternTaskBuilder execute(Consumer<ScheduledTask> consumer) {
         this.consumer = consumer;
         return this;
     }
 
     @Override
-    public LanternTaskBuilder delay(long delay, TimeUnit unit) {
-        checkArgument(delay >= 0, "delay cannot be negative");
-        this.delay = checkNotNull(unit, "unit").toNanos(delay);
-        this.delayIsTicks = false;
+    public LanternTaskBuilder delay(Duration delay) {
+        this.delay = checkNotNull(delay, "delay");
         return this;
     }
 
     @Override
-    public LanternTaskBuilder delayTicks(long delay) {
-        checkArgument(delay >= 0, "delay cannot be negative");
-        this.delay = delay;
-        this.delayIsTicks = true;
-        return this;
-    }
-
-    @Override
-    public LanternTaskBuilder interval(long interval, TimeUnit unit) {
-        checkArgument(interval >= 0, "interval cannot be negative");
-        this.interval = checkNotNull(unit, "unit").toNanos(interval);
-        this.intervalIsTicks = false;
-        return this;
-    }
-
-    @Override
-    public LanternTaskBuilder intervalTicks(long interval) {
-        checkArgument(interval >= 0, "interval cannot be negative");
-        this.interval = interval;
-        this.intervalIsTicks = true;
+    public LanternTaskBuilder interval(Duration interval) {
+        this.interval = checkNotNull(interval, "interval");
         return this;
     }
 
@@ -118,40 +98,39 @@ public class LanternTaskBuilder implements Task.Builder {
     }
 
     @Override
-    public Task submit(Object plugin) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+    public LanternTaskBuilder plugin(Object plugin) {
+        this.plugin = checkPlugin(plugin, "plugin");
+        return this;
+    }
+
+    @Override
+    public Task build() {
         checkState(this.consumer != null, "consumer not set");
         final String name;
+        PluginContainer plugin = this.plugin;
+        if (plugin == null) {
+            plugin = CauseStack.currentOrEmpty().first(PluginContainer.class)
+                    .orElseThrow(() -> new IllegalStateException("No PluginContainer found in the CauseStack."));
+        }
         if (this.name == null) {
-            name = this.scheduler.getNameFor(pluginContainer, this.syncType);
+            final int number = taskCounter.incrementAndGet();
+            name = String.format("%s-%s-%s", plugin.getId(), this.synchronicity == TaskSynchronicity.ASYNC ? "A" : "S", number);
         } else {
             name = this.name;
         }
-        long delay = this.delay;
-        long interval = this.interval;
-        boolean delayIsTicks = this.delayIsTicks;
-        boolean intervalIsTicks = this.intervalIsTicks;
-        if (this.syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
-            delay = delayIsTicks ? delay * LanternGame.TICK_DURATION_NS : delay;
-            interval = intervalIsTicks ? interval * LanternGame.TICK_DURATION_NS : interval;
-            delayIsTicks = intervalIsTicks = false;
-        }
-        ScheduledTask task = new ScheduledTask(this.syncType, this.consumer, name, delay,
-                delayIsTicks, interval, intervalIsTicks, pluginContainer);
-        this.scheduler.submit(task);
-        return task;
+        final long delay = this.delay.toNanos();
+        final long interval = this.interval.toNanos();
+        return new LanternTask(this.synchronicity, this.consumer, name, delay, interval, plugin);
     }
 
     @Override
     public LanternTaskBuilder from(Task value) {
         this.reset();
-        final ScheduledTask task = (ScheduledTask) value;
-        this.delayIsTicks = true;
-        this.delay = task.offset;
-        this.intervalIsTicks = task.intervalIsTicks;
-        this.interval = task.period;
+        final LanternTask task = (LanternTask) value;
+        this.delay = task.getDelay();
+        this.interval = task.getInterval();
         this.consumer = task.getConsumer();
-        this.syncType = task.syncType;
+        this.synchronicity = task.getSynchronicity();
         this.name = task.getName();
         return this;
     }

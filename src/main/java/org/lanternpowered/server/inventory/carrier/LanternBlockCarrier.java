@@ -41,15 +41,15 @@ import org.spongepowered.api.world.World;
 public class LanternBlockCarrier<T extends CarriedInventory<?>> extends AbstractCarrier<T>
         implements Locatable, BlockCarrier {
 
-    private final Location<World> location;
+    private final Location location;
 
-    public LanternBlockCarrier(Location<World> location) {
+    public LanternBlockCarrier(Location location) {
         checkNotNull(location, "location");
         this.location = location;
     }
 
     @Override
-    public Location<World> getLocation() {
+    public Location getLocation() {
         return this.location;
     }
 

@@ -53,15 +53,15 @@ public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayer
                 context.getSession().send(new MessagePlayOutEntityVelocity(player.getNetworkId(), 0, 1.0, 0));
                 player.offer(Keys.IS_ELYTRA_FLYING, true);
             } else if (player.get(LanternKeys.CAN_WALL_JUMP).orElse(false)) {
-                final Location<World> location = player.getLocation();
+                final Location location = player.getLocation();
 
                 // Get the horizontal direction the player is looking
                 final Direction direction = player.getHorizontalDirection(Direction.Division.CARDINAL);
 
                 // Get the block location the player may step against
-                final Location<World> location1 = location.add(direction.asOffset().mul(0.6, 0, 0.6));
+                final Location location1 = location.add(direction.asOffset().mul(0.6, 0, 0.6));
 
-                SolidSideProperty solidSideProperty = location1.getExtent().getProperty(
+                SolidSideProperty solidSideProperty = location1.getWorld().getProperty(
                         location1.getBlockPosition(), direction.getOpposite(), SolidSideProperty.class).orElse(null);
                 // Make sure that the side you step against is solid
                 //noinspection ConstantConditions
@@ -76,9 +76,9 @@ public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayer
                     // Now we try if the player can jump away from the wall
 
                     // Get the block location the player may step against
-                    final Location<World> location2 = location.add(direction.asOffset().mul(-0.6, 0, -0.6));
+                    final Location location2 = location.add(direction.asOffset().mul(-0.6, 0, -0.6));
 
-                    solidSideProperty = location2.getExtent().getProperty(
+                    solidSideProperty = location2.getWorld().getProperty(
                             location2.getBlockPosition(), direction, SolidSideProperty.class).orElse(null);
 
                     //noinspection ConstantConditions

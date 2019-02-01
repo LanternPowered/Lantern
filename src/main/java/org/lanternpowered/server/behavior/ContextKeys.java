@@ -59,13 +59,13 @@ public final class ContextKeys {
      * The exact point where for example a {@link Player} interacted
      * to place the block.
      */
-    public static final EventContextKey<Location<World>> INTERACTION_LOCATION = createFor("INTERACTION_LOCATION");
+    public static final EventContextKey<Location> INTERACTION_LOCATION = createFor("INTERACTION_LOCATION");
 
     public static final EventContextKey<Direction> INTERACTION_FACE = createFor("INTERACTION_FACE");
 
     public static final EventContextKey<HandType> INTERACTION_HAND = createFor("INTERACTION_HAND");
 
-    public static final EventContextKey<Location<World>> BLOCK_LOCATION = createFor("BLOCK_LOCATION");
+    public static final EventContextKey<Location> BLOCK_LOCATION = createFor("BLOCK_LOCATION");
 
     public static final EventContextKey<BlockType> BLOCK_TYPE = createFor("BLOCK_TYPE");
 

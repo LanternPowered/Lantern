@@ -47,7 +47,7 @@ public final class BlockPropertyStore<T extends Property<?,?>> extends AbstractB
     }
 
     @Override
-    protected Optional<T> getFor(BlockState blockState, @Nullable Location<World> location,
+    protected Optional<T> getFor(BlockState blockState, @Nullable Location location,
              @Nullable Direction direction) {
         final Optional<PropertyProvider<T>> provider = ((LanternBlockType) blockState.getType())
                 .getPropertyProviderCollection().get(this.propertyType);

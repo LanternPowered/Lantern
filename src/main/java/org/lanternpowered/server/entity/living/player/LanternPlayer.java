@@ -32,7 +32,6 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
@@ -166,11 +165,11 @@ import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.ban.Ban;
-import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.chunk.ChunkTicketManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -649,11 +648,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     public void handleRespawn() {
         resetOpenedSignPosition();
-        Transform<World> transform = getTransform();
-        final LanternWorld world = (LanternWorld) transform.getExtent();
+        Transform transform = getTransform();
+        final LanternWorld world = (LanternWorld) transform.getWorld();
         if (isDead()) {
             // TODO: Get the proper spawn location
-            final Transform<World> toTransform = new Transform<>(transform.getExtent(), new Vector3d(0, 100, 0));
+            final Transform toTransform = new Transform(transform.getWorld(), new Vector3d(0, 100, 0));
 
             // Make the player less dead...
             setDead(false);
@@ -672,14 +671,14 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 frame.addContext(EventContextKeys.PLAYER, this);
 
                 final RespawnPlayerEvent event = SpongeEventFactory.createRespawnPlayerEvent(causeStack.getCurrentCause(),
-                        transform, toTransform, this, this, false, true);
+                        this, this, transform, toTransform, false, true);
                 Sponge.getEventManager().post(event);
 
                 // Get the to transform, this can be overridden in the event
                 transform = event.getToTransform();
             }
         }
-        setWorld(world, (LanternWorld) transform.getExtent());
+        setWorld(world, (LanternWorld) transform.getWorld());
         setPosition(transform.getPosition());
     }
 
@@ -746,11 +745,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation) {
+    public boolean setLocationAndRotation(Location location, Vector3d rotation) {
         final World oldWorld = getWorld();
         final boolean success = super.setLocationAndRotation(location, rotation);
         if (success) {
-            final World world = location.getExtent();
+            final World world = location.getWorld();
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
                 final Vector3d pos = location.getPosition();
@@ -763,11 +762,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
-    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+    public boolean setLocationAndRotation(Location location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
         final World oldWorld = getWorld();
         final boolean success = super.setLocationAndRotation(location, rotation, relativePositions);
         if (success) {
-            final World world = location.getExtent();
+            final World world = location.getWorld();
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
                 final Vector3d pos = location.getPosition();
@@ -1249,7 +1248,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             return;
         }
         final ChangeWorldBorderEvent.TargetPlayer event = SpongeEventFactory.createChangeWorldBorderEventTargetPlayer(
-                cause, Optional.ofNullable(border), Optional.ofNullable(this.worldBorder), this);
+                cause, Optional.ofNullable(border), this, Optional.ofNullable(this.worldBorder));
         Sponge.getEventManager().post(event);
         if (event.isCancelled()) {
             return;

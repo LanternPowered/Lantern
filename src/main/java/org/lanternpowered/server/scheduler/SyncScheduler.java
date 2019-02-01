@@ -29,44 +29,29 @@ import org.lanternpowered.api.cause.CauseStack;
 
 final class SyncScheduler extends SchedulerBase {
 
-    // The number of ticks elapsed since this scheduler began.
-    private volatile long counter = 0L;
-
     SyncScheduler() {
-        super(ScheduledTask.TaskSynchronicity.SYNCHRONOUS);
     }
 
     /**
      * The hook to update the Ticks known by the SyncScheduler.
      */
     void tick() {
-        final long counter = this.counter;
-        this.counter = counter + 1;
         runTick();
     }
 
     @Override
-    protected long getTimestamp(ScheduledTask task) {
-        if (task.getState() == ScheduledTask.ScheduledTaskState.WAITING) {
-            // The timestamp is based on the initial offset
-            if (task.delayIsTicks) {
-                return this.counter;
-            } else {
-                return super.getTimestamp(task);
-            }
-        } else if (task.getState().isActive) {
-            // The timestamp is based on the period
-            if (task.intervalIsTicks) {
-                return this.counter;
-            } else {
-                return super.getTimestamp(task);
-            }
+    protected long getTimestamp(LanternScheduledTask task) {
+        // The timestamp is based on the initial delay
+        if (task.getState() == LanternScheduledTask.ScheduledTaskState.WAITING ||
+                // The timestamp is based on the interval
+                task.getState().isActive) {
+            return super.getTimestamp(task);
         }
         return 0L;
     }
 
     @Override
-    protected void executeTaskRunnable(ScheduledTask task, Runnable runnable) {
+    protected void executeTaskRunnable(LanternScheduledTask task, Runnable runnable) {
         final CauseStack causeStack = CauseStack.current();
         causeStack.pushCause(task.getOwner());
         causeStack.pushCause(task);

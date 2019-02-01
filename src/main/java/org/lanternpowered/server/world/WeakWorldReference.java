@@ -27,9 +27,12 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.lang.ref.WeakReference;
@@ -91,6 +94,14 @@ public final class WeakWorldReference {
             return Optional.of(world);
         }
         return Optional.empty();
+    }
+
+    public Location toLocation(Vector3i position) {
+        return getWorld().map(world -> new Location(world, position)).orElseGet(() -> new Location(getUniqueId(), position));
+    }
+
+    public Location toLocation(Vector3d position) {
+        return getWorld().map(world -> new Location(world, position)).orElseGet(() -> new Location(getUniqueId(), position));
     }
 
     @Override

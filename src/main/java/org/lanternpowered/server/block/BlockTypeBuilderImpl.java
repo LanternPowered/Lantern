@@ -100,7 +100,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
 
         @Override
         public Collection<AABB> get(BlockState blockState,
-                @Nullable Location<World> location, @Nullable Direction face) {
+                @Nullable Location location, @Nullable Direction face) {
             return Collections.singletonList(this.collisionBoxProvider.get(blockState, location, face));
         }
     }

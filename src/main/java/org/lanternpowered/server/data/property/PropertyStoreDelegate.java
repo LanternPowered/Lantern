@@ -55,7 +55,7 @@ public class PropertyStoreDelegate<T extends Property<?, ?>> implements Directio
     }
 
     @Override
-    public Optional<T> getFor(Location<World> location) {
+    public Optional<T> getFor(Location location) {
         for (PropertyStore<T> propertyStore : this.propertyStores) {
             final Optional<T> optional = propertyStore.getFor(location);
             if (optional.isPresent()) {
@@ -66,7 +66,7 @@ public class PropertyStoreDelegate<T extends Property<?, ?>> implements Directio
     }
 
     @Override
-    public Optional<T> getFor(Location<World> location, Direction direction) {
+    public Optional<T> getFor(Location location, Direction direction) {
         for (PropertyStore<T> propertyStore : this.propertyStores) {
             final Optional<T> optional = propertyStore.getFor(location, direction);
             if (optional.isPresent()) {

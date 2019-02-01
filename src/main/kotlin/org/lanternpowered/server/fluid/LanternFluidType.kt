@@ -25,19 +25,28 @@
  */
 package org.lanternpowered.server.fluid
 
+import com.google.common.collect.ImmutableList
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.data.property.AbstractPropertyHolder
-import org.spongepowered.api.block.BlockType
-import org.spongepowered.api.extra.fluid.FluidType
-import java.util.Optional
+import org.spongepowered.api.fluid.FluidState
+import org.spongepowered.api.fluid.FluidType
+import org.spongepowered.api.state.StateProperty
 
 class LanternFluidType @JvmOverloads constructor(
-        key: CatalogKey, override val internalId: Int,
-        private val blockTypeSupplier: () -> BlockType? = { null }
+        key: CatalogKey, override val internalId: Int
 ) : DefaultCatalogType(key), FluidType, AbstractPropertyHolder, InternalCatalogType {
+    override fun getDefaultState(): FluidState {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
-    override fun getBlockTypeBase(): Optional<BlockType> = this.blockTypeSupplier().optional()
+    override fun getStateProperties(): MutableCollection<StateProperty<*>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getValidStates(): ImmutableList<FluidState> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 }

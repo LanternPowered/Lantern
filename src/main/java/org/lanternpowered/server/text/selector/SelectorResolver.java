@@ -338,7 +338,7 @@ public class SelectorResolver {
         int maxToSelect = this.selector.get(ArgumentTypes.COUNT).orElse(defaultCount);
         boolean isReversed = maxToSelect < 0;
         maxToSelect = Math.abs(maxToSelect);
-        Set<? extends Extent> extents = getExtentSet();
+        Set<? extends Extent> extents = getWorldSet();
         Stream<Entity> entityStream = extents.stream()
                 .flatMap(ext -> ext.getEntities().stream())
                 .filter(this.selectorFilter);
@@ -371,7 +371,7 @@ public class SelectorResolver {
         };
     }
 
-    private Set<? extends Extent> getExtentSet() {
+    private Set<? extends Extent> getWorldSet() {
         final boolean location = this.selector.getArguments().stream()
                 .anyMatch(arg -> LOCATION_BASED_ARGUMENTS.contains(arg.getType()));
         if (location && this.origin instanceof Locatable) {

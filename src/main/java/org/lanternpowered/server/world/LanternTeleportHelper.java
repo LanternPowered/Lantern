@@ -37,7 +37,7 @@ import java.util.Optional;
 public class LanternTeleportHelper implements TeleportHelper {
 
     @Override
-    public Optional<Location<World>> getSafeLocation(Location<World> location, int height, int width, int floorDistance,
+    public Optional<Location> getSafeLocation(Location location, int height, int width, int floorDistance,
             TeleportHelperFilter filter, TeleportHelperFilter... additionalFilters) {
         return Optional.empty();
     }

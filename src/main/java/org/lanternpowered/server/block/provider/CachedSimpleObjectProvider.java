@@ -60,7 +60,7 @@ public class CachedSimpleObjectProvider<T> implements ObjectProvider<T> {
     }
 
     @Override
-    public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
+    public T get(BlockState blockState, @Nullable Location location, @Nullable Direction face) {
         return (T) this.values[((LanternBlockState) blockState).getInternalId()];
     }
 

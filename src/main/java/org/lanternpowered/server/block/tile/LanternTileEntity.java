@@ -61,7 +61,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     private final ValueCollection valueCollection = ValueCollection.create();
     private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers = AdditionalContainerCollection.createConcurrent();
 
-    @Nullable private volatile Location<World> location;
+    @Nullable private volatile Location location;
     @Nullable volatile BlockState blockState;
     private volatile boolean valid;
     @Nullable private TileEntityProtocolType<?> protocolType;
@@ -135,7 +135,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     }
 
     @Override
-    public Location<World> getLocation() {
+    public Location getLocation() {
         return requireNonNull(this.location, "The location isn't available.");
     }
 
@@ -174,7 +174,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
      *
      * @param location The location
      */
-    public void setLocation(Location<World> location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 

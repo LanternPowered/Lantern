@@ -72,7 +72,7 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotProviderPlaceBehavior's BlockSnapshot isn't present."));
-        final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        final Location location = context.requireContext(ContextKeys.BLOCK_LOCATION);
 
         final BlockType blockType = context.requireContext(ContextKeys.BLOCK_TYPE);
         final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
@@ -94,7 +94,7 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
             sneaking = true;
         }
 
-        Location<World> relLocation = location.getBlockRelative(face.getOpposite());
+        Location relLocation = location.getBlockRelative(face.getOpposite());
         BlockState relState = relLocation.getBlock();
         if (relState.getType() == blockType) {
             final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();

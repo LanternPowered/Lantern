@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.world.WeakWorldReferencedLocation;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
@@ -102,9 +101,9 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
      * @param location The location
      * @return This builder, for chaining
      */
-    public BlockSnapshotBuilder location(Location<World> location) {
+    public BlockSnapshotBuilder location(Location location) {
         checkNotNull(location, "location");
-        this.worldUUID = location.getExtent().getProperties().getUniqueId();
+        this.worldUUID = location.getWorld().getProperties().getUniqueId();
         this.position = location.getBlockPosition();
         return this;
     }
@@ -129,12 +128,12 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
     }
 
     @Override
-    public BlockSnapshotBuilder from(Location<World> location) {
+    public BlockSnapshotBuilder from(Location location) {
         checkNotNull(location, "location");
-        this.worldUUID = location.getExtent().getProperties().getUniqueId();
+        this.worldUUID = location.getWorld().getProperties().getUniqueId();
         this.position = location.getBlockPosition();
         this.blockState = location.getBlock();
-        final World world = location.getExtent();
+        final World world = location.getWorld();
         this.creator = world.getCreator(location.getBlockPosition()).orElse(null);
         this.notifier = world.getNotifier(location.getBlockPosition()).orElse(null);
         this.tileEntity = LanternBlockSnapshot.copy((LanternTileEntity) location.getTileEntity().orElse(null));
@@ -209,9 +208,9 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         this.creator = snapshot.getCreator().orElse(null);
         this.notifier = snapshot.getNotifier().orElse(null);
         this.blockState = snapshot.getState();
-        final WeakWorldReferencedLocation blockLocation = snapshot.location;
-        this.worldUUID = blockLocation == null ? null : blockLocation.getWorld().getUniqueId();
-        this.position = blockLocation == null ? null : blockLocation.getBlockPosition();
+        final Location location = snapshot.location;
+        this.worldUUID = location == null ? null : location.getWorldUniqueId();
+        this.position = location == null ? null : location.getBlockPosition();
         if (this.tileEntityManipulatorData != null) {
             this.tileEntityManipulatorData.clear();
         }
@@ -225,8 +224,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
     @Override
     public BlockSnapshot build() {
         checkState(this.blockState != null, "The block state must be set.");
-        final WeakWorldReferencedLocation blockLocation = this.worldUUID == null  || this.position == null ? null :
-                new WeakWorldReferencedLocation(this.worldUUID, this.position);
+        final Location blockLocation = this.worldUUID == null  || this.position == null ? null : new Location(this.worldUUID, this.position);
         final LanternTileEntity tileEntity = (LanternTileEntity) ((LanternBlockType) this.blockState.getType()).getTileEntityProvider()
                 .map(provider -> provider.get(this.blockState, null, null))
                 .orElse(null);

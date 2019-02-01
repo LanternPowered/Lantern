@@ -45,7 +45,7 @@ public class ChestBreakBehavior implements BreakBlockBehavior {
 
     @Override
     public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
+        Location location = context.requireContext(ContextKeys.BLOCK_LOCATION);
         final BlockState state = location.getBlock();
         final Direction connectionDir = LanternChest.getConnectedDirection(state);
         if (connectionDir != Direction.NONE) {

@@ -32,12 +32,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scheduler.TaskSynchronicity;
 import org.spongepowered.api.util.Functional;
 
 import java.util.Optional;
@@ -60,13 +61,8 @@ public class LanternScheduler implements Scheduler {
     }
 
     @Override
-    public LanternTaskBuilder createTaskBuilder() {
-        return new LanternTaskBuilder(this);
-    }
-
-    @Override
-    public Optional<Task> getTaskById(UUID id) {
-        final Optional<Task> task = this.syncScheduler.getTask(id);
+    public Optional<ScheduledTask> getTaskById(UUID id) {
+        final Optional<ScheduledTask> task = this.syncScheduler.getTask(id);
         if (task.isPresent()) {
             return task;
         }
@@ -74,24 +70,25 @@ public class LanternScheduler implements Scheduler {
     }
 
     @Override
-    public Set<Task> getTasksByName(String pattern) {
+    public Set<ScheduledTask> getTasksByName(String pattern) {
         final Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
-        return getScheduledTasks().stream()
+        return getTasks().stream()
                 .filter(task -> searchPattern.matcher(task.getName()).matches())
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
-    public Set<Task> getScheduledTasks() {
-        final ImmutableSet.Builder<Task> builder = ImmutableSet.builder();
+    public Set<ScheduledTask> getTasks() {
+        final ImmutableSet.Builder<ScheduledTask> builder = ImmutableSet.builder();
         builder.addAll(this.asyncScheduler.getScheduledTasks());
         builder.addAll(this.syncScheduler.getScheduledTasks());
         return builder.build();
     }
 
     @Override
-    public Set<Task> getScheduledTasks(boolean async) {
-        if (async) {
+    public Set<ScheduledTask> getTasks(TaskSynchronicity synchronicity) {
+        checkNotNull(synchronicity, "synchronicity");
+        if (synchronicity == TaskSynchronicity.ASYNC) {
             return this.asyncScheduler.getScheduledTasks();
         } else {
             return this.syncScheduler.getScheduledTasks();
@@ -99,10 +96,10 @@ public class LanternScheduler implements Scheduler {
     }
 
     @Override
-    public Set<Task> getScheduledTasks(Object plugin) {
+    public Set<ScheduledTask> getTasksByPlugin(Object plugin) {
         final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        return getScheduledTasks().stream()
-                .filter(task -> task.getOwner().equals(pluginContainer))
+        return getTasks().stream()
+                .filter(task -> task.getTask().getOwner().equals(pluginContainer))
                 .collect(ImmutableSet.toImmutableSet());
     }
 
@@ -119,7 +116,7 @@ public class LanternScheduler implements Scheduler {
      */
     public <V> Future<V> callSync(Callable<V> callable) {
         final ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
-        createTaskBuilder().execute(future).submit(Lantern.getMinecraftPlugin());
+        this.syncScheduler.addTask((LanternScheduledTask) new LanternTaskBuilder().execute(future).build());
         return future;
     }
 
@@ -129,31 +126,15 @@ public class LanternScheduler implements Scheduler {
      * @param runnable The runnable
      */
     public void callSync(Runnable runnable) {
-        createTaskBuilder().execute(runnable).submit(Lantern.getMinecraftPlugin());
+        this.syncScheduler.addTask((LanternScheduledTask) new LanternTaskBuilder().execute(runnable).build());
     }
 
     private SchedulerBase getDelegate(Task task) {
-        if (task.isAsynchronous()) {
+        if (task.getSynchronicity() == TaskSynchronicity.ASYNC) {
             return this.asyncScheduler;
         } else {
             return this.syncScheduler;
         }
-    }
-
-    private SchedulerBase getDelegate(ScheduledTask.TaskSynchronicity syncType) {
-        if (syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
-            return this.asyncScheduler;
-        } else {
-            return this.syncScheduler;
-        }
-    }
-
-    String getNameFor(PluginContainer plugin, ScheduledTask.TaskSynchronicity syncType) {
-        return getDelegate(syncType).nextName(plugin);
-    }
-
-    void submit(ScheduledTask task) {
-        getDelegate(task).addTask(task);
     }
 
     /**
@@ -168,13 +149,21 @@ public class LanternScheduler implements Scheduler {
     }
 
     @Override
-    public SpongeExecutorService createSyncExecutor(Object plugin) {
-        return new TaskExecutorService(this::createTaskBuilder, this.syncScheduler, checkPlugin(plugin, "plugin"));
+    public TaskExecutorService createSyncExecutor(Object plugin) {
+        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+        return new org.lanternpowered.server.scheduler.TaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer), this.syncScheduler);
     }
 
     @Override
-    public SpongeExecutorService createAsyncExecutor(Object plugin) {
-        return new TaskExecutorService(() -> createTaskBuilder().async(), this.asyncScheduler, checkPlugin(plugin, "plugin"));
+    public TaskExecutorService createAsyncExecutor(Object plugin) {
+        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+        return new org.lanternpowered.server.scheduler.TaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer).async(), this.asyncScheduler);
+    }
+
+    @Override
+    public ScheduledTask submit(Task task) {
+        checkNotNull(task, "task");
+        return getDelegate(task).submit(task);
     }
 
     public <T> CompletableFuture<T> submitAsyncTask(Callable<T> callable) {

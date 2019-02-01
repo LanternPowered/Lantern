@@ -33,10 +33,10 @@ import org.spongepowered.api.world.World
 
 class LanternBlockDamageSourceBuilder : AbstractDamageSourceBuilder<BlockDamageSource, BlockDamageSource.Builder>(), BlockDamageSource.Builder {
 
-    private var location: Location<World>? = null
+    private var location: Location? = null
     private var blockSnapshot: BlockSnapshot? = null
 
-    override fun block(location: Location<World>): BlockDamageSource.Builder = apply { this.location = location }
+    override fun block(location: Location): BlockDamageSource.Builder = apply { this.location = location }
     override fun block(blockSnapshot: BlockSnapshot): BlockDamageSource.Builder = apply { this.blockSnapshot = blockSnapshot }
 
     override fun reset(): BlockDamageSource.Builder = apply {
@@ -52,7 +52,7 @@ class LanternBlockDamageSourceBuilder : AbstractDamageSourceBuilder<BlockDamageS
     }
 
     override fun build(): BlockDamageSource {
-        var location: Location<World>? = this.location
+        var location: Location? = this.location
         var blockSnapshot: BlockSnapshot? = this.blockSnapshot
         if (location == null && blockSnapshot != null) {
             location = blockSnapshot.location.orElse(null)

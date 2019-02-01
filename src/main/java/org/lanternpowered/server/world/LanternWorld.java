@@ -415,12 +415,12 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public Location<World> getLocation(Vector3i position) {
+    public Location getLocation(Vector3i position) {
         return getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public Location<World> getLocation(Vector3d position) {
+    public Location getLocation(Vector3d position) {
         return getLocation(position.getX(), position.getY(), position.getZ());
     }
 
@@ -452,7 +452,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
+    public Extent getWorldView(Vector3i newMin, Vector3i newMax) {
         checkVolumeBounds(newMin);
         checkVolumeBounds(newMax);
         return new ExtentViewDownsize(this, newMin, newMax);
@@ -1150,12 +1150,12 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public Location<World> getLocation(int x, int y, int z) {
+    public Location getLocation(int x, int y, int z) {
         return new Location<>(this, x, y, z);
     }
 
     @Override
-    public Location<World> getLocation(double x, double y, double z) {
+    public Location getLocation(double x, double y, double z) {
         return new Location<>(this, x, y, z);
     }
 
@@ -1236,26 +1236,26 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         return builder.build();
     }
 
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform) {
+    public static void handleEntitySpawning(EntityType entityType, Transform transform) {
         handleEntitySpawning(entityType, transform, entity -> {});
     }
 
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
+    public static void handleEntitySpawning(EntityType entityType, Transform transform, Consumer<Entity> entityConsumer) {
         handleEntitySpawning(entityType, transform, entityConsumer, SpongeEventFactory::createSpawnEntityEvent);
     }
 
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer,
+    public static void handleEntitySpawning(EntityType entityType, Transform transform, Consumer<Entity> entityConsumer,
             Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
         handleEntitySpawning(entityType, transform, entityConsumer, SpongeEventFactory::createSpawnEntityEvent, constructEventChecker);
     }
 
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform,
+    public static void handleEntitySpawning(EntityType entityType, Transform transform,
             Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
         handleEntitySpawning(Collections.singleton(
                 new EntitySpawningEntry(entityType, transform, entityConsumer)), spawnEventConstructor);
     }
 
-    public static void handleEntitySpawning(EntityType entityType, Transform<World> transform,
+    public static void handleEntitySpawning(EntityType entityType, Transform transform,
             Consumer<Entity> entityConsumer, BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor,
             Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
         handleEntitySpawning(Collections.singleton(
@@ -1291,11 +1291,11 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         finishSpawnEntityEvent(spawnEvent);
     }
 
-    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer) {
+    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform transform, Consumer<Entity> entityConsumer) {
         return handlePreEntitySpawning(entityType, transform, entityConsumer, constructEvent -> {});
     }
 
-    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform<World> transform, Consumer<Entity> entityConsumer,
+    public static Optional<Entity> handlePreEntitySpawning(EntityType entityType, Transform transform, Consumer<Entity> entityConsumer,
             Consumer<ConstructEntityEvent.Pre> constructEventChecker) {
         final List<Entity> entities = handlePreEntitySpawning(CauseStack.current(),
                 Collections.singleton(new EntitySpawningEntry(entityType, transform, entityConsumer)), constructEventChecker);
@@ -1325,7 +1325,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
                 constructEventChecker.accept(preConstructEvent);
                 if (!preConstructEvent.isCancelled()) {
                     // Calls the post construction event
-                    entities.add(((LanternWorld) entry.transform.getExtent())
+                    entities.add(((LanternWorld) entry.transform.getWorld())
                             .createEntity(entry.entityType, entry.transform.getPosition(), entry.entityConsumer));
                 }
             }
@@ -1501,7 +1501,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public Location<World> getSpawnLocation() {
+    public Location getSpawnLocation() {
         return new Location<>(this, this.properties.getSpawnPosition());
     }
 

@@ -68,8 +68,8 @@ public abstract class LanternPortalAgent implements PortalAgent {
     }
 
     @Override
-    public Optional<Location<World>> findOrCreatePortal(Location<World> targetLocation) {
-        final Optional<Location<World>> optLoc = this.findPortal(targetLocation);
+    public Optional<Location> findOrCreatePortal(Location targetLocation) {
+        final Optional<Location> optLoc = this.findPortal(targetLocation);
         return optLoc.isPresent() ? optLoc : this.createPortal(targetLocation);
     }
 

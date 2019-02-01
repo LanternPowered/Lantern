@@ -46,7 +46,7 @@ typealias IndirectEntityHealingSourceBuilder = org.spongepowered.api.event.cause
 inline fun HealingSource(type: HealingType, fn: HealingSourceBuilder.() -> Unit = {}): HealingSource =
         HealingSource.builder().type(type).apply(fn).build()
 
-inline fun BlockHealingSource(type: HealingType, location: Location<World>,
+inline fun BlockHealingSource(type: HealingType, location: Location,
                              fn: BlockHealingSourceBuilder.() -> Unit = {}): BlockHealingSource =
         BlockHealingSource.builder().type(type).block(location).apply(fn).build()
 

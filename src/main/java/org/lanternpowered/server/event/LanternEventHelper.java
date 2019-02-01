@@ -47,19 +47,19 @@ import java.util.stream.Collectors;
 
 public final class LanternEventHelper {
 
-    public static void handleDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
+    public static void handleDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform>> entries) {
         LanternWorld.handleEntitySpawning(toSpawningEntries(entries));
     }
-    public static void handleDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries,
+    public static void handleDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform>> entries,
             BiFunction<Cause, List<Entity>, SpawnEntityEvent> spawnEventConstructor) {
         LanternWorld.handleEntitySpawning(toSpawningEntries(entries), spawnEventConstructor);
     }
 
-    public static List<Entity> handlePreDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
+    public static List<Entity> handlePreDroppedItemSpawning(Iterable<Tuple<ItemStackSnapshot, Transform>> entries) {
         return LanternWorld.handlePreEntitySpawning(toSpawningEntries(entries));
     }
 
-    private static List<EntitySpawningEntry> toSpawningEntries(Iterable<Tuple<ItemStackSnapshot, Transform<World>>> entries) {
+    private static List<EntitySpawningEntry> toSpawningEntries(Iterable<Tuple<ItemStackSnapshot, Transform>> entries) {
         return Streams.stream(entries)
                 .map(tuple -> new EntitySpawningEntry(EntityTypes.ITEM, tuple.getSecond(), entity -> {
                     entity.offer(Keys.REPRESENTED_ITEM, tuple.getFirst());
@@ -68,14 +68,14 @@ public final class LanternEventHelper {
                 .collect(Collectors.toList());
     }
 
-    public static Optional<Entity> handlePreDroppedItemSpawning(Transform<World> transform, ItemStackSnapshot snapshot) {
+    public static Optional<Entity> handlePreDroppedItemSpawning(Transform transform, ItemStackSnapshot snapshot) {
         return LanternWorld.handlePreEntitySpawning(EntityTypes.ITEM, transform, entity -> {
             entity.offer(Keys.REPRESENTED_ITEM, snapshot);
             entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
         });
     }
 
-    public static void handleDroppedItemSpawning(Transform<World> transform, ItemStackSnapshot snapshot) {
+    public static void handleDroppedItemSpawning(Transform transform, ItemStackSnapshot snapshot) {
         LanternWorld.handleEntitySpawning(EntityTypes.ITEM, transform, entity -> {
             entity.offer(Keys.REPRESENTED_ITEM, snapshot);
             entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);

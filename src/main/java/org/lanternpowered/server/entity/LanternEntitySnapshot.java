@@ -67,12 +67,12 @@ public class LanternEntitySnapshot implements EntitySnapshot, IImmutableDataHold
     }
 
     @Override
-    public Optional<Location<World>> getLocation() {
+    public Optional<Location> getLocation() {
         return null;
     }
 
     @Override
-    public EntitySnapshot withLocation(Location<World> location) {
+    public EntitySnapshot withLocation(Location location) {
         return null;
     }
 
@@ -82,7 +82,7 @@ public class LanternEntitySnapshot implements EntitySnapshot, IImmutableDataHold
     }
 
     @Override
-    public Optional<Transform<World>> getTransform() {
+    public Optional<Transform> getTransform() {
         return null;
     }
 

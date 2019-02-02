@@ -91,7 +91,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.ScheduledBlockUpdate;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -136,11 +135,12 @@ import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.BlockChangeFlag;
-import org.spongepowered.api.world.Chunk;
-import org.spongepowered.api.world.ChunkPreGenerate;
+import org.spongepowered.api.world.chunk.Chunk;
+import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.PortalAgent;
+import org.spongepowered.api.world.gamerule.GameRule;
+import org.spongepowered.api.world.teleport.PortalAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -1441,28 +1441,18 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public Optional<String> getGameRule(String gameRule) {
+    public <V> void setGameRule(GameRule<V> gameRule, V value) {
+        this.properties.setGameRule(gameRule, value);
+    }
+
+    @Override
+    public <V> V getGameRule(GameRule<V> gameRule) {
         return this.properties.getGameRule(gameRule);
     }
 
     @Override
-    public Map<String, String> getGameRules() {
+    public Map<GameRule<?>, ?> getGameRules() {
         return this.properties.getGameRules();
-    }
-
-    @Override
-    public <T> Optional<Rule<T>> removeRule(RuleType<T> ruleType) {
-        return this.properties.getRules().removeRule(ruleType);
-    }
-
-    @Override
-    public <T> Optional<Rule<T>> getRule(RuleType<T> ruleType) {
-        return this.properties.getRules().getRule(ruleType);
-    }
-
-    @Override
-    public <T> Rule<T> getOrCreateRule(RuleType<T> ruleType) {
-        return this.properties.getRules().getOrCreateRule(ruleType);
     }
 
     @Override
@@ -1502,7 +1492,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     @Override
     public Location getSpawnLocation() {
-        return new Location<>(this, this.properties.getSpawnPosition());
+        return new Location(this, this.properties.getSpawnPosition());
     }
 
     @Override

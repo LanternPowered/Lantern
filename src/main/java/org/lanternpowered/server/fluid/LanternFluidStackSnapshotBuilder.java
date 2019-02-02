@@ -30,7 +30,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
+import org.spongepowered.api.fluid.FluidStackSnapshot;
 
 public final class LanternFluidStackSnapshotBuilder extends AbstractFluidStackBuilder<FluidStackSnapshot, FluidStackSnapshot.Builder>
         implements FluidStackSnapshot.Builder {

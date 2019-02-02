@@ -34,9 +34,9 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
-import org.spongepowered.api.world.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 
 import java.util.Set;
 import java.util.function.Supplier;

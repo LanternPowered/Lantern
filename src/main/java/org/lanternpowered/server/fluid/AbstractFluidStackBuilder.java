@@ -34,10 +34,10 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.extra.fluid.FluidStack;
-import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
-import org.spongepowered.api.extra.fluid.FluidType;
-import org.spongepowered.api.extra.fluid.FluidTypes;
+import org.spongepowered.api.fluid.FluidStack;
+import org.spongepowered.api.fluid.FluidStackSnapshot;
+import org.spongepowered.api.fluid.FluidType;
+import org.spongepowered.api.fluid.FluidTypes;
 
 import java.util.Optional;
 

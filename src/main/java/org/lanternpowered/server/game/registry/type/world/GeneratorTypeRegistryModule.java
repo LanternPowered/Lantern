@@ -49,8 +49,8 @@ import org.spongepowered.api.registry.RegistrationPhase;
 import org.spongepowered.api.registry.util.CustomCatalogRegistration;
 import org.spongepowered.api.registry.util.DelayedRegistration;
 import org.spongepowered.api.registry.util.RegistrationDependency;
-import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.api.world.gen.GeneratorType;
+import org.spongepowered.api.world.gen.GeneratorTypes;
 
 import java.io.BufferedReader;
 import java.io.IOException;

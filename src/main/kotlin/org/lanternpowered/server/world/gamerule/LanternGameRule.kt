@@ -23,15 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.rules;
+package org.lanternpowered.server.world.gamerule
 
-import java.util.Optional;
+import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.catalog.DefaultCatalogType
+import org.spongepowered.api.text.translation.Translation
+import org.spongepowered.api.world.gamerule.GameRule
 
-public interface RuleHolder {
+class LanternGameRule<V>(
+        key: CatalogKey, name: Translation, private val valueType: TypeToken<V>, private val defaultValue: V
+) : DefaultCatalogType(key, name), GameRule<V> {
 
-    <T> Optional<Rule<T>> removeRule(RuleType<T> ruleType);
+    override fun getValueType() = this.valueType
+    override fun getDefaultValue() = this.defaultValue
 
-    <T> Optional<Rule<T>> getRule(RuleType<T> ruleType);
-
-    <T> Rule<T> getOrCreateRule(RuleType<T> ruleType);
+    override fun toStringHelper() = super.toStringHelper()
+            .add("valueType", this.valueType)
+            .add("defaultValue", this.defaultValue)
 }

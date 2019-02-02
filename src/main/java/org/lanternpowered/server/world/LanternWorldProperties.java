@@ -27,21 +27,17 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.portal.LanternPortalAgentType;
-import org.lanternpowered.server.world.rules.Rule;
-import org.lanternpowered.server.world.rules.RuleDataTypes;
-import org.lanternpowered.server.world.rules.RuleType;
-import org.lanternpowered.server.world.rules.Rules;
+import org.lanternpowered.server.world.gamerule.GameRuleContainer;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
 import org.spongepowered.api.CatalogKey;
@@ -54,14 +50,16 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.PortalAgentType;
-import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.gamerule.GameRule;
+import org.spongepowered.api.world.gamerule.GameRules;
+import org.spongepowered.api.world.gen.GeneratorType;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.teleport.PortalAgentType;
+import org.spongepowered.api.world.teleport.PortalAgentTypes;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
@@ -83,9 +81,6 @@ public final class LanternWorldProperties implements WorldProperties {
     // The world config
     private WorldConfig worldConfig;
 
-    // The rules of the world
-    private final Rules rules = new Rules(this);
-
     private final TrackerIdAllocator trackerIdAllocator = new TrackerIdAllocator();
 
     // The world border attached to this properties
@@ -105,6 +100,11 @@ public final class LanternWorldProperties implements WorldProperties {
 
     // The world generator modifiers
     ImmutableSet<WorldGeneratorModifier> generatorModifiers = ImmutableSet.of();
+
+    private final GameRuleContainer gameRules = new GameRuleContainer()
+            .addGameRuleListener(GameRules.REDUCED_DEBUG_INFO, value -> {
+                getWorld().ifPresent(world -> world.broadcast(() -> new MessagePlayOutSetReducedDebug(value)));
+            });
 
     // Whether the difficulty is locked
     private boolean difficultyLocked;
@@ -190,15 +190,6 @@ public final class LanternWorldProperties implements WorldProperties {
      */
     public void setName(String name) {
         this.name = checkNotNull(name, "name");
-    }
-
-    /**
-     * Gets the {@link Rules} that is attached to this properties.
-     *
-     * @return the rules
-     */
-    public Rules getRules() {
-        return this.rules;
     }
 
     public WorldConfig getConfig() {
@@ -536,36 +527,19 @@ public final class LanternWorldProperties implements WorldProperties {
         this.generateBonusChest = generateBonusChest;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Optional<String> getGameRule(String gameRule) {
-        final Optional<RuleType<?>> optRuleType = RuleType.get(gameRule);
-        if (!optRuleType.isPresent()) {
-            return Optional.empty();
-        }
-        final Optional<Rule> rule = this.rules.getRule((RuleType) optRuleType.get());
-        return rule.map(Rule::getRawValue);
+    public <V> void setGameRule(GameRule<V> gameRule, V value) {
+        this.gameRules.setGameRule(gameRule, value);
     }
 
     @Override
-    public Map<String, String> getGameRules() {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        for (Map.Entry<RuleType<?>, Rule<?>> entry : this.rules.getRules().entrySet()) {
-            builder.put(entry.getKey().getName(), entry.getValue().getRawValue());
-        }
-        return builder.build();
+    public <V> V getGameRule(GameRule<V> gameRule) {
+        return this.gameRules.getGameRule(gameRule);
     }
 
     @Override
-    public void setGameRule(String gameRule, String value) {
-        // We cannot know what type a plugin rule would be, so string
-        this.rules.getOrCreateRule(RuleType.getOrCreate(gameRule, RuleDataTypes.STRING, "")).setRawValue(value);
-    }
-
-    @Override
-    public boolean removeGameRule(String gameRule) {
-        final Optional<RuleType<?>> type = RuleType.get(gameRule);
-        return type.isPresent() && this.rules.removeRule(type.get()).isPresent();
+    public Map<GameRule<?>, ?> getGameRules() {
+        return this.gameRules.getGameRules();
     }
 
     @Override
@@ -619,86 +593,6 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
-    public Vector3d getWorldBorderCenter() {
-        return this.worldBorder.getCenter();
-    }
-
-    @Override
-    public void setWorldBorderCenter(double x, double z) {
-        this.worldBorder.setCenter(x, z);
-    }
-
-    @Override
-    public double getWorldBorderDiameter() {
-        return this.worldBorder.getDiameter();
-    }
-
-    @Override
-    public void setWorldBorderDiameter(double diameter) {
-        this.worldBorder.setDiameter(diameter);
-    }
-
-    @Override
-    public long getWorldBorderTimeRemaining() {
-        return this.worldBorder.getTimeRemaining();
-    }
-
-    @Override
-    public void setWorldBorderTimeRemaining(long time) {
-        this.worldBorder.setRemainingTime(time);
-    }
-
-    @Override
-    public double getWorldBorderTargetDiameter() {
-        return this.worldBorder.getNewDiameter();
-    }
-
-    @Override
-    public void setWorldBorderTargetDiameter(double diameter) {
-        this.worldBorder.setDiameter(diameter);
-    }
-
-    @Override
-    public double getWorldBorderDamageThreshold() {
-        return this.worldBorder.getDamageThreshold();
-    }
-
-    @Override
-    public void setWorldBorderDamageThreshold(double distance) {
-        this.worldBorder.setDamageThreshold(distance);
-    }
-
-    @Override
-    public double getWorldBorderDamageAmount() {
-        return this.worldBorder.getDamageAmount();
-    }
-
-    @Override
-    public void setWorldBorderDamageAmount(double damage) {
-        this.worldBorder.setDamageAmount(damage);
-    }
-
-    @Override
-    public int getWorldBorderWarningTime() {
-        return this.worldBorder.getWarningTime();
-    }
-
-    @Override
-    public void setWorldBorderWarningTime(int time) {
-        this.worldBorder.setWarningTime(time);
-    }
-
-    @Override
-    public int getWorldBorderWarningDistance() {
-        return this.worldBorder.getWarningDistance();
-    }
-
-    @Override
-    public void setWorldBorderWarningDistance(int distance) {
-        this.worldBorder.setWarningDistance(distance);
-    }
-
-    @Override
     public boolean isPVPEnabled() {
         return this.worldConfig.getPVPEnabled();
     }
@@ -706,6 +600,11 @@ public final class LanternWorldProperties implements WorldProperties {
     @Override
     public void setPVPEnabled(boolean enabled) {
         this.worldConfig.setPVPEnabled(enabled);
+    }
+
+    @Override
+    public LanternWorldBorder getWorldBorder() {
+        return this.worldBorder;
     }
 
     /**
@@ -736,9 +635,5 @@ public final class LanternWorldProperties implements WorldProperties {
 
     public TrackerIdAllocator getTrackerIdAllocator() {
         return this.trackerIdAllocator;
-    }
-
-    public LanternWorldBorder getWorldBorder() {
-        return this.worldBorder;
     }
 }

@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.ScheduledTaskFuture;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.scheduler.TaskFuture;
 
 import java.time.Duration;
@@ -46,12 +47,12 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-class TaskExecutorService extends AbstractExecutorService implements org.spongepowered.api.scheduler.TaskExecutorService {
+class LanternTaskExecutorService extends AbstractExecutorService implements TaskExecutorService {
 
     private final Supplier<Task.Builder> taskBuilderProvider;
     private final SchedulerBase scheduler;
 
-    TaskExecutorService(Supplier<Task.Builder> taskBuilderProvider, SchedulerBase scheduler) {
+    LanternTaskExecutorService(Supplier<Task.Builder> taskBuilderProvider, SchedulerBase scheduler) {
         this.taskBuilderProvider = taskBuilderProvider;
         this.scheduler = scheduler;
     }

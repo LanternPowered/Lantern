@@ -30,8 +30,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.command.element.ChoicesElement;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
-import org.lanternpowered.server.world.rules.RuleHolder;
-import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -42,6 +40,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.gamerule.GameRules;
 
 public class CommandGameMode extends CommandProvider {
 
@@ -80,7 +79,7 @@ public class CommandGameMode extends CommandProvider {
                     if (player == src) {
                         src.sendMessage(t("commands.gamemode.success.self", gameModeText));
                     } else {
-                        if (((RuleHolder) player.getWorld()).getOrCreateRule(RuleTypes.SEND_COMMAND_FEEDBACK).getValue()) {
+                        if (player.getWorld().getGameRule(GameRules.SEND_COMMAND_FEEDBACK)) {
                             player.sendMessage(t("gameMode.changed", gameModeText));
                         }
                         src.sendMessage(t("commands.gamemode.success.other", player.getName(), gameModeText));

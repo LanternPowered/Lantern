@@ -31,7 +31,7 @@ import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.gen.GeneratorType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.difficulty.Difficulty;

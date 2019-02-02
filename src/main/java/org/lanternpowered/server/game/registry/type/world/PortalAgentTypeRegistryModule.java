@@ -29,8 +29,8 @@ import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryMo
 import org.lanternpowered.server.world.portal.EmptyPortalAgent;
 import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.world.PortalAgentType;
-import org.spongepowered.api.world.PortalAgentTypes;
+import org.spongepowered.api.world.teleport.PortalAgentType;
+import org.spongepowered.api.world.teleport.PortalAgentTypes;
 
 public class PortalAgentTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<PortalAgentType> {
 

@@ -34,7 +34,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder;
 import org.lanternpowered.api.script.context.Parameter;
@@ -73,6 +72,7 @@ import org.lanternpowered.server.cause.entity.healing.source.LanternEntityHealin
 import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSourceBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
+import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
 import org.lanternpowered.server.data.key.LanternKeyBuilder;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
@@ -133,9 +133,6 @@ import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.ArtRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
-import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryModule;
@@ -182,7 +179,6 @@ import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegist
 import org.lanternpowered.server.game.registry.type.scoreboard.ObjectiveDisplayModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.VisibilityRegistryModule;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
-import org.lanternpowered.server.game.registry.type.statistic.StatisticTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
@@ -287,7 +283,7 @@ import org.lanternpowered.server.world.LanternWorldArchetypeBuilder;
 import org.lanternpowered.server.world.LanternWorldBorderBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeGenerationSettingsBuilder;
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
-import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
+import org.lanternpowered.server.world.gamerule.GameRuleRegistry;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.advancement.Advancement;
@@ -372,9 +368,9 @@ import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSourc
 import org.spongepowered.api.event.cause.entity.health.source.HealingSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
-import org.spongepowered.api.extra.fluid.FluidStack;
-import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
-import org.spongepowered.api.extra.fluid.FluidType;
+import org.spongepowered.api.fluid.FluidStack;
+import org.spongepowered.api.fluid.FluidStackSnapshot;
+import org.spongepowered.api.fluid.FluidType;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShape;
 import org.spongepowered.api.item.ItemType;
@@ -429,11 +425,7 @@ import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
-import org.spongepowered.api.statistic.BlockStatistic;
-import org.spongepowered.api.statistic.EntityStatistic;
-import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
@@ -455,9 +447,7 @@ import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.LocatableBlock;
-import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.WorldBorder;
@@ -465,8 +455,10 @@ import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.VirtualBiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
-import org.spongepowered.api.world.extent.ExtentBufferFactory;
+import org.spongepowered.api.world.gamerule.GameRule;
+import org.spongepowered.api.world.gen.GeneratorType;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
+import org.spongepowered.api.world.teleport.PortalAgentType;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.awt.image.BufferedImage;
@@ -528,7 +520,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
                 .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)
-                .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(Lantern.getGame().getScheduler()))
+                .registerBuilderSupplier(Task.Builder.class, LanternTaskBuilder::new)
                 .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
                 .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)
                 .registerBuilderSupplier(Selector.Builder.class, LanternSelectorBuilder::new)
@@ -715,15 +707,15 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(EnchantmentType.class, EnchantmentTypeRegistryModule.get())
                 .registerModule(PotionType.class, PotionTypeRegistryModule.get())
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
-                .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
-                .registerModule(DataRegistration.class, (AdditionalPluginCatalogRegistryModule) DataRegistrationRegistryModule.INSTANCE)
+                .registerModule(DataRegistration.class, (CatalogRegistryModule) DataRegistrationRegistryModule.INSTANCE)
                 .registerModule(MusicDisc.class, MusicDiscRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
-                .registerModule(EventContextKey.class, (AdditionalPluginCatalogRegistryModule) EventContextKeysModule.get())
+                .registerModule(EventContextKey.class, (CatalogRegistryModule) EventContextKeysModule.get())
                 .registerModule(new BlockChangeFlagRegistryModule())
                 .registerModule(new ItemStackComparatorRegistryModule())
-                .registerModule(DataTranslator.class, (AdditionalPluginCatalogRegistryModule) DataTranslatorRegistryModule.INSTANCE)
+                .registerModule(DataTranslator.class, (CatalogRegistryModule) DataTranslatorRegistryModule.INSTANCE)
+                .registerModule(GameRule.class, (CatalogRegistryModule) GameRuleRegistry.INSTANCE)
                 // Advancements
                 .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
                 .registerModule(Advancement.class, AdvancementRegistryModule.get())
@@ -799,12 +791,6 @@ public class LanternGameRegistry implements XGameRegistry {
         final String namespace = value.substring(0, index);
         final String actualValue = value.substring(index + 1);
         return new LanternCatalogKey(namespace, actualValue);
-    }
-
-    @Deprecated
-    @Override
-    public <T extends CatalogType> Optional<T> getType(Class<T> typeClass, String id) {
-        return getType(typeClass, CatalogKeys.resolve(id));
     }
 
     @Override
@@ -1146,26 +1132,6 @@ public class LanternGameRegistry implements XGameRegistry {
     }
 
     @Override
-    public Collection<String> getDefaultGameRules() {
-        return this.getRegistryModule(DefaultGameRulesRegistryModule.class).get().get();
-    }
-
-    @Override
-    public Optional<EntityStatistic> getEntityStatistic(StatisticType statType, EntityType entityType) {
-        return null;
-    }
-
-    @Override
-    public Optional<ItemStatistic> getItemStatistic(StatisticType statType, ItemType itemType) {
-        return null;
-    }
-
-    @Override
-    public Optional<BlockStatistic> getBlockStatistic(StatisticType statType, BlockType blockType) {
-        return null;
-    }
-
-    @Override
     public Optional<Rotation> getRotationFromDegree(int degrees) {
         return RotationRegistryModule.get().getRotationFromDegree(degrees);
     }
@@ -1227,11 +1193,6 @@ public class LanternGameRegistry implements XGameRegistry {
     @Override
     public Optional<Translation> getTranslationById(String id) {
         return getTranslationManager().getIfPresent(id);
-    }
-
-    @Override
-    public ExtentBufferFactory getWorldBufferFactory() {
-        return LanternExtentBufferFactory.INSTANCE;
     }
 
     @Override

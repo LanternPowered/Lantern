@@ -151,13 +151,13 @@ public class LanternScheduler implements Scheduler {
     @Override
     public TaskExecutorService createSyncExecutor(Object plugin) {
         final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        return new org.lanternpowered.server.scheduler.TaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer), this.syncScheduler);
+        return new LanternTaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer), this.syncScheduler);
     }
 
     @Override
     public TaskExecutorService createAsyncExecutor(Object plugin) {
         final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        return new org.lanternpowered.server.scheduler.TaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer).async(), this.asyncScheduler);
+        return new LanternTaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer).async(), this.asyncScheduler);
     }
 
     @Override

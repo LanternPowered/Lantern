@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.fluid;
 
-import org.spongepowered.api.extra.fluid.FluidStack;
+import org.spongepowered.api.fluid.FluidStack;
 
 public final class LanternFluidStackBuilder extends AbstractFluidStackBuilder<FluidStack, FluidStack.Builder> implements FluidStack.Builder {
 

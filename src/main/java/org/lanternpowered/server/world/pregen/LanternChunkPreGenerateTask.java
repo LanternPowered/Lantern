@@ -46,8 +46,10 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.world.ChunkPreGenerationEvent;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.ChunkPreGenerate;
+import org.spongepowered.api.util.TemporalUnits;
+import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -61,7 +63,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<Task> {
+public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<ScheduledTask> {
 
     private static final int DEFAULT_TICK_INTERVAL = 4;
     private static final float DEFAULT_TICK_PERCENT = 0.8f;
@@ -80,7 +82,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
     private final long tickTimeLimit;
     private final Cause cause;
     private final int totalChunksToGenerate;
-    private final Task spongeTask;
+    private final ScheduledTask spongeTask;
     private final int tickInterval;
     private final PluginContainer plugin;
 
@@ -127,11 +129,11 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
 
         this.totalChunksToGenerate = (int) Math.pow(this.chunkRadius * 2 + 1, 2);
 
-        this.spongeTask = Lantern.getScheduler()
-                .createTaskBuilder()
+        this.spongeTask = Sponge.getServer().getScheduler().submit(Task.builder()
                 .intervalTicks(preferredTickInterval)
                 .execute(this)
-                .submit(plugin);
+                .plugin(plugin)
+                .build());
 
         if (!eventListeners.isEmpty()) {
             this.eventListener = new LanternChunkPreGenerateListener(this.spongeTask.getUniqueId(), eventListeners);
@@ -141,7 +143,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
         }
     }
 
-    Task getSpongeTask() {
+    ScheduledTask getSpongeTask() {
         return this.spongeTask;
     }
 
@@ -197,7 +199,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(ScheduledTask task) {
         final long stepStartTime = System.currentTimeMillis();
         if (this.generationStartTime == 0) {
             this.generationStartTime = stepStartTime;
@@ -252,7 +254,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
 
         // Create and fire event.
         if (Sponge.getEventManager().post(SpongeEventFactory.createChunkPreGenerationEventPost(
-                this.cause, this, this.world, Duration.ofMillis(deltaTime), count, skipped))) {
+                this.cause, this, Duration.ofMillis(deltaTime), this.world, count, skipped))) {
             cancelTask(task);
             return;
         }
@@ -280,7 +282,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
         }
     }
 
-    private void cancelTask(Task task) {
+    private void cancelTask(ScheduledTask task) {
         // Don't fire multiple instances.
         if (Lantern.getScheduler().getTaskById(task.getUniqueId()).isPresent()) {
             Sponge.getEventManager().post(SpongeEventFactory.createChunkPreGenerationEventCancelled(this.cause, this, this.world));
@@ -381,6 +383,15 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<T
         public ChunkPreGenerate.Builder tickInterval(int tickInterval) {
             checkArgument(tickInterval > 0, "tickInterval must be greater than zero");
             this.tickInterval = tickInterval;
+            return this;
+        }
+
+        @Override
+        public ChunkPreGenerate.Builder interval(Duration interval) {
+            this.tickInterval = (int) checkNotNull(interval, "interval").get(TemporalUnits.MINECRAFT_TICKS);
+            if (this.tickInterval <= 0) {
+                this.tickInterval = 1;
+            }
             return this;
         }
 

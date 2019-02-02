@@ -26,8 +26,7 @@
 package org.lanternpowered.server.world.portal;
 
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.PortalAgentType;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.teleport.PortalAgentType;
 
 import java.util.Optional;
 

@@ -42,8 +42,6 @@ import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
-import org.lanternpowered.server.world.rules.RuleDataTypes;
-import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
@@ -54,12 +52,13 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.GeneratorTypes;
-import org.spongepowered.api.world.PortalAgentType;
-import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.gamerule.GameRule;
+import org.spongepowered.api.world.gen.GeneratorType;
+import org.spongepowered.api.world.gen.GeneratorTypes;
+import org.spongepowered.api.world.teleport.PortalAgentType;
+import org.spongepowered.api.world.teleport.PortalAgentTypes;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
@@ -78,6 +77,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 final class LanternWorldPropertiesIO {
 
     private final static Gson GSON = new Gson();
@@ -369,14 +369,14 @@ final class LanternWorldPropertiesIO {
         // Get the game rules
         final DataView rulesView = dataView.getView(GAME_RULES).orElse(null);
         if (rulesView != null) {
-            for (Entry<DataQuery, Object> en : rulesView.getValues(false).entrySet()) {
+            for (GameRule gameRule : Sponge.getRegistry().getAllOf(GameRule.class)) {
                 try {
-                    properties.getRules()
-                            .getOrCreateRule(RuleType.getOrCreate(en.getKey().toString(), RuleDataTypes.STRING, ""))
-                            .setRawValue((String) en.getValue());
-                } catch (IllegalArgumentException e) {
+                    final Object value = rulesView.getObject(DataQuery.of(gameRule.getName()),
+                            gameRule.getValueType().getRawType()).orElse(null);
+                    properties.setGameRule(gameRule, value);
+                } catch (Exception e) {
                     Lantern.getLogger().warn("An error occurred while loading a game rule ({}) this one will be skipped",
-                            en.getKey().toString(), e);
+                            gameRule.getName(), e);
                 }
             }
         }
@@ -462,8 +462,8 @@ final class LanternWorldPropertiesIO {
         dataView.set(SEED, properties.getSeed());
         dataView.set(VERSION, CURRENT_VERSION);
         final DataView rulesView = dataView.createView(GAME_RULES);
-        for (Entry<String, String> en : properties.getGameRules().entrySet()) {
-            rulesView.set(DataQuery.of(en.getKey()), en.getValue());
+        for (Entry<GameRule<?>, ?> en : properties.getGameRules().entrySet()) {
+            rulesView.set(DataQuery.of(en.getKey().getName()), en.getValue());
         }
 
         // Weather

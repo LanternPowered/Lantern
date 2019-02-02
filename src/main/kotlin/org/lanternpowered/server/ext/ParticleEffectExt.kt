@@ -41,8 +41,8 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.util.Color
 import org.spongepowered.api.util.Direction
 
-inline fun <V> ParticleEffect.option(option: ParticleOption<V>): V? = !getOption(option)
-inline fun <V> ParticleEffect.optionOrDefault(option: ParticleOption<V>): V? = !getOptionOrDefault(option)
+inline fun <V> ParticleEffect.option(option: ParticleOption<V>): V? = getOption(option).orNull()
+inline fun <V> ParticleEffect.optionOrDefault(option: ParticleOption<V>): V? = getOptionOrDefault(option).orNull()
 
 inline fun ParticleEffect(type: ParticleType, fn: ParticleEffect.Builder.() -> Unit = {}): ParticleEffect =
         ParticleEffect.builder().type(type).apply(fn).build()

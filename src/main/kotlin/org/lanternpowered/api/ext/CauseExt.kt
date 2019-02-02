@@ -42,17 +42,17 @@ inline fun <T> CauseStackManager.last(target: Class<T>): Optional<T> = this.curr
 inline fun CauseStackManager.containsType(target: Class<*>): Boolean = this.currentCause.containsType(target)
 inline operator fun CauseStackManager.contains(any: Any): Boolean = any in this.currentCause
 
-inline fun <reified T> CauseStackManager.first(): T? = !this.currentCause.first(T::class.java)
-inline fun <T : Any> CauseStackManager.first(clazz: KClass<T>): T? = !this.currentCause.first(clazz.java)
-inline fun <reified T> CauseStackManager.last(): T? = !this.currentCause.last(T::class.java)
-inline fun <T : Any> CauseStackManager.last(clazz: KClass<T>): T? = !this.currentCause.last(clazz.java)
+inline fun <reified T> CauseStackManager.first(): T? = this.currentCause.first(T::class.java).orNull()
+inline fun <T : Any> CauseStackManager.first(clazz: KClass<T>): T? = this.currentCause.first(clazz.java).orNull()
+inline fun <reified T> CauseStackManager.last(): T? = this.currentCause.last(T::class.java).orNull()
+inline fun <T : Any> CauseStackManager.last(clazz: KClass<T>): T? = this.currentCause.last(clazz.java).orNull()
 
-inline fun <reified T> CauseStack.first(): T? = !first(T::class.java)
-inline fun <T : Any> CauseStack.first(clazz: KClass<T>): T? = !first(clazz.java)
-inline fun <reified T> CauseStack.last(): T? = !last(T::class.java)
-inline fun <T : Any> CauseStack.last(clazz: KClass<T>): T? = !last(clazz.java)
+inline fun <reified T> CauseStack.first(): T? = first(T::class.java).orNull()
+inline fun <T : Any> CauseStack.first(clazz: KClass<T>): T? = first(clazz.java).orNull()
+inline fun <reified T> CauseStack.last(): T? = last(T::class.java).orNull()
+inline fun <T : Any> CauseStack.last(clazz: KClass<T>): T? = last(clazz.java).orNull()
 
-inline operator fun <T> CauseStackManager.get(key: CauseContextKey<T>): T? = !getContext(key)
+inline operator fun <T> CauseStackManager.get(key: CauseContextKey<T>): T? = getContext(key).orNull()
 inline operator fun <T> CauseStackManager.set(key: CauseContextKey<T>, value: T) { addContext(key, value) }
 
 inline fun CauseStackManager.withFrame(fn: CauseStackManagerFrame.() -> Unit) {
@@ -86,14 +86,14 @@ inline fun CauseStack.withFrame(fn: CauseStack.Frame.() -> Unit) {
     pushCauseFrame().use(fn)
 }
 
-inline fun <reified T> Cause.first(): T? = !first(T::class.java)
-inline fun <T : Any> Cause.first(clazz: KClass<T>): T? = !first(clazz.java)
-inline fun <reified T> Cause.last(): T? = !last(T::class.java)
-inline fun <T : Any> Cause.last(clazz: KClass<T>): T? = !last(clazz.java)
-inline fun <reified T> Cause.before(): Any? = !before(T::class.java)
-inline fun Cause.before(clazz: KClass<*>): Any? = !before(clazz.java)
-inline fun <reified T> Cause.after(): Any? = !after(T::class.java)
-inline fun Cause.after(clazz: KClass<*>): Any? = !after(clazz.java)
+inline fun <reified T> Cause.first(): T? = first(T::class.java).orNull()
+inline fun <T : Any> Cause.first(clazz: KClass<T>): T? = first(clazz.java).orNull()
+inline fun <reified T> Cause.last(): T? = last(T::class.java).orNull()
+inline fun <T : Any> Cause.last(clazz: KClass<T>): T? = last(clazz.java).orNull()
+inline fun <reified T> Cause.before(): Any? = before(T::class.java).orNull()
+inline fun Cause.before(clazz: KClass<*>): Any? = before(clazz.java).orNull()
+inline fun <reified T> Cause.after(): Any? = after(T::class.java).orNull()
+inline fun Cause.after(clazz: KClass<*>): Any? = after(clazz.java).orNull()
 inline fun <reified T> Cause.allOf(): List<T> = allOf(T::class.java)
 inline fun <T : Any> Cause.allOf(clazz: KClass<T>): List<T> = allOf(clazz.java)
 inline fun <reified T> Cause.noneOf(): List<Any> = noneOf(T::class.java)

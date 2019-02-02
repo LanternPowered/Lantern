@@ -33,16 +33,19 @@ import java.util.Optional
 /**
  * Unwraps the [Optional] value.
  */
-inline operator fun <T> Optional<T>?.not(): T? = unwrap()
+inline fun <T> Optional<T>.orNull(): T? = orElse(null)
 
 /**
- * Unwraps the [Optional] value.
+ * Wraps the boolean value into an [Optional].
  */
-inline fun <T> Optional<T>?.unwrap(): T? = this?.orElse(null)
+inline fun Boolean.optional(): Optional<Boolean> = OptBool.of(this)
+
+/**
+ * Wraps the nullable boolean value into an [Optional].
+ */
+inline fun Boolean?.optional(): Optional<Boolean> = OptBool.of(this)
 
 /**
  * Wraps the nullable value into an [Optional].
  */
-inline fun <T> T?.optional(): Optional<T> =
-        // Use OptBool for Booleans
-        if (this is Boolean) OptBool.of(this) as Optional<T> else Optional.ofNullable(this)
+inline fun <T> T?.optional(): Optional<T> = Optional.ofNullable(this)

@@ -60,7 +60,7 @@ interface XeventBus {
      * @param T The type of the event
      */
     fun <T : Xevent> post(eventType: KClass<T>, supplier: () -> T): T? {
-        return !post(eventType.java, supplier)
+        return post(eventType.java, supplier).orNull()
     }
 
     /**

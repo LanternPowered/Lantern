@@ -23,15 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.ext
+package org.lanternpowered.api.util.builder
 
-import org.lanternpowered.api.Sponge
-import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
 
-inline fun <reified T : CatalogType> catalogOf(key: CatalogKey): T? =
-        Sponge.getRegistry().getType(T::class.java, key).orNull()
-inline fun <reified T : CatalogType> catalogOf(id: String): T? =
-        Sponge.getRegistry().getType(T::class.java, CatalogKey.resolve(id)).orNull()
-inline fun <reified T : CatalogType> allCatalogsOf(): Collection<T> =
-        Sponge.getRegistry().getAllOf(T::class.java)
+/**
+ * The base class for all the builders.
+ */
+typealias BaseBuilder<T, B> = org.spongepowered.api.util.ResettableBuilder<T, B>
+
+/**
+ * A base builder to construct [CatalogType]s.
+ */
+typealias CatalogBuilder<C, B> = org.spongepowered.api.util.CatalogBuilder<C, B>

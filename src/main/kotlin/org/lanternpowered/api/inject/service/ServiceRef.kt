@@ -78,7 +78,7 @@ interface ServiceRef<T> {
          */
         fun <T> of(type: Class<T>) = object : ServiceRef<T> {
             override val registration: ProviderRegistration<T>
-                get() = !Lantern.serviceManager.getRegistration(type) ?: throw IllegalStateException("Service not found: ${type.name}")
+                get() = Lantern.serviceManager.getRegistration(type).orElseThrow { IllegalStateException("Service not found: ${type.name}") }
         }
     }
 }

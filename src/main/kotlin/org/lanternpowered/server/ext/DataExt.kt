@@ -33,13 +33,32 @@ import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.data.value.mutable.CompositeValueStore
 import kotlin.reflect.KClass
 
-inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.get(containerClass: KClass<V>): H? = !get(containerClass.java)
-inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.get(): H? = !get(V::class.java)
-inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.getOrCreate(containerClass: KClass<V>): H? = !getOrCreate(containerClass.java)
-inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.getOrCreate(): H? = !getOrCreate(V::class.java)
-inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.remove(containerClass: KClass<V>): DataTransactionResult = remove(containerClass.java)
-inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.remove(): DataTransactionResult = remove(V::class.java)
-inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.require(containerClass: KClass<V>): H = require(containerClass.java)
-inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.require(): H = require(V::class.java)
-inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.supports(containerClass: KClass<V>): Boolean = supports(containerClass.java)
-inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.supports(): Boolean = supports(V::class.java)
+inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.get(containerClass: KClass<V>): H? =
+        get(containerClass.java).orNull()
+
+inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.get(): H? =
+        get(V::class.java).orNull()
+
+inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.getOrCreate(containerClass: KClass<V>): H? =
+        getOrCreate(containerClass.java).orNull()
+
+inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.getOrCreate(): H? =
+        getOrCreate(V::class.java).orNull()
+
+inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.remove(containerClass: KClass<V>): DataTransactionResult =
+        remove(containerClass.java)
+
+inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.remove(): DataTransactionResult =
+        remove(V::class.java)
+
+inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.require(containerClass: KClass<V>): H =
+        require(containerClass.java)
+
+inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.require(): H =
+        require(V::class.java)
+
+inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.supports(containerClass: KClass<V>): Boolean =
+        supports(containerClass.java)
+
+inline fun <H : ValueContainer<*>, reified V: H> CompositeValueStore<*, H>.supports(): Boolean =
+        supports(V::class.java)

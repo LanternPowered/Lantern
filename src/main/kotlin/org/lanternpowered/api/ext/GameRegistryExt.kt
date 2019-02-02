@@ -52,8 +52,8 @@ inline fun <T : BaseBuilder<*, in T>> builderOf(clazz: KClass<T>): T = Sponge.ge
 // Helpers to allow using the kotlin class, and unbox into nullable
 
 fun <T : CatalogType> GameRegistry.getType(type: KClass<T>, id: String): T? =
-        !Sponge.getRegistry().getType(type.java, CatalogKey.resolve(id))
+        Sponge.getRegistry().getType(type.java, CatalogKey.resolve(id)).orNull()
 fun <T : CatalogType> GameRegistry.getType(type: KClass<T>, key: CatalogKey): T? =
-        !Sponge.getRegistry().getType(type.java, key)
+        Sponge.getRegistry().getType(type.java, key).orNull()
 fun <T : CatalogType> GameRegistry.getAllOf(type: KClass<T>): Collection<T> =
         Sponge.getRegistry().getAllOf(type.java)

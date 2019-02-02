@@ -37,7 +37,7 @@ class TextTemplateArgConfigSerializer : TypeSerializer<TextTemplate.Arg> {
         if (obj == null) {
             return
         }
-        value.getNode(TextTemplateConfigSerializer.NODE_DEF_VAL).value = !obj.defaultValue
+        value.getNode(TextTemplateConfigSerializer.NODE_DEF_VAL).value = obj.defaultValue.orNull()
         value.getNode(TextTemplateConfigSerializer.NODE_OPT).value = obj.isOptional
     }
 

@@ -44,10 +44,10 @@ fun checkPluginInstance(pluginInstance: Any, message: () -> Any = nullMessage): 
         return pluginInstance
     }
     val container = if (pluginInstance is String) {
-        !Sponge.getPluginManager().getPlugin(pluginInstance)
+        Sponge.getPluginManager().getPlugin(pluginInstance)
     } else {
-        !Sponge.getPluginManager().fromInstance(pluginInstance)
-    }
+        Sponge.getPluginManager().fromInstance(pluginInstance)
+    }.orNull()
     return checkNotNull(container) {
         if (message == nullMessage) message() else "invalid plugin: $pluginInstance"
     }

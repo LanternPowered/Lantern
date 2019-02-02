@@ -54,10 +54,10 @@ import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.WorldArchetypes;
+import org.spongepowered.api.world.gen.GeneratorTypes;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.FileNotFoundException;
@@ -901,11 +901,11 @@ public final class LanternWorldManager {
         LanternWorldProperties rootWorldProperties0 = rootWorldProperties;
         // Generate the root (default) world if missing
         if (rootWorldProperties0 == null) {
-            final String name = "Overworld";
             rootWorldProperties0 = createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.OVERWORLD)
                     .generator(GeneratorTypes.OVERWORLD)
-                    .build(name, name), "", 0);
+                    .name("Overworld")
+                    .build(), "", 0);
         }
 
         // Get all the dimensions (worlds) that should be loaded
@@ -982,21 +982,21 @@ public final class LanternWorldManager {
             }
         }
         if (!this.worldByDimensionId.containsKey(-1)) {
-            final String name = "Nether";
             if (createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.THE_NETHER)
                     .generator(GeneratorTypes.NETHER)
-                    .build(name, name), "DIM-1", -1).loadOnStartup()) {
+                    .name("Nether")
+                    .build(), "DIM-1", -1).loadOnStartup()) {
                 loadQueue.add(this.worldByDimensionId.get(-1));
             }
         }
         // The end
         if (!this.worldByDimensionId.containsKey(1)) {
-            final String name = "TheEnd";
             if (createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.THE_END)
                     .generator(GeneratorTypes.THE_END)
-                    .build(name, name), "DIM1", 1).loadOnStartup()) {
+                    .name("TheEnd")
+                    .build(), "DIM1", 1).loadOnStartup()) {
                 loadQueue.add(this.worldByDimensionId.get(1));
             }
         }

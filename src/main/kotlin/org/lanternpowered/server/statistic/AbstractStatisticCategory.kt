@@ -23,38 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.statistic
 
-import org.lanternpowered.server.util.ToStringHelper;
-import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.scoreboard.critieria.Criterion;
-import org.spongepowered.api.statistic.EntityStatistic;
-import org.spongepowered.api.statistic.StatisticType;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.catalog.DefaultCatalogType
+import org.lanternpowered.server.text.translation.Translated
+import org.spongepowered.api.statistic.Statistic
+import org.spongepowered.api.statistic.StatisticCategory
+import org.spongepowered.api.text.translation.Translatable
+import org.spongepowered.api.text.translation.Translation
 
-import java.text.NumberFormat;
+abstract class AbstractStatisticCategory<T : Statistic>(
+        key: CatalogKey, translation: Translation
+) : DefaultCatalogType(key), StatisticCategory, Translatable by Translated(translation) {
 
-import javax.annotation.Nullable;
-
-public class LanternEntityStatistic extends LanternStatistic implements EntityStatistic {
-
-    private final EntityType entityType;
-
-    public LanternEntityStatistic(CatalogKey key, Translation translation, String internalId, NumberFormat format,
-            @Nullable Criterion criterion, StatisticType type, EntityType entityType) {
-        super(key, translation, internalId, format, criterion, type);
-        this.entityType = entityType;
-    }
-
-    @Override
-    public EntityType getEntityType() {
-        return this.entityType;
-    }
-
-    @Override
-    public ToStringHelper toStringHelper() {
-        return super.toStringHelper()
-                .add("entityType", this.entityType.getKey());
-    }
+    abstract fun addStatistic(statistic: T)
 }

@@ -252,6 +252,7 @@ import org.lanternpowered.server.script.function.condition.ConditionTypeRegistry
 import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
+import org.lanternpowered.server.statistic.StatisticCategoryRegistry;
 import org.lanternpowered.server.statistic.builder.BlockStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.EntityStatisticBuilder;
 import org.lanternpowered.server.statistic.builder.ItemStatisticBuilder;
@@ -284,6 +285,7 @@ import org.lanternpowered.server.world.LanternWorldBorderBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeGenerationSettingsBuilder;
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.gamerule.GameRuleRegistry;
+import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.advancement.Advancement;
@@ -426,6 +428,7 @@ import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
 import org.spongepowered.api.statistic.Statistic;
+import org.spongepowered.api.statistic.StatisticCategory;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
@@ -559,6 +562,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(InventoryTransactionResult.Builder.class, LanternInventoryTransactionResult.Builder::new)
                 .registerBuilderSupplier(EnchantmentTypeBuilder.class, LanternEnchantmentTypeBuilder::new)
                 .registerBuilderSupplier(CatalogKey.Builder.class, LanternCatalogKeyBuilder::new)
+                .registerBuilderSupplier(GameRule.Builder.class, LanternGameRuleBuilder::new)
                 // Text
                 .registerBuilderSupplier(ScoreText.Builder.class, LanternScoreText.Builder::new)
                 .registerBuilderSupplier(LiteralText.Builder.class, LanternLiteralText.Builder::new)
@@ -707,7 +711,6 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(EnchantmentType.class, EnchantmentTypeRegistryModule.get())
                 .registerModule(PotionType.class, PotionTypeRegistryModule.get())
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
-                .registerModule(Statistic.class, StatisticRegistryModule.get())
                 .registerModule(DataRegistration.class, (CatalogRegistryModule) DataRegistrationRegistryModule.INSTANCE)
                 .registerModule(MusicDisc.class, MusicDiscRegistryModule.get())
                 .registerModule(FluidType.class, FluidTypeRegistryModule.get())
@@ -716,6 +719,9 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(new ItemStackComparatorRegistryModule())
                 .registerModule(DataTranslator.class, (CatalogRegistryModule) DataTranslatorRegistryModule.INSTANCE)
                 .registerModule(GameRule.class, (CatalogRegistryModule) GameRuleRegistry.INSTANCE)
+                // Statistics
+                .registerModule(Statistic.class, StatisticRegistryModule.get())
+                .registerModule(StatisticCategory.class, StatisticCategoryRegistry.INSTANCE)
                 // Advancements
                 .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
                 .registerModule(Advancement.class, AdvancementRegistryModule.get())

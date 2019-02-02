@@ -56,10 +56,22 @@ class GameRuleContainer : GameRuleHolder {
         return gameRules
     }
 
+    /**
+     * Adds a listener which tracks changes to the specified [GameRule].
+     *
+     * @param gameRule The game rule
+     * @param listener The listener
+     */
     fun <V> addGameRuleListener(gameRule: GameRule<V>, listener: Consumer<V>) = apply {
         addGameRuleListener(gameRule, listener::accept)
     }
 
+    /**
+     * Adds a listener which tracks changes to the specified [GameRule].
+     *
+     * @param gameRule The game rule
+     * @param listener The listener
+     */
     fun <V> addGameRuleListener(gameRule: GameRule<V>, listener: (V) -> Unit) = apply {
         val holder = this.values.computeIfAbsent(gameRule) { ValueHolder(gameRule.defaultValue, arrayListOf()) } as ValueHolder<V>
         holder.listeners.add(listener)

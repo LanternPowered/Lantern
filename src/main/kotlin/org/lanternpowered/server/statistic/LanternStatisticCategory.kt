@@ -23,38 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.statistic
 
-import org.lanternpowered.server.util.ToStringHelper;
-import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.scoreboard.critieria.Criterion;
-import org.spongepowered.api.statistic.ItemStatistic;
-import org.spongepowered.api.statistic.StatisticType;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.api.catalog.CatalogKey
+import org.spongepowered.api.statistic.Statistic
+import org.spongepowered.api.text.translation.Translation
+import java.util.Collections
 
-import java.text.NumberFormat;
+class LanternStatisticCategory(
+        key: CatalogKey, translation: Translation
+) : AbstractStatisticCategory<Statistic>(key, translation) {
 
-import javax.annotation.Nullable;
+    private val statistics = arrayListOf<Statistic>()
+    private val unmodifiableStatistics = Collections.unmodifiableList(this.statistics)
 
-public class LanternItemStatistic extends LanternStatistic implements ItemStatistic {
-
-    private final ItemType itemType;
-
-    public LanternItemStatistic(CatalogKey key, Translation translation, String internalId, NumberFormat format,
-            @Nullable Criterion criterion, StatisticType type, ItemType itemType) {
-        super(key, translation, internalId, format, criterion, type);
-        this.itemType = itemType;
+    override fun addStatistic(statistic: Statistic) {
+        this.statistics.add(statistic)
     }
 
-    @Override
-    public ItemType getItemType() {
-        return this.itemType;
-    }
-
-    @Override
-    public ToStringHelper toStringHelper() {
-        return super.toStringHelper()
-                .add("itemType", this.itemType.getKey());
-    }
+    override fun getStatistics(): MutableCollection<Statistic> = this.unmodifiableStatistics
 }

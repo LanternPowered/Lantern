@@ -26,30 +26,30 @@
 package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.scoreboard.critieria.Criterion
 import org.spongepowered.api.statistic.Statistic
-import org.spongepowered.api.statistic.StatisticType
+import org.spongepowered.api.statistic.StatisticCategory
 import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.text.translation.Translation
 import java.text.NumberFormat
-import java.util.Optional
 
 open class LanternStatistic(
         key: CatalogKey, translation: Translation,
         val internalId: String,
         private val format: NumberFormat,
-        private val criterion: Criterion?,
-        private val type: StatisticType
+        private val type: StatisticCategory,
+        private val criterion: Criterion?
 ) : DefaultCatalogType(key), Statistic, Translatable by Translated(translation) {
 
     override fun toStringHelper() = super.toStringHelper()
             .omitNullValues()
-            .add("type", this.type.key)
+            .add("category", this.type.key)
             .add("criterion", this.criterion?.key)
 
-    override fun getCriterion() = Optional.ofNullable(this.criterion)
+    override fun getCriterion() = this.criterion.optional()
     override fun getFormat() = this.format
     override fun getType() = this.type
 }

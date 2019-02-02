@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.statistic.LanternStatistic;
+import org.lanternpowered.server.statistic.StatisticCategoryRegistry;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.Statistics;
@@ -37,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RegistrationDependency(StatisticTypeRegistryModule.class)
+@RegistrationDependency(StatisticCategoryRegistry.class)
 public final class StatisticRegistryModule extends AdditionalPluginCatalogRegistryModule<Statistic> {
 
     private static final StatisticRegistryModule INSTANCE = new StatisticRegistryModule();

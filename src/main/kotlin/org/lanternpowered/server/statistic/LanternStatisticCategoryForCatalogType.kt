@@ -25,12 +25,32 @@
  */
 package org.lanternpowered.server.statistic
 
+import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.statistic.StatisticType
-import org.spongepowered.api.text.translation.Translatable
+import org.lanternpowered.api.catalog.CatalogType
+import org.spongepowered.api.statistic.Statistic
+import org.spongepowered.api.statistic.StatisticCategory
 import org.spongepowered.api.text.translation.Translation
+import java.util.Collections
 
-class LanternStatisticType(key: CatalogKey, translation: Translation) :
-        DefaultCatalogType(key), StatisticType, Translatable by Translated(translation)
+class LanternStatisticCategoryForCatalogType<T : CatalogType>(
+        key: CatalogKey, translation: Translation, private val catalogType: TypeToken<T>
+) : AbstractStatisticCategory<Statistic.ForCatalog<T>>(key, translation), StatisticCategory.ForCatalogType<T> {
+
+    private val statistics = hashMapOf<T, Statistic.ForCatalog<T>>()
+    private val unmodifiableStatistics = Collections.unmodifiableCollection(this.statistics.values)
+
+    override fun getCatalogType() = this.catalogType
+    override fun getStatistics(): MutableCollection<Statistic.ForCatalog<T>> = this.unmodifiableStatistics
+
+    override fun addStatistic(statistic: Statistic.ForCatalog<T>) {
+        this.statistics[statistic.catalogType] = statistic
+    }
+
+    override fun getStatistic(catalogType: T): Statistic.ForCatalog<T> {
+        return this.statistics[catalogType] ?: throw IllegalStateException("Unable to find statistic for ${catalogType.key}")
+    }
+
+    override fun toStringHelper() = super.toStringHelper()
+            .add("catalogType", this.catalogType.rawType.name)
+}

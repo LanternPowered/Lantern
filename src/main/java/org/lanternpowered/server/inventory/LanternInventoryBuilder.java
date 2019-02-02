@@ -36,7 +36,7 @@ import org.lanternpowered.server.data.property.PropertyKeySetter;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
-import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
+import org.spongepowered.api.event.item.inventory.container.InteractContainerEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -59,7 +59,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         return new LanternInventoryBuilder<>();
     }
 
-    private static class InventoryListeners implements EventListener<InteractInventoryEvent> {
+    private static class InventoryListeners implements EventListener<InteractContainerEvent> {
 
         private final WeakReference<AbstractInventory> inventory;
         private final List<Consumer<? super Event>> consumers;
@@ -71,8 +71,8 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         }
 
         @Override
-        public void handle(InteractInventoryEvent event) {
-            final AbstractContainer container = (AbstractContainer) event.getTargetInventory();
+        public void handle(InteractContainerEvent event) {
+            final AbstractContainer container = (AbstractContainer) event.getContainer();
             final AbstractInventory inventory = this.inventory.get();
             if (inventory != null) {
                 if (container.containsInventory(inventory)) {
@@ -216,14 +216,14 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
             inventory.setEventListeners(ImmutableMultimap.copyOf(this.listeners));
             for (Map.Entry<Class<? extends Event>, Collection<Consumer<? super Event>>> entry : this.listeners.asMap().entrySet()) {
                 final InventoryListeners listeners = new InventoryListeners(inventory, entry.getValue());
-                Sponge.getEventManager().registerListener(plugin, (Class<? extends InteractInventoryEvent>) entry.getKey(), listeners);
+                Sponge.getEventManager().registerListener(plugin, (Class<? extends InteractContainerEvent>) entry.getKey(), listeners);
             }
         }
         return (T) inventory;
     }
 
     @Override
-    public <E extends InteractInventoryEvent> LanternInventoryBuilder<T> listener(Class<E> type, Consumer<E> listener) {
+    public <E extends InteractContainerEvent> LanternInventoryBuilder<T> listener(Class<E> type, Consumer<E> listener) {
         checkNotNull(type, "type");
         checkNotNull(listener, "listener");
         this.listeners.put(type, (Consumer) listener);

@@ -37,7 +37,6 @@ import org.spongepowered.api.item.inventory.InventoryProperty;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -93,23 +92,21 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
      */
     public LanternInventoryArchetype<R> buildArchetype() {
         final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
-        return buildArchetype(pluginId, UUID.randomUUID().toString());
+        return buildArchetype(CatalogKey.of(pluginId, UUID.randomUUID().toString()));
     }
 
     /**
      * Constructs a {@link LanternInventoryArchetype} from this builder.
      *
-     * @param pluginId The plugin id
-     * @param id The id
+     * @param key The key
      * @return The inventory archetype
      */
-    public LanternInventoryArchetype<R> buildArchetype(String pluginId, String id) {
+    public LanternInventoryArchetype<R> buildArchetype(CatalogKey key) {
         checkState(this.constructor != null);
-        if (this.cachedArchetype != null && this.cachedArchetype.getKey()
-                .equals(CatalogKey.of(pluginId, id.toLowerCase(Locale.ENGLISH)))) {
+        if (this.cachedArchetype != null && this.cachedArchetype.getKey().equals(key)) {
             return this.cachedArchetype;
         }
-        return this.cachedArchetype = new BuilderInventoryArchetype<>(CatalogKey.of(pluginId, id), copy());
+        return this.cachedArchetype = new BuilderInventoryArchetype<>(key, copy());
     }
 
     protected void copyTo(B builder) {

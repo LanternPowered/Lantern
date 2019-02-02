@@ -63,7 +63,7 @@ import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
-import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.item.inventory.container.ClickContainerEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
@@ -75,7 +75,6 @@ import org.spongepowered.api.item.inventory.slot.OutputSlot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -195,13 +194,13 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
 
         final List<SlotTransaction> transactions1 = this.container.transformSlots(transactions);
         final CauseStack causeStack = CauseStack.current();
-        final ClickInventoryEvent.Shift event;
+        final ClickContainerEvent.Shift event;
         if (mouseButton == MouseButton.LEFT) {
-            event = SpongeEventFactory.createClickInventoryEventShiftPrimary(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container, transactions1);
+            event = SpongeEventFactory.createClickContainerEventShiftPrimary(
+                    causeStack.getCurrentCause(), this.container, cursorTransaction, Optional.of(slot), transactions1);
         } else {
-            event = SpongeEventFactory.createClickInventoryEventShiftSecondary(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container, transactions1);
+            event = SpongeEventFactory.createClickContainerEventShiftSecondary(
+                    causeStack.getCurrentCause(), this.container, cursorTransaction, Optional.of(slot), transactions1);
         }
         finishInventoryEvent(event);
     }
@@ -250,8 +249,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         final CauseStack causeStack = CauseStack.current();
 
         final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(oldItem, newItem);
-        final ClickInventoryEvent.Double event = SpongeEventFactory.createClickInventoryEventDouble(
-                causeStack.getCurrentCause(), cursorTransaction, this.container, this.container.transformSlots(transactions));
+        final ClickContainerEvent.Double event = SpongeEventFactory.createClickContainerEventDouble(causeStack.getCurrentCause(),
+                this.container, cursorTransaction, Optional.of(slot), this.container.transformSlots(transactions));
         finishInventoryEvent(event);
     }
 
@@ -287,13 +286,13 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 LanternEventHelper.handlePreDroppedItemSpawning(player.getTransform(), droppedItem).ifPresent(entities::add);
             }
             cursorTransaction = new Transaction<>(oldItem, newItem);
-            final ClickInventoryEvent.Drop event;
+            final ClickContainerEvent.Drop event;
             if (mouseButton == MouseButton.LEFT) {
-                event = SpongeEventFactory.createClickInventoryEventDropOutsidePrimary(
-                        causeStack.getCurrentCause(), cursorTransaction, entities, this.container, Collections.emptyList());
+                event = SpongeEventFactory.createClickContainerEventDropOutsidePrimary(
+                        causeStack.getCurrentCause(), this.container, cursorTransaction, entities, Collections.emptyList());
             } else {
-                event = SpongeEventFactory.createClickInventoryEventDropOutsideSecondary(
-                        causeStack.getCurrentCause(), cursorTransaction, entities, this.container, Collections.emptyList());
+                event = SpongeEventFactory.createClickContainerEventDropOutsideSecondary(
+                        causeStack.getCurrentCause(), this.container, cursorTransaction, entities, Collections.emptyList());
             }
             finishInventoryEvent(event);
             return;
@@ -316,8 +315,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 cursorTransaction = new Transaction<>(oldItem, oldItem);
             }
 
-            final ClickInventoryEvent.Middle event = SpongeEventFactory.createClickInventoryEventMiddle(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container, Collections.emptyList());
+            final ClickContainerEvent.Middle event = SpongeEventFactory.createClickContainerEventMiddle(
+                    causeStack.getCurrentCause(), this.container, cursorTransaction, Optional.of(slot), Collections.emptyList());
             finishInventoryEvent(event);
         } else {
             // Crafting slots have special click behavior
@@ -327,7 +326,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
 
                 final AbstractInventory parent = slot.parent();
                 if (parent instanceof CraftingInventory) {
-                    ClickInventoryEvent event;
+                    ClickContainerEvent event;
 
                     final CraftingInventory inventory = (CraftingInventory) parent;
                     final Optional<ExtendedCraftingResult> optResult = Lantern.getRegistry().getCraftingRecipeRegistry()
@@ -364,11 +363,11 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
 
                     transactions = this.container.transformSlots(transactions);
                     if (mouseButton == MouseButton.LEFT) {
-                        event = SpongeEventFactory.createClickInventoryEventPrimary(causeStack.getCurrentCause(), cursorTransaction,
-                                this.container, transactions);
+                        event = SpongeEventFactory.createClickContainerEventPrimary(causeStack.getCurrentCause(),
+                                this.container, cursorTransaction, Optional.of(slot), transactions);
                     } else {
-                        event = SpongeEventFactory.createClickInventoryEventSecondary(causeStack.getCurrentCause(), cursorTransaction,
-                                this.container, transactions);
+                        event = SpongeEventFactory.createClickContainerEventSecondary(causeStack.getCurrentCause(),
+                                this.container, cursorTransaction, Optional.of(slot), transactions);
                     }
                     finishInventoryEvent(event);
                     return;
@@ -377,7 +376,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 }
             }
 
-            ClickInventoryEvent event;
+            ClickContainerEvent event;
             if (mouseButton == MouseButton.LEFT) {
                 final List<SlotTransaction> transactions = new ArrayList<>();
                 Transaction<ItemStackSnapshot> cursorTransaction = null;
@@ -404,8 +403,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(getCursorItem());
                     cursorTransaction = new Transaction<>(cursorItem, cursorItem);
                 }
-                event = SpongeEventFactory.createClickInventoryEventPrimary(causeStack.getCurrentCause(),
-                        cursorTransaction, this.container, this.container.transformSlots(transactions));
+                event = SpongeEventFactory.createClickContainerEventPrimary(causeStack.getCurrentCause(),
+                        this.container, cursorTransaction, Optional.of(slot), this.container.transformSlots(transactions));
             } else {
                 final List<SlotTransaction> transactions = new ArrayList<>();
                 Transaction<ItemStackSnapshot> cursorTransaction = null;
@@ -450,9 +449,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     final ItemStackSnapshot cursorItem = LanternItemStack.toSnapshot(getCursorItem());
                     cursorTransaction = new Transaction<>(cursorItem, cursorItem);
                 }
-                event = SpongeEventFactory.createClickInventoryEventSecondary(
-                        causeStack.getCurrentCause(), cursorTransaction, this.container,
-                        this.container.transformSlots(transactions));
+                event = SpongeEventFactory.createClickContainerEventSecondary(causeStack.getCurrentCause(),
+                        this.container, cursorTransaction, Optional.of(slot), this.container.transformSlots(transactions));
             }
             finishInventoryEvent(event);
         }
@@ -487,13 +485,13 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     player.getTransform(), LanternItemStackSnapshot.wrap(itemStack)).ifPresent(entities::add);
         }
         slotTransactions = this.container.transformSlots(slotTransactions);
-        final ClickInventoryEvent.Drop event;
+        final ClickContainerEvent.Drop event;
         if (ctrl) {
-            event = SpongeEventFactory.createClickInventoryEventDropFull(causeStack.getCurrentCause(), cursorTransaction, entities,
-                    this.container, slotTransactions);
+            event = SpongeEventFactory.createClickContainerEventDropFull(causeStack.getCurrentCause(),
+                    this.container, cursorTransaction, entities, Optional.of(slot), slotTransactions);
         } else {
-            event = SpongeEventFactory.createClickInventoryEventDropSingle(causeStack.getCurrentCause(), cursorTransaction, entities,
-                    this.container, slotTransactions);
+            event = SpongeEventFactory.createClickContainerEventDropSingle(causeStack.getCurrentCause(),
+                    this.container, cursorTransaction, entities, Optional.of(slot), slotTransactions);
         }
         finishInventoryEvent(event);
     }
@@ -537,9 +535,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             }
 
             final CauseStack causeStack = CauseStack.current();
-            final ClickInventoryEvent.NumberPress event = SpongeEventFactory.createClickInventoryEventNumberPress(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container,
-                    this.container.transformSlots(transactions), number - 1);
+            final ClickContainerEvent.NumberPress event = SpongeEventFactory.createClickContainerEventNumberPress(causeStack.getCurrentCause(),
+                    this.container, cursorTransaction, Optional.of(slot1), this.container.transformSlots(transactions), number - 1);
             finishInventoryEvent(event);
         }
     }
@@ -588,8 +585,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final ItemStackSnapshot oldCursorItem = cursorItem.createSnapshot();
             final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(oldCursorItem, newCursorItem);
 
-            final ClickInventoryEvent.Drag.Primary event = SpongeEventFactory.createClickInventoryEventDragPrimary(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container, this.container.transformSlots(transactions));
+            final ClickContainerEvent.Drag.Primary event = SpongeEventFactory.createClickContainerEventDragPrimary(
+                    causeStack.getCurrentCause(), this.container, cursorTransaction, Optional.empty(), this.container.transformSlots(transactions));
             finishInventoryEvent(event);
         } else if (mouseButton == MouseButton.RIGHT) {
             int quantity = cursorItem.getQuantity();
@@ -614,8 +611,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final ItemStackSnapshot oldCursorItem = getCursorItem().createSnapshot();
             final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(oldCursorItem, newCursorItem);
 
-            final ClickInventoryEvent.Drag.Secondary event = SpongeEventFactory.createClickInventoryEventDragSecondary(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container, this.container.transformSlots(transactions));
+            final ClickContainerEvent.Drag.Secondary event = SpongeEventFactory.createClickContainerEventDragSecondary(causeStack.getCurrentCause(),
+                    this.container, cursorTransaction, Optional.empty(), this.container.transformSlots(transactions));
             finishInventoryEvent(event);
         } else {
             // TODO: Middle mouse drag mode
@@ -641,9 +638,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(
                     LanternItemStack.toSnapshot(itemStack), ItemStackSnapshot.NONE);
 
-            final ClickInventoryEvent.Creative event = SpongeEventFactory.createClickInventoryEventCreative(
-                    causeStack.getCurrentCause(), cursorTransaction, this.container,
-                    this.container.transformSlots(result.getTransactions()));
+            final ClickContainerEvent.Creative event = SpongeEventFactory.createClickContainerEventCreative(causeStack.getCurrentCause(),
+                    this.container, cursorTransaction, Optional.empty(), this.container.transformSlots(result.getTransactions()));
             finishInventoryEvent(event);
         }
     }
@@ -713,8 +709,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         final List<SlotTransaction> slotTransactions = event.getTransactions();
         Sponge.getEventManager().post(event);
         if (!event.isCancelled()) {
-            if (!(event instanceof ClickInventoryEvent.Creative) && event instanceof ClickInventoryEvent) {
-                final Transaction<ItemStackSnapshot> cursorTransaction = ((ClickInventoryEvent) event).getCursorTransaction();
+            if (!(event instanceof ClickContainerEvent.Creative) && event instanceof ClickContainerEvent) {
+                final Transaction<ItemStackSnapshot> cursorTransaction = ((ClickContainerEvent) event).getCursorTransaction();
                 if (cursorTransaction.isValid() && cursorTransaction.getOriginal() != cursorTransaction.getFinal()) {
                     setCursorItem(cursorTransaction.getFinal().createStack());
                 }

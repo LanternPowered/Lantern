@@ -34,10 +34,12 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
+import org.spongepowered.api.util.TemporalUnits;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -56,8 +58,8 @@ public final class LanternWorldBorder implements WorldBorder {
     double diameterStart = 60000000f;
     double diameterEnd = this.diameterStart;
 
-    int warningDistance = 5;
-    int warningTime = 15;
+    double warningDistance = 5;
+    Duration warningTime = Duration.ofSeconds(15);
 
     double damage = 1;
     double damageThreshold = 5;
@@ -73,7 +75,7 @@ public final class LanternWorldBorder implements WorldBorder {
     public void addPlayer(LanternPlayer player) {
         if (this.players.add(player)) {
             player.getConnection().send(new MessagePlayOutWorldBorder.Initialize(this.centerX, this.centerZ, getDiameter(),
-                    getNewDiameter(), getTimeRemaining(), BOUNDARY, this.warningDistance, this.warningTime));
+                    getNewDiameter(), getTimeRemainingMillis(), BOUNDARY, getRoundedWarningDistance(), getWarningTimeSeconds()));
         }
     }
 
@@ -86,6 +88,10 @@ public final class LanternWorldBorder implements WorldBorder {
             final Message message = supplier.get();
             this.players.forEach(p -> p.getConnection().send(message));
         }
+    }
+
+    int getRoundedWarningDistance() {
+        return (int) Math.round(this.warningDistance);
     }
 
     @Override
@@ -127,22 +133,24 @@ public final class LanternWorldBorder implements WorldBorder {
 
     @Override
     public void setDiameter(double diameter) {
-        setDiameter(diameter, diameter, 0);
+        setDiameter(diameter, diameter, Duration.ofMillis(0));
     }
 
     @Override
-    public void setDiameter(double diameter, long time) {
+    public void setDiameter(double diameter, Duration time) {
         setDiameter(getDiameter(), diameter, time);
     }
 
     @Override
-    public void setDiameter(double startDiameter, double endDiameter, long time) {
+    public void setDiameter(double startDiameter, double endDiameter, Duration duration) {
         checkArgument(startDiameter >= 0, "The start diameter cannot be negative!");
         checkArgument(endDiameter >= 0, "The end diameter cannot be negative!");
-        checkArgument(time >= 0, "The duration cannot be negative!");
+        checkNotNull(duration, "duration");
+
+        final long millis = duration.toMillis();
 
         // Only shrink or grow if needed
-        if (time == 0 || startDiameter == endDiameter) {
+        if (millis == 0 || startDiameter == endDiameter) {
             this.diameterStart = endDiameter;
             this.diameterEnd = endDiameter;
             updateCurrentTime(0);
@@ -150,17 +158,21 @@ public final class LanternWorldBorder implements WorldBorder {
         } else {
             this.diameterStart = startDiameter;
             this.diameterEnd = endDiameter;
-            updateCurrentTime(time);
-            broadcast(() -> new MessagePlayOutWorldBorder.UpdateLerpedDiameter(startDiameter, endDiameter, time));
+            updateCurrentTime(millis);
+            broadcast(() -> new MessagePlayOutWorldBorder.UpdateLerpedDiameter(startDiameter, endDiameter, millis));
         }
     }
 
-    @Override
-    public long getTimeRemaining() {
+    long getTimeRemainingMillis() {
         if (this.timeStart == -1) {
             updateCurrentTime();
         }
         return Math.max(this.timeEnd - System.currentTimeMillis(), 0);
+    }
+
+    @Override
+    public Duration getTimeRemaining() {
+        return Duration.ofMillis(getTimeRemainingMillis());
     }
 
     @Override
@@ -175,26 +187,30 @@ public final class LanternWorldBorder implements WorldBorder {
         return new Vector3d(this.centerX, 0, this.centerZ);
     }
 
+    int getWarningTimeSeconds() {
+        return (int) this.warningTime.get(TemporalUnits.SECONDS);
+    }
+
     @Override
-    public int getWarningTime() {
+    public Duration getWarningTime() {
         return this.warningTime;
     }
 
     @Override
-    public void setWarningTime(int time) {
+    public void setWarningTime(Duration time) {
         this.warningTime = time;
-        broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningTime(time));
+        broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningTime((int) time.get(TemporalUnits.SECONDS)));
     }
 
     @Override
-    public int getWarningDistance() {
+    public double getWarningDistance() {
         return this.warningDistance;
     }
 
     @Override
-    public void setWarningDistance(int distance) {
+    public void setWarningDistance(double distance) {
         this.warningDistance = distance;
-        broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningDistance(distance));
+        broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningDistance((int) Math.round(distance)));
     }
 
     @Override
@@ -215,12 +231,6 @@ public final class LanternWorldBorder implements WorldBorder {
     @Override
     public void setDamageAmount(double damage) {
         this.damage = damage;
-    }
-
-    void setRemainingTime(long time) {
-        setCurrentTime(time);
-        broadcast(() -> time == 0 ? new MessagePlayOutWorldBorder.UpdateDiameter(getNewDiameter()) :
-                    new MessagePlayOutWorldBorder.UpdateLerpedDiameter(getDiameter(), getNewDiameter(), getTimeRemaining()));
     }
 
     void updateCurrentTime() {

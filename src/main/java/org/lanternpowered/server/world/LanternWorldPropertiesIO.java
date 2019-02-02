@@ -67,6 +67,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -79,8 +80,6 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
 final class LanternWorldPropertiesIO {
-
-    private final static Gson GSON = new Gson();
 
     private final static String LEVEL_DATA = "level.dat";
     private final static String SPONGE_LEVEL_DATA = "level_sponge.dat";
@@ -251,7 +250,7 @@ final class LanternWorldPropertiesIO {
         dataView.getDouble(BORDER_DAMAGE).ifPresent(v -> border.damage = v);
         dataView.getDouble(BORDER_DAMAGE_THRESHOLD).ifPresent(v -> border.damageThreshold = v);
         dataView.getInt(BORDER_WARNING_BLOCKS).ifPresent(v -> border.warningDistance = v);
-        dataView.getInt(BORDER_WARNING_TIME).ifPresent(v -> border.warningTime = v);
+        dataView.getInt(BORDER_WARNING_TIME).ifPresent(v -> border.warningTime = Duration.ofSeconds(v));
 
         if (spongeRootDataView != null) {
             properties.setAdditionalProperties(spongeRootDataView.copy().remove(DataQueries.SPONGE_DATA));
@@ -520,9 +519,9 @@ final class LanternWorldPropertiesIO {
         dataView.set(BORDER_DAMAGE_THRESHOLD, border.damageThreshold);
         dataView.set(BORDER_SIZE_END, border.diameterEnd);
         dataView.set(BORDER_SIZE_START, border.getDiameter());
-        dataView.set(BORDER_SIZE_LERP_TIME, border.getTimeRemaining());
-        dataView.set(BORDER_WARNING_BLOCKS, border.warningDistance);
-        dataView.set(BORDER_WARNING_TIME, border.warningTime);
+        dataView.set(BORDER_SIZE_LERP_TIME, border.getTimeRemainingMillis());
+        dataView.set(BORDER_WARNING_BLOCKS, border.getRoundedWarningDistance());
+        dataView.set(BORDER_WARNING_TIME, border.getWarningTimeSeconds());
         final Vector3i spawn = properties.getSpawnPosition();
         dataView.set(SPAWN_X, spawn.getX());
         dataView.set(SPAWN_Y, spawn.getY());

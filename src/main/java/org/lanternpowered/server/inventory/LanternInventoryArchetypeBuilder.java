@@ -28,12 +28,12 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.lanternpowered.server.inventory.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
 import org.lanternpowered.server.inventory.type.LanternInventoryRow;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
@@ -42,6 +42,7 @@ import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.inventory.type.InventoryColumn;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +53,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"unchecked", "ConstantConditions"})
-public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Builder {
+public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<InventoryArchetype, InventoryArchetype.Builder>
+        implements InventoryArchetype.Builder {
 
     private final List<LanternInventoryArchetype<?>> archetypes = new ArrayList<>();
     private final Map<Class<?>, InventoryProperty<?,?>> properties = new HashMap<>();
@@ -115,11 +117,11 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         return this;
     }
 
-    private LanternInventoryArchetype<?> buildArchetype(String pluginId, String id,
+    private LanternInventoryArchetype<?> buildArchetype(CatalogKey key,
             Map<Class<?>, InventoryProperty<?,?>> properties, LanternInventoryArchetype<?> archetype) {
         final AbstractArchetypeBuilder archetypeBuilder = archetype.getBuilder().copy();
         properties.values().forEach(archetypeBuilder::property);
-        return archetypeBuilder.buildArchetype(pluginId, id);
+        return archetypeBuilder.buildArchetype(key);
     }
 
     private void applyProperties(Map<Class<?>, InventoryProperty<?,?>> properties, AbstractBuilder builder) {
@@ -127,16 +129,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
     }
 
     @Override
-    public InventoryArchetype build(String id, String name) {
-        final int index = id.indexOf(':');
-        final String pluginId;
-        if (index == -1) {
-            pluginId = InternalPluginsInfo.Implementation.IDENTIFIER;
-        } else {
-            pluginId = id.substring(0, index);
-            id = id.substring(index + 1);
-        }
-
+    protected InventoryArchetype build(CatalogKey key, Translation name) {
         final Map<Class<?>, InventoryProperty<?,?>> properties = new HashMap<>(this.properties);
 
         final InventoryDimension inventoryDimension = (InventoryDimension) properties.remove(InventoryDimension.class);
@@ -160,7 +153,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         // A base archetype is provided to create slots
         if (this.baseArchetype != null) {
             if (this.baseArchetype.getBuilder() instanceof AbstractSlot.Builder) {
-                return buildArchetype(pluginId, id, properties, this.baseArchetype);
+                return buildArchetype(key, properties, this.baseArchetype);
             } else if (this.baseArchetype.getBuilder() instanceof AbstractGridInventory.Builder) {
                 final AbstractGridInventory.Builder builder = (AbstractGridInventory.Builder) this.baseArchetype.getBuilder().copy();
                 if (inventoryDimension != null) {
@@ -175,7 +168,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                         slotsBuilder.slot(archetype);
                     }
                     applyProperties(properties, builder);
-                    return slotsBuilder.buildArchetype(pluginId, id);
+                    return slotsBuilder.buildArchetype(key);
                 } else if (builder instanceof AbstractGridInventory.RowsBuilder) {
                     final AbstractGridInventory.RowsBuilder rowsBuilder = (AbstractGridInventory.RowsBuilder) builder;
                     for (LanternInventoryArchetype<?> archetype : this.archetypes) {
@@ -188,7 +181,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                         }
                     }
                     applyProperties(properties, builder);
-                    return rowsBuilder.buildArchetype(pluginId, id);
+                    return rowsBuilder.buildArchetype(key);
                 } else if (builder instanceof AbstractGridInventory.ColumnsBuilder) {
                     final AbstractGridInventory.ColumnsBuilder columnsBuilder = (AbstractGridInventory.ColumnsBuilder) builder;
                     for (LanternInventoryArchetype<?> archetype : this.archetypes) {
@@ -201,7 +194,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                         }
                     }
                     applyProperties(properties, builder);
-                    return columnsBuilder.buildArchetype(pluginId, id);
+                    return columnsBuilder.buildArchetype(key);
                 } else {
                     throw new IllegalStateException();
                 }
@@ -224,7 +217,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                     builder.addLast(archetype);
                 }
                 applyProperties(properties, builder);
-                final LanternInventoryArchetype<?> archetype = builder.buildArchetype(pluginId, id);
+                final LanternInventoryArchetype<?> archetype = builder.buildArchetype(key);
                 if (inventoryCapacity != null) {
                     final AbstractInventory inventory = archetype.build();
                     if (inventory.capacity() != inventoryCapacity.getValue()) {
@@ -247,9 +240,9 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
             } else {
                 archetype = VanillaInventoryArchetypes.SLOT;
             }
-            return buildArchetype(pluginId, name, properties, archetype);
+            return buildArchetype(key, properties, archetype);
         } else if (size == 0 || this.archetypes.isEmpty()) { // A empty archetype
-            return new UnknownInventoryArchetype(CatalogKey.of(pluginId, id));
+            return new UnknownInventoryArchetype(key);
         }
 
         if (inventoryDimension != null) {
@@ -279,9 +272,9 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                     }
                     applyProperties(properties, builder);
                     if (targetColumns == 1) {
-                        return builder.type(LanternInventoryColumn.class).buildArchetype(pluginId, id);
+                        return builder.type(LanternInventoryColumn.class).buildArchetype(key);
                     } else {
-                        return builder.type(LanternInventoryRow.class).buildArchetype(pluginId, id);
+                        return builder.type(LanternInventoryRow.class).buildArchetype(key);
                     }
                 } else {
                     final AbstractGridInventory.SlotsBuilder<LanternGridInventory> builder = AbstractGridInventory.slotsBuilder();
@@ -291,7 +284,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                         }
                     }
                     applyProperties(properties, builder);
-                    return builder.buildArchetype(pluginId, id);
+                    return builder.buildArchetype(key);
                 }
             }
 
@@ -308,7 +301,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                         builder.type(LanternInventoryColumn.class);
                     }
                     applyProperties(properties, builder);
-                    return builder.buildArchetype(pluginId, id);
+                    return builder.buildArchetype(key);
                 }
             }
 
@@ -379,7 +372,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                     }
                 }
                 applyProperties(properties, builder);
-                return builder.type(LanternGridInventory.class).buildArchetype(pluginId, id);
+                return builder.type(LanternGridInventory.class).buildArchetype(key);
             } else {
                 int x = 0;
                 final AbstractGridInventory.ColumnsBuilder<LanternGridInventory> builder = AbstractGridInventory.columnsBuilder();
@@ -393,7 +386,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
                     }
                 }
                 applyProperties(properties, builder);
-                return builder.type(LanternGridInventory.class).buildArchetype(pluginId, id);
+                return builder.type(LanternGridInventory.class).buildArchetype(key);
             }
         }
 
@@ -403,6 +396,6 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
             builder.addLast((LanternInventoryArchetype<? extends AbstractMutableInventory>) archetype);
         }
         applyProperties(properties, builder);
-        return builder.buildArchetype(pluginId, id);
+        return builder.buildArchetype(key);
     }
 }

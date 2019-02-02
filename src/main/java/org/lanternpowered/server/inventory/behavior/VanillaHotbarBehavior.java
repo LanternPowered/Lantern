@@ -68,8 +68,8 @@ public class VanillaHotbarBehavior extends SimpleHotbarBehavior {
 
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
                 frame.pushCause(clientContainer.getPlayer());
-                final ChangeInventoryEvent.Held event = SpongeEventFactory.createChangeInventoryEventHeld(
-                        causeStack.getCurrentCause(), newSlot, oldSlot, clientContainer.getPlayer().getInventoryContainer(), transactions);
+                final ChangeInventoryEvent.Held event = SpongeEventFactory.createChangeInventoryEventHeld(causeStack.getCurrentCause(),
+                        newSlot, clientContainer.getPlayer().getInventoryContainer(), oldSlot, transactions);
                 Sponge.getEventManager().post(event);
                 if (event.isCancelled() || transactions.stream().noneMatch(SlotTransaction::isValid)) {
                     setSelectedSlotIndex(getSelectedSlotIndex());

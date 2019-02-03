@@ -35,9 +35,9 @@ import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.text.translation.FixedTranslation
 import org.spongepowered.api.text.translation.Translation
 import org.spongepowered.api.util.CatalogBuilder
-import org.spongepowered.api.util.ResettableBuilder
+import org.spongepowered.api.util.CopyableBuilder
 
-abstract class AbstractCatalogBuilder<C : CatalogType, B : ResettableBuilder<C, B>> : CatalogBuilder<C, B> {
+abstract class AbstractCatalogBuilder<C : CatalogType, B : CopyableBuilder<C, B>> : CatalogBuilder<C, B> {
 
     protected var name: Translation? = null
     protected var key: CatalogKey? = null

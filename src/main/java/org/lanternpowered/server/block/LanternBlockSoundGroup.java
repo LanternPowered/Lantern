@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 
 public final class LanternBlockSoundGroup implements BlockSoundGroup {
 
@@ -110,7 +110,7 @@ public final class LanternBlockSoundGroup implements BlockSoundGroup {
                 .toString();
     }
 
-    public static final class Builder implements ResettableBuilder<LanternBlockSoundGroup, Builder> {
+    public static final class Builder implements CopyableBuilder<LanternBlockSoundGroup, Builder> {
 
         private SoundType breakSound;
         private SoundType stepSound;

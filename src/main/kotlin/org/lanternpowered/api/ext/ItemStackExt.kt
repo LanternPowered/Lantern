@@ -30,7 +30,7 @@ import org.lanternpowered.api.item.inventory.ItemStack
 /**
  * Will return {@code null} if the stack is empty.
  */
-operator fun ItemStack.not(): ItemStack? = if (isEmpty) null else this
+fun ItemStack.orNull(): ItemStack? = if (isEmpty) null else this
 
 /**
  * Executes the given function if the stack isn't empty.

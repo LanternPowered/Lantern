@@ -36,7 +36,6 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
 import org.lanternpowered.server.data.property.entity.DominantHandPropertyStore;
-import org.lanternpowered.server.data.property.inventory.InventoryPropertyStore;
 import org.lanternpowered.server.data.property.item.BurningFuelPropertyStore;
 import org.lanternpowered.server.data.property.item.SmeltablePropertyStore;
 import org.lanternpowered.server.data.value.LanternValueFactory;
@@ -52,12 +51,8 @@ import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.PatternLayer;
+import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.property.PropertyRegistry;
-import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
-import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
-import org.spongepowered.api.data.property.entity.DominantHandProperty;
-import org.spongepowered.api.data.property.item.BurningFuelProperty;
-import org.spongepowered.api.data.property.item.SmeltableProperty;
 import org.spongepowered.api.data.type.BodyPart;
 import org.spongepowered.api.data.type.BodyParts;
 import org.spongepowered.api.data.type.WireAttachmentType;
@@ -65,16 +60,6 @@ import org.spongepowered.api.data.type.WireAttachmentTypes;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.item.enchantment.Enchantment;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.property.Identifiable;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
-import org.spongepowered.api.item.inventory.property.SlotPos;
-import org.spongepowered.api.item.inventory.property.SlotSide;
-import org.spongepowered.api.item.inventory.property.StringProperty;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.BookView;
@@ -103,29 +88,15 @@ public class DataRegistrar {
         final PropertyRegistry propertyRegistry = game.getPropertyRegistry();
 
         // Block property stores
-        propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
-        propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
+        propertyRegistry.register(Properties.SKY_LUMINANCE, new SkyLuminancePropertyStore());
+        propertyRegistry.register(Properties.BLOCK_LUMINANCE, new GroundLuminancePropertyStore());
 
         // Entity property stores
-        propertyRegistry.register(DominantHandProperty.class, new DominantHandPropertyStore());
+        propertyRegistry.register(Properties.DOMINANT_HAND, new DominantHandPropertyStore());
 
         // Item property stores
-        propertyRegistry.register(SmeltableProperty.class, new SmeltablePropertyStore());
-        propertyRegistry.register(BurningFuelProperty.class, new BurningFuelPropertyStore());
-
-        // Inventory property stores
-        propertyRegistry.register(EquipmentSlotType.class, new InventoryPropertyStore<>(EquipmentSlotType.class));
-        propertyRegistry.register(GuiIdProperty.class, new InventoryPropertyStore<>(GuiIdProperty.class));
-        propertyRegistry.register(Identifiable.class, new InventoryPropertyStore<>(Identifiable.class));
-        propertyRegistry.register(org.spongepowered.api.item.inventory.property.IntProperty.class, new InventoryPropertyStore<>(
-                org.spongepowered.api.item.inventory.property.IntProperty.class));
-        propertyRegistry.register(InventoryDimension.class, new InventoryPropertyStore<>(InventoryDimension.class));
-        propertyRegistry.register(InventoryTitle.class, new InventoryPropertyStore<>(InventoryTitle.class));
-        propertyRegistry.register(SlotPos.class, new InventoryPropertyStore<>(SlotPos.class));
-        propertyRegistry.register(SlotSide.class, new InventoryPropertyStore<>(SlotSide.class));
-        propertyRegistry.register(StringProperty.class, new InventoryPropertyStore<>(StringProperty.class));
-        propertyRegistry.register(InventoryCapacity.class, new InventoryPropertyStore<>(InventoryCapacity.class));
-        propertyRegistry.register(SlotIndex.class, new InventoryPropertyStore<>(SlotIndex.class));
+        // TODO
+        // propertyRegistry.register(BurningFuelProperty.class, new BurningFuelPropertyStore());
 
         final LanternDataManager dataManager = game.getDataManager();
         // Register the data type serializers

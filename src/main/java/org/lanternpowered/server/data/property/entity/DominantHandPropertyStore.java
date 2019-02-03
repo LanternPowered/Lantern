@@ -27,29 +27,15 @@ package org.lanternpowered.server.data.property.entity;
 
 import org.lanternpowered.server.data.property.common.AbstractEntityPropertyStore;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.entity.DominantHandProperty;
 import org.spongepowered.api.data.type.HandPreference;
-import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Optional;
 
-public class DominantHandPropertyStore extends AbstractEntityPropertyStore<DominantHandProperty> {
-
-    static final class Holder {
-
-        static final DominantHandProperty LEFT = new DominantHandProperty(HandPreferences.LEFT);
-        static final DominantHandProperty RIGHT = new DominantHandProperty(HandPreferences.RIGHT);
-    }
+public class DominantHandPropertyStore extends AbstractEntityPropertyStore<HandPreference> {
 
     @Override
-    protected Optional<DominantHandProperty> getFor(Entity entity) {
-        if (!(entity instanceof Player)) {
-            return Optional.empty();
-        }
-        final HandPreference handPreference = entity.get(Keys.DOMINANT_HAND).get();
-        return Optional.of(handPreference == HandPreferences.LEFT ? Holder.LEFT :
-                handPreference == HandPreferences.RIGHT ? Holder.RIGHT : new DominantHandProperty(handPreference));
+    protected Optional<HandPreference> getFor(Entity entity) {
+        return entity.get(Keys.DOMINANT_HAND);
     }
 }

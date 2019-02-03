@@ -25,17 +25,16 @@
  */
 package org.lanternpowered.server.data.property.inventory;
 
-import org.lanternpowered.server.data.property.common.AbstractLanternPropertyStore;
 import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.data.property.PropertyHolder;
+import org.spongepowered.api.data.property.store.PropertyStore;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.world.Location;
 
 import java.util.Optional;
 
-public class InventoryPropertyStore<T extends InventoryProperty<?, ?>> extends AbstractLanternPropertyStore<T> {
+public class InventoryPropertyStore<V> implements PropertyStore<V> {
 
     private Class<T> property;
 

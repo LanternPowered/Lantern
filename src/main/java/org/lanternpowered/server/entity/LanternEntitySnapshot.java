@@ -30,7 +30,7 @@ import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.AdditionalContainerHolder;
 import org.lanternpowered.server.data.IImmutableDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -41,7 +41,6 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +48,7 @@ import java.util.function.Function;
 
 // TODO
 public class LanternEntitySnapshot implements EntitySnapshot, IImmutableDataHolder<EntitySnapshot>,
-        AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
+        IStorePropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
     @Override
     public AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> getAdditionalContainers() {

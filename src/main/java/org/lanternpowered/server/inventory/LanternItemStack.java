@@ -34,7 +34,7 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -54,7 +54,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "SimplifiableConditionalExpression"})
-public class LanternItemStack implements ItemStack, AbstractPropertyHolder, IAdditionalDataHolder {
+public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAdditionalDataHolder {
 
     private static final LanternItemStack empty = null;
 

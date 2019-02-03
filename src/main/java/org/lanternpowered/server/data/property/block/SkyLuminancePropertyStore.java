@@ -26,37 +26,24 @@
 package org.lanternpowered.server.data.property.block;
 
 import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
-import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.LightTypes;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.chunk.Chunk;
 
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class SkyLuminancePropertyStore extends AbstractBlockPropertyStore<SkyLuminanceProperty> {
-
-    // We will be using a cache since it can only be 16 different values
-    private final Optional<SkyLuminanceProperty>[] lookup = new Optional[16];
-
-    public SkyLuminancePropertyStore() {
-        for (int i = 0; i < this.lookup.length; i++) {
-            this.lookup[i] = Optional.of(new SkyLuminanceProperty((float) i / (float) this.lookup.length));
-        }
-    }
+public final class SkyLuminancePropertyStore extends AbstractBlockPropertyStore<Double> {
 
     @Override
-    protected Optional<SkyLuminanceProperty> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction) {
+    protected Optional<Double> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction) {
         if (location == null) {
             return Optional.empty();
         }
-        final Optional<Chunk> chunk = location.getWorld().getChunk(location.getChunkPosition());
-        return chunk.isPresent() ? this.lookup[((LanternChunk) chunk.get()).getSkyLight(
-                location.getBlockX(), location.getBlockY(), location.getBlockZ())] : Optional.empty();
+        final Chunk chunk = location.getWorld().getChunk(location.getChunkPosition());
+        return Optional.of((double) chunk.getLight(LightTypes.SKY, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
     }
-    
 }

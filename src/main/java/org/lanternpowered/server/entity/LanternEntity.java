@@ -40,7 +40,7 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -108,7 +108,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPropertyHolder {
+public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePropertyHolder {
 
     @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;

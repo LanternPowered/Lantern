@@ -32,7 +32,7 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.OptionalInt;
 
@@ -76,7 +76,7 @@ public interface IFuel extends CatalogType {
         return isValid(input.createStack());
     }
 
-    interface Builder extends ResettableBuilder<IFuel, Builder> {
+    interface Builder extends CopyableBuilder<IFuel, Builder> {
 
         Builder ingredient(Ingredient ingredient);
 

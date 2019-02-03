@@ -106,8 +106,12 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
         this.keyPattern = Pattern.compile(this.keyPatternValue);
     }
 
-    void checkFinalizedContent() {
-        checkState(this.values == null, "The content is already finalized.");
+    protected boolean isContentFinalized() {
+        return this.values != null;
+    }
+
+    protected void checkFinalizedContent() {
+        checkState(!isContentFinalized(), "The content is already finalized.");
     }
 
     /**
@@ -126,6 +130,7 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
      * @param catalogType The catalog type to register
      */
     protected <A extends T> A register(A catalogType) {
+        checkFinalizedContent();
         doRegistration(catalogType, false);
         return catalogType;
     }
@@ -138,6 +143,7 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
      */
     @SuppressWarnings("ConstantConditions")
     protected final <A extends T> A register(A catalogType, boolean disallowInbuiltPluginIds) {
+        checkFinalizedContent();
         doRegistration(catalogType, disallowInbuiltPluginIds);
         return catalogType;
     }
@@ -150,6 +156,7 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
      */
     @SuppressWarnings("ConstantConditions")
     protected void doRegistration(T catalogType, boolean disallowInbuiltPluginIds) {
+        checkFinalizedContent();
         checkState(this.values == null, "The content is finalized and doesn't allow any new entries.");
         checkNotNull(catalogType, "catalogType");
         final CatalogKey key = catalogType.getKey();

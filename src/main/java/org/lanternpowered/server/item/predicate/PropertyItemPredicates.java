@@ -25,94 +25,67 @@
  */
 package org.lanternpowered.server.item.predicate;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.item.predicate.ItemPredicate.ofTypePredicate;
 
-import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
-import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.Property;
+import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.Collection;
-
 public final class PropertyItemPredicates {
 
     /**
+     * Constructs a {@link ItemPredicate} for the given {@link PropertyMatcher}.
+     *
+     * @param propertyMatcher The property matcher
+     * @return The item filter
+     */
+    public static ItemPredicate hasMatchingProperty(PropertyMatcher<?> propertyMatcher) {
+        checkNotNull(propertyMatcher, "propertyMatcher");
+        return new ItemPredicate() {
+            @Override
+            public boolean test(ItemStack stack) {
+                return propertyMatcher.matchesHolder(stack);
+            }
+
+            @Override
+            public boolean test(ItemStackSnapshot stack) {
+                return propertyMatcher.matchesHolder(stack);
+            }
+
+            @Override
+            public boolean test(ItemType type) {
+                return propertyMatcher.matchesHolder(type);
+            }
+        };
+    }
+
+    /**
      * Constructs a {@link ItemPredicate} that matches whether
-     * the {@link Property} is present and matches on the
-     * {@link ItemStack}.
+     * the {@link Property} is present on the {@link ItemStack}.
      *
      * @param property The property
      * @return The item filter
      */
-    public static ItemPredicate hasMatchingProperty(Property<?,?> property) {
+    public static ItemPredicate hasProperty(Property<?> property) {
         checkNotNull(property, "property");
         return new ItemPredicate() {
             @Override
             public boolean test(ItemStack stack) {
-                return stack.getProperty(property.getClass()).map(property::matches).orElse(false);
+                return stack.getProperty(property).isPresent();
             }
 
             @Override
             public boolean test(ItemStackSnapshot stack) {
-                return stack.getProperty(property.getClass()).map(property::matches).orElse(false);
+                return stack.getProperty(property).isPresent();
             }
 
             @Override
             public boolean test(ItemType type) {
-                return type.getDefaultProperty(property.getClass()).map(property::matches).orElse(false);
+                return type.getProperty(property).isPresent();
             }
         };
-    }
-
-    /**
-     * Constructs a {@link ItemPredicate} that matches whether
-     * the {@link Property} type is present on the {@link ItemStack}.
-     *
-     * @param propertyType The property type
-     * @return The item filter
-     */
-    public static ItemPredicate hasProperty(Class<? extends Property<?,?>> propertyType) {
-        checkNotNull(propertyType, "propertyType");
-        return new ItemPredicate() {
-            @Override
-            public boolean test(ItemStack stack) {
-                return stack.getProperty(propertyType).isPresent();
-            }
-
-            @Override
-            public boolean test(ItemStackSnapshot stack) {
-                return stack.getProperty(propertyType).isPresent();
-            }
-
-            @Override
-            public boolean test(ItemType type) {
-                return type.getDefaultProperty(propertyType).isPresent();
-            }
-        };
-    }
-
-    /**
-     * Constructs a {@link ItemPredicate} for the
-     * {@link LanternAcceptsItems} property.
-     *
-     * @param acceptsItems The accepts items property
-     * @return The item filter
-     */
-    public static ItemPredicate of(LanternAcceptsItems acceptsItems) {
-        checkNotNull(acceptsItems, "acceptsItems");
-        final Collection<ItemType> itemTypes = acceptsItems.getValue();
-        checkNotNull(itemTypes, "value");
-        final Property.Operator operator = acceptsItems.getOperator();
-        checkArgument(operator == Property.Operator.EQUAL || operator == Property.Operator.NOTEQUAL,
-                "Only the operators EQUAL and NOTEQUAL are supported, %s is not.", operator);
-        if (operator == Property.Operator.EQUAL) {
-            return ofTypePredicate(itemTypes::contains);
-        } else {
-            return ofTypePredicate(type -> !itemTypes.contains(type));
-        }
     }
 
     private PropertyItemPredicates() {

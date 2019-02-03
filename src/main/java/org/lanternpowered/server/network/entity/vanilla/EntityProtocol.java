@@ -58,13 +58,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.Text;
@@ -92,8 +93,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         static {
             EQUIPMENT_QUERIES = new QueryOperation[EQUIPMENT_TYPES.length];
             for (int i = 0; i < EQUIPMENT_QUERIES.length; i++) {
-                EQUIPMENT_QUERIES[i] = QueryOperationTypes.INVENTORY_PROPERTY.of(
-                        EquipmentSlotType.of(EQUIPMENT_TYPES[i]));
+                EQUIPMENT_QUERIES[i] = QueryOperationTypes.PROPERTY.of(
+                        PropertyMatcher.of(InventoryProperties.EQUIPMENT_TYPE, EQUIPMENT_TYPES[i]));
             }
         }
     }

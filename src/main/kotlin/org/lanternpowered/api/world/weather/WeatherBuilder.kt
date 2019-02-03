@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.api.world.weather
 
-import org.lanternpowered.api.util.builder.TranslatableCatalogBuilder
+import org.lanternpowered.api.util.builder.CatalogBuilder
 import org.lanternpowered.api.x.world.weather.XWeather
 
 /**
  * A builder to construct [Weather]s.
  */
-interface WeatherBuilder : TranslatableCatalogBuilder<XWeather, WeatherBuilder> {
+interface WeatherBuilder : CatalogBuilder<XWeather, WeatherBuilder> {
 
     /**
      * Adds the option with the specified value.

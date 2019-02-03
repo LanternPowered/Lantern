@@ -57,7 +57,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
+import org.spongepowered.api.event.item.inventory.container.InteractContainerEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -149,8 +149,8 @@ public class PlayerContainerSession {
                 ItemStackSnapshot cursorItem = ItemStackSnapshot.NONE;
                 if (this.openContainer != null) {
                     final ItemStackSnapshot cursorItemSnapshot = LanternItemStackSnapshot.wrap(this.openContainer.getCursorSlot().peek());
-                    final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
-                            frame.getCurrentCause(), new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
+                    final InteractContainerEvent.Close event = SpongeEventFactory.createInteractContainerEventClose(
+                            frame.getCurrentCause(), this.openContainer, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE));
                     Sponge.getEventManager().post(event);
                     if (event.isCancelled()) {
                         // Stop the client from closing the container, resend the open message
@@ -186,8 +186,8 @@ public class PlayerContainerSession {
                 }
                 if (container != null) {
                     final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, cursorItem);
-                    final InteractInventoryEvent.Open event = SpongeEventFactory.createInteractInventoryEventOpen(
-                            frame.getCurrentCause(), cursorTransaction, container);
+                    final InteractContainerEvent.Open event = SpongeEventFactory.createInteractContainerEventOpen(
+                            frame.getCurrentCause(), container, cursorTransaction);
                     Sponge.getEventManager().post(event);
                     if (event.isCancelled()) {
                         if (cursorTransaction.isValid()) {

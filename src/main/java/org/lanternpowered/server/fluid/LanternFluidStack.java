@@ -34,7 +34,7 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -43,7 +43,7 @@ import org.spongepowered.api.fluid.FluidStack;
 import org.spongepowered.api.fluid.FluidStackSnapshot;
 import org.spongepowered.api.fluid.FluidType;
 
-public class LanternFluidStack implements FluidStack, AbstractPropertyHolder, IAdditionalDataHolder {
+public class LanternFluidStack implements FluidStack, IStorePropertyHolder, IAdditionalDataHolder {
 
     private final ValueCollection valueCollection;
     private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers;

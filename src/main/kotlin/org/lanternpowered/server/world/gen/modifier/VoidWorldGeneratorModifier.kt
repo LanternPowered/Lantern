@@ -50,7 +50,8 @@ object VoidWorldGeneratorModifier : DefaultCatalogType(CatalogKeys.sponge("void"
             biomeSettings.populators.clear()
             biomeSettings.groundCoverLayers.clear()
         }
-        worldGenerator.setBaseGenerationPopulator { _, _, _ -> }
-        worldGenerator.setBiomeGenerator { buffer -> buffer.biomeWorker.fill { _, _, _ -> BiomeTypes.VOID } }
+        // TODO
+        //worldGenerator.setBaseGenerationPopulator { _, _, _ -> }
+        //worldGenerator.setBiomeGenerator { buffer -> buffer.biomeWorker.fill { _, _, _ -> BiomeTypes.VOID } }
     }
 }

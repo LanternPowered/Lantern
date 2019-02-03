@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.game.registry.type.item;
 
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
+import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackComparators;
 import org.spongepowered.api.registry.RegistryModule;
@@ -35,9 +35,9 @@ import org.spongepowered.api.registry.util.RegisterCatalog;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class ItemStackComparatorRegistryModule implements RegistryModule {
@@ -57,7 +57,7 @@ public class ItemStackComparatorRegistryModule implements RegistryModule {
         map("properties", properties);
         final ItemDataComparator itemData = new ItemDataComparator();
         map("item_data", itemData);
-        map("item_data_ignore_damage", new ItemDataComparator(DamageableData.class));
+        map("item_data_ignore_damage", new ItemDataComparator(DurabilityData.class));
         map("ignore_size", type.thenComparing(properties).thenComparing(itemData));
         map("all", type.thenComparing(size).thenComparing(properties).thenComparing(itemData));
     }
@@ -70,10 +70,12 @@ public class ItemStackComparatorRegistryModule implements RegistryModule {
 
         @Override
         public int compare(ItemStack o1, ItemStack o2) {
-            final Set<Property<?, ?>> properties = new HashSet<>(o2.getApplicableProperties());
-            for (Property<?, ?> property : o1.getApplicableProperties()) {
-                if (properties.contains(property)) {
-                    properties.remove(property);
+            final Map<Property<?>, Object> properties = new HashMap<>(o2.getProperties());
+            for (Map.Entry<Property<?>, ?> entry : o1.getProperties().entrySet()) {
+                final Object o1Value = entry.getValue();
+                final Object o2Value = properties.get(entry.getKey());
+                if (Objects.equals(o1Value, o2Value)) {
+                    properties.remove(entry.getKey());
                 } else {
                     return -1;
                 }

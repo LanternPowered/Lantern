@@ -26,15 +26,15 @@
 package org.lanternpowered.server.inventory;
 
 import org.lanternpowered.api.cause.CauseStack;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
@@ -65,19 +65,21 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
-        final Optional<T> optProperty = super.tryGetProperty(property, key);
-        if (optProperty.isPresent()) {
-            return optProperty;
+    protected <V> Optional<V> tryGetProperty(Property<V> property) {
+        final Optional<V> optValue = super.tryGetProperty(property);
+        if (optValue.isPresent()) {
+            return optValue;
         }
-        return getDelegateSlot().tryGetProperty(property, key);
+        return getDelegateSlot().tryGetProperty(property);
     }
 
     @Override
-    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
-        final List<T> properties = super.tryGetProperties(property);
-        properties.addAll(getDelegateSlot().tryGetProperties(property));
-        return properties;
+    protected <V> Optional<V> tryGetProperty(Inventory child, Property<V> property) {
+        final Optional<V> optValue = super.tryGetProperty(child, property);
+        if (optValue.isPresent()) {
+            return optValue;
+        }
+        return getDelegateSlot().tryGetProperty(child, property);
     }
 
     // Slot listeners should only be added directly to the inventory slot,

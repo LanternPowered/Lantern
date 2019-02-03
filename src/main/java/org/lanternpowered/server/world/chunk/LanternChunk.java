@@ -41,8 +41,6 @@ import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
-import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
@@ -55,8 +53,8 @@ import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.tile.LanternTileEntityArchetype;
-import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStoreDirectionRelativePropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.game.Lantern;
@@ -74,7 +72,6 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.ScheduledBlockUpdate;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -91,30 +88,21 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.BlockChangeFlags;
-import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.extent.ArchetypeVolume;
-import org.spongepowered.api.world.extent.Extent;
-import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
-import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
+import org.spongepowered.api.world.chunk.Chunk;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -800,10 +788,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @param z the z coordinate
      * @param biome the biome value
      */
-    public void setBiomeId(int x, int y, int z, short biome) {
+    public boolean setBiomeId(int x, int y, int z, short biome) {
         checkBiomeBounds(x, y, z);
         if (!this.loaded) {
-            return;
+            return false;
         }
         final int index = (z & 0xf) << 4 | x & 0xf;
         final long stamp = this.biomesLock.writeLock();
@@ -812,6 +800,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         } finally {
             this.biomesLock.unlockWrite(stamp);
         }
+        return true;
     }
 
     @Override
@@ -833,7 +822,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return setBlock(x, y, z, state, BlockChangeFlags.ALL);
     }
 
-    @Override
     public boolean setBlock(int x, int y, int z, BlockState state, BlockChangeFlag flag) {
         checkNotNull(state, "blockState");
         checkNotNull(flag, "flag");
@@ -1540,13 +1528,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public BlockType getBlockType(int x, int y, int z) {
-        return getBlock(x, y, z).getType();
-    }
-
-    @Override
-    public void setBiome(int x, int y, int z, BiomeType biome) {
-        setBiomeId(x, y, z, BiomeRegistryModule.get().getInternalId(biome));
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return setBiomeId(x, y, z, BiomeRegistryModule.get().getInternalId(biome));
     }
 
     @Override
@@ -1593,9 +1576,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final Location location = new Location<>(this.world, x, y, z);
         Optional<T> property;
         if (direction != null) {
-            property = AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
+            property = IStoreDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
         } else {
-            property = AbstractPropertyHolder.getPropertyFor(location, propertyClass);
+            property = IStorePropertyHolder.getPropertyFor(location, propertyClass);
         }
         if (direction == null && !property.isPresent()) {
             final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);
@@ -1633,7 +1616,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return Collections.emptyList();
         }
         return Arrays.stream(CARDINAL_FACES)
-                .filter(direction -> AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, store.get()).isPresent())
+                .filter(direction -> IStoreDirectionRelativePropertyHolder.getPropertyFor(location, direction, store.get()).isPresent())
                 .collect(ImmutableList.toImmutableList());
     }
 
@@ -1890,47 +1873,5 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public double getRegionalDifficultyPercentage() {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    @Override
-    public boolean hitBlock(int x, int y, int z, Direction side, GameProfile profile) {
-        checkVolumeBounds(x, y, z);
-        return this.world.hitBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, side, profile);
-    }
-
-    @Override
-    public boolean interactBlock(int x, int y, int z, Direction side, GameProfile profile) {
-        checkVolumeBounds(x, y, z);
-        return this.world.interactBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, side, profile);
-    }
-
-    @Override
-    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, GameProfile profile) {
-        checkVolumeBounds(x, y, z);
-        return this.world.interactBlockWith(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, itemStack, side, profile);
-    }
-
-    @Override
-    public boolean digBlock(int x, int y, int z, GameProfile profile) {
-        checkVolumeBounds(x, y, z);
-        return this.world.digBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, profile);
-    }
-
-    @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, GameProfile profile) {
-        checkVolumeBounds(x, y, z);
-        return this.world.digBlockWith(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, itemStack, profile);
-    }
-
-    @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, GameProfile profile) {
-        checkVolumeBounds(x, y, z);
-        return this.world.getBlockDigTimeWith(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, itemStack, profile);
-    }
-
-    @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, GameProfile profile) {
-        checkVolumeBounds(x, y, z);
-        return this.world.placeBlock(this.min.getX() + x, this.min.getY() + y, this.min.getZ() + z, block, direction, profile);
     }
 }

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.property.item;
 
-import org.lanternpowered.server.data.property.common.AbstractItemStackPropertyStore;
+import org.lanternpowered.server.data.property.common.AbstractItemPropertyStore;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.property.item.BurningFuelProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -34,7 +34,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public final class BurningFuelPropertyStore extends AbstractItemStackPropertyStore<BurningFuelProperty> {
+public final class BurningFuelPropertyStore extends AbstractItemPropertyStore<BurningFuelProperty> {
 
     @Override
     protected Optional<BurningFuelProperty> getFor(ItemStack itemStack) {

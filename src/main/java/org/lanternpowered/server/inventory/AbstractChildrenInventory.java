@@ -38,21 +38,20 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.TopContainerPart;
-import org.lanternpowered.server.inventory.property.LanternSlotIndex;
 import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.property.GuiIds;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.gui.GuiIds;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
@@ -182,9 +181,9 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
                 .inventories(slots) // Just put all the slots in a chest/hopper inventory layout
                 .type(LanternChildrenInventory.Viewable.class);
         if (slots.size() <= HOPPER_SIZE) {
-            builder.property(GuiIdProperty.of(GuiIds.HOPPER)); // Hopper is a row of 5 slots
+            builder.property(InventoryProperties.GUI_ID, GuiIds.HOPPER); // Hopper is a row of 5 slots
         } else {
-            builder.property(GuiIdProperty.of(GuiIds.CHEST));
+            builder.property(InventoryProperties.GUI_ID, GuiIds.CHEST);
         }
         return builder.plugin(getPlugin()).build();
     }
@@ -587,24 +586,12 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
     }
 
     @Override
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
-        if (property == SlotIndex.class && child instanceof Slot) {
+    protected <V> Optional<V> tryGetProperty(Inventory child, Property<V> property) {
+        if (property == InventoryProperties.SLOT_INDEX && child instanceof Slot) {
             final int index = getSlotIndex((Slot) child);
-            return index == INVALID_SLOT_INDEX ? Optional.empty() : Optional.of(property.cast(new LanternSlotIndex(index)));
+            return index == INVALID_SLOT_INDEX ? Optional.empty() : Optional.of((V) SlotIndex.of(index));
         }
-        return super.tryGetProperty(child, property, key);
-    }
-
-    @Override
-    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
-        final List<T> properties = super.tryGetProperties(child, property);
-        if (property == SlotIndex.class && child instanceof Slot) {
-            final int index = getSlotIndex((Slot) child);
-            if (index != INVALID_SLOT_INDEX) {
-                properties.add(property.cast(new LanternSlotIndex(index)));
-            }
-        }
-        return properties;
+        return super.tryGetProperty(child, property);
     }
 
     @Override

@@ -29,16 +29,14 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.property.LanternIdentifiable;
-import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.Identifiable;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
@@ -61,7 +59,7 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory,
         static final Translation INSTANCE = tr("inventory.empty.name");
     }
 
-    private static final Identifiable EMPTY_IDENTIFIABLE = new LanternIdentifiable(new UUID(0L, 0L), Property.Operator.DELEGATE);
+    private static final UUID EMPTY_UNIQUE_ID = new UUID(0L, 0L);
 
     @Override
     public EmptyInventory empty() {
@@ -307,19 +305,10 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory,
     }
 
     @Override
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
-        if (property == Identifiable.class) {
-            return Optional.of((T) EMPTY_IDENTIFIABLE);
+    protected <V> Optional<V> tryGetProperty(Property<V> property) {
+        if (property == InventoryProperties.UNIQUE_ID) {
+            return Optional.of((V) EMPTY_UNIQUE_ID);
         }
-        return super.tryGetProperty(property, key);
-    }
-
-    @Override
-    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
-        final List<T> properties = super.tryGetProperties(property);
-        if (property == Identifiable.class) {
-            properties.add((T) EMPTY_IDENTIFIABLE);
-        }
-        return properties;
+        return super.tryGetProperty(property);
     }
 }

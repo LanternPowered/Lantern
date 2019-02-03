@@ -25,19 +25,14 @@
  */
 package org.lanternpowered.server.item.predicate;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.item.EquipmentProperty;
+import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
 public interface EquipmentItemPredicate extends ItemPredicate {
@@ -118,88 +113,32 @@ public interface EquipmentItemPredicate extends ItemPredicate {
                 return predicate.test(equipmentType);
             }
 
-            private boolean test(Optional<EquipmentProperty> optEquipmentProperty) {
-                return optEquipmentProperty
-                        .map(property -> {
-                            final EquipmentType equipmentType = property.getValue();
-                            if (equipmentType == null) {
-                                // Equipment type is missing, fail
-                                return false;
-                            }
-                            final Property.Operator operator = property.getOperator();
-                            if (operator == Property.Operator.EQUAL) {
-                                return predicate.test(equipmentType);
-                            } else if (operator == Property.Operator.NOTEQUAL) {
-                                return !predicate.test(equipmentType); // TODO: Is this right?
-                            }
-                            return false; // All the other operations aren't supported
-                        })
-                        .orElse(false);
-            }
-
             @Override
             public boolean test(ItemStack stack) {
-                return test(stack.getProperty(EquipmentProperty.class));
+                return stack.getProperty(Properties.EQUIPMENT_TYPE).map(this::test).orElse(false);
             }
 
             @Override
             public boolean test(ItemStackSnapshot stack) {
-                return test(stack.getProperty(EquipmentProperty.class));
+                return stack.getProperty(Properties.EQUIPMENT_TYPE).map(this::test).orElse(false);
             }
 
             @Override
             public boolean test(ItemType type) {
-                return test(type.getDefaultProperty(EquipmentProperty.class));
+                return type.getProperty(Properties.EQUIPMENT_TYPE).map(this::test).orElse(false);
             }
         };
     }
 
-
     /**
      * Constructs a {@link ItemPredicate} for the provided
-     * {@link EquipmentSlotType} property.
+     * {@link EquipmentType} predicate.
      *
-     * @param equipmentSlotType The equipment slot type property
+     * @param equipmentType The equipment type
      * @return The equipment item filter
      */
-    static EquipmentItemPredicate of(EquipmentSlotType equipmentSlotType) {
-        checkNotNull(equipmentSlotType, "equipmentSlotType");
-        final EquipmentType slotEquipmentType = equipmentSlotType.getValue();
-        checkNotNull(slotEquipmentType, "value");
-        final Property.Operator operator = equipmentSlotType.getOperator();
-        checkArgument(operator == Property.Operator.EQUAL || operator == Property.Operator.NOTEQUAL,
-                "Only the operators EQUAL and NOTEQUAL are supported, %s is not.", operator);
-        return new EquipmentItemPredicate() {
-            @Override
-            public boolean test(EquipmentType equipmentType) {
-                final boolean result = ((LanternEquipmentType) slotEquipmentType).isChild(equipmentType);
-                return (operator == Property.Operator.EQUAL) == result;
-            }
-
-            private boolean test(Optional<EquipmentProperty> optEquipmentProperty) {
-                return optEquipmentProperty
-                        .map(property -> {
-                            final EquipmentType equipmentType = property.getValue();
-                            final boolean result = ((LanternEquipmentType) slotEquipmentType).isChild(equipmentType);
-                            return (operator == Property.Operator.EQUAL) == result;
-                        })
-                        .orElse(false);
-            }
-
-            @Override
-            public boolean test(ItemStack stack) {
-                return test(stack.getProperty(EquipmentProperty.class));
-            }
-
-            @Override
-            public boolean test(ItemStackSnapshot stack) {
-                return test(stack.getProperty(EquipmentProperty.class));
-            }
-
-            @Override
-            public boolean test(ItemType type) {
-                return test(type.getDefaultProperty(EquipmentProperty.class));
-            }
-        };
+    static EquipmentItemPredicate of(EquipmentType equipmentType) {
+        checkNotNull(equipmentType, "equipmentType");
+        return of(equipmentType::includes);
     }
 }

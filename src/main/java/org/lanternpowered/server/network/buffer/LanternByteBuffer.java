@@ -42,10 +42,11 @@ import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.network.item.NetworkItemHelper;
 import org.lanternpowered.server.network.item.RawItemStack;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.network.ChannelBuf;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -57,9 +58,6 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     private final ByteBuf buf;
 
-    @Nullable
-    private LanternByteBuffer opposite;
-
     public LanternByteBuffer(ByteBuf buf) {
         this.buf = buf;
     }
@@ -69,7 +67,7 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public int getCapacity() {
+    public int capacity() {
         return this.buf.capacity();
     }
 
@@ -78,9 +76,6 @@ public final class LanternByteBuffer implements ByteBuffer {
         return this.buf.readableBytes();
     }
 
-    // TODO: Deprecate in the api
-    @SuppressWarnings("deprecation")
-    @Deprecated
     @Override
     public int refCnt() {
         return this.buf.refCnt();
@@ -89,6 +84,11 @@ public final class LanternByteBuffer implements ByteBuffer {
     @Override
     public OutputStream asOutputStream() {
         return new ByteBufOutputStream(this.buf);
+    }
+
+    @Override
+    public InputStream asInputStream() {
+        return new ByteBufInputStream(this.buf);
     }
 
     @Override
@@ -116,32 +116,12 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public LanternByteBuffer order(ByteOrder order) {
-        if (this.buf.order().equals(order)) {
-            return this;
-        } else {
-            if (this.opposite == null) {
-                this.opposite = new LanternByteBuffer(this.buf.order(order));
-                this.opposite.opposite = this;
-            }
-            return this.opposite;
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    @Override
-    public ByteOrder getByteOrder() {
-        return this.buf.order();
-    }
-
-    @Override
     public int readerIndex() {
         return this.buf.readerIndex();
     }
 
     @Override
-    public LanternByteBuffer setReadIndex(int index) {
+    public LanternByteBuffer readerIndex(int index) {
         this.buf.readerIndex(index);
         return this;
     }
@@ -152,7 +132,7 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public LanternByteBuffer setWriteIndex(int index) {
+    public LanternByteBuffer writerIndex(int index) {
         this.buf.writerIndex(index);
         return this;
     }
@@ -166,30 +146,6 @@ public final class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer clear() {
         this.buf.clear();
-        return this;
-    }
-
-    @Override
-    public LanternByteBuffer markRead() {
-        this.buf.markReaderIndex();
-        return this;
-    }
-
-    @Override
-    public LanternByteBuffer markWrite() {
-        this.buf.markWriterIndex();
-        return this;
-    }
-
-    @Override
-    public LanternByteBuffer resetRead() {
-        this.buf.resetReaderIndex();
-        return this;
-    }
-
-    @Override
-    public LanternByteBuffer resetWrite() {
-        this.buf.resetWriterIndex();
         return this;
     }
 
@@ -372,8 +328,20 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public LanternByteBuffer writeShortLE(short data) {
+        this.buf.writeShortLE(data);
+        return this;
+    }
+
+    @Override
     public LanternByteBuffer setShort(int index, short data) {
         this.buf.setShort(index, data);
+        return this;
+    }
+
+    @Override
+    public ByteBuffer setShortLE(int index, short data) {
+        this.buf.setShortLE(index, data);
         return this;
     }
 
@@ -383,8 +351,18 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public short readShortLE() {
+        return this.buf.readShortLE();
+    }
+
+    @Override
     public short getShort(int index) {
         return this.buf.getShort(index);
+    }
+
+    @Override
+    public short getShortLE(int index) {
+        return this.buf.getShortLE(index);
     }
 
     @Override
@@ -410,30 +388,58 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public LanternByteBuffer writeInteger(int data) {
+    public LanternByteBuffer writeInt(int data) {
         this.buf.writeInt(data);
         return this;
     }
 
     @Override
-    public LanternByteBuffer setInteger(int index, int data) {
+    public LanternByteBuffer writeIntLE(int data) {
+        this.buf.writeIntLE(data);
+        return this;
+    }
+
+    @Override
+    public LanternByteBuffer setInt(int index, int data) {
         this.buf.setInt(index, data);
         return this;
     }
 
     @Override
-    public int readInteger() {
+    public LanternByteBuffer setIntLE(int index, int data) {
+        this.buf.setIntLE(index, data);
+        return this;
+    }
+
+    @Override
+    public int readInt() {
         return this.buf.readInt();
     }
 
     @Override
-    public int getInteger(int index) {
+    public int readIntLE() {
+        return this.buf.readIntLE();
+    }
+
+    @Override
+    public int getInt(int index) {
         return this.buf.getInt(index);
+    }
+
+    @Override
+    public int getIntLE(int index) {
+        return this.buf.getIntLE(index);
     }
 
     @Override
     public LanternByteBuffer writeLong(long data) {
         this.buf.writeLong(data);
+        return this;
+    }
+
+    @Override
+    public LanternByteBuffer writeLongLE(long data) {
+        this.buf.writeLongLE(data);
         return this;
     }
 
@@ -444,8 +450,19 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public LanternByteBuffer setLongLE(int index, long data) {
+        this.buf.setLongLE(index, data);
+        return this;
+    }
+
+    @Override
     public long readLong() {
         return this.buf.readLong();
+    }
+
+    @Override
+    public long readLongLE() {
+        return this.buf.readLongLE();
     }
 
     @Override
@@ -454,8 +471,19 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public long getLongLE(int index) {
+        return this.buf.getLongLE(index);
+    }
+
+    @Override
     public LanternByteBuffer writeFloat(float data) {
         this.buf.writeFloat(data);
+        return this;
+    }
+
+    @Override
+    public LanternByteBuffer writeFloatLE(float data) {
+        this.buf.writeFloatLE(data);
         return this;
     }
 
@@ -466,8 +494,19 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public LanternByteBuffer setFloatLE(int index, float data) {
+        this.buf.setFloatLE(index, data);
+        return this;
+    }
+
+    @Override
     public float readFloat() {
         return this.buf.readFloat();
+    }
+
+    @Override
+    public float readFloatLE() {
+        return this.buf.readFloatLE();
     }
 
     @Override
@@ -476,8 +515,19 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public float getFloatLE(int index) {
+        return this.buf.getFloatLE(index);
+    }
+
+    @Override
     public LanternByteBuffer writeDouble(double data) {
         this.buf.writeDouble(data);
+        return this;
+    }
+
+    @Override
+    public LanternByteBuffer writeDoubleLE(double data) {
+        this.buf.writeDoubleLE(data);
         return this;
     }
 
@@ -488,13 +538,29 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public LanternByteBuffer setDoubleLE(int index, double data) {
+        this.buf.setDoubleLE(index, data);
+        return null;
+    }
+
+    @Override
     public double readDouble() {
         return this.buf.readDouble();
     }
 
     @Override
+    public double readDoubleLE() {
+        return this.buf.readDoubleLE();
+    }
+
+    @Override
     public double getDouble(int index) {
         return this.buf.getDouble(index);
+    }
+
+    @Override
+    public double getDoubleLE(int index) {
+        return this.buf.getDoubleLE(index);
     }
 
     public static void writeVarInt(ByteBuf byteBuf, int value) {
@@ -901,11 +967,6 @@ public final class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer copy() {
         return new LanternByteBuffer(this.buf.copy());
-    }
-
-    @Override
-    public int readableBytes() {
-        return this.buf.readableBytes();
     }
 
     private <T> T getAt(int index, Supplier<T> supplier) {

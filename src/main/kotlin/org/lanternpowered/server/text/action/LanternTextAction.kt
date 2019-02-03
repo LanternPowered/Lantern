@@ -36,7 +36,7 @@ import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.HoverAction
 import org.spongepowered.api.text.action.ShiftClickAction
 import org.spongepowered.api.text.action.TextAction
-import org.spongepowered.api.util.ResettableBuilder
+import org.spongepowered.api.util.CopyableBuilder
 import java.net.URL
 import java.util.UUID
 import java.util.function.Consumer
@@ -80,7 +80,7 @@ data class InsertTextShiftClickAction(override val result: String) : LanternShif
 
 // Builders
 
-abstract class LanternTextActionBuilder<A : TextAction<R>, R : Any, B : ResettableBuilder<A, B>> internal constructor(): ResettableBuilder<A, B> {
+abstract class LanternTextActionBuilder<A : TextAction<R>, R : Any, B : CopyableBuilder<A, B>> internal constructor(): CopyableBuilder<A, B> {
 
     private var result: R? = null
 

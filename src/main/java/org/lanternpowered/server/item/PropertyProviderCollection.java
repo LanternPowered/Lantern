@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.data.Property;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,7 +88,7 @@ public final class PropertyProviderCollection {
         return new Builder().from(this);
     }
 
-    public static final class Builder implements ResettableBuilder<PropertyProviderCollection, Builder> {
+    public static final class Builder implements CopyableBuilder<PropertyProviderCollection, Builder> {
 
         private final Map<Class<?>, PropertyProvider<?>> propertyProviders = new HashMap<>();
 

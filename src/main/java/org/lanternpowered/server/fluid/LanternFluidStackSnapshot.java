@@ -33,7 +33,7 @@ import org.lanternpowered.server.data.IImmutableDataHolder;
 import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.MutableToImmutableManipulatorCollection;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutableDataHolder<FluidStackSnapshot>,
-        AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
+        IStorePropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
     @Nullable private AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
     private final LanternFluidStack fluidStack;

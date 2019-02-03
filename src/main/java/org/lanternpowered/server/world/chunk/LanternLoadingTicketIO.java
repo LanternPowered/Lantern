@@ -34,8 +34,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
-import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
+import org.spongepowered.api.world.chunk.ChunkTicketManager.EntityLoadingTicket;
+import org.spongepowered.api.world.chunk.ChunkTicketManager.PlayerLoadingTicket;
 
 import java.io.IOException;
 import java.nio.file.Files;

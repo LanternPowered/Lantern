@@ -34,15 +34,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
-import org.lanternpowered.server.inventory.property.LanternInventoryCapacity;
-import org.lanternpowered.server.inventory.property.LanternInventoryTitle;
 import org.lanternpowered.server.inventory.query.LanternQueryOperation;
 import org.lanternpowered.server.item.predicate.ItemPredicate;
 import org.lanternpowered.server.text.translation.TextTranslation;
-import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.Property;
+import org.spongepowered.api.data.property.store.PropertyStore;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.item.ItemType;
@@ -50,13 +49,11 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -65,12 +62,12 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -82,7 +79,7 @@ import javax.annotation.Nullable;
  * The base implementation for all the {@link Inventory}s.
  */
 @SuppressWarnings({"unchecked", "ConstantConditions"})
-public abstract class AbstractInventory implements IInventory, AbstractPropertyHolder {
+public abstract class AbstractInventory implements IInventory, IStorePropertyHolder {
 
     /**
      * Represents a invalid slot index.
@@ -584,138 +581,92 @@ public abstract class AbstractInventory implements IInventory, AbstractPropertyH
     @Override
     public Optional<Slot> getSlot(SlotIndex slotIndex) {
         checkNotNull(slotIndex, "slotIndex");
-        if (!(slotIndex.getOperator() == Property.Operator.EQUAL ||
-                slotIndex.getOperator() == Property.Operator.DELEGATE) || slotIndex.getValue() == null) {
-            return Optional.empty();
-        }
-        return (Optional) getSlot(slotIndex.getValue());
+        return (Optional) getSlot(slotIndex.getIndex());
     }
 
     // Properties
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> property) {
-        return AbstractPropertyHolder.super.getProperty(property);
-    }
-
-    @Override
-    public final <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Class<T> property) {
-        return getPropertiesBuilder(property).build();
-    }
-
-    /**
-     * Constructs a {@link ImmutableList} builder and populates it with
-     * the {@link InventoryProperty}s of the provided type.
-     *
-     * @param property The property type
-     * @param <T> The property type
-     * @return The immutable list builder
-     */
-    private <T extends InventoryProperty<?, ?>> ImmutableList.Builder<T> getPropertiesBuilder(Class<T> property) {
-        checkNotNull(property, "property");
-        final AbstractInventory parent = parent();
-        final ImmutableList.Builder<T> properties = ImmutableList.builder();
-        properties.addAll(tryGetProperties(property));
-        if (parent != this) {
-            properties.addAll(parent.tryGetProperties(this, property));
+    public final <V> Optional<V> getProperty(Property<V> property) {
+        final Optional<V> optValue = getInventoryProperty(property);
+        if (optValue.isPresent()) {
+            return optValue;
         }
-        return properties;
+        return LanternPropertyRegistry.INSTANCE.getStoreForInventory(property).getFor(this);
     }
 
     @Override
-    public final <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Inventory child, Class<T> property) {
-        return getPropertiesBuilder((AbstractInventory) child, property).build();
+    public final OptionalDouble getDoubleProperty(Property<Double> property) {
+        return getProperty(property).map(OptionalDouble::of).orElse(OptionalDouble.empty());
+    }
+
+    @Override
+    public final OptionalInt getIntProperty(Property<Integer> property) {
+        return getProperty(property).map(OptionalInt::of).orElse(OptionalInt.empty());
+    }
+
+    @Override
+    public <V> Optional<V> getProperty(Inventory child, Property<V> property) {
+        Optional<V> optValue = tryGetProperty(child, property);
+        if (optValue.isPresent()) {
+            return optValue;
+        }
+        optValue = tryGetProperty(property);
+        if (optValue.isPresent()) {
+            return optValue;
+        }
+        return LanternPropertyRegistry.INSTANCE.getStoreForInventory(property).getFor(this);
     }
 
     /**
-     * Constructs a {@link ImmutableList} builder and populates it with
-     * the {@link InventoryProperty}s of the provided type for the
-     * target child {@link Inventory}.
+     * Gets the inventory {@link Property} of this inventory. This method
+     * will not be delegated through {@link PropertyStore}s.
      *
-     * @param child The target child inventory
-     * @param property The property type
-     * @param <T> The property type
-     * @return The immutable list builder
+     * @param property The property
+     * @param <V> The property value type
+     * @return The property value
      */
-    <T extends InventoryProperty<?, ?>> ImmutableList.Builder<T> getPropertiesBuilder(AbstractInventory child, Class<T> property) {
-        checkNotNull(child, "child");
-        checkNotNull(property, "property");
-        final ImmutableList.Builder<T> properties = ImmutableList.builder();
-        properties.addAll(tryGetProperties(child, property));
-        properties.addAll(child.tryGetProperties(property));
-        return properties;
-    }
-
-    @Override
-    public final <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key) {
-        checkNotNull(property, "property");
+    public final <V> Optional<V> getInventoryProperty(Property<V> property) {
+        Optional<V> optValue = tryGetProperty(property);
+        if (optValue.isPresent()) {
+            return optValue;
+        }
         final AbstractInventory parent = parent();
         if (parent != this) {
-            final Optional<T> optProperty = parent.tryGetProperty(this, property, key);
-            if (optProperty.isPresent()) {
-                return optProperty;
+            optValue = parent.tryGetProperty(this, property);
+            if (optValue.isPresent()) {
+                return optValue;
             }
         }
-        return tryGetProperty(property, key);
-    }
-
-    @Override
-    public final <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property) {
-        return getProperty(child, property, AbstractInventoryProperty.getDefaultKey(property));
-    }
-
-    @Override
-    public final <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, @Nullable Object key) {
-        checkNotNull(child, "child");
-        checkNotNull(property, "property");
-        Optional<T> optProperty = tryGetProperty(child, property, key);
-        if (!optProperty.isPresent()) {
-            optProperty = ((AbstractInventory) child).tryGetProperty(property, key);
-        }
-        return optProperty;
+        return Optional.empty();
     }
 
     /**
-     * Attempts to get a {@link InventoryProperty} of the given
-     * type and optional key from this inventory.
+     * Attempts to get a {@link Property} value from this {@link Inventory}.
      *
-     * @param property The property type
-     * @param key The key
-     * @param <T> The property type
-     * @return The property
+     * @param property The property
+     * @param <V> The property value type
+     * @return The property value
      */
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
-        if (property == InventoryTitle.class) {
-            return Optional.of((T) new LanternInventoryTitle(TextTranslation.toText(getName()), Property.Operator.DELEGATE));
-        } else if (property == InventoryCapacity.class) {
-            return Optional.of((T) new LanternInventoryCapacity(capacity(), Property.Operator.DELEGATE));
+    protected <V> Optional<V> tryGetProperty(Property<V> property) {
+        if (property == InventoryProperties.TITLE) {
+            return Optional.of((V) TextTranslation.toText(getName()));
+        } else if (property == InventoryProperties.CAPACITY) {
+            return Optional.of((V) (Integer) capacity());
         }
         return Optional.empty();
     }
 
     /**
-     * Attempts to get all the {@link InventoryProperty}s of the given
-     * type from this inventory.
+     * Attempts to get a {@link Property} value for the specified child
+     * {@link Inventory} based on this {@link Inventory}.
      *
-     * @param property The property type
-     * @param <T> The property type
-     * @return The properties
+     * @param child The child inventory
+     * @param property The property
+     * @param <V> The property value type
+     * @return The property value
      */
-    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
-        final List<T> properties = new ArrayList<>();
-        if (property == InventoryTitle.class) {
-            properties.add((T) new LanternInventoryTitle(TextTranslation.toText(getName()), Property.Operator.DELEGATE));
-        } else if (property == InventoryCapacity.class) {
-            properties.add((T) new LanternInventoryCapacity(capacity(), Property.Operator.DELEGATE));
-        }
-        return properties;
-    }
-
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
+    protected <V> Optional<V> tryGetProperty(Inventory child, Property<V> property) {
         return Optional.empty();
-    }
-
-    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
-        return new ArrayList<>();
     }
 }

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.item.recipe;
 
-import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -160,9 +159,6 @@ public interface IIngredient extends Ingredient {
 
         @Override
         Builder with(Predicate<ItemStack> predicate);
-
-        @Override
-        Builder with(GameDictionary.Entry entry);
 
         @Override
         Builder with(ItemType... types);

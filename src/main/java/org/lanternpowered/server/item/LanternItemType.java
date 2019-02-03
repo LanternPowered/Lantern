@@ -32,7 +32,6 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.spongepowered.api.CatalogKey;
 import org.lanternpowered.server.item.appearance.ItemAppearance;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -83,12 +82,6 @@ public class LanternItemType extends DefaultCatalogType implements ItemType {
     @Override
     public Optional<BlockType> getBlock() {
         return Optional.ofNullable(this.blockType);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getDefaultProperty(Class<T> propertyClass) {
-        return this.propertyProviderCollection.get(propertyClass).map(propertyProvider -> propertyProvider.get(this, null));
     }
 
     public MutableBehaviorPipeline<Behavior> getPipeline() {

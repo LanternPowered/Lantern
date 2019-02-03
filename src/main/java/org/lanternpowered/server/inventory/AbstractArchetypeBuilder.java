@@ -31,13 +31,11 @@ import static com.google.common.base.Preconditions.checkState;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.Archetype;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -62,8 +60,8 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
     }
 
     @Override
-    public B property(InventoryProperty<String, ?> property) {
-        super.property(property);
+    public <V> B property(Property<V> property, V value) {
+        super.property(property, value);
         invalidateCachedArchetype();
         return (B) this;
     }
@@ -113,9 +111,7 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
         builder.constructor = this.constructor;
         builder.pluginContainer = this.pluginContainer;
         builder.properties.clear();
-        for (Map.Entry<Class<?>, Map<String, InventoryProperty<String, ?>>> entry : this.properties.entrySet()) {
-            builder.properties.put(entry.getKey(), new HashMap<>(entry.getValue()));
-        }
+        builder.properties.putAll(this.properties);
         builder.cachedProperties = this.cachedProperties;
         builder.shiftClickBehavior = this.shiftClickBehavior;
         builder.translation = this.translation;

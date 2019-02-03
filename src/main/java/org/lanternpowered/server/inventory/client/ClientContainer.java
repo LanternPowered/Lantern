@@ -49,7 +49,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.Text;
@@ -631,7 +630,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Binds a {@link InventoryProperty} type to
+     * Binds a {@link ContainerProperty} type to
      * the given constant value.
      *
      * @param property The property

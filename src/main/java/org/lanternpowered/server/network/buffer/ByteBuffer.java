@@ -35,15 +35,14 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteOrder;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
 
-    OutputStream asOutputStream();
+    @Override
+    ByteBuffer ensureWritable(int minWritableBytes);
 
     @Override
     ByteBuffer retain();
@@ -58,31 +57,16 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
     ByteBuffer touch(Object hint);
 
     @Override
-    ByteBuffer order(ByteOrder order);
+    ByteBuffer readerIndex(int index);
 
     @Override
-    ByteBuffer setReadIndex(int index);
-
-    @Override
-    ByteBuffer setWriteIndex(int index);
+    ByteBuffer writerIndex(int index);
 
     @Override
     ByteBuffer setIndex(int readIndex, int writeIndex);
 
     @Override
     ByteBuffer clear();
-
-    @Override
-    ByteBuffer markRead();
-
-    @Override
-    ByteBuffer markWrite();
-
-    @Override
-    ByteBuffer resetRead();
-
-    @Override
-    ByteBuffer resetWrite();
 
     @Override
     ByteBuffer slice();
@@ -141,7 +125,13 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
     ByteBuffer writeShort(short data);
 
     @Override
+    ByteBuffer writeShortLE(short data);
+
+    @Override
     ByteBuffer setShort(int index, short data);
+
+    @Override
+    ByteBuffer setShortLE(int index, short data);
 
     @Override
     ByteBuffer writeChar(char data);
@@ -150,34 +140,64 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
     ByteBuffer setChar(int index, char data);
 
     @Override
-    ByteBuffer writeInteger(int data);
+    ByteBuffer writeInt(int data);
 
     @Override
-    ByteBuffer setInteger(int index, int data);
+    ByteBuffer writeIntLE(int data);
+
+    @Override
+    ByteBuffer setInt(int index, int data);
+
+    @Override
+    ByteBuffer setIntLE(int index, int data);
 
     @Override
     ByteBuffer writeLong(long data);
 
     @Override
+    ByteBuffer writeLongLE(long data);
+
+    @Override
     ByteBuffer setLong(int index, long data);
+
+    @Override
+    ByteBuffer setLongLE(int index, long data);
 
     @Override
     ByteBuffer writeFloat(float data);
 
     @Override
+    ByteBuffer writeFloatLE(float data);
+
+    @Override
     ByteBuffer setFloat(int index, float data);
+
+    @Override
+    ByteBuffer setFloatLE(int index, float data);
 
     @Override
     ByteBuffer writeDouble(double data);
 
     @Override
+    ByteBuffer writeDoubleLE(double data);
+
+    @Override
     ByteBuffer setDouble(int index, double data);
+
+    @Override
+    ByteBuffer setDoubleLE(int index, double data);
 
     @Override
     ByteBuffer writeVarInt(int value);
 
     @Override
     ByteBuffer setVarInt(int index, int value);
+
+    @Override
+    ByteBuffer writeVarLong(long value);
+
+    @Override
+    ByteBuffer setVarLong(int index, long value);
 
     /**
      * Reads a string and checks whether the length isn't longer
@@ -261,49 +281,6 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
 
     ByteBuffer readBytes(ByteBuffer dst, int dstIndex, int length);
 
-    /**
-     * Sets the specified varlong at the current writerIndex and increases the
-     * writerIndex by the number of bytes written.
-     *
-     * <p>The number of bytes written depends on the size of the value.</p>
-     *
-     * @param value The varlong value
-     * @return This stream for chaining
-     */
-    ByteBuffer writeVarLong(long value);
-
-    /**
-     * Sets the specified varlong at the specified absolute index in this buffer.
-     * This method does not modify readerIndex or writerIndex of this buffer.
-     *
-     * <p>The number of bytes written depends on the size of the value.</p>
-     *
-     * @param index The index
-     * @param value The varlong value
-     * @return This stream for chaining
-     */
-    ByteBuffer setVarLong(int index, long value);
-
-    /**
-     * Gets a varlong at the current readerIndex and increases the readerIndex by
-     * the number of bytes read.
-     *
-     * <p>The number of bytes read depends on the size of the value.</p>
-     *
-     * @return The varlong value
-     */
-    long readVarLong();
-
-    /**
-     * Gets a varlong at the specified absolute index in this buffer.
-     *
-     * <p>The number of bytes read depends on the size of the value.</p>
-     *
-     * @param index The index
-     * @return The varlong value
-     */
-    long getVarLong(int index);
-
     Vector3i getVector3i(int index);
 
     ByteBuffer setVector3i(int index, Vector3i vector);
@@ -344,16 +321,5 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
 
     ByteBuffer writeRawItemStack(@Nullable RawItemStack rawItemStack);
 
-    /**
-     * Makes sure the number of the writable bytes is equal to
-     * or greater than the specified value.
-     *
-     * @param minWritableBytes The minimum writable bytes
-     * @return This stream for chaining
-     */
-    ByteBuffer ensureWritable(int minWritableBytes);
-
     ByteBuffer copy();
-
-    int readableBytes();
 }

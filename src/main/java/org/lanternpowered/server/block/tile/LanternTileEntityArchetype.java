@@ -32,7 +32,7 @@ import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -46,7 +46,7 @@ import org.spongepowered.api.world.Location;
 import java.util.Optional;
 import java.util.UUID;
 
-public class LanternTileEntityArchetype implements TileEntityArchetype, AbstractPropertyHolder, IAdditionalDataHolder {
+public class LanternTileEntityArchetype implements TileEntityArchetype, IStorePropertyHolder, IAdditionalDataHolder {
 
     final LanternTileEntity tileEntity;
 

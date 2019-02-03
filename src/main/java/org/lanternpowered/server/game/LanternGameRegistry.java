@@ -75,6 +75,9 @@ import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
 import org.lanternpowered.server.data.key.LanternKeyBuilder;
+import org.lanternpowered.server.data.property.LanternPropertyBuilder;
+import org.lanternpowered.server.data.property.LanternPropertyMatcherBuilder;
+import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.data.type.LanternComparatorType;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
@@ -205,17 +208,6 @@ import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
 import org.lanternpowered.server.inventory.LanternInventoryBuilder;
 import org.lanternpowered.server.inventory.LanternItemStackBuilder;
-import org.lanternpowered.server.inventory.property.LanternEquipmentSlotType;
-import org.lanternpowered.server.inventory.property.LanternGuiIdProperty;
-import org.lanternpowered.server.inventory.property.LanternIdentifiable;
-import org.lanternpowered.server.inventory.property.LanternIntProperty;
-import org.lanternpowered.server.inventory.property.LanternInventoryCapacity;
-import org.lanternpowered.server.inventory.property.LanternInventoryDimension;
-import org.lanternpowered.server.inventory.property.LanternInventoryTitle;
-import org.lanternpowered.server.inventory.property.LanternSlotIndex;
-import org.lanternpowered.server.inventory.property.LanternSlotPos;
-import org.lanternpowered.server.inventory.property.LanternSlotSide;
-import org.lanternpowered.server.inventory.property.LanternStringProperty;
 import org.lanternpowered.server.inventory.query.LanternQueryTransformationBuilder;
 import org.lanternpowered.server.inventory.transaction.LanternInventoryTransactionResult;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
@@ -253,10 +245,6 @@ import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRe
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
 import org.lanternpowered.server.statistic.StatisticCategoryRegistry;
-import org.lanternpowered.server.statistic.builder.BlockStatisticBuilder;
-import org.lanternpowered.server.statistic.builder.EntityStatisticBuilder;
-import org.lanternpowered.server.statistic.builder.ItemStatisticBuilder;
-import org.lanternpowered.server.statistic.builder.StatisticBuilder;
 import org.lanternpowered.server.text.LanternLiteralText;
 import org.lanternpowered.server.text.LanternScoreText;
 import org.lanternpowered.server.text.LanternSelectorText;
@@ -286,6 +274,7 @@ import org.lanternpowered.server.world.biome.LanternBiomeGenerationSettingsBuild
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.gamerule.GameRuleRegistry;
 import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder;
+import org.lanternpowered.server.world.update.TaskPriorityRegistry;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.advancement.Advancement;
@@ -308,6 +297,8 @@ import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.DataFormat;
 import org.spongepowered.api.data.persistence.DataTranslator;
+import org.spongepowered.api.data.property.Property;
+import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.BannerPatternShape;
@@ -383,18 +374,7 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.item.inventory.property.GuiId;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.property.Identifiable;
-import org.spongepowered.api.item.inventory.property.IntProperty;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
-import org.spongepowered.api.item.inventory.property.SlotPos;
-import org.spongepowered.api.item.inventory.property.SlotSide;
-import org.spongepowered.api.item.inventory.property.StringProperty;
+import org.spongepowered.api.item.inventory.gui.GuiId;
 import org.spongepowered.api.item.inventory.query.QueryOperationType;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
@@ -418,6 +398,7 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scheduler.TaskPriority;
 import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
@@ -444,6 +425,7 @@ import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.CopyableBuilder;
 import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.util.RespawnLocation;
 import org.spongepowered.api.util.ban.Ban;
@@ -547,10 +529,6 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(InventoryTransformation.Builder.class, LanternQueryTransformationBuilder::new)
                 .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
                 .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
-                .registerBuilderSupplier(BlockStatisticBuilder.class, BlockStatisticBuilder::create)
-                .registerBuilderSupplier(EntityStatisticBuilder.class, EntityStatisticBuilder::create)
-                .registerBuilderSupplier(ItemStatisticBuilder.class, ItemStatisticBuilder::create)
-                .registerBuilderSupplier(StatisticBuilder.class, StatisticBuilder::create)
                 .registerBuilderSupplier(DataRegistration.Builder.class, LanternDataRegistrationBuilder::new)
                 .registerBuilderSupplier(WorldBorder.Builder.class, LanternWorldBorderBuilder::new)
                 .registerBuilderSupplier(FluidStack.Builder.class, LanternFluidStackBuilder::new)
@@ -563,6 +541,9 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(EnchantmentTypeBuilder.class, LanternEnchantmentTypeBuilder::new)
                 .registerBuilderSupplier(CatalogKey.Builder.class, LanternCatalogKeyBuilder::new)
                 .registerBuilderSupplier(GameRule.Builder.class, LanternGameRuleBuilder::new)
+                // Properties
+                .registerBuilderSupplier(Property.class, (Supplier) LanternPropertyBuilder::new)
+                .registerBuilderSupplier(PropertyMatcher.class, (Supplier) LanternPropertyMatcherBuilder::new)
                 // Text
                 .registerBuilderSupplier(ScoreText.Builder.class, LanternScoreText.Builder::new)
                 .registerBuilderSupplier(LiteralText.Builder.class, LanternLiteralText.Builder::new)
@@ -579,18 +560,6 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(HoverAction.ShowText.Builder.class, ShowTextHoverActionBuilder::new)
                 .registerBuilderSupplier(ShiftClickAction.InsertText.Builder.class, InsertTextShiftClickActionBuilder::new)
                 .registerBuilderSupplier(TextTemplate.Arg.Builder.class, LanternTextTemplate.Arg.Builder::new)
-                // Inventory properties
-                .registerBuilderSupplier(SlotPos.Builder.class, LanternSlotPos.Builder::new)
-                .registerBuilderSupplier(SlotSide.Builder.class, LanternSlotSide.Builder::new)
-                .registerBuilderSupplier(StringProperty.Builder.class, LanternStringProperty.Builder::new)
-                .registerBuilderSupplier(IntProperty.Builder.class, LanternIntProperty.Builder::new)
-                .registerBuilderSupplier(SlotIndex.Builder.class, LanternSlotIndex.Builder::new)
-                .registerBuilderSupplier(InventoryCapacity.Builder.class, LanternInventoryCapacity.Builder::new)
-                .registerBuilderSupplier(Identifiable.Builder.class, LanternIdentifiable.Builder::new)
-                .registerBuilderSupplier(GuiIdProperty.Builder.class, LanternGuiIdProperty.Builder::new)
-                .registerBuilderSupplier(EquipmentSlotType.Builder.class, LanternEquipmentSlotType.Builder::new)
-                .registerBuilderSupplier(InventoryDimension.Builder.class, LanternInventoryDimension.Builder::new)
-                .registerBuilderSupplier(InventoryTitle.Builder.class, LanternInventoryTitle.Builder::new)
                 // Advancements
                 .registerBuilderSupplier(Advancement.Builder.class, LanternAdvancementBuilder::new)
                 .registerBuilderSupplier(AdvancementTree.Builder.class, LanternAdvancementTreeBuilder::new)
@@ -719,6 +688,8 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(new ItemStackComparatorRegistryModule())
                 .registerModule(DataTranslator.class, (CatalogRegistryModule) DataTranslatorRegistryModule.INSTANCE)
                 .registerModule(GameRule.class, (CatalogRegistryModule) GameRuleRegistry.INSTANCE)
+                .registerModule(TaskPriority.class, TaskPriorityRegistry.INSTANCE)
+                .registerModule(Property.class, (CatalogRegistryModule) LanternPropertyRegistry.INSTANCE)
                 // Statistics
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
                 .registerModule(StatisticCategory.class, StatisticCategoryRegistry.INSTANCE)

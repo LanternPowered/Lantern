@@ -31,7 +31,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.util.function.Predicates;
-import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -122,13 +121,6 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
     }
 
     @Override
-    public IIngredient.Builder with(GameDictionary.Entry entry) {
-        checkNotNull(entry, "entry");
-        this.matchers.add(entry::matches);
-        return withDisplay(entry.getTemplate());
-    }
-
-    @Override
     public IIngredient.Builder with(ItemStackSnapshot... items) {
         checkNotNull(items, "items");
         for (ItemStackSnapshot item : items) {
@@ -155,7 +147,7 @@ public class LanternIngredientBuilder implements IIngredient.Builder {
         checkNotNull(types, "types");
         for (ItemType type : types) {
             checkNotNull(type, "type");
-            this.matchers.add(type::matches);
+            this.matchers.add(itemStack -> itemStack.getType().equals(type));
         }
         return withDisplay(types);
     }

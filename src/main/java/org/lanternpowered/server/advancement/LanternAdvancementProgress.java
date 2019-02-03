@@ -44,7 +44,6 @@ import org.lanternpowered.server.advancement.criteria.progress.LanternEmptyCrite
 import org.lanternpowered.server.advancement.criteria.progress.LanternOrCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternScoreCriterionProgress;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
@@ -60,6 +59,7 @@ import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.gamerule.GameRules;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -187,7 +187,7 @@ public class LanternAdvancementProgress implements AdvancementProgress {
                 progress.detachTrigger();
             }
             final Optional<DisplayInfo> optDisplay = this.advancement.getDisplayInfo();
-            final boolean sendMessage = getPlayer().getWorld().getOrCreateRule(RuleTypes.ANNOUNCE_ADVANCEMENTS).getValue() &&
+            final boolean sendMessage = getPlayer().getWorld().getGameRule(GameRules.ANNOUNCE_ADVANCEMENTS) &&
                     optDisplay.map(DisplayInfo::doesAnnounceToChat).orElse(false);
             final Text message = optDisplay.<Text>map(display -> {
                 final Translation translation = tr("chat.type.advancement." + display.getType().getName().toLowerCase());

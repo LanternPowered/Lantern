@@ -117,7 +117,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 final Optional<BlockType> blockType = snapshot.getType().getBlock();
                 if (blockType.isPresent()) {
                     final BlockState state;
-                    if (blockType.get().getDefaultState().getTraits().isEmpty()) {
+                    if (blockType.get().getDefaultState().getStateProperties().isEmpty()) {
                         state = blockType.get().getDefaultState();
                     } else {
                         final BlockState.Builder builder = BlockState.builder().blockType(blockType.get());

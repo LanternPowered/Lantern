@@ -45,7 +45,6 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.world.EntitySpawningEntry;
 import org.lanternpowered.server.world.LanternWorld;
-import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -58,7 +57,6 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
@@ -79,6 +77,7 @@ import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.gamerule.GameRules;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,7 +158,7 @@ public class LanternLiving extends LanternEntity implements Living {
 
         // Only players can keep their inventory
         final boolean keepsInventory = this instanceof LanternPlayer &&
-                getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
+                getWorld().getGameRule(GameRules.KEEP_INVENTORY);
 
         // Post the entity destruction event
         final DestructEntityEvent.Death event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
@@ -409,7 +408,7 @@ public class LanternLiving extends LanternEntity implements Living {
             exhaustion = getValue(Keys.EXHAUSTION).get();
         }
 
-        final boolean naturalRegeneration = getWorld().getOrCreateRule(RuleTypes.NATURAL_REGENERATION).getValue();
+        final boolean naturalRegeneration = getWorld().getGameRule(GameRules.NATURAL_REGENERATION);
         final long currentTickTime = LanternGame.currentTimeTicks();
 
         if (naturalRegeneration && saturation.get() > saturation.getMinValue() && foodLevel.get() >= foodLevel.getMaxValue()) {

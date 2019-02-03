@@ -33,8 +33,8 @@ import org.lanternpowered.server.inventory.client.ClientContainerType;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.property.GuiId;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
+import org.spongepowered.api.item.inventory.InventoryProperties;
+import org.spongepowered.api.item.inventory.gui.GuiId;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 /**
@@ -94,8 +94,7 @@ public class PlayerTopBottomContainer extends AbstractContainer {
         final ClientContainer clientContainer;
         final AbstractChildrenInventory openInventory = getOpenInventory();
         // Get the gui id (ClientContainerType)
-        final GuiId guiId = openInventory.getProperty(GuiIdProperty.class)
-                .map(GuiIdProperty::getValue).orElseThrow(IllegalStateException::new);
+        final GuiId guiId = openInventory.getProperty(InventoryProperties.GUI_ID).orElseThrow(IllegalStateException::new);
         clientContainer = ((ClientContainerType) guiId).createContainer(openInventory);
         clientContainer.bindCursor(getCursorSlot());
         clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(this));

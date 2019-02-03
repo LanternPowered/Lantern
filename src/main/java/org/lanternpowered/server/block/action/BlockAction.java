@@ -26,7 +26,7 @@
 package org.lanternpowered.server.block.action;
 
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.chunk.Chunk;
 
 public interface BlockAction {
 

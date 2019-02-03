@@ -41,7 +41,7 @@ import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.lanternpowered.server.catalog.AbstractCatalogType;
 import org.lanternpowered.server.data.IImmutableDataHolderBase;
 import org.lanternpowered.server.data.key.LanternKey;
-import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
+import org.lanternpowered.server.data.property.IStoreDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
@@ -78,7 +78,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings({"rawtypes", "unchecked", "SuspiciousMethodCalls"})
 public final class LanternBlockState extends AbstractCatalogType implements CatalogType, BlockState,
-        AbstractDirectionRelativePropertyHolder, IImmutableDataHolderBase<BlockState> {
+        IStoreDirectionRelativePropertyHolder, IImmutableDataHolderBase<BlockState> {
 
     private static final DataQuery NAME = DataQuery.of("Name");
     private static final DataQuery PROPERTIES = DataQuery.of("Properties");

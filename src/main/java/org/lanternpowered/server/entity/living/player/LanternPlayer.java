@@ -106,7 +106,6 @@ import org.lanternpowered.server.world.LanternWorldBorder;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
-import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
@@ -170,6 +169,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.chunk.ChunkTicketManager;
+import org.spongepowered.api.world.gamerule.GameRules;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -463,7 +463,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
             final LanternGameMode gameMode = (LanternGameMode) get(Keys.GAME_MODE).get();
             final LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
             final LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
-            final boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
+            final boolean reducedDebug = world.getGameRule(GameRules.REDUCED_DEBUG_INFO);
             final boolean lowHorizon = world.getProperties().getConfig().isLowHorizon();
             // The player has joined the server
             if (oldWorld == null) {
@@ -605,7 +605,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     protected void handleDeath(CauseStack causeStack) {
         // Call the harvest event
-        final boolean keepsInventory = getWorld().getOrCreateRule(RuleTypes.KEEP_INVENTORY).getValue();
+        final boolean keepsInventory = getWorld().getGameRule(GameRules.KEEP_INVENTORY);
         final int exp = keepsInventory ? 0 : Math.min(100, get(Keys.EXPERIENCE_LEVEL).orElse(0) * 7);
         // Humanoids get their own sub-interface for the event
         final HarvestEntityEvent.TargetPlayer harvestEvent = SpongeEventFactory.createHarvestEntityEventTargetPlayer(

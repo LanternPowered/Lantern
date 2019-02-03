@@ -27,29 +27,17 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.entity.Equipable;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.Optional;
 
 public interface IEquipmentInventory extends ICarriedInventory<Equipable>, EquipmentInventory {
-
-    @Override
-    default Optional<ItemStack> poll(EquipmentSlotType equipmentType) {
-        return getSlot(equipmentType).map(Inventory::poll);
-    }
-
-    @Override
-    default Optional<ItemStack> poll(EquipmentSlotType equipmentType, int limit) {
-        return getSlot(equipmentType).map(slot -> slot.poll(limit));
-    }
 
     @Override
     default Optional<ItemStack> poll(EquipmentType equipmentType) {
@@ -59,16 +47,6 @@ public interface IEquipmentInventory extends ICarriedInventory<Equipable>, Equip
     @Override
     default Optional<ItemStack> poll(EquipmentType equipmentType, int limit) {
         return getSlot(equipmentType).map(slot -> slot.poll(limit));
-    }
-
-    @Override
-    default Optional<ItemStack> peek(EquipmentSlotType equipmentType) {
-        return getSlot(equipmentType).map(Inventory::peek);
-    }
-
-    @Override
-    default Optional<ItemStack> peek(EquipmentSlotType equipmentType, int limit) {
-        return getSlot(equipmentType).map(slot -> slot.peek(limit));
     }
 
     @Override
@@ -82,16 +60,6 @@ public interface IEquipmentInventory extends ICarriedInventory<Equipable>, Equip
     }
 
     @Override
-    default InventoryTransactionResult set(EquipmentSlotType equipmentType, ItemStack stack) {
-        checkNotNull(equipmentType, "equipmentType");
-        return getSlot(equipmentType).map(slot -> slot.set(stack))
-                .orElseGet(() -> InventoryTransactionResult.builder()
-                        .type(InventoryTransactionResult.Type.FAILURE)
-                        .reject(LanternItemStack.toSnapshot(stack).createStack())
-                        .build());
-    }
-
-    @Override
     default InventoryTransactionResult set(EquipmentType equipmentType, ItemStack stack) {
         checkNotNull(equipmentType, "equipmentType");
         return getSlot(equipmentType).map(slot -> slot.set(stack))
@@ -102,21 +70,6 @@ public interface IEquipmentInventory extends ICarriedInventory<Equipable>, Equip
     }
 
     @Override
-    default Optional<Slot> getSlot(EquipmentSlotType equipmentType) {
-        checkNotNull(equipmentType, "equipmentType");
-        if (equipmentType.getValue() == null || equipmentType.getOperator() != Property.Operator.EQUAL) {
-            return Optional.empty();
-        }
-        return getSlot(equipmentType.getValue());
-    }
-
-    /**
-     * Get the {@link Slot} for the specified equipment type.
-     *
-     * @param equipmentType Type of equipment slot to set
-     * @return The matching slot or {@link Optional#empty()} if no matching slot
-     */
-    @SuppressWarnings("unchecked")
     default Optional<Slot> getSlot(EquipmentType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
         return this.slots().stream().filter(s -> ((AbstractSlot) s).isValidItem(equipmentType)).findFirst();

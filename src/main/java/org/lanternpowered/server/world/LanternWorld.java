@@ -81,9 +81,6 @@ import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWo
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.lanternpowered.server.world.gen.IGeneratorType;
 import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
-import org.lanternpowered.server.world.rules.Rule;
-import org.lanternpowered.server.world.rules.RuleHolder;
-import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,10 +142,6 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.Explosion;
-import org.spongepowered.api.world.extent.ArchetypeVolume;
-import org.spongepowered.api.world.extent.Extent;
-import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
-import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
@@ -176,7 +169,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public class LanternWorld implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer, RuleHolder {
+public class LanternWorld implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -1585,7 +1578,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.addContext(ContextKeys.INTERACTION_FACE, side);
-            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(this, x, y, z));
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location(this, x, y, z));
             frame.addContext(ContextKeys.BLOCK_TYPE, blockType);
             if (profile != null) {
                 frame.addContext(EventContextKeys.PLAYER_SIMULATED, profile);
@@ -1613,7 +1606,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.addContext(ContextKeys.USED_BLOCK_STATE, block);
             frame.addContext(ContextKeys.INTERACTION_FACE, side);
-            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(this, x, y, z));
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location(this, x, y, z));
             frame.addContext(ContextKeys.BLOCK_TYPE, block.getType());
             if (profile != null) {
                 frame.addContext(EventContextKeys.PLAYER_SIMULATED, profile);
@@ -1649,7 +1642,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
-            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(this, x, y, z));
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location(this, x, y, z));
             frame.addContext(ContextKeys.BLOCK_TYPE, blockType);
             if (profile != null) {
                 frame.addContext(EventContextKeys.PLAYER_SIMULATED, profile);

@@ -26,23 +26,19 @@
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
 import org.lanternpowered.api.catalog.CatalogKeys;
-import org.lanternpowered.server.data.property.PropertyHelper;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.lanternpowered.server.inventory.query.LanternQueryOperationType;
 import org.lanternpowered.server.inventory.query.QueryOperations;
+import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.query.QueryOperationType;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
@@ -72,27 +68,7 @@ public class QueryOperationRegistryModule extends DefaultCatalogRegistryModule<Q
                 (arg, inventory) -> arg.isInstance(inventory)));
         register(new LanternQueryOperationType<Translation>(CatalogKeys.sponge("inventory_translation"),
                 (arg, inventory) -> inventory.getName().equals(arg)));
-        register(new LanternQueryOperationType<InventoryProperty<?,?>>(CatalogKeys.sponge("inventory_property"),
-                (arg, inventory) -> {
-                    // Equipment slot types are a special case, because
-                    // they can be grouped
-                    if (arg instanceof EquipmentSlotType) {
-                        for (EquipmentSlotType property : inventory.getProperties(EquipmentSlotType.class)) {
-                            if (((LanternEquipmentType) arg.getValue()).isChild(property.getValue())) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-                    final Optional<InventoryProperty<?,?>> optProperty = inventory.getProperty(
-                            inventory, (Class) arg.getClass(), arg.getKey());
-                    if (optProperty.isPresent()) {
-                        final InventoryProperty<?,?> prop = optProperty.get();
-                        if (PropertyHelper.matches(arg, prop)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }));
+        register(new LanternQueryOperationType<PropertyMatcher<?>>(CatalogKeys.sponge("property"),
+                (arg, inventory) -> arg.matchesHolder(inventory)));
     }
 }

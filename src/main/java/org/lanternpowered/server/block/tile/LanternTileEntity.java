@@ -32,7 +32,7 @@ import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
 import org.lanternpowered.server.network.tile.AbstractTileEntityProtocol;
 import org.lanternpowered.server.network.tile.TileEntityProtocolType;
@@ -48,14 +48,13 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHolder, AbstractPropertyHolder {
+public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHolder, IStorePropertyHolder {
 
     private LanternTileEntityType tileEntityType;
     private final ValueCollection valueCollection = ValueCollection.create();

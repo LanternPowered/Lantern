@@ -28,9 +28,9 @@ package org.lanternpowered.server.data.manipulator.mutable.fluid;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractMappedData;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.mutable.MapValue;
-import org.spongepowered.api.extra.fluid.FluidStackSnapshot;
-import org.spongepowered.api.extra.fluid.data.manipulator.immutable.ImmutableFluidTankData;
-import org.spongepowered.api.extra.fluid.data.manipulator.mutable.FluidTankData;
+import org.spongepowered.api.fluid.FluidStackSnapshot;
+import org.spongepowered.api.fluid.data.manipulator.immutable.ImmutableFluidTankData;
+import org.spongepowered.api.fluid.data.manipulator.mutable.FluidTankData;
 import org.spongepowered.api.util.Direction;
 
 import java.util.HashMap;

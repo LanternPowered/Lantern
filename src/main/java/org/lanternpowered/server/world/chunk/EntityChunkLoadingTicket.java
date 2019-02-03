@@ -26,7 +26,7 @@
 package org.lanternpowered.server.world.chunk;
 
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.world.ChunkTicketManager;
+import org.spongepowered.api.world.chunk.ChunkTicketManager;
 
 import java.util.Optional;
 

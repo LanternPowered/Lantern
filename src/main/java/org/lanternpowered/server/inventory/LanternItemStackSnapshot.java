@@ -36,9 +36,8 @@ import org.lanternpowered.server.data.IImmutableDataHolder;
 import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.MutableToImmutableManipulatorCollection;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
@@ -57,7 +56,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDataHolder<ItemStackSnapshot>,
-        AbstractPropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
+        IStorePropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
     /**
      * Gets the {@link ItemStackSnapshot#NONE} as a {@link LanternItemStackSnapshot}.
@@ -129,11 +128,6 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     @Override
     public Translation getTranslation() {
         return this.itemStack.getTranslation();
-    }
-
-    @Override
-    public GameDictionary.Entry createGameDictionaryEntry() {
-        throw new UnsupportedOperationException("The GameDictionary isn't supported, check first if Game#getGameDictionary is present.");
     }
 
     @Override

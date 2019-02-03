@@ -38,11 +38,11 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class BlockPropertyStore<T extends Property<?,?>> extends AbstractBlockPropertyStore<T> {
+public final class BlockPropertyStore<V> extends AbstractBlockPropertyStore<V> {
 
-    private final Class<T> propertyType;
+    private final Class<V> propertyType;
 
-    public BlockPropertyStore(Class<T> propertyType) {
+    public BlockPropertyStore(Class<V> propertyType) {
         this.propertyType = propertyType;
     }
 

@@ -29,14 +29,14 @@ import com.google.common.collect.ImmutableList
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
-import org.lanternpowered.server.data.property.AbstractPropertyHolder
+import org.lanternpowered.server.data.property.IStorePropertyHolder
 import org.spongepowered.api.fluid.FluidState
 import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.state.StateProperty
 
 class LanternFluidType @JvmOverloads constructor(
         key: CatalogKey, override val internalId: Int
-) : DefaultCatalogType(key), FluidType, AbstractPropertyHolder, InternalCatalogType {
+) : DefaultCatalogType(key), FluidType, IStorePropertyHolder, InternalCatalogType {
     override fun getDefaultState(): FluidState {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

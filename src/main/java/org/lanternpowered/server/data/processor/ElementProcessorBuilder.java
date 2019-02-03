@@ -31,14 +31,14 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
-        extends ResettableBuilder<ElementProcessor<V, E>, ElementProcessorBuilder<V, E>> {
+        extends CopyableBuilder<ElementProcessor<V, E>, ElementProcessorBuilder<V, E>> {
 
     /**
      * Creates the default {@link ElementProcessor} for the specified {@link Key}.

@@ -25,15 +25,13 @@
  */
 package org.lanternpowered.server.data.property;
 
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
-import org.spongepowered.api.data.property.PropertyStore;
+import org.spongepowered.api.data.property.store.PropertyStore;
 import org.spongepowered.api.util.Direction;
 
 import java.util.Optional;
 
-public interface DirectionRelativePropertyStore<T extends Property<?, ?>> extends PropertyStore<T> {
+public interface DirectionRelativePropertyStore<V> extends PropertyStore<V> {
 
-    Optional<T> getFor(PropertyHolder propertyHolder, Direction direction);
-
+    Optional<V> getFor(PropertyHolder propertyHolder, Direction direction);
 }

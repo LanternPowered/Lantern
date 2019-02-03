@@ -35,10 +35,9 @@ import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
 import org.lanternpowered.server.inventory.type.LanternInventoryRow;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.inventory.type.InventoryColumn;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
@@ -57,7 +56,7 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
         implements InventoryArchetype.Builder {
 
     private final List<LanternInventoryArchetype<?>> archetypes = new ArrayList<>();
-    private final Map<Class<?>, InventoryProperty<?,?>> properties = new HashMap<>();
+    private final Map<Property<?>, Object> properties = new HashMap<>();
 
     @Nullable private LanternInventoryArchetype<?> baseArchetype;
 
@@ -79,25 +78,25 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
     }
 
     @Override
-    public InventoryArchetype.Builder property(InventoryProperty<String, ?> property) {
+    public <V> InventoryArchetype.Builder property(Property<V> property, V value) {
         checkNotNull(property, "property");
         if (this.baseArchetype != null &&
                 this.baseArchetype.getBuilder() instanceof AbstractSlot.Builder) {
             // Disallow modifying the slot capacity
-            if (property instanceof InventoryCapacity && ((InventoryCapacity) property).getValue() != 1) {
+            if (property == InventoryProperties.CAPACITY && (Integer) value != 1) {
                 throw new IllegalArgumentException("It's not possible to modify the capacity of"
                         + "a Slot through InventoryCapacity. This is fixed at 1.");
             }
             // Disallow modifying the slot dimensions
-            if (property instanceof InventoryDimension) {
-                final Vector2i dim = ((InventoryDimension) property).getValue();
+            if (property == InventoryProperties.DIMENSION) {
+                final Vector2i dim = (Vector2i) value;
                 if (dim.getX() != 1 || dim.getY() != 1) {
                     throw new IllegalArgumentException("It's not possible to modify the dimensions of"
                             + "a Slot through InventoryDimension. This is fixed at 1;1.");
                 }
             }
         }
-        this.properties.put(property.getClass(), property);
+        this.properties.put(property, property);
         return this;
     }
 
@@ -118,36 +117,36 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
     }
 
     private LanternInventoryArchetype<?> buildArchetype(CatalogKey key,
-            Map<Class<?>, InventoryProperty<?,?>> properties, LanternInventoryArchetype<?> archetype) {
+            Map<Property<?>, Object> properties, LanternInventoryArchetype<?> archetype) {
         final AbstractArchetypeBuilder archetypeBuilder = archetype.getBuilder().copy();
-        properties.values().forEach(archetypeBuilder::property);
+        properties.forEach(archetypeBuilder::property);
         return archetypeBuilder.buildArchetype(key);
     }
 
-    private void applyProperties(Map<Class<?>, InventoryProperty<?,?>> properties, AbstractBuilder builder) {
-        properties.values().forEach(builder::property);
+    private void applyProperties(Map<Property<?>, Object> properties, AbstractBuilder builder) {
+        properties.forEach(builder::property);
     }
 
     @Override
     protected InventoryArchetype build(CatalogKey key, Translation name) {
-        final Map<Class<?>, InventoryProperty<?,?>> properties = new HashMap<>(this.properties);
+        final Map<Property<?>, Object> properties = new HashMap<>(this.properties);
 
-        final InventoryDimension inventoryDimension = (InventoryDimension) properties.remove(InventoryDimension.class);
-        final InventoryCapacity inventoryCapacity = (InventoryCapacity) properties.remove(InventoryCapacity.class);
+        final Vector2i inventoryDimension = (Vector2i) properties.remove(InventoryProperties.DIMENSION);
+        final Integer inventoryCapacity = (Integer) properties.remove(InventoryProperties.CAPACITY);
 
         int size = -1;
 
         if (inventoryDimension != null) {
-            final int targetRows = inventoryDimension.getRows();
-            final int targetColumns = inventoryDimension.getColumns();
+            final int targetRows = inventoryDimension.getY();
+            final int targetColumns = inventoryDimension.getX();
             size = targetRows * targetColumns;
 
-            if (inventoryCapacity != null && size != inventoryCapacity.getValue()) {
-                throw new IllegalStateException("The InventoryCapacity " + inventoryCapacity.getValue() + " mismatches the InventoryDimension "
+            if (inventoryCapacity != null && size != inventoryCapacity) {
+                throw new IllegalStateException("The InventoryCapacity " + inventoryCapacity + " mismatches the InventoryDimension "
                         + "slots quantity: " + targetRows + " * " + targetColumns + " = " + size);
             }
         } else if (inventoryCapacity != null) {
-            size = inventoryCapacity.getValue();
+            size = inventoryCapacity;
         }
 
         // A base archetype is provided to create slots
@@ -157,7 +156,7 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
             } else if (this.baseArchetype.getBuilder() instanceof AbstractGridInventory.Builder) {
                 final AbstractGridInventory.Builder builder = (AbstractGridInventory.Builder) this.baseArchetype.getBuilder().copy();
                 if (inventoryDimension != null) {
-                    builder.expand(inventoryDimension.getColumns(), inventoryDimension.getRows());
+                    builder.expand(inventoryDimension.getX(), inventoryDimension.getY());
                 }
                 if (builder instanceof AbstractGridInventory.SlotsBuilder) {
                     final AbstractGridInventory.SlotsBuilder slotsBuilder = (AbstractGridInventory.SlotsBuilder) builder;
@@ -202,16 +201,16 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
                 final AbstractChildrenInventory.Builder builder = (AbstractChildrenInventory.Builder) this.baseArchetype.getBuilder().copy();
                 if (inventoryDimension != null) {
                     final Class<?> inventoryType = builder.constructor.getType();
-                    if (InventoryColumn.class.isAssignableFrom(inventoryType) && inventoryDimension.getColumns() != 1) {
+                    if (InventoryColumn.class.isAssignableFrom(inventoryType) && inventoryDimension.getX() != 1) {
                         throw new IllegalStateException("A inventory column can only have one column, not " +
-                                inventoryDimension.getColumns() + " specified by the InventoryDimension.");
-                    } else if (InventoryRow.class.isAssignableFrom(inventoryType) && inventoryDimension.getRows() != 1) {
+                                inventoryDimension.getX() + " specified by the InventoryDimension.");
+                    } else if (InventoryRow.class.isAssignableFrom(inventoryType) && inventoryDimension.getY() != 1) {
                         throw new IllegalStateException("A inventory row can only have one row, not " +
-                                inventoryDimension.getRows() + " specified by the InventoryDimension.");
+                                inventoryDimension.getY() + " specified by the InventoryDimension.");
                     }
-                    builder.expand(inventoryDimension.getColumns() * inventoryDimension.getRows());
+                    builder.expand(inventoryDimension.getX() * inventoryDimension.getY());
                 } else if (inventoryCapacity != null) {
-                    builder.expand(inventoryCapacity.getValue());
+                    builder.expand(inventoryCapacity);
                 }
                 for (LanternInventoryArchetype<?> archetype : this.archetypes) {
                     builder.addLast(archetype);
@@ -220,9 +219,9 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
                 final LanternInventoryArchetype<?> archetype = builder.buildArchetype(key);
                 if (inventoryCapacity != null) {
                     final AbstractInventory inventory = archetype.build();
-                    if (inventory.capacity() != inventoryCapacity.getValue()) {
+                    if (inventory.capacity() != inventoryCapacity) {
                         throw new IllegalStateException("InventoryCapacity mismatch with the size of the resulting inventory. Got " +
-                                inventory.capacity() + ", but expected " + inventoryCapacity.getValue());
+                                inventory.capacity() + ", but expected " + inventoryCapacity);
                     }
                 }
                 return archetype;
@@ -246,8 +245,8 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
         }
 
         if (inventoryDimension != null) {
-            final int targetRows = inventoryDimension.getRows();
-            final int targetColumns = inventoryDimension.getColumns();
+            final int targetRows = inventoryDimension.getY();
+            final int targetColumns = inventoryDimension.getY();
 
             // There are two cases to handle a inventory dimension property, if there are only slots,
             // just generate a grid/column/row with those slots. Otherwise try to merge all the columns/rows/grid

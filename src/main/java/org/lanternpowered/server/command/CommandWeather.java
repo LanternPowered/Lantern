@@ -42,6 +42,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.WeatherUniverse;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -97,7 +98,7 @@ public final class CommandWeather extends CommandProvider {
                     Weather type = args.<Weather>getOne("type").get();
                     if (weatherUniverse != null) {
                         if (args.hasAny("duration")) {
-                            weatherUniverse.setWeather(type, args.<Integer>getOne("duration").get() * 20);
+                            weatherUniverse.setWeather(type, Duration.ofSeconds(args.<Integer>getOne("duration").get()));
                         } else {
                             weatherUniverse.setWeather(type);
                         }

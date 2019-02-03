@@ -46,9 +46,9 @@ import org.lanternpowered.server.inventory.client.TradingClientContainer;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.property.GuiId;
-import org.spongepowered.api.item.inventory.property.GuiIds;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
+import org.spongepowered.api.item.inventory.InventoryProperties;
+import org.spongepowered.api.item.inventory.gui.GuiId;
+import org.spongepowered.api.item.inventory.gui.GuiIds;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
@@ -67,8 +67,8 @@ public class ClientContainerRegistryModule extends DefaultCatalogRegistryModule<
     @Override
     public void registerDefaults() {
         register("minecraft", "chest", inventory -> {
-            final int rows = inventory.getProperty(InventoryCapacity.class)
-                            .map(capacity -> (int) Math.ceil(capacity.getValue().doubleValue() / 9.0))
+            final int rows = inventory.getProperty(InventoryProperties.CAPACITY)
+                            .map(capacity -> (int) Math.ceil(capacity.doubleValue() / 9.0))
                             .orElse(1);
             return new ChestClientContainer(rows);
         });

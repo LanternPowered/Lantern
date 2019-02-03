@@ -30,18 +30,10 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 
 open class LanternEquipmentType @JvmOverloads constructor(
-        key: CatalogKey, private val childChecker: (EquipmentType) -> Boolean = { _ -> false }
+        key: CatalogKey, private val childChecker: (EquipmentType) -> Boolean = { false }
 ) : DefaultCatalogType(key), EquipmentType {
 
-    /**
-     * Gets whether the specified [EquipmentType] can be considered
-     * a child of this equipment type, this will also return `true`
-     * if the specified equipment type == this.
-     *
-     * @param equipmentType The equipment type
-     * @return Is child
-     */
-    fun isChild(equipmentType: EquipmentType?): Boolean {
-        return equipmentType != null && (equipmentType == this || this.childChecker.invoke(equipmentType))
+    override fun includes(other: EquipmentType): Boolean {
+        return (other == this || this.childChecker.invoke(other))
     }
 }

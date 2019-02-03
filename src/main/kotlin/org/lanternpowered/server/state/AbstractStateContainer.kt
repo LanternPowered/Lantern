@@ -26,13 +26,19 @@
 package org.lanternpowered.server.state
 
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableSet
+import org.spongepowered.api.data.key.Key
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 import org.spongepowered.api.state.StateProperty
 
-abstract class AbstractStateContainer<S : State<S>>(
+abstract class AbstractStateContainer<S : State<S>>(containerData: StateContainerData<S>) : StateContainer<S> {
 
-) : StateContainer<S> {
+    val keys: ImmutableSet<Key<*>>
+
+    init {
+        keys = ImmutableSet.of()
+    }
 
     override fun getValidStates(): ImmutableList<S> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -42,7 +48,7 @@ abstract class AbstractStateContainer<S : State<S>>(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getStateProperties(): MutableCollection<StateProperty<*>> {
+    override fun getStateProperties(): Collection<StateProperty<*>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

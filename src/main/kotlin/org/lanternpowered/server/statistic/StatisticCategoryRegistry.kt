@@ -31,7 +31,6 @@ import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
-
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.entity.EntityType

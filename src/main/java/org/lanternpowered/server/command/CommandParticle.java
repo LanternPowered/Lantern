@@ -78,7 +78,8 @@ public final class CommandParticle extends CommandProvider {
                             protected Iterable<String> getChoices(CommandSource source) {
                                 return Sponge.getGame().getRegistry().getAllOf(ParticleType.class).stream()
                                         .filter(type -> ((LanternParticleType) type).getInternalType() != null)
-                                        .map(CatalogType::getId)
+                                        .map(CatalogType::getKey)
+                                        .map(CatalogKey::toString)
                                         .collect(Collectors.toList());
                             }
 

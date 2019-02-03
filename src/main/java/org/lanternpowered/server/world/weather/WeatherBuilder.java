@@ -36,7 +36,7 @@ import org.lanternpowered.server.util.option.Option;
 import org.lanternpowered.server.util.option.OptionValueMap;
 import org.lanternpowered.server.util.option.SimpleOptionValueMap;
 import org.lanternpowered.server.util.option.UnmodifiableOptionValueMap;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.Collections;
@@ -45,7 +45,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.Nullable;
 
-public class WeatherBuilder implements ResettableBuilder<LanternWeather, WeatherBuilder>, CatalogTypeConstructor<Weather> {
+public class WeatherBuilder implements CopyableBuilder<LanternWeather, WeatherBuilder>, CatalogTypeConstructor<Weather> {
 
     final static IntValueProvider DEFAULT_DURATION = scriptContext -> 300 + ThreadLocalRandom.current().nextInt(600);
 

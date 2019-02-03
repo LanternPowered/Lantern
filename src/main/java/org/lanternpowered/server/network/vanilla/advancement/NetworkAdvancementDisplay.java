@@ -75,7 +75,7 @@ public final class NetworkAdvancementDisplay {
         if (this.hidden) {
             flags |= 0x4;
         }
-        buf.writeInteger(flags);
+        buf.writeInt(flags);
         if (this.background != null) {
             buf.writeString(this.background);
         }
@@ -90,7 +90,7 @@ public final class NetworkAdvancementDisplay {
                 .add("icon", this.icon)
                 .add("title", this.title)
                 .add("description", this.description)
-                .add("type", this.frameType.getId())
+                .add("type", this.frameType.getKey().toString())
                 .add("background", this.background)
                 .add("showToast", this.showToast)
                 .add("hidden", this.hidden)

@@ -25,52 +25,46 @@
  */
 package org.lanternpowered.server.item.enchantment
 
-import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.item.enchantment.EnchantmentType
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
-import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
+import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
+import org.spongepowered.api.CatalogKey
 
-class LanternEnchantmentTypeBuilder : EnchantmentTypeBuilder {
+class LanternEnchantmentTypeBuilder : AbstractCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder>(), EnchantmentTypeBuilder {
+
     companion object {
         var idCounter: Int = 0
     }
 
-    private var name: Translation? = null
-    private var id: String? = null
-    private var weight: Int = 5
-    private var levelRange: IntRange = 1..1
-    private var curse: Boolean = false
-    private var treasure: Boolean = false
+    private var weight = 5
+    private var levelRange = 1..1
+    private var curse = false
+    private var treasure = false
     private var enchantabilityRange: ((Int) -> IntRange)? = null
     private var compatibilityTester: ((EnchantmentType) -> Boolean)? = null
 
-    override fun weight(weight: Int): EnchantmentTypeBuilder = apply { this.weight = weight }
-    override fun levelRange(levelRange: IntRange): EnchantmentTypeBuilder = apply { this.levelRange = levelRange }
-    override fun curse(curse: Boolean): EnchantmentTypeBuilder = apply { this.curse = curse }
-    override fun treasure(treasure: Boolean): EnchantmentTypeBuilder = apply { this.treasure = treasure }
-    override fun id(id: String): EnchantmentTypeBuilder = apply { this.id = id }
-    override fun enchantabilityRange(provider: (Int) -> IntRange): EnchantmentTypeBuilder = apply { this.enchantabilityRange = provider }
+    override fun weight(weight: Int) = apply { this.weight = weight }
+    override fun levelRange(levelRange: IntRange) = apply { this.levelRange = levelRange }
+    override fun curse(curse: Boolean) = apply { this.curse = curse }
+    override fun treasure(treasure: Boolean) = apply { this.treasure = treasure }
+    override fun enchantabilityRange(provider: (Int) -> IntRange) = apply { this.enchantabilityRange = provider }
     override fun compatibilityTester(tester: (EnchantmentType) -> Boolean) = apply { this.compatibilityTester = tester }
-    override fun name(name: Translation): EnchantmentTypeBuilder = apply { this.name = name }
-    override fun name(name: String): EnchantmentTypeBuilder = apply { this.name = tr(name) }
-    override fun name(name: Translatable): EnchantmentTypeBuilder = apply { this.name = name.translation }
+    override fun name(name: Translation) = apply { this.name = name }
+    override fun name(name: String) = apply { this.name = tr(name) }
 
-    override fun build(): XEnchantmentType {
-        val id = checkNotNull(this.id) { "The id must be set" }
-        val name = checkNotNull(this.name) { "The name must be set" }
-        check(!id.isEmpty()) { "The id cannot be empty" }
-        return LanternEnchantmentType(CatalogKeys.activePlugin(id), name, idCounter++,
+    override fun build(key: CatalogKey, name: Translation): XEnchantmentType {
+        return LanternEnchantmentType(key, name, idCounter++,
                 this.levelRange, this.weight, this.treasure, this.curse, this.enchantabilityRange, this.compatibilityTester)
     }
 
-    override fun from(value: XEnchantmentType): EnchantmentTypeBuilder = throw UnsupportedOperationException()
+    override fun from(value: XEnchantmentType) = throw UnsupportedOperationException()
 
-    override fun reset(): EnchantmentTypeBuilder = apply {
+    override fun reset() = apply {
+        super.reset()
         this.name = null
-        this.id = null
         this.weight = 5
         this.levelRange = 1..1
         this.curse = false

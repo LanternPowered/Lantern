@@ -27,7 +27,7 @@ package org.lanternpowered.server.world;
 
 import org.lanternpowered.server.data.world.MoonPhase;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
-import org.lanternpowered.server.world.rules.RuleTypes;
+import org.spongepowered.api.world.gamerule.GameRules;
 
 public class TimeUniverse {
 
@@ -44,13 +44,13 @@ public class TimeUniverse {
     public TimeUniverse(LanternWorld world) {
         this.world = world;
         this.timeData = this.world.getProperties().getTimeData();
-        this.lastDoDaylightCycle = this.world.getOrCreateRule(RuleTypes.DO_DAYLIGHT_CYCLE).getValue();
+        this.lastDoDaylightCycle = this.world.getGameRule(GameRules.DO_DAYLIGHT_CYCLE);
         this.lastMoonPhase = this.timeData.getMoonPhase();
     }
 
     void pulse() {
         this.timeData.setAge(this.timeData.getAge() + 1);
-        final boolean doDaylightCycle = this.world.getOrCreateRule(RuleTypes.DO_DAYLIGHT_CYCLE).getValue();
+        final boolean doDaylightCycle = this.world.getGameRule(GameRules.DO_DAYLIGHT_CYCLE);
         long time = this.timeData.getDayTime();
         if (doDaylightCycle) {
             time++;
@@ -68,6 +68,6 @@ public class TimeUniverse {
 
     public MessagePlayOutWorldTime createUpdateTimeMessage() {
         return new MessagePlayOutWorldTime(this.timeData.getMoonPhase(), this.timeData.getAge(), (int) this.timeData.getDayTime(),
-                this.world.getOrCreateRule(RuleTypes.DO_DAYLIGHT_CYCLE).getValue());
+                this.world.getGameRule(GameRules.DO_DAYLIGHT_CYCLE));
     }
 }

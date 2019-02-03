@@ -32,19 +32,15 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.ISlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.VanillaHotbarBehavior;
-import org.lanternpowered.server.inventory.property.LanternEquipmentSlotType;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
-import java.util.List;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
 public class LanternHotbarInventory extends AbstractInventoryRow implements Hotbar {
@@ -105,20 +101,12 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
     // The EquipmentSlotType off the selected hotbar slot is dynamic,
     // so you can't assign it directly to a slot instance
 
-    @Override
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
-        if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            return Optional.of((T) new LanternEquipmentSlotType(EquipmentTypes.MAIN_HAND));
-        }
-        return Optional.empty();
-    }
 
     @Override
-    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
-        final List<T> properties = super.tryGetProperties(child, property);
-        if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
-            properties.add((T) new LanternEquipmentSlotType(EquipmentTypes.MAIN_HAND));
+    protected <V> Optional<V> tryGetProperty(Inventory child, Property<V> property) {
+        if (property == InventoryProperties.EQUIPMENT_TYPE && child == getSelectedSlot()) {
+            return Optional.of((V) EquipmentTypes.MAIN_HAND);
         }
-        return properties;
+        return super.tryGetProperty(child, property);
     }
 }

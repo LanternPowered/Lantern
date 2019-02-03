@@ -27,23 +27,18 @@ package org.lanternpowered.server.inventory;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
-
-import java.util.Optional;
 
 @SuppressWarnings("unchecked")
 public abstract class LanternInventoryArchetype<T extends AbstractInventory> extends DefaultCatalogType
-        implements InventoryArchetype, InventoryPropertyHolder {
+        implements InventoryArchetype, PropertyHolder {
 
     LanternInventoryArchetype(CatalogKey key) {
         super(key);
     }
 
     public abstract AbstractArchetypeBuilder<T, ? super T, ?> getBuilder();
-
-    @Override
-    public abstract <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> property);
 
     /**
      * Constructs a {@link AbstractInventory}.

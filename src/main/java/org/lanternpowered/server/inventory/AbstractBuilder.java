@@ -34,16 +34,11 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
-import org.lanternpowered.server.inventory.property.AbstractInventoryProperty;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.property.Identifiable;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
@@ -59,8 +54,8 @@ import javax.annotation.Nullable;
 public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, B extends AbstractBuilder<R, T, B>> {
 
     @Nullable protected InventoryConstructor<R> constructor;
-    protected final Map<Class<?>, Map<String, InventoryProperty<String, ?>>> properties = new HashMap<>();
-    @Nullable protected Map<Class<?>, Map<String, InventoryProperty<String, ?>>> cachedProperties;
+    protected final Map<Property<?>, Object> properties = new HashMap<>();
+    @Nullable protected Map<Property<?>, Object> cachedProperties;
 
     // Catalog properties
     @Nullable protected PluginContainer pluginContainer;
@@ -69,6 +64,13 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     @Nullable protected ShiftClickBehavior shiftClickBehavior;
 
     private boolean viewable;
+
+    protected Map<Property<?>, Object> getProperties() {
+        if (this.cachedProperties == null) {
+            this.cachedProperties = ImmutableMap.copyOf(this.properties);
+        }
+        return this.cachedProperties;
+    }
 
     /**
      * Sets the {@link Supplier} for the {@link AbstractInventory}, the
@@ -98,26 +100,26 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     }
 
     /**
-     * Adds the provided {@link InventoryProperty}.
+     * Adds the provided {@link Property} and value.
      *
      * @param property The property
      * @return This builder, for chaining
      */
-    public B property(InventoryProperty<String, ?> property) {
+    public <V> B property(Property<V> property, V value) {
         checkNotNull(property, "property");
         // checkState(!(property instanceof InventoryCapacity), "The inventory capacity cannot be modified with a property.");
         // checkState(!(property instanceof InventoryDimension), "The inventory dimension cannot be modified with a property.");
-        if (property instanceof InventoryDimension ||
-                property instanceof InventoryCapacity) {
+        if (property == InventoryProperties.DIMENSION ||
+                property == InventoryProperties.CAPACITY) {
             return (B) this;
         }
         // All inventories with this property are viewable
-        if (property instanceof GuiIdProperty) {
+        if (property == InventoryProperties.GUI_ID) {
             this.viewable = true;
         }
-        putProperty(property);
-        if (property instanceof InventoryTitle) {
-            this.translation = TextTranslation.of((Text) property.getValue());
+        putProperty(property, value);
+        if (property == InventoryProperties.TITLE) {
+            this.translation = TextTranslation.of((Text) value);
         }
         return (B) this;
     }
@@ -131,13 +133,12 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     public B title(Translation translation) {
         checkNotNull(translation, "translation");
         this.translation = translation;
-        putProperty(InventoryTitle.builder().value(TextTranslation.toText(translation)).build());
+        putProperty(InventoryProperties.TITLE, TextTranslation.toText(translation));
         return (B) this;
     }
 
-    private void putProperty(InventoryProperty<String, ?> property) {
-        this.properties.computeIfAbsent(AbstractInventoryProperty.getType(property.getClass()),
-                type -> new HashMap<>()).put(property.getKey(), property);
+    private <V> void putProperty(Property<V> property, V value) {
+        this.properties.put(property, value);
         this.cachedProperties = null;
     }
 
@@ -192,23 +193,14 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
         if (inventory instanceof AbstractMutableInventory) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
             mutableInventory.setPlugin(plugin);
-            // Copy the properties and set them in the inventory
-            if (this.cachedProperties == null) {
-                final ImmutableMap.Builder<Class<?>, Map<String, InventoryProperty<String, ?>>> builder = ImmutableMap.builder();
-                for (Map.Entry<Class<?>, Map<String, InventoryProperty<String, ?>>> entry : this.properties.entrySet()) {
-                    builder.put(entry.getKey(), ImmutableMap.copyOf(entry.getValue()));
-                }
-                this.cachedProperties = builder.build();
-            }
-            Map<Class<?>, Map<String, InventoryProperty<String, ?>>> properties = this.cachedProperties;
-            if (!properties.containsKey(Identifiable.class)) {
-                final ImmutableMap.Builder<Class<?>, Map<String, InventoryProperty<String, ?>>> builder = ImmutableMap.builder();
+            Map<Property<?>, Object> properties = getProperties();
+            if (!properties.containsKey(InventoryProperties.UNIQUE_ID)) {
+                final ImmutableMap.Builder<Property<?>, Object> builder = ImmutableMap.builder();
                 builder.putAll(properties);
-                final Identifiable identifiable = Identifiable.random();
-                builder.put(Identifiable.class, ImmutableMap.of(identifiable.getKey(), identifiable));
+                builder.put(InventoryProperties.UNIQUE_ID, UUID.randomUUID());
                 properties = builder.build();
             }
-            mutableInventory.setProperties((Map) properties);
+            mutableInventory.setProperties(properties);
         }
         if (this.translation != null) {
             inventory.setName(this.translation);
@@ -236,7 +228,8 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
                 mutableInventory.setArchetype(archetype);
             } else if (this instanceof AbstractArchetypeBuilder) {
                 final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
-                mutableInventory.setArchetype(((AbstractArchetypeBuilder) this).buildArchetype(pluginId, UUID.randomUUID().toString()));
+                mutableInventory.setArchetype(((AbstractArchetypeBuilder) this)
+                        .buildArchetype(CatalogKey.of(pluginId, UUID.randomUUID().toString())));
             }
             if (this.shiftClickBehavior != null) {
                 mutableInventory.setShiftClickBehavior(this.shiftClickBehavior);

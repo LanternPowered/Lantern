@@ -125,7 +125,6 @@ import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableCareerDa
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableChargedData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableCriticalHitData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableCustomNameVisibleData;
-import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDamageableData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDamagingData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDespawnDelayData;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDominantHandData;
@@ -271,7 +270,6 @@ import org.spongepowered.api.data.manipulator.mutable.entity.CareerData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ChargedData;
 import org.spongepowered.api.data.manipulator.mutable.entity.CriticalHitData;
 import org.spongepowered.api.data.manipulator.mutable.entity.CustomNameVisibleData;
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.DamagingData;
 import org.spongepowered.api.data.manipulator.mutable.entity.DespawnDelayData;
 import org.spongepowered.api.data.manipulator.mutable.entity.DominantHandData;
@@ -382,19 +380,21 @@ import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.extra.fluid.FluidTypes;
-import org.spongepowered.api.extra.fluid.data.manipulator.immutable.ImmutableFluidItemData;
-import org.spongepowered.api.extra.fluid.data.manipulator.immutable.ImmutableFluidTankData;
-import org.spongepowered.api.extra.fluid.data.manipulator.mutable.FluidItemData;
-import org.spongepowered.api.extra.fluid.data.manipulator.mutable.FluidTankData;
+import org.spongepowered.api.fluid.FluidTypes;
+import org.spongepowered.api.fluid.data.manipulator.immutable.ImmutableFluidItemData;
+import org.spongepowered.api.fluid.data.manipulator.immutable.ImmutableFluidTankData;
+import org.spongepowered.api.fluid.data.manipulator.mutable.FluidItemData;
+import org.spongepowered.api.fluid.data.manipulator.mutable.FluidTankData;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.TemporalUnits;
 import org.spongepowered.api.util.rotation.Rotations;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -604,11 +604,6 @@ public class DataManipulatorRegistry {
                 c -> c.register(Keys.CRITICAL_HIT, false));
         register(CustomNameVisibleData.class, ImmutableCustomNameVisibleData.class,
                 c -> c.register(Keys.CUSTOM_NAME_VISIBLE, true));
-        register(DamageableData.class, ImmutableDamageableData.class,
-                c -> {
-                    c.register(Keys.LAST_ATTACKER, Optional.empty());
-                    c.register(Keys.LAST_DAMAGE, Optional.empty());
-                });
         register(DamagingData.class, ImmutableDamagingData.class,
                 c -> {
                     c.register(Keys.ATTACK_DAMAGE, 1.0);
@@ -620,7 +615,7 @@ public class DataManipulatorRegistry {
                 c -> c.register(Keys.IS_ELYTRA_FLYING, false));
         // TODO: ExperienceHolderData
         register(ExpirableData.class, ImmutableExpirableData.class,
-                c -> c.register(Keys.EXPIRATION_TICKS, 200));
+                c -> c.register(Keys.EXPIRATION_DURATION, Duration.of(200, TemporalUnits.MINECRAFT_TICKS)));
         register(ExplosionRadiusData.class, ImmutableExplosionRadiusData.class,
                 c -> c.register(Keys.EXPLOSION_RADIUS, Optional.empty()));
         register(ExpOrbData.class, ImmutableExpOrbData.class,

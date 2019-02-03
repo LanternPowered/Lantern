@@ -34,11 +34,12 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.QueryInventoryAdder;
 import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
+import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.InventoryTransformation;
 import org.spongepowered.api.item.inventory.entity.UserInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
@@ -48,7 +49,7 @@ public abstract class AbstractUserInventory<T extends User> extends AbstractChil
     private static final class Holder {
 
         private static final QueryOperation<?> OFF_HAND_OPERATION =
-                QueryOperationTypes.INVENTORY_PROPERTY.of(EquipmentSlotType.of(EquipmentTypes.OFF_HAND));
+                QueryOperationTypes.PROPERTY.of(PropertyMatcher.of(InventoryProperties.EQUIPMENT_TYPE, EquipmentTypes.OFF_HAND));
     }
 
     private LanternPrimaryPlayerInventory mainInventory;

@@ -29,22 +29,18 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.inventory.property.LanternAcceptsItems;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
 import org.lanternpowered.server.item.predicate.EquipmentItemPredicate;
 import org.lanternpowered.server.item.predicate.ItemPredicate;
-import org.lanternpowered.server.item.predicate.PropertyItemPredicates;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
@@ -52,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -556,12 +551,13 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         }
 
         @Override
-        public Builder<T> property(InventoryProperty<String, ?> property) {
-            checkArgument(!(property instanceof SlotIndex), "The slot index may not be set through a property.");
-            checkArgument(!(property instanceof InventoryCapacity), "The slot capacity cannot be set.");
-            super.property(property);
+        public <V> Builder<T> property(Property<V> property, V value) {
+            checkArgument(property != InventoryProperties.SLOT_INDEX, "The slot index may not be set through a property.");
+            checkArgument(property != InventoryProperties.CAPACITY, "The slot capacity cannot be set.");
+            super.property(property, value);
             // Regenerate the result item filter
-            if (property instanceof EquipmentSlotType || property instanceof LanternAcceptsItems) {
+            if (property == LanternInventoryProperties.ITEM_FILTER ||
+                    property == InventoryProperties.EQUIPMENT_TYPE) {
                 this.hasItemFilter = true;
                 this.cachedResultItemFilter = null;
                 invalidateCachedArchetype();
@@ -569,27 +565,14 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return this;
         }
 
-        @Nullable
-        private <R extends InventoryProperty<String, ?>> R findProperty(Class<R> type) {
-            final Map<String, InventoryProperty<String, ?>> properties = this.properties.get(type);
-            if (properties == null) {
-                return null;
-            }
-            return (R) properties.values().stream().findFirst().orElse(null);
-        }
-
         @Override
         protected void build(AbstractInventorySlot inventory) {
             if (this.cachedResultItemFilter == null && this.hasItemFilter) {
-                ItemPredicate itemFilter = this.itemFilter;
                 // Attempt to generate the ItemFilter
-                final LanternAcceptsItems acceptsItems = findProperty(LanternAcceptsItems.class);
-                if (acceptsItems != null) {
-                    itemFilter = PropertyItemPredicates.of(acceptsItems);
-                }
-                final EquipmentSlotType equipmentSlotType = findProperty(EquipmentSlotType.class);
-                if (equipmentSlotType != null) {
-                    EquipmentItemPredicate equipmentItemFilter = EquipmentItemPredicate.of(equipmentSlotType);
+                ItemPredicate itemFilter = (ItemPredicate) this.properties.get(LanternInventoryProperties.ITEM_FILTER);
+                final EquipmentType equipmentType = (EquipmentType) this.properties.get(InventoryProperties.EQUIPMENT_TYPE);
+                if (equipmentType != null) {
+                    EquipmentItemPredicate equipmentItemFilter = EquipmentItemPredicate.of(equipmentType);
                     if (itemFilter != null) {
                         equipmentItemFilter = equipmentItemFilter.andThen(itemFilter);
                     }

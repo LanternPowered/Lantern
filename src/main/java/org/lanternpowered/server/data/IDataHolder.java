@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -45,7 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings("unchecked")
-public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder, DataManipulator<?, ?>>, AbstractPropertyHolder {
+public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder, DataManipulator<?, ?>>, IStorePropertyHolder {
 
     @Override
     default DataHolder copy() {

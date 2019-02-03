@@ -26,7 +26,7 @@
 package org.lanternpowered.server.world.chunk;
 
 import com.google.common.base.MoreObjects;
-import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
+import org.spongepowered.api.world.chunk.ChunkTicketManager.PlayerLoadingTicket;
 
 import java.util.UUID;
 

@@ -30,7 +30,7 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -38,7 +38,7 @@ import java.util.function.Predicate;
 
 // TODO: Add fast method handlers
 public interface ValueProcessorBuilder<V extends BaseValue<E>, E> extends
-        ResettableBuilder<ValueProcessor<V, E>, ValueProcessorBuilder<V, E>> {
+        CopyableBuilder<ValueProcessor<V, E>, ValueProcessorBuilder<V, E>> {
 
     /**
      * Creates a new {@link ValueProcessorBuilder}.

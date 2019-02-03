@@ -34,13 +34,13 @@ import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.script.context.ContextImpl;
-import org.lanternpowered.server.world.rules.RuleTypes;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.util.weighted.WeightedTable;
+import org.spongepowered.api.world.gamerule.GameRules;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
     }
 
     private void pulseWeather(CauseStack causeStack) {
-        if (!this.world.getOrCreateRule(RuleTypes.DO_WEATHER_CYCLE).getValue()) {
+        if (!this.world.getGameRule(GameRules.DO_WEATHER_CYCLE)) {
             return;
         }
         this.weatherData.setRunningDuration(this.weatherData.getRunningDuration() + 1);

@@ -25,18 +25,18 @@
  */
 package org.lanternpowered.server.data.property.common;
 
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
+import org.spongepowered.api.data.property.store.PropertyStore;
 import org.spongepowered.api.entity.Entity;
 
 import java.util.Optional;
 
-public abstract class AbstractEntityPropertyStore<T extends Property<?, ?>> extends AbstractLanternPropertyStore<T> {
+public abstract class AbstractEntityPropertyStore<V> implements PropertyStore<V> {
 
-    protected abstract Optional<T> getFor(Entity entity);
+    protected abstract Optional<V> getFor(Entity entity);
 
     @Override
-    public Optional<T> getFor(PropertyHolder propertyHolder) {
+    public Optional<V> getFor(PropertyHolder propertyHolder) {
         if (propertyHolder instanceof Entity) {
             return getFor((Entity) propertyHolder);
         }

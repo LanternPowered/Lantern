@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.property.item;
 
-import org.lanternpowered.server.data.property.common.AbstractItemStackPropertyStore;
+import org.lanternpowered.server.data.property.common.AbstractItemPropertyStore;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.PropertyProvider;
 import org.spongepowered.api.data.Property;
@@ -33,7 +33,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
-public final class ItemPropertyStore<T extends Property<?,?>> extends AbstractItemStackPropertyStore<T> {
+public final class ItemPropertyStore<T extends Property<?,?>> extends AbstractItemPropertyStore<T> {
 
     private final Class<T> propertyType;
 

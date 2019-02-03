@@ -26,7 +26,7 @@
 package org.lanternpowered.server.effect.entity;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -124,7 +124,7 @@ public interface EntityEffectCollection {
     /**
      * A builder to construct {@link EntityEffectCollection}s.
      */
-    interface Builder extends ResettableBuilder<EntityEffectCollection, Builder> {
+    interface Builder extends CopyableBuilder<EntityEffectCollection, Builder> {
 
         /**
          * Adds a {@link EntityEffect} for the

@@ -32,15 +32,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.lanternpowered.server.data.property.PropertyKeySetter;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.item.inventory.container.InteractContainerEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import java.lang.ref.WeakReference;
@@ -147,23 +146,16 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
     }
 
     @Override
-    public Inventory.Builder property(InventoryProperty<?, ?> property) {
-        return property(property.getKey().toString(), property);
-    }
-
-    @Override
-    public LanternInventoryBuilder property(String name, InventoryProperty property) {
+    public <V> LanternInventoryBuilder<T> property(Property<V> property, V value) {
         checkNotNull(property, "property");
-        checkNotNull(name, "name");
+        checkNotNull(value, "value");
         if (this.inventoryArchetype == null) {
             return this;
         }
-        final InventoryProperty<String, ?> property1 = (InventoryProperty<String, ?>) property;
-        PropertyKeySetter.setKey(property1, name); // Modify the name of the property
         if (this.builder == null) {
             this.builder = this.inventoryArchetype.getBuilder().copy();
         }
-        this.builder.property(property1);
+        this.builder.property(property, value);
         return this;
     }
 

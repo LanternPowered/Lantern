@@ -31,40 +31,38 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.data.property.DirectionRelativePropertyStore;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
+import org.spongepowered.api.data.property.store.PropertyStore;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> extends AbstractLanternPropertyStore<T>
-        implements DirectionRelativePropertyStore<T> {
+public abstract class AbstractBlockPropertyStore<V> implements PropertyStore<V>, DirectionRelativePropertyStore<V> {
 
-    protected abstract Optional<T> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction);
+    protected abstract Optional<V> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction);
 
     @Override
-    public Optional<T> getFor(PropertyHolder propertyHolder) {
+    public Optional<V> getFor(PropertyHolder propertyHolder) {
         return getFor0(propertyHolder, null);
     }
 
     @Override
-    public Optional<T> getFor(PropertyHolder propertyHolder, Direction direction) {
+    public Optional<V> getFor(PropertyHolder propertyHolder, Direction direction) {
         return getFor0(propertyHolder, checkNotNull(direction, "direction"));
     }
 
     @Override
-    public Optional<T> getFor(Location location, Direction direction) {
+    public Optional<V> getFor(Location location, Direction direction) {
         return getFor0(location, checkNotNull(direction, "direction"));
     }
 
-    private Optional<T> getFor0(PropertyHolder propertyHolder, @Nullable Direction direction) {
+    private Optional<V> getFor0(PropertyHolder propertyHolder, @Nullable Direction direction) {
         checkNotNull(propertyHolder, "propertyHolder");
         if (propertyHolder instanceof BlockState) {
             return getFor((BlockState) propertyHolder, null, direction);
@@ -86,7 +84,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
         return Optional.empty();
     }
 
-    private Optional<T> getFor0(Location propertyHolder, @Nullable Direction direction) {
+    private Optional<V> getFor0(Location propertyHolder, @Nullable Direction direction) {
         try {
             return getFor(propertyHolder.getBlock(), propertyHolder, direction);
         // Can be thrown if the extent is gc

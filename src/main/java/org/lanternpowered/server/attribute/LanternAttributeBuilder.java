@@ -31,11 +31,11 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.function.Predicate;
 
-public final class LanternAttributeBuilder implements ResettableBuilder<LanternAttribute, LanternAttributeBuilder>{
+public final class LanternAttributeBuilder implements CopyableBuilder<LanternAttribute, LanternAttributeBuilder> {
 
     private String identifier;
     private Text name;

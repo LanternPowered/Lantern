@@ -28,14 +28,12 @@ package org.lanternpowered.server.block.provider.property;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.Property;
 
 import java.util.function.Function;
 
-public class CachedPropertyObjectProvider<T extends Property<?,?>> extends CachedSimpleObjectProvider<T> implements PropertyProvider<T> {
+public class CachedPropertyObjectProvider<V> extends CachedSimpleObjectProvider<V> implements PropertyProvider<V> {
 
-    public CachedPropertyObjectProvider(LanternBlockType blockType,
-            Function<BlockState, T> simpleObjectProvider) {
+    public CachedPropertyObjectProvider(LanternBlockType blockType, Function<BlockState, V> simpleObjectProvider) {
         super(blockType, simpleObjectProvider);
     }
 }

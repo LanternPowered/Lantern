@@ -33,7 +33,7 @@ import org.lanternpowered.server.data.element.ElementListener;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-class SimpleElementProcessor<V extends BaseValue<E>, E> extends AbstractProcessor<V, E>
+class SimpleElementProcessor<V extends Value<E>, E> extends AbstractProcessor<V, E>
         implements ElementProcessor<V, E>, Copyable<SimpleElementProcessor<V, E>>, ElementKeyRegistration<V, E> {
 
     ElementProcessorBuilder.RetrieveFunction<E> retrieveHandler;

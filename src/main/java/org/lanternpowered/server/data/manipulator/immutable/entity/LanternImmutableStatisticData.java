@@ -27,8 +27,8 @@ package org.lanternpowered.server.data.manipulator.immutable.entity;
 
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableMappedData;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableStatisticData;
-import org.spongepowered.api.data.manipulator.mutable.entity.StatisticData;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableStatisticData;
+import org.spongepowered.api.data.manipulator.mutable.StatisticData;
 import org.spongepowered.api.statistic.Statistic;
 
 public final class LanternImmutableStatisticData extends AbstractImmutableMappedData<Statistic, Long, ImmutableStatisticData, StatisticData>

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.element;
 
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 public interface Element<E> {
 
@@ -35,7 +35,7 @@ public interface Element<E> {
      *
      * @return The key
      */
-    Key<? extends BaseValue<E>> getKey();
+    Key<? extends Value<E>> getKey();
 
     /**
      * Sets the new element and retrieves the old one if present.

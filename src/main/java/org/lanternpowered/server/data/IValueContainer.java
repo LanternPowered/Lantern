@@ -32,16 +32,14 @@ import com.google.common.collect.Streams;
 import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
+import org.lanternpowered.server.data.value.LanternImmutableValue;
+import org.lanternpowered.server.data.value.LanternMutableValue;
 import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.lanternpowered.server.data.value.ValueHelper;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
-import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.OptionalValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.OptionalValue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,7 +52,7 @@ import java.util.Set;
 public interface IValueContainer<C extends ValueContainer<C>> extends ValueContainer<C>, IValueHolder {
 
     /**
-     * Converts the {@link BaseValue}s of the {@link ValueContainer} into a nicely
+     * Converts the {@link Value}s of the {@link ValueContainer} into a nicely
      * formatted {@code String}.
      *
      * @param valueContainer The value container
@@ -65,13 +63,13 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
     }
 
     /**
-     * Converts the {@link BaseValue}s into a nicely
+     * Converts the {@link Value}s into a nicely
      * formatted {@code String}.
      *
      * @param values The values
      * @return The string
      */
-    static String valuesToString(Iterable<? extends BaseValue<?>> values) {
+    static String valuesToString(Iterable<? extends Value<?>> values) {
         return Arrays.toString(Streams.stream(values)
                 .map(e -> new ToStringHelper()
                         .add("key", e.getKey().getKey())
@@ -136,7 +134,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
     }
 
     @Override
-    default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
+    default <E, V extends Value<E>> Optional<V> getValue(Key<V> key) {
         return IValueHolder.super.getValueFor(key);
     }
 
@@ -154,13 +152,13 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
         // Check the local key registration
         final KeyRegistration<?, ?> localKeyRegistration = (KeyRegistration<?, ?>) getValueCollection().get((Key) key).orElse(null);
         if (localKeyRegistration != null) {
-            return ((Processor<BaseValue<?>, ?>) localKeyRegistration).isApplicableTo(this);
+            return ((Processor<Value<?>, ?>) localKeyRegistration).isApplicableTo(this);
         }
 
         // Check for a global registration
         final Optional<ValueProcessorKeyRegistration> globalRegistration = LanternValueFactory.get().getKeyRegistration((Key) key);
         if (globalRegistration.isPresent()) {
-            return ((Processor<BaseValue<?>, ?>) globalRegistration.get()).isApplicableTo(this);
+            return ((Processor<Value<?>, ?>) globalRegistration.get()).isApplicableTo(this);
         }
 
         // Check if custom data is supported by this container
@@ -179,7 +177,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
 
     @SuppressWarnings("unchecked")
     @Override
-    default <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
+    default <E> Optional<E> get(Key<? extends Value<E>> key) {
         checkNotNull(key, "key");
 
         // Optional unwrapped key handling
@@ -189,15 +187,15 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
         }
 
         // Check the local key registration
-        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
+        final KeyRegistration<Value<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
         if (localKeyRegistration != null) {
-            return ((Processor<BaseValue<E>, E>) localKeyRegistration).getFrom(this);
+            return ((Processor<Value<E>, E>) localKeyRegistration).getFrom(this);
         }
 
         // Check for a global registration
-        final Optional<ValueProcessorKeyRegistration<BaseValue<E>, E>> globalRegistration = LanternValueFactory.get().getKeyRegistration(key);
+        final Optional<ValueProcessorKeyRegistration<Value<E>, E>> globalRegistration = LanternValueFactory.get().getKeyRegistration(key);
         if (globalRegistration.isPresent()) {
-            return ((Processor<BaseValue<E>, E>) globalRegistration.get()).getFrom(this);
+            return ((Processor<Value<E>, E>) globalRegistration.get()).getFrom(this);
         }
 
         // Check if custom data is supported by this container
@@ -216,29 +214,29 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
 
     @SuppressWarnings("unchecked")
     @Override
-    default <E, V extends BaseValue<E>> Optional<V> getRawValueFor(Key<V> key) {
+    default <E, V extends Value<E>> Optional<V> getRawMutableValueFor(Key<V> key) {
         // Optional unwrapped key handling
         final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
         if (optionalWrappedKey != null) {
-            final Optional<BaseValue> optOptionalValue = getRawValueFor(optionalWrappedKey);
+            final Optional<Value> optOptionalValue = getRawMutableValueFor(optionalWrappedKey);
             if (!optOptionalValue.isPresent()) {
                 return Optional.empty();
             }
-            final BaseValue baseValue = optOptionalValue.get();
+            final Value baseValue = optOptionalValue.get();
             final Optional optElement = (Optional) baseValue.get();
             if (!optElement.isPresent()) {
                 return Optional.empty();
             }
             final Object element = optElement.get();
-            if (baseValue instanceof OptionalValue) {
-                return Optional.of((V) new LanternValue(key, element));
+            if (baseValue instanceof OptionalValue.Mutable) {
+                return Optional.of((V) new LanternMutableValue(key, element));
             } else {
-                return Optional.of((V) ImmutableLanternValue.cachedOf((Key) key, element, element));
+                return Optional.of((V) LanternImmutableValue.cachedOf((Key) key, element));
             }
         }
 
         // Check the local key registration
-        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
+        final KeyRegistration<Value<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
         if (localKeyRegistration != null) {
             return ((Processor<V, E>) localKeyRegistration).getValueFrom(this);
         }
@@ -273,7 +271,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
 
         // Check for global registrations
         LanternValueFactory.get().getKeyRegistrations().stream()
-                .filter(registration -> ((Processor<BaseValue<?>, ?>) registration).isApplicableTo(this))
+                .filter(registration -> ((Processor<Value<?>, ?>) registration).isApplicableTo(this))
                 .forEach(registration -> keys.add(registration.getKey()));
 
         // Check if custom data is supported by this container
@@ -287,20 +285,20 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
 
     @SuppressWarnings("unchecked")
     @Override
-    default Set<ImmutableValue<?>> getValues() {
-        final ImmutableSet.Builder<ImmutableValue<?>> values = ImmutableSet.builder();
+    default Set<Value.Immutable<?>> getValues() {
+        final ImmutableSet.Builder<Value.Immutable<?>> values = ImmutableSet.builder();
 
         // Check local registrations
         for (KeyRegistration<?,?> entry : getValueCollection().getAll()) {
             final Key key = entry.getKey();
-            final Optional<BaseValue> optValue = getValue(key);
-            optValue.ifPresent(baseValue -> values.add(ValueHelper.toImmutable(baseValue)));
+            final Optional<Value> optValue = getValue(key);
+            optValue.ifPresent(baseValue -> values.add(baseValue.asImmutable()));
         }
 
         // Check for global registrations
         for (ValueProcessorKeyRegistration<?,?> registration : LanternValueFactory.get().getKeyRegistrations()) {
-            final Optional<BaseValue> optValue = ((Processor) registration).getValueFrom(this);
-            optValue.ifPresent(baseValue -> values.add(ValueHelper.toImmutable(baseValue)));
+            final Optional<Value> optValue = ((Processor) registration).getValueFrom(this);
+            optValue.ifPresent(baseValue -> values.add(baseValue.asImmutable()));
         }
 
         // Check if custom data is supported by this container

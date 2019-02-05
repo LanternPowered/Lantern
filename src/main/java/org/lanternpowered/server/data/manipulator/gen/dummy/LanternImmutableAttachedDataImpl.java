@@ -28,9 +28,9 @@ package org.lanternpowered.server.data.manipulator.gen.dummy;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableData;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableAttachedData;
-import org.spongepowered.api.data.manipulator.mutable.block.AttachedData;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.manipulator.ImmutableAttachedData;
+import org.spongepowered.api.data.manipulator.mutable.AttachedData;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.function.Consumer;
 
@@ -53,7 +53,7 @@ public class LanternImmutableAttachedDataImpl extends AbstractImmutableData<Immu
     }
 
     @Override
-    public ImmutableValue<Boolean> attached() {
+    public Value.Immutable<Boolean> attached() {
         return tryGetImmutableValueFor(keys[0]);
     }
 }

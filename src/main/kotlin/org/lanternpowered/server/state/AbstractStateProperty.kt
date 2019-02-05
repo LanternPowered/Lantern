@@ -30,14 +30,14 @@ import com.google.common.collect.Iterables
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.key.Key
-import org.spongepowered.api.data.value.BaseValue
+import org.spongepowered.api.data.value.Value
 import java.util.function.Predicate
 
 abstract class AbstractStateProperty<T : Comparable<T>, V>(
         key: CatalogKey,
         private val valueClass: Class<T>,
         private val possibleValues: ImmutableCollection<T>,
-        override val valueKey: Key<out BaseValue<V>>,
+        override val valueKey: Key<out Value<V>>,
         override val keyValueTransformer: StateKeyValueTransformer<T, V> = StateKeyValueTransformer.identity()
 ) : DefaultCatalogType(key), IStateProperty<T, V> {
 

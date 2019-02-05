@@ -29,12 +29,15 @@ import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.spongepowered.api.CatalogKey;
 import org.lanternpowered.server.item.appearance.ItemAppearance;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -98,5 +101,24 @@ public class LanternItemType extends DefaultCatalogType implements ItemType {
 
     public Optional<ItemAppearance> getAppearance() {
         return Optional.ofNullable(this.itemAppearance);
+    }
+
+    @Override
+    public <V> Optional<V> getProperty(Property<V> property) {
+        final Optional<ItemObjectProvider<V>> provider = this.propertyProviderCollection.get(property);
+        if (provider.isPresent()) {
+            final V value = provider.get().get(this);
+            if (value != null) {
+                return Optional.of(value);
+            }
+        }
+        // TODO: Cache item type properties, they should never change
+        return LanternPropertyRegistry.INSTANCE.getStore(property).getFor(this);
+    }
+
+    @Override
+    public Map<Property<?>, ?> getProperties() {
+        // TODO add provider properties
+        return LanternPropertyRegistry.INSTANCE.getPropertiesFor(this);
     }
 }

@@ -50,7 +50,7 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -105,21 +105,21 @@ public abstract class AbstractData<M extends DataManipulator<M, I>, I extends Im
     }
 
     @Override
-    public <E> M set(Key<? extends BaseValue<E>> key, E value) {
+    public <E> M set(Key<? extends Value<E>> key, E value) {
         checkNotNull(key, "key");
         checkNotNull(value, "value");
 
         // Check the local key registration
-        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
+        final KeyRegistration<Value<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
         if (localKeyRegistration != null) {
             ((Processor<?, E>) localKeyRegistration).offerTo(this, value);
             return (M) this;
         }
 
         // Check for a global registration
-        final Optional<ValueProcessorKeyRegistration<BaseValue<E>, E>> globalRegistration = LanternValueFactory.get().getKeyRegistration(key);
+        final Optional<ValueProcessorKeyRegistration<Value<E>, E>> globalRegistration = LanternValueFactory.get().getKeyRegistration(key);
         if (globalRegistration.isPresent()) {
-            ((Processor<BaseValue<E>, E>) globalRegistration.get()).offerTo(this, value);
+            ((Processor<Value<E>, E>) globalRegistration.get()).offerTo(this, value);
             return (M) this;
         }
 
@@ -127,26 +127,26 @@ public abstract class AbstractData<M extends DataManipulator<M, I>, I extends Im
         return (M) this;
     }
 
-    private <E> M transformWith(Function<E, E> function, Processor<BaseValue<E>, E> processor) {
+    private <E> M transformWith(Function<E, E> function, Processor<Value<E>, E> processor) {
         processor.offerTo(this, function.apply(processor.getFrom(this).orElse(null)));
         return (M) this;
     }
 
     @Override
-    public <E> M transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> M transform(Key<? extends Value<E>> key, Function<E, E> function) {
         checkNotNull(key, "key");
         checkNotNull(function, "function");
 
         // Check the local key registration
-        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
+        final KeyRegistration<Value<E>, E> localKeyRegistration = getValueCollection().get(key).orElse(null);
         if (localKeyRegistration != null) {
-            return transformWith(function, (Processor<BaseValue<E>, E>) localKeyRegistration);
+            return transformWith(function, (Processor<Value<E>, E>) localKeyRegistration);
         }
 
         // Check for a global registration
-        final Optional<ValueProcessorKeyRegistration<BaseValue<E>, E>> globalRegistration = LanternValueFactory.get().getKeyRegistration(key);
+        final Optional<ValueProcessorKeyRegistration<Value<E>, E>> globalRegistration = LanternValueFactory.get().getKeyRegistration(key);
         if (globalRegistration.isPresent()) {
-            return transformWith(function, (Processor<BaseValue<E>, E>) globalRegistration.get());
+            return transformWith(function, (Processor<Value<E>, E>) globalRegistration.get());
         }
 
         throwUnsupportedKeyException(key);

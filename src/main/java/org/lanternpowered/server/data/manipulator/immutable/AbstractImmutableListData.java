@@ -30,8 +30,7 @@ import org.lanternpowered.server.data.manipulator.mutable.IListData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
-import org.spongepowered.api.data.value.immutable.ImmutableListValue;
-import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.ListValue;
 
 import java.util.List;
 
@@ -41,11 +40,11 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
 
     private final Key<? extends ListValue<E>> listKey;
 
-    protected AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey) {
+    protected AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue.Mutable<E>> listKey) {
         this(immutableManipulatorType, manipulatorType, listKey, ImmutableList.of());
     }
 
-    protected AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey, List<E> list) {
+    protected AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue.Mutable<E>> listKey, List<E> list) {
         super(immutableManipulatorType, manipulatorType);
         getValueCollection().register(listKey, ImmutableList.copyOf(list));
         this.listKey = listKey;
@@ -58,8 +57,8 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
     }
 
     @Override
-    public ImmutableListValue<E> getListValue() {
-        return (ImmutableListValue<E>) tryGetImmutableValueFor(this.listKey).get();
+    public ListValue.Immutable<E> getListValue() {
+        return (ListValue.Immutable<E>) tryGetImmutableValueFor(this.listKey).get();
     }
 
     @Override

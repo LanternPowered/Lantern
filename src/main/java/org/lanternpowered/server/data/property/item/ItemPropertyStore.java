@@ -27,24 +27,25 @@ package org.lanternpowered.server.data.property.item;
 
 import org.lanternpowered.server.data.property.common.AbstractItemPropertyStore;
 import org.lanternpowered.server.item.LanternItemType;
-import org.lanternpowered.server.item.PropertyProvider;
-import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.Property;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
-public final class ItemPropertyStore<T extends Property<?,?>> extends AbstractItemPropertyStore<T> {
+import javax.annotation.Nullable;
 
-    private final Class<T> propertyType;
+public final class ItemPropertyStore<V> extends AbstractItemPropertyStore<V> {
 
-    public ItemPropertyStore(Class<T> propertyType) {
-        this.propertyType = propertyType;
+    private final Property<V> property;
+
+    public ItemPropertyStore(Property<V> property) {
+        this.property = property;
     }
 
     @Override
-    protected Optional<T> getFor(ItemStack itemStack) {
-        final Optional<PropertyProvider<? extends T>> provider = ((LanternItemType) itemStack.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.ofNullable(provider.get().get(itemStack.getType(), itemStack)) : Optional.empty();
+    protected Optional<V> getFor(ItemType itemType, @Nullable ItemStack itemStack) {
+        return ((LanternItemType) itemType).getPropertyProviderCollection().get(this.property)
+                .flatMap(provider -> Optional.ofNullable(provider.get(itemType, itemStack)));
     }
 }

@@ -30,24 +30,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.reflect.TypeToken;
-import org.jetbrains.annotations.NotNull;
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Locale;
-
-public class LanternKeyBuilder<E, V extends BaseValue<E>> extends AbstractCatalogBuilder<Key<V>, Key.Builder<E, V>> implements Key.Builder<E, V> {
+public class LanternKeyBuilder<E, V extends Value<E>> extends AbstractCatalogBuilder<Key<V>, Key.Builder<E, V>> implements Key.Builder<E, V> {
 
     TypeToken<V> valueToken;
     DataQuery query;
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T, B extends BaseValue<T>> Key.Builder<T, B> type(TypeToken<B> token) {
+    public <T, B extends Value<T>> Key.Builder<T, B> type(TypeToken<B> token) {
         this.valueToken = (TypeToken<V>) checkNotNull(token, "Value Token cannot be null!");
         return (Key.Builder<T, B>) this;
     }

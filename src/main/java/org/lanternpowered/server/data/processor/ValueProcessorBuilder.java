@@ -28,8 +28,7 @@ package org.lanternpowered.server.data.processor;
 import org.lanternpowered.server.data.IValueContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.Optional;
@@ -37,7 +36,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 // TODO: Add fast method handlers
-public interface ValueProcessorBuilder<V extends BaseValue<E>, E> extends
+public interface ValueProcessorBuilder<V extends Value<E>, E> extends
         CopyableBuilder<ValueProcessor<V, E>, ValueProcessorBuilder<V, E>> {
 
     /**
@@ -48,7 +47,7 @@ public interface ValueProcessorBuilder<V extends BaseValue<E>, E> extends
      * @param <E> The element type
      * @return The builder instance
      */
-    static <V extends BaseValue<E>, E> ValueProcessorBuilder<V, E> create(Key<? extends V> key) {
+    static <V extends Value<E>, E> ValueProcessorBuilder<V, E> create(Key<? extends V> key) {
         return new SimpleValueProcessorBuilder<>(key);
     }
 
@@ -91,7 +90,7 @@ public interface ValueProcessorBuilder<V extends BaseValue<E>, E> extends
     }
 
     /**
-     * Sets the offer handler of this value processor that will pass a {@link Value} through, it
+     * Sets the offer handler of this value processor that will pass a {@link Value.Mutable} through, it
      * will be called when someone attempts to add or update a value to the {@link IValueContainer}.
      *
      * @param handler The offer handler
@@ -119,7 +118,7 @@ public interface ValueProcessorBuilder<V extends BaseValue<E>, E> extends
 
     /**
      * Sets the retrieve retrieve handler of this value processor, it will be called when someone attempts
-     * to get a {@link BaseValue} from the {@link IValueContainer}.
+     * to get a {@link Value} from the {@link IValueContainer}.
      *
      * @param handler The retrieve handler
      * @return This builder, for chaining
@@ -127,7 +126,7 @@ public interface ValueProcessorBuilder<V extends BaseValue<E>, E> extends
     ValueProcessorBuilder<V, E> valueRetrieveHandler(ValueRetrieveFunction<V, E> handler);
 
     /**
-     * Sets the builder that should be used to create the {@link Value}s.
+     * Sets the builder that should be used to create the {@link Value.Mutable}s.
      *
      * @param builder The value builder
      * @return This builder, for chaining
@@ -142,43 +141,43 @@ public interface ValueProcessorBuilder<V extends BaseValue<E>, E> extends
     ValueProcessor<V, E> build();
 
     @FunctionalInterface
-    interface ValueBuilderFunction<V extends BaseValue<E>, E> {
+    interface ValueBuilderFunction<V extends Value<E>, E> {
 
         V get(IValueContainer<?> valueContainer, Key<? extends V> key, E element);
     }
 
     @FunctionalInterface
-    interface ApplicablePredicate<V extends BaseValue<E>, E> {
+    interface ApplicablePredicate<V extends Value<E>, E> {
 
         boolean test(IValueContainer<?> valueContainer, Key<? extends V> key);
     }
 
     @FunctionalInterface
-    interface RemoveFunction<V extends BaseValue<E>, E> {
+    interface RemoveFunction<V extends Value<E>, E> {
 
         DataTransactionResult remove(IValueContainer<?> valueContainer, Key<? extends V> key);
     }
 
     @FunctionalInterface
-    interface RetrieveFunction<V extends BaseValue<E>, E> {
+    interface RetrieveFunction<V extends Value<E>, E> {
 
         Optional<E> get(IValueContainer<?> valueContainer, Key<? extends V> key);
     }
 
     @FunctionalInterface
-    interface ValueRetrieveFunction<V extends BaseValue<E>, E> {
+    interface ValueRetrieveFunction<V extends Value<E>, E> {
 
         Optional<V> get(IValueContainer<?> valueContainer, Key<? extends V> key);
     }
 
     @FunctionalInterface
-    interface ValueOfferFunction<V extends BaseValue<E>, E> {
+    interface ValueOfferFunction<V extends Value<E>, E> {
 
         DataTransactionResult offer(IValueContainer<?> valueContainer, V value);
     }
 
     @FunctionalInterface
-    interface OfferFunction<V extends BaseValue<E>, E> {
+    interface OfferFunction<V extends Value<E>, E> {
 
         DataTransactionResult offer(IValueContainer<?> valueContainer, Key<? extends V> key, E element);
     }

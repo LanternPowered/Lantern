@@ -44,8 +44,7 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
@@ -57,7 +56,6 @@ import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
@@ -351,7 +349,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> get(int x, int y, int z, Key<? extends Value<E>> key) {
         checkRange(x, y, z);
         return this.extent.get(x, y, z, key);
     }
@@ -363,7 +361,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Set<ImmutableValue<?>> getValues(int x, int y, int z) {
+    public Set<Value.Immutable<?>> getValues(int x, int y, int z) {
         checkRange(x, y, z);
         return this.extent.getValues(x, y, z);
     }
@@ -375,19 +373,19 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public <E> E getOrNull(int x, int y, int z, Key<? extends BaseValue<E>> key) {
+    public <E> E getOrNull(int x, int y, int z, Key<? extends Value<E>> key) {
         checkRange(x, y, z);
         return this.extent.getOrNull(x, y, z, key);
     }
 
     @Override
-    public <E> E getOrElse(int x, int y, int z, Key<? extends BaseValue<E>> key, E defaultValue) {
+    public <E> E getOrElse(int x, int y, int z, Key<? extends Value<E>> key, E defaultValue) {
         checkRange(x, y, z);
         return this.extent.getOrElse(x, y, z, key, defaultValue);
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
+    public <E, V extends Value<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
         checkRange(x, y, z);
         return this.extent.getValue(x, y, z, key);
     }
@@ -399,7 +397,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public boolean supports(int x, int y, int z, BaseValue<?> value) {
+    public boolean supports(int x, int y, int z, Value<?> value) {
         checkRange(x, y, z);
         return this.extent.supports(x, y, z, value);
     }
@@ -423,19 +421,19 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends Value<E>> key, Function<E, E> function) {
         checkRange(x, y, z);
         return this.extent.transform(x, y, z, key, function);
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
+    public <E> DataTransactionResult offer(int x, int y, int z, Value<E> value) {
         checkRange(x, y, z);
         return this.extent.offer(x, y, z, value);
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends Value<E>> key, E value) {
         checkRange(x, y, z);
         return this.extent.offer(x, y, z, key, value);
     }

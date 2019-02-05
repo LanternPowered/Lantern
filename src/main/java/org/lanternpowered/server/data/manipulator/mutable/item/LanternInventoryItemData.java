@@ -30,8 +30,8 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
 import org.lanternpowered.server.inventory.LanternEmptyCarriedInventory;
-import org.spongepowered.api.data.manipulator.immutable.item.ImmutableInventoryItemData;
-import org.spongepowered.api.data.manipulator.mutable.item.InventoryItemData;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableInventoryItemData;
+import org.spongepowered.api.data.manipulator.mutable.InventoryItemData;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 

@@ -29,15 +29,14 @@ import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.element.Element;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
+public interface ElementProcessorBuilder<V extends Value<E>, E>
         extends CopyableBuilder<ElementProcessor<V, E>, ElementProcessorBuilder<V, E>> {
 
     /**
@@ -48,7 +47,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
      * @param <E> The element type
      * @return The element processor
      */
-    static <V extends BaseValue<E>, E> ElementProcessor<V, E> createDefault(Key<? extends V> key) {
+    static <V extends Value<E>, E> ElementProcessor<V, E> createDefault(Key<? extends V> key) {
         return SimpleElementProcessorBuilder.createDefault(key);
     }
 
@@ -61,7 +60,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
      * @param <E> The element type
      * @return The element processor
      */
-    static <V extends BaseValue<E>, E> ElementProcessor<V, E> createNonRemovable(Key<? extends V> key) {
+    static <V extends Value<E>, E> ElementProcessor<V, E> createNonRemovable(Key<? extends V> key) {
         return SimpleElementProcessorBuilder.createNonRemovableDefault(key);
     }
 
@@ -73,7 +72,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
      * @param <E> The element type
      * @return The builder instance
      */
-    static <V extends BaseValue<E>, E> ElementProcessorBuilder<V, E> create(Key<? extends V> key) {
+    static <V extends Value<E>, E> ElementProcessorBuilder<V, E> create(Key<? extends V> key) {
         return new SimpleElementProcessorBuilder<>(key);
     }
 
@@ -108,7 +107,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
 
     /**
      * Sets the retrieve retrieve handler of this value processor, it will be called when someone attempts
-     * to get a {@link BaseValue} from the {@link IValueContainer}.
+     * to get a {@link Value} from the {@link IValueContainer}.
      *
      * @param handler The retrieve handler
      * @return This builder, for chaining
@@ -134,7 +133,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
     ElementProcessorBuilder<V, E> fastOfferHandler(FastOfferFunction<E> handler);
 
     /**
-     * Sets the offer handler of this value processor that will pass a {@link Value} through, it
+     * Sets the offer handler of this value processor that will pass a {@link Value.Mutable} through, it
      * will be called when someone attempts to add or update a value to the {@link IValueContainer}.
      *
      * @param handler The offer handler
@@ -143,7 +142,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
     ElementProcessorBuilder<V, E> valueOfferHandler(ValueOfferFunction<V, E> handler);
 
     /**
-     * Sets the offer handler of this value processor that will pass a {@link Value} through, it
+     * Sets the offer handler of this value processor that will pass a {@link Value.Mutable} through, it
      * will be called when someone attempts to add or update a value to the {@link IValueContainer}.
      *
      * @param handler The offer handler
@@ -179,7 +178,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
     }
 
     /**
-     * Sets the builder that should be used to create the {@link Value}s.
+     * Sets the builder that should be used to create the {@link Value.Mutable}s.
      *
      * @param builder The value builder
      * @return This builder, for chaining
@@ -201,7 +200,7 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
     ElementProcessor<V, E> build();
 
     @FunctionalInterface
-    interface ValueBuilderFunction<V extends BaseValue<E>, E> {
+    interface ValueBuilderFunction<V extends Value<E>, E> {
 
         V get(IValueContainer<?> valueContainer, Element<E> elementHolder, E element);
     }
@@ -231,19 +230,19 @@ public interface ElementProcessorBuilder<V extends BaseValue<E>, E>
     }
 
     @FunctionalInterface
-    interface ValueRetrieveFunction<V extends BaseValue<E>, E> {
+    interface ValueRetrieveFunction<V extends Value<E>, E> {
 
         Optional<V> get(IValueContainer<?> valueContainer, Element<E> elementHolder);
     }
 
     @FunctionalInterface
-    interface ValueOfferFunction<V extends BaseValue<E>, E> {
+    interface ValueOfferFunction<V extends Value<E>, E> {
 
         DataTransactionResult offer(IValueContainer<?> valueContainer, Element<E> elementHolder, V value);
     }
 
     @FunctionalInterface
-    interface FastValueOfferFunction<V extends BaseValue<E>, E> {
+    interface FastValueOfferFunction<V extends Value<E>, E> {
 
         boolean offer(IValueContainer<?> valueContainer, Element<E> elementHolder, V value);
     }

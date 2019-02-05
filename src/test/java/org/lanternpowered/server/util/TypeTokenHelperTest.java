@@ -34,9 +34,8 @@ import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.manipulator.mutable.LoreData;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.complex.EnderDragon;
 import org.spongepowered.api.entity.living.monster.Slime;
@@ -46,48 +45,48 @@ public final class TypeTokenHelperTest {
     @Test
     public void testA() {
         assertTrue(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<?>>>() {}));
+                new TypeToken<Key<Value<?>>>() {},
+                new TypeToken<Key<Value<?>>>() {}));
 
         assertTrue(TypeTokenHelper.isAssignable(
                 new TypeToken<Key<?>>() {},
-                new TypeToken<Key<BaseValue<?>>>() {}));
+                new TypeToken<Key<Value<?>>>() {}));
 
         assertFalse(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<CatalogType>>>() {}));
+                new TypeToken<Key<Value<?>>>() {},
+                new TypeToken<Key<Value<CatalogType>>>() {}));
 
         assertFalse(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<? extends CatalogType>>>() {}));
+                new TypeToken<Key<Value<?>>>() {},
+                new TypeToken<Key<Value<? extends CatalogType>>>() {}));
 
         assertFalse(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<?>>>() {},
-                new TypeToken<Key<BaseValue<? extends Advancement>>>() {}));
+                new TypeToken<Key<Value<?>>>() {},
+                new TypeToken<Key<Value<? extends Advancement>>>() {}));
 
         assertFalse(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<Advancement>>>() {},
-                new TypeToken<Key<BaseValue<Integer>>>() {}));
+                new TypeToken<Key<Value<Advancement>>>() {},
+                new TypeToken<Key<Value<Integer>>>() {}));
 
         assertFalse(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<Slime>>>() {},
-                new TypeToken<Key<BaseValue<? extends EnderDragon>>>() {}));
+                new TypeToken<Key<Value<Slime>>>() {},
+                new TypeToken<Key<Value<? extends EnderDragon>>>() {}));
 
         assertTrue(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<EnderDragon>>>() {},
-                new TypeToken<Key<BaseValue<? extends Living>>>() {}));
+                new TypeToken<Key<Value<EnderDragon>>>() {},
+                new TypeToken<Key<Value<? extends Living>>>() {}));
 
         assertTrue(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<EnderDragon>>>() {},
-                new TypeToken<Key<BaseValue<Living>>>() {}));
+                new TypeToken<Key<Value<EnderDragon>>>() {},
+                new TypeToken<Key<Value<Living>>>() {}));
 
         assertTrue(TypeTokenHelper.isAssignable(
-                new TypeToken<Key<BaseValue<? extends Living>>>() {},
+                new TypeToken<Key<Value<? extends Living>>>() {},
                 TypeToken.of(Key.class)));
 
         assertFalse(TypeTokenHelper.isAssignable(
                 TypeToken.of(Key.class),
-                new TypeToken<Key<BaseValue<? extends Living>>>() {}));
+                new TypeToken<Key<Value<? extends Living>>>() {}));
 
         assertTrue(TypeTokenHelper.isAssignable(
                 new TypeToken<DataRegistration>() {},
@@ -115,16 +114,16 @@ public final class TypeTokenHelperTest {
         // Enclosing classes testing
 
         assertTrue(TypeTokenHelper.isAssignable(
-                new TypeToken<A<Object>.B<Value<Double>>>() {},
-                new TypeToken<A<Object>.B<Value<? extends Number>>>() {}));
+                new TypeToken<A<Object>.B<Value.Mutable<Double>>>() {},
+                new TypeToken<A<Object>.B<Value.Mutable<? extends Number>>>() {}));
 
         assertFalse(TypeTokenHelper.isAssignable(
-                new TypeToken<A<Key<BaseValue<EnderDragon>>>.B<Value<Double>>>() {},
-                new TypeToken<A<Key<BaseValue<Slime>>>.B<Value<? extends Number>>>() {}));
+                new TypeToken<A<Key<Value<EnderDragon>>>.B<Value.Mutable<Double>>>() {},
+                new TypeToken<A<Key<Value<Slime>>>.B<Value.Mutable<? extends Number>>>() {}));
 
         assertTrue(TypeTokenHelper.isAssignable(
-                new TypeToken<A<Key<BaseValue<EnderDragon>>>.B<Value<Double>>>() {},
-                new TypeToken<A<Key<BaseValue<? extends Living>>>.B<Value<? extends Number>>>() {}));
+                new TypeToken<A<Key<Value<EnderDragon>>>.B<Value.Mutable<Double>>>() {},
+                new TypeToken<A<Key<Value<? extends Living>>>.B<Value.Mutable<? extends Number>>>() {}));
     }
 
     @Test

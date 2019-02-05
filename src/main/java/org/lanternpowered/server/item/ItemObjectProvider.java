@@ -30,7 +30,16 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
-public interface ObjectProvider<T> {
+@FunctionalInterface
+public interface ItemObjectProvider<T> {
 
     T get(ItemType itemType, @Nullable ItemStack itemStack);
+
+    default T get(ItemType itemType) {
+        return get(itemType, null);
+    }
+
+    default T get(ItemStack itemStack) {
+        return get(itemStack.getType(), itemStack);
+    }
 }

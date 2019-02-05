@@ -26,8 +26,8 @@
 package org.lanternpowered.server.data.element;
 
 import org.lanternpowered.server.data.KeyRegistration;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
-public interface ElementKeyRegistration<V extends BaseValue<E>, E> extends KeyRegistration<V, E>, Element<E> {
+public interface ElementKeyRegistration<V extends Value<E>, E> extends KeyRegistration<V, E>, Element<E> {
 
 }

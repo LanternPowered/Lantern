@@ -26,8 +26,8 @@
 package org.lanternpowered.server.data.manipulator.gen.dummy;
 
 import org.lanternpowered.server.data.manipulator.AbstractDataManipulatorRegistration;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableAttachedData;
-import org.spongepowered.api.data.manipulator.mutable.block.AttachedData;
+import org.spongepowered.api.data.manipulator.ImmutableAttachedData;
+import org.spongepowered.api.data.manipulator.mutable.AttachedData;
 import org.spongepowered.api.plugin.PluginContainer;
 
 public class AttachedDataManipulatorRegistration extends AbstractDataManipulatorRegistration<AttachedData, ImmutableAttachedData> {

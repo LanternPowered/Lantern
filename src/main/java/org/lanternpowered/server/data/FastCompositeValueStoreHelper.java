@@ -29,9 +29,9 @@ import org.lanternpowered.server.transformer.data.FastValueContainerClassTransfo
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.CompositeValueStore;
 
 import java.util.function.Function;
 
@@ -46,27 +46,27 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 public final class FastCompositeValueStoreHelper {
 
-    public static <E> boolean transform(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public static <E> boolean transform(CompositeValueStore<?,?> store, Key<? extends Value<E>> key, Function<E, E> function) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).transformFast(key, function) :
                 store.transform(key, function).isSuccessful();
     }
 
-    public static <E> boolean offer(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, E element) {
+    public static <E> boolean offer(CompositeValueStore<?,?> store, Key<? extends Value<E>> key, E element) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).offerFast(key, element) :
                 store.offer(key, element).isSuccessful();
     }
 
-    public static <E> boolean offer(CompositeValueStore<?,?> store, BaseValue<E> value) {
+    public static <E> boolean offer(CompositeValueStore<?,?> store, Value<E> value) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).offerFast(value) :
                 store.offer(value).isSuccessful();
     }
 
-    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, Key<? extends BaseValue<E>> key, E value) throws IllegalArgumentException {
+    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, Key<? extends Value<E>> key, E value) throws IllegalArgumentException {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).tryOfferFast(key, value) :
                 store.tryOffer(key, value).isSuccessful();
     }
 
-    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, BaseValue<E> value) throws IllegalArgumentException {
+    public static <E> boolean tryOffer(CompositeValueStore<?,?> store, Value<E> value) throws IllegalArgumentException {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).tryOfferFast(value) :
                 store.tryOffer(value).isSuccessful();
     }
@@ -76,7 +76,7 @@ public final class FastCompositeValueStoreHelper {
                 store.remove(key).isSuccessful();
     }
 
-    public static boolean remove(CompositeValueStore<?,?> store, BaseValue<?> value) {
+    public static boolean remove(CompositeValueStore<?,?> store, Value<?> value) {
         return store instanceof ICompositeValueStore ? ((ICompositeValueStore<?,?>) store).removeFast(value) :
                 store.remove(value).isSuccessful();
     }

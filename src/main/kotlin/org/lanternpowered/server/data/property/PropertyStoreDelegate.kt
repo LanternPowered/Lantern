@@ -26,10 +26,10 @@
 package org.lanternpowered.server.data.property
 
 import com.google.common.collect.ImmutableList
+import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
 import org.spongepowered.api.data.property.PropertyHolder
 import org.spongepowered.api.data.property.store.PropertyStore
 import org.spongepowered.api.util.Direction
-import org.spongepowered.api.world.Location
 import java.util.Optional
 
 open class PropertyStoreDelegate<V> internal constructor(internal val propertyStores: ImmutableList<PropertyStore<V>>) : PropertyStore<V> {
@@ -44,9 +44,9 @@ open class PropertyStoreDelegate<V> internal constructor(internal val propertySt
         return Optional.empty()
     }
 
-    override fun getFor(location: Location, direction: Direction): Optional<V> {
+    override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction): Optional<V> {
         for (propertyStore in this.propertyStores) {
-            val optional = propertyStore.getFor(location, direction)
+            val optional = propertyStore.getFor(propertyHolder, direction)
             if (optional.isPresent) {
                 return optional
             }

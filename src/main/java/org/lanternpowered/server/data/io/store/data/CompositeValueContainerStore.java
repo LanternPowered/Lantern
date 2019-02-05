@@ -45,7 +45,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.CompositeValueStore;
 
 import java.util.HashMap;
 import java.util.Map;

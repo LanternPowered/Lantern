@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.inventory.LanternInventoryProperties
+import org.lanternpowered.server.item.ItemProperties
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.data.property.Properties
@@ -94,6 +95,7 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
         registerCatalog(Properties::class)
         registerCatalog(InventoryProperties::class, inventoryProperties = true)
         registerCatalog(LanternInventoryProperties::class, inventoryProperties = true)
+        registerCatalog(ItemProperties::class)
     }
 
     fun completeRegistration() {

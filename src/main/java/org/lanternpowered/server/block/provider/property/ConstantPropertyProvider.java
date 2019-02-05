@@ -26,11 +26,10 @@
 package org.lanternpowered.server.block.provider.property;
 
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
-import org.spongepowered.api.data.Property;
 
-public class ConstantPropertyProvider<T extends Property> extends ConstantObjectProvider<T> implements PropertyProvider<T> {
+public class ConstantPropertyProvider<V> extends ConstantObjectProvider<V> implements PropertyProvider<V> {
 
-    public ConstantPropertyProvider(T value) {
+    public ConstantPropertyProvider(V value) {
         super(value);
     }
 }

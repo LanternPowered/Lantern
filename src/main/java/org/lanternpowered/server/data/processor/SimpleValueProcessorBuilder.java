@@ -30,16 +30,15 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;
 
 @SuppressWarnings("unchecked")
-final class SimpleValueProcessorBuilder<V extends BaseValue<E>, E> implements ValueProcessorBuilder<V, E> {
+final class SimpleValueProcessorBuilder<V extends Value<E>, E> implements ValueProcessorBuilder<V, E> {
 
-    private static final ValueBuilderFunction<BaseValue<Object>, Object> DEFAULT_VALUE_BUILDER =
-            (key, valueContainer, object) -> (Value) LanternValueFactory.get().createValueForKey((Key) key, object);
+    private static final ValueBuilderFunction<Value<Object>, Object> DEFAULT_VALUE_BUILDER =
+            (key, valueContainer, object) -> (Value.Mutable) LanternValueFactory.get().createValueForKey((Key) key, object);
 
     final Key<? extends V> key;
 

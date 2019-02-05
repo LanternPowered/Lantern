@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.api.ext.PotionEffectHelper;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.PotionType;
-import org.lanternpowered.server.item.ObjectProvider;
+import org.lanternpowered.server.item.ItemObjectProvider;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.item.ItemType;
@@ -41,7 +41,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class PotionEffectsProvider implements ObjectProvider<Collection<PotionEffect>> {
+public class PotionEffectsProvider implements ItemObjectProvider<Collection<PotionEffect>> {
 
     @Override
     public Collection<PotionEffect> get(ItemType itemType, @Nullable ItemStack itemStack) {

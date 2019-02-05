@@ -51,7 +51,7 @@ import org.objectweb.asm.Type;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public abstract class TypeGenerator {
     static final String nKey = Type.getInternalName(Key.class);
     static final String dKey = Type.getDescriptor(Key.class);
 
-    static final String nValue = Type.getInternalName(Value.class);
+    static final String nValue = Type.getInternalName(Value.Mutable.class);
 
     private static final class Counter {
         private int value;

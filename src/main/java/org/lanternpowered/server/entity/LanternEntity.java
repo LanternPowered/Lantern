@@ -58,7 +58,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
+import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -809,7 +809,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
         if (isDead()) {
             return false;
         }
-        final MutableBoundedValue<Double> health = getValue(Keys.HEALTH).orElse(null);
+        final BoundedValue.Mutable<Double> health = getValue(Keys.HEALTH).orElse(null);
         if (health == null || health.get() >= health.getMaxValue()) {
             return false;
         }

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.key;
 
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeListKey;
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBoundedValueKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeBoundedValueKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
@@ -46,11 +46,11 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.SkinPart;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.OptionalValue;
-import org.spongepowered.api.data.value.mutable.SetValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.BoundedValue;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.OptionalValue;
+import org.spongepowered.api.data.value.SetValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
@@ -117,10 +117,10 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("CanDualWield"), "can_dual_wield");
     public static final Key<OptionalValue<HandType>> ACTIVE_HAND =
             makeOptionalKey(HandType.class, DataQuery.of("ActiveHand"), "active_hand");
-    public static final Key<MutableBoundedValue<Double>> MAX_EXHAUSTION =
-            makeMutableBoundedValueKey(Double.class, DataQuery.of("MaxExhaustion"), "max_exhaustion");
-    public static final Key<MutableBoundedValue<Integer>> MAX_FOOD_LEVEL =
-            makeMutableBoundedValueKey(Integer.class, DataQuery.of("MaxFoodLevel"), "max_food_level");
+    public static final Key<BoundedValue<Double>> MAX_EXHAUSTION =
+            makeBoundedValueKey(Double.class, DataQuery.of("MaxExhaustion"), "max_exhaustion");
+    public static final Key<BoundedValue<Integer>> MAX_FOOD_LEVEL =
+            makeBoundedValueKey(Integer.class, DataQuery.of("MaxFoodLevel"), "max_food_level");
     public static final Key<Value<RecipeBookState>> CRAFTING_RECIPE_BOOK_STATE =
             makeValueKey(RecipeBookState.class, DataQuery.of("CraftingRecipeBookState"), "crafting_recipe_book_state");
     public static final Key<Value<RecipeBookState>> SMELTING_RECIPE_BOOK_STATE =

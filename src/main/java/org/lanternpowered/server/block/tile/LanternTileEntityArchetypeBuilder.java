@@ -38,11 +38,9 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +133,7 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public <E, V extends BaseValue<E>> TileEntityArchetype.Builder set(V value) {
+    public <E, V extends Value<E>> TileEntityArchetype.Builder set(V value) {
         if (this.data == null) {
             this.data = new ArrayList<>();
         }
@@ -144,7 +142,7 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public <E, V extends BaseValue<E>> TileEntityArchetype.Builder set(Key<V> key, E value) {
+    public <E, V extends Value<E>> TileEntityArchetype.Builder set(Key<V> key, E value) {
         if (this.data == null) {
             this.data = new ArrayList<>();
         }
@@ -170,8 +168,8 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
             for (Object obj : this.data) {
                 if (obj instanceof DataManipulator) {
                     tileEntity.offerFastNoEvents((DataManipulator) obj);
-                } else if (obj instanceof Value) {
-                    tileEntity.offerFastNoEvents((Value) obj);
+                } else if (obj instanceof Value.Mutable) {
+                    tileEntity.offerFastNoEvents((Value.Mutable) obj);
                 } else {
                     final Tuple<Key, Object> tuple = (Tuple<Key, Object>) obj;
                     tileEntity.offerFastNoEvents(tuple.getFirst(), tuple.getSecond());

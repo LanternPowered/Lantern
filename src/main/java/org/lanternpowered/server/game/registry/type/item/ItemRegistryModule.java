@@ -30,16 +30,15 @@ import static org.lanternpowered.server.item.PropertyProviders.applicableEffects
 import static org.lanternpowered.server.item.PropertyProviders.armorType;
 import static org.lanternpowered.server.item.PropertyProviders.dualWield;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
-import static org.lanternpowered.server.item.PropertyProviders.foodRestoration;
 import static org.lanternpowered.server.item.PropertyProviders.maximumUseDuration;
 import static org.lanternpowered.server.item.PropertyProviders.musicDisc;
+import static org.lanternpowered.server.item.PropertyProviders.replenishedFood;
 import static org.lanternpowered.server.item.PropertyProviders.saturation;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
 import static org.lanternpowered.server.item.PropertyProviders.useDuration;
 import static org.lanternpowered.server.item.PropertyProviders.useLimit;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.effect.potion.PotionType;
@@ -157,7 +156,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(3))
+                        .add(replenishedFood(3))
                         .add(saturation(2.4)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -293,7 +292,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .maxStackQuantity(1)
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(6))
+                        .add(replenishedFood(6))
                         .add(saturation(7.2)))
                 .behaviors(pipeline -> pipeline.add(
                         new ConsumableInteractionBehavior().restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
@@ -378,7 +377,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(5))
+                        .add(replenishedFood(5))
                         .add(saturation(6.0)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -494,7 +493,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(3))
+                        .add(replenishedFood(3))
                         .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -505,7 +504,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(8))
+                        .add(replenishedFood(8))
                         .add(saturation(12.8)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -521,12 +520,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(4))
+                        .add(replenishedFood(4))
                         .add(saturation(9.6))
-                        .add(applicableEffects(ImmutableList.<PotionEffect>builder()
-                                .add(PotionEffect.of(PotionEffectTypes.REGENERATION, 1, 100))
-                                .add(PotionEffect.of(PotionEffectTypes.ABSORPTION, 0, 2400))
-                                .build()))
+                        .add(applicableEffects(
+                                PotionEffect.of(PotionEffectTypes.REGENERATION, 1, 100),
+                                PotionEffect.of(PotionEffectTypes.ABSORPTION, 0, 2400)))
                         .add(alwaysConsumable(true)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -537,14 +535,13 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(4))
+                        .add(replenishedFood(4))
                         .add(saturation(9.6))
-                        .add(applicableEffects(ImmutableList.<PotionEffect>builder()
-                                .add(PotionEffect.of(PotionEffectTypes.REGENERATION, 1, 400))
-                                .add(PotionEffect.of(PotionEffectTypes.RESISTANCE, 0, 6000))
-                                .add(PotionEffect.of(PotionEffectTypes.FIRE_RESISTANCE, 0, 6000))
-                                .add(PotionEffect.of(PotionEffectTypes.ABSORPTION, 3, 2400))
-                                .build()))
+                        .add(applicableEffects(
+                                PotionEffect.of(PotionEffectTypes.REGENERATION, 1, 400),
+                                PotionEffect.of(PotionEffectTypes.RESISTANCE, 0, 6000),
+                                PotionEffect.of(PotionEffectTypes.FIRE_RESISTANCE, 0, 6000),
+                                PotionEffect.of(PotionEffectTypes.ABSORPTION, 3, 2400)))
                         .add(alwaysConsumable(true)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -704,7 +701,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(0.4)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -715,7 +712,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(0.4)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -726,7 +723,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(1))
+                        .add(replenishedFood(1))
                         .add(saturation(0.2)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -737,7 +734,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(1))
+                        .add(replenishedFood(1))
                         .add(saturation(0.2))
                         .add(applicableEffects(
                                 PotionEffect.of(PotionEffectTypes.POISON, 3, 1200),
@@ -752,7 +749,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(5))
+                        .add(replenishedFood(5))
                         .add(saturation(6.0)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -763,7 +760,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(6))
+                        .add(replenishedFood(6))
                         .add(saturation(9.6)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -875,7 +872,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(0.4)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -898,7 +895,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(1.2)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -919,7 +916,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(3))
+                        .add(replenishedFood(3))
                         .add(saturation(1.8)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -930,7 +927,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(8))
+                        .add(replenishedFood(8))
                         .add(saturation(12.8)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -941,7 +938,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(1.2))
                         .add(applicableEffects(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .behaviors(pipeline -> pipeline
@@ -953,7 +950,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(6))
+                        .add(replenishedFood(6))
                         .add(saturation(7.2)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -964,7 +961,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(4))
+                        .add(replenishedFood(4))
                         .add(saturation(0.8))
                         .add(applicableEffects(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .behaviors(pipeline -> pipeline
@@ -1020,7 +1017,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(3.2))
                         .add(applicableEffects(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
                 .behaviors(pipeline -> pipeline
@@ -1120,7 +1117,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(3))
+                        .add(replenishedFood(3))
                         .add(saturation(3.6)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1131,7 +1128,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(1))
+                        .add(replenishedFood(1))
                         .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1142,7 +1139,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(5))
+                        .add(replenishedFood(5))
                         .add(saturation(6.0)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1153,7 +1150,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(1.2))
                         .add(applicableEffects(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
                 .behaviors(pipeline -> pipeline
@@ -1170,7 +1167,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(6))
+                        .add(replenishedFood(6))
                         .add(saturation(14.4)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1234,7 +1231,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(8))
+                        .add(replenishedFood(8))
                         .add(saturation(4.8)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1308,7 +1305,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(3))
+                        .add(replenishedFood(3))
                         .add(saturation(1.8)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1319,7 +1316,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(5))
+                        .add(replenishedFood(5))
                         .add(saturation(6.0)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1331,7 +1328,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .maxStackQuantity(1)
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(10))
+                        .add(replenishedFood(10))
                         .add(saturation(12.0)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()
@@ -1392,7 +1389,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(2))
+                        .add(replenishedFood(2))
                         .add(saturation(1.2)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1403,7 +1400,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(6))
+                        .add(replenishedFood(6))
                         .add(saturation(9.6)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1455,7 +1452,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(4))
+                        .add(replenishedFood(4))
                         .add(saturation(2.4))
                         .add(alwaysConsumable(true)))
                 .behaviors(pipeline -> pipeline
@@ -1473,7 +1470,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(1))
+                        .add(replenishedFood(1))
                         .add(saturation(1.2)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -1489,7 +1486,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .properties(builder -> builder
                         .add(useDuration(32))
-                        .add(foodRestoration(6))
+                        .add(replenishedFood(6))
                         .add(saturation(7.2)))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()

@@ -27,12 +27,12 @@ package org.lanternpowered.server.data.processor;
 
 import org.lanternpowered.server.data.KeyRegistration;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public interface ValueProcessorKeyRegistration<V extends BaseValue<E>, E> extends KeyRegistration<V, E> {
+public interface ValueProcessorKeyRegistration<V extends Value<E>, E> extends KeyRegistration<V, E> {
 
     /**
      * Creates a {@link ValueProcessorKeyRegistration} for the
@@ -43,7 +43,7 @@ public interface ValueProcessorKeyRegistration<V extends BaseValue<E>, E> extend
      * @param <E> The element type
      * @return The processor key registration
      */
-    static <V extends BaseValue<E>, E> ValueProcessorKeyRegistration<V, E> create(Key<? extends V> key) {
+    static <V extends Value<E>, E> ValueProcessorKeyRegistration<V, E> create(Key<? extends V> key) {
         return new SimpleProcessorKeyRegistration<>(key);
     }
 

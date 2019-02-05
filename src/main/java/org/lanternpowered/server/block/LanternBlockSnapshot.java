@@ -47,8 +47,7 @@ import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -173,7 +172,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     }
 
     @Override
-    public <E> Optional<BlockSnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> Optional<BlockSnapshot> transform(Key<? extends Value<E>> key, Function<E, E> function) {
         final Optional<BlockState> optNewState = this.state.transform(key, function);
         if (optNewState.isPresent()) {
             return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
@@ -190,7 +189,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     }
 
     @Override
-    public <E> Optional<BlockSnapshot> with(Key<? extends BaseValue<E>> key, E value) {
+    public <E> Optional<BlockSnapshot> with(Key<? extends Value<E>> key, E value) {
         final Optional<BlockState> optNewState = this.state.with(key, value);
         if (optNewState.isPresent()) {
             return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
@@ -207,7 +206,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     }
 
     @Override
-    public Optional<BlockSnapshot> with(BaseValue<?> value) {
+    public Optional<BlockSnapshot> with(Value<?> value) {
         final Optional<BlockState> optNewState = this.state.with(value);
         if (optNewState.isPresent()) {
             return Optional.of(new LanternBlockSnapshot(this.location, optNewState.get(),
@@ -302,7 +301,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     }
 
     @Override
-    public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> get(Key<? extends Value<E>> key) {
         final Optional<E> optResult = this.state.get(key);
         if (optResult.isPresent() || this.tileEntity == null) {
             return optResult;
@@ -311,7 +310,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
+    public <E, V extends Value<E>> Optional<V> getValue(Key<V> key) {
         final Optional<V> optResult = this.state.getValue(key);
         if (optResult.isPresent()) {
             return optResult;
@@ -336,11 +335,11 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     }
 
     @Override
-    public Set<ImmutableValue<?>> getValues() {
+    public Set<Value.Immutable<?>> getValues() {
         if (this.tileEntity == null) {
             return this.state.getValues();
         }
-        final ImmutableSet.Builder<ImmutableValue<?>> values = ImmutableSet.builder();
+        final ImmutableSet.Builder<Value.Immutable<?>> values = ImmutableSet.builder();
         values.addAll(this.state.getValues());
         values.addAll(this.tileEntity.getValues());
         return values.build();

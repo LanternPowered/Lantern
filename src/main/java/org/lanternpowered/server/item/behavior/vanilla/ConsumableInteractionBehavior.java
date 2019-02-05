@@ -34,14 +34,11 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.ISlot;
+import org.lanternpowered.server.item.ItemProperties;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
-import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
-import org.spongepowered.api.data.property.item.FoodRestorationProperty;
-import org.spongepowered.api.data.property.item.SaturationProperty;
+import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -71,19 +68,17 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
         if (optPlayer.isPresent()) {
             final Player player = optPlayer.get();
             final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
-            final AlwaysConsumableProperty property = itemStack.getProperty(AlwaysConsumableProperty.class).orElse(null);
-            if (property == null || !property.getValue()) {
+            if (itemStack.getProperty(ItemProperties.IS_ALWAYS_CONSUMABLE).orElse(false)) {
                 int status = 0;
-                final FoodRestorationProperty foodRestorationProperty = itemStack.getProperty(FoodRestorationProperty.class).orElse(null);
-                if (foodRestorationProperty != null && foodRestorationProperty.getValue() != 0.0) {
+                final double replenishedFood = itemStack.getDoubleProperty(Properties.REPLENISHED_FOOD).orElse(0);
+                if (replenishedFood != 0) {
                     final int maxFood = player.get(LanternKeys.MAX_FOOD_LEVEL).orElse(1);
                     final int food = player.get(Keys.FOOD_LEVEL).orElse(maxFood);
                     status = food < maxFood ? 2 : 1;
                 }
                 if (status != 2) {
-                    final HealthRestorationProperty healthRestorationProperty = itemStack
-                            .getProperty(HealthRestorationProperty.class).orElse(null);
-                    if (healthRestorationProperty != null && healthRestorationProperty.getValue() != 0.0) {
+                    final double restoredHealth = itemStack.getDoubleProperty(ItemProperties.HEALTH_RESTORATION).orElse(0);
+                    if (restoredHealth != 0) {
                         final double maxHealth = player.get(Keys.MAX_HEALTH).orElse(1.0);
                         final double health = player.get(Keys.HEALTH).orElse(maxHealth);
                         status = health < maxHealth ? 2 : 1;
@@ -106,36 +101,32 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
             final Player player = optPlayer.get();
             final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
 
-            final FoodRestorationProperty foodRestorationProperty = itemStack.getProperty(FoodRestorationProperty.class).orElse(null);
-            if (foodRestorationProperty != null && foodRestorationProperty.getValue() != 0.0) {
+            final double replenishedFood = itemStack.getDoubleProperty(Properties.REPLENISHED_FOOD).orElse(0);
+            if (replenishedFood != 0) {
                 final Optional<Integer> maxFood = player.get(LanternKeys.MAX_FOOD_LEVEL);
                 final Optional<Integer> optFoodLevel = player.get(Keys.FOOD_LEVEL);
-                if (optFoodLevel.isPresent()) {
-                    player.offer(Keys.FOOD_LEVEL, Math.min(optFoodLevel.get() + foodRestorationProperty.getValue(),
-                            maxFood.orElse(Integer.MAX_VALUE)));
-                }
+                optFoodLevel.ifPresent(food -> player.offer(Keys.FOOD_LEVEL,
+                        Math.min(food + (int) replenishedFood, maxFood.orElse(Integer.MAX_VALUE))));
             }
-            final HealthRestorationProperty healthRestorationProperty = itemStack.getProperty(HealthRestorationProperty.class).orElse(null);
-            if (healthRestorationProperty != null && healthRestorationProperty.getValue() != 0.0) {
+            final double restoredHealth = itemStack.getDoubleProperty(ItemProperties.HEALTH_RESTORATION).orElse(0);
+            if (restoredHealth != 0) {
                 final Optional<Double> maxHealth = player.get(Keys.MAX_HEALTH);
                 final Optional<Double> optHealth = player.get(Keys.HEALTH);
-                if (optHealth.isPresent()) {
-                    player.offer(Keys.HEALTH, Math.min(optHealth.get() + healthRestorationProperty.getValue(), maxHealth.orElse(Double.MAX_VALUE)));
-                }
+                optHealth.ifPresent(health -> player.offer(Keys.HEALTH,
+                        Math.min(health + restoredHealth, maxHealth.orElse(Double.MAX_VALUE))));
             }
-            final SaturationProperty saturationProperty = itemStack.getProperty(SaturationProperty.class).orElse(null);
-            if (saturationProperty != null && saturationProperty.getValue() != 0.0) {
+            final double replenishedSaturation = itemStack.getDoubleProperty(Properties.REPLENISHED_SATURATION).orElse(0);
+            if (replenishedSaturation != 0) {
                 final Optional<Double> optSaturation = player.get(Keys.SATURATION);
-                if (optSaturation.isPresent()) {
-                    player.offer(Keys.SATURATION, Math.min(optSaturation.get() + saturationProperty.getValue(),
-                            player.get(Keys.FOOD_LEVEL).orElse(20)));
-                }
+                optSaturation.ifPresent(aDouble -> player.offer(Keys.SATURATION,
+                        Math.min(aDouble + replenishedSaturation, player.get(Keys.FOOD_LEVEL).orElse(20))));
             }
-            final ApplicableEffectProperty applicableEffectProperty = itemStack.getProperty(ApplicableEffectProperty.class).orElse(null);
-            if (applicableEffectProperty != null && !applicableEffectProperty.getValue().isEmpty()) {
-                final List<PotionEffect> potionEffects = player.get(Keys.POTION_EFFECTS).orElse(Collections.emptyList());
-                player.offer(Keys.POTION_EFFECTS, PotionEffectHelper.merge(potionEffects, applicableEffectProperty.getValue()));
-            }
+            itemStack.getProperty(Properties.APPLICABLE_POTION_EFFECTS)
+                    .filter(applicableEffects -> !applicableEffects.isEmpty())
+                    .ifPresent(applicableEffects -> {
+                        final List<PotionEffect> potionEffects = player.get(Keys.POTION_EFFECTS).orElse(Collections.emptyList());
+                        player.offer(Keys.POTION_EFFECTS, PotionEffectHelper.merge(potionEffects, applicableEffects));
+                    });
             if (this.consumer != null) {
                 this.consumer.apply(player, pipeline, context);
             }

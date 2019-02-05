@@ -30,7 +30,7 @@ import org.lanternpowered.server.data.manipulator.immutable.IImmutableListData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
-import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.ListValue;
 
 import java.util.List;
 
@@ -64,8 +64,8 @@ public abstract class AbstractListData<E, M extends ListData<E, M, I>, I extends
     }
 
     @Override
-    public ListValue<E> getListValue() {
-        return getValue(this.listKey).get();
+    public ListValue.Mutable<E> getListValue() {
+        return getValue(this.listKey).get().asMutable();
     }
 
     @Override

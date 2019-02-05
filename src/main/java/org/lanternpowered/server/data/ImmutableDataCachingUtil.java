@@ -33,8 +33,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -56,7 +55,7 @@ public final class ImmutableDataCachingUtil {
             .concurrencyLevel(4)
             .build();
 
-    private static final Cache<String, ImmutableValue<?>> valueCache = CacheBuilder.newBuilder()
+    private static final Cache<String, Value.Immutable<?>> valueCache = CacheBuilder.newBuilder()
             .concurrencyLevel(4)
             .maximumSize(VALUE_CACHE_LIMIT)
             .build();
@@ -98,11 +97,11 @@ public final class ImmutableDataCachingUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <E, V extends ImmutableValue<?>, T extends ImmutableValue<E>> T getValue(final Class<V> valueClass,
-            final Key<? extends BaseValue<E>> usedKey, final E defaultArg, @Nullable final E arg, @Nullable final Object... extraArgs) {
+    public static <E, V extends Value.Immutable<?>, T extends Value.Immutable<E>> T getValue(final Class<V> valueClass,
+            final Key<? extends Value<E>> usedKey, final E defaultArg, @Nullable final E arg, @Nullable final Object... extraArgs) {
         final String key = getKey(valueClass, usedKey.getQuery().asString('.'), arg == null ? defaultArg.getClass() : arg.getClass(), arg);
         try {
-            return (T) ImmutableDataCachingUtil.valueCache.get(key, (Callable<ImmutableValue<?>>) () -> {
+            return (T) ImmutableDataCachingUtil.valueCache.get(key, (Callable<Value.Immutable<?>>) () -> {
                 try {
                     if (extraArgs == null || extraArgs.length == 0) {
                         return createUnsafeInstance(valueClass, usedKey, defaultArg, arg);

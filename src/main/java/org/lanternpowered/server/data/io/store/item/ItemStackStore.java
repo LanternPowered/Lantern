@@ -45,7 +45,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
@@ -278,7 +278,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         dataView.set(query, dataViews);
     }
 
-    private void deserializeEnchantments(DataView dataView, DataQuery query, Key<ListValue<Enchantment>> key,
+    private void deserializeEnchantments(DataView dataView, DataQuery query, Key<ListValue.Mutable<Enchantment>> key,
             SimpleValueContainer valueContainer) {
         dataView.getViewList(query).ifPresent(views -> {
             if (!views.isEmpty()) {

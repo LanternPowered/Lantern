@@ -25,30 +25,10 @@
  */
 package org.lanternpowered.server.data.value;
 
-import org.lanternpowered.server.util.function.TriFunction;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
-import java.util.function.BiFunction;
+public interface ValueSupplier<V extends Value<E>, E> {
 
-public interface ValueSupplier<R extends BaseValue, E> {
-
-    R get(Key key, E element);
-
-    R get(Key key, E element, E defaultElement);
-
-    static <R extends BaseValue, E> ValueSupplier<R, E> of(
-            BiFunction<Key, E, R> functionA, TriFunction<Key, E, E, R> functionB) {
-        return new ValueSupplier<R, E>() {
-            @Override
-            public R get(Key key, E element) {
-                return functionA.apply(key, element);
-            }
-
-            @Override
-            public R get(Key key, E element, E defaultElement) {
-                return functionB.apply(key, element, defaultElement);
-            }
-        };
-    }
+    V get(Key key, E element);
 }

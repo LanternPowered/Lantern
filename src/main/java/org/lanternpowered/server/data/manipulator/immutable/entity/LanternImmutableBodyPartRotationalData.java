@@ -28,14 +28,14 @@ package org.lanternpowered.server.data.manipulator.immutable.entity;
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.IImmutableValueHolder;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableBodyPartRotationalData;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableBodyPartRotationalData;
 import org.spongepowered.api.data.type.BodyPart;
-import org.spongepowered.api.data.value.immutable.ImmutableMapValue;
+import org.spongepowered.api.data.value.MapValue;
 
 public interface LanternImmutableBodyPartRotationalData extends ImmutableBodyPartRotationalData, IImmutableValueHolder {
 
     @Override
-    default ImmutableMapValue<BodyPart, Vector3d> partRotation() {
+    default MapValue.Immutable<BodyPart, Vector3d> partRotation() {
         return tryGetImmutableValueFor(Keys.BODY_ROTATIONS);
     }
 }

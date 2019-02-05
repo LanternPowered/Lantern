@@ -32,10 +32,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.TreeTypes;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -50,10 +46,6 @@ import org.spongepowered.api.item.inventory.property.GuiIds;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 @Plugin(id = "inventory_test")
 public class TestInventoryPlugin {

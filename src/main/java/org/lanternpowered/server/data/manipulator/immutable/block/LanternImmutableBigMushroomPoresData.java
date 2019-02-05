@@ -27,14 +27,14 @@ package org.lanternpowered.server.data.manipulator.immutable.block;
 
 import org.lanternpowered.server.data.IImmutableValueHolder;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableBigMushroomPoresData;
-import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableBigMushroomPoresData;
+import org.spongepowered.api.data.value.SetValue;
 import org.spongepowered.api.util.Direction;
 
 public interface LanternImmutableBigMushroomPoresData extends ImmutableBigMushroomPoresData, IImmutableValueHolder {
 
     @Override
-    default ImmutableSetValue<Direction> sides() {
+    default SetValue.Immutable<Direction> sides() {
         return tryGetImmutableValueFor(Keys.BIG_MUSHROOM_PORES);
     }
 }

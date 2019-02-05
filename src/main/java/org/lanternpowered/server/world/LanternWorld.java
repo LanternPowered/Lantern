@@ -101,8 +101,7 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.property.block.HardnessProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -818,7 +817,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> get(int x, int y, int z, Key<? extends Value<E>> key) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).get(x, y, z, key);
     }
 
@@ -833,17 +832,17 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public <E> E getOrNull(int x, int y, int z, Key<? extends BaseValue<E>> key) {
+    public <E> E getOrNull(int x, int y, int z, Key<? extends Value<E>> key) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrNull(x, y, z, key);
     }
 
     @Override
-    public <E> E getOrElse(int x, int y, int z, Key<? extends BaseValue<E>> key, E defaultValue) {
+    public <E> E getOrElse(int x, int y, int z, Key<? extends Value<E>> key, E defaultValue) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrElse(x, y, z, key, defaultValue);
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
+    public <E, V extends Value<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValue(x, y, z, key);
     }
 
@@ -853,7 +852,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public boolean supports(int x, int y, int z, BaseValue<?> value) {
+    public boolean supports(int x, int y, int z, Value<?> value) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x, y, z, value);
     }
 
@@ -873,22 +872,22 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     }
 
     @Override
-    public ImmutableSet<ImmutableValue<?>> getValues(int x, int y, int z) {
+    public ImmutableSet<Value.Immutable<?>> getValues(int x, int y, int z) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValues(x, y, z);
     }
 
     @Override
-    public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends Value<E>> key, Function<E, E> function) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).transform(x, y, z, key, function);
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends Value<E>> key, E value) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, key, value);
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
+    public <E> DataTransactionResult offer(int x, int y, int z, Value<E> value) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, value);
     }
 

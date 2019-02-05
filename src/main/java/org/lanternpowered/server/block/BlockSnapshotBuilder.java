@@ -38,7 +38,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -190,7 +190,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
     }
 
     @Override
-    public <V> BlockSnapshotBuilder add(Key<? extends BaseValue<V>> key, V value) {
+    public <V> BlockSnapshotBuilder add(Key<? extends Value<V>> key, V value) {
         checkState(this.blockState != null, "The block state must be set before you can add key values.");
         final Optional<BlockState> blockState = this.blockState.with(key, value);
         if (blockState.isPresent()) {

@@ -27,10 +27,10 @@ package org.lanternpowered.server.data.manipulator.mutable.fluid;
 
 import org.lanternpowered.server.data.manipulator.mutable.AbstractMappedData;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.mutable.MapValue;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableFluidTankData;
+import org.spongepowered.api.data.manipulator.mutable.FluidTankData;
+import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.fluid.FluidStackSnapshot;
-import org.spongepowered.api.fluid.data.manipulator.immutable.ImmutableFluidTankData;
-import org.spongepowered.api.fluid.data.manipulator.mutable.FluidTankData;
 import org.spongepowered.api.util.Direction;
 
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class LanternFluidTankData extends AbstractMappedData<Direction, List<Flu
     }
 
     @Override
-    public MapValue<Direction, List<FluidStackSnapshot>> fluids() {
+    public MapValue.Mutable<Direction, List<FluidStackSnapshot>> fluids() {
         return getMapValue();
     }
 }

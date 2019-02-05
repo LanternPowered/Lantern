@@ -38,9 +38,7 @@ import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
@@ -56,10 +54,10 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
+public class LanternKey<V extends Value<?>> implements Key<V>, CatalogType {
 
     private static final TypeVariable<Class<Optional>> optionalType = Optional.class.getTypeParameters()[0];
-    private static final TypeVariable<Class<BaseValue>> elementType = BaseValue.class.getTypeParameters()[0];
+    private static final TypeVariable<Class<Value>> elementType = Value.class.getTypeParameters()[0];
 
     private static final TypeToken<ChangeDataHolderEvent.ValueChange> valueChangeEventTypeToken =
             TypeToken.of(ChangeDataHolderEvent.ValueChange.class);
@@ -88,7 +86,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
         this.valueToken = valueToken;
         this.name = name;
         this.query = query;
-        this.elementToken = this.valueToken.resolveType(BaseValue.class.getTypeParameters()[0]);
+        this.elementToken = this.valueToken.resolveType(Value.class.getTypeParameters()[0]);
         this.key = key;
         this.hashCode = Objects.hash(this.valueToken, this.key, this.name, this.query, this.elementToken);
         TypeToken<?> elementToken = valueToken.resolveType(elementType);
@@ -96,7 +94,7 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
             elementToken = elementToken.resolveType(optionalType);
             // Generate the unwrapped version
             final LanternKeyBuilder unwrappedBuilder = new LanternKeyBuilder();
-            if (ImmutableValue.class.isAssignableFrom(valueToken.getRawType())) {
+            if (Value.Immutable.class.isAssignableFrom(valueToken.getRawType())) {
                 unwrappedBuilder.valueToken = createImmutableValueToken(elementToken);
             } else {
                 unwrappedBuilder.valueToken = createValueToken(elementToken);
@@ -113,12 +111,12 @@ public class LanternKey<V extends BaseValue<?>> implements Key<V>, CatalogType {
         }
     }
 
-    private static <E> TypeToken<Value<E>> createValueToken(TypeToken<E> elementToken) {
-        return new TypeToken<Value<E>>() {}.where(new TypeParameter<E>() {}, elementToken);
+    private static <E> TypeToken<Value.Mutable<E>> createValueToken(TypeToken<E> elementToken) {
+        return new TypeToken<Value.Mutable<E>>() {}.where(new TypeParameter<E>() {}, elementToken);
     }
 
-    private static <E> TypeToken<ImmutableValue<E>> createImmutableValueToken(TypeToken<E> elementToken) {
-        return new TypeToken<ImmutableValue<E>>() {}.where(new TypeParameter<E>() {}, elementToken);
+    private static <E> TypeToken<Value.Immutable<E>> createImmutableValueToken(TypeToken<E> elementToken) {
+        return new TypeToken<Value.Immutable<E>>() {}.where(new TypeParameter<E>() {}, elementToken);
     }
 
     @Nullable

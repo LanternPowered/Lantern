@@ -34,7 +34,7 @@ import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -101,12 +101,12 @@ public class LanternEntitySnapshot implements EntitySnapshot, IImmutableDataHold
     }
 
     @Override
-    public <E> Optional<EntitySnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> Optional<EntitySnapshot> transform(Key<? extends Value<E>> key, Function<E, E> function) {
         return null;
     }
 
     @Override
-    public <E> Optional<EntitySnapshot> with(Key<? extends BaseValue<E>> key, E value) {
+    public <E> Optional<EntitySnapshot> with(Key<? extends Value<E>> key, E value) {
         return null;
     }
 

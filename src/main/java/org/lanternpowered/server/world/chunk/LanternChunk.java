@@ -83,8 +83,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.property.PropertyStore;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
@@ -1621,7 +1620,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> get(int x, int y, int z, Key<? extends Value<E>> key) {
         if (!this.loaded) {
             return Optional.empty();
         }
@@ -1637,7 +1636,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
+    public <E, V extends Value<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
         if (!this.loaded) {
             return Optional.empty();
         }
@@ -1689,25 +1688,25 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public ImmutableSet<ImmutableValue<?>> getValues(int x, int y, int z) {
+    public ImmutableSet<Value.Immutable<?>> getValues(int x, int y, int z) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends Value<E>> key, Function<E, E> function) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends Value<E>> key, E value) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
+    public <E> DataTransactionResult offer(int x, int y, int z, Value<E> value) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.cause.entity.damage.source
 
-import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableFallingBlockData
+import org.spongepowered.api.data.manipulator.immutable.ImmutableFallingBlockData
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.FallingBlock
 import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource

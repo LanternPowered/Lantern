@@ -26,7 +26,7 @@
 package org.lanternpowered.server.game.registry.type.item;
 
 import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
+import org.spongepowered.api.data.manipulator.mutable.DurabilityData;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackComparators;

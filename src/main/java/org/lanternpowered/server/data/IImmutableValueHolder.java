@@ -31,9 +31,7 @@ import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,33 +43,30 @@ import javax.annotation.Nullable;
 public interface IImmutableValueHolder extends IValueHolder {
 
     @Override
-    default <E, V extends BaseValue<E>> Optional<V> getValueFor(Key<V> key) {
-        if (ImmutableValue.class.isInstance(key.getValueToken().getRawType())) {
-            return getImmutableValueFor((Key) key);
-        }
+    default <E, V extends Value<E>> Optional<V> getValueFor(Key<V> key) {
         return IValueHolder.super.getValueFor(key);
     }
 
     /**
-     * Attempts to get a {@link ImmutableValue} for the given
+     * Attempts to get a {@link Value.Immutable} for the given
      * {@link Key}. An exception will be thrown when it fails.
      *
      * @param key The key
      * @return The immutable value
      */
-    default <E, R extends ImmutableValue<E>> R tryGetImmutableValueFor(Key<? extends BaseValue<E>> key) {
+    default <E, R extends Value.Immutable<E>> R tryGetImmutableValueFor(Key<? extends Value<E>> key) {
         return (R) getImmutableValueFor(key).orElseThrow(() -> new IllegalArgumentException("The key " + key + " isn't present!"));
     }
 
     /**
-     * Attempts to get a {@link ImmutableValue} for the given
+     * Attempts to get a {@link Value.Immutable} for the given
      * {@link Key}. {@link Optional#empty()} will be returned
      * when it fails.
      *
      * @param key The key
      * @return The immutable value, if success
      */
-    default <E, R extends ImmutableValue<E>> Optional<R> getImmutableValueFor(Key<? extends BaseValue<E>> key) {
+    default <E, R extends Value.Immutable<E>> Optional<R> getImmutableValueFor(Key<? extends Value<E>> key) {
         checkNotNull(key, "key");
         final ImmutableContainerCache cache = getContainerCache();
         if (cache != null) {
@@ -80,14 +75,11 @@ public interface IImmutableValueHolder extends IValueHolder {
                 return value == ImmutableContainerCache.NONE ? Optional.empty() : Optional.of((R) value);
             }
         }
-        Optional optValue = getRawValueFor((Key) key);
-        if (optValue.isPresent() && !(optValue.get() instanceof ImmutableValue)) {
-            optValue = Optional.of(((Value) optValue.get()).asImmutable());
-        }
+        final Optional optValue = getRawImmutableValueFor((Key<Value>) key);
         if (cache != null) {
             cache.values.put(key, optValue.orElse(ImmutableContainerCache.NONE));
         }
-        return Optional.empty();
+        return optValue;
     }
 
     /**

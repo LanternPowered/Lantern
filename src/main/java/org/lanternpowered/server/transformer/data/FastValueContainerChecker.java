@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
 import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.server.data.ICompositeValueStore;
 import org.objectweb.asm.ClassReader;
-import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.CompositeValueStore;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

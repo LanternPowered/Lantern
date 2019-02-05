@@ -36,7 +36,7 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -103,7 +103,7 @@ public class LanternItemStackBuilder extends AbstractDataBuilder<ItemStack> impl
     }
 
     @Override
-    public <V> ItemStack.Builder add(Key<? extends BaseValue<V>> key, V value) throws IllegalArgumentException {
+    public <V> ItemStack.Builder add(Key<? extends Value<V>> key, V value) throws IllegalArgumentException {
         itemStack(null).offerFastNoEvents(key, value);
         return this;
     }

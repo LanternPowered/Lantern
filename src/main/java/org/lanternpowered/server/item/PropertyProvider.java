@@ -25,17 +25,55 @@
  */
 package org.lanternpowered.server.item;
 
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("NullableProblems")
 @FunctionalInterface
-public interface PropertyProvider<T extends Property> extends ObjectProvider<T> {
+public interface PropertyProvider<V> extends ItemObjectProvider<V> {
 
-    @SuppressWarnings("NullableProblems")
     @Nullable
     @Override
-    T get(ItemType itemType, @Nullable ItemStack itemStack);
+    V get(ItemType itemType, @Nullable ItemStack itemStack);
+
+    @Nullable
+    @Override
+    default V get(ItemType itemType) {
+        return get(itemType, null);
+    }
+
+    @Nullable
+    @Override
+    default V get(ItemStack itemStack) {
+        return get(itemStack.getType(), itemStack);
+    }
+
+    /**
+     * Represents a "simple" {@link PropertyProvider} since it doesn't
+     * rely on the state of the {@link ItemStack}. Simple property
+     * results can be cached.
+     *
+     * @param <V> The value
+     */
+    @FunctionalInterface
+    interface Simple<V> extends PropertyProvider<V> {
+
+        @Nullable
+        @Override
+        V get(ItemType itemType);
+
+        @Nullable
+        @Override
+        default V get(ItemType itemType, @Nullable ItemStack itemStack) {
+            return get(itemType);
+        }
+
+        @Nullable
+        @Override
+        default V get(ItemStack itemStack) {
+            return get(itemStack.getType());
+        }
+    }
 }

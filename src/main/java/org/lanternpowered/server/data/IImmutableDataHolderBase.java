@@ -32,7 +32,7 @@ import org.spongepowered.api.data.ImmutableDataHolder;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +52,7 @@ public interface IImmutableDataHolderBase<H extends ImmutableDataHolder<H>> exte
     }
 
     @Override
-    default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
+    default <E, V extends Value<E>> Optional<V> getValue(Key<V> key) {
         return IImmutableValueHolder.super.getValueFor(key);
     }
 
@@ -135,7 +135,7 @@ public interface IImmutableDataHolderBase<H extends ImmutableDataHolder<H>> exte
     }
 
     @Override
-    default Optional<H> with(BaseValue<?> value) {
+    default Optional<H> with(Value<?> value) {
         return with((Key) value.getKey(), value.get());
     }
 

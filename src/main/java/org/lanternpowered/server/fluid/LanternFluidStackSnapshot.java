@@ -39,7 +39,7 @@ import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.fluid.FluidStack;
 import org.spongepowered.api.fluid.FluidStackSnapshot;
 import org.spongepowered.api.fluid.FluidType;
@@ -90,7 +90,7 @@ public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutable
     }
 
     @Override
-    public <E> Optional<FluidStackSnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> Optional<FluidStackSnapshot> transform(Key<? extends Value<E>> key, Function<E, E> function) {
         final LanternFluidStack copy = this.fluidStack.copy();
         if (copy.transformFast(key, function)) {
             return Optional.of(new LanternFluidStackSnapshot(copy));
@@ -99,7 +99,7 @@ public class LanternFluidStackSnapshot implements FluidStackSnapshot, IImmutable
     }
 
     @Override
-    public <E> Optional<FluidStackSnapshot> with(Key<? extends BaseValue<E>> key, E value) {
+    public <E> Optional<FluidStackSnapshot> with(Key<? extends Value<E>> key, E value) {
         final LanternFluidStack copy = this.fluidStack.copy();
         if (copy.offerFast(key, value)) {
             return Optional.of(new LanternFluidStackSnapshot(copy));

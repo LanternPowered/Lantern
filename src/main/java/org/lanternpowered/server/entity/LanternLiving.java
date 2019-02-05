@@ -48,8 +48,8 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
+import org.spongepowered.api.data.manipulator.mutable.FoodData;
+import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -135,7 +135,7 @@ public class LanternLiving extends LanternEntity implements Living {
                         handleDeath();
                     }
                 });
-        c.register((Key<MutableBoundedValue<Double>>) (Key) Keys.ABSORPTION, 0.0, 0.0, 1024.0);
+        c.register((Key<BoundedValue.Mutable<Double>>) (Key) Keys.ABSORPTION, 0.0, 0.0, 1024.0);
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
     }
 
@@ -370,7 +370,7 @@ public class LanternLiving extends LanternEntity implements Living {
                 } else if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY) {
                     offer(Keys.INVISIBLE, duration > 0);
                 } else if (potionEffect.getType() == PotionEffectTypes.HUNGER && supports(Keys.EXHAUSTION)) {
-                    final MutableBoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+                    final BoundedValue.Mutable<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
                     final double value = exhaustion.get() + (double) deltaTicks * 0.005 * (potionEffect.getAmplifier() + 1.0);
                     offer(Keys.EXHAUSTION, Math.min(value, exhaustion.getMaxValue()));
                 } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(FoodData.class)) {
@@ -390,9 +390,9 @@ public class LanternLiving extends LanternEntity implements Living {
         }
         final Difficulty difficulty = getWorld().getDifficulty();
 
-        MutableBoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
-        MutableBoundedValue<Double> saturation = getValue(Keys.SATURATION).get();
-        MutableBoundedValue<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
+        BoundedValue.Mutable<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+        BoundedValue.Mutable<Double> saturation = getValue(Keys.SATURATION).get();
+        BoundedValue.Mutable<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
 
         if (exhaustion.get() > 4.0) {
             if (saturation.get() > saturation.getMinValue()) {

@@ -28,7 +28,6 @@ package org.lanternpowered.server.block.provider;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
 

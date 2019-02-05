@@ -34,10 +34,9 @@ import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.CompositeValueStore;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
@@ -102,19 +101,19 @@ public final class CompositeValueStoreHelper {
         result = event.getEndResult();
         // Check if something actually changed
         if (result != original) {
-            final Map<Key<?>, ImmutableValue<?>> success = new HashMap<>();
-            for (ImmutableValue<?> value : original.getSuccessfulData()) {
+            final Map<Key<?>, Value.Immutable<?>> success = new HashMap<>();
+            for (Value.Immutable<?> value : original.getSuccessfulData()) {
                 success.put(value.getKey(), value);
             }
-            for (ImmutableValue<?> value : result.getSuccessfulData()) {
-                final ImmutableValue<?> value1 = success.remove(value.getKey());
+            for (Value.Immutable<?> value : result.getSuccessfulData()) {
+                final Value.Immutable<?> value1 = success.remove(value.getKey());
                 if (value1 == null || value1.get() != value.get()) {
                     store.offerNoEvents(value);
                 }
             }
             // A previously successful offering got removed, revert this
             if (!success.isEmpty()) {
-                for (ImmutableValue<?> value : original.getReplacedData()) {
+                for (Value.Immutable<?> value : original.getReplacedData()) {
                     if (success.containsKey(value.getKey())) {
                         store.offerNoEvents(value);
                     }
@@ -124,7 +123,7 @@ public final class CompositeValueStoreHelper {
         return event.getEndResult();
     }
 
-    protected static <E, H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store, Key<? extends BaseValue<E>> key, E element) {
+    protected static <E, H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store, Key<? extends Value<E>> key, E element) {
         final boolean hasListeners = hasListeners(store, key);
         if (hasListeners) {
             return offer(store, key, element, () -> true).isSuccessful();
@@ -133,16 +132,16 @@ public final class CompositeValueStoreHelper {
     }
 
     protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
-            Key<? extends BaseValue<E>> key, E element) {
+            Key<? extends Value<E>> key, E element) {
         return offer(store, key, element, () -> hasListeners(store, key));
     }
 
     protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
-            Key<? extends BaseValue<E>> key, E element, BooleanSupplier hasListeners) {
+            Key<? extends Value<E>> key, E element, BooleanSupplier hasListeners) {
         return processDataTransactionResult(store, store.offerNoEvents(key, element), hasListeners);
     }
 
-    protected static <E, H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store, BaseValue<E> value) {
+    protected static <E, H extends ValueContainer<?>> boolean offerFast(ICompositeValueStore<?, H> store, Value<E> value) {
         final boolean hasListeners = hasListeners(store, value.getKey());
         if (hasListeners) {
             return offer(store, value, () -> true).isSuccessful();
@@ -150,12 +149,12 @@ public final class CompositeValueStoreHelper {
         return store.offerFastNoEvents(value);
     }
 
-    protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store, BaseValue<E> value) {
+    protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store, Value<E> value) {
         return offer(store, value, () -> hasListeners(store, value.getKey()));
     }
 
     protected static <E, H extends ValueContainer<?>> DataTransactionResult offer(ICompositeValueStore<?, H> store,
-            BaseValue<E> value, BooleanSupplier hasListeners) {
+            Value<E> value, BooleanSupplier hasListeners) {
         return processDataTransactionResult(store, store.offerNoEvents(value), hasListeners);
     }
 

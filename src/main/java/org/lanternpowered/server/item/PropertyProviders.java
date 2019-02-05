@@ -25,23 +25,8 @@
  */
 package org.lanternpowered.server.item;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.item.property.AlwaysConsumableProperty;
-import org.lanternpowered.server.item.property.CooldownProperty;
-import org.lanternpowered.server.item.property.DualWieldProperty;
-import org.lanternpowered.server.item.property.HealthRestorationProperty;
-import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
-import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
-import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
-import org.spongepowered.api.data.property.item.ArmorTypeProperty;
-import org.spongepowered.api.data.property.item.EquipmentProperty;
-import org.spongepowered.api.data.property.item.FoodRestorationProperty;
-import org.spongepowered.api.data.property.item.MusicDiscProperty;
-import org.spongepowered.api.data.property.item.SaturationProperty;
-import org.spongepowered.api.data.property.item.ToolTypeProperty;
-import org.spongepowered.api.data.property.item.UseLimitProperty;
+import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -52,89 +37,48 @@ import java.util.Collection;
 
 public final class PropertyProviders {
 
-    private static final DualWieldProperty DUAL_WIELD_PROPERTY_TRUE = new DualWieldProperty(true);
-    private static final DualWieldProperty DUAL_WIELD_PROPERTY_FALSE = new DualWieldProperty(false);
-
-    private static final AlwaysConsumableProperty ALWAYS_CONSUMABLE_PROPERTY_TRUE = new AlwaysConsumableProperty(true);
-    private static final AlwaysConsumableProperty ALWAYS_CONSUMABLE_PROPERTY_FALSE = new AlwaysConsumableProperty(false);
-
     public static PropertyProviderCollection applicableEffects(PotionEffect... potionEffects) {
-        checkNotNull(potionEffects, "potionEffects");
-        final ApplicableEffectProperty property = new ApplicableEffectProperty(ImmutableSet.copyOf(potionEffects));
-        return PropertyProviderCollection.builder()
-                .add(ApplicableEffectProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.APPLICABLE_POTION_EFFECTS, ImmutableList.copyOf(potionEffects));
     }
 
     public static PropertyProviderCollection applicableEffects(Collection<PotionEffect> potionEffects) {
-        checkNotNull(potionEffects, "potionEffects");
-        final ApplicableEffectProperty property = new ApplicableEffectProperty(ImmutableSet.copyOf(potionEffects));
-        return PropertyProviderCollection.builder()
-                .add(ApplicableEffectProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.APPLICABLE_POTION_EFFECTS, ImmutableList.copyOf(potionEffects));
     }
 
-    public static PropertyProviderCollection applicableEffects(ObjectProvider<Collection<PotionEffect>> potionEffects) {
-        return PropertyProviderCollection.builder()
-                .add(ApplicableEffectProperty.class, (itemType, itemStack) ->
-                        new ApplicableEffectProperty(ImmutableSet.copyOf(potionEffects.get(itemType, itemStack))))
-                .build();
+    public static PropertyProviderCollection applicableEffects(PropertyProvider<Collection<PotionEffect>> provider) {
+        return PropertyProviderCollection.of(Properties.APPLICABLE_POTION_EFFECTS, provider);
     }
 
-    public static PropertyProviderCollection foodRestoration(int food) {
-        final FoodRestorationProperty property = new FoodRestorationProperty(food);
-        return PropertyProviderCollection.builder()
-                .add(FoodRestorationProperty.class, (itemType, itemStack) -> property)
-                .build();
+    public static PropertyProviderCollection replenishedFood(double replenishedFood) {
+        return PropertyProviderCollection.constant(Properties.REPLENISHED_FOOD, replenishedFood);
     }
 
-    public static PropertyProviderCollection foodRestoration(ObjectProvider<Integer> food) {
-        return PropertyProviderCollection.builder()
-                .add(FoodRestorationProperty.class, (itemType, itemStack) ->
-                        new FoodRestorationProperty(food.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection replenishedFood(PropertyProvider<Double> replenishedFood) {
+        return PropertyProviderCollection.of(Properties.REPLENISHED_FOOD, replenishedFood);
     }
 
     public static PropertyProviderCollection saturation(double saturation) {
-        final SaturationProperty property = new SaturationProperty(saturation);
-        return PropertyProviderCollection.builder()
-                .add(SaturationProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.REPLENISHED_SATURATION, saturation);
     }
 
-    public static PropertyProviderCollection saturation(ObjectProvider<Double> saturation) {
-        return PropertyProviderCollection.builder()
-                .add(SaturationProperty.class, (itemType, itemStack) ->
-                        new SaturationProperty(saturation.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection saturation(PropertyProvider<Double> saturation) {
+        return PropertyProviderCollection.of(Properties.REPLENISHED_SATURATION, saturation);
     }
 
     public static PropertyProviderCollection healthRestoration(double health) {
-        final HealthRestorationProperty property = new HealthRestorationProperty(health);
-        return PropertyProviderCollection.builder()
-                .add(HealthRestorationProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(ItemProperties.HEALTH_RESTORATION, health);
     }
 
-    public static PropertyProviderCollection healthRestoration(ObjectProvider<Double> health) {
-        return PropertyProviderCollection.builder()
-                .add(HealthRestorationProperty.class, (itemType, itemStack) ->
-                        new HealthRestorationProperty(health.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection healthRestoration(PropertyProvider<Double> health) {
+        return PropertyProviderCollection.of(ItemProperties.HEALTH_RESTORATION, health);
     }
 
     public static PropertyProviderCollection useLimit(int limit) {
-        final UseLimitProperty property = new UseLimitProperty(limit);
-        return PropertyProviderCollection.builder()
-                .add(UseLimitProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.USE_LIMIT, limit);
     }
 
-    public static PropertyProviderCollection useLimit(ObjectProvider<Integer> limit) {
-        return PropertyProviderCollection.builder()
-                .add(UseLimitProperty.class, (itemType, itemStack) ->
-                        new UseLimitProperty(limit.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection useLimit(PropertyProvider<Integer> limit) {
+        return PropertyProviderCollection.of(Properties.USE_LIMIT, limit);
     }
 
     public static PropertyProviderCollection useDuration(int duration) {
@@ -142,117 +86,70 @@ public final class PropertyProviders {
     }
 
     public static PropertyProviderCollection useDuration(int minimum, int maximum) {
-        final MaximumUseDurationProperty maxProperty = new MaximumUseDurationProperty(maximum);
-        final MinimumUseDurationProperty minProperty = new MinimumUseDurationProperty(minimum);
         return PropertyProviderCollection.builder()
-                .add(MaximumUseDurationProperty.class, (itemType, itemStack) -> maxProperty)
-                .add(MinimumUseDurationProperty.class, (itemType, itemStack) -> minProperty)
+                .addConstant(ItemProperties.MAXIMUM_USE_DURATION, maximum)
+                .addConstant(ItemProperties.MINIMUM_USE_DURATION, minimum)
                 .build();
     }
 
     public static PropertyProviderCollection minimumUseDuration(int minimum) {
-        final MinimumUseDurationProperty minProperty = new MinimumUseDurationProperty(minimum);
-        return PropertyProviderCollection.builder()
-                .add(MinimumUseDurationProperty.class, (itemType, itemStack) -> minProperty)
-                .build();
+        return PropertyProviderCollection.constant(ItemProperties.MINIMUM_USE_DURATION, minimum);
     }
 
     public static PropertyProviderCollection maximumUseDuration(int maximum) {
-        final MaximumUseDurationProperty maxProperty = new MaximumUseDurationProperty(maximum);
-        return PropertyProviderCollection.builder()
-                .add(MaximumUseDurationProperty.class, (itemType, itemStack) -> maxProperty)
-                .build();
+        return PropertyProviderCollection.constant(ItemProperties.MAXIMUM_USE_DURATION, maximum);
     }
 
     public static PropertyProviderCollection cooldown(int cooldown) {
-        final CooldownProperty property = new CooldownProperty(cooldown);
-        return PropertyProviderCollection.builder()
-                .add(CooldownProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(ItemProperties.USE_COOLDOWN, cooldown);
     }
 
-    public static PropertyProviderCollection cooldown(ObjectProvider<Integer> cooldown) {
-        return PropertyProviderCollection.builder()
-                .add(CooldownProperty.class, (itemType, itemStack) ->
-                        new CooldownProperty(cooldown.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection cooldown(PropertyProvider<Integer> cooldown) {
+        return PropertyProviderCollection.of(ItemProperties.USE_COOLDOWN, cooldown);
     }
 
     public static PropertyProviderCollection alwaysConsumable(boolean alwaysConsumable) {
-        final AlwaysConsumableProperty property = alwaysConsumable ? ALWAYS_CONSUMABLE_PROPERTY_TRUE : ALWAYS_CONSUMABLE_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(AlwaysConsumableProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(ItemProperties.IS_ALWAYS_CONSUMABLE, alwaysConsumable);
     }
 
-    public static PropertyProviderCollection alwaysConsumable(ObjectProvider<Boolean> alwaysConsumable) {
-        return PropertyProviderCollection.builder()
-                .add(AlwaysConsumableProperty.class, (itemType, itemStack) ->
-                        alwaysConsumable.get(itemType, itemStack) ? ALWAYS_CONSUMABLE_PROPERTY_TRUE : ALWAYS_CONSUMABLE_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection alwaysConsumable(PropertyProvider<Boolean> alwaysConsumable) {
+        return PropertyProviderCollection.of(ItemProperties.IS_ALWAYS_CONSUMABLE, alwaysConsumable);
     }
 
     public static PropertyProviderCollection dualWield(boolean dualWield) {
-        final DualWieldProperty property = dualWield ? DUAL_WIELD_PROPERTY_TRUE : DUAL_WIELD_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(DualWieldProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(ItemProperties.IS_DUAL_WIELDABLE, dualWield);
     }
 
-    public static PropertyProviderCollection dualWield(ObjectProvider<Boolean> dualWield) {
-        return PropertyProviderCollection.builder()
-                .add(DualWieldProperty.class, (itemType, itemStack) ->
-                        dualWield.get(itemType, itemStack) ? DUAL_WIELD_PROPERTY_TRUE : DUAL_WIELD_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection dualWield(PropertyProvider<Boolean> dualWield) {
+        return PropertyProviderCollection.of(ItemProperties.IS_DUAL_WIELDABLE, dualWield);
     }
 
     public static PropertyProviderCollection toolType(ToolType toolType) {
-        final ToolTypeProperty property = new ToolTypeProperty(toolType);
-        return PropertyProviderCollection.builder()
-                .add(ToolTypeProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.TOOL_TYPE, toolType);
     }
 
-    public static PropertyProviderCollection toolType(ObjectProvider<ToolType> toolType) {
-        return PropertyProviderCollection.builder()
-                .add(ToolTypeProperty.class, (itemType, itemStack) ->
-                        new ToolTypeProperty(toolType.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection toolType(PropertyProvider<ToolType> toolType) {
+        return PropertyProviderCollection.of(Properties.TOOL_TYPE, toolType);
     }
 
     public static PropertyProviderCollection armorType(ArmorType armorType) {
-        final ArmorTypeProperty property = new ArmorTypeProperty(armorType);
-        return PropertyProviderCollection.builder()
-                .add(ArmorTypeProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.ARMOR_TYPE, armorType);
     }
 
-    public static PropertyProviderCollection armorType(ObjectProvider<ArmorType> armorType) {
-        return PropertyProviderCollection.builder()
-                .add(ArmorTypeProperty.class, (itemType, itemStack) ->
-                        new ArmorTypeProperty(armorType.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection armorType(PropertyProvider<ArmorType> armorType) {
+        return PropertyProviderCollection.of(Properties.ARMOR_TYPE, armorType);
     }
 
     public static PropertyProviderCollection equipmentType(EquipmentType equipmentType) {
-        final EquipmentProperty property = new EquipmentProperty(equipmentType);
-        return PropertyProviderCollection.builder()
-                .add(EquipmentProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.EQUIPMENT_TYPE, equipmentType);
     }
 
-    public static PropertyProviderCollection equipmentType(ObjectProvider<EquipmentType> equipmentType) {
-        return PropertyProviderCollection.builder()
-                .add(EquipmentProperty.class, (itemType, itemStack) ->
-                        new EquipmentProperty(equipmentType.get(itemType, itemStack)))
-                .build();
+    public static PropertyProviderCollection equipmentType(PropertyProvider<EquipmentType> equipmentType) {
+        return PropertyProviderCollection.of(Properties.EQUIPMENT_TYPE, equipmentType);
     }
 
     public static PropertyProviderCollection musicDisc(MusicDisc musicDisc) {
-        final MusicDiscProperty property = new MusicDiscProperty(musicDisc);
-        return PropertyProviderCollection.builder()
-                .add(MusicDiscProperty.class, (itemType, itemStack) -> property)
-                .build();
+        return PropertyProviderCollection.constant(Properties.MUSIC_DISC, musicDisc);
     }
 
     private PropertyProviders() {

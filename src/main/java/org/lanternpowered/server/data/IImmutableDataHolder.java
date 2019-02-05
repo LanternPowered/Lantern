@@ -29,7 +29,7 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.ImmutableDataHolder;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,7 @@ public interface IImmutableDataHolder<H extends ImmutableDataHolder<H>> extends
         IImmutableValueStore<H, ImmutableDataManipulator<?, ?>>, IImmutableDataHolderBase<H> {
 
     @Override
-    default <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
+    default <E, V extends Value<E>> Optional<V> getValue(Key<V> key) {
         return IImmutableDataHolderBase.super.getValue(key);
     }
 

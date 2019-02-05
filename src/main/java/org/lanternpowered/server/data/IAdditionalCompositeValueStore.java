@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data;
 
 import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.CompositeValueStore;
 
 public interface IAdditionalCompositeValueStore<S extends CompositeValueStore<S, H>, H extends ValueContainer<?>>
         extends ICompositeValueStore<S, H>, AdditionalContainerHolder<H> {

@@ -42,8 +42,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -239,12 +238,12 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     }
 
     @Override
-    public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> get(Key<? extends Value<E>> key) {
         return resolveUser().get(key);
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
+    public <E, V extends Value<E>> Optional<V> getValue(Key<V> key) {
         return resolveUser().getValue(key);
     }
 
@@ -264,7 +263,7 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     }
 
     @Override
-    public Set<ImmutableValue<?>> getValues() {
+    public Set<Value.Immutable<?>> getValues() {
         return resolveUser().getValues();
     }
 
@@ -284,7 +283,7 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     }
 
     @Override
-    public <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E value) {
+    public <E> DataTransactionResult offer(Key<? extends Value<E>> key, E value) {
         return resolveUser().offer(key, value);
     }
 

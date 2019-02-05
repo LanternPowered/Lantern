@@ -49,7 +49,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
-import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.ListValue;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -64,7 +64,7 @@ final class AbstractListDataTypeGenerator extends TypeGenerator {
     private static final String nKey = Type.getInternalName(Key.class);
     private static final String dKey = Type.getDescriptor(Key.class);
 
-    private static final String nListValue = Type.getInternalName(ListValue.class);
+    private static final String nListValue = Type.getInternalName(ListValue.Mutable.class);
 
     private static final String nAbstractListData = Type.getInternalName(AbstractListData.class);
     private static final String nAbstractImmutableListData = Type.getInternalName(AbstractImmutableListData.class);

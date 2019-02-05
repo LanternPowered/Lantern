@@ -49,7 +49,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.util.Coerce;
 
 import java.util.ArrayList;
@@ -326,7 +326,7 @@ class MemoryDataView implements DataView {
     }
 
     @Override
-    public <E> DataView set(Key<? extends BaseValue<E>> key, E value) {
+    public <E> DataView set(Key<? extends Value<E>> key, E value) {
         return set(checkNotNull(key, "Key was null!").getQuery(), value);
     }
 

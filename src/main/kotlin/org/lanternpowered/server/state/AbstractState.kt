@@ -38,8 +38,8 @@ import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.key.Key
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator
 import org.spongepowered.api.data.merge.MergeFunction
-import org.spongepowered.api.data.value.BaseValue
-import org.spongepowered.api.data.value.immutable.ImmutableValue
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.data.value.Value.Immutable
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 import org.spongepowered.api.state.StateProperty
@@ -61,7 +61,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     private val stateValues: ImmutableMap<StateProperty<*>, Comparable<*>>
 
     // The lookup to convert between key <--> trait
-    private val keysToProperty: ImmutableMap<Key<out BaseValue<*>>, StateProperty<*>>
+    private val keysToProperty: ImmutableMap<Key<out Value<*>>, StateProperty<*>>
 
     // A lookup table to get a specific state when you would change a value
     private val propertyValueTable: ImmutableTable<StateProperty<*>, Comparable<*>, S>
@@ -70,7 +70,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     override val internalId: Int
 
     // A list with all the values of this state
-    private val values: ImmutableSet<ImmutableValue<*>>
+    private val values: ImmutableSet<Immutable<*>>
 
     // A cache to reuse constructed data manipulators
     private val immutableContainerCache = IImmutableValueHolder.ImmutableContainerCache()
@@ -87,7 +87,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         this.internalId = data.internalId
         this.dataContainer = data.dataContainer
 
-        keysToProperty = null as ImmutableMap<Key<out BaseValue<*>>, StateProperty<*>>
+        keysToProperty = null as ImmutableMap<Key<out Value<*>>, StateProperty<*>>
         propertyValueTable = ImmutableTable.of()
         values = ImmutableSet.of()
     }
@@ -143,7 +143,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return Optional.of(this.propertyValueTable.row(stateProperty)[value] as S)
     }
 
-    override fun <T : Cycleable<T>> cycleValue(key: Key<out BaseValue<T>>): Optional<S> {
+    override fun <T : Cycleable<T>> cycleValue(key: Key<out Value<T>>): Optional<S> {
         val value = get(key).orNull() ?: return Optional.empty()
 
         var last = value
@@ -170,7 +170,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     override fun getContentVersion() = 1
     override fun toContainer(): DataContainer = this.dataContainer.copy()
 
-    override fun <E> transform(key: Key<out BaseValue<E>>, function: Function<E, E>): Optional<S> {
+    override fun <E> transform(key: Key<out Value<E>>, function: Function<E, E>): Optional<S> {
         val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
@@ -192,7 +192,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return Optional.of(this.propertyValueTable.row(property)[newStateValue] as S)
     }
 
-    override fun <E> with(key: Key<out BaseValue<E>>, value: E): Optional<S> {
+    override fun <E> with(key: Key<out Value<E>>, value: E): Optional<S> {
         val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
 
         val stateValue = property.keyValueTransformer.toStateValue(value)
@@ -207,7 +207,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return Optional.of(this.propertyValueTable.row(property)[stateValue] as S)
     }
 
-    override fun with(value: BaseValue<*>) = with(value.key as Key<BaseValue<Any>>, value.direct)
+    override fun with(value: Value<*>) = with(value.key as Key<Value<Any>>, value.direct)
 
     override fun with(valueContainer: ImmutableDataManipulator<*, *>): Optional<S> {
         var state: Optional<S>? = null
@@ -264,7 +264,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         }
     }
 
-    override fun <E> get(key: Key<out BaseValue<E>>): Optional<E> {
+    override fun <E> get(key: Key<out Value<E>>): Optional<E> {
         val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
@@ -274,7 +274,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return Optional.of(currentKeyValue)
     }
 
-    override fun <E : Any, V : BaseValue<E>> getRawValueFor(key: Key<V>): Optional<V> {
+    override fun <E : Any, V : Value<E>> getRawMutableValueFor(key: Key<V>): Optional<V> {
         val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 

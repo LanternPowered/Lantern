@@ -27,9 +27,9 @@ package org.lanternpowered.server.data.manipulator.gen.dummy;
 
 import org.lanternpowered.server.data.manipulator.mutable.AbstractListData;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.immutable.item.ImmutableLoreData;
-import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
-import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableLoreData;
+import org.spongepowered.api.data.manipulator.mutable.LoreData;
+import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.function.Supplier;
 
 public class LanternLoreDataImpl extends AbstractListData<Text, LoreData, ImmutableLoreData> implements LoreData {
 
-    public static Key<ListValue<Text>> key;
+    public static Key<ListValue.Mutable<Text>> key;
     public static Supplier<List<Text>> listSupplier;
 
     public LanternLoreDataImpl() {

@@ -33,7 +33,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.value.mutable.CompositeValueStore;
+import org.spongepowered.api.data.value.CompositeValueStore;
 import org.spongepowered.api.entity.Entity;
 
 /**

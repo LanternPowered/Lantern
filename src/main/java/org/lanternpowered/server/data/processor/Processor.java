@@ -28,11 +28,11 @@ package org.lanternpowered.server.data.processor;
 import org.lanternpowered.server.data.IValueContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;
 
-public interface Processor<V extends BaseValue<E>, E> {
+public interface Processor<V extends Value<E>, E> {
 
     /**
      * Gets the {@link Key}.
@@ -124,7 +124,7 @@ public interface Processor<V extends BaseValue<E>, E> {
     Optional<E> getFrom(IValueContainer<?> valueContainer);
 
     /**
-     * Attempts to get the {@link BaseValue} with element {@link E} value for the specified
+     * Attempts to get the {@link Value} with element {@link E} value for the specified
      * {@link Key} from the target {@link IValueContainer}.
      *
      * @param valueContainer The target value container
@@ -133,7 +133,7 @@ public interface Processor<V extends BaseValue<E>, E> {
     Optional<V> getValueFrom(IValueContainer<?> valueContainer);
 
     /**
-     * Attempts to create a {@link BaseValue} instance for the
+     * Attempts to create a {@link Value} instance for the
      * given {@link IValueContainer} and {@link E}.
      *
      * @param valueContainer The value container

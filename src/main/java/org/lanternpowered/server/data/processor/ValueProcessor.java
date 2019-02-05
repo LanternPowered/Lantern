@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data.processor;
 
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
-public interface ValueProcessor<V extends BaseValue<E>, E> extends Processor<V, E> {
+public interface ValueProcessor<V extends Value<E>, E> extends Processor<V, E> {
 
 }

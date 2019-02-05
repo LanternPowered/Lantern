@@ -71,10 +71,6 @@ class LanternPropertyBuilder<V> : AbstractCatalogBuilder<Property<V>, Property.B
         return LanternProperty(key, valueType, valueComparator!!, includesTester)
     }
 
-    override fun from(value: Property<V>): Property.Builder<V> {
-        throw UnsupportedOperationException()
-    }
-
     override fun reset() = apply {
         super.reset()
         this.valueType = null

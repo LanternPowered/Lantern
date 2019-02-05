@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.manipulator.mutable.tileentity;
 
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.BeaconData;
+import org.spongepowered.api.data.manipulator.mutable.BeaconData;
 
 import java.util.Optional;
 

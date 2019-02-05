@@ -30,11 +30,11 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableDyeableData;
 import org.spongepowered.api.data.manipulator.mutable.DyeableData;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 
 public class LanternDyeableDataImpl extends AbstractVariantData<DyeColor, DyeableData, ImmutableDyeableData> implements DyeableData {
 
-    public static Key<Value<DyeColor>> key;
+    public static Key<Value.Mutable<DyeColor>> key;
     public static DyeColor value;
 
     public LanternDyeableDataImpl() {

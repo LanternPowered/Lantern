@@ -43,7 +43,7 @@ import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -138,7 +138,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     }
 
     @Override
-    public <E> Optional<ItemStackSnapshot> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> Optional<ItemStackSnapshot> transform(Key<? extends Value<E>> key, Function<E, E> function) {
         final LanternItemStack copy = this.itemStack.copy();
         if (copy.transformFast(key, function)) {
             return Optional.of(new LanternItemStackSnapshot(copy));
@@ -147,7 +147,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     }
 
     @Override
-    public <E> Optional<ItemStackSnapshot> with(Key<? extends BaseValue<E>> key, E value) {
+    public <E> Optional<ItemStackSnapshot> with(Key<? extends Value<E>> key, E value) {
         final LanternItemStack copy = this.itemStack.copy();
         if (copy.offerFast(key, value)) {
             return Optional.of(new LanternItemStackSnapshot(copy));

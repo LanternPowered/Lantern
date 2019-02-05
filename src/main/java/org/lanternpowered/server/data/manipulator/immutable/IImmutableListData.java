@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.manipulator.immutable;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
-import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.ListValue;
 
 public interface IImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>> extends ImmutableListData<E, I, M> {
 

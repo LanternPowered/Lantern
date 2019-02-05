@@ -33,7 +33,7 @@ import org.lanternpowered.server.util.function.Int2IntFunction;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
@@ -42,23 +42,23 @@ import javax.annotation.Nullable;
 
 public class DataValueItemTypeObjectSerializer<T extends CatalogType> extends ItemTypeObjectSerializer {
 
-    private final Key<? extends BaseValue<T>> key;
+    private final Key<? extends Value<T>> key;
     private final InternalCatalogRegistryModule<T> registryModule;
 
     @Nullable private final Int2IntFunction dataValueToInternalId;
     @Nullable private final Int2IntFunction internalIdToDataValue;
 
-    public DataValueItemTypeObjectSerializer(Key<? extends BaseValue<T>> key, InternalCatalogRegistryModule<T> registryModule,
+    public DataValueItemTypeObjectSerializer(Key<? extends Value<T>> key, InternalCatalogRegistryModule<T> registryModule,
             Int2IntFunction dataValueToInternalId, Int2IntFunction internalIdToDataValue) {
         this(dataValueToInternalId, internalIdToDataValue, key, registryModule);
     }
 
-    public DataValueItemTypeObjectSerializer(Key<? extends BaseValue<T>> key, InternalCatalogRegistryModule<T> registryModule) {
+    public DataValueItemTypeObjectSerializer(Key<? extends Value<T>> key, InternalCatalogRegistryModule<T> registryModule) {
         this(null, null, key, registryModule);
     }
 
     private DataValueItemTypeObjectSerializer(@Nullable Int2IntFunction dataValueToInternalId, @Nullable Int2IntFunction internalIdToDataValue,
-            Key<? extends BaseValue<T>> key, InternalCatalogRegistryModule<T> registryModule) {
+            Key<? extends Value<T>> key, InternalCatalogRegistryModule<T> registryModule) {
         this.key = key;
         this.registryModule = registryModule;
         this.dataValueToInternalId = dataValueToInternalId;

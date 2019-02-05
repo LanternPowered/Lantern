@@ -44,12 +44,10 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
+import org.lanternpowered.server.item.ItemProperties;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.lanternpowered.server.item.property.DualWieldProperty;
-import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
-import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
@@ -76,6 +74,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -155,11 +154,11 @@ public final class PlayerInteractionHandler {
                 // Stop the interaction
                 resetItemUseTime();
             } else {
-                final MaximumUseDurationProperty property = itemStack.getProperty(MaximumUseDurationProperty.class).orElse(null);
-                if (property != null) {
+                final OptionalInt property = itemStack.getIntProperty(ItemProperties.MAXIMUM_USE_DURATION);
+                if (property.isPresent()) {
                     // Check if the interaction reached it's max time
                     final long time = LanternGame.currentTimeTicks();
-                    if (time - this.activeHandStartTime > property.getValue()) {
+                    if (time - this.activeHandStartTime > property.getAsInt()) {
                         handleFinishItemInteraction0(slot, activeHand);
                     }
                 }
@@ -208,7 +207,7 @@ public final class PlayerInteractionHandler {
                 Lantern.getLogger().warn("{} started breaking a block without finishing the last one.", this.player.getName());
             }
 
-            final BlockType blockType = this.player.getWorld().getBlockType(blockPos);
+            final BlockType blockType = this.player.getWorld().getBlock(blockPos).getType();
             if (blockType == BlockTypes.AIR) {
                 return;
             }
@@ -237,7 +236,7 @@ public final class PlayerInteractionHandler {
             if (this.diggingBlock == null) {
                 return;
             }
-            final BlockType blockType = this.player.getWorld().getBlockType(blockPos);
+            final BlockType blockType = this.player.getWorld().getBlock(blockPos).getType();
             if (blockType != this.diggingBlockType) {
                 return;
             }
@@ -255,7 +254,7 @@ public final class PlayerInteractionHandler {
     }
 
     private void handleBrokenBlock() {
-        final Location location = new Location<>(this.player.getWorld(), this.diggingBlock);
+        final Location location = new Location(this.player.getWorld(), this.diggingBlock);
 
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
@@ -330,7 +329,7 @@ public final class PlayerInteractionHandler {
         final double dy = Math.min(pos2.getY(), 0.999);
         final double dz = Math.min(pos2.getZ(), 0.999);
 
-        final Location clickedLocation = new Location<>(this.player.getWorld(),
+        final Location clickedLocation = new Location(this.player.getWorld(),
                 message.getPosition().toDouble().add(dx, dy, dz));
         final Direction face = message.getFace();
 
@@ -341,7 +340,7 @@ public final class PlayerInteractionHandler {
             // Add context
             frame.addContext(ContextKeys.INTERACTION_FACE, face);
             frame.addContext(ContextKeys.INTERACTION_LOCATION, clickedLocation);
-            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location<>(clickedLocation.getWorld(), message.getPosition()));
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location(clickedLocation.getWorld(), message.getPosition()));
             frame.addContext(ContextKeys.PLAYER, this.player);
 
             final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
@@ -429,10 +428,10 @@ public final class PlayerInteractionHandler {
         }
 
         // Require a minimum amount of ticks for the interaction to succeed
-        final MinimumUseDurationProperty property = rawItemStack.getProperty(MinimumUseDurationProperty.class).orElse(null);
-        if (property != null) {
+        final OptionalInt property = rawItemStack.getIntProperty(ItemProperties.MINIMUM_USE_DURATION);
+        if (property.isPresent()) {
             final long time = LanternGame.currentTimeTicks();
-            if (time - this.activeHandStartTime < property.getValue()) {
+            if (time - this.activeHandStartTime < property.getAsInt()) {
                 resetItemUseTime();
                 return;
             }
@@ -504,9 +503,7 @@ public final class PlayerInteractionHandler {
                 final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
                 final LanternItemStack handItem = offHandSlot.peek();
                 if (handItem.isFilled()) {
-                    final DualWieldProperty property = handItem.getProperty(DualWieldProperty.class).orElse(null);
-                    //noinspection ConstantConditions
-                    if (property != null && property.getValue()) {
+                    if (handItem.getProperty(ItemProperties.IS_DUAL_WIELDABLE).orElse(false)) {
                     /*
                     final Vector3d position = this.player.getPosition().add(0, this.player.get(Keys.IS_SNEAKING).get() ? 1.54 : 1.62, 0);
                     final Optional<BlockRayHit<LanternWorld>> hit = BlockRay.from(this.player.getWorld(), position)

@@ -28,11 +28,11 @@ package org.lanternpowered.server.data.processor;
 import org.lanternpowered.server.data.IValueContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;
 
-class SimpleValueProcessor<V extends BaseValue<E>, E> extends AbstractProcessor<V, E> implements ValueProcessor<V, E> {
+class SimpleValueProcessor<V extends Value<E>, E> extends AbstractProcessor<V, E> implements ValueProcessor<V, E> {
 
     ValueProcessorBuilder.ApplicablePredicate<V, E> applicableTester;
     ValueProcessorBuilder.RemoveFunction<V, E> removeHandler;

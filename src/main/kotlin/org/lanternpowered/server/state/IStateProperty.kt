@@ -26,7 +26,7 @@
 package org.lanternpowered.server.state
 
 import org.spongepowered.api.data.key.Key
-import org.spongepowered.api.data.value.BaseValue
+import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateProperty
 
@@ -38,7 +38,7 @@ interface IStateProperty<S : Comparable<S>, V> : StateProperty<S> {
     /**
      * The [Key] that is linked to this state property.
      */
-    val valueKey: Key<out BaseValue<V>>
+    val valueKey: Key<out Value<V>>
 
     /**
      * The [StateKeyValueTransformer] to transform between state and key value types.

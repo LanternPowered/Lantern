@@ -28,7 +28,7 @@ package org.lanternpowered.server.item;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
-import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.HashMap;
@@ -47,9 +47,17 @@ public final class PropertyProviderCollection {
         return new Builder();
     }
 
-    private final Map<Class<?>, PropertyProvider<?>> propertyProviders;
+    public static <V> PropertyProviderCollection of(Property<V> property, PropertyProvider<? extends V> provider) {
+        return builder().add(property, provider).build();
+    }
 
-    private PropertyProviderCollection(Map<Class<?>, PropertyProvider<?>> propertyProviders) {
+    public static <V> PropertyProviderCollection constant(Property<V> property, V constant) {
+        return builder().addConstant(property, constant).build();
+    }
+
+    private final Map<Property<?>, PropertyProvider<?>> propertyProviders;
+
+    private PropertyProviderCollection(Map<Property<?>, PropertyProvider<?>> propertyProviders) {
         this.propertyProviders = propertyProviders;
     }
 
@@ -57,14 +65,13 @@ public final class PropertyProviderCollection {
      * Gets the {@link PropertyProvider} for the specified property
      * type if present.
      *
-     * @param propertyType The property type
-     * @param <T> The property type
+     * @param property The property
+     * @param <V> The property value type
      * @return The property provider if found, otherwise {@link Optional#empty()}.
      */
     @SuppressWarnings("unchecked")
-    public <T extends Property> Optional<PropertyProvider<? extends T>> get(Class<T> propertyType) {
-        return Optional.ofNullable((PropertyProvider) this.propertyProviders.get(
-                checkNotNull(propertyType, "propertyType")));
+    public <V> Optional<PropertyProvider<V>> get(Property<V> property) {
+        return Optional.ofNullable((PropertyProvider) this.propertyProviders.get(checkNotNull(property, "property")));
     }
 
     /**
@@ -90,7 +97,7 @@ public final class PropertyProviderCollection {
 
     public static final class Builder implements CopyableBuilder<PropertyProviderCollection, Builder> {
 
-        private final Map<Class<?>, PropertyProvider<?>> propertyProviders = new HashMap<>();
+        private final Map<Property<?>, PropertyProvider<?>> propertyProviders = new HashMap<>();
 
         private Builder() {
         }
@@ -113,13 +120,30 @@ public final class PropertyProviderCollection {
         /**
          * Adds a {@link PropertyProvider}.
          *
-         * @param propertyType The property type
+         * @param property The property to register the provider for
          * @param provider The property provider
-         * @param <T> The property type
+         * @param <V> The property value type
          * @return This builder for chaining
          */
-        public <T extends Property<?,?>> Builder add(Class<T> propertyType, PropertyProvider<? extends T> provider) {
-            this.propertyProviders.put(checkNotNull(propertyType, "propertyType"), checkNotNull(provider, "provider"));
+        public <V> Builder add(Property<V> property, PropertyProvider<? extends V> provider) {
+            checkNotNull(provider, "provider");
+            checkNotNull(property, "property");
+            this.propertyProviders.put(property, provider);
+            return this;
+        }
+
+        /**
+         * Adds a {@link PropertyProvider}.
+         *
+         * @param property The property to register the provider for
+         * @param constant The constant property value
+         * @param <V> The property value type
+         * @return This builder for chaining
+         */
+        public <V> Builder addConstant(Property<V> property, V constant) {
+            checkNotNull(constant, "constant");
+            checkNotNull(property, "property");
+            this.propertyProviders.put(property, (itemType, itemStack) -> constant);
             return this;
         }
 

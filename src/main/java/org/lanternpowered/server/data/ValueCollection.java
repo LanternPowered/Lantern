@@ -38,12 +38,8 @@ import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.BoundedValue;
-import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -152,7 +148,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
      * @param <E> The element type
      * @return The key registration, if present
      */
-    public <V extends BaseValue<E>, E> Optional<KeyRegistration<V, E>> get(Key<? extends BaseValue<E>> key) {
+    public <V extends Value<E>, E> Optional<KeyRegistration<V, E>> get(Key<? extends Value<E>> key) {
         return Optional.ofNullable(this.values.get(key));
     }
 
@@ -163,7 +159,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
      * @param <E> The element type
      * @return The element, if present
      */
-    public <E> Optional<Element<E>> getElement(Key<? extends BaseValue<E>> key) {
+    public <E> Optional<Element<E>> getElement(Key<? extends Value<E>> key) {
         checkNotNull(key, "key");
         final Object object = this.values.get(key);
         return object instanceof Element ? Optional.of((Element<E>) object) : Optional.empty();
@@ -178,7 +174,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
      * @param <E> The element type
      * @return The element key registration
      */
-    public <V extends BaseValue<E>, E> ElementKeyRegistration<V, E> registerNonRemovable(
+    public <V extends Value<E>, E> ElementKeyRegistration<V, E> registerNonRemovable(
             Key<? extends V> key, E defaultValue) {
         checkNotNull(defaultValue, "defaultValue");
         checkKey(key);
@@ -197,7 +193,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
      * @param <E> The element type
      * @return The element key registration
      */
-    public <V extends BaseValue<E>, E> ElementKeyRegistration<V, E> register(
+    public <V extends Value<E>, E> ElementKeyRegistration<V, E> register(
             Key<? extends V> key, @Nullable E defaultValue) {
         if (this.mode == Mode.NON_REMOVABLE) {
             return registerNonRemovable(key, defaultValue);
@@ -210,12 +206,12 @@ public final class ValueCollection implements Copyable<ValueCollection> {
     }
 
     /**
-     * Registers a {@link Key} without a {@link Value} attached to it. This means that there
+     * Registers a {@link Key} without a {@link Value.Mutable} attached to it. This means that there
      * won't be any data attached to the {@link Key}, but it will use a {@link Processor} to
      * retrieve the data depending on other {@link Key}s.
      *
      * <p>For example: {@link Keys#BODY_ROTATIONS} which will use a {@link Processor}
-     * to retrieve all the body parts data from the {@link IValueContainer} to build the {@link Value}.</p>
+     * to retrieve all the body parts data from the {@link IValueContainer} to build the {@link Value.Mutable}.</p>
      *
      * @param key The key
      * @param defaultValue The default value
@@ -224,7 +220,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
      * @param <E> The element type
      * @return The element key registration
      */
-    public <V extends BaseValue<E>, E> ElementKeyRegistration<V, E> register(
+    public <V extends Value<E>, E> ElementKeyRegistration<V, E> register(
             Key<? extends V> key, @Nullable E defaultValue, Consumer<ElementProcessorBuilder<V, E>> builderConsumer) {
         checkKey(key);
         checkNotNull(builderConsumer, "builderConsumer");
@@ -244,7 +240,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
      * @param <E> The element type
      * @return The element key registration
      */
-    public <V extends BaseValue<E>, E> ValueProcessorKeyRegistration<V, E> registerProcessor(Key<? extends V> key) {
+    public <V extends Value<E>, E> ValueProcessorKeyRegistration<V, E> registerProcessor(Key<? extends V> key) {
         checkKey(key);
         final ValueProcessorKeyRegistration<V, E> processor = ValueProcessorKeyRegistration.create(key);
         this.values.put(key, processor);
@@ -257,7 +253,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
             Function<IValueContainer<?>, E> maximumSupplier) {
         checkKey(key);
         final ElementProcessorBuilder<V, E> builder = ElementProcessorBuilder.create(key);
-        final boolean immutable = key.getValueToken().getRawType().isAssignableFrom(ImmutableValue.class);
+        final boolean immutable = key.getValueToken().getRawType().isAssignableFrom(Value.Immutable.class);
         builder.fastOfferHandler((valueContainer, holder, element) -> {
             final E minimum = minimumSupplier.apply(valueContainer);
             final E maximum = maximumSupplier.apply(valueContainer);
@@ -270,7 +266,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
         builder.offerHandler((valueContainer, holder, element) -> {
             final E minimum = minimumSupplier.apply(valueContainer);
             final E maximum = maximumSupplier.apply(valueContainer);
-            final ImmutableBoundedValue<E> newValue = LanternValueFactory.boundedBuilder(key)
+            final BoundedValue.Immutable<E> newValue = LanternValueFactory.boundedBuilder(key)
                     .actualValue(element)
                     .defaultValue(defaultValue)
                     .maximum(maximum)
@@ -324,7 +320,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
                     holder.set(maximum);
                     element = maximum;
                 }
-                final MutableBoundedValue<E> value = LanternValueFactory.boundedBuilder(key)
+                final BoundedValue.Mutable<E> value = LanternValueFactory.boundedBuilder(key)
                         .actualValue(element)
                         .defaultValue(defaultValue)
                         .maximum(maximum)
@@ -377,21 +373,21 @@ public final class ValueCollection implements Copyable<ValueCollection> {
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
-            E defaultValue, Key<? extends BaseValue<E>> minimum, Key<? extends BaseValue<E>> maximum) {
+            E defaultValue, Key<? extends Value<E>> minimum, Key<? extends Value<E>> maximum) {
         return registerSupplied(key, defaultValue,
                 container -> container.get(minimum).get(),
                 container -> container.get(maximum).get());
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
-            E defaultValue, E minimum, Key<? extends BaseValue<E>> maximum) {
+            E defaultValue, E minimum, Key<? extends Value<E>> maximum) {
         return registerSupplied(key, defaultValue,
                 container -> minimum,
                 container -> container.get(maximum).get());
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> register(Key<? extends V> key,
-            E defaultValue, Key<? extends BaseValue<E>> minimum, E maximum) {
+            E defaultValue, Key<? extends Value<E>> minimum, E maximum) {
         return registerSupplied(key, defaultValue,
                 container -> container.get(minimum).get(),
                 container -> maximum);

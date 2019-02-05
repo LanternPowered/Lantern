@@ -26,9 +26,9 @@
 package org.lanternpowered.server.data;
 
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
-public interface KeyRegistration<V extends BaseValue<E>, E> {
+public interface KeyRegistration<V extends Value<E>, E> {
 
     /**
      * Gets the {@link Key} this registration is applicable for.

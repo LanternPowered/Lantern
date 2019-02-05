@@ -28,13 +28,13 @@ package org.lanternpowered.server.state
 import com.google.common.collect.ImmutableSet
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.key.Key
-import org.spongepowered.api.data.value.BaseValue
-import org.spongepowered.api.data.value.mutable.Value
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.data.value.Value.Mutable
 import org.spongepowered.api.state.IntegerStateProperty
 import java.util.Optional
 
 class LanternIntStateProperty<V> private constructor(
-        key: CatalogKey, possibleValues: ImmutableSet<Int>, valueKey: Key<out BaseValue<V>>, keyValueTransformer: StateKeyValueTransformer<Int, V>
+        key: CatalogKey, possibleValues: ImmutableSet<Int>, valueKey: Key<out Value<V>>, keyValueTransformer: StateKeyValueTransformer<Int, V>
 ) : AbstractStateProperty<Int, V>(key, Int::class.java, possibleValues, valueKey, keyValueTransformer), IntegerStateProperty {
 
     override fun parseValue(value: String): Optional<Int> {
@@ -59,12 +59,12 @@ class LanternIntStateProperty<V> private constructor(
          * @return the integer trait
          */
         @JvmStatic
-        fun of(key: CatalogKey, valueKey: Key<out Value<Int>>, vararg possibleValues: Int): LanternIntStateProperty<Int> {
+        fun of(key: CatalogKey, valueKey: Key<out Mutable<Int>>, vararg possibleValues: Int): LanternIntStateProperty<Int> {
             return ofTransformed(key, valueKey, StateKeyValueTransformer.identity(), possibleValues.asList())
         }
 
         @JvmStatic
-        fun minecraft(id: String, valueKey: Key<out Value<Int>>, vararg possibleValues: Int): LanternIntStateProperty<Int> {
+        fun minecraft(id: String, valueKey: Key<out Mutable<Int>>, vararg possibleValues: Int): LanternIntStateProperty<Int> {
             return of(CatalogKey.minecraft(id), valueKey, possibleValues.asList())
         }
 
@@ -81,7 +81,7 @@ class LanternIntStateProperty<V> private constructor(
          * @return the integer trait
          */
         @JvmStatic
-        fun <V> ofTransformed(key: CatalogKey, valueKey: Key<out Value<V>>,
+        fun <V> ofTransformed(key: CatalogKey, valueKey: Key<out Mutable<V>>,
                               keyValueTransformer: StateKeyValueTransformer<Int, V>, vararg possibleValues: Int): LanternIntStateProperty<V> {
             check(possibleValues.isNotEmpty()) { "possibleValues may not be empty" }
             val builder = ImmutableSet.builder<Int>()
@@ -92,7 +92,7 @@ class LanternIntStateProperty<V> private constructor(
         }
 
         @JvmStatic
-        fun <V> minecraftTransformed(id: String, valueKey: Key<out Value<V>>,
+        fun <V> minecraftTransformed(id: String, valueKey: Key<out Mutable<V>>,
                                      keyTraitValueTransformer: StateKeyValueTransformer<Int, V>, vararg possibleValues: Int): LanternIntStateProperty<V> {
             return ofTransformed(CatalogKey.minecraft(id), valueKey, keyTraitValueTransformer, *possibleValues)
         }
@@ -109,12 +109,12 @@ class LanternIntStateProperty<V> private constructor(
          * @return the integer trait
          */
         @JvmStatic
-        fun <V> of(key: CatalogKey, valueKey: Key<out Value<V>>, possibleValues: Iterable<Int>): LanternIntStateProperty<V> {
+        fun <V> of(key: CatalogKey, valueKey: Key<out Mutable<V>>, possibleValues: Iterable<Int>): LanternIntStateProperty<V> {
             return ofTransformed(key, valueKey, StateKeyValueTransformer.identity(), possibleValues)
         }
 
         @JvmStatic
-        fun <V> minecraft(id: String, valueKey: Key<out Value<V>>, possibleValues: Iterable<Int>): LanternIntStateProperty<V> {
+        fun <V> minecraft(id: String, valueKey: Key<out Mutable<V>>, possibleValues: Iterable<Int>): LanternIntStateProperty<V> {
             return of(CatalogKey.minecraft(id), valueKey, possibleValues)
         }
 
@@ -132,7 +132,7 @@ class LanternIntStateProperty<V> private constructor(
          */
         @JvmStatic
         fun <V> ofTransformed(key: CatalogKey,
-                              valueKey: Key<out Value<V>>,
+                              valueKey: Key<out Mutable<V>>,
                               keyValueTransformer: StateKeyValueTransformer<Int, V>,
                               possibleValues: Iterable<Int>): LanternIntStateProperty<V> {
             check(possibleValues.iterator().hasNext()) { "possibleValues may not be empty" }
@@ -141,7 +141,7 @@ class LanternIntStateProperty<V> private constructor(
 
         @JvmStatic
         fun <V> minecraftTransformed(id: String,
-                                     valueKey: Key<out Value<V>>,
+                                     valueKey: Key<out Mutable<V>>,
                                      keyValueTransformer: StateKeyValueTransformer<Int, V>,
                                      possibleValues: Iterable<Int>): LanternIntStateProperty<V> {
             return ofTransformed(CatalogKey.minecraft(id), valueKey, keyValueTransformer, possibleValues)
@@ -162,12 +162,12 @@ class LanternIntStateProperty<V> private constructor(
          * @return The integer trait
          */
         @JvmStatic
-        fun ofRange(key: CatalogKey, valueKey: Key<out Value<Int>>, min: Int, max: Int): LanternIntStateProperty<Int> {
+        fun ofRange(key: CatalogKey, valueKey: Key<out Mutable<Int>>, min: Int, max: Int): LanternIntStateProperty<Int> {
             return ofRangeTransformed(key, valueKey, StateKeyValueTransformer.identity(), min, max)
         }
 
         @JvmStatic
-        fun minecraftRange(id: String, valueKey: Key<out Value<Int>>, min: Int, max: Int): LanternIntStateProperty<Int> {
+        fun minecraftRange(id: String, valueKey: Key<out Mutable<Int>>, min: Int, max: Int): LanternIntStateProperty<Int> {
             return ofRangeTransformed(CatalogKey.minecraft(id), valueKey, StateKeyValueTransformer.identity(), min, max)
         }
 
@@ -187,7 +187,7 @@ class LanternIntStateProperty<V> private constructor(
          * @return The integer trait
          */
         @JvmStatic
-        fun <V> ofRangeTransformed(key: CatalogKey, valueKey: Key<out Value<V>>,
+        fun <V> ofRangeTransformed(key: CatalogKey, valueKey: Key<out Mutable<V>>,
                                    keyValueTransformer: StateKeyValueTransformer<Int, V>, min: Int, max: Int): LanternIntStateProperty<V> {
             check(max - min > 0) { "difference between min and max must be greater then zero" }
             val set = ImmutableSet.builder<Int>()
@@ -198,7 +198,7 @@ class LanternIntStateProperty<V> private constructor(
         }
 
         @JvmStatic
-        fun <V> minecraftRangeTransformed(id: String, valueKey: Key<out Value<V>>,
+        fun <V> minecraftRangeTransformed(id: String, valueKey: Key<out Mutable<V>>,
                                           keyValueTransformer: StateKeyValueTransformer<Int, V>, min: Int, max: Int): LanternIntStateProperty<V> {
             return ofRangeTransformed(CatalogKey.minecraft(id), valueKey, keyValueTransformer, min, max)
         }

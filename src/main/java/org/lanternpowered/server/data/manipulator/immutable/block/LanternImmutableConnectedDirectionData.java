@@ -27,14 +27,14 @@ package org.lanternpowered.server.data.manipulator.immutable.block;
 
 import org.lanternpowered.server.data.IImmutableValueHolder;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.immutable.block.ImmutableConnectedDirectionData;
-import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableConnectedDirectionData;
+import org.spongepowered.api.data.value.SetValue;
 import org.spongepowered.api.util.Direction;
 
 public interface LanternImmutableConnectedDirectionData extends ImmutableConnectedDirectionData, IImmutableValueHolder {
 
     @Override
-    default ImmutableSetValue<Direction> connectedDirections() {
+    default SetValue.Immutable<Direction> connectedDirections() {
         return tryGetImmutableValueFor(Keys.CONNECTED_DIRECTIONS);
     }
 }

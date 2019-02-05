@@ -26,29 +26,52 @@
 package org.lanternpowered.server.data;
 
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;
 
+@SuppressWarnings("unchecked")
 public interface IValueHolder {
 
     /**
-     * Gets a raw (newly) created {@link BaseValue} instance. This bypasses
-     * possible caching mechanics (see {@link IImmutableValueHolder}).
+     * Gets a raw (newly) created {@link Value.Mutable} for the given {@link Key}. This
+     * bypasses possible caching mechanics (see {@link IImmutableValueHolder}).
      *
-     * @param key The key
+     * @param key The key to get the value for
      * @param <E> The element type
      * @param <V> The value type
      * @return The value, if present
      */
-    <E, V extends BaseValue<E>> Optional<V> getRawValueFor(Key<V> key);
+    <E, V extends Value<E>> Optional<V> getRawMutableValueFor(Key<V> key);
 
-    default <E, V extends BaseValue<E>> Optional<V> getValueFor(Key<V> key) {
-        return getRawValueFor(key);
+    /**
+     * Gets a raw (newly) created {@link Value.Immutable} instance. This
+     * bypasses possible caching mechanics (see {@link IImmutableValueHolder}).
+     *
+     * @param key The key to get the value for
+     * @param <E> The element type
+     * @param <V> The value type
+     * @return The value, if present
+     */
+    default <E, V extends Value<E>> Optional<V> getRawImmutableValueFor(Key<V> key) {
+        return getRawMutableValueFor(key).map(value -> (V) value.asImmutable());
+    }
+
+    /**
+     * Gets a {@link Value.Mutable} instance. This bypasses
+     * possible caching mechanics (see {@link IImmutableValueHolder}).
+     *
+     * @param key The key to get the value for
+     * @param <E> The element type
+     * @param <V> The value type
+     * @return The value, if present
+     */
+    default <E, V extends Value<E>> Optional<V> getValueFor(Key<V> key) {
+        return getRawMutableValueFor(key);
     }
 
     @SuppressWarnings("unchecked")
-    default <E, V extends BaseValue<E>> V tryGetValueFor(Key<V> key) {
+    default <E, V extends Value<E>> V tryGetValueFor(Key<V> key) {
         return getValueFor(key).orElseThrow(() -> new IllegalArgumentException("The key " + key + " isn't present!"));
     }
 }

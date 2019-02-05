@@ -32,7 +32,7 @@ import org.lanternpowered.server.data.IValueContainer;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-final class SimpleProcessorKeyRegistration<V extends BaseValue<E>, E> implements ValueProcessorKeyRegistration<V, E>, Processor<V, E> {
+final class SimpleProcessorKeyRegistration<V extends Value<E>, E> implements ValueProcessorKeyRegistration<V, E>, Processor<V, E> {
 
     private final Key<? extends V> key;
     private final List<ValueProcessor<V, E>> processors = new ArrayList<>();

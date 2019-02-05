@@ -58,9 +58,7 @@ import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.util.Cycleable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -90,10 +88,10 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
 
     // A list with all the values of this state
-    private final ImmutableSet<ImmutableValue<?>> values;
+    private final ImmutableSet<Value.Immutable<?>> values;
 
     // The lookup to convert between key <--> trait
-    private final ImmutableMap<Key<Value<?>>, BlockTrait<?>> keyToBlockTrait;
+    private final ImmutableMap<Key<Value.Mutable<?>>, BlockTrait<?>> keyToBlockTrait;
 
     // The base block state
     private final LanternBlockStateMap baseState;
@@ -115,14 +113,14 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
         this.baseState = baseState;
         this.internalId = internalId;
 
-        final ImmutableBiMap.Builder<Key<Value<?>>, BlockTrait<?>> keyToBlockTraitBuilder = ImmutableBiMap.builder();
-        final ImmutableSet.Builder<ImmutableValue<?>> valuesBuilder = ImmutableSet.builder();
+        final ImmutableBiMap.Builder<Key<Value.Mutable<?>>, BlockTrait<?>> keyToBlockTraitBuilder = ImmutableBiMap.builder();
+        final ImmutableSet.Builder<Value.Immutable<?>> valuesBuilder = ImmutableSet.builder();
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
             final LanternBlockTrait trait = (LanternBlockTrait) entry.getKey();
             final LanternKey key = (LanternKey) trait.getValueKey();
             keyToBlockTraitBuilder.put(key, trait);
-            final BaseValue value = (BaseValue) LanternValueFactory.get().createValueForKey(key, entry.getValue());
-            valuesBuilder.add(value instanceof ImmutableValue ? (ImmutableValue) value : ((Value) value).asImmutable());
+            final Value value = (Value) LanternValueFactory.get().createValueForKey(key, entry.getValue());
+            valuesBuilder.add(value instanceof Value.Immutable ? (Value.Immutable) value : ((Value.Mutable) value).asImmutable());
         }
         this.keyToBlockTrait = keyToBlockTraitBuilder.build();
         this.values = valuesBuilder.build();
@@ -193,7 +191,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public <E> Optional<BlockState> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    public <E> Optional<BlockState> transform(Key<? extends Value<E>> key, Function<E, E> function) {
         if (!this.supports(key)) {
             return Optional.empty();
         } else {
@@ -204,7 +202,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public <E> Optional<BlockState> with(Key<? extends BaseValue<E>> key, E value) {
+    public <E> Optional<BlockState> with(Key<? extends Value<E>> key, E value) {
         BlockTrait trait;
         if (!supports(key) || !(trait = this.keyToBlockTrait.get(key)).getPredicate().test(value)) {
             return Optional.empty();
@@ -217,7 +215,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public Optional<BlockState> with(BaseValue<?> value) {
+    public Optional<BlockState> with(Value<?> value) {
         if (!supports(value)) {
             return Optional.empty();
         }
@@ -232,7 +230,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     @Override
     public Optional<BlockState> with(ImmutableDataManipulator<?, ?> valueContainer) {
         Optional<BlockState> state = null;
-        for (ImmutableValue<?> value : valueContainer.getValues()) {
+        for (Value.Immutable<?> value : valueContainer.getValues()) {
             state = with(value);
             if (!state.isPresent()) {
                 return state;
@@ -297,7 +295,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> get(Key<? extends Value<E>> key) {
         if (!supports(key)) {
             return Optional.empty();
         }
@@ -307,7 +305,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getRawValueFor(Key<V> key) {
+    public <E, V extends Value<E>> Optional<V> getRawMutableValueFor(Key<V> key) {
         if (!supports(key)) {
             return Optional.empty();
         }
@@ -327,12 +325,12 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     }
 
     @Override
-    public ImmutableSet<ImmutableValue<?>> getValues() {
+    public ImmutableSet<Value.Immutable<?>> getValues() {
         return this.values;
     }
 
     @Override
-    public BlockState cycleValue(Key<? extends BaseValue<? extends Cycleable<?>>> key) {
+    public BlockState cycleValue(Key<? extends Value<? extends Cycleable<?>>> key) {
         return supports(key) ? cycleTraitValue(this.keyToBlockTrait.get(key)).get() : this;
     }
 

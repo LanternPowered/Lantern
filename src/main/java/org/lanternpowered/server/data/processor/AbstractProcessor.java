@@ -29,9 +29,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
-public abstract class AbstractProcessor<V extends BaseValue<E>, E> implements Processor<V, E> {
+public abstract class AbstractProcessor<V extends Value<E>, E> implements Processor<V, E> {
 
     private final Key<? extends V> key;
 

@@ -29,7 +29,7 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.fluid.FluidStackSnapshot;
 
 public final class LanternFluidStackSnapshotBuilder extends AbstractFluidStackBuilder<FluidStackSnapshot, FluidStackSnapshot.Builder>
@@ -51,7 +51,7 @@ public final class LanternFluidStackSnapshotBuilder extends AbstractFluidStackBu
     }
 
     @Override
-    public <V> FluidStackSnapshot.Builder add(Key<? extends BaseValue<V>> key, V value) {
+    public <V> FluidStackSnapshot.Builder add(Key<? extends Value<V>> key, V value) {
         fluidStack(null).offerFastNoEvents(key, value);
         return this;
     }

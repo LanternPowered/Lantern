@@ -27,22 +27,22 @@ package org.lanternpowered.server.item;
 
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;
 
 @FunctionalInterface
-public interface TranslationProvider extends ObjectProvider<Translation> {
+public interface TranslationProvider extends ItemObjectProvider<Translation> {
 
     static TranslationProvider of(Translation translation) {
         return (itemType, itemStack) -> translation;
     }
 
-    static <E extends Translatable> TranslationProvider of(E defaultValue, Key<? extends BaseValue<E>> key) {
+    static <E extends Translatable> TranslationProvider of(E defaultValue, Key<? extends Value<E>> key) {
         return (itemType, itemStack) -> itemStack == null ? defaultValue.getTranslation() : itemStack.get(key).get().getTranslation();
     }
 
-    static TranslationProvider of(ObjectProvider<String> provider) {
+    static TranslationProvider of(ItemObjectProvider<String> provider) {
         return (itemType, itemStack) -> Lantern.getRegistry().getTranslationManager().get(provider.get(itemType, itemStack));
     }
 }

@@ -29,8 +29,7 @@ import org.lanternpowered.server.data.manipulator.mutable.IVariantData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
 import org.spongepowered.api.data.manipulator.mutable.VariantData;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariantData<E, I, M>, M extends VariantData<E, M, I>>
@@ -39,7 +38,7 @@ public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariant
     private final Key<? extends Value<E>> variantKey;
 
     protected AbstractImmutableVariantData(Class<I> immutableManipulatorType, Class<M> manipulatorType,
-            Key<? extends Value<E>> variantKey, E defaultValue) {
+            Key<? extends Value.Mutable<E>> variantKey, E defaultValue) {
         super(immutableManipulatorType, manipulatorType);
         this.variantKey = variantKey;
         getValueCollection().register(variantKey, defaultValue);
@@ -51,7 +50,7 @@ public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariant
     }
 
     @Override
-    public ImmutableValue<E> type() {
+    public Value.Immutable<E> type() {
         return getValue(this.variantKey).get().asImmutable();
     }
 }

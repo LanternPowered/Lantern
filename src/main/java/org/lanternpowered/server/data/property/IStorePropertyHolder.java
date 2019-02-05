@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.data.property;
 
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
 
@@ -38,21 +37,21 @@ public interface IStorePropertyHolder extends PropertyHolder {
 
     @Override
     default Map<Property<?>, ?> getProperties() {
-        return Lantern.getGame().getPropertyRegistry().getPropertiesFor(this);
+        return LanternPropertyRegistry.INSTANCE.getPropertiesFor(this);
     }
 
     @Override
     default OptionalDouble getDoubleProperty(Property<Double> property) {
-        return Lantern.getGame().getPropertyRegistry().getDoubleStore(property).getDoubleFor(this);
+        return LanternPropertyRegistry.INSTANCE.getDoubleStore(property).getDoubleFor(this);
     }
 
     @Override
     default OptionalInt getIntProperty(Property<Integer> property) {
-        return Lantern.getGame().getPropertyRegistry().getIntStore(property).getIntFor(this);
+        return LanternPropertyRegistry.INSTANCE.getIntStore(property).getIntFor(this);
     }
 
     @Override
     default <V> Optional<V> getProperty(Property<V> property) {
-        return Lantern.getGame().getPropertyRegistry().getStore(property).getFor(this);
+        return LanternPropertyRegistry.INSTANCE.getStore(property).getFor(this);
     }
 }

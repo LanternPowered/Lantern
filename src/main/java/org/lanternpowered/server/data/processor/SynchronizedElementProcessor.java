@@ -27,11 +27,11 @@ package org.lanternpowered.server.data.processor;
 
 import org.lanternpowered.server.data.element.ElementListener;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.ArrayList;
 
-final class SynchronizedElementProcessor<V extends BaseValue<E>, E> extends SimpleElementProcessor<V, E> {
+final class SynchronizedElementProcessor<V extends Value<E>, E> extends SimpleElementProcessor<V, E> {
 
     SynchronizedElementProcessor(Key<? extends V> key,
             ElementProcessorBuilder.ApplicablePredicate<E> applicableTester,

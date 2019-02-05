@@ -45,9 +45,8 @@ import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
 import org.spongepowered.api.data.manipulator.mutable.VariantData;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -178,7 +177,7 @@ public final class DataManipulatorGenerator {
                 if (!Modifier.isAbstract(method.getModifiers())) {
                     continue;
                 }
-                if (BaseValue.class.isAssignableFrom(method.getReturnType()) &&
+                if (Value.class.isAssignableFrom(method.getReturnType()) &&
                         method.getParameterTypes().length == 0) {
                     boolean add = true;
                     for (Class<?> clazz : targetClasses) {

@@ -27,8 +27,8 @@ package org.lanternpowered.server.data.manipulator.immutable.entity;
 
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableMappedData;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableRespawnLocation;
-import org.spongepowered.api.data.manipulator.mutable.entity.RespawnLocationData;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableRespawnLocation;
+import org.spongepowered.api.data.manipulator.mutable.RespawnLocationData;
 import org.spongepowered.api.util.RespawnLocation;
 
 import java.util.UUID;

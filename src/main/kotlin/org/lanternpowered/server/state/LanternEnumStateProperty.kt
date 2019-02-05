@@ -28,15 +28,15 @@ package org.lanternpowered.server.state
 import com.google.common.collect.ImmutableSet
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.key.Key
-import org.spongepowered.api.data.value.BaseValue
-import org.spongepowered.api.data.value.mutable.Value
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.data.value.Value.Mutable
 import org.spongepowered.api.state.EnumStateProperty
 import java.util.Arrays
 import java.util.Optional
 import java.util.function.Predicate
 
 class LanternEnumStateProperty<E : Enum<E>> private constructor(
-        key: CatalogKey, valueClass: Class<E>, possibleValues: ImmutableSet<E>, valueKey: Key<out BaseValue<E>>
+        key: CatalogKey, valueClass: Class<E>, possibleValues: ImmutableSet<E>, valueKey: Key<out Value<E>>
 ) : AbstractStateProperty<E, E>(key, valueClass, possibleValues, valueKey), EnumStateProperty<E> {
 
     override fun parseValue(value: String): Optional<E> {
@@ -62,13 +62,13 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
          * @return the enum trait
          */
         @JvmStatic
-        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out BaseValue<E>>, possibleValues: Iterable<E>): EnumStateProperty<E> {
+        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out Value<E>>, possibleValues: Iterable<E>): EnumStateProperty<E> {
             check(possibleValues.iterator().hasNext()) { "possibleValues may not be empty" }
             return LanternEnumStateProperty(key, possibleValues.iterator().javaClass as Class<E>, ImmutableSet.copyOf(possibleValues), valueKey)
         }
 
         @JvmStatic
-        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out BaseValue<E>>, possibleValues: Iterable<E>): EnumStateProperty<E> {
+        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Value<E>>, possibleValues: Iterable<E>): EnumStateProperty<E> {
             return of(CatalogKey.minecraft(id), valueKey, possibleValues)
         }
 
@@ -83,13 +83,13 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
          * @return the enum trait
          */
         @JvmStatic
-        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out BaseValue<E>>, enumClass: Class<E>): EnumStateProperty<E> {
+        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out Value<E>>, enumClass: Class<E>): EnumStateProperty<E> {
             check(enumClass.enumConstants.isNotEmpty()) { "enumClass must contain values" }
             return LanternEnumStateProperty(key, enumClass, ImmutableSet.copyOf(enumClass.enumConstants), valueKey)
         }
 
         @JvmStatic
-        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Value<E>>, enumClass: Class<E>): EnumStateProperty<E> {
+        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Mutable<E>>, enumClass: Class<E>): EnumStateProperty<E> {
             return of(CatalogKey.minecraft(id), valueKey, enumClass)
         }
 
@@ -106,7 +106,7 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
          * @return the enum trait
          */
         @JvmStatic
-        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out BaseValue<E>>,
+        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out Value<E>>,
                              enumClass: Class<E>, predicate: Predicate<E>): EnumStateProperty<E> {
             check(enumClass.enumConstants.isNotEmpty()) { "enumClass must contain values" }
             return LanternEnumStateProperty(key, enumClass, Arrays.stream(enumClass.enumConstants)
@@ -114,7 +114,7 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
         }
 
         @JvmStatic
-        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Value<E>>,
+        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Mutable<E>>,
                                     enumClass: Class<E>, predicate: Predicate<E>): EnumStateProperty<E> {
             return of(CatalogKey.minecraft(id), valueKey, enumClass, predicate)
         }
@@ -133,14 +133,14 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
          * @return the enum trait
          */
         @JvmStatic
-        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out Value<E>>, value: E, vararg values: E): EnumStateProperty<E> {
+        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out Mutable<E>>, value: E, vararg values: E): EnumStateProperty<E> {
             check(values.isNotEmpty()) { "enumClass must contain values" }
             return LanternEnumStateProperty(key, value.javaClass,
                     ImmutableSet.builder<E>().add(value).addAll(values.asList()).build(), valueKey)
         }
 
         @JvmStatic
-        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Value<E>>, value: E, vararg values: E): EnumStateProperty<E> {
+        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Mutable<E>>, value: E, vararg values: E): EnumStateProperty<E> {
             return of(CatalogKey.minecraft(id), valueKey, value, *values)
         }
     }

@@ -29,19 +29,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.lanternpowered.server.data.value.ValueHelper;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;
 
 @SuppressWarnings("unchecked")
-final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements ElementProcessorBuilder<V, E> {
+final class SimpleElementProcessorBuilder<V extends Value<E>, E> implements ElementProcessorBuilder<V, E> {
 
-    private static final ValueBuilderFunction<BaseValue<Object>, Object> DEFAULT_VALUE_BUILDER =
+    private static final ValueBuilderFunction<Value<Object>, Object> DEFAULT_VALUE_BUILDER =
             (container, element, object) -> LanternValueFactory.get().createValueForKey(element.getKey(), object);
 
     /**
@@ -52,19 +50,19 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
      * @param <E> The element type
      * @return The builder instance
      */
-    static <V extends BaseValue<E>, E> ElementProcessorBuilder<V, E> create(Key<? extends V> key) {
+    static <V extends Value<E>, E> ElementProcessorBuilder<V, E> create(Key<? extends V> key) {
         return new SimpleElementProcessorBuilder<>(key);
     }
 
-    static <V extends BaseValue<E>, E> ElementProcessor<V, E> createDefault(Key<? extends V> key) {
+    static <V extends Value<E>, E> ElementProcessor<V, E> createDefault(Key<? extends V> key) {
         return createCopy(key, DEFAULT);
     }
 
-    static <V extends BaseValue<E>, E> ElementProcessor<V, E> createNonRemovableDefault(Key<? extends V> key) {
+    static <V extends Value<E>, E> ElementProcessor<V, E> createNonRemovableDefault(Key<? extends V> key) {
         return createCopy(key, NON_REMOVABLE);
     }
 
-    private static <V extends BaseValue<E>, E> ElementProcessor<V, E> createCopy(Key<? extends V> key,
+    private static <V extends Value<E>, E> ElementProcessor<V, E> createCopy(Key<? extends V> key,
             SimpleElementProcessor processor) {
         return new SimpleElementProcessor(key,
                 processor.applicableTester,
@@ -317,10 +315,9 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
         if (this.offerHandler == null) {
             if (this.fastOfferHandler != null) {
                 valueProcessor.offerHandler = (valueContainer, element, e) -> {
-                    final ImmutableValue<E> oldValue = valueProcessor.valueRetrieveHandler
-                            .get(valueContainer, element).map(ValueHelper::toImmutable).orElse(null);
-                    final ImmutableValue<E> newValue = ValueHelper.toImmutable(valueProcessor.valueBuilder
-                            .get(valueContainer, element, e));
+                    final Value.Immutable<E> oldValue = valueProcessor.valueRetrieveHandler
+                            .get(valueContainer, element).map(Value::asImmutable).orElse(null);
+                    final Value.Immutable<E> newValue = valueProcessor.valueBuilder.get(valueContainer, element, e).asImmutable();
                     if (!valueProcessor.fastOfferHandler.offer(valueContainer, element, e)) {
                         return DataTransactionResult.failResult(newValue);
                     }
@@ -331,13 +328,13 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
                 };
             } else if (this.fastValueOfferHandler != null) {
                 valueProcessor.offerHandler = (valueContainer, element, e) -> {
-                    final ImmutableValue<E> oldValue = valueProcessor.valueRetrieveHandler
-                            .get(valueContainer, element).map(ValueHelper::toImmutable).orElse(null);
+                    final Value.Immutable<E> oldValue = valueProcessor.valueRetrieveHandler
+                            .get(valueContainer, element).map(Value::asImmutable).orElse(null);
                     final V value = valueProcessor.valueBuilder.get(valueContainer, element, e);
                     if (!valueProcessor.fastValueOfferHandler.offer(valueContainer, element, value)) {
-                        return DataTransactionResult.failResult(ValueHelper.toImmutable(value));
+                        return DataTransactionResult.failResult(value.asImmutable());
                     }
-                    final ImmutableValue<E> newValue = ValueHelper.toImmutable(value);
+                    final Value.Immutable<E> newValue = value.asImmutable();
                     if (oldValue != null) {
                         return DataTransactionResult.successReplaceResult(newValue, oldValue);
                     }
@@ -350,10 +347,9 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
                 };
             } else {
                 valueProcessor.offerHandler = (valueContainer, elementHolder, element) -> {
-                    final ImmutableValue<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
-                            .map(ValueHelper::toImmutable).orElse(null);
-                    final ImmutableValue<E> newValue = ValueHelper.toImmutable(
-                            valueProcessor.valueBuilder.get(valueContainer, elementHolder, element));
+                    final Value.Immutable<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
+                            .map(Value::asImmutable).orElse(null);
+                    final Value.Immutable<E> newValue = valueProcessor.valueBuilder.get(valueContainer, elementHolder, element).asImmutable();
                     elementHolder.set(element);
                     if (oldValue != null) {
                         return DataTransactionResult.successReplaceResult(newValue, oldValue);
@@ -382,12 +378,12 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
         if (this.valueOfferHandler == null) {
             if (this.fastValueOfferHandler != null) {
                 valueProcessor.valueOfferHandler = (valueContainer, elementHolder, value) -> {
-                    final ImmutableValue<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
-                            .map(ValueHelper::toImmutable).orElse(null);
+                    final Value.Immutable<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
+                            .map(Value::asImmutable).orElse(null);
                     if (!valueProcessor.fastValueOfferHandler.offer(valueContainer, elementHolder, value)) {
-                        return DataTransactionResult.failResult(ValueHelper.toImmutable(value));
+                        return DataTransactionResult.failResult(value.asImmutable());
                     }
-                    final ImmutableValue<E> newValue = ValueHelper.toImmutable(value);
+                    final Value.Immutable<E> newValue = value.asImmutable();
                     if (oldValue != null) {
                         return DataTransactionResult.successReplaceResult(newValue, oldValue);
                     }
@@ -398,12 +394,12 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
                         valueProcessor.offerHandler.offer(valueContainer, elementHolder, value.get());
             } else if (this.fastOfferHandler != null) {
                 valueProcessor.valueOfferHandler = (valueContainer, elementHolder, value) -> {
-                    final ImmutableValue<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
-                            .map(ValueHelper::toImmutable).orElse(null);
+                    final Value.Immutable<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
+                            .map(Value::asImmutable).orElse(null);
                     if (!valueProcessor.fastOfferHandler.offer(valueContainer, elementHolder, value.get())) {
-                        return DataTransactionResult.failResult(ValueHelper.toImmutable(value));
+                        return DataTransactionResult.failResult(value.asImmutable());
                     }
-                    final ImmutableValue<E> newValue = ValueHelper.toImmutable(value);
+                    final Value.Immutable<E> newValue = value.asImmutable();
                     if (oldValue != null) {
                         return DataTransactionResult.successReplaceResult(newValue, oldValue);
                     }
@@ -412,13 +408,13 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
             } else {
                 valueProcessor.valueOfferHandler = (valueContainer, elementHolder, value) -> {
                     final E oldElement = elementHolder.get();
-                    final ImmutableValue<E> newValue = ValueHelper.toImmutable(value);
+                    final Value.Immutable<E> newValue = value.asImmutable();
                     final DataTransactionResult result;
                     if (oldElement == null) {
                         result = DataTransactionResult.successResult(newValue);
                     } else {
-                        final ImmutableValue<E> oldValue = ValueHelper.toImmutable(valueProcessor.valueBuilder
-                                .get(valueContainer, elementHolder, elementHolder.get()));
+                        final Value.Immutable<E> oldValue = valueProcessor.valueBuilder
+                                .get(valueContainer, elementHolder, elementHolder.get()).asImmutable();
                         result = DataTransactionResult.successReplaceResult(newValue, oldValue);
                     }
                     elementHolder.set(value.get());
@@ -432,8 +428,8 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
         if (this.removeHandler == null) {
             if (this.fastRemoveHandler != null) {
                 valueProcessor.removeHandler = (valueContainer, elementHolder) -> {
-                    final ImmutableValue<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
-                            .map(ValueHelper::toImmutable).orElse(null);
+                    final Value.Immutable<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
+                            .map(Value::asImmutable).orElse(null);
                     if (oldValue == null) {
                         return DataTransactionResult.failNoData();
                     }
@@ -444,8 +440,8 @@ final class SimpleElementProcessorBuilder<V extends BaseValue<E>, E> implements 
                 };
             } else {
                 valueProcessor.removeHandler = (valueContainer, elementHolder) -> {
-                    final ImmutableValue<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
-                            .map(ValueHelper::toImmutable).orElse(null);
+                    final Value.Immutable<E> oldValue = valueProcessor.valueRetrieveHandler.get(valueContainer, elementHolder)
+                            .map(Value::asImmutable).orElse(null);
                     elementHolder.set(null);
                     if (oldValue != null) {
                         return DataTransactionResult.successRemove(oldValue);

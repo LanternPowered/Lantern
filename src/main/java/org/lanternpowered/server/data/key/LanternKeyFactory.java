@@ -29,15 +29,13 @@ import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.MapValue;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.OptionalValue;
-import org.spongepowered.api.data.value.mutable.PatternListValue;
-import org.spongepowered.api.data.value.mutable.SetValue;
-import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
+import org.spongepowered.api.data.value.BoundedValue;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.MapValue;
+import org.spongepowered.api.data.value.OptionalValue;
+import org.spongepowered.api.data.value.SetValue;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.data.value.WeightedCollectionValue;
 
 @SuppressWarnings("deprecation") // Ugh, shouldn't be deprecated
 public final class LanternKeyFactory {
@@ -64,48 +62,26 @@ public final class LanternKeyFactory {
         return makeValueKey(TypeToken.of(elementType), query, id, query.last().toString());
     }
 
-    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(TypeToken<E> elementToken,
+    public static <E> Key<BoundedValue<E>> makeBoundedValueKey(TypeToken<E> elementToken,
             DataQuery query, String id, String name) {
-        final TypeToken<MutableBoundedValue<E>> valueToken = new TypeToken<MutableBoundedValue<E>>() {}
+        final TypeToken<BoundedValue<E>> valueToken = new TypeToken<BoundedValue<E>>() {}
                 .where(new TypeParameter<E>() {}, elementToken);
         return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
     }
 
-    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(TypeToken<E> elementToken,
+    public static <E> Key<BoundedValue<E>> makeBoundedValueKey(TypeToken<E> elementToken,
             DataQuery query, String id) {
-        return makeMutableBoundedValueKey(elementToken, query, id, query.last().toString());
+        return makeBoundedValueKey(elementToken, query, id, query.last().toString());
     }
 
-    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(Class<E> elementType,
+    public static <E> Key<BoundedValue<E>> makeBoundedValueKey(Class<E> elementType,
             DataQuery query, String id, String name) {
-        return makeMutableBoundedValueKey(TypeToken.of(elementType), query, id, name);
+        return makeBoundedValueKey(TypeToken.of(elementType), query, id, name);
     }
 
-    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(Class<E> elementType,
+    public static <E> Key<BoundedValue<E>> makeBoundedValueKey(Class<E> elementType,
             DataQuery query, String id) {
-        return makeMutableBoundedValueKey(TypeToken.of(elementType), query, id, query.last().toString());
-    }
-
-    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(TypeToken<E> elementToken,
-            DataQuery query, String id, String name) {
-        final TypeToken<ImmutableBoundedValue<E>> valueToken = new TypeToken<ImmutableBoundedValue<E>>() {}
-                .where(new TypeParameter<E>() {}, elementToken);
-        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
-    }
-
-    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(TypeToken<E> elementToken,
-            DataQuery query, String id) {
-        return makeImmutableBoundedValueKey(elementToken, query, id, query.last().toString());
-    }
-
-    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(Class<E> elementType,
-            DataQuery query, String id, String name) {
-        return makeImmutableBoundedValueKey(TypeToken.of(elementType), query, id, name);
-    }
-
-    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(Class<E> elementType,
-            DataQuery query, String id) {
-        return makeImmutableBoundedValueKey(TypeToken.of(elementType), query, id, query.last().toString());
+        return makeBoundedValueKey(TypeToken.of(elementType), query, id, query.last().toString());
     }
 
     public static <E> Key<ListValue<E>> makeListKey(TypeToken<E> elementToken,
@@ -128,15 +104,6 @@ public final class LanternKeyFactory {
     public static <E> Key<ListValue<E>> makeListKey(Class<E> elementType,
             DataQuery query, String id) {
         return makeListKey(TypeToken.of(elementType), query, id, query.last().toString());
-    }
-
-    public static Key<PatternListValue> makePatternListKey(DataQuery query, String id, String name) {
-        final TypeToken<PatternListValue> valueToken = new TypeToken<PatternListValue>() {};
-        return new LanternKeyBuilder<>().type(valueToken).query(query).id(id).name(name).build();
-    }
-
-    public static Key<PatternListValue> makePatternListKey(DataQuery query, String id) {
-        return makePatternListKey(query, id, query.last().toString());
     }
 
     public static <E> Key<SetValue<E>> makeSetKey(TypeToken<E> elementToken,

@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.io.store;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public final class SimpleValueContainer {
      * @return The value if present
      */
     @SuppressWarnings("unchecked")
-    public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> get(Key<? extends Value<E>> key) {
         return Optional.ofNullable((E) this.values.get(checkNotNull(key, "key")));
     }
 
@@ -62,7 +62,7 @@ public final class SimpleValueContainer {
      * @return The value if present
      */
     @SuppressWarnings("unchecked")
-    public <E> Optional<E> set(Key<? extends BaseValue<E>> key, E value) {
+    public <E> Optional<E> set(Key<? extends Value<E>> key, E value) {
         return Optional.ofNullable((E) this.values.put(checkNotNull(key, "key"), checkNotNull(value, "value")));
     }
 
@@ -75,7 +75,7 @@ public final class SimpleValueContainer {
      * @return The value if present
      */
     @SuppressWarnings("unchecked")
-    public <E> Optional<E> remove(Key<? extends BaseValue<E>> key) {
+    public <E> Optional<E> remove(Key<? extends Value<E>> key) {
         return Optional.ofNullable((E) this.values.remove(checkNotNull(key, "key")));
     }
 

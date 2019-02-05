@@ -30,47 +30,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternEntityValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternItemValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternListValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternMapValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternOptionalValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternPatternListValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternSetValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternWeightedCollectionValue;
-import org.lanternpowered.server.data.value.mutable.LanternBoundedValue;
-import org.lanternpowered.server.data.value.mutable.LanternEntityValue;
-import org.lanternpowered.server.data.value.mutable.LanternItemValue;
-import org.lanternpowered.server.data.value.mutable.LanternListValue;
-import org.lanternpowered.server.data.value.mutable.LanternMapValue;
-import org.lanternpowered.server.data.value.mutable.LanternOptionalValue;
-import org.lanternpowered.server.data.value.mutable.LanternPatternListValue;
-import org.lanternpowered.server.data.value.mutable.LanternSetValue;
-import org.lanternpowered.server.data.value.mutable.LanternValue;
-import org.lanternpowered.server.data.value.mutable.LanternWeightedCollectionValue;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.meta.PatternLayer;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.MapValue;
+import org.spongepowered.api.data.value.OptionalValue;
+import org.spongepowered.api.data.value.SetValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.data.value.ValueFactory;
-import org.spongepowered.api.data.value.immutable.ImmutableListValue;
-import org.spongepowered.api.data.value.immutable.ImmutableMapValue;
-import org.spongepowered.api.data.value.immutable.ImmutableOptionalValue;
-import org.spongepowered.api.data.value.immutable.ImmutablePatternListValue;
-import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.immutable.ImmutableWeightedCollectionValue;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.MapValue;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.OptionalValue;
-import org.spongepowered.api.data.value.mutable.PatternListValue;
-import org.spongepowered.api.data.value.mutable.SetValue;
-import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.data.value.WeightedCollectionValue;
 import org.spongepowered.api.util.weighted.WeightedTable;
 
 import java.util.Collection;
@@ -99,99 +67,78 @@ public class LanternValueFactory implements ValueFactory {
     private final Collection<ValueProcessorKeyRegistration<?,?>> unmodifiableKeyRegistrations =
             Collections.unmodifiableCollection((Collection) this.keyRegistrations.values());
 
-    private final static Comparator<Integer> INT_COMPARATOR = Integer::compare;
-    private final static Comparator<Double> DOUBLE_COMPARATOR = Double::compare;
-
-    private LanternValueFactory() {
-        registerSupplier(Value.class, ValueSupplier.<Value, Object>of(
-                (key, element) -> {
-                    if (element instanceof ItemStack) {
-                        return new LanternItemValue(key, (ItemStack) element);
-                    } else if (element instanceof Entity) {
-                        return new LanternEntityValue<>(key, (Entity) element);
-                    } else {
-                        return new LanternValue<>(key, element);
-                    }
-                },
-                (key, element, defElement) -> {
-                    if (element instanceof ItemStack) {
-                        return new LanternItemValue(key, (ItemStack) defElement, (ItemStack) element);
-                    } else if (element instanceof Entity) {
-                        return new LanternEntityValue<>(key, (Entity) element);
-                    } else {
-                        return new LanternValue<>(key, defElement, element);
-                    }
-                }));
-        registerSupplier(MutableBoundedValue.class, ValueSupplier.of(
-                (key, element) -> {
-                    if (key.getElementToken().getRawType() == Integer.class) {
-                        return new LanternBoundedValue(key, element, INT_COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
-                    } else if (key.getElementToken().getRawType() == Double.class) {
-                        return new LanternBoundedValue(key, element, DOUBLE_COMPARATOR, -Double.MAX_VALUE, Double.MAX_VALUE);
-                    }
-                    throw new IllegalStateException();
-                },
-                (key, element, defElement) -> {
-                    if (key.getElementToken().getRawType() == Integer.class) {
-                        return new LanternBoundedValue(key, element, INT_COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
-                    } else if (key.getElementToken().getRawType() == Double.class) {
-                        return new LanternBoundedValue(key, element, DOUBLE_COMPARATOR, -Double.MAX_VALUE, Double.MAX_VALUE);
-                    }
-                    throw new IllegalStateException();
-                }));
-        registerSupplier(ListValue.class, ValueSupplier.<ListValue, List<Object>>of(
-                LanternListValue::new, (key, element, defElement) -> new LanternListValue<>(key, defElement, element)));
-        registerSupplier(SetValue.class, ValueSupplier.<SetValue, Set<Object>>of(
-                LanternSetValue::new, (key, element, defElement) -> new LanternSetValue<>(key, defElement, element)));
-        registerSupplier(MapValue.class, ValueSupplier.<MapValue, Map<Object, Object>>of(
-                LanternMapValue::new, (key, element, defElement) -> new LanternMapValue<>(key, defElement, element)));
-        registerSupplier(OptionalValue.class, ValueSupplier.<OptionalValue, Optional<Object>>of(
-                LanternOptionalValue::new, (key, element, defElement) -> new LanternOptionalValue(key, defElement, element)));
-        registerSupplier(PatternListValue.class, ValueSupplier.<PatternListValue, List<PatternLayer>>of(
-                LanternPatternListValue::new, (key, element, defElement) -> new LanternPatternListValue(key, defElement, element)));
-        registerSupplier(WeightedCollectionValue.class, ValueSupplier.<WeightedCollectionValue, WeightedTable<?>>of(
-                LanternWeightedCollectionValue::new, (key, element, defElement) -> new LanternWeightedCollectionValue(key, defElement, element)));
-        registerSupplier(ImmutableValue.class, ValueSupplier.<ImmutableValue, Object>of(
-                (key, element) -> {
-                    if (element instanceof ItemStack) {
-                        return new ImmutableLanternItemValue(key, (ItemStack) element);
-                    } else if (element instanceof Entity) {
-                        return new ImmutableLanternEntityValue<>(key, (Entity) element);
-                    } else {
-                        return new ImmutableLanternValue<>(key, element);
-                    }
-                },
-                (key, element, defElement) -> {
-                    if (element instanceof ItemStack) {
-                        return new ImmutableLanternItemValue(key, (ItemStack) defElement, (ItemStack) element);
-                    } else if (element instanceof Entity) {
-                        return new ImmutableLanternEntityValue<>(key, (Entity) element);
-                    } else {
-                        return new ImmutableLanternValue<>(key, defElement, element);
-                    }
-                }));
-        registerSupplier(ImmutableListValue.class, ValueSupplier.<ImmutableListValue, List<Object>>of(
-                ImmutableLanternListValue::new, (key, element, defElement) -> new ImmutableLanternListValue<>(key, defElement, element)));
-        registerSupplier(ImmutableSetValue.class, ValueSupplier.<ImmutableSetValue, Set<Object>>of(
-                ImmutableLanternSetValue::new, (key, element, defElement) -> new ImmutableLanternSetValue<>(key, defElement, element)));
-        registerSupplier(ImmutableMapValue.class, ValueSupplier.<ImmutableMapValue, Map<Object, Object>>of(
-                ImmutableLanternMapValue::new, (key, element, defElement) -> new ImmutableLanternMapValue<>(key, defElement, element)));
-        registerSupplier(ImmutableOptionalValue.class, ValueSupplier.<ImmutableOptionalValue, Optional<Object>>of(
-                ImmutableLanternOptionalValue::new, (key, element, defElement) -> new ImmutableLanternOptionalValue(key, defElement, element)));
-        registerSupplier(ImmutablePatternListValue.class, ValueSupplier.<ImmutablePatternListValue, List<PatternLayer>>of(
-                ImmutableLanternPatternListValue::new, (key, element, defElement) -> new ImmutableLanternPatternListValue(key, defElement, element)));
-        registerSupplier(ImmutableWeightedCollectionValue.class, ValueSupplier.<ImmutableWeightedCollectionValue, WeightedTable<?>>of(
-                ImmutableLanternWeightedCollectionValue::new, (key, element, defElement) ->
-                        new ImmutableLanternWeightedCollectionValue(key, defElement, element)));
+    protected interface BoundedValueConstructor {
+        <E> BoundedValue<E> create(Key<? extends Value<E>> key, E value, E min, E max, Comparator<E> comparator);
     }
 
-    public <V extends BaseValue<E>, E> ValueProcessorKeyRegistration<V, E> registerKey(Key<? extends V> key) {
+    protected static class BoundedValueSupplier<V extends BoundedValue<E>, E> implements ValueSupplier<V, E> {
+
+        private final BoundedValueConstructor constructor;
+
+        BoundedValueSupplier(BoundedValueConstructor constructor) {
+            this.constructor = constructor;
+        }
+
+        @Override
+        public V get(Key key, E element) {
+            final Class<?> type = key.getElementToken().getRawType();
+            if (type == Integer.class) {
+                return (V) this.constructor.create(key, (Integer) element, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::compare);
+            } else if (type == Double.class) {
+                return (V) this.constructor.create(key, (Double) element, -Double.MAX_VALUE, Double.MAX_VALUE, Double::compare);
+            } else if (type == Long.class) {
+                return (V) this.constructor.create(key, (Long) element, Long.MIN_VALUE, Long.MAX_VALUE, Long::compare);
+            } else if (type == Float.class) {
+                return (V) this.constructor.create(key, (Float) element, -Float.MAX_VALUE, Float.MAX_VALUE, Float::compare);
+            } else if (type == Short.class) {
+                return (V) this.constructor.create(key, (Short) element, Short.MIN_VALUE, Short.MAX_VALUE, Short::compare);
+            } else if (type == Byte.class) {
+                return (V) this.constructor.create(key, (Byte) element, Byte.MIN_VALUE, Byte.MAX_VALUE, Byte::compare);
+            }
+            throw new IllegalStateException();
+        }
+    }
+
+    private LanternValueFactory() {
+        registerSupplier(Value.Mutable.class, LanternMutableValue::new);
+        registerSupplier(Value.Immutable.class, LanternImmutableValue::new);
+
+        registerSupplier(ListValue.Mutable.class,
+                (key, element) -> new LanternMutableListValue(key, (List) element));
+        registerSupplier(ListValue.Immutable.class,
+                (key, element) -> new LanternImmutableListValue(key, (List) element));
+
+        registerSupplier(SetValue.Mutable.class,
+                (key, element) -> new LanternMutableSetValue(key, (Set) element));
+        registerSupplier(SetValue.Immutable.class,
+                (key, element) -> new LanternImmutableSetValue(key, (Set) element));
+
+        registerSupplier(MapValue.Mutable.class,
+                (key, element) -> new LanternMutableMapValue(key, (Map) element));
+        registerSupplier(MapValue.Immutable.class,
+                (key, element) -> new LanternImmutableMapValue(key, (Map) element));
+
+        registerSupplier(OptionalValue.Mutable.class,
+                (key, element) -> new LanternMutableOptionalValue(key, (Optional) element));
+        registerSupplier(OptionalValue.Immutable.class,
+                (key, element) -> new LanternImmutableOptionalValue(key, (Optional) element));
+
+        registerSupplier(WeightedCollectionValue.Mutable.class,
+                (key, element) -> new LanternMutableWeightedCollectionValue(key, (WeightedTable) element));
+        registerSupplier(WeightedCollectionValue.Immutable.class,
+                (key, element) -> new LanternImmutableWeightedCollectionValue(key, (WeightedTable) element));
+
+        registerSupplier(BoundedValue.Mutable.class, new BoundedValueSupplier<>(LanternMutableBoundedValue::new));
+        registerSupplier(BoundedValue.Immutable.class, new BoundedValueSupplier<>(LanternImmutableBoundedValue::new));
+    }
+
+    public <V extends Value<E>, E> ValueProcessorKeyRegistration<V, E> registerKey(Key<? extends V> key) {
         final ValueProcessorKeyRegistration<V, E> registration = ValueProcessorKeyRegistration.create(key);
         this.keyRegistrations.put(key, registration);
         return registration;
     }
 
-    public <V extends BaseValue<E>, E> Optional<ValueProcessorKeyRegistration<V, E>> getKeyRegistration(Key<? extends V> key) {
+    public <V extends Value<E>, E> Optional<ValueProcessorKeyRegistration<V, E>> getKeyRegistration(Key<? extends V> key) {
         return Optional.ofNullable(this.keyRegistrations.get(checkNotNull(key, "key")));
     }
 
@@ -199,12 +146,12 @@ public class LanternValueFactory implements ValueFactory {
         return this.unmodifiableKeyRegistrations;
     }
 
-    public <R extends BaseValue, E> void registerSupplier(Class<R> type, ValueSupplier<R, E> supplier) {
+    public <V extends Value<E>, E> void registerSupplier(Class<V> type, ValueSupplier<V, E> supplier) {
         this.valueSuppliers.put(type, supplier);
     }
 
     /**
-     * Creates a {@link Value} with the proper type for the specified {@link Key}.
+     * Creates a {@link Value.Mutable} with the proper type for the specified {@link Key}.
      *
      * @param key the key to create a value for
      * @param element the element (object) that is stored in the value
@@ -212,7 +159,7 @@ public class LanternValueFactory implements ValueFactory {
      * @param <E> the element type
      * @return the value instance
      */
-    public <V extends BaseValue<E>, E> V createValueForKey(Key<? extends V> key, E element) {
+    public <V extends Value<E>, E> V createValueForKey(Key<? extends V> key, E element) {
         checkNotNull(key, "key");
         checkNotNull(element, "element");
         final ValueSupplier supplier = this.valueSuppliers.get(key.getValueToken().getRawType());
@@ -220,77 +167,34 @@ public class LanternValueFactory implements ValueFactory {
         return (V) supplier.get(key, element);
     }
 
-    /**
-     * Creates a {@link Value} with the proper type for the specified {@link Key}.
-     *
-     * @param key the key to create a value for
-     * @param element the element (object) that is stored in the value
-     * @param defaultElement the default element (object) that is stored in the value
-     * @param <V> the value type
-     * @param <E> the element type
-     * @return the value instance
-     */
-    public <V extends BaseValue<E>, E> V createValueForKey(Key<V> key, E element, E defaultElement) {
-        checkNotNull(key, "key");
-        checkNotNull(element, "element");
-        ValueSupplier supplier = this.valueSuppliers.get(key.getValueToken().getRawType());
-        checkArgument(supplier != null, "The BaseValue type used by the key (" + key.getValueToken().getRawType().getName() + ") isn't supported.");
-        return (V) supplier.get(key, element, defaultElement);
+    @Override
+    public <E> Value.Mutable<E> createValue(Key<? extends Value<E>> key, E element) {
+        return new LanternMutableValue<>(key, element);
     }
 
     @Override
-    public <E> Value<E> createValue(Key<Value<E>> key, E element) {
-        return new LanternValue<>(checkNotNull(key, "key"), checkNotNull(element, "element"));
+    public <E> ListValue.Mutable<E> createListValue(Key<? extends Value<List<E>>> key, List<E> elements) {
+        return new LanternMutableListValue<>(key, elements);
     }
 
     @Override
-    public <E> Value<E> createValue(Key<Value<E>> key, E element, E defaultValue) {
-        return new LanternValue<>(checkNotNull(key, "key"), checkNotNull(defaultValue, "defaultValue"), checkNotNull(element, "element"));
+    public <E> SetValue.Mutable<E> createSetValue(Key<? extends Value<Set<E>>> key, Set<E> elements) {
+        return new LanternMutableSetValue<>(key, elements);
     }
 
     @Override
-    public <E> ListValue<E> createListValue(Key<ListValue<E>> key, List<E> elements) {
-        return new LanternListValue<>(checkNotNull(key, "key"), checkNotNull(elements, "elements"));
+    public <K, V> MapValue.Mutable<K, V> createMapValue(Key<? extends Value<Map<K, V>>> key, Map<K, V> map) {
+        return new LanternMutableMapValue<>(key, map);
     }
 
     @Override
-    public <E> ListValue<E> createListValue(Key<ListValue<E>> key, List<E> elements, List<E> defaults) {
-        return new LanternListValue<>(checkNotNull(key, "key"), checkNotNull(defaults, "defaults"), checkNotNull(elements, "elements"));
+    public <E> BoundedValueBuilder<E> createBoundedValueBuilder(Key<? extends BoundedValue<E>> key) {
+        return new LanternBoundedValueBuilder<>(key);
     }
 
     @Override
-    public <E> SetValue<E> createSetValue(Key<SetValue<E>> key, Set<E> elements) {
-        return new LanternSetValue<>(checkNotNull(key, "key"), checkNotNull(elements, "elements"));
-    }
-
-    @Override
-    public <E> SetValue<E> createSetValue(Key<SetValue<E>> key, Set<E> elements, Set<E> defaults) {
-        return new LanternSetValue<>(checkNotNull(key, "key"), checkNotNull(defaults, "defaults"), checkNotNull(elements, "elements"));
-    }
-
-    @Override
-    public <K, V> MapValue<K, V> createMapValue(Key<MapValue<K, V>> key, Map<K, V> map) {
-        return new LanternMapValue<>(checkNotNull(key, "key"), checkNotNull(map, "map"));
-    }
-
-    @Override
-    public <K, V> MapValue<K, V> createMapValue(Key<MapValue<K, V>> key, Map<K, V> map, Map<K, V> defaults) {
-        return new LanternMapValue<>(checkNotNull(key, "key"), checkNotNull(defaults, "defaults"), checkNotNull(map, "map"));
-    }
-
-    @Override
-    public <E> BoundedValueBuilder<E> createBoundedValueBuilder(Key<MutableBoundedValue<E>> key) {
-        return new LanternBoundedValueBuilder<>(checkNotNull(key, "key"));
-    }
-
-    @Override
-    public <E> OptionalValue<E> createOptionalValue(Key<OptionalValue<E>> key, @Nullable E element) {
-        return new LanternOptionalValue<>(checkNotNull(key, "key"), Optional.empty(), Optional.ofNullable(element));
-    }
-
-    @Override
-    public <E> OptionalValue<E> createOptionalValue(Key<OptionalValue<E>> key, @Nullable E element, E defaultElement) {
-        return new LanternOptionalValue<>(checkNotNull(key, "key"), Optional.of(defaultElement), Optional.ofNullable(element));
+    public <E> OptionalValue.Mutable<E> createOptionalValue(Key<? extends OptionalValue<E>> key, @Nullable E element) {
+        return new LanternMutableOptionalValue<>(key, Optional.ofNullable(element));
     }
 
     public static <E> BoundedValueBuilder<E> boundedBuilder(Key<? extends BoundedValue<E>> key) {
@@ -304,8 +208,7 @@ public class LanternValueFactory implements ValueFactory {
         private Comparator<E> comparator;
         private E minimum;
         private E maximum;
-        private E defaultValue;
-        @Nullable private E value;
+        private E value;
 
         LanternBoundedValueBuilder(Key<? extends BoundedValue<E>> key) {
             this.key = checkNotNull(key);
@@ -337,28 +240,18 @@ public class LanternValueFactory implements ValueFactory {
         }
 
         @Override
-        public BoundedValueBuilder<E> defaultValue(E defaultValue) {
-            this.defaultValue = checkNotNull(defaultValue);
-            return this;
-        }
-
-        @Override
-        public BoundedValueBuilder<E> actualValue(E value) {
+        public BoundedValueBuilder<E> value(E value) {
             this.value = checkNotNull(value);
             return this;
         }
 
         @Override
-        public LanternBoundedValue<E> build() {
+        public LanternMutableBoundedValue<E> build() {
             checkState(this.comparator != null);
             checkState(this.minimum != null);
             checkState(this.maximum != null);
-            checkState(this.defaultValue != null);
-            if (this.value == null) {
-                return new LanternBoundedValue<>(this.key, this.defaultValue, this.comparator, this.minimum, this.maximum);
-            } else {
-                return new LanternBoundedValue<>(this.key, this.defaultValue, this.comparator, this.minimum, this.maximum, this.value);
-            }
+            checkState(this.value != null);
+            return new LanternMutableBoundedValue<>(this.key, this.value, this.minimum, this.maximum, this.comparator);
         }
     }
 }

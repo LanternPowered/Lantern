@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.processor;
 
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.Value;
 
 @SuppressWarnings("unchecked")
 public final class ValueProcessorHandlers {
@@ -42,7 +42,7 @@ public final class ValueProcessorHandlers {
          * @param <V> The type of the value
          * @return The remove handler
          */
-        public static <V extends BaseValue<E>, E> ValueProcessorBuilder.RemoveFunction<V, E> failAlways() {
+        public static <V extends Value<E>, E> ValueProcessorBuilder.RemoveFunction<V, E> failAlways() {
             return (ValueProcessorBuilder.RemoveFunction<V, E>) FAIL_ALWAYS_REMOVE_HANDLER;
         }
     }

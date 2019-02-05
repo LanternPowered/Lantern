@@ -26,18 +26,21 @@
 package org.lanternpowered.server.data.property
 
 import com.google.common.collect.ImmutableList
+import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
 import org.spongepowered.api.data.property.PropertyHolder
 import org.spongepowered.api.data.property.store.DoublePropertyStore
 import org.spongepowered.api.data.property.store.PropertyStore
 import org.spongepowered.api.util.Direction
-import org.spongepowered.api.world.Location
 import java.util.OptionalDouble
 
 class DoublePropertyStoreDelegate internal constructor(propertyStores: ImmutableList<PropertyStore<Double>>) :
         PropertyStoreDelegate<Double>(propertyStores), DoublePropertyStore {
 
-    override fun getFor(propertyHolder: PropertyHolder) = super<PropertyStoreDelegate>.getFor(propertyHolder)
-    override fun getFor(location: Location, direction: Direction) = super<PropertyStoreDelegate>.getFor(location, direction)
+    override fun getFor(propertyHolder: PropertyHolder) =
+            super<PropertyStoreDelegate>.getFor(propertyHolder)
+
+    override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction) =
+            super<PropertyStoreDelegate>.getFor(propertyHolder, direction)
 
     override fun getDoubleFor(propertyHolder: PropertyHolder): OptionalDouble {
         for (propertyStore in this.propertyStores) {
@@ -56,15 +59,15 @@ class DoublePropertyStoreDelegate internal constructor(propertyStores: Immutable
         return OptionalDouble.empty()
     }
 
-    override fun getDoubleFor(location: Location, direction: Direction): OptionalDouble {
+    override fun getDoubleFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction): OptionalDouble {
         for (propertyStore in this.propertyStores) {
             if (propertyStore is DoublePropertyStore) {
-                val optional = propertyStore.getDoubleFor(location, direction)
+                val optional = propertyStore.getDoubleFor(propertyHolder, direction)
                 if (optional.isPresent) {
                     return optional
                 }
             } else {
-                val optional = propertyStore.getFor(location, direction)
+                val optional = propertyStore.getFor(propertyHolder, direction)
                 if (optional.isPresent) {
                     return OptionalDouble.of(optional.get())
                 }

@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.manipulator.mutable;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
 import org.spongepowered.api.data.manipulator.mutable.VariantData;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.value.Value;
 
 public interface IVariantData<E, T extends VariantData<E, T, I>, I extends ImmutableVariantData<E, I, T>> extends VariantData<E, T, I> {
 

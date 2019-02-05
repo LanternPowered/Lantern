@@ -29,13 +29,13 @@ import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableSet
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.key.Key
-import org.spongepowered.api.data.value.BaseValue
-import org.spongepowered.api.data.value.mutable.Value
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.data.value.Value.Mutable
 import org.spongepowered.api.state.BooleanStateProperty
 import org.spongepowered.api.util.OptBool
 import java.util.Optional
 
-class LanternBooleanStateProperty private constructor(key: CatalogKey, valueKey: Key<out BaseValue<Boolean>>) :
+class LanternBooleanStateProperty private constructor(key: CatalogKey, valueKey: Key<out Value<Boolean>>) :
         AbstractStateProperty<Boolean, Boolean>(key, Boolean::class.java, STATES, valueKey), BooleanStateProperty {
 
     override fun parseValue(value: String): Optional<Boolean> {
@@ -58,12 +58,12 @@ class LanternBooleanStateProperty private constructor(key: CatalogKey, valueKey:
          * @return The boolean trait
          */
         @JvmStatic
-        fun of(key: CatalogKey, valueKey: Key<out Value<Boolean>>): BooleanStateProperty {
+        fun of(key: CatalogKey, valueKey: Key<out Mutable<Boolean>>): BooleanStateProperty {
             return LanternBooleanStateProperty(key, checkNotNull(valueKey, "valueKey"))
         }
 
         @JvmStatic
-        fun minecraft(id: String, valueKey: Key<out Value<Boolean>>): BooleanStateProperty {
+        fun minecraft(id: String, valueKey: Key<out Mutable<Boolean>>): BooleanStateProperty {
             return of(CatalogKey.minecraft(id), valueKey)
         }
     }

@@ -30,8 +30,7 @@ import org.lanternpowered.server.data.manipulator.mutable.IMappedData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableMappedData;
 import org.spongepowered.api.data.manipulator.mutable.MappedData;
-import org.spongepowered.api.data.value.immutable.ImmutableMapValue;
-import org.spongepowered.api.data.value.mutable.MapValue;
+import org.spongepowered.api.data.value.MapValue;
 
 import java.util.Map;
 import java.util.Optional;
@@ -74,7 +73,7 @@ public class AbstractImmutableMappedData<K, V, I extends ImmutableMappedData<K, 
     }
 
     @Override
-    public ImmutableMapValue<K, V> getMapValue() {
+    public MapValue.Immutable<K, V> getMapValue() {
         return tryGetImmutableValueFor(this.mapKey);
     }
 }

@@ -27,10 +27,10 @@ package org.lanternpowered.server.data.manipulator.immutable.fluid;
 
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableMappedData;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.immutable.ImmutableMapValue;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableFluidTankData;
+import org.spongepowered.api.data.manipulator.mutable.FluidTankData;
+import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.fluid.FluidStackSnapshot;
-import org.spongepowered.api.fluid.data.manipulator.immutable.ImmutableFluidTankData;
-import org.spongepowered.api.fluid.data.manipulator.mutable.FluidTankData;
 import org.spongepowered.api.util.Direction;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public final class LanternImmutableFluidTankData extends
     }
 
     @Override
-    public ImmutableMapValue<Direction, List<FluidStackSnapshot>> fluids() {
+    public MapValue.Immutable<Direction, List<FluidStackSnapshot>> fluids() {
         return getMapValue();
     }
 }

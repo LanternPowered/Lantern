@@ -105,7 +105,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<S
 
     private LanternChunkPreGenerateTask(PluginContainer plugin, World world, Vector3d center, double diameter,
             int chunkCount, float tickPercent, int tickInterval, Cause cause, List<Consumer<ChunkPreGenerationEvent>> eventListeners) {
-        final int preferredTickInterval = Lantern.getScheduler().getPreferredTickInterval();
+        final int preferredTickInterval = (int) TemporalUnits.MINECRAFT_TICKS.getDuration().get(TemporalUnits.MILLIS);
 
         this.plugin = plugin;
         this.world = world;
@@ -180,7 +180,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<S
 
         // It's possible we haven't cancelled the task here, so we just make sure of it, and perform
         // some cleanup.
-        if (!Lantern.getScheduler().getTaskById(this.spongeTask.getUniqueId()).isPresent()) {
+        if (!Lantern.getSyncScheduler().getTaskById(this.spongeTask.getUniqueId()).isPresent()) {
             cancel();
         }
 
@@ -284,7 +284,7 @@ public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<S
 
     private void cancelTask(ScheduledTask task) {
         // Don't fire multiple instances.
-        if (Lantern.getScheduler().getTaskById(task.getUniqueId()).isPresent()) {
+        if (Lantern.getSyncScheduler().getTaskById(task.getUniqueId()).isPresent()) {
             Sponge.getEventManager().post(SpongeEventFactory.createChunkPreGenerationEventCancelled(this.cause, this, this.world));
             task.cancel();
         }

@@ -34,7 +34,6 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.scheduler.TaskSynchronicity;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,7 +46,6 @@ public class LanternTaskBuilder implements Task.Builder {
     private static AtomicInteger taskCounter = new AtomicInteger();
 
     @Nullable private Consumer<ScheduledTask> consumer;
-    private TaskSynchronicity synchronicity;
     @Nullable private String name;
     private Duration delay;
     private Duration interval;
@@ -61,15 +59,8 @@ public class LanternTaskBuilder implements Task.Builder {
     public LanternTaskBuilder reset() {
         this.name = null;
         this.consumer = null;
-        this.synchronicity = TaskSynchronicity.SYNC;
         this.delay = Duration.ofMillis(0);
         this.interval = Duration.ofMillis(0);
-        return this;
-    }
-
-    @Override
-    public Task.Builder synchronicity(TaskSynchronicity synchronicity) {
-        this.synchronicity = checkNotNull(synchronicity, "synchronicity");
         return this;
     }
 
@@ -114,13 +105,13 @@ public class LanternTaskBuilder implements Task.Builder {
         }
         if (this.name == null) {
             final int number = taskCounter.incrementAndGet();
-            name = String.format("%s-%s-%s", plugin.getId(), this.synchronicity == TaskSynchronicity.ASYNC ? "A" : "S", number);
+            name = String.format("%s-%s", plugin.getId(), number);
         } else {
             name = this.name;
         }
         final long delay = this.delay.toNanos();
         final long interval = this.interval.toNanos();
-        return new LanternTask(this.synchronicity, this.consumer, name, delay, interval, plugin);
+        return new LanternTask(this.consumer, name, plugin, delay, interval);
     }
 
     @Override
@@ -130,7 +121,6 @@ public class LanternTaskBuilder implements Task.Builder {
         this.delay = task.getDelay();
         this.interval = task.getInterval();
         this.consumer = task.getConsumer();
-        this.synchronicity = task.getSynchronicity();
         this.name = task.getName();
         return this;
     }

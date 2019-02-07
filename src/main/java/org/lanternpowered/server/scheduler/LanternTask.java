@@ -29,7 +29,6 @@ import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.scheduler.TaskSynchronicity;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,25 +41,22 @@ import javax.annotation.Nullable;
  */
 public class LanternTask implements Task {
 
-    final long delay;
-    final long interval;
+    final long delay; // nanos
+    final long interval; // nanos
     private final PluginContainer owner;
     private final Consumer<ScheduledTask> executor;
     private final String name;
-    private final TaskSynchronicity synchronicity;
     @Nullable private String toString;
 
     // The amount of times this task has been scheduled
     final AtomicInteger scheduledCounter = new AtomicInteger();
 
-    LanternTask(TaskSynchronicity synchronicity, Consumer<ScheduledTask> executor, String taskName,
-            long delay, long interval, PluginContainer pluginContainer) {
+    LanternTask(Consumer<ScheduledTask> executor, String taskName, PluginContainer pluginContainer, long delay, long interval) {
         this.delay = delay;
         this.interval = interval;
         this.owner = pluginContainer;
         this.executor = executor;
         this.name = taskName;
-        this.synchronicity = synchronicity;
     }
 
     @Override
@@ -84,11 +80,6 @@ public class LanternTask implements Task {
     }
 
     @Override
-    public TaskSynchronicity getSynchronicity() {
-        return this.synchronicity;
-    }
-
-    @Override
     public String getName() {
         return this.name;
     }
@@ -102,7 +93,6 @@ public class LanternTask implements Task {
                     .add("delay", this.delay)
                     .add("interval", this.interval)
                     .add("owner", this.owner)
-                    .add("synchronicity", this.synchronicity)
                     .toString();
         }
         return toString;

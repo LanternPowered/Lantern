@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.scheduler;
 
-import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.ScheduledTaskFuture;
@@ -33,13 +32,13 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.scheduler.TaskFuture;
 
-import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -47,12 +46,13 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 class LanternTaskExecutorService extends AbstractExecutorService implements TaskExecutorService {
 
     private final Supplier<Task.Builder> taskBuilderProvider;
-    private final SchedulerBase scheduler;
+    private final LanternScheduler scheduler;
 
-    LanternTaskExecutorService(Supplier<Task.Builder> taskBuilderProvider, SchedulerBase scheduler) {
+    LanternTaskExecutorService(Supplier<Task.Builder> taskBuilderProvider, LanternScheduler scheduler) {
         this.taskBuilderProvider = taskBuilderProvider;
         this.scheduler = scheduler;
     }
@@ -91,7 +91,7 @@ class LanternTaskExecutorService extends AbstractExecutorService implements Task
 
     @Override
     public void execute(Runnable command) {
-        submitTask(createTask(command).build());
+        this.scheduler.submit(createTask(command).build());
     }
 
     @Override
@@ -102,91 +102,85 @@ class LanternTaskExecutorService extends AbstractExecutorService implements Task
     @Override
     public <T> TaskFuture<T> submit(Callable<T> command) {
         final FutureTask<T> runnable = new FutureTask<>(command);
-        final Task task = createTask(runnable)
-                .build();
-        return new LanternScheduledFuture<>(runnable, submitTask(task), this.scheduler);
+        final Task task = createTask(runnable).build();
+        return new LanternTaskFuture<>(this.scheduler.submit(task), runnable);
     }
 
     @Override
     public <T> TaskFuture<T> submit(Runnable command, @Nullable T result) {
         final FutureTask<T> runnable = new FutureTask<>(command, result);
-        final Task task = createTask(runnable)
-                .build();
-        return new LanternScheduledFuture<>(runnable, submitTask(task), this.scheduler);
+        final Task task = createTask(runnable).build();
+        return new LanternTaskFuture<>(this.scheduler.submit(task), runnable);
+    }
+
+    private LanternScheduledTask submitScheduledTask(Task task) {
+        return this.scheduler.submit(task, (executor, scheduledTask, runnable) -> {
+            final long delay = scheduledTask.task.delay;
+            final long interval = scheduledTask.task.interval;
+            if (interval != 0) {
+                return executor.scheduleAtFixedRate(runnable, delay, interval, TimeUnit.NANOSECONDS);
+            } else {
+                return executor.schedule(runnable, delay, TimeUnit.NANOSECONDS);
+            }
+        });
     }
 
     @Override
     public ScheduledTaskFuture<?> schedule(Runnable command, long delay, TemporalUnit unit) {
-        final FutureTask<?> runnable = new FutureTask<>(command, null);
-        final Task task = createTask(runnable)
-                .delay(delay, unit)
-                .build();
-        return new LanternScheduledFuture<>(runnable, submitTask(task), this.scheduler);
+        final Task task = createTask(command).delay(delay, unit).build();
+        return new LanternScheduledTaskFuture<>(submitScheduledTask(task));
     }
 
     @Override
     public ScheduledTaskFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-        final FutureTask<?> runnable = new FutureTask<>(command, null);
-        final Task task = createTask(runnable)
-                .delay(delay, unit)
-                .build();
-        return new LanternScheduledFuture<>(runnable, submitTask(task), this.scheduler);
+        final Task task = createTask(command).delay(delay, unit).build();
+        return new LanternScheduledTaskFuture<>(submitScheduledTask(task));
     }
 
     @Override
     public <V> ScheduledTaskFuture<V> schedule(Callable<V> callable, long delay, TemporalUnit unit) {
         final FutureTask<V> runnable = new FutureTask<>(callable);
-        final Task task = createTask(runnable)
-                .delay(delay, unit)
-                .build();
-        return new LanternScheduledFuture<>(runnable, submitTask(task), this.scheduler);
+        final Task task = createTask(runnable).delay(delay, unit).build();
+        return new LanternScheduledTaskFuture<>(submitScheduledTask(task), runnable);
     }
 
     @Override
     public <V> ScheduledTaskFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
         final FutureTask<V> runnable = new FutureTask<>(callable);
-        final Task task = createTask(runnable)
-                .delay(delay, unit)
-                .build();
-        return new LanternScheduledFuture<>(runnable, submitTask(task), this.scheduler);
+        final Task task = createTask(runnable).delay(delay, unit).build();
+        return new LanternScheduledTaskFuture<>(submitScheduledTask(task), runnable);
     }
 
     @Override
     public ScheduledTaskFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TemporalUnit unit) {
-        final RepeatableFutureTask<?> runnable = new RepeatableFutureTask<>(command);
-        final Task task = createTask(runnable)
-                .delay(initialDelay, unit)
-                .interval(period, unit)
-                .build();
-        final LanternScheduledTask scheduledTask = submitTask(task);
-        // A repeatable task needs to be able to cancel itself
-        runnable.setTask(scheduledTask);
-        return new LanternScheduledFuture<>(runnable, scheduledTask, this.scheduler);
+        final Task task = createTask(command).delay(initialDelay, unit).interval(period, unit).build();
+        return new LanternScheduledTaskFuture<>(submitScheduledTask(task));
     }
 
     @Override
     public ScheduledTaskFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        final RepeatableFutureTask<?> runnable = new RepeatableFutureTask<>(command);
-        final Task task = createTask(runnable)
-                .delay(initialDelay, unit)
-                .interval(period, unit)
-                .build();
-        final LanternScheduledTask scheduledTask = submitTask(task);
-        // A repeatable task needs to be able to cancel itself
-        runnable.setTask(scheduledTask);
-        return new LanternScheduledFuture<>(runnable, scheduledTask, this.scheduler);
+        final Task task = createTask(command).delay(initialDelay, unit).interval(period, unit).build();
+        return new LanternScheduledTaskFuture<>(submitScheduledTask(task));
+    }
+
+    private LanternScheduledTask submitTaskWithFixedDelay(Task task) {
+        return this.scheduler.submit(task, (executor, scheduledTask, runnable) -> {
+            final long delay = scheduledTask.task.delay;
+            final long interval = scheduledTask.task.interval;
+            return executor.scheduleWithFixedDelay(runnable, delay, interval, TimeUnit.NANOSECONDS);
+        });
     }
 
     @Override
     public ScheduledTaskFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TemporalUnit unit) {
-        // Since we don't have full control over the execution, the contract needs to be a little broken
-        return scheduleAtFixedRate(command, initialDelay, delay, unit);
+        final Task task = createTask(command).delay(initialDelay, unit).interval(delay, unit).build();
+        return new LanternScheduledTaskFuture<>(submitTaskWithFixedDelay(task));
     }
 
     @Override
     public ScheduledTaskFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        // Since we don't have full control over the execution, the contract needs to be a little broken
-        return scheduleAtFixedRate(command, initialDelay, delay, unit);
+        final Task task = createTask(command).delay(initialDelay, unit).interval(delay, unit).build();
+        return new LanternScheduledTaskFuture<>(submitTaskWithFixedDelay(task));
     }
 
     private Task.Builder createTask(Runnable command) {
@@ -194,20 +188,20 @@ class LanternTaskExecutorService extends AbstractExecutorService implements Task
                 .execute(command);
     }
 
-    private LanternScheduledTask submitTask(Task task) {
-        return this.scheduler.submit(task);
-    }
+    private static class LanternTaskFuture<V, F extends Future<?>> implements TaskFuture<V> {
 
-    private static class LanternScheduledFuture<V> implements org.spongepowered.api.scheduler.ScheduledTaskFuture<V> {
+        final LanternScheduledTask task;
+        final Future<V> resultFuture;
+        final F future;
 
-        private final FutureTask<V> runnable;
-        private final LanternScheduledTask task;
-        private final SchedulerBase scheduler;
-
-        LanternScheduledFuture(FutureTask<V> runnable, LanternScheduledTask task, SchedulerBase scheduler) {
-            this.runnable = runnable;
+        LanternTaskFuture(LanternScheduledTask task, Future<V> resultFuture) {
+            this.future = (F) task.getFuture();
+            this.resultFuture = resultFuture;
             this.task = task;
-            this.scheduler = scheduler;
+        }
+
+        LanternTaskFuture(LanternScheduledTask task) {
+            this(task, (Future<V>) task.getFuture());
         }
 
         @Override
@@ -216,111 +210,59 @@ class LanternTaskExecutorService extends AbstractExecutorService implements Task
         }
 
         @Override
-        public boolean isPeriodic() {
-            final Duration interval = this.task.task.getInterval();
-            return interval.toMillis() > 0;
-        }
-
-        @Override
-        public long getDelay(TimeUnit unit) {
-            // Since these tasks are scheduled through
-            // SchedulerExecutionService, they are
-            // always nanotime-based, not tick-based.
-            return unit.convert(this.task.nextExecutionTimestamp() - this.scheduler.getTimestamp(this.task), TimeUnit.NANOSECONDS);
-        }
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public int compareTo(Delayed other) {
-            // Since getDelay may return different values for each call,
-            // this check is required to correctly implement Comparable
-            if (other == this) {
-                return 0;
-            }
-
-            // If we are considering other sponge tasks, we can order by
-            // their internal tasks
-            if (other instanceof LanternScheduledFuture) {
-                final LanternScheduledTask otherTask = ((LanternScheduledFuture) other).task;
-                return ComparisonChain.start()
-                        .compare(this.task.nextExecutionTimestamp(), otherTask.nextExecutionTimestamp())
-                        .compare(this.task.getUniqueId(), otherTask.getUniqueId())
-                        .result();
-            }
-
-            return Long.compare(getDelay(TimeUnit.NANOSECONDS), other.getDelay(TimeUnit.NANOSECONDS));
-        }
-
-        @Override
-        public void run() {
-            this.runnable.run();
-        }
-
-        @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            this.task.cancel(); //Ensure Sponge is not going to try to run a cancelled task.
-            return this.runnable.cancel(mayInterruptIfRunning);
+            return this.task.cancel(mayInterruptIfRunning);
         }
 
         @Override
         public boolean isCancelled() {
-            // It might be externally cancelled, the runnable would never
-            // run in that case
-            return this.runnable.isCancelled() || (this.task.getState() == LanternScheduledTask.ScheduledTaskState.CANCELED && !this.runnable.isDone());
+            return this.future.isCancelled();
         }
 
         @Override
         public boolean isDone() {
-            return this.runnable.isDone();
+            return this.future.isDone();
         }
 
         @Override
         public V get() throws InterruptedException, ExecutionException {
-            return this.runnable.get();
+            return this.resultFuture.get();
         }
 
         @Override
         public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            return this.runnable.get(timeout, unit);
+            return this.resultFuture.get(timeout, unit);
         }
     }
 
-    /**
-     * An extension of the JREs FutureTask that can be repeatedly executed,
-     * required for scheduling on an interval.
-     */
-    private static class RepeatableFutureTask<V> extends FutureTask<V> {
+    private static class LanternScheduledTaskFuture<V> extends LanternTaskFuture<V, ScheduledTaskFuture<?>> implements ScheduledTaskFuture<V> {
 
-        @Nullable private ScheduledTask owningTask = null;
-
-        RepeatableFutureTask(Runnable runnable) {
-            super(runnable, null);
+        LanternScheduledTaskFuture(LanternScheduledTask task, Future<V> resultFuture) {
+            super(task, resultFuture);
         }
 
-        protected void setTask(ScheduledTask task) {
-            this.owningTask = task;
-
-            // Since it is set after being scheduled, it might have thrown
-            // an exception already
-            if (isDone() && !isCancelled()) {
-                this.owningTask.cancel();
-            }
+        LanternScheduledTaskFuture(LanternScheduledTask task) {
+            super(task, (Future<V>) task.getFuture());
         }
 
         @Override
-        protected void done() {
-            // A repeating task that is done but hasn't been cancelled has
-            // failed exceptionally. Following the contract of
-            // ScheduledExecutorService, this means the task has to be stopped.
-            if (!isCancelled() && this.owningTask != null) {
-                this.owningTask.cancel();
-            }
+        public boolean isPeriodic() {
+            return this.future.isPeriodic();
+        }
+
+        @Override
+        public long getDelay(TimeUnit unit) {
+            return this.future.getDelay(unit);
+        }
+
+        @Override
+        public int compareTo(Delayed o) {
+            return this.future.compareTo(o);
         }
 
         @Override
         public void run() {
-            super.runAndReset();
+            this.future.run();
         }
     }
-
 }

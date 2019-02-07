@@ -36,11 +36,11 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.Player;
@@ -55,7 +55,10 @@ import org.spongepowered.api.util.Tristate;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -208,13 +211,23 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        return resolveUser().getProperty(propertyClass);
+    public <V> Optional<V> getProperty(Property<V> property) {
+        return resolveUser().getProperty(property);
     }
 
     @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
-        return resolveUser().getApplicableProperties();
+    public OptionalDouble getDoubleProperty(Property<Double> property) {
+        return resolveUser().getDoubleProperty(property);
+    }
+
+    @Override
+    public OptionalInt getIntProperty(Property<Integer> property) {
+        return resolveUser().getIntProperty(property);
+    }
+
+    @Override
+    public Map<Property<?>, ?> getProperties() {
+        return resolveUser().getProperties();
     }
 
     @Override

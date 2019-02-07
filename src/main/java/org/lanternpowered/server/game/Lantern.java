@@ -31,7 +31,6 @@ import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.TaskExecutorService;
 
 public class Lantern {
 
@@ -63,8 +62,12 @@ public class Lantern {
         return LanternGame.game;
     }
 
-    public static LanternScheduler getScheduler() {
-        return LanternGame.game.getScheduler();
+    public static LanternScheduler getAsyncScheduler() {
+        return LanternGame.game.getAsyncScheduler();
+    }
+
+    public static LanternScheduler getSyncScheduler() {
+        return LanternGame.game.getSyncScheduler();
     }
 
     public static LanternGameRegistry getRegistry() {
@@ -73,10 +76,6 @@ public class Lantern {
 
     public static LanternServer getServer() {
         return LanternGame.game.getServer();
-    }
-
-    public static TaskExecutorService getSyncExecutorService() {
-        return LanternGame.game.getSyncExecutorService();
     }
 
     public static LanternWorldManager getWorldManager() {

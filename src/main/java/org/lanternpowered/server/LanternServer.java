@@ -49,6 +49,7 @@ import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
+import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
@@ -134,6 +135,8 @@ public final class LanternServer implements Server {
 
     // The query server
     @Nullable private QueryServer queryServer;
+
+    private final LanternScheduler scheduler = new LanternScheduler(this.executor);
 
     // The key pair used for authentication
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
@@ -364,8 +367,6 @@ public final class LanternServer implements Server {
         this.runningTimeTicks.incrementAndGet();
         // Pulse the network sessions
         this.networkManager.pulseSessions();
-        // Pulse the sync scheduler tasks
-        this.game.getScheduler().pulseSyncScheduler();
         // Pulse the world threads
         this.worldManager.pulse();
     }
@@ -621,7 +622,7 @@ public final class LanternServer implements Server {
         this.executor.shutdown();
 
         // Stop the async scheduler
-        this.game.getScheduler().shutdownAsyncScheduler(10, TimeUnit.SECONDS);
+        this.game.getAsyncScheduler().shutdown(10, TimeUnit.SECONDS);
 
         final Collection<ProviderRegistration<?>> serviceRegistrations = this.game.getServiceManager().getProviderRegistrations();
         // Close all the services if possible
@@ -692,8 +693,8 @@ public final class LanternServer implements Server {
     }
 
     @Override
-    public Scheduler getScheduler() {
-        return this.game.getScheduler();
+    public LanternScheduler getScheduler() {
+        return this.scheduler;
     }
 
     @Override

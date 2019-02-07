@@ -90,13 +90,13 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public CompletableFuture<GameProfile> get(UUID uniqueId, boolean useCache) {
         checkNotNull(uniqueId, "uniqueId");
-        return Lantern.getScheduler().submitAsyncTask(() -> getById(uniqueId, useCache, true));
+        return Lantern.getAsyncScheduler().submit(() -> getById(uniqueId, useCache, true));
     }
 
     @Override
     public CompletableFuture<Collection<GameProfile>> getAllById(Iterable<UUID> uniqueIds, boolean useCache) {
         checkNotNull(uniqueIds, "uniqueIds");
-        return Lantern.getScheduler().submitAsyncTask(() -> {
+        return Lantern.getAsyncScheduler().submit(() -> {
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
             for (UUID uniqueId : uniqueIds) {
                 builder.add(getById(uniqueId, useCache, true));
@@ -108,7 +108,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public CompletableFuture<GameProfile> get(String name, boolean useCache) {
         checkNotNull(name, "name");
-        return Lantern.getScheduler().submitAsyncTask(() -> {
+        return Lantern.getAsyncScheduler().submit(() -> {
             if (useCache) {
                 final Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupByName(name);
                 if (optProfile.isPresent()) {
@@ -127,7 +127,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public CompletableFuture<Collection<GameProfile>> getAllByName(Iterable<String> names, boolean useCache) {
         checkNotNull(names, "names");
-        return Lantern.getScheduler().submitAsyncTask(() -> {
+        return Lantern.getAsyncScheduler().submit(() -> {
             if (useCache) {
                 final Map<String, Optional<GameProfile>> profiles = this.gameProfileCache.getOrLookupByNames(names);
                 return profiles.values().stream().filter(Optional::isPresent).map(Optional::get).collect(ImmutableSet.toImmutableSet());
@@ -147,7 +147,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public CompletableFuture<GameProfile> fill(GameProfile profile, boolean signed, boolean useCache) {
         checkNotNull(profile, "profile");
-        return Lantern.getScheduler().submitAsyncTask(() -> {
+        return Lantern.getAsyncScheduler().submit(() -> {
             if (useCache) {
                 // Load the profile into the cache
                 this.gameProfileCache.getOrLookupById(profile.getUniqueId());

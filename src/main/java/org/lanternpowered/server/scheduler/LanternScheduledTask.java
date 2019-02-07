@@ -30,6 +30,9 @@ import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.UUID;
+import java.util.concurrent.Future;
+
+import javax.annotation.Nullable;
 
 /**
  * An internal representation of a {@link Task} created by a plugin.
@@ -37,38 +40,17 @@ import java.util.UUID;
 public class LanternScheduledTask implements ScheduledTask {
 
     private final UUID uniqueId;
-    final LanternTask task;
     private final String name;
-    private long timestamp;
-    private ScheduledTaskState state = ScheduledTaskState.WAITING;
+    final LanternTask task;
+    final LanternScheduler scheduler;
 
-    // Internal Task state. Not for user-service use.
-    public enum ScheduledTaskState {
-        /**
-         * Never ran before, waiting for the delay to pass.
-         */
-        WAITING(false),
-        /**
-         * In the process of switching to the running state.
-         */
-        SWITCHING(true),
-        /**
-         * Has ran, and will continue to unless removed from the task map.
-         */
-        RUNNING(true),
-        /**
-         * Task cancelled, scheduled to be removed from the task map.
-         */
-        CANCELED(false);
+    @Nullable private Future<?> future;
+    private final Object futureLock = new Object();
 
-        public final boolean isActive;
+    volatile boolean scheduledRemoval;
 
-        ScheduledTaskState(boolean active) {
-            this.isActive = active;
-        }
-    }
-
-    LanternScheduledTask(Task task) {
+    LanternScheduledTask(Task task, LanternScheduler scheduler) {
+        this.scheduler = scheduler;
         this.uniqueId = UUID.randomUUID();
         this.task = (LanternTask) task;
         this.name = task.getName() + "-" + this.task.scheduledCounter.incrementAndGet();
@@ -91,43 +73,41 @@ public class LanternScheduledTask implements ScheduledTask {
 
     @Override
     public boolean cancel() {
-        boolean success = false;
-        if (this.getState() != LanternScheduledTask.ScheduledTaskState.RUNNING) {
-            success = true;
-        }
-        this.setState(LanternScheduledTask.ScheduledTaskState.CANCELED);
-        return success;
+        return cancel(false);
     }
 
-    /**
-     * Returns a timestamp after which the next execution will take place.
-     * Should only be compared to
-     * {@link SchedulerBase#getTimestamp(LanternScheduledTask)}.
-     *
-     * @return The next execution timestamp
-    */
-    long nextExecutionTimestamp() {
-        if (this.state.isActive) {
-            return this.timestamp + this.task.interval;
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        final Future<?> future = getFuture();
+        if (future.isDone()) {
+            return false;
+        }
+        // If the task is successfully cancelled, just
+        // remove it from the scheduler
+        if (future.cancel(mayInterruptIfRunning)) {
+            this.scheduler.remove(this);
         } else {
-            return this.timestamp + this.task.delay;
+            this.scheduledRemoval = true;
+        }
+        return false;
+    }
+
+    void setFuture(Future<?> future) {
+        synchronized (this.futureLock) {
+            this.future = future;
+            this.futureLock.notifyAll();
         }
     }
 
-    long getTimestamp() {
-        return this.timestamp;
-    }
-
-    void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    ScheduledTaskState getState() {
-        return this.state;
-    }
-
-    void setState(ScheduledTaskState state) {
-        this.state = state;
+    Future<?> getFuture() {
+        synchronized (this.futureLock) {
+            while (this.future == null) {
+                try {
+                    this.futureLock.wait();
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
+        return this.future;
     }
 
     @Override

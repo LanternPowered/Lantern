@@ -27,11 +27,10 @@ package org.lanternpowered.api.util.builder
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.spongepowered.api.util.CopyableBuilder
+import org.spongepowered.api.util.ResettableBuilder
 
-/**
- * The base class for all the builders.
- */
-typealias BaseBuilder<T, B> = CopyableBuilder<T, B>
+typealias BaseBuilder<T, B> = ResettableBuilder<T, B>
+typealias CopyableBuilder<T, B> = CopyableBuilder<T, B>
 
 /**
  * A base builder to construct [CatalogType]s.

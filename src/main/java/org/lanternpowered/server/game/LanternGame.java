@@ -82,8 +82,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
-import org.spongepowered.api.scheduler.TaskExecutorService;
-import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -97,6 +95,7 @@ import org.spongepowered.api.world.TeleportHelper;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -154,11 +153,8 @@ public class LanternGame implements Game {
     // The game registry
     @Inject private LanternGameRegistry gameRegistry;
 
-    // The scheduler
-    @Inject private LanternScheduler scheduler;
-
-    // The sync scheduler service
-    @Inject @SynchronousExecutor private TaskExecutorService syncExecutorService;
+    // The schedulers
+    private LanternScheduler asyncScheduler;
 
     // The chunk load service
     @Inject private LanternChunkTicketManager chunkTicketManager;
@@ -244,6 +240,13 @@ public class LanternGame implements Game {
             throw new RuntimeException("The current version and version in the cache don't match: " +
                     LanternMinecraftVersion.CURRENT + " != " + versionCacheEntry);
         }
+
+        // TODO: How many threads is reasonable for async tasks? Make it configurable.
+        final ScheduledThreadPoolExecutor asyncExecutor = new ScheduledThreadPoolExecutor(16);
+        asyncExecutor.setKeepAliveTime(5, TimeUnit.SECONDS);
+        asyncExecutor.allowCoreThreadTimeOut(true);
+
+        this.asyncScheduler = new LanternScheduler(asyncExecutor);
 
         // Load the plugin instances
         try {
@@ -486,8 +489,12 @@ public class LanternGame implements Game {
         return true;
     }
 
-    public LanternScheduler getScheduler() {
-        return this.scheduler;
+    public LanternScheduler getSyncScheduler() {
+        return this.server.getScheduler();
+    }
+
+    public LanternScheduler getAsyncScheduler() {
+        return this.asyncScheduler;
     }
 
     @Override
@@ -540,10 +547,6 @@ public class LanternGame implements Game {
      */
     public LanternGameProfileManager getGameProfileManager() {
         return this.gameProfileManager;
-    }
-
-    public TaskExecutorService getSyncExecutorService() {
-        return this.syncExecutorService;
     }
 
     public MinecraftVersionCache getMinecraftVersionCache() {

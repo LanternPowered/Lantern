@@ -139,11 +139,11 @@ import org.spongepowered.api.event.world.ChangeWorldBorderEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
@@ -1097,7 +1097,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (inventory instanceof IContainerProvidedInventory) {
             container = ((IContainerProvidedInventory) inventory).createContainer(this);
         } else {
-            inventory.getProperty(GuiIdProperty.class).map(GuiIdProperty::getValue).orElseThrow(() ->
+            inventory.getProperty(InventoryProperties.GUI_ID).orElseThrow(() ->
                     new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getKey()));
             container = PlayerTopBottomContainer.construct(this.inventory, (AbstractChildrenInventory) inventory);
             container.setName(name);

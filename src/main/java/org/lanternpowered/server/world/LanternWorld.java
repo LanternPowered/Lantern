@@ -259,7 +259,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, this, this.logger, Lantern.getScheduler());
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, this, this.logger, this.game);
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type

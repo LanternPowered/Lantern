@@ -33,7 +33,7 @@ import org.lanternpowered.server.catalog.AbstractCatalogType
 import org.lanternpowered.server.data.IImmutableDataHolderBase
 import org.lanternpowered.server.data.IImmutableValueHolder
 import org.lanternpowered.server.data.property.IStorePropertyHolder
-import org.lanternpowered.server.data.value.mutable.LanternValue
+import org.lanternpowered.server.data.value.LanternMutableValue
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.key.Key
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator
@@ -207,7 +207,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return Optional.of(this.propertyValueTable.row(property)[stateValue] as S)
     }
 
-    override fun with(value: Value<*>) = with(value.key as Key<Value<Any>>, value.direct)
+    override fun with(value: Value<*>) = with(value.key as Key<Value<Any>>, value.get())
 
     override fun with(valueContainer: ImmutableDataManipulator<*, *>): Optional<S> {
         var state: Optional<S>? = null
@@ -281,7 +281,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         val currentStateValue = this.stateValues[property]
         val currentKeyValue = transformer.toKeyValue(currentStateValue as Comparable<Any>)
 
-        return Optional.of(LanternValue(key, currentKeyValue) as V)
+        return Optional.of(LanternMutableValue(key, currentKeyValue) as V)
     }
 
     override fun supports(key: Key<*>) = key in this.keysToProperty

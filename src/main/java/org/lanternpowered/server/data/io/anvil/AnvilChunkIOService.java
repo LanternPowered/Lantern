@@ -68,6 +68,7 @@ import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStrea
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.game.DirectoryKeys;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
@@ -128,19 +129,19 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     private final World world;
     private final Logger logger;
-    private final LanternScheduler scheduler;
+    private final LanternGame game;
     private final RegionFileCache cache;
     private final Path baseDir;
 
     // TODO: Consider the session.lock file
 
     @Inject
-    public AnvilChunkIOService(@Named(DirectoryKeys.WORLD) Path baseDir, World world, Logger logger, LanternScheduler scheduler) {
+    public AnvilChunkIOService(@Named(DirectoryKeys.WORLD) Path baseDir, World world, Logger logger, LanternGame game) {
         this.cache = new RegionFileCache(baseDir);
-        this.scheduler = scheduler;
         this.baseDir = baseDir;
         this.logger = logger;
         this.world = world;
+        this.game = game;
     }
 
     @Override
@@ -205,7 +206,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                 final int tileX = tileEntityView.getInt(TILE_ENTITY_X).get();
                 try {
                     final LanternTileEntity tileEntity = tileEntitySerializer.deserialize(tileEntityView);
-                    tileEntity.setLocation(new Location<>(this.world, tileX, tileY, tileZ));
+                    tileEntity.setLocation(new Location(this.world, tileX, tileY, tileZ));
                     final short index = (short) ChunkSection.index(tileX & 0xf, tileY & 0xf, tileZ & 0xf);
                     tileEntity.setBlock(blockStateArray[section].get(index));
                     tileEntity.setValid(true);
@@ -521,12 +522,12 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public CompletableFuture<Boolean> doesChunkExist(Vector3i chunkCoords) {
-        return this.scheduler.submitAsyncTask(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
+        return this.game.getAsyncScheduler().submit(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
     }
 
     @Override
     public CompletableFuture<Optional<DataContainer>> getChunkData(Vector3i chunkCoords) {
-        return this.scheduler.submitAsyncTask(() -> {
+        return this.game.getAsyncScheduler().submit(() -> {
             final int x = chunkCoords.getX();
             final int z = chunkCoords.getZ();
 

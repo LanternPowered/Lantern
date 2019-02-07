@@ -1,179 +1,142 @@
-/*
- * This file is part of LanternServer, licensed under the MIT License (MIT).
- *
- * Copyright (c) LanternPowered <https://www.lanternpowered.org>
- * Copyright (c) SpongePowered <https://www.spongepowered.org>
- * Copyright (c) contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the Software), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 package org.lanternpowered.server.scheduler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.util.concurrent.ListenableFutureTask;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.server.util.function.TriFunction;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.scheduler.TaskSynchronicity;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.util.Functional;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-@Singleton
 public class LanternScheduler implements Scheduler {
 
-    private final AsyncScheduler asyncScheduler = new AsyncScheduler();
-    private final SyncScheduler syncScheduler = new SyncScheduler();
+    private final ScheduledExecutorService executorService;
+    private final Map<UUID, LanternScheduledTask> tasksByUniqueId = new ConcurrentHashMap<>();
 
-    @Inject
-    public LanternScheduler() {
+    public LanternScheduler(ScheduledExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
+    public void shutdown(long timeout, TimeUnit unit) {
+        for (LanternScheduledTask task : this.tasksByUniqueId.values()) {
+            task.cancel();
+        }
+        try {
+            this.executorService.shutdown();
+            if (!this.executorService.awaitTermination(timeout, unit)) {
+                this.executorService.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
+        }
     }
 
     @Override
     public Optional<ScheduledTask> getTaskById(UUID id) {
-        final Optional<ScheduledTask> task = this.syncScheduler.getTask(id);
-        if (task.isPresent()) {
-            return task;
-        }
-        return this.asyncScheduler.getTask(id);
+        checkNotNull(id, "id");
+        return Optional.ofNullable(this.tasksByUniqueId.get(id));
     }
 
     @Override
     public Set<ScheduledTask> getTasksByName(String pattern) {
         final Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
-        return getTasks().stream()
+        return this.tasksByUniqueId.values().stream()
                 .filter(task -> searchPattern.matcher(task.getName()).matches())
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
     public Set<ScheduledTask> getTasks() {
-        final ImmutableSet.Builder<ScheduledTask> builder = ImmutableSet.builder();
-        builder.addAll(this.asyncScheduler.getScheduledTasks());
-        builder.addAll(this.syncScheduler.getScheduledTasks());
-        return builder.build();
-    }
-
-    @Override
-    public Set<ScheduledTask> getTasks(TaskSynchronicity synchronicity) {
-        checkNotNull(synchronicity, "synchronicity");
-        if (synchronicity == TaskSynchronicity.ASYNC) {
-            return this.asyncScheduler.getScheduledTasks();
-        } else {
-            return this.syncScheduler.getScheduledTasks();
-        }
+        return ImmutableSet.copyOf(this.tasksByUniqueId.values());
     }
 
     @Override
     public Set<ScheduledTask> getTasksByPlugin(Object plugin) {
         final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        return getTasks().stream()
-                .filter(task -> task.getTask().getOwner().equals(pluginContainer))
+        return this.tasksByUniqueId.values().stream()
+                .filter(task -> task.getOwner().equals(pluginContainer))
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
-    public int getPreferredTickInterval() {
-        return LanternGame.TICK_DURATION;
+    public TaskExecutorService createExecutor(Object plugin) {
+        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+        return new LanternTaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer), this);
     }
 
     /**
-     * Calls the callable from the main thread.
-     * 
-     * @param callable The callable
-     * @return The future result
-     */
-    public <V> Future<V> callSync(Callable<V> callable) {
-        final ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
-        this.syncScheduler.addTask((LanternScheduledTask) new LanternTaskBuilder().execute(future).build());
-        return future;
-    }
-
-    /**
-     * Calls the callable from the main thread.
+     * Removes the stored {@link LanternScheduledTask}.
      *
-     * @param runnable The runnable
+     * @param task The scheduled task
      */
-    public void callSync(Runnable runnable) {
-        this.syncScheduler.addTask((LanternScheduledTask) new LanternTaskBuilder().execute(runnable).build());
+    void remove(LanternScheduledTask task) {
+        this.tasksByUniqueId.remove(task.getUniqueId());
     }
 
-    private SchedulerBase getDelegate(Task task) {
-        if (task.getSynchronicity() == TaskSynchronicity.ASYNC) {
-            return this.asyncScheduler;
-        } else {
-            return this.syncScheduler;
-        }
-    }
-
-    /**
-     * Pulses the synchronous scheduler.
-     */
-    public void pulseSyncScheduler() {
-        this.syncScheduler.tick();
-    }
-
-    public void shutdownAsyncScheduler(long timeout, TimeUnit unit) {
-        this.asyncScheduler.shutdown(timeout, unit);
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
-    public TaskExecutorService createSyncExecutor(Object plugin) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        return new LanternTaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer), this.syncScheduler);
+    public LanternScheduledTask submit(Task task) {
+        return submit(task, (executor, scheduledTask, runnable) -> {
+            final long delay = scheduledTask.task.delay;
+            final long interval = scheduledTask.task.interval;
+            if (interval != 0) {
+                return executor.scheduleAtFixedRate(runnable, delay, interval, TimeUnit.NANOSECONDS);
+            } else if (delay != 0) {
+                return executor.schedule(runnable, delay, TimeUnit.NANOSECONDS);
+            } else {
+                return executor.submit(runnable);
+            }
+        });
     }
 
-    @Override
-    public TaskExecutorService createAsyncExecutor(Object plugin) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        return new LanternTaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer).async(), this.asyncScheduler);
+    LanternScheduledTask submit(Task task, TriFunction<ScheduledExecutorService, LanternScheduledTask, Runnable, Future<?>> submitFunction) {
+        final LanternScheduledTask scheduledTask = new LanternScheduledTask(task, this);
+        final Runnable runnable = () -> {
+            final CauseStack causeStack = CauseStack.currentOrEmpty();
+            causeStack.pushCause(task.getOwner());
+            causeStack.pushCause(task);
+            try (CauseStack.Frame ignored = causeStack.pushCauseFrame()) {
+                task.getConsumer().accept(scheduledTask);
+            } catch (Throwable throwable) {
+                task.getOwner().getLogger().error("Error while handling task: {}", task.getName(), throwable);
+            }
+            causeStack.popCauses(2);
+            // Remove the scheduled task once it's done,
+            // only do this if it's not a repeated task
+            if (scheduledTask.task.interval == 0 || scheduledTask.scheduledRemoval) {
+                remove(scheduledTask);
+            }
+        };
+        scheduledTask.setFuture(submitFunction.apply(this.executorService, scheduledTask, runnable));
+        this.tasksByUniqueId.put(scheduledTask.getUniqueId(), scheduledTask);
+        return scheduledTask;
     }
 
-    @Override
-    public ScheduledTask submit(Task task) {
-        checkNotNull(task, "task");
-        return getDelegate(task).submit(task);
+    public <T> CompletableFuture<T> submit(Callable<T> callable) {
+        return Functional.asyncFailableFuture(callable, this.executorService);
     }
 
-    public <T> CompletableFuture<T> submitAsyncTask(Callable<T> callable) {
-        return Functional.asyncFailableFuture(callable, this.asyncScheduler.getExecutor());
-    }
-
-    public CompletableFuture<Void> submitAsyncTask(Runnable callable) {
+    public CompletableFuture<Void> submit(Runnable runnable) {
         return Functional.asyncFailableFuture(() -> {
-            callable.run();
+            runnable.run();
             return null;
-        }, this.asyncScheduler.getExecutor());
+        }, this.executorService);
     }
 }

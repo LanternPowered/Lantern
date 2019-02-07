@@ -32,7 +32,6 @@ import org.spongepowered.api.text.translation.Translation
 
 class LanternSoundTypeBuilder : AbstractCatalogBuilder<SoundType, SoundType.Builder>(), SoundType.Builder {
 
-    override fun from(value: SoundType): SoundType.Builder = apply {}
     override fun reset(): SoundType.Builder = apply {}
     override fun build(key: CatalogKey, name: Translation): SoundType = LanternSoundType(key, name)
 }

@@ -174,7 +174,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
             final InetSocketAddress virtualAddress1 = virtualAddress;
 
             // Call the event in the main thread
-            Lantern.getScheduler().callSync(() -> {
+            Lantern.getSyncScheduler().submit(() -> {
                 final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol1, true);
                 if (clientVersion == LanternMinecraftVersion.UNKNOWN) {
                     Lantern.getLogger().debug("Client with unknown legacy protocol version {} pinged the server.", protocol1);

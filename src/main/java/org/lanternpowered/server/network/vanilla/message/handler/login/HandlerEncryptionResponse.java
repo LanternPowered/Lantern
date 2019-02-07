@@ -177,7 +177,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             }
         }
         final String preventProxiesIp1 = preventProxiesIp;
-        Lantern.getScheduler().submitAsyncTask(() -> performAuth(session, authData.getUsername(), hash, preventProxiesIp1));
+        Lantern.getAsyncScheduler().submit(() -> performAuth(session, authData.getUsername(), hash, preventProxiesIp1));
     }
 
     // https://stackoverflow.com/questions/2406341/how-to-check-if-an-ip-address-is-the-local-host-on-a-multi-homed-system

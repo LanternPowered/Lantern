@@ -1370,7 +1370,7 @@ public final class LanternChunkManager {
             if (causeStack != null) {
                 postForcedChunkEvent(causeStack, ticket, coords0);
             } else {
-                Lantern.getScheduler().callSync(() -> postForcedChunkEvent(CauseStack.current(), ticket, coords0));
+                Lantern.getSyncScheduler().submit(() -> postForcedChunkEvent(CauseStack.current(), ticket, coords0));
             }
         }
     }

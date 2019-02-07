@@ -773,12 +773,12 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
             frame.addContext(LanternEventContextKeys.BASE_DAMAGE_VALUE, damage);
             frame.addContext(LanternEventContextKeys.ORIGINAL_DAMAGE_VALUE, event.getOriginalDamage());
             frame.addContext(LanternEventContextKeys.FINAL_DAMAGE_VALUE, event.getFinalDamage());
-            handleDamage(causeStack, health);
+            handleDamage(causeStack, damageSource, damage, health);
         }
         return true;
     }
 
-    protected void handleDamage(CauseStack causeStack, double health) {
+    protected void handleDamage(CauseStack causeStack, DamageSource damageSource, double damage, double newHealth) {
     }
 
     protected void collectDamageFunctions(List<Tuple<DamageFunction, Consumer<DamageEntityEvent>>> damageFunctions) {
@@ -809,7 +809,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
         if (isDead()) {
             return false;
         }
-        final BoundedValue.Mutable<Double> health = getValue(Keys.HEALTH).orElse(null);
+        final BoundedValue<Double> health = getValue(Keys.HEALTH).orElse(null);
         if (health == null || health.get() >= health.getMaxValue()) {
             return false;
         }

@@ -60,8 +60,6 @@ class LanternEnchantmentTypeBuilder : AbstractCatalogBuilder<XEnchantmentType, E
                 this.levelRange, this.weight, this.treasure, this.curse, this.enchantabilityRange, this.compatibilityTester)
     }
 
-    override fun from(value: XEnchantmentType) = throw UnsupportedOperationException()
-
     override fun reset() = apply {
         super.reset()
         this.name = null

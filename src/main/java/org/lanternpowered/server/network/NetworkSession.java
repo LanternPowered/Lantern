@@ -323,7 +323,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             if (handlerMessage.getHandleThread() == HandlerMessage.HandleThread.NETTY) {
                 handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage());
             } else if (handlerMessage.getHandleThread() == HandlerMessage.HandleThread.ASYNC) {
-                Lantern.getScheduler().submitAsyncTask(() -> handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage()));
+                Lantern.getAsyncScheduler().submit(() -> handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage()));
             } else {
                 this.messageQueue.add(handlerMessage);
             }
@@ -386,7 +386,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         // The player was able to spawn before the connection closed
         if (this.player != null) {
-            Lantern.getScheduler().callSync(this::leavePlayer);
+            Lantern.getSyncScheduler().submit(this::leavePlayer);
             Lantern.getLogger().debug("{} ({}) disconnected. Reason: {}", this.gameProfile.getName().orElse("Unknown"),
                     this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
         } else if (getProtocolState() != ProtocolState.STATUS) { // Ignore the status requests

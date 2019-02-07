@@ -53,6 +53,7 @@ import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
@@ -62,7 +63,10 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.health.source.HealingSources;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
@@ -82,8 +86,11 @@ import org.spongepowered.api.world.gamerule.GameRules;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public class LanternLiving extends LanternEntity implements Living {
@@ -116,6 +123,12 @@ public class LanternLiving extends LanternEntity implements Living {
      * dead, reached zero health.
      */
     private boolean dead;
+
+    @Nullable private Entity lastAttacker;
+    private long lastAttackTime;
+    private double lastAttackDamage;
+
+    // TODO: Clear attacker after a bit of time
 
     public LanternLiving(UUID uniqueId) {
         super(uniqueId);
@@ -289,14 +302,26 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     @Override
-    protected void handleDamage(CauseStack causeStack, double health) {
-        super.handleDamage(causeStack, health);
+    protected void handleDamage(CauseStack causeStack, DamageSource damageSource, double damage, double newHealth) {
+        super.handleDamage(causeStack, damageSource, damage, newHealth);
 
         // The death animation will be played in handleDeath
-        if (health > 0) {
+        if (newHealth > 0) {
             // Handle the hurt effect
             final EntityEffectCollection effects = getEffectCollection();
             effects.getCombinedOrEmpty(EntityEffectTypes.HURT).play(this);
+        }
+
+        if (damageSource instanceof EntityDamageSource) {
+            final Entity entity;
+            if (damageSource instanceof IndirectEntityDamageSource) {
+                entity = ((IndirectEntityDamageSource) damageSource).getIndirectSource();
+            } else {
+                entity = ((EntityDamageSource) damageSource).getSource();
+            }
+            this.lastAttacker = entity;
+            this.lastAttackTime = System.currentTimeMillis();
+            this.lastAttackDamage = damage;
         }
     }
 
@@ -308,6 +333,21 @@ public class LanternLiving extends LanternEntity implements Living {
     @Override
     protected void setDead(boolean dead) {
         this.dead = dead;
+    }
+
+    @Override
+    public Optional<Entity> getLastAttacker() {
+        return Optional.ofNullable(this.lastAttacker);
+    }
+
+    @Override
+    public void setLastAttacker(@Nullable Entity entity) {
+        this.lastAttacker = entity;
+    }
+
+    @Override
+    public OptionalDouble getLastDamage() {
+        return this.lastAttacker == null ? OptionalDouble.empty() : OptionalDouble.of(this.lastAttackDamage);
     }
 
     @Override
@@ -370,7 +410,7 @@ public class LanternLiving extends LanternEntity implements Living {
                 } else if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY) {
                     offer(Keys.INVISIBLE, duration > 0);
                 } else if (potionEffect.getType() == PotionEffectTypes.HUNGER && supports(Keys.EXHAUSTION)) {
-                    final BoundedValue.Mutable<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+                    final BoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
                     final double value = exhaustion.get() + (double) deltaTicks * 0.005 * (potionEffect.getAmplifier() + 1.0);
                     offer(Keys.EXHAUSTION, Math.min(value, exhaustion.getMaxValue()));
                 } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(FoodData.class)) {
@@ -390,9 +430,9 @@ public class LanternLiving extends LanternEntity implements Living {
         }
         final Difficulty difficulty = getWorld().getDifficulty();
 
-        BoundedValue.Mutable<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
-        BoundedValue.Mutable<Double> saturation = getValue(Keys.SATURATION).get();
-        BoundedValue.Mutable<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
+        BoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+        BoundedValue<Double> saturation = getValue(Keys.SATURATION).get();
+        BoundedValue<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
 
         if (exhaustion.get() > 4.0) {
             if (saturation.get() > saturation.getMinValue()) {

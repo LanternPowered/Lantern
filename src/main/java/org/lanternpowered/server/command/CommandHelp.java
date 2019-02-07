@@ -136,7 +136,7 @@ public final class CommandHelp extends CommandProvider {
                         throw new CommandException(Text.of("No such command: ", command.get()));
                     }
 
-                    Lantern.getGame().getScheduler().submitAsyncTask(() -> {
+                    Lantern.getAsyncScheduler().submit(() -> {
                         TreeSet<CommandMapping> commands = new TreeSet<>(comparator);
                         commands.addAll(Collections2.filter(Sponge.getCommandManager().getAll().values(),
                                 input -> input.getCallable().testPermission(src)));

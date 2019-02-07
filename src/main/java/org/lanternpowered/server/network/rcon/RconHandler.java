@@ -167,7 +167,7 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
         // Process the command on the main thread and send
         // the response on the netty thread.
-        final String content = Lantern.getScheduler().callSync(() -> {
+        final String content = Lantern.getSyncScheduler().submit(() -> {
             final CauseStack causeStack = CauseStack.current();
             causeStack.pushCause(source.getConnection());
             Sponge.getCommandManager().process(source, payload);

@@ -31,7 +31,7 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.world.extent.IExtent;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -40,7 +40,6 @@ import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -57,7 +56,7 @@ public class PlacementCollisionDetectionBehavior implements PlaceBlockBehavior, 
             }
             final Location loc = optLoc.get();
             final BlockState blockState = snapshot.getState();
-            final ObjectProvider<Collection<AABB>> collisionBoxesProvider =
+            final BlockObjectProvider<Collection<AABB>> collisionBoxesProvider =
                     ((LanternBlockType) blockState.getType()).getCollisionBoxesProvider();
             if (collisionBoxesProvider != null) {
                 final Collection<AABB> collisionBoxes = collisionBoxesProvider.get(blockState, null, null);

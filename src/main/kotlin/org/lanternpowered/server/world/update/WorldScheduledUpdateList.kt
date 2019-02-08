@@ -23,16 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.provider;
+package org.lanternpowered.server.world.update
 
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
+import org.lanternpowered.api.world.World
+import org.spongepowered.api.scheduler.ScheduledUpdate
+import org.spongepowered.api.scheduler.TaskPriority
 
-import javax.annotation.Nullable;
+class WorldScheduledUpdateList<T>(val world: World, val lookup: (Int, Int) -> AbstractScheduledUpdateList<T>) : AbstractScheduledUpdateList<T>() {
 
-@FunctionalInterface
-public interface ObjectProvider<T> {
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: TaskPriority): ScheduledUpdate<T> {
+        val chunkX = x shr 4
+        val chunkZ = z shr 4
+        val localX = x and 0xf
+        val localZ = z and 0xf
+        return this.lookup(chunkX, chunkZ).schedule(localX, y, localZ, target, delay, priority)
+    }
 
-    T get(BlockState blockState, @Nullable Location location, @Nullable Direction face);
+    override fun isScheduled(x: Int, y: Int, z: Int, target: T): Boolean {
+        val chunkX = x shr 4
+        val chunkZ = z shr 4
+        val localX = x and 0xf
+        val localZ = z and 0xf
+        return this.lookup(chunkX, chunkZ).isScheduled(localX, y, localZ, target)
+    }
+
+    override fun getScheduledAt(x: Int, y: Int, z: Int): Collection<ScheduledUpdate<T>> {
+        val chunkX = x shr 4
+        val chunkZ = z shr 4
+        val localX = x and 0xf
+        val localZ = z and 0xf
+        return this.lookup(chunkX, chunkZ).getScheduledAt(localX, y, localZ)
+    }
 }

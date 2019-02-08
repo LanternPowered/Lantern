@@ -55,5 +55,5 @@ inline fun ShowEntityHoverAction(entity: Entity, name: String) = TextActions.sho
 inline fun ShowEntityHoverAction(entityRef: ShowEntityRef) = TextActions.showEntity(entityRef)
 
 @JvmName("showEntityRefOf")
-inline fun ShowEntityRef(uniqueId: UUID, name: String, type: EntityType?) =
+inline fun ShowEntityRef(uniqueId: UUID, name: String, type: EntityType<*>?) =
         org.spongepowered.api.text.action.HoverAction.ShowEntity.Ref.builder().uniqueId(uniqueId).name(name).type(type).build()

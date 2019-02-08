@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.block;
 
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @FunctionalInterface
-public interface TranslationProvider extends ObjectProvider<Translation> {
+public interface TranslationProvider extends BlockObjectProvider<Translation> {
 
     static TranslationProvider of(Translation translation) {
         return (blockState, location, face) -> translation;

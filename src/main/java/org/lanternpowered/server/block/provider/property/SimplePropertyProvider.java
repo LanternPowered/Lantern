@@ -27,13 +27,12 @@ package org.lanternpowered.server.block.provider.property;
 
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.Property;
 
 import java.util.function.Function;
 
-public class SimplePropertyProvider<T extends Property<?,?>> extends SimpleObjectProvider<T> implements PropertyProvider<T> {
+public class SimplePropertyProvider<V> extends SimpleObjectProvider<V> implements PropertyProvider<V> {
 
-    public SimplePropertyProvider(Function<BlockState, T> provider) {
+    public SimplePropertyProvider(Function<BlockState, V> provider) {
         super(provider);
     }
 }

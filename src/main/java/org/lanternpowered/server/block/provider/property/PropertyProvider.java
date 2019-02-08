@@ -25,9 +25,17 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+
+import javax.annotation.Nullable;
 
 @FunctionalInterface
-public interface PropertyProvider<V> extends ObjectProvider<V> {
+public interface PropertyProvider<V> extends BlockObjectProvider<V> {
 
+    @Nullable
+    @Override
+    V get(BlockState blockState, @Nullable Location location, @Nullable Direction face);
 }

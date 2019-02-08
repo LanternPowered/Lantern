@@ -37,7 +37,7 @@ import com.google.inject.name.Names
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.inject.Named
+import org.lanternpowered.api.util.Named
 import org.lanternpowered.api.inject.property.InjectedProperty
 import org.lanternpowered.lmbda.LambdaFactory
 import org.lanternpowered.lmbda.MethodHandlesX

@@ -25,304 +25,167 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.FLAMMABLE_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.FLAMMABLE_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.GRAVITY_AFFECTED_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.GRAVITY_AFFECTED_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.MATTER_PROPERTIES;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.PASSABLE_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.PASSABLE_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.REPLACEABLE_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.REPLACEABLE_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_CUBE_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_CUBE_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_MATERIAL_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_MATERIAL_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_SIDE_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SOLID_SIDE_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.STATISTICS_TRACKED_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.STATISTICS_TRACKED_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SURROGATE_BLOCK_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.SURROGATE_BLOCK_PROPERTY_TRUE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.UNBREAKABLE_PROPERTY_FALSE;
-import static org.lanternpowered.server.block.provider.property.PropertyConstants.UNBREAKABLE_PROPERTY_TRUE;
-
-import org.lanternpowered.server.block.property.BlockSoundGroupProperty;
-import org.lanternpowered.server.block.property.FlameInfo;
-import org.lanternpowered.server.block.property.FlameInfoProperty;
-import org.lanternpowered.server.block.property.SolidMaterialProperty;
-import org.lanternpowered.server.block.property.SolidSideProperty;
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.BlockProperties;
+import org.lanternpowered.server.block.property.FlammableInfo;
 import org.spongepowered.api.block.BlockSoundGroup;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.block.BlastResistanceProperty;
-import org.spongepowered.api.data.property.block.FlammableProperty;
-import org.spongepowered.api.data.property.block.FullBlockSelectionBoxProperty;
-import org.spongepowered.api.data.property.block.GravityAffectedProperty;
-import org.spongepowered.api.data.property.block.HardnessProperty;
-import org.spongepowered.api.data.property.block.InstrumentProperty;
-import org.spongepowered.api.data.property.block.LightEmissionProperty;
-import org.spongepowered.api.data.property.block.MatterProperty;
-import org.spongepowered.api.data.property.block.PassableProperty;
-import org.spongepowered.api.data.property.block.ReplaceableProperty;
-import org.spongepowered.api.data.property.block.SolidCubeProperty;
-import org.spongepowered.api.data.property.block.StatisticsTrackedProperty;
-import org.spongepowered.api.data.property.block.SurrogateBlockProperty;
-import org.spongepowered.api.data.property.block.UnbreakableProperty;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.InstrumentType;
+import org.spongepowered.api.data.type.Matter;
+
+import java.util.function.Function;
 
 public final class PropertyProviders {
 
-    public static PropertyProviderCollection constant(Property<?,?> property) {
-        //noinspection unchecked
-        return PropertyProviderCollection.builder()
-                .add(property.getClass(), new ConstantPropertyProvider(property))
-                .build();
+    public static PropertyProviderCollection matter(Matter constant) {
+        return PropertyProviderCollection.constant(BlockProperties.MATTER, constant);
     }
 
-    public static PropertyProviderCollection matter(MatterProperty.Matter constant) {
-        final MatterProperty property = MATTER_PROPERTIES.get(constant);
-        return PropertyProviderCollection.builder()
-                .add(MatterProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
-    }
-
-    public static PropertyProviderCollection matter(ObjectProvider<MatterProperty.Matter> provider) {
-        return PropertyProviderCollection.builder()
-                .add(MatterProperty.class, (blockState, location, face) ->
-                        MATTER_PROPERTIES.get(provider.get(blockState, location, face)))
-                .build();
+    public static PropertyProviderCollection matter(PropertyProvider<Matter> provider) {
+        return PropertyProviderCollection.of(BlockProperties.MATTER, provider);
     }
 
     public static PropertyProviderCollection hardness(double constant) {
-        final HardnessProperty property = new HardnessProperty(constant);
-        return PropertyProviderCollection.builder()
-                .add(HardnessProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.HARDNESS, constant);
     }
 
-    public static PropertyProviderCollection hardness(ObjectProvider<Double> provider) {
-        return PropertyProviderCollection.builder()
-                .add(HardnessProperty.class, (blockState, location, face) ->
-                        new HardnessProperty(provider.get(blockState, location, face)))
-                .build();
+    public static PropertyProviderCollection hardness(PropertyProvider<Double> provider) {
+        return PropertyProviderCollection.of(BlockProperties.HARDNESS, provider);
     }
 
     public static PropertyProviderCollection blastResistance(double constant) {
-        final BlastResistanceProperty property = new BlastResistanceProperty(constant);
-        return PropertyProviderCollection.builder()
-                .add(BlastResistanceProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.BLAST_RESISTANCE, constant);
     }
 
-    public static PropertyProviderCollection blastResistance(ObjectProvider<Double> provider) {
-        return PropertyProviderCollection.builder()
-                .add(BlastResistanceProperty.class, (blockState, location, face) ->
-                        new BlastResistanceProperty(provider.get(blockState, location, face)))
-                .build();
+    public static PropertyProviderCollection blastResistance(PropertyProvider<Double> provider) {
+        return PropertyProviderCollection.of(BlockProperties.BLAST_RESISTANCE, provider);
     }
 
     public static PropertyProviderCollection unbreakable(boolean constant) {
-        final UnbreakableProperty property = constant ? UNBREAKABLE_PROPERTY_TRUE : UNBREAKABLE_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(UnbreakableProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_UNBREAKABLE, constant);
     }
 
-    public static PropertyProviderCollection unbreakable(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(UnbreakableProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? UNBREAKABLE_PROPERTY_TRUE : UNBREAKABLE_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection unbreakable(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_UNBREAKABLE, provider);
     }
 
     public static PropertyProviderCollection flammable(boolean constant) {
-        final FlammableProperty property = constant ? FLAMMABLE_PROPERTY_TRUE : FLAMMABLE_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(FlammableProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_FLAMMABLE, constant);
     }
 
-    public static PropertyProviderCollection flammable(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(FlammableProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? FLAMMABLE_PROPERTY_TRUE : FLAMMABLE_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection flammable(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_FLAMMABLE, provider);
     }
 
-    public static PropertyProviderCollection lightEmission(int constant) {
-        final LightEmissionProperty property = new LightEmissionProperty(constant);
-        return PropertyProviderCollection.builder()
-                .add(LightEmissionProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+    public static PropertyProviderCollection lightEmission(double constant) {
+        return PropertyProviderCollection.constant(BlockProperties.LIGHT_EMISSION, constant);
     }
 
-    public static PropertyProviderCollection lightEmission(ObjectProvider<Integer> provider) {
-        return  PropertyProviderCollection.builder()
-                .add(LightEmissionProperty.class, (blockState, location, face) ->
-                        new LightEmissionProperty(provider.get(blockState, location, face)))
-                .build();
+    public static PropertyProviderCollection lightEmission(PropertyProvider<Double> provider) {
+        return PropertyProviderCollection.of(BlockProperties.LIGHT_EMISSION, provider);
     }
 
     public static PropertyProviderCollection replaceable(boolean constant) {
-        final ReplaceableProperty property = constant ? REPLACEABLE_PROPERTY_TRUE : REPLACEABLE_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(ReplaceableProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_REPLACEABLE, constant);
     }
 
-    public static PropertyProviderCollection replaceable(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(ReplaceableProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? REPLACEABLE_PROPERTY_TRUE : REPLACEABLE_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection replaceable(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_REPLACEABLE, provider);
     }
 
     public static PropertyProviderCollection solidCube(boolean constant) {
-        final SolidCubeProperty property = constant ? SOLID_CUBE_PROPERTY_TRUE : SOLID_CUBE_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(SolidCubeProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_SOLID_CUBE, constant);
     }
 
-    public static PropertyProviderCollection solidCube(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(SolidCubeProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? SOLID_CUBE_PROPERTY_TRUE : SOLID_CUBE_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection solidCube(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_SOLID_CUBE, provider);
     }
 
     public static PropertyProviderCollection solidSide(boolean constant) {
-        final SolidSideProperty property = constant ? SOLID_SIDE_PROPERTY_TRUE : SOLID_SIDE_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(SolidSideProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_SOLID_SIDE, constant);
     }
 
-    public static PropertyProviderCollection solidSide(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(SolidSideProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? SOLID_SIDE_PROPERTY_TRUE : SOLID_SIDE_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection solidSide(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_SOLID_SIDE, provider);
     }
 
     public static PropertyProviderCollection solidMaterial(boolean constant) {
-        final SolidMaterialProperty property = constant ? SOLID_MATERIAL_PROPERTY_TRUE : SOLID_MATERIAL_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(SolidMaterialProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_SOLID_MATERIAL, constant);
     }
 
-    public static PropertyProviderCollection solidMaterial(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(SolidMaterialProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? SOLID_MATERIAL_PROPERTY_TRUE : SOLID_MATERIAL_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection solidMaterial(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_SOLID_MATERIAL, provider);
     }
 
     public static PropertyProviderCollection passable(boolean constant) {
-        final PassableProperty property = constant ? PASSABLE_PROPERTY_TRUE : PASSABLE_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(PassableProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_PASSABLE, constant);
     }
 
-    public static PropertyProviderCollection passable(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(PassableProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? PASSABLE_PROPERTY_TRUE : PASSABLE_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection passable(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_PASSABLE, provider);
     }
 
     public static PropertyProviderCollection gravityAffected(boolean constant) {
-        final GravityAffectedProperty property = constant ?
-                GRAVITY_AFFECTED_PROPERTY_TRUE : GRAVITY_AFFECTED_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(GravityAffectedProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.IS_GRAVITY_AFFECTED, constant);
     }
 
-    public static PropertyProviderCollection gravityAffected(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(GravityAffectedProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? GRAVITY_AFFECTED_PROPERTY_TRUE : GRAVITY_AFFECTED_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection gravityAffected(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_GRAVITY_AFFECTED, provider);
     }
 
     public static PropertyProviderCollection statisticsTracked(boolean constant) {
-        final StatisticsTrackedProperty property = constant ?
-                STATISTICS_TRACKED_PROPERTY_TRUE : STATISTICS_TRACKED_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(StatisticsTrackedProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.HAS_STATISTICS_TRACKING, constant);
     }
 
-    public static PropertyProviderCollection statisticsTracked(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(StatisticsTrackedProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? STATISTICS_TRACKED_PROPERTY_TRUE : STATISTICS_TRACKED_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection statisticsTracked(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.HAS_STATISTICS_TRACKING, provider);
     }
 
-    public static PropertyProviderCollection surrogateBlock(boolean constant) {
-        final SurrogateBlockProperty property = constant ? SURROGATE_BLOCK_PROPERTY_TRUE : SURROGATE_BLOCK_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(SurrogateBlockProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+    public static PropertyProviderCollection surrogate(boolean constant) {
+        return PropertyProviderCollection.constant(BlockProperties.IS_SURROGATE, constant);
     }
 
-    public static PropertyProviderCollection surrogateBlock(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(SurrogateBlockProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? SURROGATE_BLOCK_PROPERTY_TRUE : SURROGATE_BLOCK_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection surrogate(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.IS_SURROGATE, provider);
     }
 
     public static PropertyProviderCollection fullBlockSelectionBox(boolean constant) {
-        final FullBlockSelectionBoxProperty property = constant ? FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE : FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE;
-        return PropertyProviderCollection.builder()
-                .add(FullBlockSelectionBoxProperty.class, new ConstantPropertyProvider<>(property))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.HAS_FULL_BLOCK_SELECTION_BOX, constant);
     }
 
-    public static PropertyProviderCollection fullBlockSelectionBox(ObjectProvider<Boolean> provider) {
-        return PropertyProviderCollection.builder()
-                .add(FullBlockSelectionBoxProperty.class, (blockState, location, face) ->
-                        provider.get(blockState, location, face) ? FULL_BLOCK_SELECTION_BOX_PROPERTY_TRUE : FULL_BLOCK_SELECTION_BOX_PROPERTY_FALSE)
-                .build();
+    public static PropertyProviderCollection fullBlockSelectionBox(PropertyProvider<Boolean> provider) {
+        return PropertyProviderCollection.of(BlockProperties.HAS_FULL_BLOCK_SELECTION_BOX, provider);
     }
 
     public static PropertyProviderCollection flammableInfo(int encouragement, int flammability) {
-        return flammableInfo(new FlameInfo(encouragement, flammability));
+        return flammableInfo(new FlammableInfo(encouragement, flammability));
     }
 
-    public static PropertyProviderCollection flammableInfo(FlameInfo flameInfo) {
-        final FlameInfoProperty property = new FlameInfoProperty(flameInfo);
+    public static PropertyProviderCollection flammableInfo(FlammableInfo flammableInfo) {
         return PropertyProviderCollection.builder()
-                .add(FlammableProperty.class, new ConstantPropertyProvider<>(FLAMMABLE_PROPERTY_TRUE))
-                .add(FlameInfoProperty.class, new ConstantPropertyProvider<>(property))
+                .addConstant(BlockProperties.IS_FLAMMABLE, true)
+                .addConstant(BlockProperties.FLAMMABLE_INFO, flammableInfo)
                 .build();
     }
 
-    public static PropertyProviderCollection flammableInfo(ObjectProvider<FlameInfo> provider) {
+    public static PropertyProviderCollection flammableInfo(PropertyProvider<FlammableInfo> provider) {
+        final PropertyProvider<Boolean> flammableProvider;
+        if (provider instanceof SimplePropertyProvider) {
+            final Function<BlockState, FlammableInfo> function = ((SimplePropertyProvider<FlammableInfo>) provider).getFunction();
+            flammableProvider = new SimplePropertyProvider<>(blockState -> function.apply(blockState) != null);
+        } else {
+            flammableProvider = (blockState, location, face) -> provider.get(blockState, location, face) != null;
+        }
         return PropertyProviderCollection.builder()
-                .add(FlammableProperty.class, new ConstantPropertyProvider<>(FLAMMABLE_PROPERTY_TRUE))
-                .add(FlameInfoProperty.class, (blockState, location, face) ->
-                        new FlameInfoProperty(provider.get(blockState, location, face)))
+                .add(BlockProperties.IS_FLAMMABLE, flammableProvider)
+                .add(BlockProperties.FLAMMABLE_INFO, provider)
                 .build();
     }
 
-    public static PropertyProviderCollection instrument(InstrumentType instrument) {
-        return PropertyProviderCollection.builder()
-                .add(InstrumentProperty.class, new ConstantPropertyProvider<>(new InstrumentProperty(instrument)))
-                .build();
+    public static PropertyProviderCollection instrument(InstrumentType constant) {
+        return PropertyProviderCollection.constant(BlockProperties.REPRESENTED_INSTRUMENT, constant);
     }
     
     public static PropertyProviderCollection blockSoundGroup(BlockSoundGroup blockSoundGroup) {
-        return PropertyProviderCollection.builder()
-                .add(BlockSoundGroupProperty.class, new ConstantPropertyProvider<>(new BlockSoundGroupProperty(blockSoundGroup)))
-                .build();
+        return PropertyProviderCollection.constant(BlockProperties.BLOCK_SOUND_GROUP, blockSoundGroup);
     }
 }

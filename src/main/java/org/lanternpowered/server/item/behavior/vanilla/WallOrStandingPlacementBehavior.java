@@ -29,9 +29,9 @@ import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.lanternpowered.server.block.property.SolidMaterialProperty;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBaseBehavior;
 import org.lanternpowered.server.util.rotation.RotationHelper;
@@ -41,7 +41,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -78,8 +77,8 @@ public class WallOrStandingPlacementBehavior extends InteractWithBlockItemBaseBe
         final Location loc = context.getContext(ContextKeys.BLOCK_LOCATION).get();
         final Direction face = context.getContext(ContextKeys.INTERACTION_FACE).orElse(Direction.UP);
         final Location solidFaceLoc = loc.getBlockRelative(face.getOpposite());
-        final SolidMaterialProperty solidMaterialProperty = solidFaceLoc.getProperty(SolidMaterialProperty.class).get();
-        if (!solidMaterialProperty.getValue()) {
+        final boolean isSolidMaterial = solidFaceLoc.getProperty(BlockProperties.IS_SOLID_MATERIAL).get();
+        if (!isSolidMaterial) {
             return false;
         }
         BlockState blockState;

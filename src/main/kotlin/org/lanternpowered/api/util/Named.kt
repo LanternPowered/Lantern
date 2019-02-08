@@ -23,21 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.property;
+package org.lanternpowered.api.util
 
-import org.spongepowered.api.data.property.BooleanProperty;
-
-public final class SolidSideProperty extends BooleanProperty {
-
-    public SolidSideProperty(boolean value) {
-        super(value);
-    }
-
-    public SolidSideProperty(boolean value, Operator operator) {
-        super(value, operator);
-    }
-
-    public SolidSideProperty(Object value, Operator operator) {
-        super(value, operator);
-    }
-}
+/**
+ * A named annotation that can be used in
+ * combination with kotlin properties. It
+ * will converted to the guice named when
+ * injecting.
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+annotation class Named(val value: String)

@@ -30,6 +30,8 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.util.Named
+import org.lanternpowered.server.block.BlockProperties
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.inventory.LanternInventoryProperties
 import org.lanternpowered.server.item.ItemProperties
@@ -66,7 +68,10 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
                 if (!Modifier.isStatic(field.modifiers)) {
                     continue
                 }
-                val key = CatalogKey.sponge(field.name.toLowerCase())
+
+                val name = field.getAnnotation(Named::class.java)?.value ?: field.name
+
+                val key = CatalogKey.sponge(name.toLowerCase())
                 val optProperty = get(key)
 
                 val property: Property<*>
@@ -96,6 +101,7 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
         registerCatalog(InventoryProperties::class, inventoryProperties = true)
         registerCatalog(LanternInventoryProperties::class, inventoryProperties = true)
         registerCatalog(ItemProperties::class)
+        registerCatalog(BlockProperties::class)
     }
 
     fun completeRegistration() {

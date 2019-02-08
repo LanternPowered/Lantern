@@ -117,7 +117,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     private final UUID uniqueId;
 
     // The entity type of this entity
-    private final LanternEntityType entityType;
+    private final LanternEntityType<?> entityType;
 
     // The random object of this entity
     private final Random random = new Random();
@@ -422,7 +422,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     }
 
     @Override
-    public EntityType getType() {
+    public EntityType<?> getType() {
         return this.entityType;
     }
 

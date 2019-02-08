@@ -44,6 +44,7 @@ import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
@@ -93,14 +94,12 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.property.block.HardnessProperty;
-import org.spongepowered.api.data.property.block.UnbreakableProperty;
+import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
@@ -155,6 +154,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1679,14 +1679,12 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
                 }
             }
         }
-        final Optional<UnbreakableProperty> optUnbreakableProperty = getProperty(x, y, z, UnbreakableProperty.class);
-        if (optUnbreakableProperty.isPresent() && optUnbreakableProperty.get().getValue() == Boolean.TRUE) {
+        if (getProperty(x, y, z, BlockProperties.IS_UNBREAKABLE).orElse(false)) {
             return -1;
         }
-        final Optional<HardnessProperty> optHardnessProperty = getProperty(x, y, z, HardnessProperty.class);
-        if (optHardnessProperty.isPresent()) {
-            final Double value = optHardnessProperty.get().getValue();
-            double hardness = value == null ? 0 : value;
+        final OptionalDouble optHardness = getDoubleProperty(x, y, z, BlockProperties.HARDNESS);
+        if (optHardness.isPresent()) {
+            double hardness = optHardness.getAsDouble();
             // TODO: Calculate the duration
             return hardness <= 0 ? 0 : 1;
         }

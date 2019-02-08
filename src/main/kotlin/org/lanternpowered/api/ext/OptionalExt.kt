@@ -29,6 +29,13 @@ package org.lanternpowered.api.ext
 
 import org.spongepowered.api.util.OptBool
 import java.util.Optional
+import java.util.OptionalDouble
+import java.util.OptionalInt
+
+/**
+ * Gets a empty [Optional].
+ */
+inline fun <T> emptyOptional(): Optional<T> = Optional.empty()
 
 /**
  * Unwraps the [Optional] value.
@@ -46,6 +53,30 @@ inline fun Boolean.optional(): Optional<Boolean> = OptBool.of(this)
 inline fun Boolean?.optional(): Optional<Boolean> = OptBool.of(this)
 
 /**
+ * Wraps the value into an [Optional]. Could be nullable
+ * or not, there's no guarantees.
+ */
+@JvmName("optionalOfUnknown")
+inline fun <T> T.optional(): Optional<T> = Optional.ofNullable(this)
+
+/**
+ * Wraps the value into an [Optional].
+ */
+@JvmName("optionalOf")
+inline fun <T : Any> T.optional(): Optional<T> = Optional.of(this)
+
+/**
  * Wraps the nullable value into an [Optional].
  */
-inline fun <T> T?.optional(): Optional<T> = Optional.ofNullable(this)
+@JvmName("optionalOfNullable")
+inline fun <T : Any> T?.optional(): Optional<T> = Optional.ofNullable(this)
+
+/**
+ * Transforms this [Optional] into a [OptionalInt].
+ */
+inline fun Optional<Int>.asInt(): OptionalInt = if (isPresent) OptionalInt.of(get()) else OptionalInt.empty()
+
+/**
+ * Transforms this [Optional] into a [OptionalDouble].
+ */
+inline fun Optional<Double>.asDouble(): OptionalDouble = if (isPresent) OptionalDouble.of(get()) else OptionalDouble.empty()

@@ -31,16 +31,14 @@ import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
-import org.lanternpowered.server.block.property.SolidSideProperty;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
 
@@ -82,13 +80,13 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
         }
         Direction direction = null;
         if (facing == Direction.UP && location.getWorld().getProperty(
-                location.getBlockRelative(Direction.DOWN).getBlockPosition(), Direction.UP, SolidSideProperty.class).get().getValue()) {
+                location.getBlockRelative(Direction.DOWN).getBlockPosition(), Direction.UP, BlockProperties.IS_SOLID_SIDE).orElse(false)) {
             direction = Direction.UP;
         }
         if (direction == null) {
             for (Direction dir : getHorizontalDirections(player.getHorizontalDirectionVector())) {
                 if (location.getWorld().getProperty(location.getBlockRelative(dir.getOpposite()).getBlockPosition(),
-                        dir, SolidSideProperty.class).get().getValue()) {
+                        dir, BlockProperties.IS_SOLID_SIDE).orElse(false)) {
                     direction = dir;
                     break;
                 }
@@ -117,14 +115,14 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
         BlockSnapshotBuilder builder = null;
         Location location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         // Check if the block can be replaced
-        if (location.getWorld().getProperty(location.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
+        if (location.getWorld().getProperty(location.getBlockPosition(), BlockProperties.IS_REPLACEABLE).get()) {
             builder = tryPlaceAt(player, location);
         } else {
             final Location relLocation = location.getBlockRelative(face.getOpposite());
-            if (relLocation.getWorld().getProperty(relLocation.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
+            if (relLocation.getWorld().getProperty(relLocation.getBlockPosition(), BlockProperties.IS_REPLACEABLE).get()) {
                 // Check if the clicked face is solid, if so, place the block there
                 if (face != Direction.UP && location.getWorld().getProperty(
-                        location.getBlockPosition(), face, SolidSideProperty.class).get().getValue()) {
+                        location.getBlockPosition(), face, BlockProperties.IS_REPLACEABLE).get()) {
                     builder = createBuilder(face.getOpposite());
                 } else {
                     // Use the first valid face

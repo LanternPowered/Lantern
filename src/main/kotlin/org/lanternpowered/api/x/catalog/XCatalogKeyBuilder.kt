@@ -43,7 +43,6 @@ interface XCatalogKeyBuilder : CatalogKeyBuilder {
 
     override fun namespace(container: PluginContainer): XCatalogKeyBuilder
     override fun namespace(namespace: String): XCatalogKeyBuilder
-    override fun namespace(pluginInstance: Any): XCatalogKeyBuilder
     override fun value(value: String): XCatalogKeyBuilder
     override fun build(): XCatalogKey
 }

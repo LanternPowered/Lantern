@@ -25,22 +25,30 @@
  */
 package org.lanternpowered.server.block.property;
 
-import org.spongepowered.api.block.BlockSoundGroup;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.AbstractProperty;
+public final class FlammableInfo implements Comparable<FlammableInfo> {
 
-public final class BlockSoundGroupProperty extends AbstractProperty<String, BlockSoundGroup> {
+    private final int encouragement;
+    private final int flammability;
 
-    public BlockSoundGroupProperty(BlockSoundGroup value) {
-        super(value);
+    public FlammableInfo(int encouragement, int flammability) {
+        this.encouragement = encouragement;
+        this.flammability = flammability;
     }
 
-    public BlockSoundGroupProperty(BlockSoundGroup value, Operator operator) {
-        super(value, operator);
+    public int getEncouragement() {
+        return this.encouragement;
+    }
+
+    public int getFlammability() {
+        return this.flammability;
     }
 
     @Override
-    public int compareTo(Property<?, ?> o) {
-        return 0;
+    public int compareTo(FlammableInfo o) {
+        int r = Integer.compare(this.encouragement, o.encouragement);
+        if (r != 0) {
+            return r;
+        }
+        return Integer.compare(this.flammability, o.flammability);
     }
 }

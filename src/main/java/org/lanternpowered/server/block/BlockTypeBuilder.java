@@ -28,7 +28,7 @@ package org.lanternpowered.server.block;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.spongepowered.api.block.BlockState;
@@ -51,19 +51,19 @@ public interface BlockTypeBuilder {
 
     BlockTypeBuilder selectionBox(@Nullable Function<BlockState, AABB> selectionBoxProvider);
 
-    BlockTypeBuilder selectionBox(@Nullable ObjectProvider<AABB> selectionBoxProvider);
+    BlockTypeBuilder selectionBox(@Nullable BlockObjectProvider<AABB> selectionBoxProvider);
 
     BlockTypeBuilder collisionBox(@Nullable AABB collisionBox);
 
     BlockTypeBuilder collisionBox(@Nullable Function<BlockState, AABB> collisionBoxProvider);
 
-    BlockTypeBuilder collisionBox(@Nullable ObjectProvider<AABB> collisionBoxProvider);
+    BlockTypeBuilder collisionBox(@Nullable BlockObjectProvider<AABB> collisionBoxProvider);
 
     BlockTypeBuilder collisionBoxes(@Nullable Collection<AABB> collisionBoxes);
 
     BlockTypeBuilder collisionBoxes(@Nullable Function<BlockState, Collection<AABB>> collisionBoxesProvider);
 
-    BlockTypeBuilder collisionBoxes(@Nullable ObjectProvider<Collection<AABB>> collisionBoxesProvider);
+    BlockTypeBuilder collisionBoxes(@Nullable BlockObjectProvider<Collection<AABB>> collisionBoxesProvider);
 
     BlockTypeBuilder defaultState(Function<BlockState, BlockState> function);
 

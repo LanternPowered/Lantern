@@ -37,10 +37,10 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidMaterial;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidSide;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.statisticsTracked;
-import static org.lanternpowered.server.block.provider.property.PropertyProviders.surrogateBlock;
+import static org.lanternpowered.server.block.provider.property.PropertyProviders.surrogate;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.unbreakable;
 
-import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.data.type.Matter;
 
 /**
  * Some presents of {@link PropertyProviderCollection}s that can be
@@ -49,7 +49,7 @@ import org.spongepowered.api.data.property.block.MatterProperty;
 public final class PropertyProviderCollections {
 
     public static final PropertyProviderCollection DEFAULT = PropertyProviderCollection.builder()
-            .add(matter(MatterProperty.Matter.SOLID))
+            .add(matter(Matter.SOLID))
             .add(flammable(false))
             .add(hardness(1.0))
             .add(blastResistance(5.0))
@@ -58,7 +58,7 @@ public final class PropertyProviderCollections {
             .add(gravityAffected(false))
             .add(unbreakable(false))
             .add(replaceable(false))
-            .add(surrogateBlock(false))
+            .add(surrogate(false))
             .add(statisticsTracked(true))
             .add(solidMaterial(true))
             .build();
@@ -83,14 +83,14 @@ public final class PropertyProviderCollections {
             .build();
 
     public static final PropertyProviderCollection DEFAULT_GAS = DEFAULT.toBuilder()
-            .add(matter(MatterProperty.Matter.GAS))
+            .add(matter(Matter.GAS))
             .add(solidMaterial(false))
             .add(replaceable(true))
             .add(PASSABLE)
             .build();
 
     public static final PropertyProviderCollection DEFAULT_LIQUID = DEFAULT.toBuilder()
-            .add(matter(MatterProperty.Matter.LIQUID))
+            .add(matter(Matter.LIQUID))
             .add(solidMaterial(false))
             .add(replaceable(true))
             .add(PASSABLE)

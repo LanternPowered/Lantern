@@ -49,7 +49,7 @@ import org.lanternpowered.server.block.TileEntityProvider;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.tile.LanternTileEntityArchetype;
@@ -1167,7 +1167,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (block.getType() == BlockTypes.AIR) {
             return Optional.empty();
         }
-        final ObjectProvider<AABB> aabbObjectProvider = ((LanternBlockType) block.getType()).getSelectionBoxProvider();
+        final BlockObjectProvider<AABB> aabbObjectProvider = ((LanternBlockType) block.getType()).getSelectionBoxProvider();
         if (aabbObjectProvider == null) {
             return Optional.empty();
         }
@@ -1188,7 +1188,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (block.getType() == BlockTypes.AIR) {
             return Collections.emptySet();
         }
-        final ObjectProvider<Collection<AABB>> aabbObjectProvider = ((LanternBlockType) block.getType()).getCollisionBoxesProvider();
+        final BlockObjectProvider<Collection<AABB>> aabbObjectProvider = ((LanternBlockType) block.getType()).getCollisionBoxesProvider();
         if (aabbObjectProvider == null) {
             return Collections.emptySet();
         }
@@ -1841,12 +1841,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return true;
         }
         return false;
-    }
-
-    @Deprecated
-    @Override
-    public int getInhabittedTime() {
-        return getInhabitedTime();
     }
 
     @Override

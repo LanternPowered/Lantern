@@ -30,18 +30,17 @@ import org.lanternpowered.server.util.ToStringHelper
 import org.spongepowered.api.scheduler.ScheduledUpdate
 import org.spongepowered.api.world.Location
 import java.time.Duration
+import java.util.Objects
 
 class LanternScheduledUpdate<T>(
-        private val list: LanternScheduledUpdateList<T>,
+        private val list: ChunkScheduledUpdateList<T>,
         private val position: BlockPosition,
         private val target: T,
         private val priority: LanternTaskPriority,
-        private val updateId: Long,
-        delay: Long
+        val updateId: Long,
+        private val scheduledTime: Long
 ) : ScheduledUpdate<T>, Comparable<LanternScheduledUpdate<T>> {
 
-    // The time this update is scheduled at
-    private val scheduledTime: Long = System.currentTimeMillis() + delay
     private val theLocation by lazy { Location(this.list.world, this.position.toVector3i()) }
 
     // The state of the scheduled task
@@ -82,19 +81,31 @@ class LanternScheduledUpdate<T>(
     }
 
     override fun compareTo(other: LanternScheduledUpdate<T>): Int {
+        return compareTo(other.priority, other.updateId, other.scheduledTime)
+    }
+
+    internal fun compareTo(priority: LanternTaskPriority, updateId: Long, scheduledTime: Long): Int {
         return when {
-            this.scheduledTime < other.scheduledTime -> -1
-            this.scheduledTime > other.scheduledTime -> 1
-            this.priority != other.priority -> this.priority.value - other.priority.value
-            this.updateId < other.updateId -> -1
-            this.updateId > other.updateId -> 1
+            this.scheduledTime < scheduledTime -> -1
+            this.scheduledTime > scheduledTime -> 1
+            this.priority !== priority -> this.priority.value - priority.value
+            this.updateId < updateId -> -1
+            this.updateId > updateId -> 1
             else -> 0
         }
     }
 
-    override fun hashCode(): Int {
-        return this.position.hashCode()
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is LanternScheduledUpdate<*>) return false
+        return other.target == this.target &&
+                other.position == this.position &&
+                other.scheduledTime == this.scheduledTime &&
+                other.priority == this.priority &&
+                other.updateId == this.updateId
     }
+
+    override fun hashCode() = Objects.hash(this.target, this.position, this.scheduledTime, this.priority, this.updateId)
 
     override fun toString() = ToStringHelper("ScheduledUpdate")
             .add("world", this.world.uniqueId)

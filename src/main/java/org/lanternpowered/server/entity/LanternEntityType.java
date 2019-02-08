@@ -42,36 +42,36 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.function.Function;
 
-public final class LanternEntityType extends DefaultCatalogType implements EntityType {
+public final class LanternEntityType<E extends Entity> extends DefaultCatalogType implements EntityType<E> {
 
     public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, String translation,
             Class<E> entityClass, Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(key, translation, entityClass, entityConstructor);
+        return new LanternEntityType<>(key, translation, entityClass, entityConstructor);
     }
 
     public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, Translation translation,
             Class<E> entityClass, Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(key, translation, entityClass, entityConstructor);
+        return new LanternEntityType<>(key, translation, entityClass, entityConstructor);
     }
 
     public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, String translation,
             Class<E> entityClass) {
-        return new LanternEntityType(key, translation, entityClass, getEntityConstructor(entityClass));
+        return new LanternEntityType<>(key, translation, entityClass, getEntityConstructor(entityClass));
     }
 
     public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, Translation translation,
             Class<E> entityClass) {
-        return new LanternEntityType(key, translation, entityClass, getEntityConstructor(entityClass));
+        return new LanternEntityType<>(key, translation, entityClass, getEntityConstructor(entityClass));
     }
 
     public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, String translation,
             Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(key, translation, getEntityClass(entityConstructor), entityConstructor);
+        return new LanternEntityType<>(key, translation, getEntityClass(entityConstructor), entityConstructor);
     }
 
     public static <E extends LanternEntity> LanternEntityType of(CatalogKey key, Translation translation,
             Function<UUID, E> entityConstructor) {
-        return new LanternEntityType(key, translation, getEntityClass(entityConstructor), entityConstructor);
+        return new LanternEntityType<>(key, translation, getEntityClass(entityConstructor), entityConstructor);
     }
 
     private static <E extends LanternEntity> Function<UUID, E> getEntityConstructor(Class<E> entityClass) {
@@ -108,12 +108,12 @@ public final class LanternEntityType extends DefaultCatalogType implements Entit
         }
     }
 
-    private final Class<? extends Entity> entityClass;
-    private final Function<UUID, ? extends Entity> entityConstructor;
+    private final Class<E> entityClass;
+    private final Function<UUID, E> entityConstructor;
     private final Translation translation;
 
     private LanternEntityType(CatalogKey key, String translation,
-            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
+            Class<E> entityClass, Function<UUID, E> entityConstructor) {
         super(key);
         this.translation = tr(translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
@@ -121,19 +121,19 @@ public final class LanternEntityType extends DefaultCatalogType implements Entit
     }
 
     private LanternEntityType(CatalogKey key, Translation translation,
-            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
+            Class<E> entityClass, Function<UUID, E> entityConstructor) {
         super(key);
         this.translation = translation;
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
         this.entityClass = checkNotNull(entityClass, "entityClass");
     }
 
-    public Function<UUID, ? extends Entity> getEntityConstructor() {
+    public Function<UUID, E> getEntityConstructor() {
         return this.entityConstructor;
     }
 
     @Override
-    public Class<? extends Entity> getEntityClass() {
+    public Class<E> getEntityClass() {
         return this.entityClass;
     }
 

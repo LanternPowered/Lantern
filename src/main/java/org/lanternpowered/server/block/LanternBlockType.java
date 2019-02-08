@@ -28,7 +28,7 @@ package org.lanternpowered.server.block;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.RandomTickBehavior;
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
@@ -84,8 +84,8 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, I
      */
     private boolean tickRandomly;
 
-    @Nullable private ObjectProvider<AABB> selectionBoxProvider;
-    @Nullable private ObjectProvider<Collection<AABB>> collisionBoxesProvider;
+    @Nullable private BlockObjectProvider<AABB> selectionBoxProvider;
+    @Nullable private BlockObjectProvider<Collection<AABB>> collisionBoxesProvider;
 
     /**
      * The block sound group of this block type.
@@ -223,20 +223,20 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, I
     }
 
     @Nullable
-    public ObjectProvider<AABB> getSelectionBoxProvider() {
+    public BlockObjectProvider<AABB> getSelectionBoxProvider() {
         return this.selectionBoxProvider;
     }
 
-    void setSelectionBoxProvider(@Nullable ObjectProvider<AABB> selectionBoxProvider) {
+    void setSelectionBoxProvider(@Nullable BlockObjectProvider<AABB> selectionBoxProvider) {
         this.selectionBoxProvider = selectionBoxProvider;
     }
 
     @Nullable
-    public ObjectProvider<Collection<AABB>> getCollisionBoxesProvider() {
+    public BlockObjectProvider<Collection<AABB>> getCollisionBoxesProvider() {
         return this.collisionBoxesProvider;
     }
 
-    void setCollisionBoxesProvider(@Nullable ObjectProvider<Collection<AABB>> boundingBoxProvider) {
+    void setCollisionBoxesProvider(@Nullable BlockObjectProvider<Collection<AABB>> boundingBoxProvider) {
         this.collisionBoxesProvider = boundingBoxProvider;
     }
 

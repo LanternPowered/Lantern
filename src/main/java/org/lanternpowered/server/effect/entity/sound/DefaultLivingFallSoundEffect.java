@@ -30,11 +30,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.block.property.BlockSoundGroupProperty;
+import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.effect.entity.AbstractEntityEffect;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.event.LanternEventContextKeys;
-import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.effect.sound.SoundType;
 
 import java.util.Random;
@@ -70,10 +69,7 @@ public class DefaultLivingFallSoundEffect extends AbstractEntityEffect {
 
         // Play a sound for hitting the ground
         final Vector3i blockPos = entity.getPosition().add(0, -0.2, 0).toInt();
-        final BlockSoundGroup soundGroup = entity.getWorld().getProperty(blockPos, BlockSoundGroupProperty.class).get().getValue();
-
-        if (soundGroup != null) {
-            entity.playSound(soundGroup.getFallSound(), soundGroup.getVolume() * 0.5, soundGroup.getPitch() * 0.75);
-        }
+        entity.getWorld().getProperty(blockPos, BlockProperties.BLOCK_SOUND_GROUP).ifPresent(
+                soundGroup -> entity.playSound(soundGroup.getFallSound(), soundGroup.getVolume() * 0.5, soundGroup.getPitch() * 0.75));
     }
 }

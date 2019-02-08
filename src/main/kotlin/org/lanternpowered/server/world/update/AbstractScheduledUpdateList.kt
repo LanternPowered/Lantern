@@ -23,24 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.property;
+package org.lanternpowered.server.world.update
 
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.AbstractProperty;
+import org.spongepowered.api.scheduler.ScheduledUpdate
+import org.spongepowered.api.scheduler.ScheduledUpdateList
+import org.spongepowered.api.scheduler.TaskPriority
+import java.time.Duration
+import java.time.temporal.TemporalUnit
 
-public final class FlameInfoProperty extends AbstractProperty<String, FlameInfo> {
+abstract class AbstractScheduledUpdateList<T> : ScheduledUpdateList<T> {
 
-    public FlameInfoProperty(FlameInfo value) {
-        super(value);
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Int, temporalUnit: TemporalUnit, priority: TaskPriority): ScheduledUpdate<T> {
+        return schedule(x, y, z, target, temporalUnit.duration.toMillis() * delay, priority)
     }
 
-    public FlameInfoProperty(FlameInfo value, Operator operator) {
-        super(value, operator);
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration, priority: TaskPriority): ScheduledUpdate<T> {
+        return schedule(x, y, z, target, delay.toMillis(), priority)
     }
 
-    @Override
-    public int compareTo(Property<?, ?> o) {
-        //noinspection ConstantConditions
-        return o == null ?  0 : this.getValue().compareTo((FlameInfo) o.getValue());
-    }
+    abstract fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: TaskPriority): ScheduledUpdate<T>
 }
+

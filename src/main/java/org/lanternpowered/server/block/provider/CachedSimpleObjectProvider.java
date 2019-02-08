@@ -33,7 +33,6 @@ import org.lanternpowered.server.block.state.LanternBlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +41,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public class CachedSimpleObjectProvider<T> implements ObjectProvider<T> {
+public class CachedSimpleObjectProvider<T> implements BlockObjectProvider<T> {
 
     private final Function<BlockState, T> function;
     private final Object[] values;

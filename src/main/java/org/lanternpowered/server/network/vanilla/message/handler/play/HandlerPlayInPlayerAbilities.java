@@ -26,7 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.block.property.SolidSideProperty;
+import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -37,7 +37,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayerAbilities> {
 
@@ -61,11 +60,10 @@ public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayer
                 // Get the block location the player may step against
                 final Location location1 = location.add(direction.asOffset().mul(0.6, 0, 0.6));
 
-                SolidSideProperty solidSideProperty = location1.getWorld().getProperty(
-                        location1.getBlockPosition(), direction.getOpposite(), SolidSideProperty.class).orElse(null);
+                boolean solidSide = location1.getWorld().getProperty(
+                        location1.getBlockPosition(), direction.getOpposite(), BlockProperties.IS_SOLID_SIDE).orElse(false);
                 // Make sure that the side you step against is solid
-                //noinspection ConstantConditions
-                if (solidSideProperty != null && solidSideProperty.getValue()) {
+                if (solidSide) {
                     // Push the player a bit back in the other direction,
                     // to give a more realistic feeling when pushing off
                     // against a wall
@@ -78,11 +76,10 @@ public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayer
                     // Get the block location the player may step against
                     final Location location2 = location.add(direction.asOffset().mul(-0.6, 0, -0.6));
 
-                    solidSideProperty = location2.getWorld().getProperty(
-                            location2.getBlockPosition(), direction, SolidSideProperty.class).orElse(null);
+                    solidSide = location2.getWorld().getProperty(
+                            location2.getBlockPosition(), direction, BlockProperties.IS_SOLID_SIDE).orElse(false);
 
-                    //noinspection ConstantConditions
-                    if (solidSideProperty != null && solidSideProperty.getValue()) {
+                    if (solidSide) {
                         // Combine the vectors in the direction of the block face
                         // and the direction the player is looking
                         final Vector3d vector = direction.asBlockOffset().toDouble()

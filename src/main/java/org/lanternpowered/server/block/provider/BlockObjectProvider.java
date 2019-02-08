@@ -23,32 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.property;
+package org.lanternpowered.server.block.provider;
 
-public final class FlameInfo implements Comparable<FlameInfo> {
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 
-    private final int encouragement;
-    private final int flammability;
+import javax.annotation.Nullable;
 
-    public FlameInfo(int encouragement, int flammability) {
-        this.encouragement = encouragement;
-        this.flammability = flammability;
-    }
+@FunctionalInterface
+public interface BlockObjectProvider<T> {
 
-    public int getEncouragement() {
-        return this.encouragement;
-    }
-
-    public int getFlammability() {
-        return this.flammability;
-    }
-
-    @Override
-    public int compareTo(FlameInfo o) {
-        int r = Integer.compare(this.encouragement, o.encouragement);
-        if (r != 0) {
-            return r;
-        }
-        return Integer.compare(this.flammability, o.flammability);
-    }
+    T get(BlockState blockState, @Nullable Location location, @Nullable Direction face);
 }

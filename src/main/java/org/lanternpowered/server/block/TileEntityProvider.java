@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.block;
 
-import org.lanternpowered.server.block.provider.ObjectProvider;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.spongepowered.api.block.tileentity.TileEntity;
 
 import java.util.function.Supplier;
 
 @FunctionalInterface
-public interface TileEntityProvider extends ObjectProvider<TileEntity> {
+public interface TileEntityProvider extends BlockObjectProvider<TileEntity> {
 
     static TileEntityProvider of(Supplier<TileEntity> supplier) {
         return (blockState, location, face) -> supplier.get();

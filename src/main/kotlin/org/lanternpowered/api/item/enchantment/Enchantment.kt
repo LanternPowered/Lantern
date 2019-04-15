@@ -28,6 +28,8 @@
 package org.lanternpowered.api.item.enchantment
 
 import org.lanternpowered.api.ext.*
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 typealias Enchantment = org.spongepowered.api.item.enchantment.Enchantment
 typealias EnchantmentBuilder = org.spongepowered.api.item.enchantment.Enchantment.Builder
@@ -40,8 +42,12 @@ typealias EnchantmentBuilder = org.spongepowered.api.item.enchantment.Enchantmen
  * @param level The level of the enchantment
  * @return The constructed enchantment
  */
-inline fun Enchantment(type: EnchantmentType, level: Int = type.minimumLevel, fn: EnchantmentBuilder.() -> Unit = {}): Enchantment =
-        EnchantmentBuilder().type(type).level(level).apply(fn).build()
+inline fun Enchantment(type: EnchantmentType, level: Int = type.minimumLevel, fn: EnchantmentBuilder.() -> Unit = {}): Enchantment {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    return EnchantmentBuilder().type(type).level(level).apply(fn).build()
+}
 
 /**
  * Constructs a new [EnchantmentBuilder].

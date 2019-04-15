@@ -29,6 +29,8 @@ package org.lanternpowered.api.boss
 
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.Text
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 // Use ServerBossBar instead, normal BossBar will never be used in Lantern
 typealias BossBar = org.spongepowered.api.boss.ServerBossBar
@@ -45,9 +47,13 @@ typealias BossBarOverlays = org.spongepowered.api.boss.BossBarOverlays
  * @param fn The builder function
  * @return The constructed boss bar
  */
-inline fun BossBar(name: Text, fn: BossBarBuilder.() -> Unit = {}): BossBar =
-        // Apply a few defaults, so only the name is required
-        BossBarBuilder().name(name).color(BossBarColors.PURPLE).overlay(BossBarOverlays.PROGRESS).apply(fn).build()
+inline fun BossBar(name: Text, fn: BossBarBuilder.() -> Unit = {}): BossBar {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    // Apply a few defaults, so only the name is required
+    return BossBarBuilder().name(name).color(BossBarColors.PURPLE).overlay(BossBarOverlays.PROGRESS).apply(fn).build()
+}
 
 /**
  * Constructs a new [BossBarBuilder].

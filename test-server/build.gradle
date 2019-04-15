@@ -11,7 +11,10 @@ version = '' // 'cero.sero.zero'
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
     jvmTarget = '1.8'
     languageVersion = '1.3'
-    freeCompilerArgs = [ '-Xuse-experimental=kotlin.ExperimentalUnsignedTypes' ]
+    freeCompilerArgs = [
+            '-Xuse-experimental=kotlin.ExperimentalUnsignedTypes',
+            '-Xuse-experimental=kotlin.contracts.ExperimentalContracts'
+    ]
 }
 
 sourceSets {

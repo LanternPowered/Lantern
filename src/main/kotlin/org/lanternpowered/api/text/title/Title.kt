@@ -28,6 +28,9 @@
 
 package org.lanternpowered.api.text.title
 
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
 typealias Title = org.spongepowered.api.text.title.Title
 typealias TitleBuilder = org.spongepowered.api.text.title.Title.Builder
 
@@ -38,7 +41,12 @@ typealias TitleBuilder = org.spongepowered.api.text.title.Title.Builder
  * @return The constructed title
  */
 @JvmName("of")
-inline fun Title(fn: TitleBuilder.() -> Unit): Title = TitleBuilder().apply(fn).build()
+inline fun Title(fn: TitleBuilder.() -> Unit): Title {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    return TitleBuilder().apply(fn).build()
+}
 
 /**
  * Constructs a new [TitleBuilder].

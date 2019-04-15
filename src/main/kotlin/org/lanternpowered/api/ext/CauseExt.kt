@@ -33,6 +33,8 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.cause.CauseStackManagerFrame
 import java.util.Optional
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 inline fun <T> CauseStackManager.first(target: Class<T>): Optional<T> = this.currentCause.first(target)
@@ -53,16 +55,36 @@ inline fun <T : Any> CauseStack.last(clazz: KClass<T>): T? = !last(clazz.java)
 inline operator fun <T> CauseStackManager.get(key: CauseContextKey<T>): T? = !getContext(key)
 inline operator fun <T> CauseStackManager.set(key: CauseContextKey<T>, value: T) { addContext(key, value) }
 
-inline fun CauseStackManager.withFrame(fn: CauseStackManagerFrame.() -> Unit) = pushCauseFrame().use(fn)
-inline fun CauseStackManager.withPlugin(plugin: Any, fn: () -> Unit) = withCause(checkPluginInstance(plugin), fn)
+inline fun CauseStackManager.withFrame(fn: CauseStackManagerFrame.() -> Unit) {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    pushCauseFrame().use(fn)
+}
+
+inline fun CauseStackManager.withPlugin(plugin: Any, fn: () -> Unit) {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    withCause(checkPluginInstance(plugin), fn)
+}
+
 inline fun CauseStackManager.withCause(cause: Any, fn: () -> Unit) {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
     withFrame {
         pushCause(cause)
         fn()
     }
 }
 
-inline fun CauseStack.withFrame(fn: CauseStack.Frame.() -> Unit) = pushCauseFrame().use(fn)
+inline fun CauseStack.withFrame(fn: CauseStack.Frame.() -> Unit) {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    pushCauseFrame().use(fn)
+}
 
 inline fun <reified T> Cause.first(): T? = !first(T::class.java)
 inline fun <T : Any> Cause.first(clazz: KClass<T>): T? = !first(clazz.java)

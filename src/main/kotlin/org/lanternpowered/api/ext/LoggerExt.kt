@@ -31,6 +31,8 @@ import org.lanternpowered.api.logging.Marker
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import java.util.function.Supplier
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 // Logger extensions to allow lazily initialized messages
 // and Text objects to be logged
@@ -58,6 +60,9 @@ private inline fun toLoggableString(fn: () -> Any): String = toLoggableString(fn
  * @param fn The message provider
  */
 fun Logger.debug(fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isDebugEnabled) debug(toLoggableString(fn))
 }
 
@@ -68,6 +73,9 @@ fun Logger.debug(fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.debug(marker: Marker, fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isDebugEnabled(marker)) debug(marker, toLoggableString(fn))
 }
 
@@ -77,6 +85,9 @@ fun Logger.debug(marker: Marker, fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.trace(fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isTraceEnabled) trace(toLoggableString(fn))
 }
 
@@ -87,6 +98,9 @@ fun Logger.trace(fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.trace(marker: Marker, fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isTraceEnabled(marker)) trace(marker, toLoggableString(fn))
 }
 
@@ -96,6 +110,9 @@ fun Logger.trace(marker: Marker, fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.info(fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isInfoEnabled) info(toLoggableString(fn))
 }
 
@@ -106,6 +123,9 @@ fun Logger.info(fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.info(marker: Marker, fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isInfoEnabled(marker)) info(marker, toLoggableString(fn))
 }
 
@@ -115,6 +135,9 @@ fun Logger.info(marker: Marker, fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.warn(fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isWarnEnabled) warn(toLoggableString(fn))
 }
 
@@ -125,6 +148,9 @@ fun Logger.warn(fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.warn(marker: Marker, fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isWarnEnabled(marker)) warn(marker, toLoggableString(fn))
 }
 
@@ -134,6 +160,9 @@ fun Logger.warn(marker: Marker, fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.error(fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isErrorEnabled) error(toLoggableString(fn))
 }
 
@@ -144,6 +173,9 @@ fun Logger.error(fn: () -> Any) {
  * @param fn The message provider
  */
 fun Logger.error(marker: Marker, fn: () -> Any) {
+    contract {
+        callsInPlace(fn, InvocationKind.AT_MOST_ONCE)
+    }
     if (isErrorEnabled(marker)) error(marker, toLoggableString(fn))
 }
 

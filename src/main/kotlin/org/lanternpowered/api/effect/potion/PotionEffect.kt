@@ -28,6 +28,8 @@
 package org.lanternpowered.api.effect.potion
 
 import org.lanternpowered.api.ext.*
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 typealias PotionEffect = org.spongepowered.api.effect.potion.PotionEffect
 typealias PotionEffectBuilder = org.spongepowered.api.effect.potion.PotionEffect.Builder
@@ -41,8 +43,12 @@ typealias PotionEffectTypes = org.spongepowered.api.effect.potion.PotionEffectTy
  * @param fn The builder function
  * @return The constructed potion effect
  */
-inline fun PotionEffect(type: PotionEffectType, fn: PotionEffectBuilder.() -> Unit): PotionEffect =
-        PotionEffectBuilder().potionType(type).duration(1).apply(fn).build()
+inline fun PotionEffect(type: PotionEffectType, fn: PotionEffectBuilder.() -> Unit): PotionEffect {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    return PotionEffectBuilder().potionType(type).duration(1).apply(fn).build()
+}
 
 inline fun PotionEffect(type: PotionEffectType, duration: Int = 1, amplifier: Int = 0,
                         ambient: Boolean = false, particles: Boolean = true): PotionEffect =

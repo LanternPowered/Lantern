@@ -30,13 +30,20 @@ package org.lanternpowered.api.world.weather
 
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.x.world.weather.XWeather
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 typealias Weather = org.spongepowered.api.world.weather.Weather
 typealias Weathers = org.spongepowered.api.world.weather.Weathers
 typealias WeatherUniverse = org.spongepowered.api.world.weather.WeatherUniverse
 
 @JvmName("of")
-inline fun Weather(id: String, fn: WeatherBuilder.() -> Unit): XWeather = WeatherBuilder().id(id).apply(fn).build()
+inline fun Weather(id: String, fn: WeatherBuilder.() -> Unit): XWeather {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    return WeatherBuilder().id(id).apply(fn).build()
+}
 
 /**
  * Constructs a new [WeatherBuilder].

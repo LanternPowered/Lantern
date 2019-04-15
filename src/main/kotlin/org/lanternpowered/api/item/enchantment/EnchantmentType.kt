@@ -30,6 +30,8 @@ package org.lanternpowered.api.item.enchantment
 
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 typealias EnchantmentType = org.spongepowered.api.item.enchantment.EnchantmentType
 typealias EnchantmentTypes = org.spongepowered.api.item.enchantment.EnchantmentTypes
@@ -41,8 +43,12 @@ typealias EnchantmentTypes = org.spongepowered.api.item.enchantment.EnchantmentT
  * @param fn The builder function to apply
  */
 @JvmName("of")
-inline fun EnchantmentType(id: String, fn: EnchantmentTypeBuilder.() -> Unit): EnchantmentType =
-        EnchantmentTypeBuilder().id(id).name(tr("enchantment.$id")).apply(fn).build()
+inline fun EnchantmentType(id: String, fn: EnchantmentTypeBuilder.() -> Unit): EnchantmentType {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    return EnchantmentTypeBuilder().id(id).name(tr("enchantment.$id")).apply(fn).build()
+}
 
 /**
  * Constructs a new [EnchantmentTypeBuilder].

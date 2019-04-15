@@ -60,7 +60,7 @@ inline fun <V> SoftThreadLocal(): SoftThreadLocal<V?> = SoftThreadLocal { null }
  * @param supplier The initial value supplier
  * @constructor Constructs a new soft thread local with the initial supplier
  */
-class SoftThreadLocal<V> @JvmOverloads constructor(private val supplier: () -> V = { null as V }) {
+class SoftThreadLocal<V> constructor(private val supplier: () -> V) {
 
     private val threadLocal = ThreadLocal<SoftReference<V>?> {
         val obj = this.supplier()

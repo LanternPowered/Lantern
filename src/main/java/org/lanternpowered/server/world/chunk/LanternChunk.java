@@ -172,7 +172,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final NibbleArray lightFromSky;
         final NibbleArray lightFromBlock;
 
-        final Short2ObjectMap<LanternBlockEntity> tileEntities;
+        final Short2ObjectMap<LanternBlockEntity> blockEntities;
 
         /**
          * The amount of non empty (air with index 0, no cave/void air) blocks in this chunk section.
@@ -197,13 +197,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
             } else {
                 this.blocks = new ChunkBlockStateArray(CHUNK_SECTION_VOLUME);
             }
-            this.tileEntities = new Short2ObjectOpenHashMap<>();
+            this.blockEntities = new Short2ObjectOpenHashMap<>();
             this.lightFromBlock = new NibbleArray(CHUNK_SECTION_VOLUME);
             this.lightFromSky = new NibbleArray(CHUNK_SECTION_VOLUME);
         }
 
         public ChunkSection(ChunkBlockStateArray blocks, NibbleArray lightFromSky, NibbleArray lightFromBlock,
-                Short2ObjectMap<LanternBlockEntity> tileEntities) {
+                Short2ObjectMap<LanternBlockEntity> blockEntities) {
             checkArgument(blocks.getCapacity() == CHUNK_SECTION_VOLUME, "Type array length mismatch: Got "
                     + blocks.getCapacity() + ", but expected " + CHUNK_SECTION_VOLUME);
             checkArgument(lightFromSky.length() == CHUNK_SECTION_VOLUME, "Sky light nibble array length mismatch: Got "
@@ -212,7 +212,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                     + lightFromBlock.length() + ", but expected " + CHUNK_SECTION_VOLUME);
             this.lightFromBlock = lightFromBlock;
             this.lightFromSky = lightFromSky;
-            this.tileEntities = tileEntities;
+            this.blockEntities = blockEntities;
             this.blocks = blocks;
 
             // Count the non air blocks.
@@ -253,7 +253,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
 
         private ChunkSectionSnapshot asSnapshot() {
-            return new ChunkSectionSnapshot(this.blocks.copy(), new Short2ObjectOpenHashMap<>(this.tileEntities), this.nonAirCount);
+            return new ChunkSectionSnapshot(this.blocks.copy(), new Short2ObjectOpenHashMap<>(this.blockEntities), this.nonAirCount);
         }
     }
 
@@ -262,12 +262,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
         // The block types array
         public final ChunkBlockStateArray blockStates;
         // The blockEntity entities
-        public final Short2ObjectMap<LanternBlockEntity> tileEntities;
+        public final Short2ObjectMap<LanternBlockEntity> blockEntities;
 
         public final int nonAirBlockCount;
 
-        private ChunkSectionSnapshot(ChunkBlockStateArray blockStates, Short2ObjectMap<LanternBlockEntity> tileEntities, int nonAirBlockCount) {
-            this.tileEntities = tileEntities;
+        private ChunkSectionSnapshot(ChunkBlockStateArray blockStates, Short2ObjectMap<LanternBlockEntity> blockEntities, int nonAirBlockCount) {
+            this.blockEntities = blockEntities;
             this.blockStates = blockStates;
             this.nonAirBlockCount = nonAirBlockCount;
         }
@@ -876,32 +876,32 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (section.nonEmptyCount <= 0) {
                 return null;
             }
-            final LanternBlockEntity tileEntity = section.tileEntities.get((short) index);
+            final LanternBlockEntity blockEntity = section.blockEntities.get((short) index);
             boolean remove = false;
             boolean refresh = false;
-            final Optional<BlockEntityProvider> tileEntityProvider = ((LanternBlockType) state.getType()).getBlockEntityProvider();
-            if (tileEntity != null) {
+            final Optional<BlockEntityProvider> blockEntityProvider = ((LanternBlockType) state.getType()).getBlockEntityProvider();
+            if (blockEntity != null) {
                 if (oldState.getType() != state.getType()) {
-                    refresh = tileEntityProvider.isPresent();
+                    refresh = blockEntityProvider.isPresent();
                     remove = true;
                 }
-            } else if (tileEntityProvider.isPresent()) {
+            } else if (blockEntityProvider.isPresent()) {
                 refresh = true;
             }
             if (remove) {
-                tileEntity.setValid(false);
+                blockEntity.setValid(false);
             }
             if (refresh) {
-                final Location location = tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z);
-                final LanternBlockEntity newBlockEntity = (LanternBlockEntity) tileEntityProvider.get().get(state, location, null);
-                section.tileEntities.put((short) index, newBlockEntity);
+                final Location location = blockEntity != null ? blockEntity.getLocation() : new Location<>(this.world, x, y, z);
+                final LanternBlockEntity newBlockEntity = (LanternBlockEntity) blockEntityProvider.get().get(state, location, null);
+                section.blockEntities.put((short) index, newBlockEntity);
                 newBlockEntity.setLocation(location);
                 newBlockEntity.setBlock(state);
                 newBlockEntity.setValid(true);
             } else if (remove) {
-                section.tileEntities.remove((short) index);
-            } else if (tileEntity != null) {
-                tileEntity.setBlock(state);
+                section.blockEntities.remove((short) index);
+            } else if (blockEntity != null) {
+                blockEntity.setBlock(state);
             }
             return section;
         });
@@ -985,11 +985,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public BlockSnapshot createSnapshot(int x, int y, int z) {
         final BlockState state = getBlock(x, y, z);
         final Location loc = new Location<>(this.world, x, y, z);
-        final LanternBlockEntity tileEntity = getBlockEntity(x, y, z)
-                .map(tile -> LanternBlockEntityArchetype.copy((LanternBlockEntity) tile))
+        final LanternBlockEntity blockEntity = getBlockEntity(x, y, z)
+                .map(blockEntity1 -> LanternBlockEntityArchetype.copy((LanternBlockEntity) blockEntity1))
                 .orElse(null);
         return new LanternBlockSnapshot(loc, state, getCreator(x, y, z).orElse(null),
-                getNotifier(x, y, z).orElse(null), tileEntity);
+                getNotifier(x, y, z).orElse(null), blockEntity);
     }
 
     @Override
@@ -1470,24 +1470,24 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (this.chunkSections == null) {
             return Collections.emptyList();
         }
-        final ImmutableSet.Builder<BlockEntity> tileEntities = ImmutableSet.builder();
+        final ImmutableSet.Builder<BlockEntity> blockEntities = ImmutableSet.builder();
         for (int i = 0; i < CHUNK_SECTIONS; i++) {
             this.chunkSections.work(i, chunkSection -> {
                 if (chunkSection == null) {
                     return;
                 }
-                final ObjectIterator<LanternBlockEntity> it = chunkSection.tileEntities.values().iterator();
+                final ObjectIterator<LanternBlockEntity> it = chunkSection.blockEntities.values().iterator();
                 while (it.hasNext()) {
-                    final LanternBlockEntity tileEntity = it.next();
-                    if (tileEntity.isValid()) {
-                        tileEntities.add(tileEntity);
+                    final LanternBlockEntity blockEntity = it.next();
+                    if (blockEntity.isValid()) {
+                        blockEntities.add(blockEntity);
                     } else {
                         it.remove();
                     }
                 }
             }, true);
         }
-        return tileEntities.build();
+        return blockEntities.build();
     }
 
     @Override
@@ -1503,13 +1503,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (chunkSection == null) {
                 return Optional.empty();
             }
-            final LanternBlockEntity tileEntity = chunkSection.tileEntities.get(index);
+            final LanternBlockEntity blockEntity = chunkSection.blockEntities.get(index);
             // Remove invalid blockEntity entities
-            if (tileEntity != null && !tileEntity.isValid()) {
-                chunkSection.tileEntities.remove(index);
+            if (blockEntity != null && !blockEntity.isValid()) {
+                chunkSection.blockEntities.remove(index);
                 return Optional.empty();
             }
-            return Optional.ofNullable(tileEntity);
+            return Optional.ofNullable(blockEntity);
         }, true);
     }
 
@@ -1593,9 +1593,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
             property = IStorePropertyHolder.getPropertyFor(location, propertyClass);
         }
         if (direction == null && !property.isPresent()) {
-            final Optional<BlockEntity> tileEntity = getBlockEntity(x, y, z);
-            if (tileEntity.isPresent()) {
-                property = tileEntity.get().getProperty(propertyClass);
+            final Optional<BlockEntity> blockEntity = getBlockEntity(x, y, z);
+            if (blockEntity.isPresent()) {
+                property = blockEntity.get().getProperty(propertyClass);
             }
         }
         return property;
@@ -1609,7 +1609,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final Location location = new Location<>(this.world, x, y, z);
         final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
         builder.addAll(Lantern.getGame().getPropertyRegistry().getPropertiesFor(location));
-        getBlockEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
+        getBlockEntity(x, y, z).ifPresent(blockEntity -> builder.addAll(blockEntity.getApplicableProperties()));
         return builder.build();
     }
 

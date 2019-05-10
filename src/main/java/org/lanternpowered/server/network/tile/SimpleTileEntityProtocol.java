@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.tile;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 
-public class SimpleTileEntityProtocol<T extends LanternTileEntity> extends TileEntityProtocol<T> {
+public class SimpleTileEntityProtocol<T extends LanternBlockEntity> extends TileEntityProtocol<T> {
 
     /**
      * Constructs a new {@link AbstractTileEntityProtocol} object.

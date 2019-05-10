@@ -47,7 +47,6 @@ import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.property.GuiIds;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,7 +54,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class LanternChest extends LanternContainerTile<ChestInventory> implements Chest {
+public class LanternChest extends ContainerBlockEntity<ChestInventory> implements Chest {
 
     public static final class DoubleChestInventory extends ChestInventory {
 

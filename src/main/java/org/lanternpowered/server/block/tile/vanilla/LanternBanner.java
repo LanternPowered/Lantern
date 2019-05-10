@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.network.tile.TileEntityProtocolTypes;
 import org.spongepowered.api.block.tileentity.Banner;
@@ -34,7 +34,7 @@ import org.spongepowered.api.data.type.DyeColors;
 
 import java.util.ArrayList;
 
-public class LanternBanner extends LanternTileEntity implements Banner {
+public class LanternBanner extends LanternBlockEntity implements Banner {
 
     public LanternBanner() {
         setProtocolType(TileEntityProtocolTypes.BANNER);

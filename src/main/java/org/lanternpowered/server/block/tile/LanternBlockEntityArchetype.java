@@ -35,8 +35,8 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.block.tileentity.TileEntityArchetype;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.block.entity.BlockEntityArchetype;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -46,86 +46,86 @@ import org.spongepowered.api.world.Location;
 import java.util.Optional;
 import java.util.UUID;
 
-public class LanternTileEntityArchetype implements TileEntityArchetype, IStorePropertyHolder, IAdditionalDataHolder {
+public class LanternBlockEntityArchetype implements BlockEntityArchetype, IStorePropertyHolder, IAdditionalDataHolder {
 
-    final LanternTileEntity tileEntity;
+    final LanternBlockEntity blockEntity;
 
-    LanternTileEntityArchetype(LanternTileEntity internalTileEntity) {
-        this.tileEntity = internalTileEntity;
+    LanternBlockEntityArchetype(LanternBlockEntity internalBlockEntity) {
+        this.blockEntity = internalBlockEntity;
     }
 
     @Override
     public BlockState getState() {
-        return this.tileEntity.getBlock();
+        return this.blockEntity.getBlock();
     }
 
     @Override
-    public LanternTileEntityType getTileEntityType() {
-        return this.tileEntity.getType();
+    public LanternBlockEntityType getBlockEntityType() {
+        return this.blockEntity.getType();
     }
 
     @Override
-    public DataContainer getTileData() {
-        return this.tileEntity.toContainer();
+    public DataContainer getBlockEntityData() {
+        return this.blockEntity.toContainer();
     }
 
     @Override
     public boolean validateRawData(DataView container) {
-        return this.tileEntity.validateRawData(container);
+        return this.blockEntity.validateRawData(container);
     }
 
     @Override
     public void setRawData(DataView container) throws InvalidDataException {
-        this.tileEntity.setRawData(container);
+        this.blockEntity.setRawData(container);
     }
 
     @Override
-    public TileEntityArchetype copy() {
-        return new LanternTileEntityArchetype(copy(this.tileEntity));
+    public BlockEntityArchetype copy() {
+        return new LanternBlockEntityArchetype(copy(this.blockEntity));
     }
 
     @Override
-    public AdditionalContainerCollection<DataManipulator<?, ?>> getAdditionalContainers() {
-        return this.tileEntity.getAdditionalContainers();
+    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
+        return this.blockEntity.getAdditionalContainers();
     }
 
     @Override
     public ValueCollection getValueCollection() {
-        return this.tileEntity.getValueCollection();
+        return this.blockEntity.getValueCollection();
     }
 
     @Override
-    public Optional<TileEntity> apply(Location location) {
+    public Optional<BlockEntity> apply(Location location) {
         checkNotNull(location, "location");
         final BlockState locState = location.getBlock();
         final BlockState archetypeState = getState();
         if (locState.getType() != archetypeState.getType()) {
             location.setBlock(archetypeState);
         }
-        final Optional<TileEntity> optTileEntity = location.getTileEntity();
-        optTileEntity.ifPresent(tile -> {
-            final LanternTileEntity tileEntity = (LanternTileEntity) tile;
-            tileEntity.copyFromFastNoEvents(this.tileEntity);
+        final Optional<BlockEntity> optBlockEntity = location.getBlockEntity();
+        optBlockEntity.ifPresent(tile -> {
+            final LanternBlockEntity blockEntity = (LanternBlockEntity) tile;
+            blockEntity.copyFromFastNoEvents(this.blockEntity);
         });
-        return optTileEntity;
+        return optBlockEntity;
     }
 
     @Override
     public BlockSnapshot toSnapshot(Location location) {
-        BlockState blockState = this.tileEntity.blockState;
+        BlockState blockState = this.blockEntity.blockState;
         if (blockState == null) {
-            blockState = getTileEntityType().getDefaultBlock();
+            blockState = getBlockEntityType().getDefaultBlock();
         }
         final Vector3i pos = location.getBlockPosition();
         final UUID notifier = location.getWorld().getNotifier(pos).orElse(null);
         final UUID creator = location.getWorld().getCreator(pos).orElse(null);
-        return new LanternBlockSnapshot(location, blockState, creator, notifier, copy(this.tileEntity));
+        return new LanternBlockSnapshot(location, blockState, creator, notifier, copy(this.blockEntity));
     }
 
-    public static LanternTileEntity copy(LanternTileEntity tileEntity) {
-        final LanternTileEntity copy = tileEntity.getType().construct();
-        copy.copyFromFastNoEvents(tileEntity);
-        copy.setBlock(tileEntity.getBlock());
+    public static LanternBlockEntity copy(LanternBlockEntity blockEntity) {
+        final LanternBlockEntity copy = blockEntity.getType().construct();
+        copy.copyFromFastNoEvents(blockEntity);
+        copy.setBlock(blockEntity.getBlock());
         return copy;
     }
 }

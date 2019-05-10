@@ -27,15 +27,15 @@ package org.lanternpowered.server.network.tile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 
 /**
  * Represents the protocol to init, update and destroy a
- * certain {@link LanternTileEntity} within a chunk.
+ * certain {@link LanternBlockEntity} within a chunk.
  *
  * @param <T> The tile entity type
  */
-public abstract class AbstractTileEntityProtocol<T extends LanternTileEntity> {
+public abstract class AbstractTileEntityProtocol<T extends LanternBlockEntity> {
 
     protected final T tile;
 
@@ -75,7 +75,7 @@ public abstract class AbstractTileEntityProtocol<T extends LanternTileEntity> {
     }
 
     /**
-     * Initializes the {@link LanternTileEntity} for the
+     * Initializes the {@link LanternBlockEntity} for the
      * given {@link TileEntityProtocolUpdateContext}.
      *
      * @param context The tile entity update context
@@ -83,7 +83,7 @@ public abstract class AbstractTileEntityProtocol<T extends LanternTileEntity> {
     protected abstract void init(TileEntityProtocolUpdateContext context);
 
     /**
-     * Updates the {@link LanternTileEntity} for the
+     * Updates the {@link LanternBlockEntity} for the
      * given {@link TileEntityProtocolUpdateContext}.
      *
      * @param context The tile entity update context
@@ -91,7 +91,7 @@ public abstract class AbstractTileEntityProtocol<T extends LanternTileEntity> {
     protected abstract void update(TileEntityProtocolUpdateContext context);
 
     /**
-     * Destroys the {@link LanternTileEntity} for the
+     * Destroys the {@link LanternBlockEntity} for the
      * given {@link TileEntityProtocolUpdateContext}.
      *
      * @param context The tile entity update context

@@ -25,12 +25,12 @@
  */
 package org.lanternpowered.server.network.tile;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.spongepowered.api.CatalogType;
 
 import java.util.function.Function;
 
-public interface TileEntityProtocolType<T extends LanternTileEntity> extends CatalogType {
+public interface TileEntityProtocolType<T extends LanternBlockEntity> extends CatalogType {
 
     Class<T> getTileEntityType();
 

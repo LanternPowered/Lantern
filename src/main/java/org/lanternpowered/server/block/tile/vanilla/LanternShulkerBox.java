@@ -37,12 +37,11 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class LanternShulkerBox extends LanternContainerTile<ChestInventory> {
+public class LanternShulkerBox extends ContainerBlockEntity<ChestInventory> {
 
     public LanternShulkerBox() {
         setProtocolType(TileEntityProtocolTypes.DEFAULT);

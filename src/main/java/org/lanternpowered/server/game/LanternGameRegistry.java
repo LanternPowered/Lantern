@@ -59,7 +59,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder;
-import org.lanternpowered.server.block.tile.LanternTileEntityArchetypeBuilder;
+import org.lanternpowered.server.block.tile.LanternBlockEntityArchetypeBuilder;
 import org.lanternpowered.server.boss.LanternBossBarBuilder;
 import org.lanternpowered.server.catalog.LanternCatalogKey;
 import org.lanternpowered.server.catalog.LanternCatalogKeyBuilder;
@@ -120,7 +120,7 @@ import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetReg
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockSoundGroupRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
-import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.ConstantDamageSourceRegistryModule;
@@ -425,7 +425,6 @@ import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.CopyableBuilder;
 import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.util.RespawnLocation;
 import org.spongepowered.api.util.ban.Ban;
@@ -500,7 +499,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
-                .registerBuilderSupplier(TileEntityArchetype.Builder.class, LanternTileEntityArchetypeBuilder::new)
+                .registerBuilderSupplier(TileEntityArchetype.Builder.class, LanternBlockEntityArchetypeBuilder::new)
                 .registerBuilderSupplier(LocatableBlock.Builder.class, LanternLocatableBlockBuilder::new)
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
@@ -667,7 +666,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())
                 .registerModule(EntityType.class, EntityTypeRegistryModule.get())
-                .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
+                .registerModule(TileEntityType.class, BlockEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(TileEntityProtocolType.class, new TileEntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())

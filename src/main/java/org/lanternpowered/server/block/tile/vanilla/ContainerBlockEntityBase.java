@@ -25,19 +25,18 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.block.vanilla.container.action.ContainerAnimationAction;
 import org.lanternpowered.server.inventory.AbstractContainer;
 import org.lanternpowered.server.inventory.InventoryViewerListener;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class LanternContainerTileBase extends LanternTileEntity implements InventoryViewerListener {
+public abstract class ContainerBlockEntityBase extends LanternBlockEntity implements InventoryViewerListener {
 
     protected final Set<Player> viewers = new HashSet<>();
 

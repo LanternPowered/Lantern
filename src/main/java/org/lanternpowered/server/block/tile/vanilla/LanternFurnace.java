@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.tile.ITileEntityCarrier;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.IBlockEntityCarrier;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.element.ElementListener;
@@ -54,7 +54,7 @@ import org.spongepowered.api.util.Direction;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityCarrier {
+public class LanternFurnace extends LanternBlockEntity implements Furnace, IBlockEntityCarrier {
 
     // The inventory of the furnace
     private final FurnaceInventory inventory;
@@ -280,7 +280,7 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                 // TODO: Limited access to the fuel slot to pull out empty buckets?
                 return this.inventory.getOutputSlot();
             default:
-                return ITileEntityCarrier.super.getInventory(from);
+                return IBlockEntityCarrier.super.getInventory(from);
         }
     }
 }

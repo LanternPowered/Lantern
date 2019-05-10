@@ -29,8 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.block.tile.vanilla.LanternContainerTile;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
+import org.lanternpowered.server.block.tile.vanilla.ContainerBlockEntity;
 import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
 import org.lanternpowered.server.data.io.store.entity.EntityStore;
 import org.lanternpowered.server.data.io.store.entity.ItemStore;
@@ -88,8 +88,8 @@ public final class ObjectStoreRegistry {
         register(LanternItemStack.class, ItemStackStore.INSTANCE);
 
         // Tile entities
-        register(LanternTileEntity.class, new TileEntityObjectStore<>());
-        register(LanternContainerTile.class, new ContainerTileEntityStore<>());
+        register(LanternBlockEntity.class, new TileEntityObjectStore<>());
+        register(ContainerBlockEntity.class, new ContainerTileEntityStore<>());
         register(LanternJukebox.class, new JukeboxTileEntitySerializer<>());
     }
 

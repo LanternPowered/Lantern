@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.inventory.vanilla.block;
 
-import org.lanternpowered.server.block.tile.ITileEntityInventory;
+import org.lanternpowered.server.block.tile.IBlockEntityInventory;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ContainerProperties;
@@ -39,7 +39,7 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 
 import java.util.Optional;
 
-public class FurnaceInventory extends AbstractChildrenInventory implements ITileEntityInventory {
+public class FurnaceInventory extends AbstractChildrenInventory implements IBlockEntityInventory {
 
     private static final class Holder {
 

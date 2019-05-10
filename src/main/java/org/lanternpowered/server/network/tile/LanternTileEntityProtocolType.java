@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.tile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
@@ -35,18 +35,18 @@ import org.spongepowered.api.CatalogKey;
 import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
-public final class LanternTileEntityProtocolType<T extends LanternTileEntity> extends DefaultCatalogType implements TileEntityProtocolType<T> {
+public final class LanternTileEntityProtocolType<T extends LanternBlockEntity> extends DefaultCatalogType implements TileEntityProtocolType<T> {
 
-    public static <T extends LanternTileEntity> TileEntityProtocolType<T> of(CatalogKey key,
+    public static <T extends LanternBlockEntity> TileEntityProtocolType<T> of(CatalogKey key,
             Class<T> tileEntityType, Function<T, ? extends AbstractTileEntityProtocol<T>> entityProtocolSupplier) {
         checkNotNull(tileEntityType, "tileEntityType");
         checkNotNull(entityProtocolSupplier, "entityProtocolSupplier");
         return new LanternTileEntityProtocolType<>(key, tileEntityType, entityProtocolSupplier);
     }
 
-    public static <T extends LanternTileEntity> TileEntityProtocolType<T> of(CatalogKey key,
+    public static <T extends LanternBlockEntity> TileEntityProtocolType<T> of(CatalogKey key,
             Function<T, ? extends AbstractTileEntityProtocol<T>> entityProtocolSupplier) {
-        return of(key, (Class<T>) LanternTileEntity.class, entityProtocolSupplier);
+        return of(key, (Class<T>) LanternBlockEntity.class, entityProtocolSupplier);
     }
 
     private final Class<T> tileEntityType;

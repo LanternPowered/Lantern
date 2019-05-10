@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.inventory.vanilla.block;
 
-import org.lanternpowered.server.block.tile.ITileEntityInventory;
+import org.lanternpowered.server.block.tile.IBlockEntityInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
 
-public class ChestInventory extends AbstractGridInventory implements ITileEntityInventory {
+public class ChestInventory extends AbstractGridInventory implements IBlockEntityInventory {
 
 }

@@ -30,14 +30,12 @@ import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
+import org.spongepowered.api.CatalogType
+import org.spongepowered.api.NamedCatalogType
 
-open class DefaultCatalogType @JvmOverloads constructor(key: CatalogKey, name: Translation? = null) : AbstractCatalogType() {
+open class DefaultCatalogType(key: CatalogKey) : AbstractCatalogType() {
 
     private val key: CatalogKey
-
-    private val theName: String by lazy {
-        name?.get() ?: (key as? NamedCatalogKey)?.name ?: (this as? Translatable)?.translation?.get() ?: key.value
-    }
 
     init {
         check(key.namespace.isNotEmpty()) { "plugin id (key namespace) cannot be empty" }
@@ -47,17 +45,30 @@ open class DefaultCatalogType @JvmOverloads constructor(key: CatalogKey, name: T
     }
 
     override fun getKey() = this.key
-    override fun getName() = this.theName
+    override fun compareTo(other: CatalogType): Int = this.key.compareTo(other.key)
 
     companion object {
 
-        fun minecraft(id: String, name: String = id): DefaultCatalogType =
-                DefaultCatalogType(CatalogKeys.minecraft(id, name))
+        fun minecraft(id: String) = DefaultCatalogType(CatalogKeys.minecraft(id))
+        fun minecraft(id: String, name: String) = Named(CatalogKeys.minecraft(id), name)
+        fun minecraft(id: String, name: (() -> String)) = Named(CatalogKeys.minecraft(id), name)
 
-        fun sponge(id: String, name: String = id): DefaultCatalogType =
-                DefaultCatalogType(CatalogKeys.sponge(id, name))
+        fun sponge(id: String) = DefaultCatalogType(CatalogKeys.sponge(id))
+        fun sponge(id: String, name: String): DefaultCatalogType = Named(CatalogKeys.sponge(id), name)
+        fun sponge(id: String, name: () -> String): DefaultCatalogType = Named(CatalogKeys.sponge(id), name)
 
-        fun lantern(id: String, name: String = id): DefaultCatalogType =
-                DefaultCatalogType(CatalogKeys.lantern(id, name))
+        fun lantern(id: String) = DefaultCatalogType(CatalogKeys.lantern(id))
+        fun lantern(id: String, name: String): DefaultCatalogType = Named(CatalogKeys.lantern(id), name)
+        fun lantern(id: String, name: () -> String): DefaultCatalogType = Named(CatalogKeys.lantern(id), name)
+    }
+
+    open class Named(key: CatalogKey, name: () -> String) : DefaultCatalogType(key), NamedCatalogType {
+
+        constructor(key: CatalogKey, name: Translation): this(key, name::get)
+        constructor(key: CatalogKey, name: String): this(key, { name })
+
+        private val theName: String by lazy(name)
+
+        override fun getName() = this.theName
     }
 }

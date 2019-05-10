@@ -31,40 +31,40 @@ import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.block.tileentity.TileEntityType;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.block.entity.BlockEntityType;
 
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public final class LanternTileEntityType extends DefaultCatalogType implements TileEntityType {
+public final class LanternBlockEntityType extends DefaultCatalogType implements BlockEntityType {
 
-    public static <T extends TileEntity> LanternTileEntityType of(CatalogKey key,
+    public static <T extends BlockEntity> LanternBlockEntityType of(CatalogKey key,
             Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
-        return new LanternTileEntityType(key, tileEntityClass, (Supplier) tileEntitySupplier);
+        return new LanternBlockEntityType(key, tileEntityClass, (Supplier) tileEntitySupplier);
     }
 
-    public static <T extends TileEntity> LanternTileEntityType of(CatalogKey key,
+    public static <T extends BlockEntity> LanternBlockEntityType of(CatalogKey key,
             Supplier<T> tileEntitySupplier) {
-        return new LanternTileEntityType(key, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
+        return new LanternBlockEntityType(key, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
     }
 
-    private final Class<? extends TileEntity> tileEntityClass;
-    private final Supplier<TileEntity> tileEntityConstructor;
+    private final Class<? extends BlockEntity> tileEntityClass;
+    private final Supplier<BlockEntity> tileEntityConstructor;
 
     @Nullable BlockState defaultBlock;
 
-    private LanternTileEntityType(CatalogKey key, Class<? extends TileEntity> tileEntityClass,
-            Supplier<TileEntity> tileEntityConstructor) {
+    private LanternBlockEntityType(CatalogKey key, Class<? extends BlockEntity> tileEntityClass,
+            Supplier<BlockEntity> tileEntityConstructor) {
         super(key);
         this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
         this.tileEntityConstructor = tileEntityConstructor;
     }
 
     @Override
-    public Class<? extends TileEntity> getTileEntityType() {
+    public Class<? extends BlockEntity> getBlockEntityType() {
         return this.tileEntityClass;
     }
 
@@ -78,7 +78,7 @@ public final class LanternTileEntityType extends DefaultCatalogType implements T
 
     /**
      * Sets the default {@link BlockState} that should
-     * be used for this {@link TileEntityType}.
+     * be used for this {@link BlockEntityType}.
      *
      * @param defaultBlock The default block state
      */
@@ -89,7 +89,7 @@ public final class LanternTileEntityType extends DefaultCatalogType implements T
 
     /**
      * Gets the default {@link BlockState} that should
-     * be used for this {@link TileEntityType}.
+     * be used for this {@link BlockEntityType}.
      *
      * @return The default block state
      */
@@ -98,13 +98,13 @@ public final class LanternTileEntityType extends DefaultCatalogType implements T
     }
 
     /**
-     * Constructs a new {@link TileEntity} for this tile entity type.
+     * Constructs a new {@link BlockEntity} for this tile entity type.
      *
      * @return The constructed tile entity
      */
-    public LanternTileEntity construct() {
-        final LanternTileEntity tileEntity = (LanternTileEntity) this.tileEntityConstructor.get();
-        tileEntity.setTileEntityType(this);
+    public LanternBlockEntity construct() {
+        final LanternBlockEntity tileEntity = (LanternBlockEntity) this.tileEntityConstructor.get();
+        tileEntity.setBlockEntityType(this);
         return tileEntity;
     }
 

@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
@@ -73,7 +73,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
     @Nullable private UUID creator;
     @Nullable private UUID notifier;
 
-    @Nullable private LanternTileEntity tileEntity;
+    @Nullable private LanternBlockEntity tileEntity;
     @Nullable private Map<Key, Object> tileEntityKeyData;
     @Nullable private Map<Class<?>, DataManipulator<?,?>> tileEntityManipulatorData;
 
@@ -136,7 +136,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         final World world = location.getWorld();
         this.creator = world.getCreator(location.getBlockPosition()).orElse(null);
         this.notifier = world.getNotifier(location.getBlockPosition()).orElse(null);
-        this.tileEntity = LanternBlockSnapshot.copy((LanternTileEntity) location.getTileEntity().orElse(null));
+        this.tileEntity = LanternBlockSnapshot.copy((LanternBlockEntity) location.getTileEntity().orElse(null));
         if (this.tileEntityKeyData != null) {
             this.tileEntityKeyData.clear();
         }
@@ -225,7 +225,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
     public BlockSnapshot build() {
         checkState(this.blockState != null, "The block state must be set.");
         final Location blockLocation = this.worldUUID == null  || this.position == null ? null : new Location(this.worldUUID, this.position);
-        final LanternTileEntity tileEntity = (LanternTileEntity) ((LanternBlockType) this.blockState.getType()).getTileEntityProvider()
+        final LanternBlockEntity tileEntity = (LanternBlockEntity) ((LanternBlockType) this.blockState.getType()).getTileEntityProvider()
                 .map(provider -> provider.get(this.blockState, null, null))
                 .orElse(null);
         if (tileEntity != null) {

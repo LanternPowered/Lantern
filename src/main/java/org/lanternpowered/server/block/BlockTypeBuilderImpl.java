@@ -49,7 +49,7 @@ import org.lanternpowered.server.block.provider.property.PropertyProviderCollect
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.provider.property.SimplePropertyProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
-import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.tile.LanternBlockEntityType;
 import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
@@ -187,7 +187,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Override
     public BlockTypeBuilderImpl tileEntityType(Supplier<TileEntityType> tileEntityType) {
         checkNotNull(tileEntityType, "tileEntityType");
-        this.tileEntityProvider = (blockState, location, face) -> ((LanternTileEntityType) tileEntityType.get()).construct();
+        this.tileEntityProvider = (blockState, location, face) -> ((LanternBlockEntityType) tileEntityType.get()).construct();
         return this;
     }
 

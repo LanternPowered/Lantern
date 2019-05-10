@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.tile;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTileEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-public abstract class TileEntityProtocol<T extends LanternTileEntity> extends AbstractTileEntityProtocol<T> {
+public abstract class TileEntityProtocol<T extends LanternBlockEntity> extends AbstractTileEntityProtocol<T> {
 
     /**
      * Constructs a new {@link AbstractTileEntityProtocol} object.

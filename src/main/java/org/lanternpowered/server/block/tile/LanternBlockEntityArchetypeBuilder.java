@@ -31,9 +31,9 @@ import static com.google.common.base.Preconditions.checkState;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.block.tileentity.TileEntityArchetype;
-import org.spongepowered.api.block.tileentity.TileEntityType;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.block.entity.BlockEntityArchetype;
+import org.spongepowered.api.block.entity.BlockEntityType;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -49,23 +49,23 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Builder {
+public class LanternBlockEntityArchetypeBuilder implements BlockEntityArchetype.Builder {
 
-    @Nullable private LanternTileEntityType tileEntityType;
-    @Nullable private LanternTileEntity tileEntity;
+    @Nullable private LanternBlockEntityType blockEntityType;
+    @Nullable private LanternBlockEntity blockEntity;
     @Nullable private List data;
     @Nullable private BlockState blockState;
 
     @Override
-    public Optional<TileEntityArchetype> build(DataView container) throws InvalidDataException {
-        final ObjectSerializer<LanternTileEntity> serializer = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
-        return Optional.of(new LanternTileEntityArchetype(serializer.deserialize(container)));
+    public Optional<BlockEntityArchetype> build(DataView container) throws InvalidDataException {
+        final ObjectSerializer<LanternBlockEntity> serializer = ObjectSerializerRegistry.get().get(LanternBlockEntity.class).get();
+        return Optional.of(new LanternBlockEntityArchetype(serializer.deserialize(container)));
     }
 
     @Override
-    public TileEntityArchetype.Builder reset() {
-        this.tileEntityType = null;
-        this.tileEntity = null;
+    public BlockEntityArchetype.Builder reset() {
+        this.blockEntityType = null;
+        this.blockEntity = null;
         this.blockState = null;
         if (this.data != null) {
             this.data.clear();
@@ -74,41 +74,41 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public TileEntityArchetype.Builder from(TileEntityArchetype value) {
+    public BlockEntityArchetype.Builder from(BlockEntityArchetype value) {
         checkNotNull(value, "value");
-        return tile(((LanternTileEntityArchetype) value).tileEntity);
+        return blockEntity(((LanternBlockEntityArchetype) value).blockEntity);
     }
 
     @Override
-    public TileEntityArchetype.Builder from(Location location) {
-        return tile(location.getTileEntity().orElseThrow(
+    public BlockEntityArchetype.Builder from(Location location) {
+        return blockEntity(location.getBlockEntity().orElseThrow(
                 () -> new IllegalArgumentException("There is no tile entity available at the provided location: " + location)));
     }
 
     @Override
-    public TileEntityArchetype.Builder state(BlockState state) {
+    public BlockEntityArchetype.Builder state(BlockState state) {
         checkNotNull(state, "state");
         this.blockState = state;
         return this;
     }
 
     @Override
-    public TileEntityArchetype.Builder tile(TileEntityType tileEntityType) {
-        checkNotNull(tileEntityType, "tileEntityType");
-        this.tileEntityType = (LanternTileEntityType) tileEntityType;
+    public BlockEntityArchetype.Builder blockEntity(BlockEntityType blockEntityType) {
+        checkNotNull(blockEntityType, "blockEntityType");
+        this.blockEntityType = (LanternBlockEntityType) blockEntityType;
         return this;
     }
 
     @Override
-    public TileEntityArchetype.Builder tile(TileEntity tileEntity) {
-        checkNotNull(tileEntity, "tileEntity");
-        return from(LanternTileEntityArchetype.copy((LanternTileEntity) tileEntity));
+    public BlockEntityArchetype.Builder blockEntity(BlockEntity blockEntity) {
+        checkNotNull(blockEntity, "blockEntity");
+        return from(LanternBlockEntityArchetype.copy((LanternBlockEntity) blockEntity));
     }
 
-    private TileEntityArchetype.Builder from(LanternTileEntity tileEntity) {
-        this.tileEntity = tileEntity;
-        this.tileEntityType = tileEntity.getType();
-        this.blockState = tileEntity.getBlock();
+    private BlockEntityArchetype.Builder from(LanternBlockEntity blockEntity) {
+        this.blockEntity = blockEntity;
+        this.blockEntityType = blockEntity.getType();
+        this.blockState = blockEntity.getBlock();
         if (this.data != null) {
             this.data.clear();
         }
@@ -116,15 +116,15 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public TileEntityArchetype.Builder tileData(DataView dataView) {
-        final ObjectSerializer<LanternTileEntity> serializer = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
-        final LanternTileEntity tileEntity = serializer.deserialize(dataView);
-        from(tileEntity);
+    public BlockEntityArchetype.Builder blockEntityData(DataView dataView) {
+        final ObjectSerializer<LanternBlockEntity> serializer = ObjectSerializerRegistry.get().get(LanternBlockEntity.class).get();
+        final LanternBlockEntity blockEntity = serializer.deserialize(dataView);
+        from(blockEntity);
         return this;
     }
 
     @Override
-    public TileEntityArchetype.Builder setData(DataManipulator<?, ?> manipulator) {
+    public BlockEntityArchetype.Builder set(DataManipulator manipulator) {
         if (this.data == null) {
             this.data = new ArrayList<>();
         }
@@ -133,7 +133,7 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public <E, V extends Value<E>> TileEntityArchetype.Builder set(V value) {
+    public <E, V extends Value<E>> BlockEntityArchetype.Builder set(V value) {
         if (this.data == null) {
             this.data = new ArrayList<>();
         }
@@ -142,7 +142,7 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public <E, V extends Value<E>> TileEntityArchetype.Builder set(Key<V> key, E value) {
+    public <E, V extends Value<E>> BlockEntityArchetype.Builder set(Key<V> key, E value) {
         if (this.data == null) {
             this.data = new ArrayList<>();
         }
@@ -151,31 +151,31 @@ public class LanternTileEntityArchetypeBuilder implements TileEntityArchetype.Bu
     }
 
     @Override
-    public TileEntityArchetype build() {
-        checkState(this.tileEntityType != null, "The tile entity type must be set");
+    public BlockEntityArchetype build() {
+        checkState(this.blockEntityType != null, "The tile entity type must be set");
         checkState(this.blockState != null, "The block state must be set");
-        final LanternTileEntity tileEntity;
-        if (this.tileEntity == null || this.tileEntity.getType() != this.tileEntityType) {
-            tileEntity = this.tileEntityType.construct();
-            if (this.tileEntity != null) {
-                tileEntity.copyFrom(this.tileEntity);
+        final LanternBlockEntity blockEntity;
+        if (this.blockEntity == null || this.blockEntity.getType() != this.blockEntityType) {
+            blockEntity = this.blockEntityType.construct();
+            if (this.blockEntity != null) {
+                blockEntity.copyFrom(this.blockEntity);
             }
         } else {
-            tileEntity = LanternTileEntityArchetype.copy(this.tileEntity);
+            blockEntity = LanternBlockEntityArchetype.copy(this.blockEntity);
         }
-        tileEntity.setBlock(this.blockState);
+        blockEntity.setBlock(this.blockState);
         if (this.data != null) {
             for (Object obj : this.data) {
                 if (obj instanceof DataManipulator) {
-                    tileEntity.offerFastNoEvents((DataManipulator) obj);
+                    blockEntity.offerFastNoEvents((DataManipulator) obj);
                 } else if (obj instanceof Value.Mutable) {
-                    tileEntity.offerFastNoEvents((Value.Mutable) obj);
+                    blockEntity.offerFastNoEvents((Value.Mutable) obj);
                 } else {
                     final Tuple<Key, Object> tuple = (Tuple<Key, Object>) obj;
-                    tileEntity.offerFastNoEvents(tuple.getFirst(), tuple.getSecond());
+                    blockEntity.offerFastNoEvents(tuple.getFirst(), tuple.getSecond());
                 }
             }
         }
-        return new LanternTileEntityArchetype(tileEntity);
+        return new LanternBlockEntityArchetype(blockEntity);
     }
 }

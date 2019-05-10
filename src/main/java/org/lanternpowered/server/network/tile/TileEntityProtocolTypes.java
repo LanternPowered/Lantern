@@ -25,19 +25,19 @@
  */
 package org.lanternpowered.server.network.tile;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 @SuppressWarnings("unchecked")
 public final class TileEntityProtocolTypes {
 
-    public static final TileEntityProtocolType<LanternTileEntity> BANNER = dummy("BANNER");
+    public static final TileEntityProtocolType<LanternBlockEntity> BANNER = dummy("BANNER");
 
-    public static final TileEntityProtocolType<LanternTileEntity> DEFAULT = dummy("DEFAULT");
+    public static final TileEntityProtocolType<LanternBlockEntity> DEFAULT = dummy("DEFAULT");
 
-    public static final TileEntityProtocolType<LanternTileEntity> SIGN = dummy("SIGN");
+    public static final TileEntityProtocolType<LanternBlockEntity> SIGN = dummy("SIGN");
 
-    private static <E extends LanternTileEntity> TileEntityProtocolType<E> dummy(String name) {
+    private static <E extends LanternBlockEntity> TileEntityProtocolType<E> dummy(String name) {
         return DummyObjectProvider.createFor(TileEntityProtocolType.class, name);
     }
 

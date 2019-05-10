@@ -33,11 +33,8 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
-import org.lanternpowered.server.world.pregen.LanternChunkPreGenerateTask;
 import org.spongepowered.api.util.TemporalUnits;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
-import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 
 import java.time.Duration;
 import java.util.Set;
@@ -114,7 +111,7 @@ public final class LanternWorldBorder implements WorldBorder {
             long elapsedTime = System.currentTimeMillis() - this.timeStart;
             elapsedTime = elapsedTime > lerpTime ? lerpTime : elapsedTime < 0 ? 0 : elapsedTime;
 
-            double d = elapsedTime / lerpTime;
+            double d = (double) elapsedTime / lerpTime;
             double diameter;
 
             if (d == 0.0) {
@@ -245,11 +242,5 @@ public final class LanternWorldBorder implements WorldBorder {
     private void updateCurrentTime(long time) {
         this.timeStart = System.currentTimeMillis();
         this.timeEnd = this.timeStart + time;
-    }
-
-    @Override
-    public ChunkPreGenerate.Builder newChunkPreGenerate(World world) {
-        checkNotNull(world, "world");
-        return new LanternChunkPreGenerateTask.Builder(world, getCenter(), getDiameter());
     }
 }

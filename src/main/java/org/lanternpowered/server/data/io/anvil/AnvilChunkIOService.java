@@ -59,7 +59,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
@@ -69,8 +69,6 @@ import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStre
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.scheduler.LanternScheduler;
-import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
 import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
@@ -178,7 +176,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         final ChunkSection[] sections = new ChunkSection[16];
         final ChunkBlockStateArray[] blockStateArray = new ChunkBlockStateArray[16];
         //noinspection unchecked
-        final Short2ObjectOpenHashMap<LanternTileEntity>[] tileEntitySections = new Short2ObjectOpenHashMap[sections.length];
+        final Short2ObjectOpenHashMap<LanternBlockEntity>[] tileEntitySections = new Short2ObjectOpenHashMap[sections.length];
 
         for (DataView sectionTag : sectionList) {
             final int y = sectionTag.getInt(Y).get();
@@ -195,7 +193,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         }
 
         levelDataView.getViewList(TILE_ENTITIES).ifPresent(tileEntityViews -> {
-            final ObjectSerializer<LanternTileEntity> tileEntitySerializer = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
+            final ObjectSerializer<LanternBlockEntity> tileEntitySerializer = ObjectSerializerRegistry.get().get(LanternBlockEntity.class).get();
             for (DataView tileEntityView : tileEntityViews) {
                 final int tileY = tileEntityView.getInt(TILE_ENTITY_Y).get();
                 final int section = tileY >> 4;
@@ -205,7 +203,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                 final int tileZ = tileEntityView.getInt(TILE_ENTITY_Z).get();
                 final int tileX = tileEntityView.getInt(TILE_ENTITY_X).get();
                 try {
-                    final LanternTileEntity tileEntity = tileEntitySerializer.deserialize(tileEntityView);
+                    final LanternBlockEntity tileEntity = tileEntitySerializer.deserialize(tileEntityView);
                     tileEntity.setLocation(new Location(this.world, tileX, tileY, tileZ));
                     final short index = (short) ChunkSection.index(tileX & 0xf, tileY & 0xf, tileZ & 0xf);
                     tileEntity.setBlock(blockStateArray[section].get(index));
@@ -328,9 +326,9 @@ public class AnvilChunkIOService implements ChunkIOService {
             sectionDataViews.add(sectionDataView);
 
             //noinspection unchecked
-            final ObjectSerializer<LanternTileEntity> tileEntitySerializer = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
+            final ObjectSerializer<LanternBlockEntity> tileEntitySerializer = ObjectSerializerRegistry.get().get(LanternBlockEntity.class).get();
             // Serialize the tile entities
-            for (Short2ObjectMap.Entry<LanternTileEntity> tileEntityEntry : section.tileEntities.short2ObjectEntrySet()) {
+            for (Short2ObjectMap.Entry<LanternBlockEntity> tileEntityEntry : section.tileEntities.short2ObjectEntrySet()) {
                 if (!tileEntityEntry.getValue().isValid()) {
                     continue;
                 }

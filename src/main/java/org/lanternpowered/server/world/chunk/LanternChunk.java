@@ -51,8 +51,8 @@ import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
 import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.block.tile.LanternTileEntityArchetype;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntityArchetype;
 import org.lanternpowered.server.data.property.IStoreDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -174,7 +174,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final NibbleArray lightFromSky;
         final NibbleArray lightFromBlock;
 
-        final Short2ObjectMap<LanternTileEntity> tileEntities;
+        final Short2ObjectMap<LanternBlockEntity> tileEntities;
 
         /**
          * The amount of non air blocks in this chunk section.
@@ -200,7 +200,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
 
         public ChunkSection(ChunkBlockStateArray blocks, NibbleArray lightFromSky, NibbleArray lightFromBlock,
-                Short2ObjectMap<LanternTileEntity> tileEntities) {
+                Short2ObjectMap<LanternBlockEntity> tileEntities) {
             checkArgument(blocks.getCapacity() == CHUNK_SECTION_VOLUME, "Type array length mismatch: Got "
                     + blocks.getCapacity() + ", but expected " + CHUNK_SECTION_VOLUME);
             checkArgument(lightFromSky.length() == CHUNK_SECTION_VOLUME, "Sky light nibble array length mismatch: Got "
@@ -256,13 +256,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
         // The block types array
         public final ChunkBlockStateArray blockStates;
         // The tile entities
-        public final Short2ObjectMap<LanternTileEntity> tileEntities;
+        public final Short2ObjectMap<LanternBlockEntity> tileEntities;
 
         // The light level arrays
         @Nullable public final byte[] lightFromSky;
         public final byte[] lightFromBlock;
 
-        private ChunkSectionSnapshot(ChunkBlockStateArray blockStates, Short2ObjectMap<LanternTileEntity> tileEntities,
+        private ChunkSectionSnapshot(ChunkBlockStateArray blockStates, Short2ObjectMap<LanternBlockEntity> tileEntities,
                 byte[] lightFromBlock, @Nullable byte[] lightFromSky) {
             this.lightFromBlock = lightFromBlock;
             this.lightFromSky = lightFromSky;
@@ -863,7 +863,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (section.nonAirCount <= 0) {
                 return null;
             }
-            final LanternTileEntity tileEntity = section.tileEntities.get((short) index);
+            final LanternBlockEntity tileEntity = section.tileEntities.get((short) index);
             boolean remove = false;
             boolean refresh = false;
             final Optional<TileEntityProvider> tileEntityProvider = ((LanternBlockType) state.getType()).getTileEntityProvider();
@@ -880,7 +880,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
             if (refresh) {
                 final Location location = tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z);
-                final LanternTileEntity newTileEntity = (LanternTileEntity) tileEntityProvider.get().get(state, location, null);
+                final LanternBlockEntity newTileEntity = (LanternBlockEntity) tileEntityProvider.get().get(state, location, null);
                 section.tileEntities.put((short) index, newTileEntity);
                 newTileEntity.setLocation(location);
                 newTileEntity.setBlock(state);
@@ -972,8 +972,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public BlockSnapshot createSnapshot(int x, int y, int z) {
         final BlockState state = getBlock(x, y, z);
         final Location loc = new Location<>(this.world, x, y, z);
-        final LanternTileEntity tileEntity = getTileEntity(x, y, z)
-                .map(tile -> LanternTileEntityArchetype.copy((LanternTileEntity) tile))
+        final LanternBlockEntity tileEntity = getTileEntity(x, y, z)
+                .map(tile -> LanternBlockEntityArchetype.copy((LanternBlockEntity) tile))
                 .orElse(null);
         return new LanternBlockSnapshot(loc, state, getCreator(x, y, z).orElse(null),
                 getNotifier(x, y, z).orElse(null), tileEntity);
@@ -1062,7 +1062,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         getTileEntities().forEach(tileEntity -> {
             causeStack.pushCause(tileEntity); // Add the tile entity to the cause
             try {
-                ((LanternTileEntity) tileEntity).pulse();
+                ((LanternBlockEntity) tileEntity).pulse();
             } catch (Throwable t) {
                 final Vector3i pos = tileEntity.getLocation().getBlockPosition();
                 Lantern.getLogger().error("Failed to pulse TileEntity at ({};{};{})", pos.getX(), pos.getY(), pos.getZ(), t);
@@ -1463,9 +1463,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 if (chunkSection == null) {
                     return;
                 }
-                final ObjectIterator<LanternTileEntity> it = chunkSection.tileEntities.values().iterator();
+                final ObjectIterator<LanternBlockEntity> it = chunkSection.tileEntities.values().iterator();
                 while (it.hasNext()) {
-                    final LanternTileEntity tileEntity = it.next();
+                    final LanternBlockEntity tileEntity = it.next();
                     if (tileEntity.isValid()) {
                         tileEntities.add(tileEntity);
                     } else {
@@ -1490,7 +1490,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (chunkSection == null) {
                 return Optional.empty();
             }
-            final LanternTileEntity tileEntity = chunkSection.tileEntities.get(index);
+            final LanternBlockEntity tileEntity = chunkSection.tileEntities.get(index);
             // Remove invalid tile entities
             if (tileEntity != null && !tileEntity.isValid()) {
                 chunkSection.tileEntities.remove(index);

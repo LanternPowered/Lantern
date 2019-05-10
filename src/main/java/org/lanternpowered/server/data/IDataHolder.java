@@ -45,7 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings("unchecked")
-public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder, DataManipulator<?, ?>>, IStorePropertyHolder {
+public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder, DataManipulator>, IStorePropertyHolder {
 
     @Override
     default DataHolder copy() {
@@ -71,7 +71,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
 
     // TODO: Support event? Would require special handling to restore the container
     @Override
-    default boolean removeFast(Class<? extends DataManipulator<?,?>> containerClass) {
+    default boolean removeFast(Class<? extends DataManipulator> containerClass) {
         checkNotNull(containerClass, "containerClass");
         // You cannot remove default data manipulators?
         final Optional optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
@@ -80,7 +80,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
 
     // TODO: Support event? Would require special handling to restore the container
     @Override
-    default DataTransactionResult remove(Class<? extends DataManipulator<?,?>> containerClass) {
+    default DataTransactionResult remove(Class<? extends DataManipulator> containerClass) {
         checkNotNull(containerClass, "containerClass");
         // You cannot remove default data manipulators?
         final Optional optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
@@ -91,7 +91,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
     }
 
     @Override
-    default boolean supports(Class<? extends DataManipulator<?,?>> containerClass) {
+    default boolean supports(Class<? extends DataManipulator> containerClass) {
         checkNotNull(containerClass, "containerClass");
         // Offer all the default key values as long if they are supported
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
@@ -108,7 +108,7 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
     }
 
     @Override
-    default <T extends DataManipulator<?,?>> Optional<T> get(Class<T> containerClass) {
+    default <T extends DataManipulator> Optional<T> get(Class<T> containerClass) {
         checkNotNull(containerClass, "containerClass");
         // Check default registrations
         final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getBy(containerClass);
@@ -121,8 +121,8 @@ public interface IDataHolder extends DataHolder, ICompositeValueStore<DataHolder
     }
 
     @Override
-    default Collection<DataManipulator<?, ?>> getContainers() {
-        final ImmutableList.Builder<DataManipulator<?, ?>> builder = ImmutableList.builder();
+    default Collection<DataManipulator> getContainers() {
+        final ImmutableList.Builder<DataManipulator> builder = ImmutableList.builder();
         for (DataManipulatorRegistration registration : DataManipulatorRegistry.get().getAll()) {
             final DataManipulator manipulator = DataHelper.create(this, registration);
             if (manipulator != null) {

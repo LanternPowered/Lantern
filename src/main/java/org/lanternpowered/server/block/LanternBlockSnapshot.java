@@ -31,8 +31,8 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.block.tile.LanternTileEntityArchetype;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntityArchetype;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
@@ -68,7 +68,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     private final BlockState state;
     @Nullable private final UUID notifier;
     @Nullable private final UUID creator;
-    @Nullable final LanternTileEntity tileEntity;
+    @Nullable final LanternBlockEntity tileEntity;
 
     public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
@@ -83,7 +83,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     public LanternBlockSnapshot(@Nullable Location location, BlockState blockState,
             @Nullable UUID creator, @Nullable UUID notifier, @Nullable TileEntity tileEntity) {
         this.state = checkNotNull(blockState, "blockState");
-        this.tileEntity = (LanternTileEntity) tileEntity;
+        this.tileEntity = (LanternBlockEntity) tileEntity;
         this.location = location;
         this.notifier = notifier;
         this.creator = creator;
@@ -180,7 +180,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         } else if (this.tileEntity == null || !this.tileEntity.supports(key)) {
             return Optional.empty();
         }
-        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        final LanternBlockEntity newTileEntity = copy(this.tileEntity);
         if (!newTileEntity.transformFast(key, function)) {
             return Optional.empty();
         }
@@ -197,7 +197,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         } else if (this.tileEntity == null || !this.tileEntity.supports(key)) {
             return Optional.empty();
         }
-        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        final LanternBlockEntity newTileEntity = copy(this.tileEntity);
         if (!newTileEntity.offerFast(key, value)) {
             return Optional.empty();
         }
@@ -214,7 +214,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         } else if (this.tileEntity == null || !this.tileEntity.supports(value.getKey())) {
             return Optional.empty();
         }
-        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        final LanternBlockEntity newTileEntity = copy(this.tileEntity);
         if (!newTileEntity.offerFast(value)) {
             return Optional.empty();
         }
@@ -235,7 +235,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         if (!optRegistration.isPresent() || !this.tileEntity.supports(optRegistration.get().getManipulatorClass())) {
             return Optional.empty();
         }
-        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        final LanternBlockEntity newTileEntity = copy(this.tileEntity);
         if (!newTileEntity.offerFast(valueContainer.asMutable())) {
             return Optional.empty();
         }
@@ -252,7 +252,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         } else if (this.tileEntity == null) {
             return Optional.empty();
         }
-        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        final LanternBlockEntity newTileEntity = copy(this.tileEntity);
         if (!newTileEntity.offerFast(Streams.stream(valueContainers)
                 .map(ImmutableDataManipulator::asMutable)
                 .collect(Collectors.toList()))) {
@@ -272,7 +272,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         if (!optRegistration.isPresent() || !this.tileEntity.supports(optRegistration.get().getManipulatorClass())) {
             return Optional.empty();
         }
-        final LanternTileEntity newTileEntity = copy(this.tileEntity);
+        final LanternBlockEntity newTileEntity = copy(this.tileEntity);
         if (!newTileEntity.removeFast(optRegistration.get().getManipulatorClass())) {
             return Optional.empty();
         }
@@ -294,7 +294,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         if (that0.tileEntity == null || this.tileEntity == null) {
             return that0;
         }
-        final LanternTileEntity newTileEntity = copy(that0.tileEntity);
+        final LanternBlockEntity newTileEntity = copy(that0.tileEntity);
         newTileEntity.copyFrom(this.tileEntity, function);
         return new LanternBlockSnapshot(this.location, this.state,
                 this.creator, this.notifier, newTileEntity);
@@ -351,7 +351,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
             return new LanternBlockSnapshot(this.location, blockState,
                     this.creator, this.notifier, this.tileEntity);
         }
-        final LanternTileEntity tileEntity = (LanternTileEntity) ((LanternBlockType) blockState.getType()).getTileEntityProvider()
+        final LanternBlockEntity tileEntity = (LanternBlockEntity) ((LanternBlockType) blockState.getType()).getTileEntityProvider()
                 .map(provider -> provider.get(blockState, null, null))
                 .orElse(null);
         if (tileEntity != null) {
@@ -417,7 +417,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
         world.setCreator(x, y, z, this.creator);
         world.setNotifier(x, y, z, this.notifier);
         if (this.tileEntity != null) {
-            final LanternTileEntity tileEntity = (LanternTileEntity) world.getTileEntity(x, y, z).orElse(null);
+            final LanternBlockEntity tileEntity = (LanternBlockEntity) world.getTileEntity(x, y, z).orElse(null);
             if (tileEntity != null) {
                 tileEntity.copyFromFastNoEvents(this.tileEntity);
             }
@@ -441,7 +441,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
     }
 
     @Nullable
-    static LanternTileEntity copy(@Nullable LanternTileEntity tileEntity) {
-        return tileEntity == null ? null : LanternTileEntityArchetype.copy(tileEntity);
+    static LanternBlockEntity copy(@Nullable LanternBlockEntity tileEntity) {
+        return tileEntity == null ? null : LanternBlockEntityArchetype.copy(tileEntity);
     }
 }

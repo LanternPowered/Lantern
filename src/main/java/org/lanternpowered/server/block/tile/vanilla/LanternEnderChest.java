@@ -32,11 +32,10 @@ import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class LanternEnderChest extends LanternContainerTileBase implements EnderChest {
+public class LanternEnderChest extends ContainerBlockEntityBase implements EnderChest {
 
     public LanternEnderChest() {
         setProtocolType(TileEntityProtocolTypes.DEFAULT);

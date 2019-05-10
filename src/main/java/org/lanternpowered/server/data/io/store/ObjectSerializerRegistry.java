@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.data.io.store.entity.EntitySerializer;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.io.store.tile.TileEntitySerializer;
@@ -73,7 +73,7 @@ public final class ObjectSerializerRegistry {
     public ObjectSerializerRegistry() {
         register(LanternItemStack.class, new ItemStackStore());
         register(LanternEntity.class, new EntitySerializer());
-        register(LanternTileEntity.class, new TileEntitySerializer());
+        register(LanternBlockEntity.class, new TileEntitySerializer());
     }
 
     /**

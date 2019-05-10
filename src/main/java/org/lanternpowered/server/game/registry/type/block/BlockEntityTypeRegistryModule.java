@@ -28,7 +28,7 @@ package org.lanternpowered.server.game.registry.type.block;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.tile.LanternBlockEntityType;
 import org.lanternpowered.server.block.tile.vanilla.LanternBanner;
 import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
@@ -41,9 +41,9 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.spongepowered.api.CatalogKey;
 import org.lanternpowered.server.network.tile.TileEntityProtocolTypeRegistryModule;
-import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.block.tileentity.TileEntityType;
-import org.spongepowered.api.block.tileentity.TileEntityTypes;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.block.entity.BlockEntityType;
+import org.spongepowered.api.block.entity.BlockEntityTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
 import java.util.HashMap;
@@ -51,41 +51,41 @@ import java.util.Map;
 import java.util.Optional;
 
 @RegistrationDependency({ KeyRegistryModule.class, InventoryArchetypeRegistryModule.class, TileEntityProtocolTypeRegistryModule.class })
-public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<TileEntityType> {
+public final class BlockEntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockEntityType> {
 
-    private static final TileEntityTypeRegistryModule INSTANCE = new TileEntityTypeRegistryModule();
+    private static final BlockEntityTypeRegistryModule INSTANCE = new BlockEntityTypeRegistryModule();
 
-    public static TileEntityTypeRegistryModule get() {
+    public static BlockEntityTypeRegistryModule get() {
         return INSTANCE;
     }
 
-    private final Map<Class<?>, TileEntityType> tileEntityTypesByClass = new HashMap<>();
+    private final Map<Class<?>, BlockEntityType> BlockEntityTypesByClass = new HashMap<>();
 
-    private TileEntityTypeRegistryModule() {
-        super(TileEntityTypes.class);
+    private BlockEntityTypeRegistryModule() {
+        super(BlockEntityTypes.class);
     }
 
     @Override
-    protected void doRegistration(TileEntityType catalogType, boolean disallowInbuiltPluginIds) {
-        checkArgument(!this.tileEntityTypesByClass.containsKey(catalogType.getClass()),
-                "There is already a TileEntityType registered for the class: %s", catalogType.getTileEntityType().getName());
+    protected void doRegistration(BlockEntityType catalogType, boolean disallowInbuiltPluginIds) {
+        checkArgument(!this.BlockEntityTypesByClass.containsKey(catalogType.getClass()),
+                "There is already a BlockEntityType registered for the class: %s", catalogType.getBlockEntityType().getName());
         super.doRegistration(catalogType, disallowInbuiltPluginIds);
-        this.tileEntityTypesByClass.put(catalogType.getTileEntityType(), catalogType);
+        this.BlockEntityTypesByClass.put(catalogType.getBlockEntityType(), catalogType);
     }
 
-    public Optional<TileEntityType> getByClass(Class<? extends TileEntity> entityClass) {
+    public Optional<BlockEntityType> getByClass(Class<? extends BlockEntity> entityClass) {
         checkNotNull(entityClass, "entityClass");
-        return Optional.ofNullable(this.tileEntityTypesByClass.get(entityClass));
+        return Optional.ofNullable(this.BlockEntityTypesByClass.get(entityClass));
     }
 
     @Override
     public void registerDefaults() {
-        register(LanternTileEntityType.of(CatalogKey.minecraft("banner"), LanternBanner::new));
-        register(LanternTileEntityType.of(CatalogKey.minecraft("chest"), LanternChest::new));
-        register(LanternTileEntityType.of(CatalogKey.minecraft("ender_chest"), LanternEnderChest::new));
-        register(LanternTileEntityType.of(CatalogKey.minecraft("furnace"), LanternFurnace::new));
-        register(LanternTileEntityType.of(CatalogKey.minecraft("jukebox"), LanternJukebox::new));
-        register(LanternTileEntityType.of(CatalogKey.minecraft("shulker_box"), LanternShulkerBox::new));
-        register(LanternTileEntityType.of(CatalogKey.minecraft("sign"), LanternSign::new));
+        register(LanternBlockEntityType.of(CatalogKey.minecraft("banner"), LanternBanner::new));
+        register(LanternBlockEntityType.of(CatalogKey.minecraft("chest"), LanternChest::new));
+        register(LanternBlockEntityType.of(CatalogKey.minecraft("ender_chest"), LanternEnderChest::new));
+        register(LanternBlockEntityType.of(CatalogKey.minecraft("furnace"), LanternFurnace::new));
+        register(LanternBlockEntityType.of(CatalogKey.minecraft("jukebox"), LanternJukebox::new));
+        register(LanternBlockEntityType.of(CatalogKey.minecraft("shulker_box"), LanternShulkerBox::new));
+        register(LanternBlockEntityType.of(CatalogKey.minecraft("sign"), LanternSign::new));
     }
 }

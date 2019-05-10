@@ -50,6 +50,7 @@ import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryMod
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.Quaternions;
+import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -462,7 +463,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     @Override
     public Location getLocation() {
         checkState(this.world != null, "This entity doesn't have a world.");
-        return new Location(this.world, this.position);
+        return new LanternLocation(this.world, this.position);
     }
 
     @Override

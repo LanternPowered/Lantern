@@ -28,9 +28,9 @@ package org.lanternpowered.server.catalog
 import org.lanternpowered.server.util.ToString
 import org.lanternpowered.server.util.ToStringHelper
 import org.spongepowered.api.CatalogType
+import org.spongepowered.api.NamedCatalogType
 
 abstract class AbstractCatalogType : CatalogType, ToString {
-
     override fun toStringHelper(): ToStringHelper = applyCatalog(super.toStringHelper())
     override fun toString(): String = toStringHelper().toString()
 }
@@ -39,7 +39,9 @@ private fun CatalogType.applyCatalog(helper: ToStringHelper): ToStringHelper = h
     if (this@applyCatalog is InternalCatalogType) {
         helper.addFirst("internalId", internalId)
     }
-    helper.addFirst("name", name)
+    if (this@applyCatalog is NamedCatalogType) {
+        helper.addFirst("name", name)
+    }
     helper.addFirst("id", key)
 }
 

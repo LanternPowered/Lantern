@@ -33,13 +33,13 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.IStorePropertyHolder;
-import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.network.tile.AbstractTileEntityProtocol;
 import org.lanternpowered.server.network.tile.TileEntityProtocolType;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.block.tileentity.TileEntityArchetype;
-import org.spongepowered.api.block.tileentity.TileEntityType;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.block.entity.BlockEntityArchetype;
+import org.spongepowered.api.block.entity.BlockEntityType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
@@ -54,11 +54,11 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHolder, IStorePropertyHolder {
+public abstract class LanternBlockEntity implements BlockEntity, IAdditionalDataHolder, IStorePropertyHolder {
 
-    private LanternTileEntityType tileEntityType;
+    private LanternBlockEntityType blockEntityType;
     private final ValueCollection valueCollection = ValueCollection.create();
-    private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers = AdditionalContainerCollection.createConcurrent();
+    private final AdditionalContainerCollection<DataManipulator> additionalContainers = AdditionalContainerCollection.createConcurrent();
 
     @Nullable private volatile Location location;
     @Nullable volatile BlockState blockState;
@@ -66,7 +66,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     @Nullable private TileEntityProtocolType<?> protocolType;
     @Nullable private AbstractTileEntityProtocol<?> protocol;
 
-    protected LanternTileEntity() {
+    protected LanternBlockEntity() {
         registerKeys();
     }
 
@@ -74,7 +74,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     }
 
     /**
-     * Pulses this {@link LanternTileEntity}.
+     * Pulses this {@link LanternBlockEntity}.
      */
     public void pulse() {
     }
@@ -85,7 +85,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     }
 
     @Override
-    public AdditionalContainerCollection<DataManipulator<?, ?>> getAdditionalContainers() {
+    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
         return this.additionalContainers;
     }
 
@@ -110,27 +110,27 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     }
 
     @Override
-    public LanternTileEntityType getType() {
-        if (this.tileEntityType == null) {
+    public LanternBlockEntityType getType() {
+        if (this.blockEntityType == null) {
             // Load the tile entity type, if not provided earlier
-            this.tileEntityType = (LanternTileEntityType) TileEntityTypeRegistryModule.get().getByClass(getClass()).orElseThrow(
+            this.blockEntityType = (LanternBlockEntityType) BlockEntityTypeRegistryModule.get().getByClass(getClass()).orElseThrow(
                     () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
         }
-        return this.tileEntityType;
+        return this.blockEntityType;
     }
 
     /**
-     * Sets the {@link TileEntityType}.
+     * Sets the {@link BlockEntityType}.
      *
-     * @param tileEntityType The tile entity type
+     * @param blockEntityType The block entity type
      */
-    void setTileEntityType(LanternTileEntityType tileEntityType) {
-        this.tileEntityType = tileEntityType;
+    void setBlockEntityType(LanternBlockEntityType blockEntityType) {
+        this.blockEntityType = blockEntityType;
     }
 
     @Override
-    public TileEntityArchetype createArchetype() {
-        return new LanternTileEntityArchetype(LanternTileEntityArchetype.copy(this));
+    public BlockEntityArchetype createArchetype() {
+        return new LanternBlockEntityArchetype(LanternBlockEntityArchetype.copy(this));
     }
 
     @Override
@@ -184,7 +184,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
      */
     public void setBlock(BlockState blockState) {
         this.blockState = blockState;
-        final LanternTileEntityType type = getType();
+        final LanternBlockEntityType type = getType();
         if (type.defaultBlock == null) {
             // Should be fine, in 1.13 ...
             type.defaultBlock = blockState.getType().getDefaultState();
@@ -192,7 +192,7 @@ public abstract class LanternTileEntity implements TileEntity, IAdditionalDataHo
     }
 
     /**
-     * Sets the {@link TileEntityProtocolType} of this {@link TileEntity}.
+     * Sets the {@link TileEntityProtocolType} of this {@link BlockEntity}.
      *
      * @param protocolType The protocol type
      */

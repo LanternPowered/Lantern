@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data.io.store.tile;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntityType;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
@@ -41,33 +41,33 @@ import org.spongepowered.api.data.persistence.InvalidDataException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TileEntitySerializer implements ObjectSerializer<LanternTileEntity> {
+public class TileEntitySerializer implements ObjectSerializer<LanternBlockEntity> {
 
     private static final DataQuery ID = DataQuery.of("id");
 
     @Override
-    public LanternTileEntity deserialize(DataView dataView) throws InvalidDataException {
+    public LanternBlockEntity deserialize(DataView dataView) throws InvalidDataException {
         final String id = fixTileId(dataView, dataView.getString(ID).get());
         dataView.remove(ID);
 
-        final LanternTileEntityType tileEntityType = (LanternTileEntityType) Sponge.getRegistry()
+        final LanternBlockEntityType tileEntityType = (LanternBlockEntityType) Sponge.getRegistry()
                 .getType(TileEntityType.class, CatalogKey.resolve(id))
                 .orElseThrow(() -> new InvalidDataException("Unknown tile entity id: " + id));
         //noinspection unchecked
-        final ObjectStore<LanternTileEntity> store = (ObjectStore)
+        final ObjectStore<LanternBlockEntity> store = (ObjectStore)
                 ObjectStoreRegistry.get().get(tileEntityType.getTileEntityType()).get();
         //noinspection unchecked
-        final LanternTileEntity entity = tileEntityType.construct();
+        final LanternBlockEntity entity = tileEntityType.construct();
         store.deserialize(entity, dataView);
         return entity;
     }
 
     @Override
-    public DataView serialize(LanternTileEntity object) {
+    public DataView serialize(LanternBlockEntity object) {
         final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         dataView.set(ID, object.getType().getKey());
         //noinspection unchecked
-        final ObjectStore<LanternTileEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();
+        final ObjectStore<LanternBlockEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();
         store.serialize(object, dataView);
         return dataView;
     }

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.network.tile.TileEntityProtocolTypes;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.key.Keys;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class LanternSign extends LanternTileEntity implements Sign {
+public class LanternSign extends LanternBlockEntity implements Sign {
 
     private static final List<Text> emptyLines = Arrays.asList(Text.of(), Text.of(), Text.of(), Text.of());
 

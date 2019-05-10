@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.io.store.tile;
 
 import static org.lanternpowered.server.data.io.store.InventorySnapshotSerializer.SLOT;
 
-import org.lanternpowered.server.block.tile.vanilla.LanternContainerTile;
+import org.lanternpowered.server.block.tile.vanilla.ContainerBlockEntity;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
@@ -44,7 +44,7 @@ import org.spongepowered.api.item.inventory.property.SlotIndex;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContainerTileEntityStore<T extends LanternContainerTile> extends TileEntityObjectStore<T> {
+public class ContainerTileEntityStore<T extends ContainerBlockEntity> extends TileEntityObjectStore<T> {
 
     private static final DataQuery DISPLAY_NAME = DataQuery.of("CustomName");
     private static final DataQuery ITEMS = DataQuery.of("Items");

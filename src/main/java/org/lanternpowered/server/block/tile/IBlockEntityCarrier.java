@@ -26,11 +26,11 @@
 package org.lanternpowered.server.block.tile;
 
 import org.lanternpowered.server.inventory.LanternEmptyCarriedInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.block.entity.carrier.BlockEntityCarrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.util.Direction;
 
-public interface ITileEntityCarrier extends TileEntityCarrier {
+public interface IBlockEntityCarrier extends BlockEntityCarrier {
 
     @Override
     default Inventory getInventory(Direction from) {

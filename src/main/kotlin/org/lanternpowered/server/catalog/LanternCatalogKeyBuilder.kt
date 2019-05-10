@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.x.catalog.XCatalogKey
 import org.lanternpowered.api.x.catalog.XCatalogKeyBuilder
@@ -40,7 +38,6 @@ class LanternCatalogKeyBuilder : XCatalogKeyBuilder {
     override fun name(name: String): XCatalogKeyBuilder = apply { this.name = name }
     override fun namespace(namespace: String): XCatalogKeyBuilder = apply { this.namespace = namespace }
     override fun namespace(container: PluginContainer): XCatalogKeyBuilder = namespace(container.id)
-    override fun namespace(pluginInstance: Any): XCatalogKeyBuilder = namespace(checkPluginInstance(pluginInstance))
 
     override fun value(value: String): XCatalogKeyBuilder = apply {
         this.value = value
@@ -63,6 +60,4 @@ class LanternCatalogKeyBuilder : XCatalogKeyBuilder {
         this.value = null
         this.name = null
     }
-
-    override fun from(value: CatalogKey?): XCatalogKeyBuilder = throw UnsupportedOperationException()
 }

@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.inventory.vanilla.block;
 
-import org.lanternpowered.server.block.tile.ITileEntityInventory;
+import org.lanternpowered.server.block.tile.IBlockEntityInventory;
 import org.lanternpowered.server.inventory.type.slot.LanternFilteringSlot;
 import org.spongepowered.api.block.tileentity.Jukebox;
 
-public class JukeboxInventory extends LanternFilteringSlot implements ITileEntityInventory {
+public class JukeboxInventory extends LanternFilteringSlot implements IBlockEntityInventory {
 
     @Override
     protected void queueUpdate() {

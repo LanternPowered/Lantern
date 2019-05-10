@@ -23,34 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile.vanilla;
+package org.lanternpowered.server.block.tile;
 
-import org.lanternpowered.server.block.tile.ITileEntityCarrier;
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
-import org.spongepowered.api.util.Direction;
+import org.lanternpowered.server.inventory.ICarriedInventory;
+import org.lanternpowered.server.inventory.IViewableInventory;
+import org.spongepowered.api.block.entity.carrier.BlockEntityCarrier;
+import org.spongepowered.api.item.inventory.type.BlockEntityInventory;
 
-public abstract class LanternContainerTile<I extends AbstractInventory & TileEntityInventory<TileEntityCarrier>>
-        extends LanternContainerTileBase implements ITileEntityCarrier {
+import java.util.Optional;
 
-    protected final I inventory;
-
-    protected LanternContainerTile() {
-        this.inventory = createInventory();
-        this.inventory.addViewListener(this);
-    }
-
-    protected abstract I createInventory();
+public interface IBlockEntityInventory extends BlockEntityInventory<BlockEntityCarrier>,
+        ICarriedInventory<BlockEntityCarrier>, IViewableInventory {
 
     @Override
-    public I getInventory() {
-        return this.inventory;
+    default void markDirty() {
     }
 
     @Override
-    public Inventory getInventory(Direction from) {
-        return this.inventory;
+    default Optional<BlockEntityCarrier> getBlockEntity() {
+        return getCarrier();
     }
 }

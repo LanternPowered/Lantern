@@ -26,7 +26,7 @@
 package org.lanternpowered.server.network.tile.vanilla;
 
 import com.google.common.base.Objects;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.network.tile.TileEntityProtocol;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-public class SignTileEntityProtocol<T extends LanternTileEntity> extends TileEntityProtocol<T> {
+public class SignTileEntityProtocol<T extends LanternBlockEntity> extends TileEntityProtocol<T> {
 
     private static final DataQuery[] lineQueries = {
             DataQuery.of("Text1"),

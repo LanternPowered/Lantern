@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.tile.vanilla;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.data.type.LanternBannerPatternShape;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.network.tile.TileEntityProtocol;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class BannerTileEntityProtocol<T extends LanternTileEntity> extends TileEntityProtocol<T> {
+public class BannerTileEntityProtocol<T extends LanternBlockEntity> extends TileEntityProtocol<T> {
 
     private static final DataQuery baseColorQuery = DataQuery.of("Base");
     private static final DataQuery layersQuery = DataQuery.of("Patterns");

@@ -35,7 +35,7 @@ import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.action.BlockAction;
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternBlockEntity;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.tile.AbstractTileEntityProtocol;
@@ -170,10 +170,10 @@ public final class ObservedChunkManager implements WorldEventListener {
     private static final MessagePlayOutChunkData.Section EMPTY_SECTION = new MessagePlayOutChunkData.Section(
             EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, null, new Short2ObjectOpenHashMap<>());
 
-    private static Map<Vector3i, LanternTileEntity> getMappedTileEntities(LanternChunk chunk) {
+    private static Map<Vector3i, LanternBlockEntity> getMappedTileEntities(LanternChunk chunk) {
         return chunk.getTileEntities().stream().collect(Collectors.toMap(
                 tileEntity -> tileEntity.getLocation().getBlockPosition(),
-                tileEntity -> (LanternTileEntity) tileEntity));
+                tileEntity -> (LanternBlockEntity) tileEntity));
     }
 
     private static int getStateId(Chunk chunk, Vector3i coords) {
@@ -273,7 +273,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                 return;
             }
 
-            final Map<Vector3i, LanternTileEntity> mappedTileEntities;
+            final Map<Vector3i, LanternBlockEntity> mappedTileEntities;
 
             final List<Message> messages;
             if (!this.dirtyBlocks.isEmpty()) {
@@ -311,7 +311,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                     final TileEntityUpdateContext initContext = new TileEntityUpdateContext(messages);
                     mappedTileEntities = getMappedTileEntities(chunk);
                     for (Vector3i pos : changes) {
-                        final LanternTileEntity tileEntity = mappedTileEntities.remove(pos);
+                        final LanternBlockEntity tileEntity = mappedTileEntities.remove(pos);
                         if (tileEntity != null) {
                             final AbstractTileEntityProtocol protocol = tileEntity.getProtocol();
                             if (protocol != null) {
@@ -326,7 +326,7 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
 
             final TileEntityUpdateContext updateContext = new TileEntityUpdateContext(messages);
-            for (Map.Entry<Vector3i, LanternTileEntity> entry : mappedTileEntities.entrySet()) {
+            for (Map.Entry<Vector3i, LanternBlockEntity> entry : mappedTileEntities.entrySet()) {
                 final AbstractTileEntityProtocol protocol = entry.getValue().getProtocol();
                 if (protocol != null) {
                     TileEntityProtocolHelper.update(protocol, updateContext, 1);
@@ -413,7 +413,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                     final TileEntityChunkInitContext initContext = new TileEntityChunkInitContext(
                             messages, tileEntityInitData, chunk.getX(), chunk.getZ(), i);
                     // Serialize the tile entities
-                    for (Short2ObjectMap.Entry<LanternTileEntity> tileEntityEntry : section.tileEntities.short2ObjectEntrySet()) {
+                    for (Short2ObjectMap.Entry<LanternBlockEntity> tileEntityEntry : section.tileEntities.short2ObjectEntrySet()) {
                         if (!tileEntityEntry.getValue().isValid()) { // Ignore invalid tile entities
                             continue;
                         }

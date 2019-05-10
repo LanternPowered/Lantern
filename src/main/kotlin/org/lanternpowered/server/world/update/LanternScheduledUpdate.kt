@@ -27,8 +27,8 @@ package org.lanternpowered.server.world.update
 
 import org.lanternpowered.api.world.BlockPosition
 import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.server.world.LanternLocation
 import org.spongepowered.api.scheduler.ScheduledUpdate
-import org.spongepowered.api.world.Location
 import java.time.Duration
 import java.util.Objects
 
@@ -41,7 +41,7 @@ class LanternScheduledUpdate<T>(
         private val scheduledTime: Long
 ) : ScheduledUpdate<T>, Comparable<LanternScheduledUpdate<T>> {
 
-    private val theLocation by lazy { Location(this.list.world, this.position.toVector3i()) }
+    private val theLocation by lazy { LanternLocation(this.list.world, this.position.toVector3i()) }
 
     // The state of the scheduled task
     private var state = ScheduledUpdate.State.WAITING

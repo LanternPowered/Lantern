@@ -28,19 +28,19 @@ package org.lanternpowered.server.game.registry.type.block;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.block.tile.LanternBlockEntityType;
-import org.lanternpowered.server.block.tile.vanilla.LanternBanner;
-import org.lanternpowered.server.block.tile.vanilla.LanternChest;
-import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
-import org.lanternpowered.server.block.tile.vanilla.LanternFurnace;
-import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
-import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
-import org.lanternpowered.server.block.tile.vanilla.LanternSign;
+import org.lanternpowered.server.block.entity.LanternBlockEntityType;
+import org.lanternpowered.server.block.entity.vanilla.LanternBanner;
+import org.lanternpowered.server.block.entity.vanilla.LanternChest;
+import org.lanternpowered.server.block.entity.vanilla.LanternEnderChest;
+import org.lanternpowered.server.block.entity.vanilla.LanternFurnace;
+import org.lanternpowered.server.block.entity.vanilla.LanternJukebox;
+import org.lanternpowered.server.block.entity.vanilla.LanternShulkerBox;
+import org.lanternpowered.server.block.entity.vanilla.LanternSign;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.spongepowered.api.CatalogKey;
-import org.lanternpowered.server.network.tile.TileEntityProtocolTypeRegistryModule;
+import org.lanternpowered.server.network.block.BlockEntityProtocolTypeRegistryModule;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.block.entity.BlockEntityType;
 import org.spongepowered.api.block.entity.BlockEntityTypes;
@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RegistrationDependency({ KeyRegistryModule.class, InventoryArchetypeRegistryModule.class, TileEntityProtocolTypeRegistryModule.class })
+@RegistrationDependency({ KeyRegistryModule.class, InventoryArchetypeRegistryModule.class, BlockEntityProtocolTypeRegistryModule.class })
 public final class BlockEntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockEntityType> {
 
     private static final BlockEntityTypeRegistryModule INSTANCE = new BlockEntityTypeRegistryModule();
@@ -59,7 +59,7 @@ public final class BlockEntityTypeRegistryModule extends AdditionalPluginCatalog
         return INSTANCE;
     }
 
-    private final Map<Class<?>, BlockEntityType> BlockEntityTypesByClass = new HashMap<>();
+    private final Map<Class<?>, BlockEntityType> blockEntityTypesByClass = new HashMap<>();
 
     private BlockEntityTypeRegistryModule() {
         super(BlockEntityTypes.class);
@@ -67,15 +67,15 @@ public final class BlockEntityTypeRegistryModule extends AdditionalPluginCatalog
 
     @Override
     protected void doRegistration(BlockEntityType catalogType, boolean disallowInbuiltPluginIds) {
-        checkArgument(!this.BlockEntityTypesByClass.containsKey(catalogType.getClass()),
+        checkArgument(!this.blockEntityTypesByClass.containsKey(catalogType.getClass()),
                 "There is already a BlockEntityType registered for the class: %s", catalogType.getBlockEntityType().getName());
         super.doRegistration(catalogType, disallowInbuiltPluginIds);
-        this.BlockEntityTypesByClass.put(catalogType.getBlockEntityType(), catalogType);
+        this.blockEntityTypesByClass.put(catalogType.getBlockEntityType(), catalogType);
     }
 
     public Optional<BlockEntityType> getByClass(Class<? extends BlockEntity> entityClass) {
         checkNotNull(entityClass, "entityClass");
-        return Optional.ofNullable(this.BlockEntityTypesByClass.get(entityClass));
+        return Optional.ofNullable(this.blockEntityTypesByClass.get(entityClass));
     }
 
     @Override

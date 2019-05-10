@@ -70,7 +70,7 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, I
      */
     private final MutableBehaviorPipeline<Behavior> behaviorPipeline;
 
-    @Nullable private final TileEntityProvider tileEntityProvider;
+    @Nullable private final BlockEntityProvider tileEntityProvider;
 
     /**
      * The default block state of this block type.
@@ -97,7 +97,7 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, I
 
     LanternBlockType(CatalogKey key, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
-            @Nullable TileEntityProvider tileEntityProvider) {
+            @Nullable BlockEntityProvider tileEntityProvider) {
         super(key);
         this.translationProvider = translationProvider;
         this.behaviorPipeline = behaviorPipeline;
@@ -116,7 +116,7 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, I
         this.defaultBlockState = blockState;
     }
 
-    public Optional<TileEntityProvider> getTileEntityProvider() {
+    public Optional<BlockEntityProvider> getBlockEntityProvider() {
         return Optional.ofNullable(this.tileEntityProvider);
     }
 

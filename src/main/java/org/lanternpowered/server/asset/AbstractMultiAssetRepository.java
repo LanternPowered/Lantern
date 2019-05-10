@@ -98,7 +98,7 @@ abstract class AbstractMultiAssetRepository implements AssetRepository {
             });
         }
         final ImmutableMultimap.Builder<String, Asset> builder = ImmutableMultimap.builder();
-        map.entrySet().forEach(entry -> builder.putAll(entry.getKey(), entry.getValue().values()));
+        map.forEach((key, value) -> builder.putAll(key, value.values()));
         return builder.build();
     }
 

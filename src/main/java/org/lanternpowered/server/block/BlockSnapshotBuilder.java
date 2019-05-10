@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.block.tile.LanternBlockEntity;
+import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
@@ -225,7 +225,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
     public BlockSnapshot build() {
         checkState(this.blockState != null, "The block state must be set.");
         final Location blockLocation = this.worldUUID == null  || this.position == null ? null : new Location(this.worldUUID, this.position);
-        final LanternBlockEntity tileEntity = (LanternBlockEntity) ((LanternBlockType) this.blockState.getType()).getTileEntityProvider()
+        final LanternBlockEntity tileEntity = (LanternBlockEntity) ((LanternBlockType) this.blockState.getType()).getBlockEntityProvider()
                 .map(provider -> provider.get(this.blockState, null, null))
                 .orElse(null);
         if (tileEntity != null) {

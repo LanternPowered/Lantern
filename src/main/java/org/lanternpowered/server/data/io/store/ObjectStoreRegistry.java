@@ -29,15 +29,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.lanternpowered.server.block.tile.LanternBlockEntity;
-import org.lanternpowered.server.block.tile.vanilla.ContainerBlockEntity;
-import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
+import org.lanternpowered.server.block.entity.LanternBlockEntity;
+import org.lanternpowered.server.block.entity.vanilla.ContainerBlockEntity;
+import org.lanternpowered.server.block.entity.vanilla.LanternJukebox;
 import org.lanternpowered.server.data.io.store.entity.EntityStore;
 import org.lanternpowered.server.data.io.store.entity.ItemStore;
 import org.lanternpowered.server.data.io.store.entity.LivingStore;
 import org.lanternpowered.server.data.io.store.entity.UserStore;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
-import org.lanternpowered.server.data.io.store.tile.ContainerTileEntityStore;
+import org.lanternpowered.server.data.io.store.tile.ContainerBlockEntityStore;
 import org.lanternpowered.server.data.io.store.tile.JukeboxTileEntitySerializer;
 import org.lanternpowered.server.data.io.store.tile.TileEntityObjectStore;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -89,7 +89,7 @@ public final class ObjectStoreRegistry {
 
         // Tile entities
         register(LanternBlockEntity.class, new TileEntityObjectStore<>());
-        register(ContainerBlockEntity.class, new ContainerTileEntityStore<>());
+        register(ContainerBlockEntity.class, new ContainerBlockEntityStore<>());
         register(LanternJukebox.class, new JukeboxTileEntitySerializer<>());
     }
 

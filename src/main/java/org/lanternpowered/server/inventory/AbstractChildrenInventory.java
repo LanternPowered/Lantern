@@ -332,7 +332,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
         checkNotNull(matcher, "matcher");
         for (AbstractMutableInventory inventory : getChildren()) {
             final LanternItemStack itemStack = inventory.poll(matcher);
-            if (itemStack.isFilled()) {
+            if (itemStack.isNotEmpty()) {
                 return itemStack;
             }
         }
@@ -351,7 +351,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.poll(limit, matcher);
-                if (!stack.isEmpty()) {
+                if (stack.isNotEmpty()) {
                     if (stack.getQuantity() >= limit) {
                         return stack;
                     } else {
@@ -364,8 +364,8 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
                     stack = null;
                 }
             } else {
-                final ItemStack stack1 = inventory.poll(limit, matcher);
-                if (!stack1.isEmpty()) {
+                final LanternItemStack stack1 = inventory.poll(limit, matcher);
+                if (stack1.isNotEmpty()) {
                     final int stackSize = stack1.getQuantity();
                     limit -= stackSize;
                     stack.setQuantity(stack.getQuantity() + stackSize);
@@ -441,7 +441,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
         checkNotNull(matcher, "matcher");
         for (AbstractMutableInventory inventory : getChildren()) {
             final LanternItemStack itemStack = inventory.peek(matcher);
-            if (itemStack.isFilled()) {
+            if (itemStack.isNotEmpty()) {
                 return itemStack;
             }
         }
@@ -460,7 +460,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.peek(limit, matcher);
-                if (stack.isFilled()) {
+                if (stack.isNotEmpty()) {
                     if (stack.getQuantity() >= limit) {
                         return stack;
                     } else {
@@ -478,12 +478,12 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
                 // boxing/unboxing and cloning the item stack
                 if (inventory instanceof Slot) {
                     final LanternItemStack stack1 = ((AbstractSlot) inventory).getRawItemStack();
-                    if (stack1.isFilled() && matcher.test(stack1)) {
-                        peekedStackSize = Math.min(((Slot) inventory).getStackSize(), limit);
+                    if (stack1.isNotEmpty() && matcher.test(stack1)) {
+                        peekedStackSize = Math.min(inventory.totalItems(), limit);
                     }
                 } else {
-                    final ItemStack stack1 = inventory.peek(limit, matcher);
-                    if (!stack1.isEmpty()) {
+                    final LanternItemStack stack1 = inventory.peek(limit, matcher);
+                    if (stack1.isNotEmpty()) {
                         peekedStackSize = stack1.getQuantity();
                     }
                 }
@@ -620,7 +620,6 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
             return ((LanternItemStack) this.itemStack).similarTo(itemStack);
         }
     }
-
 
     public static final class Builder<T extends AbstractChildrenInventory>
             extends AbstractArchetypeBuilder<T, AbstractChildrenInventory, Builder<T>>  {

@@ -75,7 +75,7 @@ public interface BlockTypeBuilder {
 
     BlockTypeBuilder tileEntity(Supplier<TileEntity> supplier);
 
-    BlockTypeBuilder tileEntity(TileEntityProvider tileEntityProvider);
+    BlockTypeBuilder tileEntity(BlockEntityProvider tileEntityProvider);
 
     BlockTypeBuilder traits(BlockTrait<?>... blockTraits);
 

@@ -44,7 +44,7 @@ public class HandlerPlayInSignBook implements Handler<MessagePlayInModifyBook.Si
         final LanternPlayer player = context.getSession().getPlayer();
 
         LanternItemStack itemStack = slot.peek();
-        if (itemStack.isFilled() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
+        if (itemStack.isNotEmpty() && itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
             final ItemStack writtenBookStack = new LanternItemStack(ItemTypes.WRITTEN_BOOK);
             itemStack.getValues().stream()
                     .filter(value -> value.getKey() != Keys.PLAIN_BOOK_PAGES)

@@ -83,7 +83,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
     }
 
     private final ValueCollection valueCollection;
-    private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers;
+    private final AdditionalContainerCollection<DataManipulator> additionalContainers;
     private final ItemType itemType;
 
     private int quantity;
@@ -111,7 +111,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
     }
 
     private LanternItemStack(ItemType itemType, int quantity, ValueCollection valueCollection,
-            AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers) {
+            AdditionalContainerCollection<DataManipulator> additionalContainers) {
         checkArgument(quantity >= 0, "quantity may not be negative");
         checkNotNull(itemType, "itemType");
         this.additionalContainers = additionalContainers;
@@ -244,9 +244,9 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
     /**
      * Gets whether this item stack is filled. (non empty)
      *
-     * @return Is filled
+     * @return Is not empty
      */
-    public boolean isFilled() {
+    public boolean isNotEmpty() {
         return !isEmpty();
     }
 
@@ -256,8 +256,8 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
      * @param consumer The consumer to accept
      * @see #isEmpty()
      */
-    public void ifFilled(Consumer<LanternItemStack> consumer) {
-        if (isFilled()) {
+    public void ifNotEmpty(Consumer<LanternItemStack> consumer) {
+        if (!isEmpty()) {
             consumer.accept(this);
         }
     }

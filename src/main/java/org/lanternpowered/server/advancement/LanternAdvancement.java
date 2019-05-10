@@ -52,7 +52,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternAdvancement extends DefaultCatalogType implements Advancement {
+public class LanternAdvancement extends DefaultCatalogType.Named implements Advancement {
 
     @Nullable private AdvancementTree advancementTree;
     @Nullable private final Advancement parent;
@@ -87,7 +87,7 @@ public class LanternAdvancement extends DefaultCatalogType implements Advancemen
         } else {
             final AdvancementType type = displayInfo.getType();
             final TextFormat format = type.getTextFormat();
-            toastBuilder.add(Text.builder(tr("advancements.toast." + type.getName().toLowerCase()))
+            toastBuilder.add(Text.builder(tr("advancements.toast." + type.getKey().getValue()))
                     .format(format).build());
             final Text title = displayInfo.getTitle();
             toastBuilder.add(title);

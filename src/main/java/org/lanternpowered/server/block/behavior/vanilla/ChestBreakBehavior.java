@@ -31,7 +31,7 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
-import org.lanternpowered.server.block.tile.vanilla.LanternChest;
+import org.lanternpowered.server.block.entity.vanilla.LanternChest;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -39,7 +39,6 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class ChestBreakBehavior implements BreakBlockBehavior {
 

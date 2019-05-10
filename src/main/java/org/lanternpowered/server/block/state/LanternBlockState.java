@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.tile.LanternBlockEntity;
+import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.lanternpowered.server.catalog.AbstractCatalogType;
 import org.lanternpowered.server.data.IImmutableDataHolderBase;
@@ -338,7 +338,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
     public BlockSnapshot snapshotFor(Location location) {
         final World world = location.getWorld();
         final Vector3i pos = location.getBlockPosition();
-        final LanternBlockEntity tileEntity = (LanternBlockEntity) getType().getTileEntityProvider()
+        final LanternBlockEntity tileEntity = (LanternBlockEntity) getType().getBlockEntityProvider()
                 .map(provider -> provider.get(this, location, null))
                 .orElse(null);
         return new LanternBlockSnapshot(location, this, world.getCreator(pos).orElse(null),

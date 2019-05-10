@@ -211,7 +211,7 @@ public class LanternItem extends LanternEntity implements Item {
             final ChangeInventoryEvent.Pickup event;
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
                 frame.addContext(LanternEventContextKeys.ORIGINAL_ITEM_STACK, originalStack);
-                if (stack.isFilled()) {
+                if (stack.isNotEmpty()) {
                     frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, stack);
                 }
 
@@ -238,7 +238,7 @@ public class LanternItem extends LanternEntity implements Item {
                 break;
             }
         }
-        if (stack.isFilled()) {
+        if (stack.isNotEmpty()) {
             offer(Keys.REPRESENTED_ITEM, stack.toWrappedSnapshot());
         } else {
             remove();

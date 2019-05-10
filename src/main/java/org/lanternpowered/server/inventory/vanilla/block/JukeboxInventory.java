@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.inventory.vanilla.block;
 
-import org.lanternpowered.server.block.tile.IBlockEntityInventory;
+import org.lanternpowered.server.block.entity.IBlockEntityInventory;
 import org.lanternpowered.server.inventory.type.slot.LanternFilteringSlot;
-import org.spongepowered.api.block.tileentity.Jukebox;
+import org.spongepowered.api.block.entity.Jukebox;
 
 public class JukeboxInventory extends LanternFilteringSlot implements IBlockEntityInventory {
 

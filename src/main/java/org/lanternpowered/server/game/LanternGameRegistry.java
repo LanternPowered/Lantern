@@ -59,7 +59,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder;
-import org.lanternpowered.server.block.tile.LanternBlockEntityArchetypeBuilder;
+import org.lanternpowered.server.block.entity.LanternBlockEntityArchetypeBuilder;
 import org.lanternpowered.server.boss.LanternBossBarBuilder;
 import org.lanternpowered.server.catalog.LanternCatalogKey;
 import org.lanternpowered.server.catalog.LanternCatalogKeyBuilder;
@@ -230,8 +230,8 @@ import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegis
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.status.LanternFavicon;
-import org.lanternpowered.server.network.tile.TileEntityProtocolType;
-import org.lanternpowered.server.network.tile.TileEntityProtocolTypeRegistryModule;
+import org.lanternpowered.server.network.block.BlockEntityProtocolType;
+import org.lanternpowered.server.network.block.BlockEntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
@@ -668,7 +668,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(EntityType.class, EntityTypeRegistryModule.get())
                 .registerModule(TileEntityType.class, BlockEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
-                .registerModule(TileEntityProtocolType.class, new TileEntityProtocolTypeRegistryModule())
+                .registerModule(BlockEntityProtocolType.class, new BlockEntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
                 .registerModule(QueryOperationType.class, new QueryOperationRegistryModule())
                 .registerModule(new InventoryTransformationRegistryModule())

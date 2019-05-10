@@ -29,14 +29,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
 
 import java.util.Iterator;
 import java.util.Map;
 
-@SuppressWarnings("ConstantConditions")
 public final class InventorySnapshot {
 
     public static final InventorySnapshot EMPTY = new InventorySnapshot(Int2ObjectMaps.emptyMap());
@@ -52,9 +51,9 @@ public final class InventorySnapshot {
         final Int2ObjectMap<ItemStackSnapshot> itemStackSnapshots = new Int2ObjectOpenHashMap<>();
         while (it.hasNext()) {
             final ISlot slot = (ISlot) it.next();
-            slot.peek().ifFilled(stack -> {
-                final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, "slot_index").get();
-                itemStackSnapshots.put((int) index.getValue(), LanternItemStackSnapshot.wrap(stack));
+            slot.peek().ifNotEmpty(stack -> {
+                final int slotIndex = inventory.getProperty(slot, InventoryProperties.SLOT_INDEX).get().getIndex();
+                itemStackSnapshots.put(slotIndex, LanternItemStackSnapshot.wrap(stack));
             });
         }
         return new InventorySnapshot(itemStackSnapshots);
@@ -80,8 +79,8 @@ public final class InventorySnapshot {
 
     public void offerTo(Inventory inventory) {
         for (Slot slot : inventory.slots()) {
-            final SlotIndex index = inventory.getProperty(slot, SlotIndex.class, "slot_index").get();
-            final ItemStackSnapshot itemStackSnapshot = this.itemStackSnapshots.get((int) index.getValue());
+            final int slotIndex = inventory.getProperty(slot, InventoryProperties.SLOT_INDEX).get().getIndex();
+            final ItemStackSnapshot itemStackSnapshot = this.itemStackSnapshots.get(slotIndex);
             if (itemStackSnapshot != null) {
                 slot.set(itemStackSnapshot.createStack());
             }

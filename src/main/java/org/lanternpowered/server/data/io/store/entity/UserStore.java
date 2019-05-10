@@ -56,8 +56,9 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.util.RespawnLocation;
 
@@ -74,7 +75,7 @@ import java.util.UUID;
  * into one {@link DataView}. This listed under a sub view with the data query
  * {@link DataQueries#SPONGE_DATA}.
  */
-@SuppressWarnings({"OptionalGetWithoutIsPresent", "unchecked", "ConstantConditions"})
+@SuppressWarnings({"OptionalGetWithoutIsPresent", "ConstantConditions"})
 public class UserStore<T extends AbstractUser> extends LivingStore<T> {
 
     private static final DataQuery ABILITIES = DataQuery.of("abilities");
@@ -279,9 +280,9 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         final List<DataView> itemViews = new ArrayList<>();
         final Iterable<Slot> slots = enderChestInventory.slots();
         for (Slot slot : slots) {
-            ((ISlot) slot).peek().ifFilled(stack -> {
+            ((ISlot) slot).peek().ifNotEmpty(stack -> {
                 final DataView itemView = ItemStackStore.INSTANCE.serialize(stack);
-                itemView.set(SLOT, (byte) enderChestInventory.getProperty(slot, SlotIndex.class, null).get().getValue().intValue());
+                itemView.set(SLOT, (byte) enderChestInventory.getProperty(slot, InventoryProperties.SLOT_INDEX).get().getIndex());
                 itemViews.add(itemView);
             });
         }
@@ -293,7 +294,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         for (DataView itemView : itemViews) {
             final int slot = itemView.getByte(SLOT).get() & 0xff;
             final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
-            enderChestInventory.set(SlotIndex.builder().value(slot).build(), itemStack);
+            enderChestInventory.set(SlotIndex.of(slot), itemStack);
         }
     }
 
@@ -307,9 +308,9 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
 
             if (slot >= 0 && slot < mainInventory.capacity()) {
-                mainInventory.set(SlotIndex.builder().value(slot).build(), itemStack);
+                mainInventory.set(SlotIndex.of(slot), itemStack);
             } else if (slot >= 100 && slot - 100 < equipmentInventory.capacity()) {
-                equipmentInventory.set(SlotIndex.builder().value(slot - 100).build(), itemStack);
+                equipmentInventory.set(SlotIndex.of(slot - 100), itemStack);
             } else if (slot == 150) {
                 offHandSlot.set(itemStack);
             }
@@ -338,12 +339,12 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
 
     private static void serializeSlot(Inventory parent, Slot slot, int indexOffset,
             ObjectSerializer<LanternItemStack> itemStackSerializer, List<DataView> views) {
-        final SlotIndex index = parent.getProperty(slot, SlotIndex.class, "index").get(); // Key doesn't matter
-        serializeSlot(index.getValue() + indexOffset, slot, itemStackSerializer, views);
+        final int index = parent.getProperty(slot, InventoryProperties.SLOT_INDEX).get().getIndex();
+        serializeSlot(index + indexOffset, slot, itemStackSerializer, views);
     }
 
     private static void serializeSlot(int index, Slot slot, ObjectSerializer<LanternItemStack> itemStackSerializer, List<DataView> views) {
-        ((ISlot) slot).peek().ifFilled(stack -> {
+        ((ISlot) slot).peek().ifNotEmpty(stack -> {
             final DataView itemView = itemStackSerializer.serialize(stack);
             itemView.set(SLOT, (byte) index);
             views.add(itemView);

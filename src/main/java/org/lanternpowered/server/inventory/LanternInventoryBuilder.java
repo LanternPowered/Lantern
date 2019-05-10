@@ -41,6 +41,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.plugin.PluginContainer;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -167,7 +168,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
     }
 
     @Override
-    public T build(Object plugin) {
+    public T build(PluginContainer plugin) {
         checkState(this.inventoryArchetype != null, "The inventory archetype must be set");
         AbstractBuilder builder = this.builder;
         LanternInventoryArchetype<T> inventoryArchetype = this.inventoryArchetype;

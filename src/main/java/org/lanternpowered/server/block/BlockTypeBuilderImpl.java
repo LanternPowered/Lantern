@@ -49,7 +49,7 @@ import org.lanternpowered.server.block.provider.property.PropertyProviderCollect
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.provider.property.SimplePropertyProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
-import org.lanternpowered.server.block.tile.LanternBlockEntityType;
+import org.lanternpowered.server.block.entity.LanternBlockEntityType;
 import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
@@ -107,7 +107,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Nullable private MutableBehaviorPipeline<Behavior> behaviorPipeline;
     private final List<BlockTrait<?>> traits = new ArrayList<>();
     @Nullable private TranslationProvider translationProvider;
-    @Nullable private TileEntityProvider tileEntityProvider;
+    @Nullable private BlockEntityProvider tileEntityProvider;
     @Nullable private ItemTypeBuilder itemTypeBuilder;
 
     @Nullable private BlockObjectProvider<AABB> selectionBoxProvider = null;
@@ -194,12 +194,12 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Override
     public BlockTypeBuilderImpl tileEntity(Supplier<TileEntity> supplier) {
         checkNotNull(supplier, "supplier");
-        this.tileEntityProvider = TileEntityProvider.of(supplier);
+        this.tileEntityProvider = BlockEntityProvider.of(supplier);
         return this;
     }
 
     @Override
-    public BlockTypeBuilderImpl tileEntity(TileEntityProvider tileEntityProvider) {
+    public BlockTypeBuilderImpl tileEntity(BlockEntityProvider tileEntityProvider) {
         checkNotNull(tileEntityProvider, "tileEntityProvider");
         this.tileEntityProvider = tileEntityProvider;
         return this;

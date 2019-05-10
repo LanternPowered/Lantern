@@ -29,6 +29,7 @@ import static org.lanternpowered.server.plugin.InternalPluginsInfo.Minecraft;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
@@ -434,7 +435,7 @@ public final class VanillaInventoryArchetypes {
 
         JUKEBOX = AbstractSlot.builder()
                 .type(JukeboxInventory.class)
-                .buildArchetype(Minecraft.IDENTIFIER, "jukebox");
+                .buildArchetype(CatalogKeys.minecraft("jukebox"));
 
         ///////////////
         /// Furnace ///

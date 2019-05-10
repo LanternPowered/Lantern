@@ -1525,7 +1525,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         // Pulse the entities
         pulseEntities();
 
-        // Pulse the tile entities
+        // Pulse the blockEntity entities
         getLoadedChunks().forEach(chunk -> ((LanternChunk) chunk).pulse());
 
         causeStack.popCause();

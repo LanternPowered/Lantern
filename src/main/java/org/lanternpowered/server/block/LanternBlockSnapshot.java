@@ -31,8 +31,8 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import org.lanternpowered.server.block.tile.LanternBlockEntity;
-import org.lanternpowered.server.block.tile.LanternBlockEntityArchetype;
+import org.lanternpowered.server.block.entity.LanternBlockEntity;
+import org.lanternpowered.server.block.entity.LanternBlockEntityArchetype;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
@@ -351,7 +351,7 @@ public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder
             return new LanternBlockSnapshot(this.location, blockState,
                     this.creator, this.notifier, this.tileEntity);
         }
-        final LanternBlockEntity tileEntity = (LanternBlockEntity) ((LanternBlockType) blockState.getType()).getTileEntityProvider()
+        final LanternBlockEntity tileEntity = (LanternBlockEntity) ((LanternBlockType) blockState.getType()).getBlockEntityProvider()
                 .map(provider -> provider.get(blockState, null, null))
                 .orElse(null);
         if (tileEntity != null) {

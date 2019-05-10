@@ -143,7 +143,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
                 final LanternItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek();
                 final int slotIndex = i;
-                if (itemStack.isFilled()) {
+                if (itemStack.isNotEmpty()) {
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
                 }
             }

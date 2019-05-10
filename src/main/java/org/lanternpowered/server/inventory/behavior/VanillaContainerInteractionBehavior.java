@@ -381,7 +381,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 final List<SlotTransaction> transactions = new ArrayList<>();
                 Transaction<ItemStackSnapshot> cursorTransaction = null;
 
-                if (getCursorItem().isFilled() && !(slot instanceof OutputSlot)) {
+                if (getCursorItem().isNotEmpty() && !(slot instanceof OutputSlot)) {
                     final PeekedOfferTransactionResult result = slot.peekOffer(getCursorItem().copy());
                     if (!result.isEmpty()) {
                         transactions.addAll(result.getTransactions());
@@ -437,7 +437,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                         final PeekedSetTransactionResult result1 = slot.peekSet(getCursorItem());
                         if (!result1.isEmpty()) {
                             final LanternItemStack replacedItem = slot.peek();
-                            if (replacedItem.isFilled()) {
+                            if (replacedItem.isNotEmpty()) {
                                 setCursorItem(replacedItem);
                             }
                             cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(), replacedItem.toSnapshot());
@@ -661,7 +661,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
 
         // The slot we will swap items with
         AbstractSlot hotbarSlot = hotbar.getSelectedSlot();
-        if (hotbarSlot.peek().isFilled()) {
+        if (hotbarSlot.peek().isNotEmpty()) {
             final Optional<Slot> optSlot = hotbar.slots().stream()
                     .filter(slot1 -> slot1.peek().isEmpty())
                     .findFirst();

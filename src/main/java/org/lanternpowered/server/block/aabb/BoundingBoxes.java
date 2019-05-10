@@ -26,7 +26,7 @@
 package org.lanternpowered.server.block.aabb;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.block.tile.vanilla.LanternChest;
+import org.lanternpowered.server.block.entity.vanilla.LanternChest;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.spongepowered.api.block.BlockState;

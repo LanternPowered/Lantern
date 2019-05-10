@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.io.store.tile;
 
-import org.lanternpowered.server.block.tile.vanilla.LanternJukebox;
+import org.lanternpowered.server.block.entity.vanilla.LanternJukebox;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.inventory.IInventory;
@@ -55,7 +55,7 @@ public class JukeboxTileEntitySerializer<T extends LanternJukebox> extends TileE
     @Override
     public void serializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(object, valueContainer, dataView);
-        ((IInventory) object.getInventory()).peek().ifFilled(stack -> dataView
+        ((IInventory) object.getInventory()).peek().ifNotEmpty(stack -> dataView
                 .set(RECORD_ITEM, ItemStackStore.INSTANCE.serialize(stack)));
     }
 }

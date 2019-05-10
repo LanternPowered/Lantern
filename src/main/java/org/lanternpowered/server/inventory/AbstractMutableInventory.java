@@ -54,7 +54,7 @@ import javax.annotation.Nullable;
  * A base class for every {@link Inventory} that
  * isn't a {@link EmptyInventory}.
  */
-@SuppressWarnings({"unchecked", "ConstantConditions"})
+@SuppressWarnings("unchecked")
 public abstract class AbstractMutableInventory extends AbstractInventory {
 
     @Nullable private PluginContainer plugin;

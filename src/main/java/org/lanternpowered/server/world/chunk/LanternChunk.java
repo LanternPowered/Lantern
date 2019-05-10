@@ -45,14 +45,14 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
-import org.lanternpowered.server.block.TileEntityProvider;
+import org.lanternpowered.server.block.BlockEntityProvider;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
 import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
-import org.lanternpowered.server.block.tile.LanternBlockEntity;
-import org.lanternpowered.server.block.tile.LanternBlockEntityArchetype;
+import org.lanternpowered.server.block.entity.LanternBlockEntity;
+import org.lanternpowered.server.block.entity.LanternBlockEntityArchetype;
 import org.lanternpowered.server.data.property.IStoreDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -71,17 +71,15 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.property.PropertyStore;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -263,7 +261,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
         // The block types array
         public final ChunkBlockStateArray blockStates;
-        // The tile entities
+        // The blockEntity entities
         public final Short2ObjectMap<LanternBlockEntity> tileEntities;
 
         public final int nonAirBlockCount;
@@ -881,7 +879,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             final LanternBlockEntity tileEntity = section.tileEntities.get((short) index);
             boolean remove = false;
             boolean refresh = false;
-            final Optional<TileEntityProvider> tileEntityProvider = ((LanternBlockType) state.getType()).getTileEntityProvider();
+            final Optional<BlockEntityProvider> tileEntityProvider = ((LanternBlockType) state.getType()).getBlockEntityProvider();
             if (tileEntity != null) {
                 if (oldState.getType() != state.getType()) {
                     refresh = tileEntityProvider.isPresent();
@@ -895,11 +893,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
             if (refresh) {
                 final Location location = tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z);
-                final LanternBlockEntity newTileEntity = (LanternBlockEntity) tileEntityProvider.get().get(state, location, null);
-                section.tileEntities.put((short) index, newTileEntity);
-                newTileEntity.setLocation(location);
-                newTileEntity.setBlock(state);
-                newTileEntity.setValid(true);
+                final LanternBlockEntity newBlockEntity = (LanternBlockEntity) tileEntityProvider.get().get(state, location, null);
+                section.tileEntities.put((short) index, newBlockEntity);
+                newBlockEntity.setLocation(location);
+                newBlockEntity.setBlock(state);
+                newBlockEntity.setValid(true);
             } else if (remove) {
                 section.tileEntities.remove((short) index);
             } else if (tileEntity != null) {
@@ -987,7 +985,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public BlockSnapshot createSnapshot(int x, int y, int z) {
         final BlockState state = getBlock(x, y, z);
         final Location loc = new Location<>(this.world, x, y, z);
-        final LanternBlockEntity tileEntity = getTileEntity(x, y, z)
+        final LanternBlockEntity tileEntity = getBlockEntity(x, y, z)
                 .map(tile -> LanternBlockEntityArchetype.copy((LanternBlockEntity) tile))
                 .orElse(null);
         return new LanternBlockSnapshot(loc, state, getCreator(x, y, z).orElse(null),
@@ -1074,15 +1072,15 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
         final CauseStack causeStack = CauseStack.Companion.current();
         causeStack.pushCause(this); // Add the chunk that is being pulsed
-        getTileEntities().forEach(tileEntity -> {
-            causeStack.pushCause(tileEntity); // Add the tile entity to the cause
+        getBlockEntities().forEach(blockEntity -> {
+            causeStack.pushCause(blockEntity); // Add the blockEntity entity to the cause
             try {
-                ((LanternBlockEntity) tileEntity).pulse();
+                ((LanternBlockEntity) blockEntity).pulse();
             } catch (Throwable t) {
-                final Vector3i pos = tileEntity.getLocation().getBlockPosition();
-                Lantern.getLogger().error("Failed to pulse TileEntity at ({};{};{})", pos.getX(), pos.getY(), pos.getZ(), t);
+                final Vector3i pos = blockEntity.getLocation().getBlockPosition();
+                Lantern.getLogger().error("Failed to pulse BlockEntity at ({};{};{})", pos.getX(), pos.getY(), pos.getZ(), t);
             } finally {
-                causeStack.popCause(); // Pop the tile entity
+                causeStack.popCause(); // Pop the blockEntity entity
             }
         });
         causeStack.popCause(); // Pop the chunk
@@ -1468,11 +1466,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public Collection<TileEntity> getTileEntities() {
+    public Collection<BlockEntity> getBlockEntities() {
         if (this.chunkSections == null) {
             return Collections.emptyList();
         }
-        final ImmutableSet.Builder<TileEntity> tileEntities = ImmutableSet.builder();
+        final ImmutableSet.Builder<BlockEntity> tileEntities = ImmutableSet.builder();
         for (int i = 0; i < CHUNK_SECTIONS; i++) {
             this.chunkSections.work(i, chunkSection -> {
                 if (chunkSection == null) {
@@ -1493,12 +1491,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
-        return getTileEntities().stream().filter(filter).collect(ImmutableSet.toImmutableSet());
+    public Collection<BlockEntity> getBlockEntities(Predicate<BlockEntity> filter) {
+        return getBlockEntities().stream().filter(filter).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
-    public Optional<TileEntity> getTileEntity(int x, int y, int z) {
+    public Optional<BlockEntity> getBlockEntity(int x, int y, int z) {
         checkVolumeBounds(x, y, z);
         final short index = (short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
         return this.chunkSections.work(y >> 4, chunkSection -> {
@@ -1506,7 +1504,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 return Optional.empty();
             }
             final LanternBlockEntity tileEntity = chunkSection.tileEntities.get(index);
-            // Remove invalid tile entities
+            // Remove invalid blockEntity entities
             if (tileEntity != null && !tileEntity.isValid()) {
                 chunkSection.tileEntities.remove(index);
                 return Optional.empty();
@@ -1595,7 +1593,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             property = IStorePropertyHolder.getPropertyFor(location, propertyClass);
         }
         if (direction == null && !property.isPresent()) {
-            final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);
+            final Optional<BlockEntity> tileEntity = getBlockEntity(x, y, z);
             if (tileEntity.isPresent()) {
                 property = tileEntity.get().getProperty(propertyClass);
             }
@@ -1611,7 +1609,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final Location location = new Location<>(this.world, x, y, z);
         final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
         builder.addAll(Lantern.getGame().getPropertyRegistry().getPropertiesFor(location));
-        getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
+        getBlockEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
         return builder.build();
     }
 
@@ -1642,9 +1640,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final BlockState blockState = getBlock(x, y, z);
         Optional<E> value = blockState.get(key);
         if (!value.isPresent()) {
-            final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);
-            if (tileEntity.isPresent()) {
-                value = tileEntity.get().get(key);
+            final Optional<BlockEntity> blockEntity = getBlockEntity(x, y, z);
+            if (blockEntity.isPresent()) {
+                value = blockEntity.get().get(key);
             }
         }
         return value;
@@ -1658,22 +1656,22 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final BlockState blockState = getBlock(x, y, z);
         Optional<V> value = blockState.getValue(key);
         if (!value.isPresent()) {
-            final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);
-            if (tileEntity.isPresent()) {
-                value = tileEntity.get().getValue(key);
+            final Optional<BlockEntity> blockEntity = getBlockEntity(x, y, z);
+            if (blockEntity.isPresent()) {
+                value = blockEntity.get().getValue(key);
             }
         }
         return value;
     }
 
     @Override
-    public <T extends DataManipulator<?, ?>> Optional<T> get(int x, int y, int z, Class<T> manipulatorClass) {
+    public <T extends DataManipulator> Optional<T> get(int x, int y, int z, Class<T> manipulatorClass) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(int x, int y, int z, Class<T> manipulatorClass) {
+    public <T extends DataManipulator> Optional<T> getOrCreate(int x, int y, int z, Class<T> manipulatorClass) {
         // TODO Auto-generated method stub
         return null;
     }

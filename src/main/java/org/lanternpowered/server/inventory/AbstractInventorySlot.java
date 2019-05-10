@@ -161,11 +161,6 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     }
 
     @Override
-    public int getStackSize() {
-        return LanternItemStack.isEmpty(this.itemStack) ? 0 : this.itemStack.getQuantity();
-    }
-
-    @Override
     public boolean isValidItem(ItemStackSnapshot stack) {
         checkNotNull(stack, "stack");
         return this.itemFilter == null || this.itemFilter.test(stack);
@@ -195,7 +190,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         if (stack.isEmpty()) {
             return true;
         }
-        if (!this.itemStack.isEmpty()) {
+        if (this.itemStack.isNotEmpty()) {
             if (!this.itemStack.similarTo(stack)) {
                 return false;
             }
@@ -306,7 +301,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return;
         }
         final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
-        if ((this.itemStack.isFilled() && (!this.itemStack.similarTo(stack) || this.itemStack.getQuantity() >= maxStackSize)) ||
+        if ((this.itemStack.isNotEmpty() && (!this.itemStack.similarTo(stack) || this.itemStack.getQuantity() >= maxStackSize)) ||
                 !isValidItem(stack)) {
             return;
         }
@@ -350,7 +345,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return;
         }
         final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
-        if (this.itemStack.isFilled() && (!this.itemStack.similarTo(stack) ||
+        if (this.itemStack.isNotEmpty() && (!this.itemStack.similarTo(stack) ||
                 this.itemStack.getQuantity() >= maxStackSize) || !isValidItem(stack)) {
             return;
         }
@@ -386,7 +381,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
     @Override
     public PeekedSetTransactionResult peekSet(ItemStack stack) {
         checkNotNull(stack, "stack");
-        if (!stack.isEmpty() && !isValidItem(stack)) {
+        if (stack.isEmpty() && !isValidItem(stack)) {
             return new PeekedSetTransactionResult(ImmutableList.of(), stack.createSnapshot());
         }
         final ItemStackSnapshot oldSnapshot = this.itemStack.toSnapshot();
@@ -451,7 +446,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
 
     @Override
     public void clear() {
-        if (this.itemStack.isFilled()) {
+        if (this.itemStack.isNotEmpty()) {
             this.itemStack = LanternItemStack.empty();
             queueUpdate();
         }
@@ -472,7 +467,6 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         return 1;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public boolean contains(ItemStack stack) {
         checkNotNull(stack, "stack");

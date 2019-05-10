@@ -56,6 +56,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
+import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -278,7 +279,7 @@ public final class PlayerInteractionHandler {
             } else {
                 context.revert();
 
-                // TODO: Resend tile entity data, action data, ... ???
+                // TODO: Resend entity entity data, action data, ... ???
                 this.player.sendBlockChange(this.diggingBlock, blockState);
             }
             if (this.lastBreakState != -1) {
@@ -329,7 +330,7 @@ public final class PlayerInteractionHandler {
         final double dy = Math.min(pos2.getY(), 0.999);
         final double dz = Math.min(pos2.getZ(), 0.999);
 
-        final Location clickedLocation = new Location(this.player.getWorld(),
+        final Location clickedLocation = new LanternLocation(this.player.getWorld(),
                 message.getPosition().toDouble().add(dx, dy, dz));
         final Direction face = message.getFace();
 
@@ -340,7 +341,7 @@ public final class PlayerInteractionHandler {
             // Add context
             frame.addContext(ContextKeys.INTERACTION_FACE, face);
             frame.addContext(ContextKeys.INTERACTION_LOCATION, clickedLocation);
-            frame.addContext(ContextKeys.BLOCK_LOCATION, new Location(clickedLocation.getWorld(), message.getPosition()));
+            frame.addContext(ContextKeys.BLOCK_LOCATION, new LanternLocation(clickedLocation.getWorld(), message.getPosition()));
             frame.addContext(ContextKeys.PLAYER, this.player);
 
             final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);
@@ -356,7 +357,7 @@ public final class PlayerInteractionHandler {
                 BehaviorContext.Snapshot snapshot1 = context.pushSnapshot();
 
                 // Try first with the main hand
-                hotbarSlot.peek().ifFilled(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
+                hotbarSlot.peek().ifNotEmpty(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
                 frame.addContext(ContextKeys.USED_SLOT, hotbarSlot);
                 frame.addContext(ContextKeys.INTERACTION_HAND, HandTypes.MAIN_HAND);
 
@@ -367,7 +368,7 @@ public final class PlayerInteractionHandler {
                     snapshot1 = context.pushSnapshot();
 
                     // Try again with the off hand
-                    offHandSlot.peek().ifFilled(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
+                    offHandSlot.peek().ifNotEmpty(stack -> frame.addContext(ContextKeys.USED_ITEM_STACK, stack));
                     frame.addContext(ContextKeys.USED_SLOT, offHandSlot);
                     frame.addContext(ContextKeys.INTERACTION_HAND, HandTypes.OFF_HAND);
 
@@ -442,7 +443,7 @@ public final class PlayerInteractionHandler {
 
     private void handleFinishItemInteraction0(AbstractSlot slot, HandType handType) {
         final LanternItemStack handItem = slot.peek();
-        if (handItem.isFilled()) {
+        if (!handItem.isEmpty()) {
             final CauseStack causeStack = CauseStack.current();
             try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
                 frame.pushCause(this.player);
@@ -502,7 +503,7 @@ public final class PlayerInteractionHandler {
                 }
                 final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
                 final LanternItemStack handItem = offHandSlot.peek();
-                if (handItem.isFilled()) {
+                if (handItem.isNotEmpty()) {
                     if (handItem.getProperty(ItemProperties.IS_DUAL_WIELDABLE).orElse(false)) {
                     /*
                     final Vector3d position = this.player.getPosition().add(0, this.player.get(Keys.IS_SNEAKING).get() ? 1.54 : 1.62, 0);
@@ -550,7 +551,7 @@ public final class PlayerInteractionHandler {
             return true;
         }
         final LanternItemStack handItem = slot.peek();
-        if (handItem.isFilled()) {
+        if (handItem.isNotEmpty()) {
             final LanternItemType itemType = (LanternItemType) handItem.getType();
             context.addContext(ContextKeys.USED_ITEM_STACK, handItem);
             context.addContext(ContextKeys.USED_SLOT, slot);

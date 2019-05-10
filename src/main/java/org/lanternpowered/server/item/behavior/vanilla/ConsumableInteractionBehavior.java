@@ -135,7 +135,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                 final ISlot slot = (ISlot) context.requireContext(ContextKeys.USED_SLOT);
                 slot.poll(1);
                 if (this.restItemSupplier != null) {
-                    if (slot.peek().isFilled()) {
+                    if (slot.peek().isNotEmpty()) {
                         ((LanternPlayer) player).getInventory().getPrimary().offer(this.restItemSupplier.get());
                     } else {
                         slot.set(this.restItemSupplier.get());

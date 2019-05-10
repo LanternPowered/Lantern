@@ -143,7 +143,7 @@ import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseStyleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.LlamaVariantRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.LlamaTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModule;
@@ -229,7 +229,6 @@ import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuild
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
-import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.network.block.BlockEntityProtocolType;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
@@ -288,8 +287,8 @@ import org.spongepowered.api.advancement.criteria.trigger.Trigger;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.tileentity.TileEntityArchetype;
-import org.spongepowered.api.block.tileentity.TileEntityType;
+import org.spongepowered.api.block.entity.BlockEntityArchetype;
+import org.spongepowered.api.block.entity.BlockEntityType;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.ServerBossBar;
@@ -300,9 +299,7 @@ import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.data.type.ArmorType;
-import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.BannerPatternShape;
-import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.ChestAttachmentType;
 import org.spongepowered.api.data.type.ChestAttachmentTypes;
 import org.spongepowered.api.data.type.ComparatorType;
@@ -316,9 +313,8 @@ import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.InstrumentTypes;
-import org.spongepowered.api.data.type.LlamaVariant;
+import org.spongepowered.api.data.type.LlamaType;
 import org.spongepowered.api.data.type.NotePitch;
-import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.PickupRule;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
@@ -331,7 +327,6 @@ import org.spongepowered.api.data.type.SlabPortions;
 import org.spongepowered.api.data.type.Surface;
 import org.spongepowered.api.data.type.Surfaces;
 import org.spongepowered.api.data.type.ToolType;
-import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOption;
@@ -384,7 +379,7 @@ import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipeRegistry;
-import org.spongepowered.api.network.status.Favicon;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.CatalogRegistryModule;
@@ -403,7 +398,7 @@ import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.Visibility;
-import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.scoreboard.criteria.Criterion;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
@@ -445,14 +440,9 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.teleport.PortalAgentType;
 import org.spongepowered.api.world.weather.Weather;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -499,7 +489,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
-                .registerBuilderSupplier(TileEntityArchetype.Builder.class, LanternBlockEntityArchetypeBuilder::new)
+                .registerBuilderSupplier(BlockEntityArchetype.Builder.class, LanternBlockEntityArchetypeBuilder::new)
                 .registerBuilderSupplier(LocatableBlock.Builder.class, LanternLocatableBlockBuilder::new)
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
@@ -621,7 +611,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(SlabPortion.class, new EnumValueRegistryModule<SlabPortion>(LanternSlabPortion.class, SlabPortions.class) {})
                 .registerModule(NotePitch.class, NotePitchRegistryModule.get())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
-                .registerModule(LlamaVariant.class, new LlamaVariantRegistryModule())
+                .registerModule(LlamaType.class, new LlamaTypeRegistryModule())
                 .registerModule(Profession.class, new ProfessionRegistryModule())
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
                 .registerModule(ToolType.class, new ToolTypeRegistryModule())
@@ -666,7 +656,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())
                 .registerModule(EntityType.class, EntityTypeRegistryModule.get())
-                .registerModule(TileEntityType.class, BlockEntityTypeRegistryModule.get())
+                .registerModule(BlockEntityType.class, BlockEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(BlockEntityProtocolType.class, new BlockEntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
@@ -817,6 +807,11 @@ public class LanternGameRegistry implements XGameRegistry {
             throw new IllegalArgumentException("Could not find a Supplier for the provided class: " + builderClass.getCanonicalName());
         }
         return (T) supplier.get();
+    }
+
+    @Override
+    public <T> T requireFactory(Class<T> clazz) {
+        return null;
     }
 
     @Override
@@ -1113,31 +1108,6 @@ public class LanternGameRegistry implements XGameRegistry {
     }
 
     @Override
-    public Favicon loadFavicon(String raw) throws IOException {
-        return LanternFavicon.load(raw);
-    }
-
-    @Override
-    public Favicon loadFavicon(Path path) throws IOException {
-        return LanternFavicon.load(path);
-    }
-
-    @Override
-    public Favicon loadFavicon(URL url) throws IOException {
-        return LanternFavicon.load(url);
-    }
-
-    @Override
-    public Favicon loadFavicon(InputStream in) throws IOException {
-        return LanternFavicon.load(in);
-    }
-
-    @Override
-    public Favicon loadFavicon(BufferedImage image) throws IOException {
-        return LanternFavicon.load(image);
-    }
-
-    @Override
     public ICraftingRecipeRegistry getCraftingRecipeRegistry() {
         return this.craftingRecipeRegistry;
     }
@@ -1164,6 +1134,11 @@ public class LanternGameRegistry implements XGameRegistry {
     @Override
     public Optional<DisplaySlot> getDisplaySlotForColor(TextColor color) {
         return getRegistryModule(DisplaySlotRegistryModule.class).get().getByTeamColor(color);
+    }
+
+    @Override
+    public AITaskType registerAITaskType(PluginContainer plugin, String id, String name, Class<? extends AbstractAITask<? extends Agent>> aiClass) {
+        return null;
     }
 
     @Override

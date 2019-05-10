@@ -39,7 +39,6 @@ import org.spongepowered.api.plugin.PluginContainer;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Singleton
 public class LanternPlatform implements Platform {
 

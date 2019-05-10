@@ -23,10 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.data.type.LanternLlamaType;
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
+import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.data.type.LlamaType;
+import org.spongepowered.api.data.type.LlamaTypes;
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+public class LlamaTypeRegistryModule extends DefaultCatalogRegistryModule<LlamaType> {
+
+    public LlamaTypeRegistryModule() {
+        super(LlamaTypes.class);
+    }
+
+    @Override
+    public void registerDefaults() {
+        register(new LanternLlamaType(CatalogKey.minecraft("creamy"), 0));
+        register(new LanternLlamaType(CatalogKey.minecraft("white"), 1));
+        register(new LanternLlamaType(CatalogKey.minecraft("brown"), 2));
+        register(new LanternLlamaType(CatalogKey.minecraft("gray"), 3));
+    }
+}

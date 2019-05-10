@@ -79,7 +79,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         final LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress);
         final ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
         final LanternStatusResponse response = new LanternStatusResponse(Lantern.getGame().getPlatform().getMinecraftVersion(),
-                server.getFavicon(), description, players);
+                description, players, server.getFavicon().orElse(null));
 
         final Cause cause = Cause.of(EventContext.empty(), new WrappedRemoteConnection(session));
         final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(cause, client, response);

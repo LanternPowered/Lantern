@@ -23,10 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.type.play
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import io.netty.util.ReferenceCounted
+import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.message.Message
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+/**
+ * A channel payload message.
+ */
+class MessagePlayInOutChannelPayload(
+        val channel: String,
+        val content: ByteBuffer
+) : Message, ReferenceCounted by content

@@ -255,7 +255,7 @@ public final class PlayerInteractionHandler {
     }
 
     private void handleBrokenBlock() {
-        final Location location = new Location(this.player.getWorld(), this.diggingBlock);
+        final Location location = new LanternLocation(this.player.getWorld(), this.diggingBlock);
 
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {

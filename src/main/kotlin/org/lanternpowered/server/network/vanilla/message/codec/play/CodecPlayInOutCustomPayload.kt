@@ -23,21 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.login
+package org.lanternpowered.server.network.vanilla.message.codec.play
 
-import io.netty.util.ReferenceCounted
+import io.netty.handler.codec.EncoderException
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.message.Message
+import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload
 
-/**
- * A message send by the server to the client to request for data.
- *
- * @param transactionId The transaction id of the request, the response will use the same id
- * @param channel The channel this message is send to
- * @param content The content of the request message
- */
-data class MessageLoginOutChannelRequest(
-        val transactionId: Int,
-        val channel: String,
-        val content: ByteBuffer
-) : Message, ReferenceCounted by content
+class CodecPlayInOutCustomPayload : AbstractCodecPlayInOutCustomPayload() {
+
+    override fun encode0(context: CodecContext, message: Message): AbstractCodecPlayInOutCustomPayload.MessageResult {
+        if (message is MessagePlayInOutBrand) {
+            val content = context.byteBufAlloc().buffer().writeString(message.brand)
+            return AbstractCodecPlayInOutCustomPayload.MessageResult("minecraft:brand", content)
+        }
+        throw EncoderException("Unsupported message type: $message")
+    }
+
+    override fun decode0(context: CodecContext, channel: String, content: ByteBuffer): Message {
+        if (channel == "minecraft:brand") {
+            return MessagePlayInOutBrand(content.readString())
+        }
+        content.retain() // Retain the content until we can process it
+        return MessagePlayInOutChannelPayload(channel, content)
+    }
+}

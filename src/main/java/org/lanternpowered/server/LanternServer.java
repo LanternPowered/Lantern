@@ -256,13 +256,13 @@ public final class LanternServer implements Server {
         final Path faviconPath = Paths.get(config.getFavicon());
         if (Files.exists(faviconPath)) {
             try {
-                this.favicon = LanternFavicon.load(faviconPath);
+                this.favicon = Favicon.load(faviconPath);
             } catch (IOException e) {
                 this.logger.error("Failed to load the favicon", e);
             }
         } else {
             try {
-                this.favicon = LanternFavicon.load(getGame().getAssetManager().getAsset(
+                this.favicon = Favicon.load(getGame().getAssetManager().getAsset(
                         InternalPluginsInfo.Implementation.IDENTIFIER, "icon/favicon.png").get().getUrl());
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to load the default favicon.");

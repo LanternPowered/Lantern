@@ -23,10 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.status
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.api.ext.optional
+import org.lanternpowered.server.util.ToStringHelper
+import org.spongepowered.api.MinecraftVersion
+import org.spongepowered.api.network.status.StatusClient
+import java.net.InetSocketAddress
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+class LanternStatusClient(
+        private val address: InetSocketAddress,
+        private val version: MinecraftVersion,
+        private val virtualHost: InetSocketAddress?
+) : StatusClient {
+
+    override fun getAddress() = this.address
+    override fun getVersion() = this.version
+    override fun getVirtualHost() = this.virtualHost.optional()
+
+    override fun toString(): String {
+        return ToStringHelper(this)
+                .omitNullValues()
+                .add("address", this.address)
+                .add("virtualHost", this.virtualHost)
+                .add("version", this.version)
+                .toString()
+    }
+}

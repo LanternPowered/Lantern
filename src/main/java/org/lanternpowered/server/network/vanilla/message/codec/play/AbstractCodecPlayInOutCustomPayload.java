@@ -97,7 +97,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
                     content.available(), getClass().getName(), channel, message);
         }
         // Skip all the bytes, we already processed them
-        buf.setReadIndex(buf.readerIndex() + buf.available());
+        buf.readerIndex(buf.readerIndex() + buf.available());
         return message;
     }
 
@@ -120,7 +120,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             if (message0 == null) {
                 final String channel0 = content.readString();
                 final int parts = content.readByte() & 0xff;
-                final int size = content.readInteger();
+                final int size = content.readInt();
                 if (size <= 0) {
                     throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Received: " + size);
                 }

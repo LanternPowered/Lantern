@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.factory;
 
 import co.aikar.timings.Timing;
 import co.aikar.timings.TimingsFactory;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import javax.annotation.Nullable;
@@ -41,7 +41,7 @@ public class DummyLanternTimingsFactory implements TimingsFactory {
     }
 
     @Override
-    public Timing of(Object plugin, String name, @Nullable Timing groupHandler) {
+    public Timing of(PluginContainer plugin, String name, @Nullable Timing groupHandler) {
         return DUMMY_TIMING;
     }
 
@@ -87,11 +87,6 @@ public class DummyLanternTimingsFactory implements TimingsFactory {
 
     @Override
     public void reset() {
-        // Ignore
-    }
-
-    @Override
-    public void generateReport(@Nullable CommandSource source) {
         // Ignore
     }
 

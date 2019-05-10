@@ -23,10 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.type.connection
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.network.message.Message
+import org.spongepowered.api.text.Text
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+/**
+ * A message to send a disconnect reason to the client.
+ *
+ * @param reason The reason of the disconnection
+ */
+data class MessageOutDisconnect(val reason: Text) : Message

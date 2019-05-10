@@ -33,6 +33,9 @@ import org.lanternpowered.server.network.message.Message
  * A login channel response [Message] is send by the client after a
  * [MessageLoginOutChannelRequest] message is send by the server.
  * The transaction id in both messages should match to be valid.
+ *
+ * @param transactionId The transaction id of the response, the request will use the same id
+ * @param content The content of the response message
  */
 data class MessageLoginInChannelResponse(
         val transactionId: Int,

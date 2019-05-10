@@ -23,10 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.type.login
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.network.message.Message
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+/**
+ * A message send by the client to initiate the login process.
+ *
+ * @param username The username of the player that wants to join the server
+ */
+class MessageLoginInStart(val username: String) : Message

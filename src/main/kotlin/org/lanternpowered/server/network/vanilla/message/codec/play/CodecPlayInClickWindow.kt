@@ -23,10 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.codec.play
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.message.codec.Codec
+import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+class CodecPlayInClickWindow : Codec<MessagePlayInClickWindow> {
+
+    override fun decode(context: CodecContext, buf: ByteBuffer): MessagePlayInClickWindow {
+        return buf.run {
+            val windowId = readByte().toInt()
+            val slot = readShort().toInt()
+            val button = readByte().toInt()
+            val transaction = readShort().toInt()
+            val mode = readVarInt()
+            val clickedItem = context.read(buf, ContextualValueTypes.ITEM_STACK)
+            MessagePlayInClickWindow(windowId, slot, mode, button, transaction, clickedItem)
+        }
+    }
+}

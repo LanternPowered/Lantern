@@ -23,10 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.codec.connection
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.message.codec.Codec
+import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+class CodecInOutKeepAlive : Codec<MessageInOutKeepAlive> {
+
+    override fun encode(context: CodecContext, message: MessageInOutKeepAlive): ByteBuffer {
+        return context.byteBufAlloc().buffer(Long.SIZE_BYTES).writeLong(message.time)
+    }
+
+    override fun decode(context: CodecContext, buf: ByteBuffer): MessageInOutKeepAlive {
+        return MessageInOutKeepAlive(buf.readLong())
+    }
+}

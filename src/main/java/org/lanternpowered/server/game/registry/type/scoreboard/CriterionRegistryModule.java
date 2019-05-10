@@ -28,8 +28,8 @@ package org.lanternpowered.server.game.registry.type.scoreboard;
 import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternCriterion;
-import org.spongepowered.api.scoreboard.critieria.Criteria;
-import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.scoreboard.criteria.Criteria;
+import org.spongepowered.api.scoreboard.criteria.Criterion;
 
 public final class CriterionRegistryModule extends AdditionalPluginCatalogRegistryModule<Criterion> {
 

@@ -23,10 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.type.login
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.network.message.Message
+import org.lanternpowered.server.profile.LanternGameProfile
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+/**
+ * An internal message that gets sent to finish the login phase.
+ */
+class MessageLoginInFinish(val gameProfile: LanternGameProfile) : Message

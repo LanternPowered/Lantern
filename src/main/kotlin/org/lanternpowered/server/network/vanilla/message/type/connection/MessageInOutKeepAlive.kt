@@ -23,10 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.type.connection
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.network.message.Message
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+/**
+ * Send between the client and server to keep the connection
+ * alive and to determine the ping.
+ *
+ * @param time The time the message was sent
+ */
+data class MessageInOutKeepAlive(val time: Long) : Message

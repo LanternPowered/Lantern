@@ -28,15 +28,21 @@ package org.lanternpowered.server.network.vanilla.message.handler.login;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
-import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.profile.GameProfileCache;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
 
@@ -62,8 +68,13 @@ public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
         session.sendWithFuture(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
                 .addListener(future -> {
                     session.setGameProfile(gameProfile);
-                    session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
-                    session.queueReceivedMessage(new MessageForgeHandshakeInStart());
+                    session.setProtocolState(ProtocolState.PLAY);
+                    final Set<String> channels = Sponge.getChannelRegistrar().getRegisteredChannels(Platform.Type.SERVER)
+                            .stream().map(CatalogKey::toString).collect(Collectors.toSet());
+                    if (!channels.isEmpty()) {
+                        session.send(new MessagePlayInOutRegisterChannels(channels));
+                    }
+                    session.initPlayer();
                 });
     }
 }

@@ -46,12 +46,7 @@ public enum ProtocolState {
     /**
      * The login state.
      */
-    LOGIN               (2, new ProtocolLogin()),
-    /**
-     * The handshake phase of forge. This may be skipped and
-     * is only activated by the server.
-     */
-    FORGE_HANDSHAKE     (999, new ProtocolForgeHandshake());
+    LOGIN               (2, new ProtocolLogin());
 
     private final static Int2ObjectMap<ProtocolState> lookup = new Int2ObjectOpenHashMap<>();
 

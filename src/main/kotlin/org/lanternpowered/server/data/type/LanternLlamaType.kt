@@ -23,10 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.catalog.InternalCatalogType
+import org.spongepowered.api.data.type.LlamaType
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+class LanternLlamaType(key: CatalogKey, override val internalId: Int) :
+        DefaultCatalogType(key), LlamaType, InternalCatalogType

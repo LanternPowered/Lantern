@@ -23,10 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard
+package org.lanternpowered.server.network.vanilla.message.type.play
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.lanternpowered.server.network.message.Message
+import org.spongepowered.api.item.inventory.ItemStack
 
-class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+data class MessagePlayInClickWindow(
+        val windowId: Int,
+        val slot: Int,
+        val mode: Int,
+        val button: Int,
+        val transaction: Int,
+        val clickedItem: ItemStack?
+) : Message

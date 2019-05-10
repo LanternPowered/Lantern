@@ -51,7 +51,6 @@ import org.spongepowered.api.text.Text;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
-@SuppressWarnings("deprecation")
 public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
 
     private static final int V1_3_2_PROTOCOL = 39;
@@ -186,7 +185,8 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                 final InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
                 final LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress1);
                 final ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
-                final LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
+                final LanternStatusResponse response = new LanternStatusResponse(
+                        serverVersion, description, players, server.getFavicon().orElse(null));
 
                 final SimpleRemoteConnection connection = new SimpleRemoteConnection(address, virtualAddress1);
                 final Cause cause = Cause.of(EventContext.empty(), connection);

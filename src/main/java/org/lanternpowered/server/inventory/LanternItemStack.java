@@ -130,7 +130,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
     }
 
     @Override
-    public AdditionalContainerCollection<DataManipulator<?, ?>> getAdditionalContainers() {
+    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
         return this.additionalContainers;
     }
 

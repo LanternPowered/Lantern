@@ -52,10 +52,10 @@ data class NetworkTradeOffer(
             ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.secondInput)
         }
         buf.writeBoolean(this.disabled)
-        buf.writeInteger(this.uses)
-        buf.writeInteger(this.maxUses)
-        buf.writeInteger(this.experience)
-        buf.writeInteger(this.specialPrice)
+        buf.writeInt(this.uses)
+        buf.writeInt(this.maxUses)
+        buf.writeInt(this.experience)
+        buf.writeInt(this.specialPrice)
         buf.writeFloat(this.priceMultiplier.toFloat())
     }
 }

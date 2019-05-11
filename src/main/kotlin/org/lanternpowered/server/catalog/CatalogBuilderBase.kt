@@ -23,25 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+@file:Suppress("UNCHECKED_CAST")
 
-import org.lanternpowered.server.data.type.LanternOcelotType;
-import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
-import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.data.type.OcelotType;
-import org.spongepowered.api.data.type.OcelotTypes;
+package org.lanternpowered.server.catalog
 
-public class OcelotTypeRegistryModule extends InternalPluginCatalogRegistryModule<OcelotType> {
+import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.ext.*
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.CatalogType
+import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.text.translation.FixedTranslation
+import org.spongepowered.api.text.translation.Translation
+import org.spongepowered.api.util.CatalogBuilder
+import org.spongepowered.api.util.ResettableBuilder
 
-    public OcelotTypeRegistryModule() {
-        super(OcelotTypes.class);
+abstract class CatalogBuilderBase<C : CatalogType, B : ResettableBuilder<C, B>> : CatalogBuilder<C, B> {
+
+    protected var key: CatalogKey? = null
+
+    override fun key(key: CatalogKey) = apply {
+        check(key.namespace.isNotBlank()) { "The key namespace may not be blank." }
+        check(key.value.isNotBlank()) { "The key value may not be blank." }
+        this.key = key
+    } as B
+
+    override fun id(id: String): B {
+        check(id.isNotBlank()) { "The id may not be blank." }
+        val pluginContainer = CauseStack.current().first<PluginContainer>()
+                ?: throw IllegalStateException("Unable to find PluginContainer in the cause stack.")
+        return key(CatalogKey.of(pluginContainer.id, id))
     }
 
-    @Override
-    public void registerDefaults() {
-        register(new LanternOcelotType(CatalogKey.minecraft("wild_ocelot"), 0));
-        register(new LanternOcelotType(CatalogKey.minecraft("black_cat"), 1));
-        register(new LanternOcelotType(CatalogKey.minecraft("red_cat"), 2));
-        register(new LanternOcelotType(CatalogKey.minecraft("siamese_cat"), 3));
-    }
+    override fun reset() = apply {
+        this.key = null
+    } as B
 }

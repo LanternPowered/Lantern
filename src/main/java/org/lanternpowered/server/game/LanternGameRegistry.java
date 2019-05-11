@@ -133,9 +133,8 @@ import org.lanternpowered.server.game.registry.type.cause.HealingTypeRegistryMod
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.ArtRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.ArtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryModule;
@@ -146,7 +145,7 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.LlamaTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.CatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
@@ -154,6 +153,7 @@ import org.lanternpowered.server.game.registry.type.data.RailDirectionRegistryMo
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.VillagerTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleOptionRegistryModule;
@@ -299,7 +299,9 @@ import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.data.type.ArmorType;
+import org.spongepowered.api.data.type.ArtType;
 import org.spongepowered.api.data.type.BannerPatternShape;
+import org.spongepowered.api.data.type.CatType;
 import org.spongepowered.api.data.type.ChestAttachmentType;
 import org.spongepowered.api.data.type.ChestAttachmentTypes;
 import org.spongepowered.api.data.type.ComparatorType;
@@ -327,6 +329,7 @@ import org.spongepowered.api.data.type.SlabPortions;
 import org.spongepowered.api.data.type.Surface;
 import org.spongepowered.api.data.type.Surfaces;
 import org.spongepowered.api.data.type.ToolType;
+import org.spongepowered.api.data.type.VillagerType;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOption;
@@ -596,8 +599,7 @@ public class LanternGameRegistry implements XGameRegistry {
                         new EnumValueRegistryModule<LanternDoorHalf>(LanternDoorHalf.class, null) {})
                 .registerModule(InstrumentType.class,
                         new EnumValueRegistryModule<InstrumentType>(LanternInstrumentType.class, InstrumentTypes.class) {})
-                .registerModule(Art.class, new ArtRegistryModule())
-                .registerModule(Career.class, new CareerRegistryModule())
+                .registerModule(ArtType.class, new ArtTypeRegistryModule())
                 .registerModule(HandType.class, new HandTypeRegistryModule())
                 .registerModule(HandPreference.class, new HandPreferenceRegistryModule())
                 .registerModule(HorseColor.class, new HorseColorRegistryModule())
@@ -610,7 +612,8 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
                 .registerModule(SlabPortion.class, new EnumValueRegistryModule<SlabPortion>(LanternSlabPortion.class, SlabPortions.class) {})
                 .registerModule(NotePitch.class, NotePitchRegistryModule.get())
-                .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
+                .registerModule(CatType.class, new CatTypeRegistryModule())
+                .registerModule(VillagerType.class, new VillagerTypeRegistryModule())
                 .registerModule(LlamaType.class, new LlamaTypeRegistryModule())
                 .registerModule(Profession.class, new ProfessionRegistryModule())
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())

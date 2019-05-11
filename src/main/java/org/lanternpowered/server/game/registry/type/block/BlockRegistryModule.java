@@ -66,7 +66,7 @@ import org.lanternpowered.server.block.behavior.vanilla.ShulkerBoxInteractionBeh
 import org.lanternpowered.server.block.behavior.vanilla.SignInteractionBehavior;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
-import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.block.state.property.LanternEnumStateProperties;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
@@ -433,9 +433,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Dispenser  ///
         ////////////////////
         register(simpleBuilder()
-                        .traits(LanternEnumTraits.FACING, LanternBooleanTraits.TRIGGERED)
+                        .traits(LanternEnumStateProperties.FACING, LanternBooleanTraits.TRIGGERED)
                         .defaultState(state -> state
-                                .withTrait(LanternEnumTraits.FACING, Direction.NORTH).get()
+                                .withTrait(LanternEnumStateProperties.FACING, Direction.NORTH).get()
                                 .withTrait(LanternBooleanTraits.TRIGGERED, false).get())
                         .itemType()
                         .properties(builder -> builder
@@ -458,9 +458,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Note Block  ///
         /////////////////////
         register(simpleBuilder()
-                .traits(LanternEnumTraits.INSTRUMENT, LanternIntegerTraits.NOTE, LanternBooleanTraits.POWERED)
+                .traits(LanternEnumStateProperties.INSTRUMENT, LanternIntegerTraits.NOTE, LanternBooleanTraits.POWERED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.INSTRUMENT, LanternInstrumentType.HARP).get()
+                        .withTrait(LanternEnumStateProperties.INSTRUMENT, LanternInstrumentType.HARP).get()
                         .withTrait(LanternIntegerTraits.NOTE, 0).get()
                         .withTrait(LanternBooleanTraits.POWERED, false).get())
                 .itemType()
@@ -493,9 +493,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Powered Rail  ///
         ///////////////////////
         register(simpleBuilder()
-                .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED, LanternBooleanTraits.WATERLOGGED)
+                .traits(LanternEnumStateProperties.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED, LanternBooleanTraits.WATERLOGGED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
+                        .withTrait(LanternEnumStateProperties.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
                         .withTrait(LanternBooleanTraits.POWERED, false).get()
                         .withTrait(LanternBooleanTraits.WATERLOGGED, false).get())
                 .itemType()
@@ -509,9 +509,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Detector Rail  ///
         ////////////////////////
         register(simpleBuilder()
-                .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED, LanternBooleanTraits.WATERLOGGED)
+                .traits(LanternEnumStateProperties.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED, LanternBooleanTraits.WATERLOGGED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
+                        .withTrait(LanternEnumStateProperties.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
                         .withTrait(LanternBooleanTraits.POWERED, false).get()
                         .withTrait(LanternBooleanTraits.WATERLOGGED, false).get())
                 .itemType()
@@ -732,9 +732,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Wall Torch   ///
         //////////////////////
         register(simpleBuilder()
-                .trait(LanternEnumTraits.HORIZONTAL_FACING)
+                .trait(LanternEnumStateProperties.HORIZONTAL_FACING)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                        .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get())
                 .properties(builder -> builder
                         .add(INSTANT_BROKEN))
                 .selectionBox(BoundingBoxes::wallTorch)
@@ -779,16 +779,16 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///////////////////////////
         register(simpleBuilder()
                 .traits(LanternIntegerTraits.POWER,
-                        LanternEnumTraits.REDSTONE_NORTH_CONNECTION,
-                        LanternEnumTraits.REDSTONE_SOUTH_CONNECTION,
-                        LanternEnumTraits.REDSTONE_EAST_CONNECTION,
-                        LanternEnumTraits.REDSTONE_WEST_CONNECTION)
+                        LanternEnumStateProperties.REDSTONE_NORTH_CONNECTION,
+                        LanternEnumStateProperties.REDSTONE_SOUTH_CONNECTION,
+                        LanternEnumStateProperties.REDSTONE_EAST_CONNECTION,
+                        LanternEnumStateProperties.REDSTONE_WEST_CONNECTION)
                 .defaultState(state -> state
                         .withTrait(LanternIntegerTraits.POWER, 0).get()
-                        .withTrait(LanternEnumTraits.REDSTONE_NORTH_CONNECTION, RedstoneConnectionType.NONE).get()
-                        .withTrait(LanternEnumTraits.REDSTONE_SOUTH_CONNECTION, RedstoneConnectionType.NONE).get()
-                        .withTrait(LanternEnumTraits.REDSTONE_EAST_CONNECTION, RedstoneConnectionType.NONE).get()
-                        .withTrait(LanternEnumTraits.REDSTONE_WEST_CONNECTION, RedstoneConnectionType.NONE).get())
+                        .withTrait(LanternEnumStateProperties.REDSTONE_NORTH_CONNECTION, RedstoneConnectionType.NONE).get()
+                        .withTrait(LanternEnumStateProperties.REDSTONE_SOUTH_CONNECTION, RedstoneConnectionType.NONE).get()
+                        .withTrait(LanternEnumStateProperties.REDSTONE_EAST_CONNECTION, RedstoneConnectionType.NONE).get()
+                        .withTrait(LanternEnumStateProperties.REDSTONE_WEST_CONNECTION, RedstoneConnectionType.NONE).get())
                 .selectionBox(new AABB(0, 0, 0, 1.0, 0.0625, 1.0)) // TODO: Based on connections
                 .build("minecraft", "redstone_wire"));
         ///////////////////////
@@ -948,10 +948,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///  Ender Chest  ///
         /////////////////////
         register(simpleBuilder()
-                .traits(LanternEnumTraits.HORIZONTAL_FACING,
+                .traits(LanternEnumStateProperties.HORIZONTAL_FACING,
                         LanternBooleanTraits.WATERLOGGED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
+                        .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get()
                         .withTrait(LanternBooleanTraits.WATERLOGGED, false).get())
                 .itemType()
                 .tileEntityType(() -> TileEntityTypes.ENDER_CHEST)
@@ -998,9 +998,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///    Hopper   ///
         ///////////////////
         register(simpleBuilder()
-                .traits(LanternEnumTraits.HOPPER_FACING, LanternBooleanTraits.ENABLED)
+                .traits(LanternEnumStateProperties.HOPPER_FACING, LanternBooleanTraits.ENABLED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.HOPPER_FACING, Direction.DOWN).get()
+                        .withTrait(LanternEnumStateProperties.HOPPER_FACING, Direction.DOWN).get()
                         .withTrait(LanternBooleanTraits.ENABLED, false).get())
                 .itemType()
                 .properties(builder -> builder
@@ -1021,9 +1021,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///  Quartz Pillar  ///
         ///////////////////////
         register(quartzBlockBuilder()
-                .trait(LanternEnumTraits.AXIS)
+                .trait(LanternEnumStateProperties.AXIS)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.AXIS, Axis.X).get())
+                        .withTrait(LanternEnumStateProperties.AXIS, Axis.X).get())
                 .behaviors(pipeline -> pipeline
                         .add(new AxisRotationPlacementBehavior()))
                 .build("minecraft", "quartz_pillar"));
@@ -1031,9 +1031,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///    Dropper   ///
         ////////////////////
         register(simpleBuilder()
-                .traits(LanternEnumTraits.FACING, LanternBooleanTraits.TRIGGERED)
+                .traits(LanternEnumStateProperties.FACING, LanternBooleanTraits.TRIGGERED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.FACING, Direction.NORTH).get()
+                        .withTrait(LanternEnumStateProperties.FACING, Direction.NORTH).get()
                         .withTrait(LanternBooleanTraits.TRIGGERED, false).get())
                 .itemType()
                 .properties(builder -> builder
@@ -1156,9 +1156,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .tileEntityType(() -> TileEntityTypes.SIGN)
                         .build("minecraft", "oak_sign"));
         register(simpleBuilder()
-                        .traits(LanternEnumTraits.HORIZONTAL_FACING, LanternBooleanTraits.WATERLOGGED)
+                        .traits(LanternEnumStateProperties.HORIZONTAL_FACING, LanternBooleanTraits.WATERLOGGED)
                         .defaultState(state -> state
-                                .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
+                                .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get()
                                 .withTrait(LanternBooleanTraits.WATERLOGGED, false).get())
                         .properties(builder -> builder
                                 .add(hardness(1.0))
@@ -1184,9 +1184,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .tileEntityType(() -> TileEntityTypes.BANNER)
                         .build("minecraft", colorName + "_banner"));
             register(simpleBuilder()
-                        .trait(LanternEnumTraits.HORIZONTAL_FACING)
+                        .trait(LanternEnumStateProperties.HORIZONTAL_FACING)
                         .defaultState(state -> state
-                                .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                                .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get())
                         .properties(builder -> builder
                                 .add(hardness(1.0))
                                 .add(blastResistance(5.0)))
@@ -1200,9 +1200,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         /////////////////////
         /*
         register(simpleBuilder()
-                        .traits(LanternEnumTraits.HORIZONTAL_FACING, LanternEnumTraits.)
+                        .traits(LanternEnumStateProperties.HORIZONTAL_FACING, LanternEnumStateProperties.)
                         .defaultState(state -> state
-                                .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                                .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get())
                         .itemType()
                         .properties(builder -> builder
                                 .add(hardness(5.0))
@@ -1242,10 +1242,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     private BlockTypeBuilder bedBuilder() {
         return simpleBuilder()
                 .itemType()
-                .traits(LanternEnumTraits.HORIZONTAL_FACING, LanternEnumTraits.BED_PART, LanternBooleanTraits.OCCUPIED)
+                .traits(LanternEnumStateProperties.HORIZONTAL_FACING, LanternEnumStateProperties.BED_PART, LanternBooleanTraits.OCCUPIED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
-                        .withTrait(LanternEnumTraits.BED_PART, LanternBedPart.FOOT).get()
+                        .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get()
+                        .withTrait(LanternEnumStateProperties.BED_PART, LanternBedPart.FOOT).get()
                         .withTrait(LanternBooleanTraits.OCCUPIED, false).get())
                 .properties(builder -> builder
                         .add(hardness(0.2))
@@ -1314,9 +1314,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder horizontalFacingBuilder() {
         return simpleBuilder()
-                .traits(LanternEnumTraits.HORIZONTAL_FACING)
+                .traits(LanternEnumStateProperties.HORIZONTAL_FACING)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                        .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get())
                 .behaviors(pipeline -> pipeline
                         .add(new HorizontalRotationPlacementBehavior()));
     }
@@ -1415,8 +1415,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     private BlockTypeBuilder woodLogBuilder() {
         return simpleBuilder()
                 .itemType()
-                .traits(LanternEnumTraits.AXIS)
-                .defaultState(state -> state.withTrait(LanternEnumTraits.AXIS, Axis.X).get())
+                .traits(LanternEnumStateProperties.AXIS)
+                .defaultState(state -> state.withTrait(LanternEnumStateProperties.AXIS, Axis.X).get())
                 .properties(builder -> builder
                         .add(hardness(2.0))
                         .add(blastResistance(5.0))
@@ -1428,12 +1428,12 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder chestBuilder() {
         return builder()
-                .traits(LanternEnumTraits.CHEST_ATTACHMENT,
-                        LanternEnumTraits.HORIZONTAL_FACING,
+                .traits(LanternEnumStateProperties.CHEST_ATTACHMENT,
+                        LanternEnumStateProperties.HORIZONTAL_FACING,
                         LanternBooleanTraits.WATERLOGGED)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
-                        .withTrait(LanternEnumTraits.CHEST_ATTACHMENT, LanternChestAttachment.SINGLE).get()
+                        .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, Direction.NORTH).get()
+                        .withTrait(LanternEnumStateProperties.CHEST_ATTACHMENT, LanternChestAttachment.SINGLE).get()
                         .withTrait(LanternBooleanTraits.WATERLOGGED, false).get())
                 .itemType()
                 .tileEntityType(() -> TileEntityTypes.CHEST)
@@ -1453,8 +1453,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder shulkerBoxBuilder() {
         return builder()
-                .trait(LanternEnumTraits.FACING)
-                .defaultState(state -> state.withTrait(LanternEnumTraits.FACING, Direction.UP).get())
+                .trait(LanternEnumStateProperties.FACING)
+                .defaultState(state -> state.withTrait(LanternEnumStateProperties.FACING, Direction.UP).get())
                 .itemType(builder -> builder
                         .keysProvider(collection -> collection
                                 .register(LanternKeys.INVENTORY_SNAPSHOT, InventorySnapshot.EMPTY)
@@ -1477,10 +1477,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder slabBuilder() {
         return simpleBuilder()
-                .traits(LanternEnumTraits.SLAB_PORTION, LanternBooleanTraits.WATERLOGGED)
+                .traits(LanternEnumStateProperties.SLAB_PORTION, LanternBooleanTraits.WATERLOGGED)
                 .collisionBox(BoundingBoxes::slab)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.SLAB_PORTION, LanternSlabPortion.BOTTOM).get()
+                        .withTrait(LanternEnumStateProperties.SLAB_PORTION, LanternSlabPortion.BOTTOM).get()
                         .withTrait(LanternBooleanTraits.WATERLOGGED, false).get())
                 .itemType(builder -> builder
                         .behaviors(pipeline -> pipeline.add(new SlabItemInteractionBehavior())));

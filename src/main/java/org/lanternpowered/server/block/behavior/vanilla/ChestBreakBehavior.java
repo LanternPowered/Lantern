@@ -32,7 +32,7 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.entity.vanilla.LanternChest;
-import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.block.state.property.LanternEnumStateProperties;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -51,10 +51,10 @@ public class ChestBreakBehavior implements BreakBlockBehavior {
             location = location.getBlockRelative(connectionDir);
             final BlockState relState = location.getBlock();
             if (relState.getType() == state.getType() &&
-                    relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get() ==
-                    state.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get()) {
-                final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
-                final LanternChestAttachment connection = state.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
+                    relState.getTraitValue(LanternEnumStateProperties.HORIZONTAL_FACING).get() ==
+                    state.getTraitValue(LanternEnumStateProperties.HORIZONTAL_FACING).get()) {
+                final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumStateProperties.CHEST_ATTACHMENT).get();
+                final LanternChestAttachment connection = state.getTraitValue(LanternEnumStateProperties.CHEST_ATTACHMENT).get();
                 if ((relConnection == LanternChestAttachment.LEFT && connection == LanternChestAttachment.RIGHT) ||
                         (relConnection == LanternChestAttachment.RIGHT && connection == LanternChestAttachment.LEFT)) {
                     context.addBlockChange(BlockSnapshot.builder()

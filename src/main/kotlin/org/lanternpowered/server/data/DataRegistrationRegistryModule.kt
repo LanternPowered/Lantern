@@ -29,9 +29,9 @@ import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.spongepowered.api.data.DataRegistration
 
-object DataRegistrationRegistryModule : AdditionalPluginCatalogRegistryModule<DataRegistration<*, *>>() {
+object DataRegistrationRegistryModule : AdditionalPluginCatalogRegistryModule<DataRegistration>() {
 
-    override fun registerAdditionalCatalog(catalogType: DataRegistration<*, *>) {
+    override fun registerAdditionalCatalog(catalogType: DataRegistration) {
         if (catalogType is DataManipulatorRegistration<*, *>) {
             register(catalogType)
         } else {
@@ -39,7 +39,7 @@ object DataRegistrationRegistryModule : AdditionalPluginCatalogRegistryModule<Da
         }
     }
 
-    override fun <A : DataRegistration<*, *>> register(catalogType: A): A {
+    override fun <A : DataRegistration> register(catalogType: A): A {
         if (catalogType is LanternDataRegistration<*, *>) {
             catalogType.validate()
             catalogType.register()

@@ -32,7 +32,7 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.block.state.property.LanternEnumStateProperties;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -41,7 +41,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
 import java.util.List;
@@ -97,9 +96,9 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
         Location relLocation = location.getBlockRelative(face.getOpposite());
         BlockState relState = relLocation.getBlock();
         if (relState.getType() == blockType) {
-            final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
+            final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumStateProperties.CHEST_ATTACHMENT).get();
             if (relConnection == LanternChestAttachment.SINGLE) {
-                final Direction relFacing = relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
+                final Direction relFacing = relState.getTraitValue(LanternEnumStateProperties.HORIZONTAL_FACING).get();
                 final List<Direction> dirs = getConnectionDirections(relFacing);
                 int index = dirs.indexOf(face);
                 if (index-- != -1) {
@@ -123,8 +122,8 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
                     relLocation = location.getBlockRelative(relDirection);
                     relState = relLocation.getBlock();
                     if (relState.getType() == blockType) {
-                        final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
-                        final Direction relFacing = relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
+                        final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumStateProperties.CHEST_ATTACHMENT).get();
+                        final Direction relFacing = relState.getTraitValue(LanternEnumStateProperties.HORIZONTAL_FACING).get();
                         if (relFacing == facing && relConnection == LanternChestAttachment.SINGLE) {
                             connection = index == 0 ? LanternChestAttachment.LEFT : LanternChestAttachment.RIGHT;
                             context.addBlockChange(BlockSnapshot.builder()

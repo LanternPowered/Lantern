@@ -39,13 +39,13 @@ class CodecPlayOutPlayerJoinGame : Codec<MessagePlayOutPlayerJoinGame> {
     override fun encode(context: CodecContext, message: MessagePlayOutPlayerJoinGame): ByteBuffer {
         context.channel.attr(PLAYER_ENTITY_ID).set(message.entityId)
         return context.byteBufAlloc().buffer().apply {
-            writeInteger(message.entityId)
+            writeInt(message.entityId)
             var gameMode = (message.gameMode as LanternGameMode).internalId.toByte()
             if (message.isHardcore) {
                 gameMode = gameMode or 0x8
             }
             writeByte(gameMode)
-            writeInteger((message.dimensionType as LanternDimensionType<*>).internalId)
+            writeInt((message.dimensionType as LanternDimensionType<*>).internalId)
             writeByte(Math.min(message.playerListSize, 255).toByte())
             writeString(if (message.lowHorizon) "flat" else "default")
             writeVarInt(message.viewDistance)

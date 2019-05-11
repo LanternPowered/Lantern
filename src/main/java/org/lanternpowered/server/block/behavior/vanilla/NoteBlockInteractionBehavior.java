@@ -54,7 +54,7 @@ public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
         state = state.withTrait(LanternIntegerTraits.NOTE, notePitch).get();
         // Get the instrument type based on the underlying block
         // TODO: Use the following line once the note block state can be updated by surrounding changes
-        //  final LanternInstrumentType instrumentType = state.getTraitValue(LanternEnumTraits.INSTRUMENT).get();
+        //  final LanternInstrumentType instrumentType = state.getTraitValue(LanternEnumStateProperties.INSTRUMENT).get();
         final InstrumentType instrumentType = location.getBlockRelative(Direction.DOWN).getProperty(InstrumentProperty.class)
                 .map(InstrumentProperty::getValue).orElse(InstrumentTypes.HARP);
         // Trigger the note play effect

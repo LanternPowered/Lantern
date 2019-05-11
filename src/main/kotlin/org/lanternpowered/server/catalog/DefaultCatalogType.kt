@@ -45,7 +45,6 @@ open class DefaultCatalogType(key: CatalogKey) : AbstractCatalogType() {
     }
 
     override fun getKey() = this.key
-    override fun compareTo(other: CatalogType): Int = this.key.compareTo(other.key)
 
     companion object {
 

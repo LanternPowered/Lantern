@@ -26,17 +26,17 @@
 package org.lanternpowered.server.game.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKeys
-import org.lanternpowered.server.data.type.LanternArt
+import org.lanternpowered.server.data.type.LanternArtType
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
-import org.spongepowered.api.data.type.Art
-import org.spongepowered.api.data.type.Arts
+import org.spongepowered.api.data.type.ArtType
+import org.spongepowered.api.data.type.ArtTypes
 
-class ArtRegistryModule : DefaultCatalogRegistryModule<Art>(Arts::class.java) {
+class ArtTypeRegistryModule : DefaultCatalogRegistryModule<ArtType>(ArtTypes::class.java) {
 
     override fun registerDefaults() {
         var internalId = 0
         fun register(id: String, name: String, width: Int, height: Int) =
-                register(LanternArt(CatalogKeys.minecraft(id, name), internalId++, width, height))
+                register(LanternArtType(CatalogKeys.minecraft(id, name), internalId++, width, height))
 
         register("alban", "Alban", 1, 1)
         register("aztec", "Aztec", 1, 1)

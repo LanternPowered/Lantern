@@ -265,7 +265,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         // Get the dimension type
         final LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
         // Create the weather universe if needed
-        if (dimensionType.getHasSky()) {
+        if (dimensionType.hasSkylight()) {
             this.weatherUniverse = new LanternWeatherUniverse(this);
         } else {
             this.weatherUniverse = null;

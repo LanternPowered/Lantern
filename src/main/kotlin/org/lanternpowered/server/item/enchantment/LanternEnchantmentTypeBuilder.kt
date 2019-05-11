@@ -30,10 +30,11 @@ import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
+import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.CatalogKey
 
-class LanternEnchantmentTypeBuilder : AbstractCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder>(), EnchantmentTypeBuilder {
+class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder>(), EnchantmentTypeBuilder {
 
     companion object {
         var idCounter: Int = 0

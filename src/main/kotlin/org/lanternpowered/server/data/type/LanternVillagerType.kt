@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.type
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
-import org.spongepowered.api.data.type.OcelotType
+import org.spongepowered.api.data.type.VillagerType
 
-class LanternOcelotType(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), OcelotType, InternalCatalogType
+class LanternVillagerType(key: CatalogKey, override val internalId: Int) :
+        DefaultCatalogType(key), VillagerType, InternalCatalogType

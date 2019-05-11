@@ -32,8 +32,8 @@ import org.lanternpowered.server.inventory.client.*
 import org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.entity.Entity
-import org.spongepowered.api.item.inventory.property.GuiId
-import org.spongepowered.api.item.inventory.property.GuiIds
+import org.spongepowered.api.item.inventory.gui.GuiId
+import org.spongepowered.api.item.inventory.gui.GuiIds
 import org.spongepowered.api.item.inventory.type.CarriedInventory
 
 object ClientContainerRegistryModule : DefaultCatalogRegistryModule<GuiId>(GuiIds::class) {

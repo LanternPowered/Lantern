@@ -36,7 +36,7 @@ class CodecPlayOutOpenHorseWindow : Codec<MessagePlayOutOpenHorseWindow> {
         return context.byteBufAlloc().buffer().apply {
             writeVarInt(message.windowId)
             writeByte(message.slots.toByte())
-            writeInteger(message.entityId)
+            writeInt(message.entityId)
         }
     }
 }

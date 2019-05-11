@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.block.state.property;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
@@ -41,7 +41,7 @@ import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Direction;
 
 @SuppressWarnings("unchecked")
-public final class LanternEnumTraits {
+public final class LanternEnumStateProperties {
 
     public static final EnumStateProperty<LanternBedPart> BED_PART =
             LanternEnumStateProperty.minecraft("type", (Key) LanternKeys.BED_PART, LanternBedPart.class);
@@ -78,8 +78,8 @@ public final class LanternEnumTraits {
             LanternEnumStateProperty.minecraft("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class);
 
     public static final EnumStateProperty<Direction> TORCH_FACING =
-            LanternEnumStateProperty
-                    .minecraft("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP);
+            LanternEnumStateProperty.minecraft("facing", (Key) Keys.DIRECTION,
+                    Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP);
 
     public static final EnumStateProperty<RedstoneConnectionType> REDSTONE_NORTH_CONNECTION =
             LanternEnumStateProperty.minecraft("north", (Key) LanternKeys.REDSTONE_NORTH_CONNECTION, RedstoneConnectionType.class);
@@ -96,6 +96,6 @@ public final class LanternEnumTraits {
     public static final EnumStateProperty<LanternInstrumentType> INSTRUMENT =
             LanternEnumStateProperty.minecraft("instrument", (Key) LanternKeys.INSTRUMENT_TYPE, LanternInstrumentType.class);
 
-    private LanternEnumTraits() {
+    private LanternEnumStateProperties() {
     }
 }

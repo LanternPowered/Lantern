@@ -33,7 +33,7 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
-import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.block.state.property.LanternEnumStateProperties;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockTypes;
@@ -104,7 +104,7 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
             return builder.blockState(BlockTypes.TORCH.getDefaultState());
         } else {
             return builder.blockState(BlockTypes.WALL_TORCH.getDefaultState()
-                    .withTrait(LanternEnumTraits.HORIZONTAL_FACING, direction).get());
+                    .withTrait(LanternEnumStateProperties.HORIZONTAL_FACING, direction).get());
         }
     }
 

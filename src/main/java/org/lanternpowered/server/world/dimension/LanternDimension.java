@@ -66,7 +66,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public boolean hasSky() {
-        return this.dimensionType.getHasSky();
+        return this.dimensionType.getHasSkylight();
     }
 
     @Override

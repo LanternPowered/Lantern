@@ -26,8 +26,9 @@
 package org.lanternpowered.api.x.item.enchantment
 
 import org.lanternpowered.api.item.enchantment.EnchantmentType
+import org.spongepowered.api.NamedCatalogType
 
-interface XEnchantmentType : EnchantmentType {
+interface XEnchantmentType : EnchantmentType, NamedCatalogType {
 
     /**
      * The range of the [getMinimumLevel] and [getMaximumLevel].

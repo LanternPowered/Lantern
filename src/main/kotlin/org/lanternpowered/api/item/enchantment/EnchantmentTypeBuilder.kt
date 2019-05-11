@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.api.item.enchantment
 
-import org.lanternpowered.api.util.builder.CatalogBuilder
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
+import org.spongepowered.api.util.NamedCatalogBuilder
 import java.util.function.Predicate
 
 /**
  * A builder to construct [EnchantmentType]s.
  */
-interface EnchantmentTypeBuilder : CatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder> {
+interface EnchantmentTypeBuilder : NamedCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder> {
 
     fun weight(weight: Int): EnchantmentTypeBuilder
     fun levelRange(levelRange: IntRange): EnchantmentTypeBuilder

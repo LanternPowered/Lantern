@@ -26,7 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.data.type.LanternArt;
+import org.lanternpowered.server.data.type.LanternArtType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -40,7 +40,7 @@ public final class CodecPlayOutSpawnPainting implements Codec<MessagePlayOutSpaw
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         buf.writeUniqueId(message.getUniqueId());
-        buf.writeVarInt(((LanternArt) message.getArt()).getInternalId());
+        buf.writeVarInt(((LanternArtType) message.getArt()).getInternalId());
         buf.writePosition(message.getX(), message.getY(), message.getZ());
         buf.writeByte(toId(message.getDirection()));
         return buf;

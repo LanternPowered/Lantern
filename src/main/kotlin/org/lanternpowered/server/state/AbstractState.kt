@@ -209,7 +209,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
 
     override fun with(value: Value<*>) = with(value.key as Key<Value<Any>>, value.get())
 
-    override fun with(valueContainer: ImmutableDataManipulator<*, *>): Optional<S> {
+    override fun with(valueContainer: ImmutableDataManipulator): Optional<S> {
         var state: Optional<S>? = null
         for (value in valueContainer.getValues()) {
             state = with(value)
@@ -220,7 +220,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return state ?: (this as S).optional()
     }
 
-    override fun with(valueContainers: Iterable<ImmutableDataManipulator<*, *>>): Optional<S> {
+    override fun with(valueContainers: Iterable<ImmutableDataManipulator>): Optional<S> {
         var state: Optional<S>? = null
         for (valueContainer in valueContainers) {
             state = with(valueContainer)
@@ -231,7 +231,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return state ?: (this as S).optional()
     }
 
-    override fun without(containerClass: Class<out ImmutableDataManipulator<*, *>>) = Optional.empty<S>()
+    override fun without(containerClass: Class<out ImmutableDataManipulator>) = Optional.empty<S>()
 
     override fun merge(that: S): S {
         return if (this.stateContainer != (that as IState<S>).stateContainer) {

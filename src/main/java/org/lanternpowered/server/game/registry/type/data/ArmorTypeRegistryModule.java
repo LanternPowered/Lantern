@@ -31,6 +31,7 @@ import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ArmorTypes;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.recipe.crafting.Ingredient;
 
 public final class ArmorTypeRegistryModule extends DefaultCatalogRegistryModule<ArmorType> {
 
@@ -41,9 +42,9 @@ public final class ArmorTypeRegistryModule extends DefaultCatalogRegistryModule<
     @Override
     public void registerDefaults() {
         register(new LanternArmorType(CatalogKey.minecraft("chain")));
-        register(new LanternArmorType(CatalogKey.minecraft("diamond"), () -> ItemTypes.DIAMOND));
-        register(new LanternArmorType(CatalogKey.minecraft("gold"), () -> ItemTypes.GOLD_INGOT));
-        register(new LanternArmorType(CatalogKey.minecraft("iron"), () -> ItemTypes.IRON_INGOT));
-        register(new LanternArmorType(CatalogKey.minecraft("leather"), () -> ItemTypes.LEATHER));
+        register(new LanternArmorType(CatalogKey.minecraft("diamond"), () -> Ingredient.of(ItemTypes.DIAMOND)));
+        register(new LanternArmorType(CatalogKey.minecraft("gold"), () -> Ingredient.of(ItemTypes.GOLD_INGOT)));
+        register(new LanternArmorType(CatalogKey.minecraft("iron"), () -> Ingredient.of(ItemTypes.IRON_INGOT)));
+        register(new LanternArmorType(CatalogKey.minecraft("leather"), () -> Ingredient.of(ItemTypes.LEATHER)));
     }
 }

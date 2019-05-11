@@ -26,13 +26,13 @@
 package org.lanternpowered.server.world.gamerule
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.server.catalog.AbstractCatalogBuilder
+import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.text.translation.Translation
 import org.spongepowered.api.world.gamerule.GameRule
 
 @Suppress("UNCHECKED_CAST")
-class LanternGameRuleBuilder<V : Any> : AbstractCatalogBuilder<GameRule<V>, GameRule.Builder<V>>(), GameRule.Builder<V> {
+class LanternGameRuleBuilder<V : Any> : AbstractNamedCatalogBuilder<GameRule<V>, GameRule.Builder<V>>(), GameRule.Builder<V> {
 
     private var valueType: TypeToken<V>? = null
     private var defaultValue: V? = null

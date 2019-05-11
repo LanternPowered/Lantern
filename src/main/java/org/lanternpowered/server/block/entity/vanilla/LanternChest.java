@@ -27,7 +27,7 @@ package org.lanternpowered.server.block.entity.vanilla;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.block.state.property.LanternEnumStateProperties;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
@@ -65,11 +65,11 @@ public class LanternChest extends ContainerBlockEntity<ChestInventory> implement
     }
 
     public static Direction getConnectedDirection(BlockState blockState) {
-        final LanternChestAttachment connection = blockState.getStateProperty(LanternEnumTraits.CHEST_ATTACHMENT).get();
+        final LanternChestAttachment connection = blockState.getStateProperty(LanternEnumStateProperties.CHEST_ATTACHMENT).get();
         if (connection == LanternChestAttachment.SINGLE) {
             return Direction.NONE;
         }
-        final Direction direction = blockState.getStateProperty(LanternEnumTraits.HORIZONTAL_FACING).get();
+        final Direction direction = blockState.getStateProperty(LanternEnumStateProperties.HORIZONTAL_FACING).get();
         boolean left = connection == LanternChestAttachment.LEFT;
         switch (direction) {
             case NORTH:
@@ -114,7 +114,7 @@ public class LanternChest extends ContainerBlockEntity<ChestInventory> implement
         }
         final Location location =  getLocation();
         final BlockState blockState = location.getBlock();
-        final LanternChestAttachment connection = blockState.getStateProperty(LanternEnumTraits.CHEST_ATTACHMENT).get();
+        final LanternChestAttachment connection = blockState.getStateProperty(LanternEnumStateProperties.CHEST_ATTACHMENT).get();
         if (connection == LanternChestAttachment.SINGLE) {
             return Optional.empty();
         }
@@ -153,7 +153,7 @@ public class LanternChest extends ContainerBlockEntity<ChestInventory> implement
         final Location location =  getLocation();
         final BlockState blockState = location.getBlock();
         final LanternChestAttachment connection = blockState.getStateProperty(
-                LanternEnumTraits.CHEST_ATTACHMENT).get();
+                LanternEnumStateProperties.CHEST_ATTACHMENT).get();
         if (connection == LanternChestAttachment.SINGLE) {
             return Optional.empty();
         }

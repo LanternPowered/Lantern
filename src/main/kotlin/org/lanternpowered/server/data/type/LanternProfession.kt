@@ -28,18 +28,7 @@ package org.lanternpowered.server.data.type
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
-import org.spongepowered.api.data.type.Career
 import org.spongepowered.api.data.type.Profession
-import java.util.Collections
-import java.util.HashSet
 
 class LanternProfession(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), Profession, InternalCatalogType {
-
-    private val careers = HashSet<Career>()
-    private val unmodifiableCareers = Collections.unmodifiableSet(this.careers)
-
-    fun addCareer(career: Career) { this.careers.add(career) }
-
-    override fun getCareers(): Collection<Career> = this.unmodifiableCareers
-}
+        DefaultCatalogType(key), Profession, InternalCatalogType

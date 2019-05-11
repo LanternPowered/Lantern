@@ -23,24 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type
+package org.lanternpowered.server.game.registry.type.data
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
-import org.spongepowered.api.data.type.Art
+import org.lanternpowered.server.data.type.LanternProfession
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
+import org.lanternpowered.server.game.registry.InternalRegistries
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.data.type.Profession
+import org.spongepowered.api.data.type.Professions
 
-class LanternArt(
-        key: CatalogKey,
-        override val internalId: Int,
-        private val width: Int,
-        private val height: Int
-): DefaultCatalogType(key), Art, InternalCatalogType {
+class ProfessionRegistryModule : DefaultCatalogRegistryModule<Profession>(Professions::class) {
 
-    override fun getHeight(): Int = this.height
-    override fun getWidth(): Int = this.width
-
-    override fun toStringHelper() = super.toStringHelper()
-            .add("width", this.width)
-            .add("height", this.height)
+    override fun registerDefaults() {
+        InternalRegistries.visit("villager_profession") { key, internalId ->
+            register(LanternProfession(CatalogKey.resolve(key), internalId))
+        }
+    }
 }

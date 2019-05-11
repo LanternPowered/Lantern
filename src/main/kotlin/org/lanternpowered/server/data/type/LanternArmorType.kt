@@ -26,13 +26,15 @@
 package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ext.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.ArmorType
-import org.spongepowered.api.item.ItemType
-import java.util.Optional
+import org.spongepowered.api.item.recipe.crafting.Ingredient
 
-class LanternArmorType @JvmOverloads constructor(key: CatalogKey, private val repairItemType: () -> ItemType? = { null }) :
+class LanternArmorType @JvmOverloads constructor(key: CatalogKey, repairIngredient: () -> Ingredient? = { null }) :
         DefaultCatalogType(key), ArmorType {
 
-    override fun getRepairItemType(): Optional<ItemType> = Optional.ofNullable(this.repairItemType())
+    private val ingredient by lazy(repairIngredient)
+
+    override fun getRepairIngredient() = this.ingredient.optional()
 }

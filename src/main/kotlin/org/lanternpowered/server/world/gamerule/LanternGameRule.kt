@@ -33,7 +33,7 @@ import org.spongepowered.api.world.gamerule.GameRule
 
 class LanternGameRule<V>(
         key: CatalogKey, name: Translation, private val valueType: TypeToken<V>, private val defaultValue: V
-) : DefaultCatalogType(key, name), GameRule<V> {
+) : DefaultCatalogType.Named(key, name), GameRule<V> {
 
     override fun getValueType() = this.valueType
     override fun getDefaultValue() = this.defaultValue

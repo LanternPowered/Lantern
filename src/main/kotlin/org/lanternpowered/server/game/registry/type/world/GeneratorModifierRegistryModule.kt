@@ -27,8 +27,6 @@ package org.lanternpowered.server.game.registry.type.world
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.world.gen.modifier.VoidWorldGeneratorModifier
-import org.spongepowered.api.world.gen.WorldGeneratorModifier
-import org.spongepowered.api.world.gen.WorldGeneratorModifiers
 
 object GeneratorModifierRegistryModule : AdditionalPluginCatalogRegistryModule<WorldGeneratorModifier>(WorldGeneratorModifiers::class) {
 

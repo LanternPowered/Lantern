@@ -23,27 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.game.registry.type.data
 
-import org.lanternpowered.server.data.type.LanternProfession;
-import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
-import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.data.type.Profession;
-import org.spongepowered.api.data.type.Professions;
+import org.lanternpowered.server.data.type.LanternVillagerType
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule
+import org.lanternpowered.server.game.registry.InternalRegistries
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.data.type.VillagerType
+import org.spongepowered.api.data.type.VillagerTypes
 
-public class ProfessionRegistryModule extends DefaultCatalogRegistryModule<Profession> {
+class VillagerTypeRegistryModule : InternalPluginCatalogRegistryModule<VillagerType>(VillagerTypes::class) {
 
-    public ProfessionRegistryModule() {
-        super(Professions.class);
-    }
-
-    @Override
-    public void registerDefaults() {
-        register(new LanternProfession(CatalogKey.minecraft("farmer"), 0));
-        register(new LanternProfession(CatalogKey.minecraft("librarian"), 1));
-        register(new LanternProfession(CatalogKey.minecraft("priest"), 2));
-        register(new LanternProfession(CatalogKey.minecraft("blacksmith"), 3));
-        register(new LanternProfession(CatalogKey.minecraft("butcher"), 4));
-        register(new LanternProfession(CatalogKey.minecraft("nitwit"), 5));
+    override fun registerDefaults() {
+        InternalRegistries.visit("villager_type") { key, internalId ->
+            register(LanternVillagerType(CatalogKey.resolve(key), internalId))
+        }
     }
 }

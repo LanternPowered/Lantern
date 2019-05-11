@@ -27,17 +27,20 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.text.translation.Translated
-import org.lanternpowered.server.text.translation.TranslationHelper.tr
-import org.spongepowered.api.data.type.Career
-import org.spongepowered.api.data.type.Profession
-import org.spongepowered.api.text.translation.Translatable
-import org.spongepowered.api.text.translation.Translation
+import org.lanternpowered.server.catalog.InternalCatalogType
+import org.spongepowered.api.data.type.ArtType
 
-class LanternCareer(key: CatalogKey, translation: Translation, private val profession: Profession) :
-        DefaultCatalogType(key), Career, Translatable by Translated(translation) {
+class LanternArtType(
+        key: CatalogKey,
+        override val internalId: Int,
+        private val width: Int,
+        private val height: Int
+): DefaultCatalogType(key), ArtType, InternalCatalogType {
 
-    constructor(key: CatalogKey, profession: Profession) : this(key, tr("entity.Villager.${key.value}"), profession)
+    override fun getHeight(): Int = this.height
+    override fun getWidth(): Int = this.width
 
-    override fun getProfession(): Profession = this.profession
+    override fun toStringHelper() = super.toStringHelper()
+            .add("width", this.width)
+            .add("height", this.height)
 }

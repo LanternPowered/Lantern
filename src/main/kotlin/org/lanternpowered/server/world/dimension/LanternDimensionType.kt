@@ -37,6 +37,7 @@ import java.util.function.BiFunction
 
 class LanternDimensionType<T : LanternDimension>(
         key: CatalogKey,
+        name: String,
         override val internalId: Int,
         private val dimensionClass: Class<T>,
         /**
@@ -46,10 +47,10 @@ class LanternDimensionType<T : LanternDimension>(
         val defaultGeneratorType: GeneratorType,
         val keepSpawnLoaded: Boolean,
         val doesWaterEvaporate: Boolean,
-        val hasSky: Boolean,
+        private val hasSkylight: Boolean,
         val allowsPlayerRespawns: Boolean,
         private val supplier: BiFunction<LanternWorld, LanternDimensionType<T>, T>
-) : DefaultCatalogType(key), DimensionType, InternalCatalogType {
+) : DefaultCatalogType.Named(key, name), DimensionType, InternalCatalogType {
 
     /**
      * The shared [Context] for all the [Dimension]s of this type.
@@ -65,6 +66,9 @@ class LanternDimensionType<T : LanternDimension>(
     fun newDimension(world: LanternWorld): T {
         return this.supplier.apply(world, this)
     }
+
+    override fun hasSkylight() = this.hasSkylight
+    override fun getDirectoryName() = "DIM" + this.internalId
 
     override fun getDimensionClass() = this.dimensionClass
     override fun toStringHelper() = super.toStringHelper()

@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableSet
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.key.Key
 import org.spongepowered.api.data.value.Value
-import org.spongepowered.api.data.value.Value.Mutable
 import org.spongepowered.api.state.EnumStateProperty
 import java.util.Arrays
 import java.util.Optional
@@ -89,7 +88,7 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
         }
 
         @JvmStatic
-        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Mutable<E>>, enumClass: Class<E>): EnumStateProperty<E> {
+        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Value<E>>, enumClass: Class<E>): EnumStateProperty<E> {
             return of(CatalogKey.minecraft(id), valueKey, enumClass)
         }
 
@@ -114,7 +113,7 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
         }
 
         @JvmStatic
-        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Mutable<E>>,
+        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Value<E>>,
                                     enumClass: Class<E>, predicate: Predicate<E>): EnumStateProperty<E> {
             return of(CatalogKey.minecraft(id), valueKey, enumClass, predicate)
         }
@@ -133,14 +132,14 @@ class LanternEnumStateProperty<E : Enum<E>> private constructor(
          * @return the enum trait
          */
         @JvmStatic
-        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out Mutable<E>>, value: E, vararg values: E): EnumStateProperty<E> {
+        fun <E : Enum<E>> of(key: CatalogKey, valueKey: Key<out Value<E>>, value: E, vararg values: E): EnumStateProperty<E> {
             check(values.isNotEmpty()) { "enumClass must contain values" }
             return LanternEnumStateProperty(key, value.javaClass,
                     ImmutableSet.builder<E>().add(value).addAll(values.asList()).build(), valueKey)
         }
 
         @JvmStatic
-        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Mutable<E>>, value: E, vararg values: E): EnumStateProperty<E> {
+        fun <E : Enum<E>> minecraft(id: String, valueKey: Key<out Value<E>>, value: E, vararg values: E): EnumStateProperty<E> {
             return of(CatalogKey.minecraft(id), valueKey, value, *values)
         }
     }

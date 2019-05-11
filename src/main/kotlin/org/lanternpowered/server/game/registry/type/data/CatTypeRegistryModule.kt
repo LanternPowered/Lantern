@@ -23,26 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound
+package org.lanternpowered.server.game.registry.type.data
 
-import com.flowpowered.math.vector.Vector3d
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.text.translation.Translation
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.network.message.Message
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect
-import org.spongepowered.api.effect.sound.SoundCategory
-import org.spongepowered.api.effect.sound.SoundType
+import org.lanternpowered.server.data.type.LanternCatType
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule
+import org.lanternpowered.server.game.registry.InternalRegistries
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.data.type.CatType
+import org.spongepowered.api.data.type.CatTypes
 
-class LanternSoundType @JvmOverloads constructor(key: CatalogKey, name: Translation, private val eventId: Int? = null) :
-        DefaultCatalogType.Named(key, name), SoundType {
+class CatTypeRegistryModule : InternalPluginCatalogRegistryModule<CatType>(CatTypes::class) {
 
-    fun createMessage(position: Vector3d, soundCategory: SoundCategory, volume: Float, pitch: Float): Message {
-        return if (this.eventId != null) {
-            MessagePlayOutSoundEffect(this.eventId, position, soundCategory, volume, pitch)
-        } else {
-            MessagePlayOutNamedSoundEffect(name, position, soundCategory, volume, pitch)
+    override fun registerDefaults() {
+        InternalRegistries.visit("cat_type") { key, internalId ->
+            register(LanternCatType(CatalogKey.resolve(key), internalId))
         }
     }
 }

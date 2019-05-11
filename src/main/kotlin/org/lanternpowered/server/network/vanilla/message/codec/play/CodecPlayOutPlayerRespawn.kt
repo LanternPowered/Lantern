@@ -36,7 +36,7 @@ class CodecPlayOutPlayerRespawn : Codec<MessagePlayOutPlayerRespawn> {
 
     override fun encode(context: CodecContext, message: MessagePlayOutPlayerRespawn): ByteBuffer {
         return context.byteBufAlloc().buffer().apply {
-            writeInteger((message.dimensionType as LanternDimensionType<*>).internalId)
+            writeInt((message.dimensionType as LanternDimensionType<*>).internalId)
             writeByte((message.gameMode as LanternGameMode).internalId.toByte())
             writeString(if (message.lowHorizon) "flat" else "default")
         }

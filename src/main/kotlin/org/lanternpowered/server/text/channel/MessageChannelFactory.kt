@@ -23,23 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.fluid
+package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.server.state.AbstractState
-import org.lanternpowered.server.state.StateData
-import org.spongepowered.api.block.BlockState
-import org.spongepowered.api.fluid.FluidState
-import org.spongepowered.api.fluid.FluidType
+import org.spongepowered.api.text.channel.MessageChannel
+import org.spongepowered.api.text.channel.MessageReceiver
+import org.spongepowered.api.world.World
 
-class LanternFluidState(data: StateData<FluidState>) : AbstractState<FluidState, FluidType>(data), FluidState {
+object MessageChannelFactory : MessageChannel.Factory {
 
-    override fun isEmpty(): Boolean {
+    override fun subjectsWithPermission(permission: String) = SubjectPermissionMessageChannel(permission)
+
+    override fun combined(vararg channels: MessageChannel) = CombinedMessageChannel(channels.asList())
+    override fun combined(channels: MutableCollection<MessageChannel>) = CombinedMessageChannel(channels)
+
+    override fun fixed(vararg recipients: MessageReceiver) = FixedMessageChannel(recipients.asList())
+    override fun fixed(recipients: MutableCollection<out MessageReceiver>) = FixedMessageChannel(recipients)
+
+    override fun world(world: World) = WorldMessageChannel(world)
+
+    override fun none() = EmptyMessageChannel
+
+    override fun players() = PlayerMessageChannel
+    override fun playersWithPermission(permission: String) = PlayerPermissionMessageChannel(permission)
+
+    override fun playersAndConsole(): MessageChannel {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getType() = this.stateContainer
-
-    override fun getBlock(): BlockState {
+    override fun console(): MessageChannel {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun asMutable(channel: MessageChannel) = DelegateMutableMessageChannel(channel)
 }

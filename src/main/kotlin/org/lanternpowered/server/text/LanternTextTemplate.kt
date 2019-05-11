@@ -32,7 +32,7 @@ import ninja.leaping.configurate.objectmapping.Setting
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.TextBuilder
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.TextElement
 import org.spongepowered.api.text.TextTemplate

@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.trait;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.Iterables;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.util.ToStringHelper;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.Value;

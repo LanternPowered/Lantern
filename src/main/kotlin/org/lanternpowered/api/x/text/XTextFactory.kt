@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.api.x.text
 
-import org.spongepowered.api.text.TextFactory
+import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.TextTemplate
 import org.spongepowered.api.text.format.TextStyle
 
-interface XTextFactory : TextFactory {
+interface XTextFactory : Text.Factory {
 
     fun style(bold: Boolean?, italic: Boolean?, underline: Boolean?, strikethrough: Boolean?, obfuscated: Boolean?): TextStyle
 

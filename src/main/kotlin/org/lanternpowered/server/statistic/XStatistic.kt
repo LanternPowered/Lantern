@@ -23,30 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.status
+package org.lanternpowered.server.statistic
 
-import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.util.ToStringHelper
-import org.spongepowered.api.MinecraftVersion
-import org.spongepowered.api.network.status.StatusClient
-import java.net.InetSocketAddress
+import org.lanternpowered.api.catalog.CatalogType
+import org.spongepowered.api.NamedCatalogType
+import org.spongepowered.api.statistic.Statistic
 
-class LanternStatusClient(
-        private val address: InetSocketAddress,
-        private val version: MinecraftVersion,
-        private val virtualHost: InetSocketAddress?
-) : StatusClient {
+interface XStatistic : Statistic, NamedCatalogType {
 
-    override fun getAddress() = this.address
-    override fun getVersion() = this.version
-    override fun getVirtualHost() = this.virtualHost.optional()
-
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("address", this.address)
-                .add("virtualHost", this.virtualHost)
-                .add("version", this.version)
-                .toString()
-    }
+    interface ForCatalog<T : CatalogType> : XStatistic, Statistic.ForCatalog<T>
 }

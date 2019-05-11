@@ -27,7 +27,7 @@ package org.lanternpowered.server.event;
 
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.util.ToStringHelper;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.event.cause.EventContextKey;
 

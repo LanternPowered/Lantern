@@ -29,8 +29,7 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.scoreboard.critieria.Criterion
-import org.spongepowered.api.statistic.Statistic
+import org.spongepowered.api.scoreboard.criteria.Criterion
 import org.spongepowered.api.statistic.StatisticCategory
 import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.text.translation.Translation
@@ -42,7 +41,7 @@ open class LanternStatistic(
         private val format: NumberFormat,
         private val type: StatisticCategory,
         private val criterion: Criterion?
-) : DefaultCatalogType(key), Statistic, Translatable by Translated(translation) {
+) : DefaultCatalogType(key), XStatistic, Translatable by Translated(translation) {
 
     override fun toStringHelper() = super.toStringHelper()
             .omitNullValues()

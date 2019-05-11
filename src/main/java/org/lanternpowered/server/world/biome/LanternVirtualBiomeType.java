@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.biome;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.util.ToStringHelper;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;

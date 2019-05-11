@@ -30,7 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.advancement.layout.LanternTreeLayoutElement;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.util.ToStringHelper;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;

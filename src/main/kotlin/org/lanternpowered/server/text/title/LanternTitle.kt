@@ -29,7 +29,7 @@ import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.title.Title
 import org.lanternpowered.api.text.title.TitleBuilder
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 
 data class LanternTitle(
         internal val title: Text?,

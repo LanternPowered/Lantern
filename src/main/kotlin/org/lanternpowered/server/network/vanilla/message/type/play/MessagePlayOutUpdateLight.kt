@@ -26,7 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play
 
 import org.lanternpowered.server.network.message.Message
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 
 class MessagePlayOutUpdateLight(
         val chunkX: Int,

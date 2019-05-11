@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.status
 import org.lanternpowered.api.ext.emptyOptional
 import org.lanternpowered.api.ext.optional
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.MinecraftVersion
 import org.spongepowered.api.event.server.ClientPingServerEvent
 import org.spongepowered.api.network.status.Favicon

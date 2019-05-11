@@ -26,6 +26,7 @@
 package org.lanternpowered.server.util
 
 import org.junit.Test
+import org.lanternpowered.api.util.ToStringHelper
 
 class ToStringHelperTest {
 

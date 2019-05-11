@@ -52,8 +52,15 @@ import org.spongepowered.api.util.Direction
 
 import java.util.OptionalInt
 
-@RegistrationDependency(ParticleOptionRegistryModule::class, NotePitchRegistryModule::class, BlockRegistryModule::class, ItemRegistryModule::class, PotionEffectTypeRegistryModule::class, FireworkShapeRegistryModule::class)
-class ParticleTypeRegistryModule : DefaultCatalogRegistryModule<ParticleType>(ParticleTypes::class.java) {
+@RegistrationDependency(
+        ParticleOptionRegistryModule::class,
+        NotePitchRegistryModule::class,
+        BlockRegistryModule::class,
+        ItemRegistryModule::class,
+        PotionEffectTypeRegistryModule::class,
+        FireworkShapeRegistryModule::class
+)
+class ParticleTypeRegistryModule : DefaultCatalogRegistryModule<ParticleType>(ParticleTypes::class) {
 
     private fun registerEffect(id: String, options: Map<ParticleOption<*>, Any>) {
         registerEffect(id, OptionalInt.empty(), options)

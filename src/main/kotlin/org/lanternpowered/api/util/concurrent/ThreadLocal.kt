@@ -29,8 +29,20 @@
 package org.lanternpowered.api.util.concurrent
 
 import java.lang.ref.SoftReference
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 typealias ThreadLocal<V> = io.netty.util.concurrent.FastThreadLocal<V>
+
+/**
+ * Provides a delegate for a [ThreadLocal].
+ */
+operator fun <V> ThreadLocal<V>.provideDelegate(thisRef: Any, property: KProperty<*>): ReadWriteProperty<Any, V> = ThreadLocalDelegate(this)
+
+private class ThreadLocalDelegate<V>(private val threadLocal: ThreadLocal<V>) : ReadWriteProperty<Any, V> {
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: V) = this.threadLocal.set(value)
+    override fun getValue(thisRef: Any, property: KProperty<*>) = this.threadLocal.get() as V
+}
 
 /**
  * Constructs a new [ThreadLocal] with the initial value supplier.
@@ -60,7 +72,7 @@ inline fun <V> SoftThreadLocal(): SoftThreadLocal<V?> = SoftThreadLocal { null }
  * @param supplier The initial value supplier
  * @constructor Constructs a new soft thread local with the initial supplier
  */
-class SoftThreadLocal<V> constructor(private val supplier: () -> V) {
+class SoftThreadLocal<V>(private val supplier: () -> V) {
 
     private val threadLocal = ThreadLocal<SoftReference<V>?> {
         val obj = this.supplier()
@@ -99,4 +111,14 @@ class SoftThreadLocal<V> constructor(private val supplier: () -> V) {
      * @param value The value
      */
     fun set(value: V) = this.threadLocal.set(if (value == null) null else SoftReference(value))
+
+    /**
+     * Provides a delegate for this [SoftThreadLocal].
+     */
+    operator fun provideDelegate(thisRef: Any, property: KProperty<*>): ReadWriteProperty<Any, V> = SoftThreadLocalDelegate(this)
+
+    private class SoftThreadLocalDelegate<V>(private val threadLocal: SoftThreadLocal<V>) : ReadWriteProperty<Any, V> {
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: V) = this.threadLocal.set(value)
+        override fun getValue(thisRef: Any, property: KProperty<*>) = this.threadLocal.get()
+    }
 }

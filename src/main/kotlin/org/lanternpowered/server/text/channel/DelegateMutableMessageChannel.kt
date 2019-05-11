@@ -23,30 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.status
+package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.util.ToStringHelper
-import org.spongepowered.api.MinecraftVersion
-import org.spongepowered.api.network.status.StatusClient
-import java.net.InetSocketAddress
+import org.lanternpowered.api.text.Text
+import org.spongepowered.api.text.chat.ChatType
+import org.spongepowered.api.text.channel.MessageReceiver
+import org.spongepowered.api.text.channel.MessageChannel
+import java.util.Optional
 
-class LanternStatusClient(
-        private val address: InetSocketAddress,
-        private val version: MinecraftVersion,
-        private val virtualHost: InetSocketAddress?
-) : StatusClient {
 
-    override fun getAddress() = this.address
-    override fun getVersion() = this.version
-    override fun getVirtualHost() = this.virtualHost.optional()
+/**
+ * A mutable message channel that leaves transforming and
+ * members to the delegate channel passed.
+ *
+ * The members from the provided channel are copied into our
+ * own local collection.
+ *
+ * @param delegate The delegate channel
+ */
+class DelegateMutableMessageChannel(private val delegate: MessageChannel) : AbstractMutableMessageChannel() {
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("address", this.address)
-                .add("virtualHost", this.virtualHost)
-                .add("version", this.version)
-                .toString()
+    init {
+        this.members.addAll(this.delegate.members)
     }
+
+    override fun transformMessage(sender: Any?, recipient: MessageReceiver, original: Text, type: ChatType): Optional<Text> =
+            this.delegate.transformMessage(sender, recipient, original, type)
 }

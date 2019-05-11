@@ -23,30 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.status
+package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.util.ToStringHelper
-import org.spongepowered.api.MinecraftVersion
-import org.spongepowered.api.network.status.StatusClient
-import java.net.InetSocketAddress
+import org.spongepowered.api.text.channel.MessageChannel
+import org.spongepowered.api.text.channel.MessageReceiver
 
-class LanternStatusClient(
-        private val address: InetSocketAddress,
-        private val version: MinecraftVersion,
-        private val virtualHost: InetSocketAddress?
-) : StatusClient {
+/**
+ * A message channel that targets no recipients.
+ */
+object EmptyMessageChannel : MessageChannel {
 
-    override fun getAddress() = this.address
-    override fun getVersion() = this.version
-    override fun getVirtualHost() = this.virtualHost.optional()
-
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("address", this.address)
-                .add("virtualHost", this.virtualHost)
-                .add("version", this.version)
-                .toString()
-    }
+    override fun getMembers(): Collection<MessageReceiver> = emptyList()
 }

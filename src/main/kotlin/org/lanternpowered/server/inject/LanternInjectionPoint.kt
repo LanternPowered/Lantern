@@ -28,9 +28,8 @@ package org.lanternpowered.server.inject
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.inject.InjectionPoint
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 import java.lang.reflect.Executable
-import java.lang.reflect.Field
 import java.util.Arrays
 
 internal abstract class LanternInjectionPoint(

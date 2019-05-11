@@ -32,7 +32,10 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Multimap
+import java.util.Collections
 import java.util.EnumMap
+import java.util.WeakHashMap
+import java.util.stream.Stream
 
 inline fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
 inline fun <T> Array<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
@@ -50,3 +53,21 @@ inline fun <T> immutableListBuilderOf() = ImmutableList.builder<T>()
 inline fun <T> immutableSetBuilderOf() = ImmutableSet.builder<T>()
 
 inline fun <reified K : Enum<K>, V> enumMapOf(): MutableMap<K, V> = EnumMap(K::class.java)
+
+fun <E> weakSetOf(): MutableSet<E> = Collections.newSetFromMap(WeakHashMap())
+fun <E> weakSetOf(iterable: Iterable<E>): MutableSet<E> = weakSetOf<E>().apply { addAll(iterable) }
+fun <E> weakSetOf(vararg args: E): MutableSet<E> = weakSetOf<E>().apply { addAll(args) }
+
+fun <E> immutableWeakSetOf(): Set<E> = Collections.unmodifiableSet(weakSetOf())
+fun <E> immutableWeakSetOf(iterable: Iterable<E>): Set<E> = Collections.unmodifiableSet(weakSetOf<E>().apply { addAll(iterable) })
+fun <E> immutableWeakSetOf(vararg args: E): Set<E> = Collections.unmodifiableSet(weakSetOf<E>().apply { addAll(args) })
+
+/**
+ * Returns a [ImmutableList] containing all elements produced by this stream.
+ */
+fun <T> Stream<T>.toImmutableList(): ImmutableList<T> = collect(ImmutableList.toImmutableList())
+
+/**
+ * Returns a [ImmutableSet] containing all elements produced by this stream.
+ */
+fun <T> Stream<T>.toImmutableSet(): ImmutableSet<T> = collect(ImmutableSet.toImmutableSet())

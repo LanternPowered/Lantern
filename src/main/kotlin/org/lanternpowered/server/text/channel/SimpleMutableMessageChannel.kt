@@ -23,30 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.status
+package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.util.ToStringHelper
-import org.spongepowered.api.MinecraftVersion
-import org.spongepowered.api.network.status.StatusClient
-import java.net.InetSocketAddress
+import org.spongepowered.api.text.channel.MessageReceiver
+import org.spongepowered.api.text.channel.MessageChannel
+import org.spongepowered.api.text.channel.MutableMessageChannel
 
-class LanternStatusClient(
-        private val address: InetSocketAddress,
-        private val version: MinecraftVersion,
-        private val virtualHost: InetSocketAddress?
-) : StatusClient {
+/**
+ * A simple implementation of [MutableMessageChannel].
+ */
+class SimpleMutableMessageChannel : AbstractMutableMessageChannel {
 
-    override fun getAddress() = this.address
-    override fun getVersion() = this.version
-    override fun getVirtualHost() = this.virtualHost.optional()
+    /**
+     * Creates a new mutable [MessageChannel].
+     */
+    constructor()
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("address", this.address)
-                .add("virtualHost", this.virtualHost)
-                .add("version", this.version)
-                .toString()
-    }
+    /**
+     * Creates a new mutable [MessageChannel] with the provided
+     * [Collection] of [MessageReceiver]s.
+     *
+     * @param members The members to add to this channel by default
+     */
+    constructor(members: MutableCollection<MessageReceiver>) : super(members)
 }

@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.util.ToStringHelper;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;

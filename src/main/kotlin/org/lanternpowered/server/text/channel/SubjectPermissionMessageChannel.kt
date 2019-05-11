@@ -23,30 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.status
+package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.util.ToStringHelper
-import org.spongepowered.api.MinecraftVersion
-import org.spongepowered.api.network.status.StatusClient
-import java.net.InetSocketAddress
+import org.lanternpowered.api.ext.*
+import org.spongepowered.api.Sponge
+import org.spongepowered.api.service.permission.PermissionService
+import org.spongepowered.api.text.channel.MessageChannel
+import org.spongepowered.api.text.channel.MessageReceiver
 
-class LanternStatusClient(
-        private val address: InetSocketAddress,
-        private val version: MinecraftVersion,
-        private val virtualHost: InetSocketAddress?
-) : StatusClient {
+/**
+ * A message channel that targets all subjects with the given permission.
+ *
+ * @param permission The permission node
+ */
+class SubjectPermissionMessageChannel(private val permission: String) : MessageChannel {
 
-    override fun getAddress() = this.address
-    override fun getVersion() = this.version
-    override fun getVirtualHost() = this.virtualHost.optional()
+    override fun getMembers(): Collection<MessageReceiver> {
+        val service = Sponge.getGame().serviceManager.provideUnchecked(PermissionService::class.java)
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("address", this.address)
-                .add("virtualHost", this.virtualHost)
-                .add("version", this.version)
-                .toString()
+        return service.loadedCollections.values.stream()
+                .flatMap { input ->
+                    input.getLoadedWithPermission(this.permission).entries.stream()
+                            .filter { it.value }
+                            .map<Any> { entry -> entry.key.getCommandSource().orElse(null) }// TODO: Wait for command refactor
+                            .filter { source -> source != null }
+                }
+                .toImmutableSet()
     }
 }

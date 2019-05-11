@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Objects;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.util.ToStringHelper;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.manipulator.DataManipulator;

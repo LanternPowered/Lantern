@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.util
 
+import org.lanternpowered.api.util.ToStringHelper
+
 interface ToString {
 
     /**

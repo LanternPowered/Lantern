@@ -27,13 +27,13 @@ package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.scoreboard.critieria.Criterion
+import org.spongepowered.api.scoreboard.criteria.Criterion
 import org.spongepowered.api.statistic.Statistic
 import org.spongepowered.api.statistic.StatisticCategory
 import org.spongepowered.api.text.translation.Translation
-import org.spongepowered.api.util.CatalogBuilder
+import org.spongepowered.api.util.NamedCatalogBuilder
 
-interface StatisticBuilder : CatalogBuilder<Statistic, StatisticBuilder> {
+interface StatisticBuilder : NamedCatalogBuilder<XStatistic, StatisticBuilder> {
 
     /**
      * Sets the translation for the [Statistic].
@@ -86,6 +86,6 @@ interface StatisticBuilder : CatalogBuilder<Statistic, StatisticBuilder> {
          */
         fun catalogType(catalogType: C)
 
-        override fun build(): Statistic.ForCatalog<C>
+        override fun build(): XStatistic.ForCatalog<C>
     }
 }

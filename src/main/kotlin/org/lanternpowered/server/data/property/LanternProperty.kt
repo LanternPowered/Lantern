@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.property
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.property.Property
 import java.util.Comparator

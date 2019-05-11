@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.persistence
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.data.persistence.DataTranslator
 
 abstract class AbstractDataTranslator<T>(key: CatalogKey, private val typeToken: TypeToken<T>) :

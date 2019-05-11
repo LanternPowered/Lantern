@@ -43,13 +43,13 @@ object StatisticCategoryRegistry : AdditionalPluginCatalogRegistryModule<Statist
         register(LanternStatisticCategory(CatalogKey.minecraft("custom"), tr("Custom")))
 
         register<BlockType>("blocks_broken", "Blocks Broken")
-        register<EntityType>("entities_killed", "Entities Killed")
+        register<EntityType<*>>("entities_killed", "Entities Killed")
         register<ItemType>("items_broken", "Items Broken")
         register<ItemType>("items_crafted", "Items Crafted")
         register<ItemType>("items_dropped", "Items Dropped")
         register<ItemType>("items_picked_up", "Items Picked Up")
         register<ItemType>("items_used", "Items Used")
-        register<EntityType>("killed_by_entities", "Killed By Entities")
+        register<EntityType<*>>("killed_by_entities", "Killed By Entities")
     }
 
     private inline fun <reified C : CatalogType> register(id: String, name: String) {

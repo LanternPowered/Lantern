@@ -33,7 +33,7 @@ import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.format.TextStyleBase
 import org.lanternpowered.api.x.text.format.XTextStyle
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 import java.util.Objects
 
 open class LanternTextStyle(

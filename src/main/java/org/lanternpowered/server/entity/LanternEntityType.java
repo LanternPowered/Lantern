@@ -31,7 +31,7 @@ import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
 import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.util.ToStringHelper;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;

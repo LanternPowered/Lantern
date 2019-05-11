@@ -29,7 +29,7 @@ import io.netty.buffer.ByteBufInputStream
 import io.netty.buffer.ByteBufOutputStream
 import io.netty.buffer.Unpooled
 import io.netty.handler.codec.base64.Base64
-import org.lanternpowered.server.util.ToStringHelper
+import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.network.status.Favicon
 import java.awt.image.BufferedImage
 import java.io.InputStream

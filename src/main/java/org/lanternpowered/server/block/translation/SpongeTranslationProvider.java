@@ -26,14 +26,13 @@
 package org.lanternpowered.server.block.translation;
 
 import org.lanternpowered.server.block.TranslationProvider;
-import org.lanternpowered.server.block.trait.LanternBooleanTraits;
+import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
 
@@ -50,6 +49,6 @@ public class SpongeTranslationProvider implements TranslationProvider {
 
     @Override
     public Translation get(BlockState blockState, @Nullable Location location, @Nullable Direction face) {
-        return blockState.getTraitValue(LanternBooleanTraits.IS_WET).get() ? this.wetTranslation : this.dryTranslation;
+        return blockState.getTraitValue(BlockStateProperties.IS_WET).get() ? this.wetTranslation : this.dryTranslation;
     }
 }

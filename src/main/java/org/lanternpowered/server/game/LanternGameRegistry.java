@@ -611,7 +611,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(Key.class, KeyRegistryModule.get())
                 .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
                 .registerModule(SlabPortion.class, new EnumValueRegistryModule<SlabPortion>(LanternSlabPortion.class, SlabPortions.class) {})
-                .registerModule(NotePitch.class, NotePitchRegistryModule.get())
+                .registerModule(NotePitch.class, NotePitchRegistryModule.INSTANCE)
                 .registerModule(CatType.class, new CatTypeRegistryModule())
                 .registerModule(VillagerType.class, new VillagerTypeRegistryModule())
                 .registerModule(LlamaType.class, new LlamaTypeRegistryModule())

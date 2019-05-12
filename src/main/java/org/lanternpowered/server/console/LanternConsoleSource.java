@@ -29,8 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.permission.AbstractProxySubject;
 import org.lanternpowered.server.text.LanternTexts;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
@@ -41,7 +40,7 @@ import org.spongepowered.api.util.Tristate;
 import java.util.Map;
 import java.util.Optional;
 
-public final class LanternConsoleSource extends AbstractProxySubject implements ConsoleSource {
+public final class LanternConsoleSource extends AbstractProxySubject implements CommandSource {
 
     public static final String NAME = "Server";
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
@@ -67,22 +66,22 @@ public final class LanternConsoleSource extends AbstractProxySubject implements 
 
     @Override
     public void sendMessages(Text... messages) {
-        ConsoleSource.super.sendMessages(messages);
+        CommandSource.super.sendMessages(messages);
     }
 
     @Override
     public void sendMessages(Iterable<Text> messages) {
-        ConsoleSource.super.sendMessages(messages);
+        CommandSource.super.sendMessages(messages);
     }
 
     @Override
     public void sendMessage(TextTemplate template) {
-        ConsoleSource.super.sendMessage(template);
+        CommandSource.super.sendMessage(template);
     }
 
     @Override
     public void sendMessage(TextTemplate template, Map<String, TextElement> params) {
-        ConsoleSource.super.sendMessage(template, params);
+        CommandSource.super.sendMessage(template, params);
     }
 
     @Override

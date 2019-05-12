@@ -32,7 +32,7 @@ import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.text.translation.Translation;
 
-public class LanternAdvancementTree extends DefaultCatalogType implements AdvancementTree {
+public class LanternAdvancementTree extends DefaultCatalogType.Named implements AdvancementTree {
 
     private final Advancement rootAdvancement;
     private final String background;

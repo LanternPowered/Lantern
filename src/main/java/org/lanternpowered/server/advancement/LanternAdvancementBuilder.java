@@ -27,7 +27,7 @@ package org.lanternpowered.server.advancement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
+import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
@@ -39,7 +39,7 @@ import org.spongepowered.api.text.translation.Translation;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"NullableProblems", "ConstantConditions"})
-public class LanternAdvancementBuilder extends AbstractCatalogBuilder<Advancement, Advancement.Builder> implements Advancement.Builder {
+public class LanternAdvancementBuilder extends AbstractNamedCatalogBuilder<Advancement, Advancement.Builder> implements Advancement.Builder {
 
     @Nullable private Advancement parent;
     private AdvancementCriterion criterion;

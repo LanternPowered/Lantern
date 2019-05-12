@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.block.entity.IBlockEntityCarrier;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
-import org.lanternpowered.server.block.trait.LanternBooleanTraits;
+import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
@@ -90,7 +90,7 @@ public final class LanternJukebox extends LanternBlockEntity implements Jukebox,
     private void updateBlockState() {
         final Location location = getLocation();
         final BlockState block = location.getBlock();
-        location.setBlock(block.withStateProperty(LanternBooleanTraits.HAS_MUSIC_DISC, this.inventory.totalItems() > 0).orElse(block));
+        location.setBlock(block.withStateProperty(BlockStateProperties.HAS_MUSIC_DISC, this.inventory.totalItems() > 0).orElse(block));
     }
 
     /**

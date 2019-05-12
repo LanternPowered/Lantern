@@ -27,7 +27,7 @@ package org.lanternpowered.server.block.entity.vanilla;
 
 import org.lanternpowered.server.block.entity.IBlockEntityCarrier;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
-import org.lanternpowered.server.block.trait.LanternBooleanTraits;
+import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.element.ElementListener;
 import org.lanternpowered.server.game.Lantern;
@@ -226,10 +226,10 @@ public class LanternFurnace extends LanternBlockEntity implements Furnace, IBloc
         BlockState blockState = getLocation().getBlock();
 
         final boolean burning = require(Keys.PASSED_BURN_TIME) < require(Keys.MAX_BURN_TIME);
-        final boolean blockBurning = blockState.getStateProperty(LanternBooleanTraits.LIT).get();
+        final boolean blockBurning = blockState.getStateProperty(BlockStateProperties.LIT).get();
 
         if (burning != blockBurning) {
-            getLocation().setBlock(blockState.withStateProperty(LanternBooleanTraits.LIT, burning).get());
+            getLocation().setBlock(blockState.withStateProperty(BlockStateProperties.LIT, burning).get());
         }
     }
 

@@ -28,12 +28,14 @@ package org.lanternpowered.server.state
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
+import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.AbstractCatalogType
 import org.lanternpowered.server.data.IImmutableDataHolderBase
 import org.lanternpowered.server.data.IImmutableValueHolder
 import org.lanternpowered.server.data.property.IStorePropertyHolder
 import org.lanternpowered.server.data.value.LanternMutableValue
+import org.lanternpowered.server.state.property.AbstractStateProperty
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.key.Key
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator
@@ -52,7 +54,7 @@ import java.util.function.Predicate
 abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateData<S>) : AbstractCatalogType(), IState<S>, IStorePropertyHolder,
         IImmutableDataHolderBase<S> {
 
-    private val key: org.lanternpowered.api.catalog.CatalogKey
+    private val key: CatalogKey
 
     // The container this state is linked to
     final override val stateContainer: C
@@ -99,15 +101,15 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     }
 
     override fun <T : Comparable<T>, V : T> withStateProperty(stateProperty: StateProperty<T>, value: V): Optional<S> {
-        return Optional.ofNullable(this.propertyValueTable.row(stateProperty)?.get(value))
+        return this.propertyValueTable.row(stateProperty)?.get(value).optional()
     }
 
     override fun getStatePropertyByName(statePropertyId: String): Optional<StateProperty<*>> {
-        return Optional.empty()
+        return emptyOptional()
     }
 
     override fun <T : Comparable<T>> cycleStateProperty(stateProperty: StateProperty<T>): Optional<S> {
-        var value = this.stateValues[stateProperty] as? T ?: return Optional.empty()
+        var value = this.stateValues[stateProperty] as? T ?: return emptyOptional()
 
         if (value is Cycleable<*>) {
             var last = value
@@ -116,7 +118,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
                 next = (last as Cycleable<*>).cycleNext() as T
                 if (next === value) {
                     // We cycled completely, abort
-                    return Optional.of(this as S)
+                    return (this as S).optional()
                 }
                 // Check if the next value is actually supported
                 if (stateProperty.predicate.test(next)) {
@@ -140,11 +142,11 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
             }
         }
 
-        return Optional.of(this.propertyValueTable.row(stateProperty)[value] as S)
+        return (this.propertyValueTable.row(stateProperty)[value] as S).optional()
     }
 
     override fun <T : Cycleable<T>> cycleValue(key: Key<out Value<T>>): Optional<S> {
-        val value = get(key).orNull() ?: return Optional.empty()
+        val value = get(key).orNull() ?: return emptyOptional()
 
         var last = value
         var next: T
@@ -152,7 +154,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
             next = (last as Cycleable<*>).cycleNext() as T
             if (next === value) {
                 // We cycled completely, abort
-                return Optional.of(this as S)
+                return (this as S).optional()
             }
             // Check if the next value is actually supported
             val state = with(key, next)
@@ -171,7 +173,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     override fun toContainer(): DataContainer = this.dataContainer.copy()
 
     override fun <E> transform(key: Key<out Value<E>>, function: Function<E, E>): Optional<S> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
+        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
         val currentStateValue = this.stateValues[property]
@@ -193,7 +195,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     }
 
     override fun <E> with(key: Key<out Value<E>>, value: E): Optional<S> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
+        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
 
         val stateValue = property.keyValueTransformer.toStateValue(value)
         val currentStateValue = this.stateValues[property]
@@ -211,7 +213,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
 
     override fun with(valueContainer: ImmutableDataManipulator): Optional<S> {
         var state: Optional<S>? = null
-        for (value in valueContainer.getValues()) {
+        for (value in valueContainer.values) {
             state = with(value)
             if (!state.isPresent) {
                 return state
@@ -265,7 +267,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     }
 
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
+        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
         val currentStateValue = this.stateValues[property]
@@ -275,7 +277,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     }
 
     override fun <E : Any, V : Value<E>> getRawMutableValueFor(key: Key<V>): Optional<V> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return Optional.empty()
+        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
         val currentStateValue = this.stateValues[property]

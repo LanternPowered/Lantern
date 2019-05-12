@@ -32,7 +32,7 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.state.property.LanternEnumStateProperties;
+import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockState;
@@ -55,7 +55,7 @@ public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
         BlockState state = location.getBlock();
         // There is already a half/double slab placed
         if (state.getType() == blockType) {
-            final LanternSlabPortion type = state.getTraitValue(LanternEnumStateProperties.SLAB_PORTION).get();
+            final LanternSlabPortion type = state.getTraitValue(BlockStateProperties.SLAB_PORTION).get();
             // Already a full block
             if (type == LanternSlabPortion.DOUBLE) {
                 return null;
@@ -74,7 +74,7 @@ public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
                 return null;
             }
             return BlockSnapshotBuilder.create().blockState(state
-                    .withTrait(LanternEnumStateProperties.SLAB_PORTION, LanternSlabPortion.DOUBLE).get());
+                    .withTrait(BlockStateProperties.SLAB_PORTION, LanternSlabPortion.DOUBLE).get());
         } else if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
             return null;
         } else {
@@ -91,7 +91,7 @@ public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
                 type = LanternSlabPortion.BOTTOM;
             }
             return BlockSnapshotBuilder.create().blockState(blockType.getDefaultState()
-                    .withTrait(LanternEnumStateProperties.SLAB_PORTION, type).get());
+                    .withTrait(BlockStateProperties.SLAB_PORTION, type).get());
         }
     }
 

@@ -32,7 +32,7 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.action.vanilla.PlayNoteAction;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
-import org.lanternpowered.server.block.trait.LanternIntegerTraits;
+import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -42,7 +42,6 @@ import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
 
@@ -50,11 +49,11 @@ public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final Location location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         BlockState state = location.getBlock();
-        final int notePitch = (state.getTraitValue(LanternIntegerTraits.NOTE).get() + 1) % 25;
-        state = state.withTrait(LanternIntegerTraits.NOTE, notePitch).get();
+        final int notePitch = (state.getTraitValue(BlockStateProperties.NOTE).get() + 1) % 25;
+        state = state.withTrait(BlockStateProperties.NOTE, notePitch).get();
         // Get the instrument type based on the underlying block
         // TODO: Use the following line once the note block state can be updated by surrounding changes
-        //  final LanternInstrumentType instrumentType = state.getTraitValue(LanternEnumStateProperties.INSTRUMENT).get();
+        //  final LanternInstrumentType instrumentType = state.getTraitValue(BlockStateProperties.INSTRUMENT).get();
         final InstrumentType instrumentType = location.getBlockRelative(Direction.DOWN).getProperty(InstrumentProperty.class)
                 .map(InstrumentProperty::getValue).orElse(InstrumentTypes.HARP);
         // Trigger the note play effect

@@ -40,8 +40,16 @@ import java.util.stream.Stream
 inline fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
 inline fun <T> Array<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
 
+fun IntArray.toImmutableList(): ImmutableList<Int> = ImmutableList.builder<Int>().apply { forEach { add(it) } }.build()
+fun DoubleArray.toImmutableList(): ImmutableList<Double> = ImmutableList.builder<Double>().apply { forEach { add(it) } }.build()
+fun LongArray.toImmutableList(): ImmutableList<Long> = ImmutableList.builder<Long>().apply { forEach { add(it) } }.build()
+
 inline fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> = ImmutableSet.copyOf(this)
 inline fun <T> Array<T>.toImmutableSet(): ImmutableSet<T> = ImmutableSet.copyOf(this)
+
+fun IntArray.toImmutableSet(): ImmutableSet<Int> = ImmutableSet.builder<Int>().apply { forEach { add(it) } }.build()
+fun DoubleArray.toImmutableSet(): ImmutableSet<Double> = ImmutableSet.builder<Double>().apply { forEach { add(it) } }.build()
+fun LongArray.toImmutableSet(): ImmutableSet<Long> = ImmutableSet.builder<Long>().apply { forEach { add(it) } }.build()
 
 inline fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> = ImmutableMap.copyOf(this)
 inline fun <K, V> Multimap<K, V>.toImmutableMultimap(): ImmutableMultimap<K, V> = ImmutableMultimap.copyOf(this)

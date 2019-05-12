@@ -28,7 +28,7 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
+import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.CatalogKey;
@@ -38,7 +38,8 @@ import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
 @SuppressWarnings({"NullableProblems", "ConstantConditions"})
-public class LanternAdvancementTreeBuilder extends AbstractCatalogBuilder<AdvancementTree, AdvancementTree.Builder> implements AdvancementTree.Builder {
+public class LanternAdvancementTreeBuilder extends AbstractNamedCatalogBuilder<AdvancementTree, AdvancementTree.Builder>
+        implements AdvancementTree.Builder {
 
     private Advancement rootAdvancement;
     private String background;

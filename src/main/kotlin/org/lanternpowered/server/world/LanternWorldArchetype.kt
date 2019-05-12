@@ -64,7 +64,7 @@ internal data class LanternWorldArchetype(
         internal val waterEvaporates: Boolean?,
         internal val allowPlayerRespawns: Boolean?,
         val buildHeight: Int
-) : CatalogType by DefaultCatalogType(key, name), WorldArchetype {
+) : CatalogType by DefaultCatalogType.Named(key, name), WorldArchetype {
 
     override fun getDifficulty() = this.difficulty
     override fun isEnabled() = this.enabled

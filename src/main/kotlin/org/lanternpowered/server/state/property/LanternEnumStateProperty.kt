@@ -23,36 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("UNCHECKED_CAST")
+package org.lanternpowered.server.state.property
 
-package org.lanternpowered.server.state
+import com.google.common.collect.ImmutableSet
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.state.identityStateKeyValueTransformer
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.data.key.Key
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.state.EnumStateProperty
+import java.util.Optional
 
-/**
- * Transforms between state and key values.
- *
- * @property T The type of the state value
- * @property V The type of the key value
- */
-interface StateKeyValueTransformer<T : Comparable<T>, V> {
+internal class LanternEnumStateProperty<E : Enum<E>>(
+        key: CatalogKey, valueClass: Class<E>, possibleValues: ImmutableSet<E>, valueKey: Key<out Value<E>>
+) : AbstractStateProperty<E, E>(key, valueClass, possibleValues, valueKey, identityStateKeyValueTransformer()), EnumStateProperty<E> {
 
-    fun toKeyValue(stateValue: T): V
-    fun toStateValue(keyValue: V): T
-}
-
-inline fun <T : Comparable<T>, V> stateKeyValueTransformer(
-        crossinline toKeyValue: (T) -> V,
-        crossinline toStateValue: (V) -> T
-) = object : StateKeyValueTransformer<T, V> {
-
-    override fun toKeyValue(stateValue: T): V = toKeyValue(stateValue)
-    override fun toStateValue(keyValue: V): T = toStateValue(keyValue)
-}
-
-fun <T : Comparable<T>> identityStateKeyValueTransformer(): StateKeyValueTransformer<T, T>
-        = IdentityStateKeyValueTransformer as StateKeyValueTransformer<T, T>
-
-private object IdentityStateKeyValueTransformer : StateKeyValueTransformer<Comparable<Any>, Any> {
-
-    override fun toStateValue(keyValue: Any): Comparable<Any> = keyValue as Comparable<Any>
-    override fun toKeyValue(stateValue: Comparable<Any>) = stateValue
+    override fun parseValue(value: String): Optional<E> {
+        for (enumValue in valueClass.enumConstants) {
+            if (enumValue.name.equals(value, ignoreCase = true)) {
+                return enumValue.optional()
+            }
+        }
+        return emptyOptional()
+    }
 }

@@ -27,6 +27,7 @@ package org.lanternpowered.server.block.trait;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.Iterables;
+import org.lanternpowered.server.block.state.property.KeyStatePropertyValueTransformer;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
@@ -40,13 +41,13 @@ import javax.annotation.Nullable;
 @SuppressWarnings({"unchecked","rawtypes"})
 public abstract class LanternBlockTrait<T extends Comparable<T>, V> extends DefaultCatalogType implements BlockTrait<T> {
 
-    private final static KeyTraitValueTransformer DEFAULT_TRANSFORMER = new KeyTraitValueTransformer() {
+    private final static KeyStatePropertyValueTransformer DEFAULT_TRANSFORMER = new KeyStatePropertyValueTransformer() {
         @Override
-        public Object toKeyValue(Comparable traitValue) {
-            return traitValue;
+        public Object toKeyValue(Comparable statePropertyValue) {
+            return statePropertyValue;
         }
         @Override
-        public Comparable toTraitValue(Object keyValue) {
+        public Comparable toStateValue(Object keyValue) {
             return (Comparable) keyValue;
         }
     };
@@ -54,10 +55,10 @@ public abstract class LanternBlockTrait<T extends Comparable<T>, V> extends Defa
     private final Key<? extends Value<V>> valueKey;
     private final ImmutableCollection<T> possibleValues;
     private final Class<T> valueClass;
-    private final KeyTraitValueTransformer<T, V> keyTraitValueTransformer;
+    private final KeyStatePropertyValueTransformer<T, V> keyTraitValueTransformer;
 
     LanternBlockTrait(CatalogKey key, Key<? extends Value<V>> valueKey, Class<T> valueClass, ImmutableCollection<T> possibleValues,
-            @Nullable KeyTraitValueTransformer<T, V> keyTraitValueTransformer) {
+            @Nullable KeyStatePropertyValueTransformer<T, V> keyTraitValueTransformer) {
         super(key);
         this.keyTraitValueTransformer = keyTraitValueTransformer == null ? DEFAULT_TRANSFORMER : keyTraitValueTransformer;
         this.possibleValues = possibleValues;
@@ -74,7 +75,7 @@ public abstract class LanternBlockTrait<T extends Comparable<T>, V> extends Defa
         return this.valueKey;
     }
 
-    public KeyTraitValueTransformer<T, V> getKeyTraitValueTransformer() {
+    public KeyStatePropertyValueTransformer<T, V> getKeyTraitValueTransformer() {
         return this.keyTraitValueTransformer;
     }
 

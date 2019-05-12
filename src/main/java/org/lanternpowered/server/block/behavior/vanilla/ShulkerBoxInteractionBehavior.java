@@ -27,7 +27,7 @@ package org.lanternpowered.server.block.behavior.vanilla;
 
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
-import org.lanternpowered.server.block.state.property.LanternEnumStateProperties;
+import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.util.AABB;
@@ -66,7 +66,7 @@ public class ShulkerBoxInteractionBehavior extends OpenableContainerInteractionB
 
     @Override
     protected boolean validateOpenableSpace(BehaviorContext context, Location location, List<Runnable> tasks) {
-        final Direction facing = location.getBlock().getTraitValue(LanternEnumStateProperties.FACING).get();
+        final Direction facing = location.getBlock().getTraitValue(BlockStateProperties.FACING).get();
         final Location relLocation = location.getBlockRelative(facing);
         final AABB aabb = relLocation.getWorld().getBlockSelectionBox(
                 relLocation.getBlockPosition()).orElse(null);

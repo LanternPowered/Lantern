@@ -190,14 +190,14 @@ public class LanternAdvancementProgress implements AdvancementProgress {
             final boolean sendMessage = getPlayer().getWorld().getGameRule(GameRules.ANNOUNCE_ADVANCEMENTS) &&
                     optDisplay.map(DisplayInfo::doesAnnounceToChat).orElse(false);
             final Text message = optDisplay.<Text>map(display -> {
-                final Translation translation = tr("chat.type.advancement." + display.getType().getName().toLowerCase());
+                final Translation translation = tr("chat.type.advancement." + display.getType().getKey().getValue());
                 return Text.of(translation, getPlayer().getName(), this.advancement.toText());
             }).orElseGet(() -> Text.of(getPlayer().getName() + " achieved ", this.advancement.toText()));
             final MessageEvent.MessageFormatter formatter = new MessageEvent.MessageFormatter(message);
             final Cause cause = CauseStack.current().getCurrentCause();
             final Instant instant = get().orElseThrow(() -> new IllegalStateException("Something funky happened"));
-            final AdvancementEvent.Grant event = SpongeEventFactory.createAdvancementEventGrant(cause, MessageChannel.TO_ALL,
-                    Optional.of(MessageChannel.TO_ALL), this.advancement, formatter, getPlayer(), instant, !sendMessage);
+            final AdvancementEvent.Grant event = SpongeEventFactory.createAdvancementEventGrant(cause, MessageChannel.players(),
+                    Optional.of(MessageChannel.players()), this.advancement, formatter, getPlayer(), instant, !sendMessage);
             Sponge.getEventManager().post(event);
             if (!event.isMessageCancelled()) {
                 event.getChannel().ifPresent(channel -> channel.send(event.getMessage()));

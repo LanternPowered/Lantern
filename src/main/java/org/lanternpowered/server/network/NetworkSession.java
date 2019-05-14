@@ -360,7 +360,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         this.connectionTask = this.channel.eventLoop().scheduleAtFixedRate(() -> {
             final ProtocolState protocolState = this.protocolState;
-            if (protocolState == ProtocolState.PLAY || protocolState == ProtocolState.FORGE_HANDSHAKE) {
+            if (protocolState == ProtocolState.PLAY) {
                 final long time = currentTime();
                 if (this.keepAliveTime == -1L) {
                     this.keepAliveTime = time;
@@ -842,7 +842,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         this.disconnectReason = reason;
         if (this.channel.isActive() && (this.protocolState == ProtocolState.PLAY ||
-                this.protocolState == ProtocolState.LOGIN || this.protocolState == ProtocolState.FORGE_HANDSHAKE)) {
+                this.protocolState == ProtocolState.LOGIN)) {
             sendWithFuture(new MessageOutDisconnect(reason)).addListener(ChannelFutureListener.CLOSE);
         } else {
             this.channel.close();

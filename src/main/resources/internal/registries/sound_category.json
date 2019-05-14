@@ -1,0 +1,12 @@
+[
+  "minecraft:master",
+  "minecraft:music",
+  "minecraft:record",
+  "minecraft:weather",
+  "minecraft:block",
+  "minecraft:hostile",
+  "minecraft:neutral",
+  "minecraft:player",
+  "minecraft:ambient",
+  "minecraft:voice"
+]

@@ -52,6 +52,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.AbstractServer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 
 import java.net.InetSocketAddress;
@@ -83,7 +84,7 @@ public class QueryServer extends AbstractServer {
     private final Map<InetSocketAddress, Integer> challengeTokens = new ConcurrentHashMap<>();
 
     // The task used to invalidate all challenge tokens every 30 seconds
-    @Nullable private Task flushTask;
+    @Nullable private ScheduledTask flushTask;
 
     private final boolean showPlugins;
 
@@ -100,9 +101,12 @@ public class QueryServer extends AbstractServer {
                 .channel(getDatagramChannelClass(channelType))
                 .handler(new QueryHandler(this, showPlugins));
         if (this.flushTask == null) {
-            this.flushTask = this.game.getScheduler().createTaskBuilder().async()
-                    .delay(30, TimeUnit.SECONDS).interval(30, TimeUnit.SECONDS)
-                    .execute(this::flushChallengeTokens).submit(this.game.getMinecraftPlugin());
+            this.flushTask = this.game.getAsyncScheduler().submit(Task.builder()
+                    .delay(30, TimeUnit.SECONDS)
+                    .interval(30, TimeUnit.SECONDS)
+                    .execute(this::flushChallengeTokens)
+                    .plugin(this.game.getMinecraftPlugin())
+                    .build());
         }
         return this.bootstrap.bind(address);
     }

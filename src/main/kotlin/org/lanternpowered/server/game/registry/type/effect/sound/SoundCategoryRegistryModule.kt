@@ -23,20 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.text.channel
+package org.lanternpowered.server.game.registry.type.effect.sound
 
-import org.lanternpowered.api.world.World
-import org.spongepowered.api.text.channel.MessageChannel
+import org.lanternpowered.server.effect.sound.LanternSoundCategory
+import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
+import org.lanternpowered.server.game.registry.InternalRegistries
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.effect.sound.SoundCategories
+import org.spongepowered.api.effect.sound.SoundCategory
 
+class SoundCategoryRegistryModule : DefaultCatalogRegistryModule<SoundCategory>(SoundCategories::class) {
 
-/**
- * A message channel that targets all subjects within the given [World].
- *
- * @param world The world to target
- */
-class WorldMessageChannel(world: World) : MessageChannel {
-
-    private val members = listOf(world)
-
-    override fun getMembers() = this.members
+    override fun registerDefaults() {
+        InternalRegistries.visit("sound_category") { key, internalId ->
+            register(LanternSoundCategory(CatalogKey.resolve(key), internalId))
+        }
+    }
 }

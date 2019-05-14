@@ -66,7 +66,7 @@ import javax.annotation.Nullable;
 
 public class RconServer extends AbstractServer implements RconService {
 
-    private final Map<String, RconSource> sourcesByHostname = new ConcurrentHashMap<>();
+    private final Map<String, LanternRconConnection> connectionByHostname = new ConcurrentHashMap<>();
     private final String password;
 
     @Nullable private ServerBootstrap bootstrap;
@@ -80,14 +80,14 @@ public class RconServer extends AbstractServer implements RconService {
     }
 
     @Override
-    protected ChannelFuture init(SocketAddress address, TransportType channelType) {
+    protected ChannelFuture init(SocketAddress address, TransportType transportType) {
         this.address = (InetSocketAddress) address;
         this.bootstrap = new ServerBootstrap();
-        this.bossGroup = createEventLoopGroup(channelType);
-        this.workerGroup = createEventLoopGroup(channelType);
+        this.bossGroup = createEventLoopGroup(transportType);
+        this.workerGroup = createEventLoopGroup(transportType);
         return this.bootstrap
                 .group(this.bossGroup, this.workerGroup)
-                .channel(getServerSocketChannelClass(channelType))
+                .channel(getServerSocketChannelClass(transportType))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) {
@@ -110,36 +110,36 @@ public class RconServer extends AbstractServer implements RconService {
     }
 
     /**
-     * Creates a new rcon source.
+     * Creates a new {@link LanternRconConnection}.
      * 
      * @param channel The channel
      * @return source The rcon source
      */
-    RconSource newSource(Channel channel) {
+    LanternRconConnection newConnection(Channel channel) {
         //noinspection ConstantConditions
-        return new RconSource(new RconConnection((InetSocketAddress) channel.remoteAddress(), this.address));
+        return new LanternRconConnection((InetSocketAddress) channel.remoteAddress(), this.address);
     }
 
     /**
-     * Called when the channel becomes active.
+     * Called when the {@link LanternRconConnection} becomes active.
      *
-     * @param source The rcon source
+     * @param connection The rcon connection
      */
-    void onChannelActive(RconSource source) {
-        this.sourcesByHostname.put(source.getConnection().getAddress().getHostName(), source);
+    void onChannelActive(LanternRconConnection connection) {
+        this.connectionByHostname.put(connection.getAddress().getHostName(), connection);
     }
 
     /**
-     * Called when the channel becomes inactive.
+     * Called when the {@link LanternRconConnection} becomes inactive.
      *
-     * @param source The rcon source
+     * @param connection The rcon connection
      */
-    void onChannelInactive(RconSource source) {
-        this.sourcesByHostname.remove(source.getConnection().getAddress().getHostName());
+    void onChannelInactive(LanternRconConnection connection) {
+        this.connectionByHostname.remove(connection.getAddress().getHostName());
     }
 
-    public Optional<RconSource> getByHostName(String hostname) {
-        return Optional.ofNullable(this.sourcesByHostname.get(hostname));
+    public Optional<LanternRconConnection> getByHostName(String hostname) {
+        return Optional.ofNullable(this.connectionByHostname.get(hostname));
     }
 
     @Override

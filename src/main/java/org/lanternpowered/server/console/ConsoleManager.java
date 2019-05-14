@@ -42,11 +42,12 @@ import org.jline.terminal.Terminal;
 import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.PrettyPrinter;
 import org.lanternpowered.server.util.ThreadHelper;
-import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.command.manager.CommandManager;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -85,10 +86,10 @@ public final class ConsoleManager extends SimpleTerminalConsole {
     private long lastHistoryWrite = System.currentTimeMillis();
 
     @Inject
-    public ConsoleManager(Logger logger, LanternScheduler scheduler, CommandManager commandManager,
+    public ConsoleManager(Logger logger, LanternGame game, CommandManager commandManager,
             @Named(DirectoryKeys.CONFIG) Path configFolder,
             @Named(Implementation.IDENTIFIER) PluginContainer pluginContainer) {
-        this.syncExecutor = scheduler.createSyncExecutor(pluginContainer);
+        this.syncExecutor = game.getSyncScheduler().createExecutor(pluginContainer);
         this.consoleHistoryFile = configFolder.resolve(HISTORY_FILE_NAME);
         this.pluginContainer = pluginContainer;
         this.commandManager = commandManager;

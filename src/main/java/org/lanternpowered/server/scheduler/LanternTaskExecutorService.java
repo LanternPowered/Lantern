@@ -200,10 +200,6 @@ class LanternTaskExecutorService extends AbstractExecutorService implements Task
             this.task = task;
         }
 
-        LanternTaskFuture(LanternScheduledTask task) {
-            this(task, (Future<V>) task.getFuture());
-        }
-
         @Override
         public ScheduledTask getTask() {
             return this.task;

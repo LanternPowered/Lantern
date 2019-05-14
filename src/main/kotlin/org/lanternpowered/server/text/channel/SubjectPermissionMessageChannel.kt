@@ -27,6 +27,7 @@ package org.lanternpowered.server.text.channel
 
 import org.lanternpowered.api.ext.*
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.command.source.CommandSource
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.text.channel.MessageChannel
 import org.spongepowered.api.text.channel.MessageReceiver
@@ -44,9 +45,8 @@ class SubjectPermissionMessageChannel(private val permission: String) : MessageC
         return service.loadedCollections.values.stream()
                 .flatMap { input ->
                     input.getLoadedWithPermission(this.permission).entries.stream()
-                            .filter { it.value }
-                            .map<Any> { entry -> entry.key.getCommandSource().orElse(null) }// TODO: Wait for command refactor
-                            .filter { source -> source != null }
+                            .filter { it.key is CommandSource && it.value }
+                            .map { it.key as CommandSource }
                 }
                 .toImmutableSet()
     }

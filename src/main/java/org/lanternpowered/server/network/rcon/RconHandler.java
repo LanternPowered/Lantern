@@ -55,22 +55,24 @@ import io.netty.util.AttributeKey;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
+import org.spongepowered.api.text.Text;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    private static final AttributeKey<RconSource> SOURCE = AttributeKey.valueOf("rcon-source");
+    private static final AttributeKey<LanternRconConnection> CONNECTION = AttributeKey.valueOf("rcon-connection");
 
     private static final byte FAILURE = -1;
     private static final byte TYPE_RESPONSE = 0;
     private static final byte TYPE_COMMAND = 2;
-    private static final byte TYPE_LOGIN = 3;
+    private static final byte TYPE_AUTH = 3;
 
     private final RconServer server;
     private final String password;
@@ -81,7 +83,7 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         if (buf.readableBytes() < 8) {
             return;
         }
@@ -96,8 +98,8 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         // Two byte padding
         buf.readBytes(2);
 
-        if (type == TYPE_LOGIN) {
-            handleLogin(ctx, payload, this.password, requestId);
+        if (type == TYPE_AUTH) {
+            handleAuth(ctx, payload, this.password, requestId);
         } else if (type == TYPE_COMMAND) {
             handleCommand(ctx, payload, requestId);
         } else {
@@ -106,75 +108,83 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) {
+    public void channelActive(ChannelHandlerContext ctx) throws ExecutionException, InterruptedException {
         final Channel channel = ctx.channel();
-        final RconSource source = this.server.newSource(channel);
+        final LanternRconConnection connection = this.server.newConnection(channel);
 
-        final Cause cause = Cause.of(EventContext.empty(), source.getConnection());
-        final RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(cause, source);
-        Sponge.getEventManager().post(event);
+        final Cause cause = Cause.of(EventContext.empty(), connection);
+        final RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(cause, connection);
+
+        Lantern.getSyncScheduler().submit(() -> Sponge.getEventManager().post(event)).get();
+
         if (event.isCancelled()) {
             ctx.channel().close();
-            return;
         }
 
-        if (!channel.attr(SOURCE).compareAndSet(null, source)) {
+        if (!channel.attr(CONNECTION).compareAndSet(null, connection)) {
             throw new IllegalStateException("Rcon source may not be set more than once!");
         }
 
-        this.server.onChannelActive(source);
+        this.server.onChannelActive(connection);
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(ChannelHandlerContext ctx) throws ExecutionException, InterruptedException {
         final Channel channel = ctx.channel();
-        final RconSource source = channel.attr(SOURCE).getAndSet(null);
+        final LanternRconConnection connection = channel.attr(CONNECTION).getAndSet(null);
 
-        if (source == null) {
+        if (connection == null) {
             return;
         }
-        final Cause cause = Cause.of(EventContext.empty(), source.getConnection());
-        final RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(cause, source);
-        Sponge.getEventManager().post(event);
 
-        this.server.onChannelInactive(source);
+        final Cause cause = Cause.of(EventContext.empty(), connection);
+        final RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(cause, connection);
+
+        Lantern.getSyncScheduler().submit(() -> Sponge.getEventManager().post(event)).get();
+
+        this.server.onChannelInactive(connection);
     }
 
-    private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {
-        final RconSource source = ctx.channel().attr(SOURCE).get();
-        if (password.equals(payload)) {
-            final Cause cause = Cause.of(EventContext.empty(), source.getConnection());
-            final RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(cause, source);
+    private static void handleAuth(ChannelHandlerContext ctx, String payload, String password, int requestId) {
+        final LanternRconConnection connection = ctx.channel().attr(CONNECTION).get();
+        Lantern.getSyncScheduler().submit(() -> {
+            final Cause cause = Cause.of(EventContext.empty(), connection);
+            final RconConnectionEvent.Auth event = SpongeEventFactory.createRconConnectionEventAuth(cause, connection);
+            event.setCancelled(!password.equals(payload));
 
-            if (!Sponge.getEventManager().post(event)) {
-                source.setLoggedIn(true);
-                sendResponse(ctx, requestId, TYPE_COMMAND, "");
+            Sponge.getEventManager().post(event);
+            connection.setAuthorized(!event.isCancelled());
 
+            if (connection.isAuthorized()) {
                 Lantern.getLogger().info("Rcon connection from [" + ctx.channel().remoteAddress() + "]");
-                return;
+                ctx.channel().eventLoop().submit(() -> sendResponse(ctx, requestId, TYPE_COMMAND, ""));
+            } else {
+                ctx.channel().eventLoop().submit(() -> sendResponse(ctx, FAILURE, TYPE_COMMAND, ""));
             }
-        }
-        source.setLoggedIn(false);
-        sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
+        });
     }
 
-    private static void handleCommand(ChannelHandlerContext ctx, String payload, int requestId)
-            throws ExecutionException, InterruptedException {
-        final RconSource source = ctx.channel().attr(SOURCE).get();
-        if (!source.getLoggedIn()) {
+    private static void handleCommand(ChannelHandlerContext ctx, String payload, int requestId) {
+        final LanternRconConnection connection = ctx.channel().attr(CONNECTION).get();
+        if (!connection.isAuthorized()) {
             sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
             return;
         }
         // Process the command on the main thread and send
         // the response on the netty thread.
-        final String content = Lantern.getSyncScheduler().submit(() -> {
+        Lantern.getSyncScheduler().submit(() -> {
             final CauseStack causeStack = CauseStack.current();
-            causeStack.pushCause(source.getConnection());
-            Sponge.getCommandManager().process(source, payload);
+            causeStack.pushCause(connection);
+            try {
+                Sponge.getCommandManager().process(connection, payload);
+            } catch (CommandException e) {
+                connection.sendMessage(Text.of("An error occurred while executing the command: " + payload + "; " + e));
+            }
             causeStack.popCause();
-            return source.flush();
-        }).get();
-        sendLargeResponse(ctx, requestId, content);
+            final String content = connection.flush();
+            // Send the response on the netty thread
+            ctx.channel().eventLoop().submit(() -> sendLargeResponse(ctx, requestId, content));
+        });
     }
 
     private static void sendResponse(ChannelHandlerContext ctx, int requestId, int type, String payload) {

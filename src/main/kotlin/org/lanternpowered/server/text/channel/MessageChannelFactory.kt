@@ -31,26 +31,24 @@ import org.spongepowered.api.world.World
 
 object MessageChannelFactory : MessageChannel.Factory {
 
-    override fun subjectsWithPermission(permission: String) = SubjectPermissionMessageChannel(permission)
+    override fun toSubjectsWithPermission(permission: String) = SubjectPermissionMessageChannel(permission)
 
     override fun combined(vararg channels: MessageChannel) = CombinedMessageChannel(channels.asList())
-    override fun combined(channels: MutableCollection<MessageChannel>) = CombinedMessageChannel(channels)
+    override fun combined(channels: Iterable<MessageChannel>) = CombinedMessageChannel(channels)
 
-    override fun fixed(vararg recipients: MessageReceiver) = FixedMessageChannel(recipients.asList())
-    override fun fixed(recipients: MutableCollection<out MessageReceiver>) = FixedMessageChannel(recipients)
+    override fun to(vararg recipients: MessageReceiver) = FixedMessageChannel(recipients.asList())
+    override fun to(recipients: Iterable<MessageReceiver>) = FixedMessageChannel(recipients)
 
-    override fun world(world: World) = WorldMessageChannel(world)
+    override fun toNone() = EmptyMessageChannel
 
-    override fun none() = EmptyMessageChannel
+    override fun toPlayers() = PlayerMessageChannel
+    override fun toPlayersWithPermission(permission: String) = PlayerPermissionMessageChannel(permission)
 
-    override fun players() = PlayerMessageChannel
-    override fun playersWithPermission(permission: String) = PlayerPermissionMessageChannel(permission)
-
-    override fun playersAndConsole(): MessageChannel {
+    override fun toPlayersAndServer(): MessageChannel {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun console(): MessageChannel {
+    override fun toServer(): MessageChannel {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

@@ -125,7 +125,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
 
     // The raw value map
     private final ValueCollection valueCollection = ValueCollection.create();
-    private final AdditionalContainerCollection<DataManipulator<?,?>> additionalContainers = AdditionalContainerCollection.createConcurrent();
+    private final AdditionalContainerCollection<DataManipulator> additionalContainers = AdditionalContainerCollection.createConcurrent();
 
     // The world this entity is located in, may be null
     private LanternWorld world;
@@ -181,7 +181,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     }
 
     @Override
-    public AdditionalContainerCollection<DataManipulator<?, ?>> getAdditionalContainers() {
+    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
         return this.additionalContainers;
     }
 
@@ -499,7 +499,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
 
     @Override
     public Transform getTransform() {
-        return new Transform(this.world, this.position, this.rotation);
+        return new LanternTransform(this.world, this.position, this.rotation);
     }
 
     @Override

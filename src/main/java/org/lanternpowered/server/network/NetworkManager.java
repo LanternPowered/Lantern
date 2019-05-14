@@ -120,17 +120,17 @@ public final class NetworkManager extends AbstractServer {
     }
 
     @Override
-    protected ChannelFuture init(SocketAddress address, TransportType channelType) {
+    protected ChannelFuture init(SocketAddress address, TransportType transportType) {
         this.bootstrap = new ServerBootstrap();
         // Take advantage of the fast thread local threads,
         // this is also provided by the default thread factory
         final ThreadFactory threadFactory = ThreadHelper.newThreadFactory(() -> "netty-" + threadCounter.getAndIncrement());
-        this.bossGroup = createEventLoopGroup(channelType, threadFactory);
-        this.workerGroup = createEventLoopGroup(channelType, threadFactory);
+        this.bossGroup = createEventLoopGroup(transportType, threadFactory);
+        this.workerGroup = createEventLoopGroup(transportType, threadFactory);
         this.socketAddress = address;
         return this.bootstrap
                 .group(this.bossGroup, this.workerGroup)
-                .channel(getServerSocketChannelClass(channelType))
+                .channel(getServerSocketChannelClass(transportType))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {

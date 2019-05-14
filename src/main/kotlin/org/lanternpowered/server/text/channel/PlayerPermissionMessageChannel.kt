@@ -27,6 +27,7 @@ package org.lanternpowered.server.text.channel
 
 import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.ext.*
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.channel.MessageChannel
 import org.spongepowered.api.text.channel.MessageReceiver
 
@@ -40,6 +41,6 @@ class PlayerPermissionMessageChannel(private val permission: String) : MessageCh
     override fun getMembers(): Collection<MessageReceiver> {
         return Lantern.server.onlinePlayers.stream()
                 .filter { player -> player.hasPermission(this.permission) }
-                .toImmutableSet() as Collection<MessageReceiver>
+                .toImmutableSet()
     }
 }

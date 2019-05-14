@@ -109,8 +109,9 @@ public class LanternPaletteBasedArray<T> implements PaletteBasedArray<T> {
             return assignedStates;
         }
 
+        @SafeVarargs
         @Override
-        public int[] getOrAssign(T... objects) {
+        public final int[] getOrAssign(T... objects) {
             final int[] ids = new int[objects.length];
             int toAssign = 0;
             for (int i = 0; i < objects.length; i++) {

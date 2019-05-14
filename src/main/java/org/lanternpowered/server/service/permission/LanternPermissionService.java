@@ -31,15 +31,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import org.lanternpowered.server.console.LanternConsoleSource;
+import org.lanternpowered.server.network.rcon.LanternRconConnection;
 import org.lanternpowered.server.network.rcon.RconServer;
-import org.lanternpowered.server.network.rcon.RconSource;
 import org.lanternpowered.server.service.permission.base.FixedParentMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -74,7 +73,6 @@ public final class LanternPermissionService implements PermissionService {
     private static final String SUBJECTS_DEFAULT = "default";
     private static final Function<String, CommandSource> NO_COMMAND_SOURCE = s -> null;
 
-    private final Game game;
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<>();
     @Nullable private Collection<PermissionDescription> descriptions;
     private final ConcurrentMap<String, LanternSubjectCollection> subjects = new ConcurrentHashMap<>();
@@ -82,8 +80,7 @@ public final class LanternPermissionService implements PermissionService {
     private final LanternSubject defaultData;
 
     @Inject
-    private LanternPermissionService(Game game) {
-        this.game = game;
+    private LanternPermissionService() {
         this.defaultData = new OpLevelCollection.OpLevelSubject(this, 0);
         this.subjects.put(SUBJECTS_DEFAULT, this.defaultCollection = newCollection(SUBJECTS_DEFAULT));
         this.subjects.put(SUBJECTS_USER, new UserCollection(this));
@@ -94,9 +91,9 @@ public final class LanternPermissionService implements PermissionService {
                 s -> new FixedParentMemorySubjectData(this.defaultData, getGroupForOpLevel(4).asSubjectReference()),
                 s -> {
                     if (s.equals(LanternConsoleSource.NAME)) {
-                        return Sponge.getServer().getConsole();
+                        return Sponge.getServer();/*.getConsole(); TODO? */
                     } else {
-                        final Matcher matcher = RconSource.NAME_PATTERN.matcher(s);
+                        final Matcher matcher = LanternRconConnection.NAME_PATTERN.matcher(s);
                         if (matcher.matches()) {
                             final String hostName = matcher.group(1);
                             final RconService rconService = Sponge.getServiceManager().provideUnchecked(RconService.class);
@@ -181,13 +178,9 @@ public final class LanternPermissionService implements PermissionService {
     }
 
     @Override
-    public Builder newDescriptionBuilder(Object instance) {
-        final Optional<PluginContainer> container = this.game.getPluginManager().fromInstance(checkNotNull(instance, "instance"));
-        if (!container.isPresent()) {
-            throw new IllegalArgumentException("The provided plugin object does not have an associated plugin container "
-                    + "(in other words, is 'plugin' actually your plugin object?)");
-        }
-        return new LanternPermissionDescription.Builder(this, container.get());
+    public Builder newDescriptionBuilder(PluginContainer pluginContainer) {
+        checkNotNull(pluginContainer, "pluginContainer");
+        return new LanternPermissionDescription.Builder(this, pluginContainer);
     }
 
     void addDescription(PermissionDescription permissionDescription) {

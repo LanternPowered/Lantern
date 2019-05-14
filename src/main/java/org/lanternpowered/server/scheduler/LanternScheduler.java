@@ -26,7 +26,6 @@
 package org.lanternpowered.server.scheduler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.api.cause.CauseStack;
@@ -45,7 +44,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -93,16 +91,16 @@ public class LanternScheduler implements Scheduler {
     }
 
     @Override
-    public Set<ScheduledTask> getTasksByPlugin(Object plugin) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+    public Set<ScheduledTask> getTasksByPlugin(PluginContainer plugin) {
+        final PluginContainer pluginContainer = checkNotNull(plugin, "plugin");
         return this.tasksByUniqueId.values().stream()
                 .filter(task -> task.getOwner().equals(pluginContainer))
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
-    public TaskExecutorService createExecutor(Object plugin) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+    public TaskExecutorService createExecutor(PluginContainer plugin) {
+        final PluginContainer pluginContainer = checkNotNull(plugin, "plugin");
         return new LanternTaskExecutorService(() -> new LanternTaskBuilder().plugin(pluginContainer), this);
     }
 

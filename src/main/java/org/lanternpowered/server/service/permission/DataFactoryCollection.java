@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -99,7 +99,7 @@ final class DataFactoryCollection extends LanternSubjectCollection {
             return getCommandSource().map(CommandSource::getName);
         }
 
-        @Override
+        // @Override TODO?
         public Optional<CommandSource> getCommandSource() {
             return Optional.ofNullable(DataFactoryCollection.this.commandSourceFunction.apply(getIdentifier()));
         }

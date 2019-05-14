@@ -42,7 +42,7 @@ public class LanternScheduledTask implements ScheduledTask {
     private final UUID uniqueId;
     private final String name;
     final LanternTask task;
-    final LanternScheduler scheduler;
+    private final LanternScheduler scheduler;
 
     @Nullable private Future<?> future;
     private final Object futureLock = new Object();

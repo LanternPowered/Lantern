@@ -49,6 +49,7 @@ import org.lanternpowered.server.effect.entity.sound.player.PlayerHurtSoundEffec
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternLiving;
+import org.lanternpowered.server.entity.LanternTransform;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
@@ -107,6 +108,7 @@ import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
@@ -114,7 +116,7 @@ import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.Sign;
+import org.spongepowered.api.block.entity.Sign;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
@@ -146,7 +148,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
@@ -362,8 +363,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
      * @return Whether opening the sign was successful
      */
     public boolean openSignAt(Vector3i position) {
-        return getWorld().getTileEntity(position).map(tile -> {
-            if (tile instanceof Sign) {
+        return getWorld().getBlockEntity(position).map(blockEntity -> {
+            if (blockEntity instanceof Sign) {
                 this.session.send(new MessagePlayOutOpenSign(position));
                 this.openedSignPosition = position;
                 return true;
@@ -673,7 +674,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         final LanternWorld world = (LanternWorld) transform.getWorld();
         if (isDead()) {
             // TODO: Get the proper spawn location
-            final Transform toTransform = new Transform(transform.getWorld(), new Vector3d(0, 100, 0));
+            final Transform toTransform = new LanternTransform(transform.getWorld(), new Vector3d(0, 100, 0));
 
             // Make the player less dead...
             setDead(false);
@@ -1016,7 +1017,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     private void stopSounds0(@Nullable SoundType sound, @Nullable SoundCategory category) {
-        this.session.send(new MessagePlayOutStopSounds(sound == null ? null : sound.getName(), category));
+        this.session.send(new MessagePlayOutStopSounds(sound == null ? null : sound.getKey().getValue(), category));
     }
 
     @Override

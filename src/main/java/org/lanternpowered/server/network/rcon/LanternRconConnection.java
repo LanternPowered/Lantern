@@ -25,32 +25,55 @@
  */
 package org.lanternpowered.server.network.rcon;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 import org.lanternpowered.server.permission.AbstractProxySubject;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.network.RconConnection;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.Tristate;
 
-import java.util.Optional;
+import java.net.InetSocketAddress;
 import java.util.regex.Pattern;
 
-public final class RconSource extends AbstractProxySubject implements org.spongepowered.api.command.source.RconSource {
+public final class LanternRconConnection extends AbstractProxySubject implements RconConnection {
 
     public static final String NAME_FORMAT = "Rcon[%s]";
     public static final Pattern NAME_PATTERN = Pattern.compile('^' + String.format(NAME_FORMAT, "(.+)") + '$');
 
     private final StringBuffer buffer = new StringBuffer();
-    private final RconConnection connection;
     private final String name;
 
-    // Whether the rcon source is logged in
-    private volatile boolean loggedIn;
+    private final InetSocketAddress address;
+    private final InetSocketAddress virtualHost;
 
-    RconSource(RconConnection connection) {
-        this.name = String.format(NAME_FORMAT, connection.getAddress().getHostName());
-        this.connection = connection;
+    // Whether the rcon source is authorized
+    private volatile boolean authorized;
+
+    LanternRconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
+        this.name = String.format(NAME_FORMAT, address.getHostName());
+        this.virtualHost = virtualHost;
+        this.address = address;
         initializeSubject();
+    }
+
+    @Override
+    public InetSocketAddress getAddress() {
+        return this.address;
+    }
+
+    @Override
+    public InetSocketAddress getVirtualHost() {
+        return this.virtualHost;
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("address", this.address)
+                .add("virtualHost", this.virtualHost)
+                .toString();
     }
 
     @Override
@@ -65,7 +88,7 @@ public final class RconSource extends AbstractProxySubject implements org.sponge
 
     @Override
     public MessageChannel getMessageChannel() {
-        return MessageChannel.TO_ALL;
+        return MessageChannel.toPlayersAndServer();
     }
 
     @Override
@@ -78,23 +101,13 @@ public final class RconSource extends AbstractProxySubject implements org.sponge
     }
 
     @Override
-    public Optional<CommandSource> getCommandSource() {
-        return Optional.of(this);
+    public boolean isAuthorized() {
+        return this.authorized;
     }
 
     @Override
-    public boolean getLoggedIn() {
-        return this.loggedIn;
-    }
-
-    @Override
-    public void setLoggedIn(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
-
-    @Override
-    public RconConnection getConnection() {
-        return this.connection;
+    public void setAuthorized(boolean authorized) {
+        this.authorized = authorized;
     }
 
     @Override
@@ -112,4 +125,5 @@ public final class RconSource extends AbstractProxySubject implements org.sponge
         this.buffer.setLength(0);
         return result;
     }
+
 }

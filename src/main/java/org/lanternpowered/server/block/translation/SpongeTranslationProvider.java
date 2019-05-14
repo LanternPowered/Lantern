@@ -49,6 +49,6 @@ public class SpongeTranslationProvider implements TranslationProvider {
 
     @Override
     public Translation get(BlockState blockState, @Nullable Location location, @Nullable Direction face) {
-        return blockState.getTraitValue(BlockStateProperties.IS_WET).get() ? this.wetTranslation : this.dryTranslation;
+        return blockState.getStateProperty(BlockStateProperties.IS_WET).get() ? this.wetTranslation : this.dryTranslation;
     }
 }

@@ -196,8 +196,8 @@ public class LanternAdvancementProgress implements AdvancementProgress {
             final MessageEvent.MessageFormatter formatter = new MessageEvent.MessageFormatter(message);
             final Cause cause = CauseStack.current().getCurrentCause();
             final Instant instant = get().orElseThrow(() -> new IllegalStateException("Something funky happened"));
-            final AdvancementEvent.Grant event = SpongeEventFactory.createAdvancementEventGrant(cause, MessageChannel.players(),
-                    Optional.of(MessageChannel.players()), this.advancement, formatter, getPlayer(), instant, !sendMessage);
+            final AdvancementEvent.Grant event = SpongeEventFactory.createAdvancementEventGrant(cause, MessageChannel.toPlayers(),
+                    Optional.of(MessageChannel.toPlayers()), this.advancement, formatter, getPlayer(), instant, !sendMessage);
             Sponge.getEventManager().post(event);
             if (!event.isMessageCancelled()) {
                 event.getChannel().ifPresent(channel -> channel.send(event.getMessage()));

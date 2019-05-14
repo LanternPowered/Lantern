@@ -23,34 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.effect.sound;
+package org.lanternpowered.server.game.registry.type.effect.sound
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import org.lanternpowered.api.catalog.CatalogKeys;
-import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.SoundTypes;
+import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.server.effect.sound.LanternSoundType
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
+import org.lanternpowered.server.game.registry.InternalRegistries
+import org.spongepowered.api.effect.sound.SoundType
+import org.spongepowered.api.effect.sound.SoundTypes
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+class SoundTypeRegistryModule : AdditionalPluginCatalogRegistryModule<SoundType>(SoundTypes::class) {
 
-public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
-
-    public SoundTypeRegistryModule() {
-        super(SoundTypes.class);
-    }
-
-    @Override
-    public void registerDefaults() {
-        final Gson gson = new Gson();
-        final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
-                .getResourceAsStream("/internal/registries/sound_event.json"))), JsonArray.class);
-        for (int i = 0; i < array.size(); i++) {
-            final String name = array.get(i).getAsString().replace("minecraft:", "");
-            final String id = name.replaceAll("\\.", "_");
-            register(new LanternSoundType(CatalogKeys.minecraft(id, name), i));
+    override fun registerDefaults() {
+        InternalRegistries.visit("sound_event") { key, internalId ->
+            register(LanternSoundType(CatalogKeys.resolve(key), internalId))
         }
     }
+
+    override fun provideCatalogMap() = super.provideCatalogMap().mapKeys { (key, _) -> key.replace('.', '_') }
 }

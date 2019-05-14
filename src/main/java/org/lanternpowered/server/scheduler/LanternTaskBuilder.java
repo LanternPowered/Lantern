@@ -28,7 +28,6 @@ package org.lanternpowered.server.scheduler;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import org.lanternpowered.api.cause.CauseStack;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -59,8 +58,8 @@ public class LanternTaskBuilder implements Task.Builder {
     public LanternTaskBuilder reset() {
         this.name = null;
         this.consumer = null;
-        this.delay = Duration.ofMillis(0);
-        this.interval = Duration.ofMillis(0);
+        this.delay = Duration.ZERO;
+        this.interval = Duration.ZERO;
         return this;
     }
 
@@ -89,8 +88,8 @@ public class LanternTaskBuilder implements Task.Builder {
     }
 
     @Override
-    public LanternTaskBuilder plugin(Object plugin) {
-        this.plugin = checkPlugin(plugin, "plugin");
+    public LanternTaskBuilder plugin(PluginContainer plugin) {
+        this.plugin = checkNotNull(plugin, "plugin");
         return this;
     }
 

@@ -75,7 +75,7 @@ import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameState;
-import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.command.manager.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;

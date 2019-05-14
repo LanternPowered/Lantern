@@ -41,27 +41,9 @@ import java.util.Optional
  * .transformMessage(channels[...]
  * .transformMessage(channels[0].transformMessage(input))))` would occur).
  */
-class CombinedMessageChannel : MessageChannel {
+class CombinedMessageChannel(channels: Iterable<MessageChannel>) : MessageChannel {
 
-    private val channels: Collection<MessageChannel>
-
-    /**
-     * Creates a new combined message channel of the provided
-     * [MessageChannel]s.
-     *
-     * @param channels The channels to combine into a single message channel
-     */
-    constructor(vararg channels: MessageChannel) : this(channels.toImmutableSet())
-
-    /**
-     * Creates a new combined message channel of the provided [Collection]
-     * of [MessageChannel]s.
-     *
-     * @param channels The channels to combine into a single message channel
-     */
-    constructor(channels: Collection<MessageChannel>) {
-        this.channels = ImmutableSet.copyOf(channels)
-    }
+    private val channels = ImmutableSet.copyOf(channels)
 
     override fun transformMessage(sender: Any?, recipient: MessageReceiver, original: Text, type: ChatType): Optional<Text> {
         var text = original

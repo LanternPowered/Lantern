@@ -51,6 +51,8 @@ import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
+import org.lanternpowered.server.console.LanternConsole;
+import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.event.LanternEventManager;
@@ -73,6 +75,7 @@ import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
+import org.spongepowered.api.Console;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.command.manager.CommandManager;
@@ -442,6 +445,11 @@ public class LanternGame implements Game {
     @Override
     public LanternServer getServer() {
         return this.server;
+    }
+
+    @Override
+    public Console getConsole() {
+        return LanternConsole.INSTANCE;
     }
 
     @Override

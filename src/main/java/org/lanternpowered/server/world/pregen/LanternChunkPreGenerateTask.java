@@ -48,7 +48,7 @@ import org.spongepowered.api.event.world.ChunkPreGenerationEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.TemporalUnits;
+import org.spongepowered.api.util.temporal.TemporalUnits;
 import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;

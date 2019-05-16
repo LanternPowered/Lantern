@@ -52,7 +52,7 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
     static {
         converters.put(String.class.getName(), Function.identity());
         converters.put(EntityType.class.getName(), (Function<String, EntityType>) input ->
-                EntityTypeRegistryModule.get().get(CatalogKey.resolve(input.toLowerCase())).orElse(null));
+                EntityTypeRegistryModule.INSTANCE.get(CatalogKey.resolve(input.toLowerCase())).orElse(null));
         converters.put(GameMode.class.getName(), input -> {
             switch (input) {
                 case "s": return GameModes.SURVIVAL;

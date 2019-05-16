@@ -26,13 +26,15 @@
 package org.lanternpowered.server.advancement.criteria;
 
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
-import org.spongepowered.api.advancement.criteria.OrCriterion;
+import org.spongepowered.api.advancement.criteria.AndCriterion;
 
+import java.util.Arrays;
 import java.util.Collection;
 
-public final class LanternAndCriterion extends AbstractOperatorCriterion implements OrCriterion {
+public final class LanternAndCriterion extends AbstractOperatorCriterion implements AndCriterion {
 
     LanternAndCriterion(Collection<AdvancementCriterion> criteria) {
         super("and", criteria);
     }
+
 }

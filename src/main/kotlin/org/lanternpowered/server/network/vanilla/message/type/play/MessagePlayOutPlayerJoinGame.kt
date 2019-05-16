@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.message.Message
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.world.DimensionType
 
-class MessagePlayOutPlayerJoinGame(
+data class MessagePlayOutPlayerJoinGame(
         /**
          * The game mode of the player.
          */
@@ -54,6 +54,7 @@ class MessagePlayOutPlayerJoinGame(
         /**
          * Whether the hardcore mode is enabled.
          */
-        val isHardcore: Boolean, val lowHorizon: Boolean,
+        val isHardcore: Boolean,
+        val lowHorizon: Boolean,
         val viewDistance: Int
 ) : Message

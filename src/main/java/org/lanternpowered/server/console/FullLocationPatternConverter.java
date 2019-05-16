@@ -34,6 +34,9 @@ import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
+/**
+ * Cannot be converted to Kotlin, the static 'newInstance' method is required.
+ */
 @ConverterKeys({ "fullLocation", "loc" })
 @Plugin(name = "FullLocation", category = "Converter")
 public final class FullLocationPatternConverter extends LogEventPatternConverter {
@@ -69,11 +72,11 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
         for (int i = stackTrace.length - 1; i > 0; i--) {
             String className = stackTrace[i].getClassName();
             // Check if the target logger source should be redirected
-            if (ConsoleManager.REDIRECT_FQCNS.contains(className) || className.equals(fqcn)) {
+            if (LanternConsole.redirectFqcns.contains(className) || className.equals(fqcn)) {
                 return last;
             }
             // Check if the target logger source should be ignored
-            if (ConsoleManager.IGNORE_FQCNS.contains(className)) {
+            if (LanternConsole.ignoreFqcns.contains(className)) {
                 return null;
             }
             // Reaching the printStackTrace method is also the end of the road

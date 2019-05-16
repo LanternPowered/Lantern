@@ -242,7 +242,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return PeekedPollTransactionResult.empty();
         }
         final List<SlotTransaction> transactions = new ArrayList<>();
-        transactions.add(new SlotTransaction(this, this.itemStack.createSnapshot(), ItemStackSnapshot.NONE));
+        transactions.add(new SlotTransaction(this, this.itemStack.createSnapshot(), ItemStackSnapshot.empty()));
         return new PeekedPollTransactionResult(transactions, this.itemStack.copy());
     }
 
@@ -260,7 +260,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         final int quantity = itemStack.getQuantity();
         final ItemStackSnapshot newItem;
         if (limit >= quantity) {
-            newItem = ItemStackSnapshot.NONE;
+            newItem = ItemStackSnapshot.empty();
         } else {
             itemStack.setQuantity(quantity - limit);
             newItem = itemStack.toSnapshot();
@@ -385,8 +385,8 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return new PeekedSetTransactionResult(ImmutableList.of(), stack.createSnapshot());
         }
         final ItemStackSnapshot oldSnapshot = this.itemStack.toSnapshot();
-        ItemStackSnapshot rejectedSnapshot = ItemStackSnapshot.NONE;
-        ItemStackSnapshot newSnapshot = ItemStackSnapshot.NONE;
+        ItemStackSnapshot rejectedSnapshot = ItemStackSnapshot.empty();
+        ItemStackSnapshot newSnapshot = ItemStackSnapshot.empty();
         if (!stack.isEmpty()) {
             final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
             final int quantity = stack.getQuantity();

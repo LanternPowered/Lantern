@@ -29,11 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.lanternpowered.server.console.LanternConsoleSource;
+import org.lanternpowered.server.console.LanternConsole;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
@@ -127,7 +126,7 @@ public abstract class BanEntry implements Ban {
             return Optional.of(source);
         }
         final String plainSource = LanternTexts.toLegacy(this.source);
-        if (plainSource.equals(LanternConsoleSource.NAME)) {
+        if (plainSource.equals(LanternConsole.INSTANCE.getName())) {
             source = Sponge.getServer().getConsole();
         } else {
             source = Sponge.getServer().getPlayer(plainSource).orElse(null);

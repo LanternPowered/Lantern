@@ -666,7 +666,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
     public Entity createEntity(EntityType type, Vector3d position, Consumer<Entity> entityConsumer) {
         checkNotNull(position, "position");
         final LanternEntityType entityType = (LanternEntityType) checkNotNull(type, "type");
-        final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(UUID.randomUUID());
+        final LanternEntity entity = (LanternEntity) entityType.constructEntity(UUID.randomUUID());
         entity.setPositionAndWorld(this, position);
         entityConsumer.accept(entity);
         final CauseStack causeStack = CauseStack.current();

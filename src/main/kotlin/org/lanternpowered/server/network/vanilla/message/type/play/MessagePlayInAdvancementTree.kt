@@ -23,28 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.network.vanilla.message.type.play
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInModifyBook;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.ItemTypes;
+import org.lanternpowered.server.network.message.Message
 
-public class HandlerPlayInEditBook implements Handler<MessagePlayInModifyBook.Edit> {
+sealed class MessagePlayInAdvancementTree : Message {
 
-    @Override
-    public void handle(NetworkContext context, MessagePlayInModifyBook.Edit message) {
-        final LanternPlayer player = context.getSession().getPlayer();
-        final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
+    /**
+     * When a client switches between advancement trees (tabs).
+     *
+     * @param id The id of the opened advancement tree.
+     */
+    data class Open(val id: String) : MessagePlayInAdvancementTree()
 
-        final LanternItemStack itemStack = slot.peek();
-        if (itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
-            itemStack.offer(Keys.PLAIN_BOOK_PAGES, message.getPages());
-            slot.set(itemStack);
-        }
-    }
+    /**
+     * When a client closes the advancements.
+     */
+    object Close : MessagePlayInAdvancementTree()
 }

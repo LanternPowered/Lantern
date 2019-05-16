@@ -116,7 +116,7 @@ public final class PlayerInteractionHandler {
     }
 
     ItemStackSnapshot getActiveItem() {
-        return this.lastActiveItemStack == null ? ItemStackSnapshot.NONE : this.lastActiveItemStack.createSnapshot();
+        return this.lastActiveItemStack == null ? ItemStackSnapshot.empty() : this.lastActiveItemStack.createSnapshot();
     }
 
     /**

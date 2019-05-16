@@ -147,7 +147,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     PeekedOfferTransactionResult peekResult = targetInventory.peekOffer(itemStack1);
 
                     if (!peekResult.isEmpty()) {
-                        transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
+                        transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.empty()));
 
                         if (!itemStack1.isEmpty()) {
                             final int added = quantity - itemStack1.getQuantity();
@@ -164,7 +164,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     }
                 } else {
                     // No actual transaction, there shouldn't have been a item in the crafting result slot
-                    transactions.add(new SlotTransaction(slot, ItemStackSnapshot.NONE, ItemStackSnapshot.NONE));
+                    transactions.add(new SlotTransaction(slot, ItemStackSnapshot.empty(), ItemStackSnapshot.empty()));
                 }
             } else {
                 Lantern.getLogger().warn("Found a CraftingOutput slot without a CraftingInventory as parent.");
@@ -269,8 +269,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final Transaction<ItemStackSnapshot> cursorTransaction;
 
             // Clicking outside the container
-            ItemStackSnapshot oldItem = ItemStackSnapshot.NONE;
-            ItemStackSnapshot newItem = ItemStackSnapshot.NONE;
+            ItemStackSnapshot oldItem = ItemStackSnapshot.empty();
+            ItemStackSnapshot newItem = ItemStackSnapshot.empty();
             if (!getCursorItem().isEmpty()) {
                 oldItem = getCursorItem().createSnapshot();
                 final ItemStackSnapshot droppedItem;
@@ -352,13 +352,13 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                             final LanternItemStack itemStack = (LanternItemStack) resultItem.createStack();
                             itemStack.setQuantity(quantity);
                             cursorTransaction = new Transaction<>(originalCursorItem, itemStack.createSnapshot());
-                            transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
+                            transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.empty()));
                             updateCraftingGrid(player, inventory, optResult.get().getMatrixResult(1), transactions);
                         }
                     } else {
                         cursorTransaction = new Transaction<>(originalCursorItem, originalCursorItem);
                         // No actual transaction, there shouldn't have been a item in the crafting result slot
-                        transactions.add(new SlotTransaction(slot, ItemStackSnapshot.NONE, ItemStackSnapshot.NONE));
+                        transactions.add(new SlotTransaction(slot, ItemStackSnapshot.empty(), ItemStackSnapshot.empty()));
                     }
 
                     transactions = this.container.transformSlots(transactions);
@@ -396,7 +396,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     }
                 } else if (getCursorItem().isEmpty()) {
                     final PeekedPollTransactionResult result = slot.peekPoll(stack -> true);
-                    cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, LanternItemStack.toSnapshot(result.getPolledItem()));
+                    cursorTransaction = new Transaction<>(ItemStackSnapshot.empty(), LanternItemStack.toSnapshot(result.getPolledItem()));
                     transactions.addAll(result.getTransactions());
                 }
                 if (cursorTransaction == null) {
@@ -415,7 +415,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                         stackSize = stackSize - (stackSize / 2);
                         final PeekedPollTransactionResult result = slot.peekPoll(stackSize, stack -> true);
                         transactions.addAll(result.getTransactions());
-                        cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, result.getPolledItem().createSnapshot());
+                        cursorTransaction = new Transaction<>(ItemStackSnapshot.empty(), result.getPolledItem().createSnapshot());
                     }
                 } else {
                     final ItemStack itemStack = getCursorItem().copy();
@@ -426,7 +426,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                         final ItemStackSnapshot oldCursor = getCursorItem().createSnapshot();
                         int quantity = getCursorItem().getQuantity() - 1;
                         if (quantity <= 0) {
-                            cursorTransaction = new Transaction<>(oldCursor, ItemStackSnapshot.NONE);
+                            cursorTransaction = new Transaction<>(oldCursor, ItemStackSnapshot.empty());
                         } else {
                             final LanternItemStack newCursorItem = getCursorItem().copy();
                             newCursorItem.setQuantity(quantity);
@@ -514,7 +514,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final Transaction<ItemStackSnapshot> cursorTransaction;
 
             if (getCursorItem().isEmpty()) {
-                cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, ItemStackSnapshot.NONE);
+                cursorTransaction = new Transaction<>(ItemStackSnapshot.empty(), ItemStackSnapshot.empty());
 
                 final ItemStack itemStack = slot1.getRawItemStack();
                 final ItemStack hotbarItemStack = hotbarSlot1.getRawItemStack();
@@ -522,9 +522,9 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 final ItemStackSnapshot itemStackSnapshot = LanternItemStack.toSnapshot(itemStack);
                 final ItemStackSnapshot hotbarItemStackSnapshot = LanternItemStack.toSnapshot(hotbarItemStack);
 
-                if (!(itemStackSnapshot != ItemStackSnapshot.NONE && (!hotbarSlot1.isValidItem(itemStack) ||
+                if (!(itemStackSnapshot != ItemStackSnapshot.empty() && (!hotbarSlot1.isValidItem(itemStack) ||
                         itemStackSnapshot.getQuantity() > hotbarSlot1.getMaxStackSize())) &&
-                        !(hotbarItemStackSnapshot != ItemStackSnapshot.NONE && (!slot1.isValidItem(hotbarItemStack) ||
+                        !(hotbarItemStackSnapshot != ItemStackSnapshot.empty() && (!slot1.isValidItem(hotbarItemStack) ||
                                 hotbarItemStack.getQuantity() > slot1.getMaxStackSize()))) {
                     transactions.add(new SlotTransaction(slot1, itemStackSnapshot, hotbarItemStackSnapshot));
                     transactions.add(new SlotTransaction(hotbarSlot1, hotbarItemStackSnapshot, itemStackSnapshot));
@@ -576,7 +576,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 rest += itemStack.getQuantity();
             }
 
-            ItemStackSnapshot newCursorItem = ItemStackSnapshot.NONE;
+            ItemStackSnapshot newCursorItem = ItemStackSnapshot.empty();
             if (rest > 0) {
                 final ItemStack itemStack = cursorItem.copy();
                 itemStack.setQuantity(rest);
@@ -602,7 +602,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             }
             quantity -= size;
 
-            ItemStackSnapshot newCursorItem = ItemStackSnapshot.NONE;
+            ItemStackSnapshot newCursorItem = ItemStackSnapshot.empty();
             if (quantity > 0) {
                 final ItemStack itemStack = cursorItem.copy();
                 itemStack.setQuantity(quantity);
@@ -636,7 +636,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             // We do not know the remaining stack in the cursor,
             // so just use none as new item
             final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(
-                    LanternItemStack.toSnapshot(itemStack), ItemStackSnapshot.NONE);
+                    LanternItemStack.toSnapshot(itemStack), ItemStackSnapshot.empty());
 
             final ClickContainerEvent.Creative event = SpongeEventFactory.createClickContainerEventCreative(causeStack.getCurrentCause(),
                     this.container, cursorTransaction, Optional.empty(), this.container.transformSlots(result.getTransactions()));

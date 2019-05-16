@@ -146,11 +146,11 @@ public class PlayerContainerSession {
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             if (this.openContainer != container) {
                 frame.addContext(EventContextKeys.PLAYER, this.player);
-                ItemStackSnapshot cursorItem = ItemStackSnapshot.NONE;
+                ItemStackSnapshot cursorItem = ItemStackSnapshot.empty();
                 if (this.openContainer != null) {
                     final ItemStackSnapshot cursorItemSnapshot = LanternItemStackSnapshot.wrap(this.openContainer.getCursorSlot().peek());
                     final InteractContainerEvent.Close event = SpongeEventFactory.createInteractContainerEventClose(
-                            frame.getCurrentCause(), this.openContainer, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE));
+                            frame.getCurrentCause(), this.openContainer, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.empty()));
                     Sponge.getEventManager().post(event);
                     if (event.isCancelled()) {
                         // Stop the client from closing the container, resend the open message
@@ -185,7 +185,7 @@ public class PlayerContainerSession {
                     sendClose = false;
                 }
                 if (container != null) {
-                    final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, cursorItem);
+                    final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(ItemStackSnapshot.empty(), cursorItem);
                     final InteractContainerEvent.Open event = SpongeEventFactory.createInteractContainerEventOpen(
                             frame.getCurrentCause(), container, cursorTransaction);
                     Sponge.getEventManager().post(event);

@@ -72,7 +72,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
             uniqueId = UUID.randomUUID();
         }
         //noinspection unchecked
-        final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(uniqueId);
+        final LanternEntity entity = (LanternEntity) entityType.constructEntity(uniqueId);
         store.deserialize(entity, dataView);
         return entity;
     }

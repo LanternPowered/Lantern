@@ -195,7 +195,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
     @Override
     public ItemStackSnapshot createSnapshot() {
         if (isEmpty()) {
-            return ItemStackSnapshot.NONE;
+            return ItemStackSnapshot.empty();
         }
         return new LanternItemStackSnapshot(copy());
     }
@@ -206,7 +206,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
 
     public ItemStackSnapshot toWrappedSnapshot() {
         if (isEmpty() && empty != null) {
-            return ItemStackSnapshot.NONE;
+            return ItemStackSnapshot.empty();
         }
         return new LanternItemStackSnapshot(this);
     }
@@ -337,6 +337,6 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
     }
 
     public static ItemStackSnapshot toSnapshot(@Nullable ItemStack itemStack) {
-        return itemStack == null || itemStack.isEmpty() ? ItemStackSnapshot.NONE : itemStack.createSnapshot();
+        return itemStack == null || itemStack.isEmpty() ? ItemStackSnapshot.empty() : itemStack.createSnapshot();
     }
 }

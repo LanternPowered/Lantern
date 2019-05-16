@@ -80,7 +80,7 @@ public class LanternAdvancementBuilder extends AbstractNamedCatalogBuilder<Advan
 
     @Override
     public Advancement.Builder reset() {
-        this.criterion = AdvancementCriterion.EMPTY;
+        this.criterion = AdvancementCriterion.empty();
         this.displayInfo = null;
         this.parent = null;
         return super.reset();

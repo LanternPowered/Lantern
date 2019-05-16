@@ -90,11 +90,11 @@ public final class ItemStackContextualValueType implements ContextualValueType<I
     public static DataView serializeForNetwork(ItemStack itemStack) {
         final int[] ids = NetworkItemTypeRegistry.itemTypeToInternalAndNetworkId.get(itemStack.getType());
         if (ids == null) {
-            throw new IllegalStateException("Invalid vanilla/modded item type id: " + itemStack.getType().getId());
+            throw new IllegalStateException("Invalid vanilla/modded item type id: " + itemStack.getType().getKey());
         }
         final DataView dataView = serializeForNetwork(itemStack, ids);
         // Remap the item stack identifier, used in the json format, will be omitted in other messages
-        dataView.set(ItemStackStore.IDENTIFIER, NetworkItemTypeRegistry.serverModdedToClientId.get(itemStack.getType().getId()));
+        dataView.set(ItemStackStore.IDENTIFIER, NetworkItemTypeRegistry.serverModdedToClientId.get(itemStack.getType().getKey().toString()));
         return dataView;
     }
 
@@ -146,7 +146,7 @@ public final class ItemStackContextualValueType implements ContextualValueType<I
         } else {
             final int[] ids = NetworkItemTypeRegistry.itemTypeToInternalAndNetworkId.get(object.getType());
             if (ids == null) {
-                throw new EncoderException("Invalid vanilla/modded item type id: " + object.getType().getId());
+                throw new EncoderException("Invalid vanilla/modded item type id: " + object.getType().getKey());
             }
             final DataView dataView;
             try (TranslationContext ignored = TranslationContext.enter()

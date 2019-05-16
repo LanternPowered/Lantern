@@ -391,7 +391,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.TemporalUnits;
+import org.spongepowered.api.util.temporal.TemporalUnits;
 import org.spongepowered.api.util.rotation.Rotations;
 
 import java.time.Duration;
@@ -441,7 +441,7 @@ public class DataManipulatorRegistry {
         register(FireworkRocketData.class, ImmutableFireworkRocketData.class,
                 c -> c.register(Keys.FIREWORK_FLIGHT_MODIFIER, 0));
         register(RepresentedItemData.class, ImmutableRepresentedItemData.class,
-                c -> c.register(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE));
+                c -> c.register(Keys.REPRESENTED_ITEM, ItemStackSnapshot.empty()));
         register(RepresentedPlayerData.class, ImmutableRepresentedPlayerData.class,
                 c -> c.register(Keys.REPRESENTED_PLAYER, LanternGameProfile.UNKNOWN));
         register(TargetedLocationData.class, ImmutableTargetedLocationData.class,
@@ -547,7 +547,7 @@ public class DataManipulatorRegistry {
         register(AbsorptionData.class, ImmutableAbsorptionData.class,
                 c -> c.register(Keys.ABSORPTION, 0.0));
         register(ActiveItemData.class, ImmutableActiveItemData.class,
-                c -> c.register(Keys.ACTIVE_ITEM, ItemStackSnapshot.NONE));
+                c -> c.register(Keys.ACTIVE_ITEM, ItemStackSnapshot.empty()));
         register(AffectsSpawningData.class, ImmutableAffectsSpawningData.class,
                 c -> c.register(Keys.AFFECTS_SPAWNING, false));
         register(AgeableData.class, ImmutableAgeableData.class,

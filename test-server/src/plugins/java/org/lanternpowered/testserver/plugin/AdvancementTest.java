@@ -128,7 +128,7 @@ public class AdvancementTest {
                         .title(Text.of("Random advancements!"))
                         .description(Text.of("Some random and useless advancements."))
                         .build())
-                .criterion(AdvancementCriterion.EMPTY)
+                .criterion(AdvancementCriterion.empty())
                 .id("random_root")
                 .build();
         event.register(this.rootAdvancement);
@@ -139,7 +139,7 @@ public class AdvancementTest {
                         .icon(ItemTypes.BARRIER)
                         .title(Text.of("Test?"))
                         .build())
-                .criterion(AdvancementCriterion.DUMMY)
+                .criterion(AdvancementCriterion.dummy())
                 .id("random_test")
                 .build();
         event.register(this.testAdvancement);
@@ -151,7 +151,7 @@ public class AdvancementTest {
                         .title(Text.of("First time?"))
                         .description(Text.of("Login for the first time"))
                         .build())
-                .criterion(AdvancementCriterion.DUMMY)
+                .criterion(AdvancementCriterion.dummy())
                 .id("random_first_login")
                 .build();
         event.register(this.firstTimeAdvancement);
@@ -162,7 +162,7 @@ public class AdvancementTest {
                         .title(Text.of("Welcome back?"))
                         .description(Text.of("Login for the second time"))
                         .build())
-                .criterion(AdvancementCriterion.DUMMY)
+                .criterion(AdvancementCriterion.dummy())
                 .id("random_second_login")
                 .build();
         event.register(this.secondTimeAdvancement);
@@ -187,7 +187,7 @@ public class AdvancementTest {
         // Create the cook dirt advancement
         this.cookDirtAdvancement = Advancement.builder()
                 .parent(this.rootAdvancement)
-                .criterion(AdvancementCriterion.DUMMY)
+                .criterion(AdvancementCriterion.dummy())
                 .displayInfo(DisplayInfo.builder()
                         .icon(ItemTypes.FURNACE)
                         .title(Text.of("Dirty cook"))
@@ -224,7 +224,7 @@ public class AdvancementTest {
             // Create the suicidal advancement
             this.suicidalAdvancement = Advancement.builder()
                     .parent(parent)
-                    .criterion(AdvancementCriterion.DUMMY)
+                    .criterion(AdvancementCriterion.dummy())
                     .displayInfo(DisplayInfo.builder()
                             .icon(ItemTypes.TNT)
                             .title(Text.of("Suicidal?"))

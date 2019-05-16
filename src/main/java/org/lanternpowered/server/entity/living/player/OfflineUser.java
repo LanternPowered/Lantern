@@ -54,7 +54,7 @@ public class OfflineUser extends AbstractUser {
         // A offline can't have a active item, so always return none and reject offers
         c.registerProcessor(Keys.ACTIVE_ITEM).add(builder -> builder
                 .valueOfferHandler((valueContainer, value) -> DataTransactionResult.errorResult(value.asImmutable()))
-                .retrieveHandler((valueContainer, key) -> Optional.of(ItemStackSnapshot.NONE))
+                .retrieveHandler((valueContainer, key) -> Optional.of(ItemStackSnapshot.empty()))
                 .failAlwaysRemoveHandler());
     }
 

@@ -32,7 +32,6 @@ import org.spongepowered.api.registry.util.RegistrationDependency
 
 @RegistrationDependency(
         AdvancementTypeRegistryModule::class,
-        AdvancementCriterionModule::class,
         ItemRegistryModule::class,
         TriggerRegistryModule::class
 )

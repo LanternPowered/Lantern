@@ -89,7 +89,7 @@ public class LanternItem extends LanternEntity implements Item {
     public void registerKeys() {
         super.registerKeys();
         final ValueCollection c = getValueCollection();
-        c.registerNonRemovable(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE);
+        c.registerNonRemovable(Keys.REPRESENTED_ITEM, ItemStackSnapshot.empty());
         c.registerNonRemovable(Keys.PICKUP_DELAY, 10);
         c.registerNonRemovable(Keys.DESPAWN_DELAY, 6000);
         c.registerNonRemovable(LanternKeys.GRAVITY_FACTOR, 0.002);
@@ -309,7 +309,7 @@ public class LanternItem extends LanternEntity implements Item {
                 entity.offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack2));
             } else {
                 // The other entity is completely drained and will be removed
-                entity.offer(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE);
+                entity.offer(Keys.REPRESENTED_ITEM, ItemStackSnapshot.empty());
                 entity.remove();
             }
             // The item stack has changed

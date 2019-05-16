@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
-import org.spongepowered.api.util.TemporalUnits;
+import org.spongepowered.api.util.temporal.TemporalUnits;
 import org.spongepowered.api.world.WorldBorder;
 
 import java.time.Duration;

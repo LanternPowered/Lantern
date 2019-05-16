@@ -23,67 +23,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.console;
+package org.lanternpowered.server.console
 
-import org.apache.commons.lang3.StringUtils;
-import org.jline.reader.Candidate;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.scheduler.LanternScheduler;
-import org.spongepowered.api.Sponge;
+import org.jline.reader.Candidate
+import org.jline.reader.Completer
+import org.jline.reader.LineReader
+import org.jline.reader.ParsedLine
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.game.Lantern
+import org.spongepowered.api.Sponge
+import java.util.concurrent.ExecutionException
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+internal class ConsoleCommandCompleter : Completer {
 
-final class ConsoleCommandCompleter implements Completer {
-
-    @Override
-    public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        final String buffer = line.line();
+    override fun complete(reader: LineReader, line: ParsedLine, candidates: MutableList<Candidate>) {
+        val buffer = line.line()
 
         // The content with normalized spaces, the spaces are trimmed
         // from the ends and there are never two spaces directly after each other
-        String command = StringUtils.normalizeSpace(buffer);
+        var command = buffer.normalizeSpaces()
 
-        boolean hasPrefix = command.startsWith("/");
+        val hasPrefix = command.startsWith("/")
         // Don't include the '/'
         if (hasPrefix) {
-            command = command.substring(1);
+            command = command.substring(1)
         }
 
         // Keep the last space, it must be there!
         if (buffer.endsWith(" ")) {
-            command = command + " ";
+            command = "$command "
         }
 
-        final String command0 = command;
-        final Future<List<String>> tabComplete = ((LanternScheduler) Sponge.getScheduler()).callSync(() ->
-                Sponge.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, command0, null));
+        val command0 = command
+        val tabComplete = Lantern.getSyncScheduler().submit<List<String>> {
+            Sponge.getCommandManager().suggest(LanternConsole, command0)
+        }
 
         try {
             // Get the suggestions
-            final List<String> suggestions = tabComplete.get();
+            val suggestions = tabComplete.get()
             // If the suggestions are for the command and there was a prefix, then append the prefix
-            if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
-                for (String completion : suggestions) {
-                    if (!completion.isEmpty()) {
-                        candidates.add(new Candidate('/' + completion));
+            if (hasPrefix && command.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray().size == 1 && !command.endsWith(" ")) {
+                for (completion in suggestions) {
+                    if (completion.isNotEmpty()) {
+                        candidates.add(Candidate("/$completion"))
                     }
                 }
             } else {
-                for (String completion : suggestions) {
-                    if (!completion.isEmpty()) {
-                        candidates.add(new Candidate(completion));
+                for (completion in suggestions) {
+                    if (completion.isNotEmpty()) {
+                        candidates.add(Candidate(completion))
                     }
                 }
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            Lantern.getLogger().error("Failed to tab complete", e);
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
+        } catch (e: ExecutionException) {
+            Lantern.getLogger().error("Failed to tab complete", e)
         }
     }
 }

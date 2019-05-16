@@ -23,28 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.entity
 
-import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.text.translation.Translation
+import java.util.UUID
 
-public abstract class MessagePlayInAdvancementTree implements Message {
+fun <E : Entity> entityTypeOf(key: CatalogKey, translation: Translation, entityClass: Class<E>, entityConstructor: (UUID) -> E) =
+        LanternEntityType(key, translation, entityClass, entityConstructor)
 
-    private MessagePlayInAdvancementTree() {
-    }
+fun <E : Entity> entityTypeOf(key: CatalogKey, translation: String, entityClass: Class<E>, entityConstructor: (UUID) -> E) =
+        LanternEntityType(key, translation, entityClass, entityConstructor)
 
-    public static final class Open extends MessagePlayInAdvancementTree {
+inline fun <reified E : Entity> entityTypeOf(key: CatalogKey, translation: Translation, noinline entityConstructor: (UUID) -> E) =
+        entityTypeOf(key, translation, E::class.java, entityConstructor)
 
-        private final String id;
-
-        public Open(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return this.id;
-        }
-    }
-
-    public static final class Close extends MessagePlayInAdvancementTree {
-    }
-}
+inline fun <reified E : Entity> entityTypeOf(key: CatalogKey, translation: String, noinline entityConstructor: (UUID) -> E) =
+        entityTypeOf(key, translation, E::class.java, entityConstructor)

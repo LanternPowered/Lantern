@@ -40,6 +40,7 @@ object Lantern {
     @JvmStatic inline val causeStackManager: XCauseStackManager get() = Sponge.getCauseStackManager() as XCauseStackManager
     @JvmStatic inline val pluginManager: PluginManager get() = Sponge.getPluginManager()
     @JvmStatic inline val eventManager: EventManager get() = Sponge.getEventManager()
-    @JvmStatic inline val scheduler: Scheduler get() = Sponge.getServer().scheduler
+    @JvmStatic inline val syncScheduler: Scheduler get() = Sponge.getServer().scheduler
+    @JvmStatic inline val asyncScheduler: Scheduler get() = Sponge.getGame().asyncScheduler
     @JvmStatic inline val serviceManager: ServiceManager get() = Sponge.getServiceManager()
 }

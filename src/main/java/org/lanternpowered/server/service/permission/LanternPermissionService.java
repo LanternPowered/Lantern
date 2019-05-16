@@ -30,15 +30,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import org.lanternpowered.server.console.LanternConsoleSource;
-import org.lanternpowered.server.network.rcon.LanternRconConnection;
-import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.service.permission.base.FixedParentMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -47,7 +42,6 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.service.rcon.RconService;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -57,9 +51,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
@@ -71,7 +63,6 @@ import javax.annotation.Nullable;
 public final class LanternPermissionService implements PermissionService {
 
     private static final String SUBJECTS_DEFAULT = "default";
-    private static final Function<String, CommandSource> NO_COMMAND_SOURCE = s -> null;
 
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<>();
     @Nullable private Collection<PermissionDescription> descriptions;
@@ -86,24 +77,9 @@ public final class LanternPermissionService implements PermissionService {
         this.subjects.put(SUBJECTS_USER, new UserCollection(this));
         this.subjects.put(SUBJECTS_GROUP, new OpLevelCollection(this));
         this.subjects.put(SUBJECTS_COMMAND_BLOCK, new DataFactoryCollection(SUBJECTS_COMMAND_BLOCK, this,
-                s -> new FixedParentMemorySubjectData(this.defaultData, getGroupForOpLevel(2).asSubjectReference()), NO_COMMAND_SOURCE));
+                s -> new FixedParentMemorySubjectData(this.defaultData, getGroupForOpLevel(2).asSubjectReference())));
         this.subjects.put(SUBJECTS_SYSTEM, new DataFactoryCollection(SUBJECTS_SYSTEM, this,
-                s -> new FixedParentMemorySubjectData(this.defaultData, getGroupForOpLevel(4).asSubjectReference()),
-                s -> {
-                    if (s.equals(LanternConsoleSource.NAME)) {
-                        return Sponge.getServer();/*.getConsole(); TODO? */
-                    } else {
-                        final Matcher matcher = LanternRconConnection.NAME_PATTERN.matcher(s);
-                        if (matcher.matches()) {
-                            final String hostName = matcher.group(1);
-                            final RconService rconService = Sponge.getServiceManager().provideUnchecked(RconService.class);
-                            if (rconService instanceof RconServer) {
-                                return ((RconServer) rconService).getByHostName(hostName).orElse(null);
-                            }
-                        }
-                    }
-                    return null;
-                }));
+                s -> new FixedParentMemorySubjectData(this.defaultData, getGroupForOpLevel(4).asSubjectReference())));
     }
 
     public Subject getGroupForOpLevel(int level) {
@@ -122,8 +98,7 @@ public final class LanternPermissionService implements PermissionService {
 
     private LanternSubjectCollection newCollection(String identifier) {
         checkNotNull(identifier, "identifier");
-        return new DataFactoryCollection(identifier, this,
-                s -> new GlobalMemorySubjectData(this.defaultData), NO_COMMAND_SOURCE);
+        return new DataFactoryCollection(identifier, this, s -> new GlobalMemorySubjectData(this.defaultData));
     }
 
     public LanternSubjectCollection get(String identifier) {

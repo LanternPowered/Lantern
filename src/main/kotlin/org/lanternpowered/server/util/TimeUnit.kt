@@ -23,22 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.advancement
+package org.lanternpowered.server.util
 
-import com.google.common.collect.ImmutableList
-import org.lanternpowered.server.advancement.criteria.EmptyCriterion
-import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder
-import org.lanternpowered.server.game.registry.CatalogMappingData
-import org.lanternpowered.server.game.registry.CatalogMappingDataHolder
-import org.spongepowered.api.advancement.criteria.AdvancementCriterion
-import org.spongepowered.api.registry.RegistryModule
+import org.lanternpowered.api.ext.*
+import java.time.Duration
+import java.time.temporal.Temporal
+import java.time.temporal.TemporalUnit
 
-class AdvancementCriterionModule : RegistryModule, CatalogMappingDataHolder {
+/**
+ * A time based [TemporalUnit].
+ *
+ * @param name The name of time unit
+ * @param duration The duration
+ */
+class TimeUnit(private val name: String, private val duration: Duration) : TemporalUnit {
 
-    override fun getCatalogMappings(): List<CatalogMappingData> {
-        val mappings = HashMap<String, AdvancementCriterion>()
-        mappings["empty"] = EmptyCriterion.INSTANCE
-        mappings["dummy"] = LanternCriterionBuilder().name("dummy").build()
-        return ImmutableList.of(CatalogMappingData(AdvancementCriterion::class, mappings))
-    }
+    override fun getDuration() = this.duration
+
+    override fun isDurationEstimated() = false
+    override fun isDateBased() = false
+    override fun isTimeBased() = true
+
+    override fun <R : Temporal> addTo(temporal: R, amount: Long) = temporal.plus(amount, this).uncheckedCast<R>()
+    override fun between(temporal1Inclusive: Temporal, temporal2Exclusive: Temporal) = temporal1Inclusive.until(temporal2Exclusive, this)
+
+    override fun toString() = this.name
 }
+
+//public static final TimeUnit MINECRAFT_TICKS = new TimeUnit("MinecraftTicks", Duration.ofMillis(50));
+//public static final TimeUnit MINECRAFT_DAYS = new TimeUnit("MinecraftDays", MINECRAFT_TICKS.getDuration().multipliedBy(24000));

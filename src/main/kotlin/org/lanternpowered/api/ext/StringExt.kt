@@ -23,28 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+@file:Suppress("NOTHING_TO_INLINE")
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInModifyBook;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.ItemTypes;
+package org.lanternpowered.api.ext
 
-public class HandlerPlayInEditBook implements Handler<MessagePlayInModifyBook.Edit> {
+import org.apache.commons.lang3.StringUtils
 
-    @Override
-    public void handle(NetworkContext context, MessagePlayInModifyBook.Edit message) {
-        final LanternPlayer player = context.getSession().getPlayer();
-        final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
-
-        final LanternItemStack itemStack = slot.peek();
-        if (itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
-            itemStack.offer(Keys.PLAIN_BOOK_PAGES, message.getPages());
-            slot.set(itemStack);
-        }
-    }
-}
+/**
+ * Normalizes the spaces of this string.
+ */
+inline fun String.normalizeSpaces(): String = StringUtils.normalizeSpace(this)

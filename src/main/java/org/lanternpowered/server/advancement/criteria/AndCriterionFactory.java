@@ -23,23 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.factory;
+package org.lanternpowered.server.advancement.criteria;
 
-import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
-import org.spongepowered.api.registry.FactoryRegistry;
-import org.spongepowered.api.resourcepack.ResourcePackFactory;
-import org.spongepowered.api.resourcepack.ResourcePacks;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.AndCriterion;
 
-public class ResourcePackFactoryModule implements FactoryRegistry<ResourcePackFactory, ResourcePacks> {
+import java.util.Arrays;
+
+public final class AndCriterionFactory implements AndCriterion.Factory {
 
     @Override
-    public Class<ResourcePacks> getFactoryOwner() {
-        return ResourcePacks.class;
+    public AdvancementCriterion of(AdvancementCriterion... criteria) {
+        return AbstractCriterion.build(AndCriterion.class, LanternAndCriterion::new, Arrays.asList(criteria));
     }
 
     @Override
-    public ResourcePackFactory provideFactory() {
-        return new LanternResourcePackFactory();
+    public AdvancementCriterion of(Iterable<AdvancementCriterion> criteria) {
+        return AbstractCriterion.build(AndCriterion.class, LanternAndCriterion::new, criteria);
     }
-
 }

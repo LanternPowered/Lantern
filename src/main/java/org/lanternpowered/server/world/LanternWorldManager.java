@@ -57,6 +57,7 @@ import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.WorldArchetypes;
+import org.spongepowered.api.world.WorldManager;
 import org.spongepowered.api.world.gen.GeneratorTypes;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -90,7 +91,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 @Singleton
-public final class LanternWorldManager {
+public final class LanternWorldManager implements WorldManager {
 
     // The counter for the executor threads
     private final AtomicInteger counter = new AtomicInteger();
@@ -521,7 +522,8 @@ public final class LanternWorldManager {
      * @param worldArchetype The world archetype for creation
      * @return The new or existing world properties, if creation was successful
      */
-    public WorldProperties createWorldProperties(String folderName, WorldArchetype worldArchetype) throws IOException {
+    @Override
+    public WorldProperties createProperties(String folderName, WorldArchetype worldArchetype) throws IOException {
         checkNotNull(worldArchetype, "worldArchetype");
         WorldLookupEntry entry = this.worldByName.get(worldArchetype.getName());
         if (entry != null) {

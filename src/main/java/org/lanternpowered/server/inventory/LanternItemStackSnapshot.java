@@ -59,12 +59,12 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
         IStorePropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
 
     /**
-     * Gets the {@link ItemStackSnapshot#NONE} as a {@link LanternItemStackSnapshot}.
+     * Gets the {@link ItemStackSnapshot.empty()} as a {@link LanternItemStackSnapshot}.
      *
      * @return The none item stack snapshot
      */
     public static LanternItemStackSnapshot none() {
-        return (LanternItemStackSnapshot) ItemStackSnapshot.NONE;
+        return (LanternItemStackSnapshot) ItemStackSnapshot.empty();
     }
 
     /**
@@ -80,7 +80,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
         checkNotNull(itemStack, "itemStack");
         // Reuse the none item stack snapshot if possible
         if (itemStack.isEmpty()) {
-            return (LanternItemStackSnapshot) ItemStackSnapshot.NONE;
+            return (LanternItemStackSnapshot) ItemStackSnapshot.empty();
         }
         return new LanternItemStackSnapshot((LanternItemStack) itemStack);
     }

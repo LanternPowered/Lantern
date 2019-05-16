@@ -1440,7 +1440,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final LanternEntityType entityType = (LanternEntityType) checkNotNull(type, "type");
         checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
         //noinspection unchecked
-        final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(UUID.randomUUID());
+        final LanternEntity entity = (LanternEntity) entityType.constructEntity(UUID.randomUUID());
         entity.setPositionAndWorld(this.world, position);
         return entity;
     }

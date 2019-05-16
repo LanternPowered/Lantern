@@ -189,7 +189,7 @@ final class LanternShapedCraftingRecipe extends LanternCraftingRecipe implements
         if ((flags & Flags.REMAINING_ITEMS) != 0) {
             final List<ItemStackSnapshot> builder = new ArrayList<>();
             for (int i = 0; i < ch * cw; i++) {
-                builder.add(ItemStackSnapshot.NONE);
+                builder.add(ItemStackSnapshot.empty());
             }
             for (int j = 0; j < rh; j++) {
                 for (int i = 0; i < rw; i++) {

@@ -23,25 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.resourcepack
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAdvancementTree;
+import org.lanternpowered.api.ext.*
+import org.spongepowered.api.resourcepack.ResourcePack
+import java.net.URI
 
-public final class CodecPlayInAdvancementTree implements Codec<MessagePlayInAdvancementTree> {
+data class LanternResourcePack(
+        private val uri: URI,
+        private val id: String,
+        private val name: String,
+        private val hash: String?
+) : ResourcePack {
 
-    @Override
-    public MessagePlayInAdvancementTree decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final int type = buf.readVarInt();
-        if (type == 0) {
-            final String id = buf.readString();
-            return new MessagePlayInAdvancementTree.Open(id);
-        } else if (type == 1) {
-            return new MessagePlayInAdvancementTree.Close();
-        }
-        throw new IllegalArgumentException("Unknown type: " + type);
-    }
+    override fun getUri() = this.uri
+    override fun getName() = this.name
+    override fun getId() = this.id
+    override fun getHash() = this.hash.optional()
 }

@@ -658,7 +658,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(SerializationBehavior.class, new SerializationBehaviorRegistryModule())
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())
-                .registerModule(EntityType.class, EntityTypeRegistryModule.get())
+                .registerModule(EntityType.class, EntityTypeRegistryModule.INSTANCE)
                 .registerModule(BlockEntityType.class, BlockEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(BlockEntityProtocolType.class, new BlockEntityProtocolTypeRegistryModule())
@@ -691,7 +691,6 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(AdvancementType.class, new AdvancementTypeRegistryModule())
                 .registerModule(Trigger.class, (AdditionalPluginCatalogRegistryModule) TriggerRegistryModule.get())
                 .registerModule(new AdvancementTreeLayoutModule())
-                .registerModule(new AdvancementCriterionModule())
                 // Recipes
                 .registerModule(CraftingRecipe.class, this.craftingRecipeRegistry)
                 .registerModule(SmeltingRecipe.class, this.smeltingRecipeRegistry)

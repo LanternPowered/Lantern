@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
-import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -50,13 +49,10 @@ final class DataFactoryCollection extends LanternSubjectCollection {
     private final LanternPermissionService service;
     private final ConcurrentMap<String, LanternSubject> subjects = new ConcurrentHashMap<>();
     private final Function<String, MemorySubjectData> dataFactory;
-    private final Function<String, CommandSource> commandSourceFunction;
 
     DataFactoryCollection(String identifier, LanternPermissionService service,
-            Function<String, MemorySubjectData> dataFactory,
-            Function<String, CommandSource> commandSourceFunction) {
+            Function<String, MemorySubjectData> dataFactory) {
         super(identifier, service);
-        this.commandSourceFunction = commandSourceFunction;
         this.dataFactory = dataFactory;
         this.service = service;
     }
@@ -96,12 +92,7 @@ final class DataFactoryCollection extends LanternSubjectCollection {
 
         @Override
         public Optional<String> getFriendlyIdentifier() {
-            return getCommandSource().map(CommandSource::getName);
-        }
-
-        // @Override TODO?
-        public Optional<CommandSource> getCommandSource() {
-            return Optional.ofNullable(DataFactoryCollection.this.commandSourceFunction.apply(getIdentifier()));
+            return Optional.empty();
         }
 
         @Override

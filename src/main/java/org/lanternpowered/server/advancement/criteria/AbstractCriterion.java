@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.AndCriterion;
 import org.spongepowered.api.advancement.criteria.OperatorCriterion;
@@ -62,7 +63,7 @@ public abstract class AbstractCriterion implements AdvancementCriterion {
 
     @Override
     public AdvancementCriterion and(Iterable<AdvancementCriterion> criteria) {
-        return build(AndCriterion.class, LanternAndCriterion::new, this, criteria);
+        return build(AndCriterion.class, LanternAndCriterion::new, Iterables.concat(Collections.singleton(this), criteria));
     }
 
     @Override
@@ -72,7 +73,7 @@ public abstract class AbstractCriterion implements AdvancementCriterion {
 
     @Override
     public AdvancementCriterion or(Iterable<AdvancementCriterion> criteria) {
-        return build(OrCriterion.class, LanternOrCriterion::new, this, criteria);
+        return build(OrCriterion.class, LanternOrCriterion::new, Iterables.concat(Collections.singleton(this), criteria));
     }
 
     @Override
@@ -90,14 +91,11 @@ public abstract class AbstractCriterion implements AdvancementCriterion {
                 Collections.singletonList(criterion);
     }
 
-    private static AdvancementCriterion build(Class<? extends OperatorCriterion> type,
-            Function<Set<AdvancementCriterion>, AdvancementCriterion> function,
-            AdvancementCriterion criterion, Iterable<AdvancementCriterion> criteria) {
-        checkNotNull(criteria, "criteria");
+    public static AdvancementCriterion build(Class<? extends OperatorCriterion> type,
+            Function<Set<AdvancementCriterion>, AdvancementCriterion> function, Iterable<AdvancementCriterion> criteria) {
         final List<AdvancementCriterion> builder = new ArrayList<>();
-        build(type, criterion, builder);
-        for (AdvancementCriterion criterion1 : criteria) {
-            build(type, criterion1, builder);
+        for (AdvancementCriterion criterion : criteria) {
+            build(type, criterion, builder);
         }
         return builder.isEmpty() ? EmptyCriterion.INSTANCE : builder.size() == 1 ? builder.get(0) : function.apply(ImmutableSet.copyOf(builder));
     }

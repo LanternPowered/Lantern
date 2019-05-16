@@ -67,6 +67,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -111,14 +112,11 @@ import javax.annotation.Nullable;
 
 public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePropertyHolder {
 
-    @SuppressWarnings("unused")
-    private static boolean bypassEntityTypeLookup;
-
     // The unique id of this entity
     private final UUID uniqueId;
 
     // The entity type of this entity
-    private final LanternEntityType<?> entityType;
+    @Nullable private EntityType<?> entityType;
 
     // The random object of this entity
     private final Random random = new Random();
@@ -201,13 +199,6 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
 
     public LanternEntity(UUID uniqueId) {
         this.uniqueId = uniqueId;
-        if (!bypassEntityTypeLookup) {
-            this.entityType = (LanternEntityType) EntityTypeRegistryModule.get().getByClass(getClass()).orElseThrow(
-                    () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
-        } else {
-            //noinspection ConstantConditions
-            this.entityType = null;
-        }
         registerKeys();
     }
 
@@ -332,7 +323,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
                 final CauseStack causeStack = CauseStack.current();
                 // TODO: Message channel?
                 final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEvent(causeStack.getCurrentCause(),
-                        MessageChannel.TO_NONE, Optional.empty(), this, new MessageEvent.MessageFormatter(), false);
+                        MessageChannel.toNone(), Optional.empty(), this, new MessageEvent.MessageFormatter(), false);
                 postDestructEvent(event);
             }
         }
@@ -424,7 +415,11 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
 
     @Override
     public EntityType<?> getType() {
-        return this.entityType;
+        EntityType<?> entityType = this.entityType;
+        if (entityType == null) {
+            entityType = this.entityType = EntityTypeRegistryModule.INSTANCE.getByClass(getClass()).orElse(EntityTypes.UNKNOWN);
+        }
+        return entityType;
     }
 
     @Override

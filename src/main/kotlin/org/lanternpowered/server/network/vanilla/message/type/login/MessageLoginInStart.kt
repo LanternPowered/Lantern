@@ -32,4 +32,4 @@ import org.lanternpowered.server.network.message.Message
  *
  * @param username The username of the player that wants to join the server
  */
-class MessageLoginInStart(val username: String) : Message
+data class MessageLoginInStart(val username: String) : Message

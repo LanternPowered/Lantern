@@ -37,8 +37,7 @@ import io.netty.channel.ChannelFuture;
 import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.config.GlobalConfig;
-import org.lanternpowered.server.console.ConsoleManager;
-import org.lanternpowered.server.console.LanternConsoleSource;
+import org.lanternpowered.server.console.LanternConsole;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
@@ -47,7 +46,6 @@ import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.RconServer;
-import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.CloseableService;
@@ -58,8 +56,8 @@ import org.lanternpowered.server.util.SyncLanternThread;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
+import org.spongepowered.api.Console;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -70,7 +68,6 @@ import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePacks;
-import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.rcon.RconService;
@@ -128,7 +125,7 @@ public final class LanternServer implements Server {
     @Inject private LanternGame game;
 
     // The console manager
-    @Inject private ConsoleManager consoleManager;
+    @Inject private LanternConsole console;
 
     // The rcon server/service
     @Nullable private RconServer rconServer;
@@ -181,7 +178,7 @@ public final class LanternServer implements Server {
 
     void initialize() {
         // First initialize the console manager, but don't start to read anything yet
-        this.consoleManager.init();
+        this.console.init();
 
         this.logger.info("Starting Lantern Server {}",
                 firstNonNull(InternalPluginsInfo.Implementation.VERSION, ""));
@@ -216,7 +213,7 @@ public final class LanternServer implements Server {
             this.logger.warn("disable the authentication and allow non registered usernames to be used.");
         }
 
-        this.consoleManager.start();
+        this.console.start();
 
         try {
             bind();
@@ -593,7 +590,7 @@ public final class LanternServer implements Server {
         this.shuttingDown = true;
 
         // Stop the console
-        this.consoleManager.stop();
+        this.console.stop();
 
         final Cause gameCause = Cause.of(EventContext.empty(), this.game);
         this.game.postGameStateChange(SpongeEventFactory.createGameStoppingServerEvent(gameCause));
@@ -663,8 +660,8 @@ public final class LanternServer implements Server {
     }
 
     @Override
-    public ConsoleSource getConsole() {
-        return LanternConsoleSource.INSTANCE;
+    public Console getConsole() {
+        return LanternConsole.INSTANCE;
     }
 
     @Override
@@ -707,13 +704,8 @@ public final class LanternServer implements Server {
         return this.game.getGameProfileManager();
     }
 
-    /**
-     * Gets the {@link LanternWorldManager}.
-     *
-     * @return The world manager
-     */
+    @Override
     public LanternWorldManager getWorldManager() {
         return this.worldManager;
     }
-
 }

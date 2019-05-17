@@ -32,7 +32,7 @@ import static org.objectweb.asm.Opcodes.ACC_SUPER;
 import static org.objectweb.asm.Opcodes.V1_8;
 
 import org.lanternpowered.lmbda.LambdaFactory;
-import org.lanternpowered.lmbda.MethodHandlesX;
+import org.lanternpowered.lmbda.MethodHandlesExtensions;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.ICarriedInventory;
 import org.lanternpowered.server.inventory.IViewableInventory;
@@ -88,7 +88,7 @@ public final class InventoryConstructorFactory {
             if (Modifier.isFinal(inventoryType.getModifiers()) && !(isCarried || isViewable)) {
                 throw new IllegalStateException("The inventory type '" + inventoryType.getName() + "' may not be final.");
             }
-            final MethodHandles.Lookup lookup = doUnchecked(() -> MethodHandlesX.privateLookupIn(inventoryType, this.lookup));
+            final MethodHandles.Lookup lookup = doUnchecked(() -> MethodHandlesExtensions.privateLookupIn(inventoryType, this.lookup));
             final MethodHandle constructorHandle;
             try {
                 constructorHandle = lookup.findConstructor(inventoryType, MethodType.methodType(void.class));
@@ -163,7 +163,7 @@ public final class InventoryConstructorFactory {
         BytecodeUtils.visitEmptyConstructor(cw, inventoryType);
 
         cw.visitEnd();
-        return (Class<? extends AbstractInventory>) doUnchecked(() -> MethodHandlesX.defineClass(lookup, cw.toByteArray()));
+        return (Class<? extends AbstractInventory>) doUnchecked(() -> MethodHandlesExtensions.defineClass(lookup, cw.toByteArray()));
     }
 
     // Will generate a carried class like the following:
@@ -191,6 +191,6 @@ public final class InventoryConstructorFactory {
         BytecodeUtils.visitEmptyConstructor(cw, inventoryType);
 
         cw.visitEnd();
-        return (Class<? extends AbstractInventory>) doUnchecked(() -> MethodHandlesX.defineClass(lookup, cw.toByteArray()));
+        return (Class<? extends AbstractInventory>) doUnchecked(() -> MethodHandlesExtensions.defineClass(lookup, cw.toByteArray()));
     }
 }

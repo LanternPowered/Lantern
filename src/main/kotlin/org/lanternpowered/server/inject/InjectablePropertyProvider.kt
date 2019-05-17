@@ -37,10 +37,10 @@ import com.google.inject.name.Names
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.util.Named
 import org.lanternpowered.api.inject.property.InjectedProperty
+import org.lanternpowered.api.util.Named
 import org.lanternpowered.lmbda.LambdaFactory
-import org.lanternpowered.lmbda.MethodHandlesX
+import org.lanternpowered.lmbda.kt.privateLookupIn
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
@@ -58,7 +58,7 @@ class InjectablePropertyProvider : Module, TypeListener {
         while (javaTarget != Any::class.java && !javaTarget.isArray && !javaTarget.isPrimitive) {
             try {
                 val target = javaTarget.kotlin
-                val lookup by lazy { MethodHandlesX.privateLookupIn(javaTarget, lookup) }
+                val lookup by lazy { lookup.privateLookupIn(javaTarget) }
 
                 target.declaredMemberProperties.forEach { property ->
                     val field = property.javaField

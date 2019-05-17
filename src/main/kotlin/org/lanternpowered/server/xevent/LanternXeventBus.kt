@@ -34,7 +34,7 @@ import org.lanternpowered.api.xevent.XeventHandler
 import org.lanternpowered.api.xevent.XeventListener
 import org.lanternpowered.lmbda.LambdaFactory
 import org.lanternpowered.lmbda.LambdaType
-import org.lanternpowered.lmbda.MethodHandlesX
+import org.lanternpowered.lmbda.kt.privateLookupIn
 import org.lanternpowered.server.game.Lantern
 import java.lang.invoke.MethodHandles
 import java.lang.reflect.Method
@@ -92,9 +92,9 @@ class LanternXeventBus : XeventBus {
                 check(method.parameterCount == 1 && Xevent::class.java.isAssignableFrom(method.parameterTypes[0])) {
                         "ShardeventListener methods can only have one parameter and must extend Shardevent"}
                 // Generate a Shardevent handler for the method
-                val methodHandler = this.untargetedMethodHandlerByMethod.computeIfAbsent(method) { _ ->
+                val methodHandler = this.untargetedMethodHandlerByMethod.computeIfAbsent(method) {
                     // Convert the method to a method handle
-                    val methodHandle = MethodHandlesX.privateLookupIn(method.declaringClass, this.lookup).unreflect(method)
+                    val methodHandle = this.lookup.privateLookupIn(method.declaringClass).unreflect(method)
                     UntargetedMethodHandler(method.parameterTypes[0], LambdaFactory.create(this.untargetedHandlerType, methodHandle))
                 }
                 handlers.add(methodHandler)

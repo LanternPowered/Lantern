@@ -26,7 +26,6 @@
 package org.lanternpowered.server.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
 import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
@@ -39,7 +38,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.lmbda.LambdaFactory;
-import org.lanternpowered.lmbda.MethodHandlesX;
+import org.lanternpowered.lmbda.MethodHandlesExtensions;
 import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.data.key.KeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
@@ -120,7 +119,7 @@ public class LanternEventManager implements EventManager {
     private static final class ShouldFireField {
 
         private final static MethodHandles.Lookup lookup = doUnchecked(() ->
-                MethodHandlesX.privateLookupIn(ShouldFire.class, MethodHandles.lookup()));
+                MethodHandlesExtensions.privateLookupIn(ShouldFire.class, MethodHandles.lookup()));
 
         private final Class<? extends Event> eventClass;
 
@@ -326,11 +325,11 @@ public class LanternEventManager implements EventManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void registerListeners(Object plugin, Object listener) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+    public void registerListeners(PluginContainer plugin, Object listener) {
+        checkNotNull(plugin, "plugin");
         checkNotNull(listener, "listener");
 
-        registerListenerInstance(pluginContainer, listener);
+        registerListenerInstance(plugin, listener);
 
         final List<RegisteredListener<?>> handlers = new ArrayList<>();
         final Map<Method, String> methodErrors = new HashMap<>();
@@ -351,7 +350,7 @@ public class LanternEventManager implements EventManager {
                         continue;
                     }
 
-                    handlers.add(createRegistration(pluginContainer, eventType, subscribe.order(), handler));
+                    handlers.add(createRegistration(plugin, eventType, subscribe.order(), handler));
                 } else {
                     methodErrors.put(method, error);
                 }
@@ -380,46 +379,46 @@ public class LanternEventManager implements EventManager {
     }
 
     @Override
-    public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, boolean beforeModifications,
+    public <T extends Event> void registerListener(PluginContainer plugin, Class<T> eventClass, Order order, boolean beforeModifications,
             EventListener<? super T> listener) {
         // Ignore the "beforeModifications" property, this is only used in combination with mods
         registerListener(plugin, eventClass, order, listener);
     }
 
     @Override
-    public <T extends Event> void registerListener(Object plugin, TypeToken<T> eventType, Order order, boolean beforeModifications,
+    public <T extends Event> void registerListener(PluginContainer plugin, TypeToken<T> eventType, Order order, boolean beforeModifications,
             EventListener<? super T> listener) {
         // Ignore the "beforeModifications" property, this is only used in combination with mods
         registerListener(plugin, eventType, order, listener);
     }
 
     @Override
-    public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, EventListener<? super T> listener) {
+    public <T extends Event> void registerListener(PluginContainer plugin, Class<T> eventClass, EventListener<? super T> listener) {
         registerListener(plugin, eventClass, Order.DEFAULT, listener);
     }
 
     @Override
-    public <T extends Event> void registerListener(Object plugin, TypeToken<T> eventType, EventListener<? super T> listener) {
+    public <T extends Event> void registerListener(PluginContainer plugin, TypeToken<T> eventType, EventListener<? super T> listener) {
         registerListener(plugin, eventType, Order.DEFAULT, listener);
     }
 
     @Override
-    public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, EventListener<? super T> listener) {
+    public <T extends Event> void registerListener(PluginContainer plugin, Class<T> eventClass, Order order, EventListener<? super T> listener) {
         register(plugin, TypeToken.of(eventClass), order, listener);
     }
 
     @Override
-    public <T extends Event> void registerListener(Object plugin, TypeToken<T> eventType, Order order, EventListener<? super T> listener) {
+    public <T extends Event> void registerListener(PluginContainer plugin, TypeToken<T> eventType, Order order, EventListener<? super T> listener) {
         register(plugin, eventType, order, listener);
     }
 
-    public <T extends Event> RegisteredListener<T> register(Object plugin, TypeToken<T> eventType, Order order, EventListener<? super T> listener) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+    public <T extends Event> RegisteredListener<T> register(PluginContainer plugin, TypeToken<T> eventType, Order order, EventListener<? super T> listener) {
+        checkNotNull(plugin, "plugin");
         checkNotNull(eventType, "eventType");
         checkNotNull(order, "order");
         checkNotNull(listener, "listener");
-        registerListenerInstance(pluginContainer, listener);
-        final RegisteredListener<T> registeredListener = createRegistration(pluginContainer, eventType, order, listener);
+        registerListenerInstance(plugin, listener);
+        final RegisteredListener<T> registeredListener = createRegistration(plugin, eventType, order, listener);
         register(Collections.singletonList(registeredListener));
         return registeredListener;
     }
@@ -463,8 +462,8 @@ public class LanternEventManager implements EventManager {
     }
 
     @Override
-    public void unregisterPluginListeners(Object pluginObj) {
-        final PluginContainer plugin = checkPlugin(pluginObj, "plugin");
+    public void unregisterPluginListeners(PluginContainer plugin) {
+        checkNotNull(plugin, "plugin");
         unregister(handler -> plugin.equals(handler.getPlugin()));
     }
 

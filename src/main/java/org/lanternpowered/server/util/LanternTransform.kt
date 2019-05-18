@@ -23,80 +23,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity
+package org.lanternpowered.server.util
 
 import com.flowpowered.math.imaginary.Quaterniond
 import com.flowpowered.math.matrix.Matrix4d
 import com.flowpowered.math.vector.Vector3d
 import org.lanternpowered.api.util.ToStringHelper
-import org.lanternpowered.server.world.LanternLocation
-import org.spongepowered.api.entity.Transform
-import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
+import org.spongepowered.api.util.Transform
 
 class LanternTransform @JvmOverloads constructor(
-        private val location: Location,
+        private val position: Vector3d,
         private val rotation: Vector3d = Vector3d.ZERO,
         private val scale: Vector3d = Vector3d.ONE
 ) : Transform {
 
     private val rotationQuaternion by lazy { fromAxesAngles(this.rotation) }
 
-    @JvmOverloads
-    constructor(world: World, position: Vector3d, rotation: Vector3d = Vector3d.ZERO, scale: Vector3d = Vector3d.ONE) :
-            this(LanternLocation(world, position), rotation, scale)
-
-    override fun getLocation() = this.location
-
-    override fun withLocation(location: Location) = LanternTransform(location, getRotation(), getScale())
-
-    override fun getWorld(): World = this.location.world
-
-    override fun withWorld(world: World) = LanternTransform(world, position, getRotation(), getScale())
-
-    override fun getPosition(): Vector3d = this.location.position
-
-    override fun withPosition(position: Vector3d) = LanternTransform(this.location.withPosition(position), getRotation(), getScale())
-
+    override fun getPosition() = this.position
     override fun getRotation() = this.rotation
-
-    override fun withRotation(rotation: Quaterniond) = withRotation(toAxesAngles(rotation))
-
-    override fun withRotation(rotation: Vector3d) = LanternTransform(this.location, rotation, getScale())
-
     override fun getRotationAsQuaternion() = this.rotationQuaternion
-
-    override fun getPitch() = this.rotation.x
-
-    override fun getYaw() = this.rotation.y
-
-    override fun getRoll() = this.rotation.z
-
     override fun getScale() = this.scale
 
-    override fun withScale(scale: Vector3d) = LanternTransform(getLocation(), getRotation(), scale)
+    override fun getPitch() = this.rotation.x
+    override fun getYaw() = this.rotation.y
+    override fun getRoll() = this.rotation.z
+
+    override fun withPosition(position: Vector3d) = LanternTransform(position, this.rotation, this.scale)
+    override fun withRotation(rotation: Quaterniond) = withRotation(toAxesAngles(rotation))
+    override fun withRotation(rotation: Vector3d) = LanternTransform(this.position, rotation, this.scale)
+    override fun withScale(scale: Vector3d) = LanternTransform(this.position, this.rotation, scale)
 
     override fun add(other: Transform): Transform {
-        val location = getLocation().add(other.position)
-        val rotation = toAxesAngles(other.rotationAsQuaternion.mul(rotationAsQuaternion))
-        val scale = getScale().mul(other.scale)
-        return LanternTransform(location, rotation, scale)
+        val position = this.position.add(other.position)
+        val rotation = toAxesAngles(other.rotationAsQuaternion.mul(this.rotationAsQuaternion))
+        val scale = this.scale.mul(other.scale)
+        return LanternTransform(position, rotation, scale)
     }
 
-    override fun translate(translation: Vector3d) = LanternTransform(getLocation().add(translation), getRotation(), getScale())
-
+    override fun translate(translation: Vector3d) = withPosition(this.position.add(translation))
     override fun rotate(rotation: Vector3d) = rotate(fromAxesAngles(rotation))
+    override fun rotate(rotation: Quaterniond) = withRotation(toAxesAngles(rotation.mul(this.rotationAsQuaternion)))
+    override fun scale(scale: Vector3d) = withScale(this.scale.mul(scale))
 
-    override fun rotate(rotation: Quaterniond) = LanternTransform(getLocation(), toAxesAngles(rotation.mul(rotationAsQuaternion)), getScale())
-
-    override fun scale(scale: Vector3d) = LanternTransform(getLocation(), getRotation(), getScale().mul(scale))
-
-    override fun toMatrix(): Matrix4d = Matrix4d.createScaling(getScale().toVector4(1f)).rotate(rotationAsQuaternion).translate(position)
-
-    override fun isValid() = this.location.isValid
+    override fun toMatrix(): Matrix4d = Matrix4d.createScaling(this.scale.toVector4(1f))
+            .rotate(this.rotationAsQuaternion).translate(this.position)
 
     override fun hashCode(): Int {
-        var result = this.location.hashCode()
+        var result = this.position.hashCode()
         result = 31 * result + this.rotation.hashCode()
         result = 31 * result + this.scale.hashCode()
         return result
@@ -109,8 +82,7 @@ class LanternTransform @JvmOverloads constructor(
         if (other !is Transform) {
             return false
         }
-        return other.location == this.location && other.position == this.position &&
-                other.rotation == this.rotation && other.scale == this.scale
+        return other.position == this.position && other.rotation == this.rotation && other.scale == this.scale
     }
 
     private fun toAxesAngles(quaternion: Quaterniond): Vector3d {
@@ -118,19 +90,17 @@ class LanternTransform @JvmOverloads constructor(
         return Vector3d(axesAngles.x, -axesAngles.y, axesAngles.z)
     }
 
-    private fun fromAxesAngles(angles: Vector3d): Quaterniond {
-        return Quaterniond.fromAxesAnglesDeg(angles.x, -angles.y, angles.z)
-    }
+    private fun fromAxesAngles(angles: Vector3d): Quaterniond = Quaterniond.fromAxesAnglesDeg(angles.x, -angles.y, angles.z)
 
     override fun toString() = ToStringHelper("Transform")
-            .add("location", getLocation())
+            .add("position", this.position)
             .add("rotation", this.rotation)
             .add("scale", this.scale)
             .toString()
 
     object Factory : Transform.Factory {
 
-        override fun create(location: Location, rotation: Vector3d, scale: Vector3d) =
-                LanternTransform(location, rotation, scale)
+        override fun create(position: Vector3d, rotation: Vector3d, scale: Vector3d)
+                = LanternTransform(position, rotation, scale)
     }
 }

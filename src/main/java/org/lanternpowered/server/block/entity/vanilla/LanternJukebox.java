@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.block.entity.IBlockEntityCarrier;
+import org.lanternpowered.server.block.entity.ICarrierBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.game.Lantern;
@@ -37,7 +37,7 @@ import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.Jukebox;
-import org.spongepowered.api.block.entity.carrier.BlockEntityCarrier;
+import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.effect.sound.music.MusicDisc;
@@ -51,7 +51,7 @@ import org.spongepowered.api.world.Location;
 
 import java.util.Optional;
 
-public final class LanternJukebox extends LanternBlockEntity implements Jukebox, IBlockEntityCarrier {
+public final class LanternJukebox extends LanternBlockEntity implements Jukebox, ICarrierBlockEntity {
 
     // The internal inventory of the jukebox
     private JukeboxInventory inventory = VanillaInventoryArchetypes.JUKEBOX.builder()
@@ -125,7 +125,7 @@ public final class LanternJukebox extends LanternBlockEntity implements Jukebox,
     }
 
     @Override
-    public BlockEntityInventory<BlockEntityCarrier> getInventory() {
+    public BlockEntityInventory<CarrierBlockEntity> getInventory() {
         return this.inventory;
     }
 }

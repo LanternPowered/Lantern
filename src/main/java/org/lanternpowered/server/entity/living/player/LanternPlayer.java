@@ -49,7 +49,7 @@ import org.lanternpowered.server.effect.entity.sound.player.PlayerHurtSoundEffec
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternLiving;
-import org.lanternpowered.server.entity.LanternTransform;
+import org.lanternpowered.server.util.LanternTransform;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;

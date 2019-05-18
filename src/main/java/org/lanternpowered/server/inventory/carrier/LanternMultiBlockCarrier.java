@@ -38,14 +38,12 @@ import org.spongepowered.api.item.inventory.MultiBlockCarrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class LanternMultiBlockCarrier<T extends CarriedInventory<?>> extends AbstractCarrier<T>
-        implements MultiBlockCarrier {
+public class LanternMultiBlockCarrier<T extends CarriedInventory<?>> extends AbstractCarrier<T> implements MultiBlockCarrier {
 
     private final Location mainLocation;
     private final Map<Location, BlockCarrier> carriers;

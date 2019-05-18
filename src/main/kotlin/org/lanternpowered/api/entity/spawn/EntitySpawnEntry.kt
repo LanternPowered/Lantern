@@ -23,18 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.manipulator.immutable.block;
+@file:Suppress("NOTHING_TO_INLINE")
 
-import org.lanternpowered.server.data.IImmutableValueHolder;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.immutable.ImmutableConnectedDirectionData;
-import org.spongepowered.api.data.value.SetValue;
-import org.spongepowered.api.util.Direction;
+package org.lanternpowered.api.entity.spawn
 
-public interface LanternImmutableConnectedDirectionData extends ImmutableConnectedDirectionData, IImmutableValueHolder {
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.EntityType
+import org.spongepowered.api.util.Transform
+import java.util.function.Consumer
 
-    @Override
-    default SetValue.Immutable<Direction> connectedDirections() {
-        return tryGetImmutableValueFor(Keys.CONNECTED_DIRECTIONS);
-    }
+/**
+ * Represents a spawning entry that can be spawned through the [EntitySpawner].
+ *
+ * @param entityType The entity type that will be constructed
+ * @param transform The transform that should be applied to the entity
+ * @param populator The populator that can be used to apply properties to the entity
+ */
+class EntitySpawnEntry<T : Entity> @JvmOverloads constructor(
+        val entityType: EntityType<T>,
+        val transform: Transform,
+        val populator: T.() -> Unit = {}
+) {
+
+    constructor(
+            entityType: EntityType<T>,
+            transform: Transform,
+            entityConsumer: Consumer<T>
+    ) : this(entityType, transform, entityConsumer::accept)
 }

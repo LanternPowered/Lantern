@@ -23,29 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.entity.vanilla;
+package org.lanternpowered.server.block.entity;
 
-import org.lanternpowered.server.block.entity.LanternBlockEntity;
-import org.lanternpowered.server.network.block.BlockEntityProtocolTypes;
-import org.spongepowered.api.block.entity.Sign;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.text.Text;
+import org.lanternpowered.server.inventory.LanternEmptyCarriedInventory;
+import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.util.Direction;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class LanternSign extends LanternBlockEntity implements Sign {
-
-    private static final List<Text> emptyLines = Arrays.asList(Text.of(), Text.of(), Text.of(), Text.of());
-
-    public LanternSign() {
-        setProtocolType(BlockEntityProtocolTypes.SIGN);
-    }
+public interface ICarrierBlockEntity extends CarrierBlockEntity {
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        getValueCollection().register(Keys.SIGN_LINES, new ArrayList<>(emptyLines));
+    default Inventory getInventory(Direction from) {
+        return new LanternEmptyCarriedInventory(this);
     }
 }

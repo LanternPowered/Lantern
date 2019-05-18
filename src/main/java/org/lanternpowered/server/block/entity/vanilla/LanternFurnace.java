@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.block.entity.vanilla;
 
-import org.lanternpowered.server.block.entity.IBlockEntityCarrier;
+import org.lanternpowered.server.block.entity.ICarrierBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.data.ValueCollection;
@@ -40,8 +40,8 @@ import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.fuel.IFuel;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.entity.carrier.BlockEntityCarrier;
-import org.spongepowered.api.block.entity.carrier.Furnace;
+import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
+import org.spongepowered.api.block.entity.carrier.furnace.Furnace;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -54,7 +54,7 @@ import org.spongepowered.api.util.Direction;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public class LanternFurnace extends LanternBlockEntity implements Furnace, IBlockEntityCarrier {
+public class LanternFurnace extends LanternBlockEntity implements Furnace, ICarrierBlockEntity {
 
     // The inventory of the furnace
     private final FurnaceInventory inventory;
@@ -234,7 +234,7 @@ public class LanternFurnace extends LanternBlockEntity implements Furnace, IBloc
     }
 
     @Override
-    public boolean smelt() {
+    public boolean process() {
         final LanternItemStack itemStack = this.inventory.getInputSlot().getRawItemStack();
         if (itemStack.isNotEmpty()) {
             // Check if the item can be smelted, this means finding a compatible
@@ -262,7 +262,7 @@ public class LanternFurnace extends LanternBlockEntity implements Furnace, IBloc
     }
 
     @Override
-    public BlockEntityInventory<BlockEntityCarrier> getInventory() {
+    public BlockEntityInventory<CarrierBlockEntity> getInventory() {
         return this.inventory;
     }
 
@@ -280,7 +280,7 @@ public class LanternFurnace extends LanternBlockEntity implements Furnace, IBloc
                 // TODO: Limited access to the fuel slot to pull out empty buckets?
                 return this.inventory.getOutputSlot();
             default:
-                return IBlockEntityCarrier.super.getInventory(from);
+                return ICarrierBlockEntity.super.getInventory(from);
         }
     }
 }

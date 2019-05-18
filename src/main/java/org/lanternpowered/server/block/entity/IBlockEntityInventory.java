@@ -27,20 +27,20 @@ package org.lanternpowered.server.block.entity;
 
 import org.lanternpowered.server.inventory.ICarriedInventory;
 import org.lanternpowered.server.inventory.IViewableInventory;
-import org.spongepowered.api.block.entity.carrier.BlockEntityCarrier;
+import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
 import org.spongepowered.api.item.inventory.type.BlockEntityInventory;
 
 import java.util.Optional;
 
-public interface IBlockEntityInventory extends BlockEntityInventory<BlockEntityCarrier>,
-        ICarriedInventory<BlockEntityCarrier>, IViewableInventory {
+public interface IBlockEntityInventory extends BlockEntityInventory<CarrierBlockEntity>,
+        ICarriedInventory<CarrierBlockEntity>, IViewableInventory {
 
     @Override
     default void markDirty() {
     }
 
     @Override
-    default Optional<BlockEntityCarrier> getBlockEntity() {
+    default Optional<CarrierBlockEntity> getBlockEntity() {
         return getCarrier();
     }
 }

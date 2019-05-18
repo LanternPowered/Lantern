@@ -49,6 +49,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.util.LanternTransform;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.LanternWorld;
@@ -68,7 +69,6 @@ import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -93,6 +93,7 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RelativePositions;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -494,13 +495,14 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
 
     @Override
     public Transform getTransform() {
-        return new LanternTransform(this.world, this.position, this.rotation);
+        return new LanternTransform(this.position, this.rotation);
     }
 
     @Override
     public boolean setTransform(Transform transform) {
         checkNotNull(transform, "transform");
-        setLocationAndRotation(transform.getLocation(), transform.getRotation());
+        setPosition(transform.getPosition());
+        setRotation(transform.getRotation());
         setScale(transform.getScale());
         // TODO: Events
         return true;

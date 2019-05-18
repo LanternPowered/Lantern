@@ -27,8 +27,7 @@ package org.lanternpowered.server.world;
 
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.Transform;
 
 import java.util.function.Consumer;
 

@@ -37,7 +37,7 @@ import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
-import org.spongepowered.api.block.entity.carrier.Chest;
+import org.spongepowered.api.block.entity.carrier.chest.Chest;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;

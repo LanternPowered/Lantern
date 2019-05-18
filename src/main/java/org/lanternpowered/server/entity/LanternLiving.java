@@ -89,6 +89,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -200,7 +201,7 @@ public class LanternLiving extends LanternEntity implements Living {
 
         // Post the entity destruction event
         final DestructEntityEvent.Death event = SpongeEventFactory.createDestructEntityEventDeath(causeStack.getCurrentCause(),
-                MessageChannel.TO_NONE, Optional.empty(), this, new MessageEvent.MessageFormatter(), keepsInventory, false);
+                MessageChannel.toNone(), Optional.empty(), this, new MessageEvent.MessageFormatter(), keepsInventory, false);
         postDestructEvent(event);
 
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {

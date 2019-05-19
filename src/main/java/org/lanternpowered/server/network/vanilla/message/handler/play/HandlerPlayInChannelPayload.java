@@ -34,7 +34,6 @@ public final class HandlerPlayInChannelPayload implements Handler<MessagePlayInO
 
     @Override
     public void handle(NetworkContext context, MessagePlayInOutChannelPayload message) {
-        Lantern.getGame().getChannelRegistrar().handlePayload(message.getContent(),
-                message.getChannel(), context.getSession());
+        Lantern.getGame().getChannelRegistrar().handleChannelPayload(message, context.getSession());
     }
 }

@@ -26,10 +26,10 @@
 package org.lanternpowered.server.network.channel
 
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.network.ChannelBinding
-import org.spongepowered.api.network.RemoteConnection
 
 internal abstract class LanternChannelBinding(
         private val registrar: LanternChannelRegistrar,
@@ -52,7 +52,7 @@ internal abstract class LanternChannelBinding(
      * @param buf The buffer with the content of the message
      * @param connection The connection to decode the packet for
      */
-    internal abstract fun handlePayload(buf: ByteBuffer, connection: RemoteConnection)
+    internal abstract fun handlePayload(buf: ByteBuffer, connection: NetworkSession)
 
     /**
      * Handles the login response for the remote connection.
@@ -60,7 +60,7 @@ internal abstract class LanternChannelBinding(
      * @param buf The buffer with the content of the message, if there is one
      * @param connection The connection to decode the packet for
      */
-    internal abstract fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: RemoteConnection)
+    internal abstract fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: NetworkSession)
 
     override fun toString() = ToStringHelper(this)
             .add("key", this.key)

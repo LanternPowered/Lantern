@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.buffer;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.ReferenceCounted;
 import org.lanternpowered.server.network.item.RawItemStack;
@@ -41,6 +42,8 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
+
+    ByteBuffer EMPTY = new LanternByteBuffer(Unpooled.unreleasableBuffer(Unpooled.wrappedBuffer(new byte[0])));
 
     @Override
     ByteBuffer ensureWritable(int minWritableBytes);

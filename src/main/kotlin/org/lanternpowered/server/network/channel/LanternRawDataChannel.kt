@@ -94,7 +94,7 @@ internal class LanternRawDataChannel(registrar: LanternChannelRegistrar, key: Ca
         }
     }
 
-    override fun handlePayload(buf: ByteBuffer, connection: RemoteConnection) {
+    override fun handlePayload(buf: ByteBuffer, connection: NetworkSession) {
         Lantern.getSyncScheduler().submit {
             for (listener in this.handlers) {
                 // We slice the buffer, to preserve the reader index for all the handlers,
@@ -104,6 +104,6 @@ internal class LanternRawDataChannel(registrar: LanternChannelRegistrar, key: Ca
         }
     }
 
-    override fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: RemoteConnection) {
+    override fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: NetworkSession) {
     }
 }

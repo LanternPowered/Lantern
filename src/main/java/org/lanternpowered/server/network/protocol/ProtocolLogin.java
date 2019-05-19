@@ -36,6 +36,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginO
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutSuccess;
 import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerEncryptionResponse;
 import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginFinish;
+import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginInChannelResponse;
 import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginStart;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInChannelResponse;
@@ -57,7 +58,8 @@ final class ProtocolLogin extends ProtocolBase {
         inbound.bind(CodecLoginInEncryptionResponse.class, MessageLoginInEncryptionResponse.class)
                 .bindHandler(new HandlerEncryptionResponse());
         inbound.bindHandler(MessageLoginInFinish.class, new HandlerLoginFinish());
-        inbound.bind(CodecLoginInChannelResponse.class, MessageLoginInChannelResponse.class);
+        inbound.bind(CodecLoginInChannelResponse.class, MessageLoginInChannelResponse.class)
+                .bindHandler(new HandlerLoginInChannelResponse());
 
         outbound.bind(CodecOutDisconnect.class, MessageOutDisconnect.class);
         outbound.bind(CodecLoginOutEncryptionRequest.class, MessageLoginOutEncryptionRequest.class);

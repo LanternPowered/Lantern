@@ -23,31 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network
+package org.lanternpowered.server.network.channel
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
+import org.lanternpowered.server.network.NetworkSession
 
 /**
- * Represents a storage for transactional requests/responses of
- * a specific [NetworkSession].
+ * A specialized [ChannelTransactionStore] to track the changes in the
+ * amount of responses the are expected. This will be used to determine
+ * during the client login phase when it's possible to move on from the
+ * handshake.
  */
-class LoginTransactionStore : TransactionStore {
+class LoginChannelTransactionStore(private val networkSession: NetworkSession) : ChannelTransactionStore() {
 
-    private var idCounter = AtomicInteger()
-
-    /**
-     * A map with stored data related to transactions.
-     */
-    private val data = ConcurrentHashMap<Int, Any>()
-
-    override fun nextId() = this.idCounter.getAndIncrement()
-
-    override fun setData(id: Int, data: Any) {
-        this.data[id] = data
+    override fun removeData(id: Int): ChannelTransaction? {
+        val transactionData = super.removeData(id)
+        if (transactionData != null && this.transactions.isEmpty()) {
+            this.networkSession.notifyLoginHandshakeRequestsDone()
+        }
+        return transactionData
     }
-
-    override fun getData(id: Int): Any? = this.data[id]
-
-    override fun removeData(id: Int): Any? = this.data.remove(id)
 }

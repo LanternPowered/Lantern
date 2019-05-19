@@ -612,6 +612,15 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
+     * Notify this network session about the fact that the login
+     * handshake phase is finished, all the send requests to the client
+     * are responded to and nothing is being waited for.
+     */
+    public void notifyLoginHandshakeRequestsDone() {
+
+    }
+
+    /**
      * Sends a {@link Message} and returns the {@link ChannelFuture}.
      *
      * @param message The message

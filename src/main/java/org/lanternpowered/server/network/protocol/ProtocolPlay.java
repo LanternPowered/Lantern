@@ -153,8 +153,8 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWindowProperty;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
-import org.lanternpowered.server.network.vanilla.message.handler.HandlerPlayInLockDifficulty;
-import org.lanternpowered.server.network.vanilla.message.handler.HandlerPlayInSetDifficulty;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInLockDifficulty;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;

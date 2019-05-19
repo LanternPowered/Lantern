@@ -34,7 +34,7 @@ internal class LanternPacketBinding<P : Packet>(
         private val opcode: Int,
         private val messageType: Class<P>,
         val packetConstructor: () -> P
-) : PacketBinding<P>, IBinding {
+) : PacketBinding<P> {
 
     internal val handlers = mutableListOf<PacketHandler<in P>>()
 

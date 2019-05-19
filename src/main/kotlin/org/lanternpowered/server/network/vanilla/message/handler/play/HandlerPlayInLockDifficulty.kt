@@ -23,6 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.channel
+package org.lanternpowered.server.network.vanilla.message.handler.play
 
-internal interface IBinding
+import org.lanternpowered.server.game.Lantern
+import org.lanternpowered.server.network.NetworkContext
+import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInLockDifficulty
+
+class HandlerPlayInLockDifficulty : Handler<MessagePlayInLockDifficulty> {
+
+    override fun handle(context: NetworkContext, message: MessagePlayInLockDifficulty) {
+        Lantern.getLogger().info("${context.session.player.name} attempted to ${ if (message.locked) "lock" else "unlock" } the difficulty.")
+    }
+}

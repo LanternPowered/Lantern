@@ -23,34 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network
+package org.lanternpowered.server.network.vanilla.message.handler.login
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import org.lanternpowered.server.game.Lantern
+import org.lanternpowered.server.network.NetworkContext
+import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInChannelResponse
 
-/**
- * Represents a storage for transactional requests/responses of
- * a specific [NetworkSession].
- *
- * This store should only be accessed from the netty thread, it's
- * not thread-safe.
- */
-@NettyThreadOnly
-class DefaultTransactionStore : TransactionStore {
+class HandlerLoginInChannelResponse : Handler<MessageLoginInChannelResponse> {
 
-    private var idCounter = 0
-
-    /**
-     * A map with stored data related to transactions.
-     */
-    private val data = Int2ObjectOpenHashMap<Any>()
-
-    override fun nextId() = this.idCounter++
-
-    override fun setData(id: Int, data: Any) {
-        this.data[id] = data
+    override fun handle(context: NetworkContext, message: MessageLoginInChannelResponse) {
+        Lantern.getGame().channelRegistrar.handleLoginResponse(message, context.session)
     }
-
-    override fun getData(id: Int): Any? = this.data[id]
-
-    override fun removeData(id: Int): Any? = this.data.remove(id)
 }

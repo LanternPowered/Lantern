@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler
+package org.lanternpowered.server.network.vanilla.message.handler.play
 
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext

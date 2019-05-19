@@ -30,9 +30,7 @@ import org.lanternpowered.api.ext.*
 import org.lanternpowered.lmbda.kt.createLambda
 import org.lanternpowered.lmbda.kt.privateLookupIn
 import org.lanternpowered.server.game.Lantern
-import org.lanternpowered.server.network.LoginTransactionStore
 import org.lanternpowered.server.network.NetworkSession
-import org.lanternpowered.server.network.TransactionStore
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator
 import org.lanternpowered.server.network.message.Message
@@ -43,7 +41,6 @@ import org.spongepowered.api.Platform
 import org.spongepowered.api.network.ChannelException
 import org.spongepowered.api.network.ClientConnection
 import org.spongepowered.api.network.NoResponseException
-import org.spongepowered.api.network.RemoteConnection
 import org.spongepowered.api.network.packet.Packet
 import org.spongepowered.api.network.packet.PacketBinding
 import org.spongepowered.api.network.packet.PacketChannel
@@ -59,7 +56,7 @@ import java.util.concurrent.CompletableFuture
 internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: CatalogKey) :
         LanternChannelBinding(registrar, key), PacketChannel {
 
-    private val byOpcode = Int2ObjectOpenHashMap<IBinding>()
+    private val byOpcode = Int2ObjectOpenHashMap<Any>()
     private val byClass = HashMap<Class<*>, PacketBinding<*>>()
 
     private val transactionalBindingByRequest = HashMap<Class<*>, TransactionalPacketBinding<*, *>>()
@@ -117,7 +114,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
             // Get the opcode, this checks if the packet class is valid
             val opcode = findOpcode(packet.javaClass)
 
-            val transactionStore = connection.channel.attr(TransactionStore.KEY).get()
+            val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
             val allocator = ByteBufferAllocator.pooled()
 
             val buf = allocator.buffer()
@@ -126,12 +123,12 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
             packet.write(buf.slice())
 
             // Check if the login phase is still applicable
-            if (transactionStore is LoginTransactionStore) {
+            if (transactionStore is LoginChannelTransactionStore) {
                 val transactionId = transactionStore.nextId()
 
                 // We need to store some kind of transaction object, but it will be
                 // ignored when handling a response
-                transactionStore.setData(transactionId, NoTransaction)
+                transactionStore.put(transactionId, NoTransaction(this.name))
                 connection.sendWithFuture(MessageLoginOutChannelRequest(transactionId, this.name, buf)).addListener { future ->
                     if (!future.isSuccess) {
                         transactionStore.removeData(transactionId)
@@ -143,13 +140,14 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
         }
     }
 
-    private object NoTransaction
+    private class NoTransaction(channel: String) : ChannelTransaction(channel)
 
-    private data class Transaction<P : RequestPacket<R>, R : ResponsePacket>(
+    private class Transaction<P : RequestPacket<R>, R : ResponsePacket>(
+            channel: String,
             val request: P,
             val binding: LanternTransactionalPacketBinding<P, R>,
             val completableFuture: CompletableFuture<R>?
-    )
+    ) : ChannelTransaction(channel)
 
     override fun <R : ResponsePacket> sendTo(connection: ClientConnection, packet: RequestPacket<R>): CompletableFuture<R> {
         val completableFuture = CompletableFuture<R>()
@@ -167,7 +165,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
                 .uncheckedCast<LanternTransactionalPacketBinding<RequestPacket<R>, R>?>()
         check(binding != null) { "The packet type ${packet.javaClass.name} isn't registered to this channel." }
 
-        val transactionStore = connection.channel.attr(TransactionStore.KEY).get()
+        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
         val allocator = ByteBufferAllocator.pooled()
         val opcode = binding.opcode
 
@@ -175,7 +173,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
         val transactionId = transactionStore.nextId()
 
         // Check if the login phase is still applicable
-        val message: Message = if (transactionStore is LoginTransactionStore) {
+        val message: Message = if (transactionStore is LoginChannelTransactionStore) {
             buf.writeVarLong(TYPE_REQUEST.toLong() or (opcode.toLong() shl TYPE_BITS))
             // Slice to avoid too visibility of written data and writerIndex
             packet.write(buf.slice())
@@ -190,7 +188,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
             MessagePlayInOutChannelPayload(this.name, buf)
         }
 
-        transactionStore.setData(transactionId, Transaction(packet, binding, completableFuture))
+        transactionStore.put(transactionId, Transaction(this.name, packet, binding, completableFuture))
         connection.sendWithFuture(message).addListener { future ->
             if (!future.isSuccess) {
                 if (completableFuture != null) {
@@ -253,7 +251,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
             response.writeVarInt(opcode)
 
             if (login) {
-                val transactionStore = connection.channel.attr(TransactionStore.KEY).get()
+                val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
                 connection.send(MessageLoginOutChannelRequest(transactionStore.nextId(), this.name, response))
             } else {
                 connection.send(MessagePlayInOutChannelPayload(this.name, response))
@@ -283,7 +281,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
                     response.write(responseBuf.slice())
 
                     if (login) {
-                        val transactionStore = connection.channel.attr(TransactionStore.KEY).get()
+                        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
                         connection.send(MessageLoginOutChannelRequest(transactionStore.nextId(), name, responseBuf))
                     } else {
                         connection.send(MessagePlayInOutChannelPayload(name, responseBuf))
@@ -297,11 +295,11 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
 
     private fun <P : RequestPacket<R>, R : ResponsePacket> handleResponsePacket(
             connection: NetworkSession, transactionId: Int, buf: ByteBuffer?) {
-        val transactionStore = connection.channel.attr(TransactionStore.KEY).get()
+        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
         var transaction = transactionStore.getData(transactionId)
 
         if (transaction != null) {
-            if (transaction == NoTransaction) {
+            if (transaction is NoTransaction) {
                 // Just remove the entry, responses like this can be send during the login phase
                 transactionStore.removeData(transactionId)
             } else {
@@ -363,9 +361,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
         }
     }
 
-    override fun handlePayload(buf: ByteBuffer, connection: RemoteConnection) {
-        connection as NetworkSession
-
+    override fun handlePayload(buf: ByteBuffer, connection: NetworkSession) {
         val longValue = buf.readVarLong()
         // Extract the type, this are the 2 least significant bits
         val type = (longValue and TYPE_MASK).toInt()
@@ -386,9 +382,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
         buf.release()
     }
 
-    override fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: RemoteConnection) {
-        connection as NetworkSession
-
+    override fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: NetworkSession) {
         if (buf == null) {
             handleResponsePacket<RequestPacket<ResponsePacket>, ResponsePacket>(connection, transactionId, null)
         } else {

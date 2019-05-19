@@ -25,11 +25,8 @@
  */
 package org.lanternpowered.server.network.channel
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.game.Lantern
-import org.lanternpowered.server.network.LoginTransactionStore
 import org.lanternpowered.server.network.NetworkSession
-import org.lanternpowered.server.network.TransactionStore
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutChannelRequest
@@ -58,9 +55,9 @@ internal class LanternRawLoginDataChannel(registrar: LanternChannelRegistrar, ke
     override fun sendTo(connection: ClientConnection, payload: Consumer<ChannelBuf>): CompletableFuture<ChannelBuf> {
         connection as NetworkSession
 
-        val transactionStore = connection.channel.attr(TransactionStore.KEY).get()
+        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
         // Only supported during login phase
-        check(transactionStore is LoginTransactionStore) { "The RawLoginDataChannel is only usable during the login handshake." }
+        check(transactionStore is LoginChannelTransactionStore) { "The RawLoginDataChannel is only usable during the login handshake." }
 
         val buf = ByteBufferAllocator.pooled().buffer()
         payload.accept(buf)
@@ -69,7 +66,7 @@ internal class LanternRawLoginDataChannel(registrar: LanternChannelRegistrar, ke
         val transactionId = transactionStore.nextId()
 
         // Store the completable future
-        transactionStore.setData(transactionId, completableFuture)
+        transactionStore.put(transactionId, completableFuture)
         // Send the message, also append a handler to catch exception if the message fails to send
         connection.sendWithFuture(MessageLoginOutChannelRequest(transactionId, this.name, buf)).addListener { future ->
             if (!future.isSuccess) {

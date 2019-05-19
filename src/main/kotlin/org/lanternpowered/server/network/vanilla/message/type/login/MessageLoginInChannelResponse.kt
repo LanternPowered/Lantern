@@ -39,5 +39,5 @@ import org.lanternpowered.server.network.message.Message
  */
 data class MessageLoginInChannelResponse(
         val transactionId: Int,
-        val content: ByteBuffer
-) : Message, ReferenceCounted by content
+        val content: ByteBuffer?
+) : Message, ReferenceCounted by (content ?: ByteBuffer.EMPTY)

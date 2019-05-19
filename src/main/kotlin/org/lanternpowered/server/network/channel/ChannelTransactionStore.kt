@@ -23,52 +23,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network
+package org.lanternpowered.server.network.channel
 
 import io.netty.util.AttributeKey
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Represents a storage for transactional requests/responses of
- * a specific [NetworkSession].
+ * a specific connection.
  */
-interface TransactionStore {
+open class ChannelTransactionStore {
+
+    private var idCounter = AtomicInteger()
+
+    /**
+     * A map with stored data related to transactions.
+     */
+    internal val transactions = ConcurrentHashMap<Int, ChannelTransaction>()
 
     /**
      * Gets the next available transaction id.
      *
      * @return The transaction id
      */
-    fun nextId(): Int
+    fun nextId() = this.idCounter.getAndIncrement()
 
     /**
-     * Sets data for the given transaction id.
+     * Sets the transaction data for the given transaction id.
      *
      * @param id The id
-     * @param data The data
+     * @param transaction The transaction data
      */
-    fun setData(id: Int, data: Any)
+    fun put(id: Int, transaction: ChannelTransaction) {
+        this.transactions[id] = transaction
+    }
 
     /**
-     * Gets data for the given transaction id.
+     * Gets the transaction data for the given transaction id.
      *
      * @param id The id
-     * @return The data
+     * @return The transaction data
      */
-    fun getData(id: Int): Any?
+    fun getData(id: Int): ChannelTransaction? = this.transactions[id]
 
     /**
-     * Removes data for the given transaction id.
+     * Removes the transaction data for the given transaction id.
      *
      * @param id The id
-     * @return The removed data
+     * @return The removed transaction data
      */
-    fun removeData(id: Int): Any?
+    open fun removeData(id: Int): ChannelTransaction? = this.transactions.remove(id)
 
     companion object {
 
         /**
-         * The [AttributeKey] of the [TransactionStore].
+         * The [AttributeKey] of the [ChannelTransactionStore].
          */
-        val KEY: AttributeKey<TransactionStore> = AttributeKey.valueOf("transaction-store")
+        val KEY: AttributeKey<ChannelTransactionStore> = AttributeKey.valueOf("transaction-store")
     }
 }

@@ -32,7 +32,8 @@ class ToStringHelper @JvmOverloads constructor(
         private var brackets: Brackets = Brackets.ROUND,
         private var omitNullValues: Boolean = false,
         private var nameValueSeparator: String = "=",
-        private var entrySeparator: String = ", ") {
+        private var entrySeparator: String = ", "
+) {
 
     private var first: Entry? = null
     private var last: Entry? = null

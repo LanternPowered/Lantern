@@ -75,7 +75,6 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -91,10 +90,10 @@ import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.translation.locale.Locales;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.difficulty.Difficulties;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -543,6 +542,16 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
+     * Gets whether the channel is registered for this session.
+     *
+     * @param channel The channel
+     * @return Whether the channel is available
+     */
+    public boolean hasChannel(String channel) {
+        return this.registeredChannels.contains(channel);
+    }
+
+    /**
      * Gets the {@link LanternServer}.
      *
      * @return The server
@@ -823,18 +832,17 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
     }
 
-    /**
-     * Disconnects the session with a unknown reason.
-     */
+    @Override
+    public GameProfile getProfile() {
+        return null;
+    }
+
+    @Override
     public void disconnect() {
         disconnect(Text.of("Unknown reason."));
     }
 
-    /**
-     * Disconnects the session with a specific reason.
-     *
-     * @param reason The reason
-     */
+    @Override
     public void disconnect(Text reason) {
         checkNotNull(reason, "reason");
         if (this.disconnectReason != null) {
@@ -867,7 +875,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             final Text quitMessage = t("multiplayer.player.left", this.player.getName());
 
             final ClientConnectionEvent.Disconnect event = SpongeEventFactory.createClientConnectionEventDisconnect(
-                    causeStack.getCurrentCause(), messageChannel, Optional.of(messageChannel),
+                    causeStack.getCurrentCause(), messageChannel, Optional.of(messageChannel), this,
                     new MessageEvent.MessageFormatter(quitMessage), this.player, false);
 
             Sponge.getEventManager().post(event);
@@ -991,8 +999,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         final Cause cause = Cause.builder().append(this).build(EventContext.builder().add(EventContextKeys.PLAYER, this.player).build());
         final Transform fromTransform = this.player.getTransform();
+        final World fromWorld = this.player.getWorld();
         final ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
-                fromTransform, fromTransform, this, messageFormatter, this.gameProfile, this.player, false);
+                fromTransform, fromTransform, fromWorld, fromWorld, this, messageFormatter, this.player, false);
 
         if (kickReason != null) {
             loginEvent.setCancelled(true);
@@ -1015,7 +1024,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         final Transform toTransform = loginEvent.getToTransform();
-        world = (LanternWorld) toTransform.getWorld();
+        world = (LanternWorld) loginEvent.getToWorld();
         final WorldConfig config = world.getProperties().getConfig();
 
         // Update the game mode if necessary
@@ -1044,7 +1053,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         final ClientConnectionEvent.Join joinEvent = SpongeEventFactory.createClientConnectionEventJoin(cause, messageChannel,
-                Optional.of(messageChannel), new MessageEvent.MessageFormatter(joinMessage), this.player, false);
+                Optional.of(messageChannel), this, new MessageEvent.MessageFormatter(joinMessage), this.player, false);
 
         Sponge.getEventManager().post(joinEvent);
         if (!joinEvent.isMessageCancelled()) {

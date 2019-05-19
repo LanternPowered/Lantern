@@ -23,50 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.channel;
+package org.lanternpowered.server.network.channel
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.spongepowered.api.network.ChannelBinding;
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.Platform
+import org.spongepowered.api.network.packet.Packet
+import org.spongepowered.api.network.packet.PacketBinding
+import org.spongepowered.api.network.packet.PacketHandler
 
-abstract class LanternChannelBinding implements ChannelBinding {
+internal class LanternPacketBinding<P : Packet>(
+        private val opcode: Int,
+        private val messageType: Class<P>,
+        val packetConstructor: () -> P
+) : PacketBinding<P>, IBinding {
 
-    private final LanternChannelRegistrar registrar;
-    private final PluginContainer owner;
-    private final String name;
+    internal val handlers = mutableListOf<PacketHandler<in P>>()
 
-    boolean bound;
+    override fun getOpcode() = this.opcode
+    override fun getPacketType() = this.messageType
 
-    LanternChannelBinding(LanternChannelRegistrar registrar, String name, PluginContainer owner) {
-        this.registrar = registrar;
-        this.owner = owner;
-        this.name = name;
+    override fun addHandler(side: Platform.Type, handler: PacketHandler<in P>) = apply {
+        if (side == Platform.Type.SERVER) {
+            this.handlers.add(handler)
+        }
     }
 
-    @Override
-    public LanternChannelRegistrar getRegistrar() {
-        return this.registrar;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public PluginContainer getOwner() {
-        return this.owner;
-    }
-
-    abstract void handlePayload(ByteBuffer buf, RemoteConnection connection);
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("plugin", this.owner)
-                .add("name", this.name)
-                .toString();
+    override fun addHandler(handler: PacketHandler<in P>) = apply {
+        this.handlers.add(handler)
     }
 }

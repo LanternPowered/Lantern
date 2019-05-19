@@ -25,15 +25,32 @@
  */
 package org.lanternpowered.server.network
 
-import org.lanternpowered.server.network.message.handler.Handler
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 
 /**
- * A annotation that can be applied to methods and
- * fields to mark them as only supported on Netty threads.
+ * Represents a storage for transactional requests/responses of
+ * a specific [NetworkSession].
  *
- * It can also be used to define whether a specific or [Handler]
- * method should be handled on the netty thread.
+ * This store should only be accessed from the netty thread, it's
+ * not thread-safe.
  */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD, AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class NettyThreadOnly
+@NettyThreadOnly
+class DefaultTransactionStore : TransactionStore {
+
+    private var idCounter = 0
+
+    /**
+     * A map with stored data related to transactions.
+     */
+    private val data = Int2ObjectOpenHashMap<Any>()
+
+    override fun nextId() = this.idCounter++
+
+    override fun setData(id: Int, data: Any) {
+        this.data[id] = data
+    }
+
+    override fun getData(id: Int): Any? = this.data[id]
+
+    override fun removeData(id: Int): Any? = this.data.remove(id)
+}

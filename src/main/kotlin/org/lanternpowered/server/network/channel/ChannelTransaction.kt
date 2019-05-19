@@ -23,17 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network
+package org.lanternpowered.server.network.channel
 
-import org.lanternpowered.server.network.message.handler.Handler
-
-/**
- * A annotation that can be applied to methods and
- * fields to mark them as only supported on Netty threads.
- *
- * It can also be used to define whether a specific or [Handler]
- * method should be handled on the netty thread.
- */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD, AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class NettyThreadOnly
+abstract class ChannelTransaction(val channel: String)

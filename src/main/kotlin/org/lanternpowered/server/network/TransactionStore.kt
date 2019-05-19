@@ -25,15 +25,50 @@
  */
 package org.lanternpowered.server.network
 
-import org.lanternpowered.server.network.message.handler.Handler
+import io.netty.util.AttributeKey
 
 /**
- * A annotation that can be applied to methods and
- * fields to mark them as only supported on Netty threads.
- *
- * It can also be used to define whether a specific or [Handler]
- * method should be handled on the netty thread.
+ * Represents a storage for transactional requests/responses of
+ * a specific [NetworkSession].
  */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD, AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class NettyThreadOnly
+interface TransactionStore {
+
+    /**
+     * Gets the next available transaction id.
+     *
+     * @return The transaction id
+     */
+    fun nextId(): Int
+
+    /**
+     * Sets data for the given transaction id.
+     *
+     * @param id The id
+     * @param data The data
+     */
+    fun setData(id: Int, data: Any)
+
+    /**
+     * Gets data for the given transaction id.
+     *
+     * @param id The id
+     * @return The data
+     */
+    fun getData(id: Int): Any?
+
+    /**
+     * Removes data for the given transaction id.
+     *
+     * @param id The id
+     * @return The removed data
+     */
+    fun removeData(id: Int): Any?
+
+    companion object {
+
+        /**
+         * The [AttributeKey] of the [TransactionStore].
+         */
+        val KEY: AttributeKey<TransactionStore> = AttributeKey.valueOf("transaction-store")
+    }
+}

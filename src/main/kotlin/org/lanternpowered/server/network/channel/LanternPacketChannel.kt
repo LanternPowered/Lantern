@@ -36,11 +36,13 @@ import org.lanternpowered.server.network.buffer.ByteBufferAllocator
 import org.lanternpowered.server.network.message.Message
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutChannelRequest
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload
+import org.lanternpowered.server.util.SyncLanternThread
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.Platform
 import org.spongepowered.api.network.ChannelException
 import org.spongepowered.api.network.ClientConnection
 import org.spongepowered.api.network.NoResponseException
+import org.spongepowered.api.network.packet.HandlerPacketBinding
 import org.spongepowered.api.network.packet.Packet
 import org.spongepowered.api.network.packet.PacketBinding
 import org.spongepowered.api.network.packet.PacketChannel
@@ -61,10 +63,10 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
 
     private val transactionalBindingByRequest = HashMap<Class<*>, TransactionalPacketBinding<*, *>>()
 
-    override fun <M : Packet> register(packetClass: Class<M>, packetId: Int): PacketBinding<M> {
+    override fun <M : Packet> register(packetClass: Class<M>, packetId: Int): HandlerPacketBinding<M> {
         check(packetClass !in this.byClass) { "The packet class ${packetClass.name} is already registered." }
         check(packetId !in this.byOpcode) { "The packet opcode $packetId is already used." }
-        val binding = createPacketBinding(packetId, packetClass)
+        val binding = LanternHandlerPacketBinding(packetId, packetClass, createPacketConstructor(packetClass))
         this.byClass[packetClass] = binding
         this.byOpcode[packetId] = binding
         return binding
@@ -84,12 +86,14 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
         return transactionalBinding
     }
 
-    private fun <M : Packet> createPacketBinding(opcode: Int, packetClass: Class<M>): LanternPacketBinding<M> {
+    private fun <P : Packet> createPacketConstructor(packetClass: Class<P>): () -> P {
         val privateLookup = lookup.privateLookupIn(packetClass)
         val constructor = privateLookup.findConstructor(packetClass, MethodType.methodType(Void.TYPE))
-        val packetConstructor = constructor.createLambda<() -> M>()
-        return LanternPacketBinding(opcode, packetClass, packetConstructor)
+        return constructor.createLambda()
     }
+
+    private fun <M : Packet> createPacketBinding(opcode: Int, packetClass: Class<M>)
+            = LanternPacketBinding(opcode, packetClass, createPacketConstructor(packetClass))
 
     override fun <M : Packet> getBinding(packetClass: Class<M>)
             = this.byClass[packetClass].uncheckedCast<PacketBinding<M>?>().optional()
@@ -105,16 +109,19 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
 
     override fun sendTo(connection: ClientConnection, packet: Packet) {
         if (packet is RequestPacket<*>) {
-            sendTo(connection, packet)
+            sendTo(connection, packet, null)
         } else if (packet is ResponsePacket) {
             throw UnsupportedOperationException("A response packet can only be returned as response to a RequestPacket.")
         } else {
             connection as NetworkSession
+            if (!connection.hasChannel(this.name)) {
+                return
+            }
 
             // Get the opcode, this checks if the packet class is valid
             val opcode = findOpcode(packet.javaClass)
 
-            val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
+            val transactionStore = connection.transactionStore
             val allocator = ByteBufferAllocator.pooled()
 
             val buf = allocator.buffer()
@@ -155,17 +162,40 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
         return completableFuture
     }
 
-    private fun <R : ResponsePacket> sendTo(connection: ClientConnection, packet: RequestPacket<R>, completableFuture: CompletableFuture<R>?) {
+    private fun syncIfNeeded(fn: () -> Unit) {
+        if (Thread.currentThread() is SyncLanternThread) {
+            fn()
+        } else {
+            Lantern.getSyncScheduler().submit(fn)
+        }
+    }
+
+    private fun <R : ResponsePacket> sendTo(connection: ClientConnection, request: RequestPacket<R>, completableFuture: CompletableFuture<R>?) {
         connection as NetworkSession
 
         // Check if the channel is bound
         checkBound()
 
-        val binding = this.transactionalBindingByRequest[packet.javaClass]
+        val binding = this.transactionalBindingByRequest[request.javaClass]
                 .uncheckedCast<LanternTransactionalPacketBinding<RequestPacket<R>, R>?>()
-        check(binding != null) { "The packet type ${packet.javaClass.name} isn't registered to this channel." }
+        check(binding != null) { "The packet type ${request.javaClass.name} isn't registered to this channel." }
 
-        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
+        if (!connection.hasChannel(this.name)) {
+            val exception = NoResponseException()
+            syncIfNeeded {
+                binding.responseHandlers.forEach { handler ->
+                    try {
+                        handler.handleFailure(request, connection, Platform.Type.SERVER, exception)
+                    } catch (t: Throwable) {
+                        Lantern.getLogger().error("Failed to handle response packet failure", t)
+                    }
+                }
+                completableFuture?.completeExceptionally(exception)
+            }
+            return
+        }
+
+        val transactionStore = connection.transactionStore
         val allocator = ByteBufferAllocator.pooled()
         val opcode = binding.opcode
 
@@ -176,19 +206,19 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
         val message: Message = if (transactionStore is LoginChannelTransactionStore) {
             buf.writeVarLong(TYPE_REQUEST.toLong() or (opcode.toLong() shl TYPE_BITS))
             // Slice to avoid too visibility of written data and writerIndex
-            packet.write(buf.slice())
+            request.write(buf.slice())
 
             MessageLoginOutChannelRequest(transactionId, this.name, buf)
         } else {
             buf.writeVarLong(TYPE_REQUEST.toLong() or (transactionId.toLong() shl TYPE_BITS))
             buf.writeVarInt(opcode)
             // Slice to avoid too visibility of written data and writerIndex
-            packet.write(buf.slice())
+            request.write(buf.slice())
 
             MessagePlayInOutChannelPayload(this.name, buf)
         }
 
-        transactionStore.put(transactionId, Transaction(this.name, packet, binding, completableFuture))
+        transactionStore.put(transactionId, Transaction(this.name, request, binding, completableFuture))
         connection.sendWithFuture(message).addListener { future ->
             if (!future.isSuccess) {
                 if (completableFuture != null) {
@@ -218,7 +248,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
     }
 
     private fun <P : Packet> handleNormalPacket(connection: NetworkSession, opcode: Int, buf: ByteBuffer) {
-        val binding = this.byOpcode[opcode].uncheckedCast<LanternPacketBinding<P>?>()
+        val binding = this.byOpcode[opcode].uncheckedCast<LanternHandlerPacketBinding<P>?>()
         check(binding != null) { "Unexpected opcode $opcode" }
 
         val packet = binding.packetConstructor()
@@ -251,7 +281,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
             response.writeVarInt(opcode)
 
             if (login) {
-                val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
+                val transactionStore = connection.transactionStore
                 connection.send(MessageLoginOutChannelRequest(transactionStore.nextId(), this.name, response))
             } else {
                 connection.send(MessagePlayInOutChannelPayload(this.name, response))
@@ -281,7 +311,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
                     response.write(responseBuf.slice())
 
                     if (login) {
-                        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
+                        val transactionStore = connection.transactionStore
                         connection.send(MessageLoginOutChannelRequest(transactionStore.nextId(), name, responseBuf))
                     } else {
                         connection.send(MessagePlayInOutChannelPayload(name, responseBuf))
@@ -295,7 +325,7 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
 
     private fun <P : RequestPacket<R>, R : ResponsePacket> handleResponsePacket(
             connection: NetworkSession, transactionId: Int, buf: ByteBuffer?) {
-        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
+        val transactionStore = connection.transactionStore
         var transaction = transactionStore.getData(transactionId)
 
         if (transaction != null) {
@@ -428,6 +458,12 @@ internal class LanternPacketChannel(registrar: LanternChannelRegistrar, key: Cat
          * Represents a no response packet type.
          */
         const val TYPE_NO_RESPONSE = 3
+
+        /**
+         * Represents a packet that is split in multiple packets because
+         * it exceeds the original limit.
+         */
+        const val TYPE_MULTI_PART = 4
 
         const val TYPE_BITS = 3 // 3 bits are reserved for types
         const val TYPE_MASK = ((1 shl TYPE_BITS) - 1).toLong()

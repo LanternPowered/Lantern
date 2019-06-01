@@ -25,15 +25,27 @@
  */
 package org.lanternpowered.server.network.channel
 
+import org.spongepowered.api.Platform
+import org.spongepowered.api.network.packet.HandlerPacketBinding
 import org.spongepowered.api.network.packet.Packet
-import org.spongepowered.api.network.packet.PacketBinding
+import org.spongepowered.api.network.packet.PacketHandler
 
-internal open class LanternPacketBinding<P : Packet>(
-        private val opcode: Int,
-        private val messageType: Class<P>,
-        val packetConstructor: () -> P
-) : PacketBinding<P> {
+internal class LanternHandlerPacketBinding<P : Packet>(opcode: Int, messageType: Class<P>, packetConstructor: () -> P) :
+        LanternPacketBinding<P>(opcode, messageType, packetConstructor), HandlerPacketBinding<P> {
 
-    override fun getOpcode() = this.opcode
-    override fun getPacketType() = this.messageType
+    internal val handlers = mutableListOf<PacketHandler<in P>>()
+
+    override fun addHandler(side: Platform.Type, handler: PacketHandler<in P>) = apply {
+        if (side == Platform.Type.SERVER) {
+            this.handlers.add(handler)
+        }
+    }
+
+    override fun addHandler(handler: PacketHandler<in P>) = apply {
+        this.handlers.add(handler)
+    }
+
+    override fun removeHandler(handler: PacketHandler<in P>) = apply {
+        this.handlers.remove(handler)
+    }
 }

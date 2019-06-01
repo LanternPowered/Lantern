@@ -43,6 +43,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.timeout.TimeoutException;
+import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.ScheduledFuture;
@@ -53,6 +54,8 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.network.channel.ChannelTransactionStore;
+import org.lanternpowered.server.network.channel.LoginChannelTransactionStore;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.lanternpowered.server.network.message.BulkMessage;
@@ -138,6 +141,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     public static final AttributeKey<Boolean> FML_MARKER = AttributeKey.valueOf("fml-marker");
 
+    private static final AttributeKey<ChannelTransactionStore> TRANSACTION_STORE = AttributeKey.valueOf("transaction-store");
+
     private final NetworkManager networkManager;
     private final LanternServer server;
     private final Channel channel;
@@ -198,6 +203,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     private final Set<String> installedMods = new HashSet<>();
 
+    private final Attribute<ChannelTransactionStore> transactionStoreAttribute;
+
     /**
      * The latency of the connection.
      */
@@ -229,6 +236,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     private boolean firstClientSettingsMessage;
 
     public NetworkSession(Channel channel, LanternServer server, NetworkManager networkManager) {
+        this.transactionStoreAttribute = channel.attr(TRANSACTION_STORE);
         this.networkManager = networkManager;
         this.channel = channel;
         this.server = server;
@@ -447,6 +455,15 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
+     * Gets the {@link ChannelTransactionStore}.
+     *
+     * @return The channel transaction store
+     */
+    public ChannelTransactionStore getTransactionStore() {
+        return this.transactionStoreAttribute.get();
+    }
+
+    /**
      * Sets the virtual host address.
      *
      * @param address The virtual host address
@@ -597,6 +614,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     @NettyThreadOnly
     public void setProtocolState(ProtocolState state) {
         this.protocolState = state;
+        if (state == ProtocolState.LOGIN) {
+            this.transactionStoreAttribute.set(new LoginChannelTransactionStore(this));
+        } else if (state == ProtocolState.PLAY) {
+            this.transactionStoreAttribute.set(new ChannelTransactionStore());
+        }
     }
 
     /**

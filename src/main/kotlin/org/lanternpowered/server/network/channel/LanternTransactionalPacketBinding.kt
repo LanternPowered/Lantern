@@ -38,7 +38,7 @@ internal class LanternTransactionalPacketBinding<M : RequestPacket<R>, R : Respo
         private val opcode: Int,
         private val requestBinding: LanternPacketBinding<M>,
         private val responseBinding: LanternPacketBinding<R>
-) : TransactionalPacketBinding<M, R>, IBinding {
+) : TransactionalPacketBinding<M, R> {
 
     internal var requestHandler: RequestPacketHandler<M, R>? = null
     internal val responseHandlers = mutableListOf<ResponsePacketHandler<M, R>>()

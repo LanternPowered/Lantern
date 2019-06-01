@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.channel
 
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.buffer.ByteBuffer
@@ -35,7 +36,6 @@ import org.spongepowered.api.Platform
 import org.spongepowered.api.network.ChannelBuf
 import org.spongepowered.api.network.ClientConnection
 import org.spongepowered.api.network.NoResponseException
-import org.spongepowered.api.network.RemoteConnection
 import org.spongepowered.api.network.raw.login.RawLoginDataChannel
 import org.spongepowered.api.network.raw.login.RawLoginDataRequestHandler
 import java.util.concurrent.CompletableFuture
@@ -52,10 +52,12 @@ internal class LanternRawLoginDataChannel(registrar: LanternChannelRegistrar, ke
         // Only on the client side, for now
     }
 
+    private class Transaction(channel: String, val completableFuture: CompletableFuture<ChannelBuf>) : ChannelTransaction(channel)
+
     override fun sendTo(connection: ClientConnection, payload: Consumer<ChannelBuf>): CompletableFuture<ChannelBuf> {
         connection as NetworkSession
 
-        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
+        val transactionStore = connection.transactionStore
         // Only supported during login phase
         check(transactionStore is LoginChannelTransactionStore) { "The RawLoginDataChannel is only usable during the login handshake." }
 
@@ -66,7 +68,7 @@ internal class LanternRawLoginDataChannel(registrar: LanternChannelRegistrar, ke
         val transactionId = transactionStore.nextId()
 
         // Store the completable future
-        transactionStore.put(transactionId, completableFuture)
+        transactionStore.put(transactionId, Transaction(this.name, completableFuture))
         // Send the message, also append a handler to catch exception if the message fails to send
         connection.sendWithFuture(MessageLoginOutChannelRequest(transactionId, this.name, buf)).addListener { future ->
             if (!future.isSuccess) {
@@ -77,23 +79,22 @@ internal class LanternRawLoginDataChannel(registrar: LanternChannelRegistrar, ke
         return completableFuture
     }
 
-    override fun handlePayload(buf: ByteBuffer, connection: RemoteConnection) {
+    override fun handlePayload(buf: ByteBuffer, connection: NetworkSession) {
         // Should never happen
     }
 
-    override fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: RemoteConnection) {
-        connection as NetworkSession
-
+    override fun handleLoginPayload(buf: ByteBuffer?, transactionId: Int, connection: NetworkSession) {
         val transactionStore = connection.transactionStore
-        val data = transactionStore.getData(transactionId)
+        val transaction = transactionStore.getData(transactionId)
 
-        if (data is CompletableFuture<*>) {
+        if (transaction is Transaction) {
             // Handle the response on the sync scheduler
             Lantern.getSyncScheduler().submit {
+                val future = transaction.completableFuture
                 if (buf == null) {
-                    data.completeExceptionally(NoResponseException())
+                    future.completeExceptionally(NoResponseException())
                 } else {
-                    data.uncheckedCast<CompletableFuture<ChannelBuf>>().complete(buf)
+                    future.uncheckedCast<CompletableFuture<ChannelBuf>>().complete(buf)
                 }
                 // The login phase needs to keep track of handled transactions to be
                 // able to continue, so delay the removal until it's actually handled

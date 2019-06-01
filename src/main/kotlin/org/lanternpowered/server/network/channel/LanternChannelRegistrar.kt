@@ -91,7 +91,7 @@ class LanternChannelRegistrar : ChannelRegistrar {
     }
 
     fun handleLoginResponse(message: MessageLoginInChannelResponse, connection: NetworkSession) {
-        val transactionStore = connection.channel.attr(ChannelTransactionStore.KEY).get()
+        val transactionStore = connection.transactionStore
         val transaction = transactionStore.getData(message.transactionId)
         val content = message.content
 

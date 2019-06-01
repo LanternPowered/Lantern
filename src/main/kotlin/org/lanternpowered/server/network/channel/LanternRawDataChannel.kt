@@ -35,7 +35,6 @@ import org.spongepowered.api.Platform
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.network.ChannelBuf
 import org.spongepowered.api.network.ClientConnection
-import org.spongepowered.api.network.RemoteConnection
 import org.spongepowered.api.network.raw.RawDataChannel
 import org.spongepowered.api.network.raw.RawDataHandler
 import java.util.function.Consumer
@@ -61,7 +60,7 @@ internal class LanternRawDataChannel(registrar: LanternChannelRegistrar, key: Ca
         }
     }
 
-    override fun removeListener(handler: RawDataHandler) {
+    override fun removeHandler(handler: RawDataHandler) {
         checkBound()
         this.handlers.remove(handler)
     }

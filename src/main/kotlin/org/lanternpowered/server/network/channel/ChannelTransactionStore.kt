@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.channel
 
-import io.netty.util.AttributeKey
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -74,12 +73,4 @@ open class ChannelTransactionStore {
      * @return The removed transaction data
      */
     open fun removeData(id: Int): ChannelTransaction? = this.transactions.remove(id)
-
-    companion object {
-
-        /**
-         * The [AttributeKey] of the [ChannelTransactionStore].
-         */
-        val KEY: AttributeKey<ChannelTransactionStore> = AttributeKey.valueOf("transaction-store")
-    }
 }

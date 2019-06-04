@@ -65,8 +65,8 @@ class LanternResourcePackFactory : ResourcePack.Factory {
                 val path0 = path.replaceFirst("level://".toRegex(), "")
                 val file = this.levelPacksFolder.resolve(path0)
                 if (!Files.exists(file)) {
-                    throw FileNotFoundException("Cannot find the file: \"" + file.toAbsolutePath() + "\" which" +
-                            " is required to generate the hash for \"" + path + "\"")
+                    throw FileNotFoundException("Cannot find the file: \"${file.toAbsolutePath()}\" which" +
+                            " is required to generate the hash for \"$path\"")
                 }
                 url = PathUtils.toURL(file)
                 actualUri = file.toUri()

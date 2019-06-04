@@ -23,23 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.text.format
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
-import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.lanternpowered.api.x.text.format.XTextFormatFactory
+import org.spongepowered.api.text.format.TextColor
+import org.spongepowered.api.text.format.TextStyle
 
-public final class CodecPlayInAcceptBeaconEffects implements Codec<MessagePlayInAcceptBeaconEffects> {
+object LanternTextFormatFactory : XTextFormatFactory {
 
-    @Override
-    public MessagePlayInAcceptBeaconEffects decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final PotionEffectTypeRegistryModule registryModule = PotionEffectTypeRegistryModule.INSTANCE;
-        final PotionEffectType primary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        final PotionEffectType secondary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        return new MessagePlayInAcceptBeaconEffects(primary, secondary);
-    }
+    override fun format(color: TextColor, style: TextStyle) =
+            LanternTextFormat(color, style)
+
+    override fun style(bold: Boolean?, italic: Boolean?, underline: Boolean?, strikethrough: Boolean?, obfuscated: Boolean?) =
+            LanternTextStyle(bold, italic, underline, strikethrough, obfuscated)
+
+    override fun emptyFormat() = LanternTextFormat.EMPTY
 }

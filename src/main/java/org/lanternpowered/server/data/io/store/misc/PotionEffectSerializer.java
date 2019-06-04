@@ -72,7 +72,7 @@ public final class PotionEffectSerializer {
             internalId = dataView.getInt(IDENTIFIER).get();
         }
 
-        final PotionEffectType effectType = PotionEffectTypeRegistryModule.get().getByInternalId(internalId).orElse(null);
+        final PotionEffectType effectType = PotionEffectTypeRegistryModule.INSTANCE.getByInternalId(internalId).orElse(null);
         if (effectType == null) {
             Lantern.getLogger().warn("Unknown potion effect type: " + internalId);
             return null;

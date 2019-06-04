@@ -23,23 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.api.item.potion
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
-import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.lanternpowered.api.effect.potion.PotionEffect
+import org.lanternpowered.api.effect.potion.PotionEffectType
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.builder.CatalogBuilder
 
-public final class CodecPlayInAcceptBeaconEffects implements Codec<MessagePlayInAcceptBeaconEffects> {
+/**
+ * A builder to construct [PotionType]s.
+ */
+interface PotionTypeBuilder : CatalogBuilder<PotionType, PotionTypeBuilder> {
 
-    @Override
-    public MessagePlayInAcceptBeaconEffects decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final PotionEffectTypeRegistryModule registryModule = PotionEffectTypeRegistryModule.INSTANCE;
-        final PotionEffectType primary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        final PotionEffectType secondary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        return new MessagePlayInAcceptBeaconEffects(primary, secondary);
-    }
+    /**
+     * Adds a [PotionEffect].
+     *
+     * @param potionEffect The potion effect to add
+     */
+    fun addEffect(potionEffect: PotionEffect): PotionTypeBuilder
+
+    /**
+     * Adds a potion effect.
+     */
+    fun addEffect(type: PotionEffectType, amplifier: Int, duration: Int, ambient: Boolean = false, particles: Boolean = true) =
+            addEffect(potionEffectOf(type, amplifier, duration, ambient, particles))
+
+    /**
+     * Sets the (partial) translation key that is used to provide
+     * translations based on the built potion type.
+     *
+     * For example, setting `weakness` becomes
+     * `item.minecraft.splash_potion.effect.weakness` when
+     * used to translate a splash potion item.
+     *
+     * Defaults to the catalog key value.
+     *
+     * @param key The (partial) translation key
+     * @return This builder, for chaining
+     */
+    fun translationKey(key: String): PotionTypeBuilder
 }

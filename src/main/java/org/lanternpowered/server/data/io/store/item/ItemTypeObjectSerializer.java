@@ -32,7 +32,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 public class ItemTypeObjectSerializer {
 
-    static DataQuery DATA_VALUE = DataQuery.of("dataVal007");
+    static final DataQuery BLOCK_ENTITY_TAG = DataQuery.of("BlockEntityTag");
 
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
     }

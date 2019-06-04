@@ -25,33 +25,23 @@
  */
 package org.lanternpowered.server.text
 
-import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.format.TextStyles
-import org.lanternpowered.api.text.serializer.TextSerializers
 import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.x.text.XTextFactory
-import org.lanternpowered.server.game.registry.type.text.TextSerializerRegistryModule
-import org.lanternpowered.server.text.format.LanternTextFormat
-import org.lanternpowered.server.text.format.LanternTextStyle
 import org.spongepowered.api.scoreboard.Score
-import org.spongepowered.api.text.TextTemplate
 import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.HoverAction
 import org.spongepowered.api.text.action.ShiftClickAction
 import org.spongepowered.api.text.action.TextAction
 import org.spongepowered.api.text.selector.Selector
-import org.spongepowered.api.text.serializer.FormattingCodeTextSerializer
-import java.util.concurrent.ConcurrentHashMap
 
 object LanternTextFactory : XTextFactory {
-
-    private val formattingCodeSerializers = ConcurrentHashMap<Char, FormattingCodeTextSerializer>()
 
     override fun of(vararg objects: Any): Text {
         // Shortcut for a lonely TextRepresentable
@@ -191,31 +181,5 @@ object LanternTextFactory : XTextFactory {
             builder.append(texts.next())
         } while (texts.hasNext())
         return builder.build()
-    }
-
-    override fun format(color: TextColor, style: TextStyle) = LanternTextFormat(color, style)
-    override fun style(bold: Boolean?, italic: Boolean?, underline: Boolean?, strikethrough: Boolean?, obfuscated: Boolean?) =
-            LanternTextStyle(bold, italic, underline, strikethrough, obfuscated)
-
-    override fun emptyFormat() = LanternTextFormat.EMPTY
-    override fun emptyTemplate() = LanternTextTemplate.EMPTY
-
-    override fun template(openArg: String, closeArg: String, elements: Collection<Any>): TextTemplate {
-        check(!openArg.isEmpty()) { "open arg cannot be empty" }
-        check(!closeArg.isEmpty()) { "close arg cannot be empty" }
-        return if (elements.isEmpty()) emptyTemplate() else LanternTextTemplate.of(openArg, closeArg, elements)
-    }
-
-    @Suppress("DEPRECATION")
-    override fun createFormattingCodeSerializer(legacyChar: Char): FormattingCodeTextSerializer {
-        return when (legacyChar) {
-            TextConstants.LEGACY_CHAR -> TextSerializers.LEGACY_FORMATTING_CODE
-            TextSerializers.FORMATTING_CODE.character -> TextSerializers.FORMATTING_CODE
-            else -> this.formattingCodeSerializers.computeIfAbsent(legacyChar) {
-                val serializer = LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)
-                TextSerializerRegistryModule.register(serializer)
-                serializer
-            }
-        }
     }
 }

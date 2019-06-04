@@ -45,6 +45,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -79,6 +80,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
     private static final DataQuery ENCHANTMENT_ID = DataQuery.of("id");
     private static final DataQuery ENCHANTMENT_LEVEL = DataQuery.of("lvl");
     private static final DataQuery STORED_ENCHANTMENTS = DataQuery.of("StoredEnchantments");
+    private static final DataQuery DAMAGE = DataQuery.of("Damage");
 
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
@@ -90,54 +92,6 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         add(ItemTypes.SPLASH_POTION, potionEffectsSerializer);
         add(ItemTypes.LINGERING_POTION, potionEffectsSerializer);
         add(ItemTypes.TIPPED_ARROW, potionEffectsSerializer);
-        final DurableItemObjectObjectSerializer durableSerializer = new DurableItemObjectObjectSerializer();
-        add(ItemTypes.WOODEN_SWORD, durableSerializer);
-        add(ItemTypes.WOODEN_PICKAXE, durableSerializer);
-        add(ItemTypes.WOODEN_AXE, durableSerializer);
-        add(ItemTypes.WOODEN_HOE, durableSerializer);
-        add(ItemTypes.WOODEN_SHOVEL, durableSerializer);
-        add(ItemTypes.STONE_SWORD, durableSerializer);
-        add(ItemTypes.STONE_PICKAXE, durableSerializer);
-        add(ItemTypes.STONE_AXE, durableSerializer);
-        add(ItemTypes.STONE_HOE, durableSerializer);
-        add(ItemTypes.STONE_SHOVEL, durableSerializer);
-        add(ItemTypes.CHAINMAIL_BOOTS, durableSerializer);
-        add(ItemTypes.CHAINMAIL_LEGGINGS, durableSerializer);
-        add(ItemTypes.CHAINMAIL_CHESTPLATE, durableSerializer);
-        add(ItemTypes.CHAINMAIL_HELMET, durableSerializer);
-        add(ItemTypes.IRON_SWORD, durableSerializer);
-        add(ItemTypes.IRON_PICKAXE, durableSerializer);
-        add(ItemTypes.IRON_AXE, durableSerializer);
-        add(ItemTypes.IRON_HOE, durableSerializer);
-        add(ItemTypes.IRON_SHOVEL, durableSerializer);
-        add(ItemTypes.IRON_BOOTS, durableSerializer);
-        add(ItemTypes.IRON_LEGGINGS, durableSerializer);
-        add(ItemTypes.IRON_CHESTPLATE, durableSerializer);
-        add(ItemTypes.IRON_HELMET, durableSerializer);
-        add(ItemTypes.GOLDEN_SWORD, durableSerializer);
-        add(ItemTypes.GOLDEN_PICKAXE, durableSerializer);
-        add(ItemTypes.GOLDEN_AXE, durableSerializer);
-        add(ItemTypes.GOLDEN_HOE, durableSerializer);
-        add(ItemTypes.GOLDEN_SHOVEL, durableSerializer);
-        add(ItemTypes.GOLDEN_BOOTS, durableSerializer);
-        add(ItemTypes.GOLDEN_LEGGINGS, durableSerializer);
-        add(ItemTypes.GOLDEN_CHESTPLATE, durableSerializer);
-        add(ItemTypes.GOLDEN_HELMET, durableSerializer);
-        add(ItemTypes.DIAMOND_SWORD, durableSerializer);
-        add(ItemTypes.DIAMOND_PICKAXE, durableSerializer);
-        add(ItemTypes.DIAMOND_AXE, durableSerializer);
-        add(ItemTypes.DIAMOND_HOE, durableSerializer);
-        add(ItemTypes.DIAMOND_SHOVEL, durableSerializer);
-        add(ItemTypes.DIAMOND_BOOTS, durableSerializer);
-        add(ItemTypes.DIAMOND_LEGGINGS, durableSerializer);
-        add(ItemTypes.DIAMOND_CHESTPLATE, durableSerializer);
-        add(ItemTypes.DIAMOND_HELMET, durableSerializer);
-        add(ItemTypes.BOW, durableSerializer);
-        add(ItemTypes.FLINT_AND_STEEL, durableSerializer);
-        add(ItemTypes.FISHING_ROD, durableSerializer);
-        add(ItemTypes.SHEARS, durableSerializer);
-        add(ItemTypes.ELYTRA, durableSerializer);
-        add(ItemTypes.SHIELD, durableSerializer);
         final ColoredLeatherItemTypeObjectSerializer leatherSerializer = new ColoredLeatherItemTypeObjectSerializer();
         add(ItemTypes.LEATHER_BOOTS, leatherSerializer);
         add(ItemTypes.LEATHER_CHESTPLATE, leatherSerializer);
@@ -199,7 +153,6 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         dataView.set(QUANTITY, (byte) object.getQuantity());
         final DataView tag = dataView.createView(TAG);
         super.serialize(object, tag);
-        tag.remove(ItemTypeObjectSerializer.DATA_VALUE);
         if (tag.isEmpty()) {
             dataView.remove(TAG);
         }
@@ -233,6 +186,8 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         }
         valueContainer.remove(Keys.ITEM_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, ENCHANTMENTS, list));
         valueContainer.remove(Keys.STORED_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, STORED_ENCHANTMENTS, list));
+        valueContainer.remove(Keys.ITEM_DURABILITY).ifPresent(durability ->
+                dataView.set(DAMAGE, object.getIntProperty(Properties.USE_LIMIT).getAsInt() - durability));
         super.serializeValues(object, valueContainer, dataView);
     }
 
@@ -261,6 +216,8 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         });
         deserializeEnchantments(dataView, ENCHANTMENTS, Keys.ITEM_ENCHANTMENTS, valueContainer);
         deserializeEnchantments(dataView, STORED_ENCHANTMENTS, Keys.STORED_ENCHANTMENTS, valueContainer);
+        dataView.getInt(DAMAGE).ifPresent(durability -> object.getIntProperty(Properties.USE_LIMIT)
+                .ifPresent(useLimit -> valueContainer.set(Keys.ITEM_DURABILITY, Math.max(0, useLimit - durability))));
         super.deserializeValues(object, valueContainer, dataView);
     }
 
@@ -278,7 +235,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         dataView.set(query, dataViews);
     }
 
-    private void deserializeEnchantments(DataView dataView, DataQuery query, Key<ListValue.Mutable<Enchantment>> key,
+    private void deserializeEnchantments(DataView dataView, DataQuery query, Key<ListValue<Enchantment>> key,
             SimpleValueContainer valueContainer) {
         dataView.getViewList(query).ifPresent(views -> {
             if (!views.isEmpty()) {

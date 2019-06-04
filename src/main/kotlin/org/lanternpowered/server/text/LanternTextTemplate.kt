@@ -67,7 +67,7 @@ data class LanternTextTemplate internal constructor(
     override fun concat(other: TextTemplate): TextTemplate {
         val elements = ArrayList(this.elements)
         elements.addAll(other.elements)
-        return LanternTextTemplate.of(this.openArg, this.closeArg, elements.toTypedArray().asIterable())
+        return of(this.openArg, this.closeArg, elements.toTypedArray().asIterable())
     }
 
     override fun apply(): Text.Builder = apply(emptyMap<String, Any>())

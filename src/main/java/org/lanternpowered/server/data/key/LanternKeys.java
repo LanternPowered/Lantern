@@ -35,7 +35,6 @@ import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
-import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.inventory.InventorySnapshot;
@@ -94,8 +93,6 @@ public final class LanternKeys {
             makeValueKey(InventorySnapshot.class, DataQuery.of("InventorySnapshot"), "inventory_snapshot");
     public static final Key<Value<Boolean>> TRIGGERED =
             makeValueKey(Boolean.class, DataQuery.of("Triggered"), "triggered");
-    public static final Key<Value<PotionType>> POTION_TYPE =
-            makeValueKey(PotionType.class, DataQuery.of("PotionType"), "potion_type");
     public static final Key<Value<Boolean>> EXPLODE =
             makeValueKey(Boolean.class, DataQuery.of("Explode"), "explode");
     public static final Key<Value<CarriedInventory<? extends Carrier>>> ITEM_INVENTORY =

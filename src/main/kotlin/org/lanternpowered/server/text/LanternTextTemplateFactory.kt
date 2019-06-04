@@ -23,24 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.item;
+package org.lanternpowered.server.text
 
-import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.lanternpowered.api.x.text.XTextTemplateFactory
+import org.spongepowered.api.text.TextTemplate
 
-public class DurableItemObjectObjectSerializer extends ItemTypeObjectSerializer {
+object LanternTextTemplateFactory : XTextTemplateFactory {
 
-    @Override
-    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.serializeValues(itemStack, valueContainer, dataView);
-        valueContainer.remove(Keys.ITEM_DURABILITY).ifPresent(durability -> dataView.set(DATA_VALUE, durability));
-    }
+    override fun emptyTemplate() = LanternTextTemplate.EMPTY
 
-    @Override
-    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.deserializeValues(itemStack, valueContainer, dataView);
-        dataView.getInt(DATA_VALUE).ifPresent(durability -> valueContainer.set(Keys.ITEM_DURABILITY, durability));
+    override fun template(openArg: String, closeArg: String, elements: Collection<Any>): TextTemplate {
+        check(openArg.isNotEmpty()) { "open arg cannot be empty" }
+        check(closeArg.isNotEmpty()) { "close arg cannot be empty" }
+        return if (elements.isEmpty()) emptyTemplate() else LanternTextTemplate.of(openArg, closeArg, elements)
     }
 }

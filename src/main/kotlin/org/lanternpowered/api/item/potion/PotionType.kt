@@ -23,22 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.potion;
+@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
 
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.effect.potion.PotionEffect;
-import org.spongepowered.api.text.translation.Translatable;
-import org.spongepowered.api.text.translation.Translation;
+package org.lanternpowered.api.item.potion
 
-import java.util.List;
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ext.*
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
-public interface PotionType extends CatalogType, Translatable {
-
-    List<PotionEffect> getEffects();
-
-    Translation getLingeringTranslation();
-
-    Translation getSplashTranslation();
-
-    Translation getTippedArrowTranslation();
-}
+typealias PotionType = org.spongepowered.api.item.potion.PotionType
+typealias PotionTypes = org.spongepowered.api.item.potion.PotionTypes

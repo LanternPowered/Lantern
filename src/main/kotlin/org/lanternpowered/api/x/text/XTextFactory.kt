@@ -26,14 +26,5 @@
 package org.lanternpowered.api.x.text
 
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.TextTemplate
-import org.spongepowered.api.text.format.TextStyle
 
-interface XTextFactory : Text.Factory {
-
-    fun style(bold: Boolean?, italic: Boolean?, underline: Boolean?, strikethrough: Boolean?, obfuscated: Boolean?): TextStyle
-
-    override fun template(openArg: String, closeArg: String, elements: Array<Any>) = template(openArg, closeArg, elements.asList())
-
-    fun template(openArg: String, closeArg: String, elements: Collection<Any>): TextTemplate
-}
+interface XTextFactory : Text.Factory

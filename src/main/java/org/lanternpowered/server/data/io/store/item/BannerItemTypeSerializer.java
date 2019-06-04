@@ -43,52 +43,37 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.stream.Collectors;
 
-public class BannerItemTypeSerializer extends DataValueItemTypeObjectSerializer<DyeColor> {
+public class BannerItemTypeSerializer extends ItemTypeObjectSerializer {
 
-    private static final DataQuery blockEntityTagQuery = DataQuery.of("BlockEntityTag");
-    // private static final DataQuery baseColorQuery = DataQuery.of("Base");
-    private static final DataQuery layersQuery = DataQuery.of("Patterns");
-    private static final DataQuery layerIdQuery = DataQuery.of("Pattern");
-    private static final DataQuery layerColorQuery = DataQuery.of("Color");
-
-    public BannerItemTypeSerializer() {
-        super(Keys.BANNER_BASE_COLOR, DyeColorRegistryModule.get(), dataValue -> 15 - dataValue, internalId -> 15 - internalId);
-    }
+    private static final DataQuery LAYERS = DataQuery.of("Patterns");
+    private static final DataQuery LAYER_ID = DataQuery.of("Pattern");
+    private static final DataQuery LAYER_COLOR = DataQuery.of("Color");
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        final DataView blockEntityView = getOrCreateView(dataView, blockEntityTagQuery);
-        /*
-        valueContainer.remove(Keys.BANNER_BASE_COLOR).ifPresent(baseColor ->
-                blockEntityView.set(baseColorQuery, 15 - ((LanternDyeColor) baseColor).getInternalId()));
-        */
+        final DataView blockEntityView = getOrCreateView(dataView, BLOCK_ENTITY_TAG);
         valueContainer.remove(Keys.BANNER_PATTERNS).ifPresent(patternLayers ->
-                blockEntityView.set(layersQuery, patternLayers.stream()
+                blockEntityView.set(LAYERS, patternLayers.stream()
                         .map(patternLayer -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
-                                    .set(layerIdQuery, ((LanternBannerPatternShape) patternLayer.getShape()).getInternalId())
-                                    .set(layerColorQuery, ((LanternDyeColor) patternLayer.getColor()).getInternalId()))
+                                    .set(LAYER_ID, ((LanternBannerPatternShape) patternLayer.getShape()).getInternalId())
+                                    .set(LAYER_COLOR, ((LanternDyeColor) patternLayer.getColor()).getInternalId()))
                         .collect(Collectors.toList())));
     }
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.deserializeValues(itemStack, valueContainer, dataView);
-        dataView.getView(blockEntityTagQuery).ifPresent(blockEntityView -> {
-            /*
-            blockEntityView.getInt(baseColorQuery).ifPresent(value ->
-                    valueContainer.set(Keys.BANNER_BASE_COLOR, DyeColorRegistryModule.get().getByInternalId(15 - value).get()));
-            */
-            blockEntityView.getViewList(layersQuery).ifPresent(value ->
-                    valueContainer.set(Keys.BANNER_PATTERNS, value.stream()
-                            .map(patternView -> {
-                                final DyeColor dyeColor = DyeColorRegistryModule.get()
-                                        .getByInternalId(15 - patternView.getInt(layerColorQuery).get()).get();
-                                final BannerPatternShape shape = BannerPatternShapeRegistryModule.get()
-                                        .getByInternalId(patternView.getString(layerIdQuery).get()).get();
-                                return PatternLayer.of(shape, dyeColor);
-                            })
-                            .collect(Collectors.toList())));
-        });
+        dataView.getView(BLOCK_ENTITY_TAG).ifPresent(blockEntityView ->
+                blockEntityView.getViewList(LAYERS).ifPresent(value ->
+                        valueContainer.set(Keys.BANNER_PATTERNS, value.stream()
+                                .map(patternView -> {
+                                    final DyeColor dyeColor = DyeColorRegistryModule.get()
+                                            .getByInternalId(15 - patternView.getInt(LAYER_COLOR).get()).get();
+                                    final BannerPatternShape shape = BannerPatternShapeRegistryModule.get()
+                                            .getByInternalId(patternView.getString(LAYER_ID).get()).get();
+                                    return PatternLayer.of(shape, dyeColor);
+                                })
+                                .collect(Collectors.toList()))));
     }
 }

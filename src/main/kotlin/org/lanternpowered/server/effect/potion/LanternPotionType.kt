@@ -31,24 +31,28 @@ import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.effect.potion.PotionEffect
+import org.spongepowered.api.item.potion.PotionType
 import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.text.translation.Translation
-import java.util.ArrayList
 
-class LanternPotionType(key: CatalogKey, translationPart: String, override val internalId: Int) :
-        DefaultCatalogType(key), PotionType, InternalCatalogType,
-        Translatable by Translated("potion.$translationPart") {
+class LanternPotionType(
+        key: CatalogKey, translationPart: String, override val internalId: Int, private val effects: List<PotionEffect>
+) : DefaultCatalogType(key), PotionType, InternalCatalogType, Translatable by Translated("item.minecraft.potion.$translationPart") {
 
-    private val lingeringTranslation: Translation = tr("lingering_potion.$translationPart")
-    private val splashTranslation: Translation = tr("splash_potion.$translationPart")
-    private val tippedArrowTranslation: Translation = tr("tipped_arrow.$translationPart")
+    /**
+     * The [Translation] when a item stack is a lingering potion of this potion type.
+     */
+    val lingeringTranslation: Translation = tr("item.minecraft.lingering_potion.$translationPart")
 
-    private val potionEffects = ArrayList<PotionEffect>()
+    /**
+     * The [Translation] when a item stack is a splash potion of this potion type.
+     */
+    val splashTranslation: Translation = tr("item.minecraft.splash_potion.$translationPart")
 
-    override fun getEffects(): List<PotionEffect> = this.potionEffects
-    override fun getLingeringTranslation(): Translation = this.lingeringTranslation
-    override fun getSplashTranslation(): Translation = this.splashTranslation
-    override fun getTippedArrowTranslation(): Translation = this.tippedArrowTranslation
+    /**
+     * The [Translation] when a item stack is a tipped arrow that uses this potion type.
+     */
+    val tippedArrowTranslation: Translation = tr("item.minecraft.tipped_arrow.$translationPart")
 
-    fun add(potionEffect: PotionEffect): LanternPotionType = apply { this.potionEffects.add(potionEffect) }
+    override fun getEffects() = this.effects
 }

@@ -23,5 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.effect.potion;
+package org.lanternpowered.api.ext
+
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.item.potion.PotionType
+import org.lanternpowered.api.item.potion.PotionTypeBuilder
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+/**
+ * Constructs a new [PotionType] with the given [CatalogKey] and
+ * possibility to apply other data using the function.
+ */
+inline fun potionTypeOf(key: CatalogKey, fn: PotionTypeBuilder.() -> Unit = {}): PotionType {
+    contract {
+        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+    return builderOf<PotionTypeBuilder>().key(key).apply(fn).build()
+}

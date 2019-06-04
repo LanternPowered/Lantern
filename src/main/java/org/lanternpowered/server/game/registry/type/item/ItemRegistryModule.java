@@ -39,9 +39,8 @@ import static org.lanternpowered.server.item.PropertyProviders.useDuration;
 import static org.lanternpowered.server.item.PropertyProviders.useLimit;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternDyeColor;
-import org.lanternpowered.server.effect.potion.PotionType;
+import org.lanternpowered.server.effect.potion.LanternPotionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
@@ -84,6 +83,7 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.item.potion.PotionType;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -1016,7 +1016,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         ///   Potion   ///
         //////////////////
-        register(potionEffectsBuilder(PotionType::getTranslation)
+        register(potionEffectsBuilder(LanternPotionType::getTranslation)
                 .properties(builder -> builder
                         .add(useDuration(32))
                         .add(applicableEffects(new PotionEffectsProvider()))
@@ -1521,7 +1521,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         ///   Splash Potion   ///
         /////////////////////////
-        register(potionEffectsBuilder(PotionType::getSplashTranslation)
+        register(potionEffectsBuilder(LanternPotionType::getSplashTranslation)
                 .maxStackQuantity(1)
                 .build("minecraft", "splash_potion"));
         //////////////////////////
@@ -1532,12 +1532,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////
         ///   Tipped Arrow   ///
         ////////////////////////
-        register(potionEffectsBuilder(PotionType::getTippedArrowTranslation)
+        register(potionEffectsBuilder(LanternPotionType::getTippedArrowTranslation)
                 .build("minecraft", "tipped_arrow"));
         ////////////////////////////
         ///   Lingering Potion   ///
         ////////////////////////////
-        register(potionEffectsBuilder(PotionType::getLingeringTranslation)
+        register(potionEffectsBuilder(LanternPotionType::getLingeringTranslation)
                 .maxStackQuantity(1)
                 .build("minecraft", "lingering_potion"));
         //////////////////
@@ -1685,13 +1685,13 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         }
     }
 
-    private ItemTypeBuilder potionEffectsBuilder(Function<PotionType, Translation> translationFunction) {
+    private ItemTypeBuilder potionEffectsBuilder(Function<LanternPotionType, Translation> translationFunction) {
         return builder()
                 .translation((itemType, itemStack) -> {
                     if (itemStack != null) {
-                        final PotionType potionType = itemStack.get(LanternKeys.POTION_TYPE).orElse(null);
+                        final PotionType potionType = itemStack.get(Keys.POTION_TYPE).orElse(null);
                         if (potionType != null) {
-                            return translationFunction.apply(potionType);
+                            return translationFunction.apply((LanternPotionType) potionType);
                         }
                     }
                     return tr("item.potion.name");
@@ -1699,7 +1699,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(c -> {
                     c.register(Keys.COLOR, null);
                     c.register(Keys.POTION_EFFECTS, null);
-                    c.register(LanternKeys.POTION_TYPE, null);
+                    c.register(Keys.POTION_TYPE, null);
                 });
     }
 

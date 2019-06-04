@@ -886,17 +886,17 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public Vector3i readVector3i() {
-        final int x = readInteger();
-        final int y = readInteger();
-        final int z = readInteger();
+        final int x = readInt();
+        final int y = readInt();
+        final int z = readInt();
         return new Vector3i(x, y, z);
     }
 
     @Override
     public LanternByteBuffer writeVector3i(int x, int y, int z) {
-        writeInteger(x);
-        writeInteger(y);
-        writeInteger(z);
+        writeInt(x);
+        writeInt(y);
+        writeInt(z);
         return this;
     }
 

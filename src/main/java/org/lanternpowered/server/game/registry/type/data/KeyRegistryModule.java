@@ -85,6 +85,7 @@ import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.merchant.TradeOffer;
+import org.spongepowered.api.item.potion.PotionType;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.statistic.Statistic;
@@ -320,6 +321,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeListKey(String.class, of("PlainBookPages"), "plain_book_pages"));
         register(makeValueKey(Boolean.class, of("PlayerCreated"), "player_created"));
         register(makeValueKey(PortionType.class, of("PortionType"), "portion_type"));
+        register(makeValueKey(PotionType.class, of("PotionType"), "potion_type"));
         register(makeListKey(PotionEffect.class, of("PotionEffects"), "potion_effects"));
         register(makeValueKey(Integer.class, of("Power"), "power"));
         register(makeValueKey(Boolean.class, of("Powered"), "powered"));

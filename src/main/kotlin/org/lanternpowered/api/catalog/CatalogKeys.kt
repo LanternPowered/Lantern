@@ -157,7 +157,7 @@ object CatalogKeys {
      * Resolves a catalog key from the given value.
      */
     @JvmStatic
-    fun resolve(value: String): XCatalogKey {
+    fun resolve(value: String): CatalogKey {
         return Sponge.getRegistry().resolveKey(value) as XCatalogKey
     }
 }

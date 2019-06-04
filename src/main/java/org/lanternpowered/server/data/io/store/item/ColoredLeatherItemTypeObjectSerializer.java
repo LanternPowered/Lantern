@@ -35,7 +35,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Color;
 
-public class ColoredLeatherItemTypeObjectSerializer extends DurableItemObjectObjectSerializer {
+public class ColoredLeatherItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     private static final DataQuery COLOR = DataQuery.of("color");
 

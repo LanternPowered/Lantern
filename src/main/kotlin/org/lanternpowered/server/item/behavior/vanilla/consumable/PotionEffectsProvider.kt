@@ -23,23 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.item.behavior.vanilla.consumable
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
-import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.item.PropertyProvider
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.effect.potion.PotionEffect
+import org.spongepowered.api.item.ItemType
+import org.spongepowered.api.item.inventory.ItemStack
 
-public final class CodecPlayInAcceptBeaconEffects implements Codec<MessagePlayInAcceptBeaconEffects> {
+class PotionEffectsProvider : PropertyProvider<Collection<PotionEffect>> {
 
-    @Override
-    public MessagePlayInAcceptBeaconEffects decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final PotionEffectTypeRegistryModule registryModule = PotionEffectTypeRegistryModule.INSTANCE;
-        final PotionEffectType primary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        final PotionEffectType secondary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        return new MessagePlayInAcceptBeaconEffects(primary, secondary);
+    override fun get(itemType: ItemType, itemStack: ItemStack?): Collection<PotionEffect> {
+        if (itemStack == null) return emptyList()
+        val potionType = itemStack.get(Keys.POTION_TYPE).orNull()
+        // The base potion effects based on the potion type
+        var potionEffects = potionType?.effects
+        // Add extra customizable potion effects
+        val extraPotionEffects = itemStack.get(Keys.POTION_EFFECTS).orNull()
+        if (extraPotionEffects != null) {
+            potionEffects = potionEffects?.merge(extraPotionEffects) ?: extraPotionEffects
+        }
+        return potionEffects?.toImmutableSet() ?: immutableListOf()
     }
 }

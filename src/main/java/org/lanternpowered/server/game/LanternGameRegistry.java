@@ -93,7 +93,6 @@ import org.lanternpowered.server.effect.entity.LanternEntityEffectCollectionBuil
 import org.lanternpowered.server.effect.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
-import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.event.LanternEventContextKeyBuilder;
@@ -376,6 +375,7 @@ import org.spongepowered.api.item.inventory.gui.GuiId;
 import org.spongepowered.api.item.inventory.query.QueryOperationType;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
+import org.spongepowered.api.item.potion.PotionType;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
@@ -625,7 +625,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
                 .registerModule(ParticleOption.class, new ParticleOptionRegistryModule())
                 .registerModule(FireworkShape.class, FireworkShapeRegistryModule.get())
-                .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.get())
+                .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.INSTANCE)
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
                 .registerModule(EntityEffectType.class, new EntityEffectTypeRegistryModule())
@@ -670,7 +670,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(PickupRule.class, PickupRuleRegistryModule.get())
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())
                 .registerModule(EnchantmentType.class, EnchantmentTypeRegistryModule.get())
-                .registerModule(PotionType.class, PotionTypeRegistryModule.get())
+                .registerModule(PotionType.class, PotionTypeRegistryModule.INSTANCE)
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(DataRegistration.class, (CatalogRegistryModule) DataRegistrationRegistryModule.INSTANCE)
                 .registerModule(MusicDisc.class, MusicDiscRegistryModule.get())
@@ -1146,12 +1146,6 @@ public class LanternGameRegistry implements XGameRegistry {
     @Override
     public Optional<Translation> getTranslationById(String id) {
         return getTranslationManager().getIfPresent(id);
-    }
-
-    @Override
-    public AITaskType registerAITaskType(Object plugin, String id, String name, Class<? extends AbstractAITask<? extends Agent>> aiClass) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

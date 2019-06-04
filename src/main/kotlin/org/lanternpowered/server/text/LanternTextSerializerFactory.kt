@@ -23,23 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.text
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
-import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.game.registry.type.text.TextSerializerRegistryModule
+import org.spongepowered.api.text.serializer.FormattingCodeTextSerializer
+import org.spongepowered.api.text.serializer.TextSerializers
+import java.util.concurrent.ConcurrentHashMap
 
-public final class CodecPlayInAcceptBeaconEffects implements Codec<MessagePlayInAcceptBeaconEffects> {
+object LanternTextSerializerFactory : TextSerializers.Factory {
 
-    @Override
-    public MessagePlayInAcceptBeaconEffects decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final PotionEffectTypeRegistryModule registryModule = PotionEffectTypeRegistryModule.INSTANCE;
-        final PotionEffectType primary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        final PotionEffectType secondary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        return new MessagePlayInAcceptBeaconEffects(primary, secondary);
+    private val formattingCodeSerializers = ConcurrentHashMap<Char, FormattingCodeTextSerializer>()
+
+    @Suppress("DEPRECATION")
+    override fun createFormattingCodeSerializer(legacyChar: Char): FormattingCodeTextSerializer {
+        return when (legacyChar) {
+            TextConstants.LEGACY_CHAR -> TextSerializers.LEGACY_FORMATTING_CODE
+            TextSerializers.FORMATTING_CODE.character -> TextSerializers.FORMATTING_CODE
+            else -> this.formattingCodeSerializers.computeIfAbsent(legacyChar) {
+                val serializer = LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)
+                TextSerializerRegistryModule.register(serializer)
+                serializer
+            }
+        }
     }
 }

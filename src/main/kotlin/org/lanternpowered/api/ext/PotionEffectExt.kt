@@ -34,6 +34,9 @@ import org.lanternpowered.api.effect.potion.PotionEffectType
 import java.util.ArrayList
 import java.util.HashMap
 
+inline fun potionEffectOf(type: PotionEffectType, amplifier: Int, duration: Int, ambient: Boolean = false, particles: Boolean = true): PotionEffect =
+        PotionEffect.builder().potionType(type).amplifier(amplifier).duration(duration).ambient(ambient).particles(particles).build()
+
 // Fix sponge typo
 inline fun PotionEffectBuilder.ambient(ambient: Boolean = true): PotionEffectBuilder = ambience(ambient)
 
@@ -62,7 +65,7 @@ fun Collection<PotionEffect>.merge(that: Collection<PotionEffect>): MutableList<
  * @return The merged potion effect
  */
 fun PotionEffect.merge(that: PotionEffect): PotionEffect {
-    val builder = PotionEffectBuilder().from(this)
+    val builder = builderOf<PotionEffectBuilder>().from(this)
     if (that.amplifier > amplifier) {
         builder.amplifier(that.amplifier).duration(that.duration)
     } else if (that.amplifier == amplifier && duration < that.duration) {

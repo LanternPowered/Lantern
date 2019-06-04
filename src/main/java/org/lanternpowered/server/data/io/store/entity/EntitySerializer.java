@@ -39,8 +39,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.entity.EntityType;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class EntitySerializer implements ObjectSerializer<LanternEntity> {
@@ -50,14 +48,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
 
     @Override
     public LanternEntity deserialize(DataView dataView) throws InvalidDataException {
-        String id0 = dataView.getString(ID).get();
-        final String id;
-        // Fast fail if the data isn't old
-        if (dataView.getInt(DATA_VERSION).orElse(0) < 704) {
-            id = fixEntityId(dataView, id0);
-        } else {
-            id = id0;
-        }
+        final String id = dataView.getString(ID).get();
         dataView.remove(ID);
 
         final LanternEntityType entityType = (LanternEntityType) Sponge.getRegistry()
@@ -88,136 +79,5 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
             ((IdentifiableObjectStore) store).serializeUniqueId(dataView, object.getUniqueId());
         }
         return dataView;
-    }
-
-    private static final String[] HORSE_ENTITY_IDS =
-            { "minecraft:horse", "minecraft:donkey", "minecraft:mule", "minecraft:zombie_horse", "minecraft:skeleton_horse" };
-    private static final DataQuery HORSE_TYPE = DataQuery.of("Type");
-
-    private static final String[] SKELETON_ENTITY_IDS =
-            { "minecraft:skeleton", "minecraft:wither_skeleton", "minecraft:stray" };
-    private static final DataQuery SKELETON_TYPE = DataQuery.of("SkeletonType");
-
-    private static final String[] MINECART_ENTITY_IDS =
-            { "minecraft:minecart", "minecraft:chest_minecart", "minecraft:furnace_minecart", "minecraft:tnt_minecart",
-                    "minecraft:spawner_minecart", "minecraft:hopper_minecart", "minecraft:commandblock_minecart" };
-    private static final DataQuery MINECART_TYPE = DataQuery.of("Type");
-
-    private static final DataQuery ZOMBIE_TYPE = DataQuery.of("ZombieType");
-
-    private static final Map<String, String> OLD_TO_NEW_ID_MAPPINGS = new HashMap<>();
-
-    private static void put(String newId, String oldId) {
-        OLD_TO_NEW_ID_MAPPINGS.put(oldId, newId);
-    }
-
-    static {
-        put("minecraft:area_effect_cloud", "AreaEffectCloud");
-        put("minecraft:armor_stand", "ArmorStand");
-        put("minecraft:arrow", "Arrow");
-        put("minecraft:bat", "Bat");
-        put("minecraft:blaze", "Blaze");
-        put("minecraft:boat", "Boat");
-        put("minecraft:cave_spider", "CaveSpider");
-        put("minecraft:chest_minecart", "MinecartChest");
-        put("minecraft:chicken", "Chicken");
-        put("minecraft:commandblock_minecart", "MinecartCommandBlock");
-        put("minecraft:cow", "Cow");
-        put("minecraft:creeper", "Creeper");
-        put("minecraft:donkey", "Donkey");
-        put("minecraft:dragon_fireball", "DragonFireball");
-        put("minecraft:egg", "ThrownEgg");
-        put("minecraft:elder_guardian", "ElderGuardian");
-        put("minecraft:ender_crystal", "EnderCrystal");
-        put("minecraft:ender_dragon", "EnderDragon");
-        put("minecraft:ender_pearl", "ThrownEnderpearl");
-        put("minecraft:enderman", "Enderman");
-        put("minecraft:endermite", "Endermite");
-        put("minecraft:eye_of_ender_signal", "EyeOfEnderSignal");
-        put("minecraft:falling_block", "FallingSand");
-        put("minecraft:fireball", "Fireball");
-        put("minecraft:fireworks_rocket", "FireworksRocketEntity");
-        put("minecraft:furnace_minecart", "MinecartFurnace");
-        put("minecraft:ghast", "Ghast");
-        put("minecraft:giant", "Giant");
-        put("minecraft:guardian", "Guardian");
-        put("minecraft:hopper_minecart", "MinecartHopper");
-        put("minecraft:horse", "Horse");
-        put("minecraft:husk", "Husk");
-        put("minecraft:item", "Item");
-        put("minecraft:item_frame", "ItemFrame");
-        put("minecraft:leash_knot", "LeashKnot");
-        put("minecraft:magma_cube", "LavaSlime");
-        put("minecraft:minecart", "MinecartRideable");
-        put("minecraft:mooshroom", "MushroomCow");
-        put("minecraft:mule", "Mule");
-        put("minecraft:ocelot", "Ozelot");
-        put("minecraft:painting", "Painting");
-        put("minecraft:pig", "Pig");
-        put("minecraft:polar_bear", "PolarBear");
-        put("minecraft:potion", "ThrownPotion");
-        put("minecraft:rabbit", "Rabbit");
-        put("minecraft:sheep", "Sheep");
-        put("minecraft:shulker", "Shulker");
-        put("minecraft:shulker_bullet", "ShulkerBullet");
-        put("minecraft:silverfish", "Silverfish");
-        put("minecraft:skeleton", "Skeleton");
-        put("minecraft:skeleton_horse", "SkeletonHorse");
-        put("minecraft:slime", "Slime");
-        put("minecraft:small_fireball", "SmallFireball");
-        put("minecraft:snowball", "Snowball");
-        put("minecraft:snowman", "SnowMan");
-        put("minecraft:spawner_minecart", "MinecartSpawner");
-        put("minecraft:spectral_arrow", "SpectralArrow");
-        put("minecraft:spider", "Spider");
-        put("minecraft:squid", "Squid");
-        put("minecraft:stray", "Stray");
-        put("minecraft:tnt", "PrimedTnt");
-        put("minecraft:tnt_minecart", "MinecartTNT");
-        put("minecraft:villager", "Villager");
-        put("minecraft:villager_golem", "VillagerGolem");
-        put("minecraft:witch", "Witch");
-        put("minecraft:wither", "WitherBoss");
-        put("minecraft:wither_skeleton", "WitherSkeleton");
-        put("minecraft:wither_skull", "WitherSkull");
-        put("minecraft:wolf", "Wolf");
-        put("minecraft:xp_bottle", "ThrownExpBottle");
-        put("minecraft:xp_orb", "XPOrb");
-        put("minecraft:zombie", "Zombie");
-        put("minecraft:zombie_horse", "ZombieHorse");
-        put("minecraft:zombie_pigman", "PigZombie");
-        put("minecraft:zombie_villager", "ZombieVillager");
-    }
-
-    public static String fixEntityId(DataView dataView, String id) {
-        // Separate the horse entities
-        if (id.equals("EntityHorse")) {
-            final int type = dataView.getInt(HORSE_TYPE).get();
-            dataView.remove(HORSE_TYPE);
-            return HORSE_ENTITY_IDS[type < 0 ? 0 : type >= HORSE_ENTITY_IDS.length ? 0 : type];
-        // Separate the skeleton entities
-        } else if (id.equals("Skeleton")) {
-            final int type = dataView.getInt(SKELETON_TYPE).orElse(0);
-            dataView.remove(SKELETON_TYPE);
-            return SKELETON_ENTITY_IDS[type < 0 ? 0 : type >= SKELETON_ENTITY_IDS.length ? 0 : type];
-        // Separate the minecart entities
-        } else if (id.equals("Minecart")) {
-            final int type = dataView.getInt(MINECART_TYPE).get();
-            dataView.remove(MINECART_TYPE);
-            return MINECART_ENTITY_IDS[type < 0 ? 0 : type >= MINECART_ENTITY_IDS.length ? 0 : type];
-        } else if (id.equals("Zombie")) {
-            final int type = dataView.getInt(ZOMBIE_TYPE).orElse(0);
-            // Profession
-            if (type > 0 && type <= 5) {
-                dataView.set(ZombieVillagerStore.PROFESSION, type - 1);
-                return "minecraft:zombie_villager";
-            } else if (type == 6) {
-                return "minecraft:husk";
-            } else {
-                return "minecraft:zombie";
-            }
-        }
-        final String id1 = OLD_TO_NEW_ID_MAPPINGS.get(id);
-        return id1 == null ? id : id1;
     }
 }

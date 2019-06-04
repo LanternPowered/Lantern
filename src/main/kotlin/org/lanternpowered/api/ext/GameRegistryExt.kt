@@ -29,7 +29,7 @@
 package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.GameRegistry
-import org.lanternpowered.api.Sponge
+import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.util.builder.BaseBuilder
@@ -40,20 +40,29 @@ import kotlin.reflect.KClass
  *
  * @param T The builder type
  */
-inline fun <reified T : BaseBuilder<*, in T>> builderOf(): T = Sponge.getRegistry().createBuilder(T::class.java)
+inline fun <reified T : BaseBuilder<*, in T>> builderOf(): T = Lantern.registry.createBuilder(T::class.java)
 
 /**
  * Constructs a builder for the given builder type [T].
  *
  * @param T The builder type
  */
-inline fun <T : BaseBuilder<*, in T>> builderOf(clazz: KClass<T>): T = Sponge.getRegistry().createBuilder(clazz.java)
+inline fun <T : BaseBuilder<*, in T>> builderOf(clazz: KClass<T>): T = Lantern.registry.createBuilder(clazz.java)
+
+/**
+ * Gets the factory for the given factory type [T].
+ *
+ * @param T The factory type
+ */
+inline fun <T : Any> factoryOf(clazz: KClass<T>): T = Lantern.registry.requireFactory(clazz.java)
+
+/**
+ * Gets the factory for the given factory type [T].
+ */
+inline fun <reified T : Any> factoryOf(): T = Lantern.registry.requireFactory(T::class.java)
 
 // Helpers to allow using the kotlin class, and unbox into nullable
 
-fun <T : CatalogType> GameRegistry.getType(type: KClass<T>, id: String): T? =
-        Sponge.getRegistry().getType(type.java, CatalogKey.resolve(id)).orNull()
-fun <T : CatalogType> GameRegistry.getType(type: KClass<T>, key: CatalogKey): T? =
-        Sponge.getRegistry().getType(type.java, key).orNull()
-fun <T : CatalogType> GameRegistry.getAllOf(type: KClass<T>): Collection<T> =
-        Sponge.getRegistry().getAllOf(type.java)
+fun <T : CatalogType> GameRegistry.getType(type: KClass<T>, id: String): T? = getType(type.java, CatalogKey.resolve(id)).orNull()
+fun <T : CatalogType> GameRegistry.getType(type: KClass<T>, key: CatalogKey): T? = getType(type.java, key).orNull()
+fun <T : CatalogType> GameRegistry.getAllOf(type: KClass<T>): Collection<T> = getAllOf(type.java)

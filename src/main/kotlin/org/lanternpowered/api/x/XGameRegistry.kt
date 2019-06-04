@@ -26,9 +26,15 @@
 package org.lanternpowered.api.x
 
 import org.lanternpowered.api.GameRegistry
+import org.lanternpowered.api.util.builder.BaseBuilder
 import org.lanternpowered.api.x.text.XTextFactory
+import kotlin.reflect.KClass
 
 interface XGameRegistry : GameRegistry {
 
-    override fun getTextFactory(): XTextFactory
+    fun getTextFactory(): XTextFactory
+
+    override fun <T : BaseBuilder<*, in T>> createBuilder(builderClass: Class<T>): T
+
+    fun <T : BaseBuilder<*, in T>> createBuilder(builderClass: KClass<T>): T
 }

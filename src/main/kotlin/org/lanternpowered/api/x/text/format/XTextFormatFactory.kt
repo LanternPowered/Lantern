@@ -23,24 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.item;
+package org.lanternpowered.api.x.text.format
 
-import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.format.TextFormat
+import org.spongepowered.api.text.format.TextStyle
 
-public class SpongeItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+interface XTextFormatFactory : TextFormat.Factory {
 
-    @Override
-    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.serializeValues(itemStack, valueContainer, dataView);
-        dataView.set(DATA_VALUE, valueContainer.remove(Keys.IS_WET).get() ? 1 : 0);
-    }
-
-    @Override
-    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.deserializeValues(itemStack, valueContainer, dataView);
-        valueContainer.set(Keys.IS_WET, dataView.getInt(DATA_VALUE).get() > 0);
-    }
+    fun style(bold: Boolean?, italic: Boolean?, underline: Boolean?, strikeThrough: Boolean?, obfuscated: Boolean?): TextStyle
 }

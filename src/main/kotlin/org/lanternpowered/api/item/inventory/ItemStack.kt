@@ -23,25 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
 
 package org.lanternpowered.api.item.inventory
 
-import org.spongepowered.api.item.ItemType
-import org.spongepowered.api.item.inventory.ItemStack
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-
-typealias ItemStack = ItemStack
-typealias ItemStackBuilder = ItemStack.Builder
-
-/**
- * Constructs a new [ItemStack] with the given [ItemType], quantity and
- * possibility to apply other data using the function.
- */
-inline fun ItemStack(type: ItemType, quantity: Int = 1, fn: ItemStackBuilder.() -> Unit = {}): ItemStack {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    return ItemStack.builder().itemType(type).quantity(quantity).apply(fn).build()
-}
+typealias ItemStack = org.spongepowered.api.item.inventory.ItemStack
+typealias ItemStackBuilder = org.spongepowered.api.item.inventory.ItemStack.Builder

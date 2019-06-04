@@ -23,23 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.api.x.text
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
-import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.text.TextTemplate
 
-public final class CodecPlayInAcceptBeaconEffects implements Codec<MessagePlayInAcceptBeaconEffects> {
+interface XTextTemplateFactory : TextTemplate.Factory {
 
-    @Override
-    public MessagePlayInAcceptBeaconEffects decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final PotionEffectTypeRegistryModule registryModule = PotionEffectTypeRegistryModule.INSTANCE;
-        final PotionEffectType primary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        final PotionEffectType secondary = registryModule.getByInternalId(buf.readVarInt()).orElse(null);
-        return new MessagePlayInAcceptBeaconEffects(primary, secondary);
-    }
+    override fun template(openArg: String, closeArg: String, elements: Array<Any>) = template(openArg, closeArg, elements.asList())
+
+    fun template(openArg: String, closeArg: String, elements: Collection<Any>): TextTemplate
 }

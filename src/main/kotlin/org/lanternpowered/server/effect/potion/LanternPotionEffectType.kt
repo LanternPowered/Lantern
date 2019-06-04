@@ -43,15 +43,15 @@ class LanternPotionEffectType @JvmOverloads constructor(
         private var instant: Boolean = false
 ) : DefaultCatalogType(key), PotionEffectType, InternalCatalogType, Translatable by Translated(translation) {
 
-    @JvmOverloads constructor(key: CatalogKey, internalId: Int, translationPart: String,
+    @JvmOverloads constructor(key: CatalogKey, internalId: Int,
                               effectConsumer: (Entity, PotionEffect) -> Unit = { _,_ -> }, instant: Boolean = false) :
             this(key, internalId,
-                    tr("effect.%s", translationPart),
-                    tr("potion.effect.%s", translationPart),
+                    tr("effect.${key.namespace}.${key.value}"),
+                    tr("item.minecraft.potion.effect.${key.value}"),
                     effectConsumer, instant)
 
-    fun instant(): LanternPotionEffectType = apply { this.instant = true }
+    fun instant() = apply { this.instant = true }
 
-    override fun isInstant(): Boolean = this.instant
-    override fun getPotionTranslation(): Translation = this.potionTranslation
+    override fun isInstant() = this.instant
+    override fun getPotionTranslation() = this.potionTranslation
 }

@@ -43,8 +43,8 @@ import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.Visibilities;
 import org.spongepowered.api.scoreboard.Visibility;
-import org.spongepowered.api.scoreboard.critieria.Criteria;
-import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.scoreboard.criteria.Criteria;
+import org.spongepowered.api.scoreboard.criteria.Criterion;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayModes;
@@ -177,17 +177,17 @@ public class ScoreboardIO {
                     .suffix(LanternTexts.fromLegacy(entry.getString(SUFFIX).get()))
                     .members(entry.getStringList(MEMBERS).get().stream().map(LanternTexts::fromLegacy).collect(Collectors.toSet()));
             entry.getString(NAME_TAG_VISIBILITY).ifPresent(value -> builder.nameTagVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
-                    .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
+                    .stream().filter(visibility -> visibility.getKey().getValue().equals(value)).findFirst().orElseGet(() -> {
                 Lantern.getLogger().warn("Unable to find a name tag visibility with id: {}, default to always.", value);
                 return Visibilities.ALWAYS;
             })));
             entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent(value -> builder.deathTextVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
-                    .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
+                    .stream().filter(visibility -> visibility.getKey().getValue().equals(value)).findFirst().orElseGet(() -> {
                 Lantern.getLogger().warn("Unable to find a death message visibility with id: {}, default to always.", value);
                 return Visibilities.ALWAYS;
             })));
             entry.getString(COLLISION_RULE).ifPresent(value -> builder.collisionRule(Sponge.getRegistry().getAllOf(CollisionRule.class)
-                    .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
+                    .stream().filter(visibility -> visibility.getKey().getValue().equals(value)).findFirst().orElseGet(() -> {
                 Lantern.getLogger().warn("Unable to find a collision rule with id: {}, default to never.", value);
                 return CollisionRules.NEVER;
             })));
@@ -270,11 +270,11 @@ public class ScoreboardIO {
            final DataView container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(ALLOW_FRIENDLY_FIRE, (byte) (team.allowFriendlyFire() ? 1 : 0))
                     .set(CAN_SEE_FRIENDLY_INVISIBLES, (byte) (team.canSeeFriendlyInvisibles() ? 1 : 0))
-                    .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getName())
+                    .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getKey().getValue())
                     .set(NAME, team.getName())
                     .set(DISPLAY_NAME, LanternTexts.toLegacy(team.getDisplayName()))
-                    .set(DEATH_MESSAGE_VISIBILITY, team.getDeathMessageVisibility().getName())
-                    .set(COLLISION_RULE, team.getCollisionRule().getName())
+                    .set(DEATH_MESSAGE_VISIBILITY, team.getDeathMessageVisibility().getKey().getValue())
+                    .set(COLLISION_RULE, team.getCollisionRule().getKey().getValue())
                     .set(PREFIX, LanternTexts.toLegacy(team.getPrefix()))
                     .set(SUFFIX, LanternTexts.toLegacy(team.getSuffix()));
             final TextColor teamColor = team.getColor();

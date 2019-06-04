@@ -1,34 +1,130 @@
 [
-  "minecraft:speed",
-  "minecraft:slowness",
-  "minecraft:haste",
-  "minecraft:mining_fatigue",
-  "minecraft:strength",
-  "minecraft:instant_health",
-  "minecraft:instant_damage",
-  "minecraft:jump_boost",
-  "minecraft:nausea",
-  "minecraft:regeneration",
-  "minecraft:resistance",
-  "minecraft:fire_resistance",
-  "minecraft:water_breathing",
-  "minecraft:invisibility",
-  "minecraft:blindness",
-  "minecraft:night_vision",
-  "minecraft:hunger",
-  "minecraft:weakness",
-  "minecraft:poison",
-  "minecraft:wither",
-  "minecraft:health_boost",
-  "minecraft:absorption",
-  "minecraft:saturation",
-  "minecraft:glowing",
-  "minecraft:levitation",
-  "minecraft:luck",
-  "minecraft:unluck",
-  "minecraft:slow_falling",
-  "minecraft:conduit_power",
-  "minecraft:dolphins_grace",
-  "minecraft:bad_omen",
-  "minecraft:hero_of_the_village"
+  {
+    "id": "minecraft:speed",
+    "internal_id": 1
+  },
+  {
+    "id": "minecraft:slowness",
+    "internal_id": 2
+  },
+  {
+    "id": "minecraft:haste",
+    "internal_id": 3
+  },
+  {
+    "id": "minecraft:mining_fatigue",
+    "internal_id": 4
+  },
+  {
+    "id": "minecraft:strength",
+    "internal_id": 5
+  },
+  {
+    "id": "minecraft:instant_health",
+    "internal_id": 6
+  },
+  {
+    "id": "minecraft:instant_damage",
+    "internal_id": 7
+  },
+  {
+    "id": "minecraft:jump_boost",
+    "internal_id": 8
+  },
+  {
+    "id": "minecraft:nausea",
+    "internal_id": 9
+  },
+  {
+    "id": "minecraft:regeneration",
+    "internal_id": 10
+  },
+  {
+    "id": "minecraft:resistance",
+    "internal_id": 11
+  },
+  {
+    "id": "minecraft:fire_resistance",
+    "internal_id": 12
+  },
+  {
+    "id": "minecraft:water_breathing",
+    "internal_id": 13
+  },
+  {
+    "id": "minecraft:invisibility",
+    "internal_id": 14
+  },
+  {
+    "id": "minecraft:blindness",
+    "internal_id": 15
+  },
+  {
+    "id": "minecraft:night_vision",
+    "internal_id": 16
+  },
+  {
+    "id": "minecraft:hunger",
+    "internal_id": 17
+  },
+  {
+    "id": "minecraft:weakness",
+    "internal_id": 18
+  },
+  {
+    "id": "minecraft:poison",
+    "internal_id": 19
+  },
+  {
+    "id": "minecraft:wither",
+    "internal_id": 20
+  },
+  {
+    "id": "minecraft:health_boost",
+    "internal_id": 21
+  },
+  {
+    "id": "minecraft:absorption",
+    "internal_id": 22
+  },
+  {
+    "id": "minecraft:saturation",
+    "internal_id": 23
+  },
+  {
+    "id": "minecraft:glowing",
+    "internal_id": 24
+  },
+  {
+    "id": "minecraft:levitation",
+    "internal_id": 25
+  },
+  {
+    "id": "minecraft:luck",
+    "internal_id": 26
+  },
+  {
+    "id": "minecraft:unluck",
+    "internal_id": 27
+  },
+  {
+    "id": "minecraft:slow_falling",
+    "internal_id": 28
+  },
+  {
+    "id": "minecraft:conduit_power",
+    "internal_id": 29
+  },
+  {
+    "id": "minecraft:dolphins_grace",
+    "internal_id": 30
+  },
+  {
+    "id": "minecraft:bad_omen",
+    "internal_id": 31
+  },
+  {
+    "id": "minecraft:hero_of_the_village",
+    "internal_id": 32
+  }
 ]

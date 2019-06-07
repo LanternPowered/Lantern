@@ -103,8 +103,8 @@ import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.scheduler.AsynchronousExecutor;
 import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.util.metric.MetricsConfigManager;
 import org.spongepowered.api.world.TeleportHelper;
@@ -119,7 +119,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternModule extends PrivateModule {
 

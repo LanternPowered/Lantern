@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class CodecRegistration<M extends Message, C extends Codec<? super M>> {
 

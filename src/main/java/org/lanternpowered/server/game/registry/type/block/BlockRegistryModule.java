@@ -33,7 +33,6 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.hardness;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.lightEmission;
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.replaceable;
-import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidMaterial;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -54,12 +53,12 @@ import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.CraftingTableInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.FaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.JukeboxInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.NoteBlockInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.OpenableContainerInteractionBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.FaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.PlacementCollisionDetectionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ShulkerBoxInteractionBehavior;

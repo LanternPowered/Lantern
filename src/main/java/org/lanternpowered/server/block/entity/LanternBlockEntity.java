@@ -51,7 +51,7 @@ import org.spongepowered.api.world.Location;
 
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public abstract class LanternBlockEntity implements BlockEntity, IAdditionalDataHolder, IStorePropertyHolder {

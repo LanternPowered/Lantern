@@ -38,7 +38,7 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractInventory, B extends AbstractArchetypeBuilder<R, T, B>>

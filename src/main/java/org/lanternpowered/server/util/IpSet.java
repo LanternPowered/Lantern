@@ -38,7 +38,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class IpSet implements Predicate<InetAddress> {
 

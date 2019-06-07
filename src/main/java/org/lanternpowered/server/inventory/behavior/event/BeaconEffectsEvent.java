@@ -31,7 +31,7 @@ import org.spongepowered.api.effect.potion.PotionEffectType;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Will be thrown when the accept button in the

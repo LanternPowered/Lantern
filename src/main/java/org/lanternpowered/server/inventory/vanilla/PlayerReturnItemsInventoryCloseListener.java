@@ -45,13 +45,12 @@ import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This {@link InventoryCloseListener} returns all the contents back to the

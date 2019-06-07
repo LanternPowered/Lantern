@@ -28,9 +28,7 @@ package org.lanternpowered.server.catalog
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
-import org.spongepowered.api.CatalogType
 import org.spongepowered.api.NamedCatalogType
 
 open class DefaultCatalogType(key: CatalogKey) : AbstractCatalogType() {

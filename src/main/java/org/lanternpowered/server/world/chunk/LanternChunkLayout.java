@@ -28,10 +28,10 @@ package org.lanternpowered.server.world.chunk;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTIONS;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_SIZE;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.world.storage.ChunkLayout;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3i;
 
 public class LanternChunkLayout implements ChunkLayout {
 

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.testserver.plugin;
 
-import com.flowpowered.math.vector.Vector2d;
+import org.spongepowered.math.vector.Vector2d;
 import com.google.inject.Inject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;

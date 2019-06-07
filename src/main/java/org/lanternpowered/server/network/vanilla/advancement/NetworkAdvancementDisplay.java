@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.advancement;
 
-import com.flowpowered.math.vector.Vector2d;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.advancement.LanternAdvancementType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
@@ -34,8 +33,9 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.math.vector.Vector2d;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class NetworkAdvancementDisplay {
 

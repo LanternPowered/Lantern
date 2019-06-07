@@ -28,7 +28,6 @@ package org.lanternpowered.server.world;
 import com.google.inject.Singleton;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.TeleportHelper;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
 import java.util.Optional;

@@ -29,9 +29,9 @@ import org.lanternpowered.server.transformer.data.FastValueContainerClassTransfo
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.value.CompositeValueStore;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.CompositeValueStore;
 
 import java.util.function.Function;
 

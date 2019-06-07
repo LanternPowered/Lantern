@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.effect
 
-import com.flowpowered.math.vector.Vector3d
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import org.lanternpowered.server.effect.particle.LanternParticleType
@@ -49,7 +48,6 @@ import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.registry.util.RegistrationDependency
 import org.spongepowered.api.util.Color
 import org.spongepowered.api.util.Direction
-
 import java.util.OptionalInt
 
 @RegistrationDependency(

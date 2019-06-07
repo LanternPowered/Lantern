@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.recipe;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 abstract class GroupedNetworkRecipe extends NetworkRecipe {
 

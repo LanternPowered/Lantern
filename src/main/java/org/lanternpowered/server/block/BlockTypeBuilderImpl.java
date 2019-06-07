@@ -32,12 +32,12 @@ import static org.lanternpowered.server.block.provider.property.PropertyProvider
 import static org.lanternpowered.server.block.provider.property.PropertyProviders.solidSide;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
+import org.lanternpowered.server.block.entity.LanternBlockEntityType;
 import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
@@ -49,7 +49,6 @@ import org.lanternpowered.server.block.provider.property.PropertyProviderCollect
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.provider.property.SimplePropertyProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
-import org.lanternpowered.server.block.entity.LanternBlockEntityType;
 import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
@@ -65,6 +64,7 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -76,7 +76,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public class BlockTypeBuilderImpl implements BlockTypeBuilder {

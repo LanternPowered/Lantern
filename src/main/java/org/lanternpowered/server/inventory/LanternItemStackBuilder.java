@@ -44,7 +44,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public class LanternItemStackBuilder extends AbstractDataBuilder<ItemStack> implements ItemStack.Builder {

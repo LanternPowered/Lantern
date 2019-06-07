@@ -27,8 +27,6 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3f;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -52,6 +50,8 @@ import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.StartsWithPredicate;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +61,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class CommandParticle extends CommandProvider {
 

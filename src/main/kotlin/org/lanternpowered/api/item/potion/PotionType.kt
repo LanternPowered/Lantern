@@ -27,10 +27,5 @@
 
 package org.lanternpowered.api.item.potion
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.*
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-
 typealias PotionType = org.spongepowered.api.item.potion.PotionType
 typealias PotionTypes = org.spongepowered.api.item.potion.PotionTypes

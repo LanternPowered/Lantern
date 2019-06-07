@@ -30,8 +30,8 @@ import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
-import org.spongepowered.api.CatalogKey;
 import org.lanternpowered.server.item.appearance.ItemAppearance;
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.ItemType;
@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternItemType extends DefaultCatalogType implements ItemType {
 

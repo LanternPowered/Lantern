@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternPaginationBuilder implements PaginationList.Builder {
 

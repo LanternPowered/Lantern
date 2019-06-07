@@ -27,10 +27,10 @@ package org.lanternpowered.server.world.gen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.gen.BiomeGenerator;
+import org.spongepowered.math.vector.Vector3i;
 
 public class SingleBiomeGenerator implements BiomeGenerator {
 

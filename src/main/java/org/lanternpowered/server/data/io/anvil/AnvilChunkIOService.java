@@ -53,7 +53,6 @@ import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_SIZ
 import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 import static org.lanternpowered.server.world.chunk.LanternChunk.fixEntityYSection;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -84,6 +83,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -96,7 +96,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
 public class AnvilChunkIOService implements ChunkIOService {

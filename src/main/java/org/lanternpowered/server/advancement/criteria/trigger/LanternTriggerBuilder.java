@@ -52,7 +52,7 @@ import java.io.StringReader;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"unchecked", "NullableProblems", "ConstantConditions"})
 public class LanternTriggerBuilder<C extends FilteredTriggerConfiguration> implements Trigger.Builder<C> {

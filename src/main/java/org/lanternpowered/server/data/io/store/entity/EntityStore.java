@@ -27,7 +27,6 @@ package org.lanternpowered.server.data.io.store.entity;
 
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.DataQueries;
@@ -41,6 +40,7 @@ import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.HashSet;
 import java.util.List;

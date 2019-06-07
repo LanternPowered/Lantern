@@ -31,7 +31,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 abstract class LanternCraftingRecipe extends LanternRecipe implements ISimpleCraftingRecipe {
 

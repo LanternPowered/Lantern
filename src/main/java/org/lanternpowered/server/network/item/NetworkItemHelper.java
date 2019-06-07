@@ -31,7 +31,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.ItemType;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class NetworkItemHelper {
 

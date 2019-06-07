@@ -26,7 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.login
 
 import org.lanternpowered.server.network.message.Message
-import java.util.*
+import java.util.UUID
 
 /**
  * A message send to the client if login is successful.

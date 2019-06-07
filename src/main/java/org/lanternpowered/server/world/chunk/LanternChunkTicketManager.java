@@ -28,7 +28,6 @@ package org.lanternpowered.server.world.chunk;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -39,8 +38,9 @@ import com.google.inject.Singleton;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.chunk.ChunkTicketManager;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.chunk.ChunkTicketManager;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 import java.util.UUID;

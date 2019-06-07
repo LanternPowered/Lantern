@@ -35,7 +35,7 @@ import org.spongepowered.plugin.meta.PluginMetadata;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ALL")
 public final class LanternPluginContainer extends InfoPluginContainer {

@@ -27,8 +27,8 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.math.vector.Vector3i;
 
 public abstract class MessagePlayInEditCommandBlock implements Message {
 

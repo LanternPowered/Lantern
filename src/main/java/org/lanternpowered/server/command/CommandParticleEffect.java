@@ -25,9 +25,6 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -46,6 +43,7 @@ import org.spongepowered.api.util.Color;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 public final class CommandParticleEffect extends CommandProvider {
 

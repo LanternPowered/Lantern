@@ -27,12 +27,12 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.spongepowered.math.vector.Vector3d;
 
 public abstract class ObjectEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
 

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.util.gen.biome;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBiomeVolumeWrapper;
@@ -35,6 +34,7 @@ import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeVolume;
 import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
+import org.spongepowered.math.vector.Vector3i;
 
 public abstract class AbstractMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeVolume {
 

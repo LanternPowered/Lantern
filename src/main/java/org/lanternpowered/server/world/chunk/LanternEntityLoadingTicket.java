@@ -34,7 +34,7 @@ import org.spongepowered.api.entity.Entity;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityChunkLoadingTicket {
 

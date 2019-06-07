@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
-import com.flowpowered.math.GenericMath;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -41,12 +40,13 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.util.Coerce;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
+import org.spongepowered.math.GenericMath;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class FlatGeneratorSettingsParser {
 

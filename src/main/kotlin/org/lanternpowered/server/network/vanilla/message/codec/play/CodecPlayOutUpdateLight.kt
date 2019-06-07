@@ -25,10 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play
 
-import io.netty.buffer.Unpooled
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator
-import org.lanternpowered.server.network.buffer.LanternByteBuffer
 import org.lanternpowered.server.network.message.codec.Codec
 import org.lanternpowered.server.network.message.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateLight

@@ -49,7 +49,6 @@ import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.ArrayDeque;
 import java.util.Collection;

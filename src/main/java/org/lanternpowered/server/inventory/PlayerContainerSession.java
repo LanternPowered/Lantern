@@ -64,7 +64,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents a session of a player interacting with a

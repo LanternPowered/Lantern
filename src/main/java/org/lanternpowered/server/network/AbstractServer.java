@@ -49,7 +49,7 @@ import org.lanternpowered.server.game.Lantern;
 import java.net.SocketAddress;
 import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractServer {

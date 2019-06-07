@@ -38,7 +38,7 @@ import org.spongepowered.api.service.permission.Subject;
 import java.util.Collection;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * User collection keeping track of opped users.

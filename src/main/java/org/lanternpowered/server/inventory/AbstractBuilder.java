@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"unchecked", "ConstantConditions"})
 public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, B extends AbstractBuilder<R, T, B>> {

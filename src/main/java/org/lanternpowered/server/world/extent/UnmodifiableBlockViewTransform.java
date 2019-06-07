@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
+import org.spongepowered.math.vector.Vector3i;
 
 public class UnmodifiableBlockViewTransform extends AbstractBlockViewTransform<UnmodifiableBlockVolume> implements UnmodifiableBlockVolume {
 

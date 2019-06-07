@@ -29,7 +29,6 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;

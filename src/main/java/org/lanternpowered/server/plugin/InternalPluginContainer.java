@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class InternalPluginContainer extends InfoPluginContainer {
 

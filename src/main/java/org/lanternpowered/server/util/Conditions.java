@@ -35,7 +35,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Conditions {
 

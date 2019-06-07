@@ -34,7 +34,7 @@ import org.spongepowered.api.CatalogType;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InternalEnumValueRegistryModule<V extends CatalogType> extends EnumValueRegistryModule<V>
         implements InternalCatalogRegistryModule<V> {

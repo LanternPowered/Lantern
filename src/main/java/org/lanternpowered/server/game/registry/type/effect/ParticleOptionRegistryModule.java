@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.effect;
 
-import com.flowpowered.math.vector.Vector3d;
 import kotlin.jvm.functions.Function1;
 import org.lanternpowered.server.effect.particle.LanternParticleOption;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
@@ -38,10 +37,11 @@ import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ParticleOptionRegistryModule extends DefaultCatalogRegistryModule<ParticleOption> {
 

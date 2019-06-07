@@ -43,7 +43,7 @@ import java.net.InetAddress;
 import java.time.Instant;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @ConfigSerializable
 public abstract class BanEntry implements Ban {

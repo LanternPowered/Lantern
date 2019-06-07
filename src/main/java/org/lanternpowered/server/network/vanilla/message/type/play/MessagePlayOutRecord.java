@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.effect.sound.music.MusicDisc;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MessagePlayOutRecord implements Message {
 

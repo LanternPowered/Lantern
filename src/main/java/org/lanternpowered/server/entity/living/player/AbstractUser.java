@@ -27,7 +27,6 @@ package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.io.store.entity.UserStore;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -58,6 +57,7 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractUser extends LanternLiving implements IUser, AbstractArmorEquipable {
 

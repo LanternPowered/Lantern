@@ -34,7 +34,7 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SpongeTranslationProvider implements TranslationProvider {
 

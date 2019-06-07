@@ -27,7 +27,6 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -60,6 +59,7 @@ import org.spongepowered.api.world.WorldArchetypes;
 import org.spongepowered.api.world.WorldManager;
 import org.spongepowered.api.world.gen.GeneratorTypes;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -88,7 +88,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
 public final class LanternWorldManager implements WorldManager {

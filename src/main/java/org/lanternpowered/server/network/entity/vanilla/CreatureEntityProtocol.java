@@ -27,11 +27,11 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
+import org.spongepowered.math.vector.Vector3d;
 
 public abstract class CreatureEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 

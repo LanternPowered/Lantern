@@ -32,7 +32,7 @@ import org.spongepowered.api.network.RemoteConnection;
 
 import java.net.InetSocketAddress;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class SimpleRemoteConnection implements RemoteConnection {
 

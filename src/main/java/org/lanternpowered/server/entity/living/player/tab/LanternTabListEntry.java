@@ -37,7 +37,7 @@ import org.spongepowered.api.text.Text;
 import java.util.Collections;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class LanternTabListEntry implements TabListEntry {
 

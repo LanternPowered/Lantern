@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.gen.block.AtomicIntArrayMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.IntArrayImmutableBlockBuffer;
@@ -37,6 +36,7 @@ import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.math.vector.Vector3i;
 
 public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implements BlockVolume {
 

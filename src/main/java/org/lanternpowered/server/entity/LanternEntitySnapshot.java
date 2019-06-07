@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.entity;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.AdditionalContainerHolder;
 import org.lanternpowered.server.data.IImmutableDataHolder;
@@ -41,6 +40,7 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 import java.util.UUID;

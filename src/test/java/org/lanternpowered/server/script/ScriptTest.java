@@ -27,12 +27,12 @@ package org.lanternpowered.server.script;
 
 import static org.junit.Assert.assertEquals;
 
-import com.flowpowered.math.GenericMath;
 import org.junit.Test;
 import org.lanternpowered.api.script.Script;
 import org.lanternpowered.api.script.function.condition.Condition;
 import org.lanternpowered.api.script.function.value.DoubleValueProvider;
 import org.lanternpowered.api.script.function.value.FloatValueProvider;
+import org.spongepowered.math.GenericMath;
 
 public class ScriptTest {
 

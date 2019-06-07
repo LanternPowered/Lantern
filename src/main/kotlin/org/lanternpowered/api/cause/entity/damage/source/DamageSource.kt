@@ -32,7 +32,6 @@ import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.FallingBlock
 import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
 
 typealias DamageSource = org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 typealias DamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.DamageSource.Builder

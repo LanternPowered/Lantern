@@ -27,7 +27,7 @@ package org.lanternpowered.server.permission;
 
 import org.spongepowered.api.service.permission.SubjectReference;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractProxySubject implements ProxySubject {
 

@@ -28,7 +28,7 @@ package org.lanternpowered.server.util;
 import io.netty.util.concurrent.FastThreadLocalThread;
 import org.lanternpowered.api.cause.CauseStack;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link FastThreadLocalThread} which directly stores some objects

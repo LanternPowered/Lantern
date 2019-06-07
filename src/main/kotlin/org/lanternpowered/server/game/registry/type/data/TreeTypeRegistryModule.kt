@@ -28,8 +28,6 @@ package org.lanternpowered.server.game.registry.type.data
 import org.lanternpowered.server.data.type.LanternTreeType
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.data.type.TreeType
-import org.spongepowered.api.data.type.TreeTypes
 
 object TreeTypeRegistryModule : DefaultCatalogRegistryModule<TreeType>(TreeTypes::class) {
 

@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.text.channel
 
-import org.spongepowered.api.text.channel.MessageReceiver
 import org.spongepowered.api.text.channel.MessageChannel
+import org.spongepowered.api.text.channel.MessageReceiver
 import org.spongepowered.api.text.channel.MutableMessageChannel
 
 /**

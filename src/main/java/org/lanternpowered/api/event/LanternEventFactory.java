@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.api.event;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -38,6 +37,8 @@ import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class LanternEventFactory {
 

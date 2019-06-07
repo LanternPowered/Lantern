@@ -33,7 +33,7 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import java.lang.ref.WeakReference;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class SubjectSettingCallback implements Predicate<PermissionService> {
 

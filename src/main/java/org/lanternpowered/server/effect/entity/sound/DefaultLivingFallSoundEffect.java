@@ -27,18 +27,18 @@ package org.lanternpowered.server.effect.entity.sound;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.effect.entity.AbstractEntityEffect;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.event.LanternEventContextKeys;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Random;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DefaultLivingFallSoundEffect extends AbstractEntityEffect {
 

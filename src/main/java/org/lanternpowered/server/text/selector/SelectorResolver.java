@@ -27,8 +27,6 @@ package org.lanternpowered.server.text.selector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -58,6 +56,8 @@ import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,7 +70,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A resolver that acts like Vanilla Minecraft in many regards.

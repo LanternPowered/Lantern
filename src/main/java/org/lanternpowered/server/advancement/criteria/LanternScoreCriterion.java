@@ -29,7 +29,7 @@ import com.google.common.base.MoreObjects;
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternScoreCriterion extends LanternCriterion implements ScoreAdvancementCriterion {
 

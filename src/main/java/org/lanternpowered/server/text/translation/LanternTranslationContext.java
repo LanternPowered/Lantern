@@ -31,7 +31,7 @@ import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.Locale;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class LanternTranslationContext implements TranslationContext {
 

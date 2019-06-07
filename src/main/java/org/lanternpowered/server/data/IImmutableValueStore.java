@@ -26,8 +26,8 @@
 package org.lanternpowered.server.data;
 
 import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.ImmutableValueStore;
+import org.spongepowered.api.data.value.ValueContainer;
 
 import java.util.List;
 

@@ -29,14 +29,12 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.provider.property.PropertyProvider;
 import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockPropertyStore<V> extends AbstractBlockPropertyStore<V> {
 

@@ -27,10 +27,6 @@ package org.lanternpowered.server.world.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.GenericMath;
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -62,6 +58,10 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.math.GenericMath;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -70,7 +70,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SoftBufferExtentViewDownsize implements AbstractExtent {
 

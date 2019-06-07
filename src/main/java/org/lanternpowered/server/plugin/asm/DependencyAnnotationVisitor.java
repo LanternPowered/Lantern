@@ -31,7 +31,7 @@ import static org.objectweb.asm.Opcodes.ASM5;
 import org.spongepowered.plugin.meta.PluginDependency;
 import org.spongepowered.plugin.meta.PluginMetadata;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class DependencyAnnotationVisitor extends WarningAnnotationVisitor {
 

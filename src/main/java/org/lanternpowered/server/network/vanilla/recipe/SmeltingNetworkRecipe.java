@@ -30,7 +30,7 @@ import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class SmeltingNetworkRecipe extends GroupedNetworkRecipe {
 

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -39,8 +38,9 @@ import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.math.vector.Vector3d;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public class TorchInteractionBehavior implements InteractWithItemBehavior {

@@ -32,7 +32,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public interface CarrierReference<T> {

@@ -28,7 +28,6 @@ package org.lanternpowered.server.block.entity.vanilla;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.block.entity.ICarrierBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.state.BlockStateProperties;
@@ -48,6 +47,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.type.BlockEntityInventory;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 

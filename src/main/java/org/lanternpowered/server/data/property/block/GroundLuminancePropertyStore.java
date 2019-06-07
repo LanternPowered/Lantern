@@ -34,7 +34,7 @@ import org.spongepowered.api.world.chunk.Chunk;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public final class GroundLuminancePropertyStore extends AbstractBlockPropertyStore<Double> {

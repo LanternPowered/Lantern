@@ -32,7 +32,7 @@ import org.spongepowered.api.data.DataView;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class BlockEntityProtocol<T extends LanternBlockEntity> extends AbstractBlockEntityProtocol<T> {
 

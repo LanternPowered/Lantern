@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play
 
-import com.flowpowered.math.vector.Vector3f
 import org.lanternpowered.server.network.message.Message
 import org.spongepowered.api.item.inventory.ItemStack
 

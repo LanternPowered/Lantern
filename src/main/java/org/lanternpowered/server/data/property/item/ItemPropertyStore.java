@@ -33,7 +33,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ItemPropertyStore<V> extends AbstractItemPropertyStore<V> {
 

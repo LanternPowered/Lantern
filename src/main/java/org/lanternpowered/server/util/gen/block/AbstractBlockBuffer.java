@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.util.gen.block;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockState;
@@ -34,6 +33,7 @@ import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.math.vector.Vector3i;
 
 /**
  * Base class for block buffers.

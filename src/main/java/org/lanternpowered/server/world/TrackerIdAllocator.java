@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.locks.StampedLock;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class TrackerIdAllocator {
 

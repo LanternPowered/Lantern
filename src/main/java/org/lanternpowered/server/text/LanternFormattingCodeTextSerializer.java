@@ -48,7 +48,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * TODO: Separate the usage of {@link TextColors#RESET} and {@link TextStyles#RESET}.

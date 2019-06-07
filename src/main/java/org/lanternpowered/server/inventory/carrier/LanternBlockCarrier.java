@@ -36,7 +36,6 @@ import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class LanternBlockCarrier<T extends CarriedInventory<?>> extends AbstractCarrier<T>
         implements Locatable, BlockCarrier {

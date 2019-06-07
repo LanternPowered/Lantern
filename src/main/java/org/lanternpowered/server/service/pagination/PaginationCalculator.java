@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.service.pagination;
 
-import com.flowpowered.math.GenericMath;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -34,6 +33,7 @@ import ninja.leaping.configurate.loader.HeaderMode;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.math.GenericMath;
 
 import java.io.IOException;
 import java.util.Collections;

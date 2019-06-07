@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.effect.sound
 
-import com.flowpowered.math.vector.Vector3d
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.network.message.Message

@@ -50,7 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
         implements AlternateCatalogRegistryModule<T>, CatalogMappingDataHolder {

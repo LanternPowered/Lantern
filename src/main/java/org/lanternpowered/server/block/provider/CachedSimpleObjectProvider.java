@@ -38,7 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public class CachedSimpleObjectProvider<T> implements BlockObjectProvider<T> {

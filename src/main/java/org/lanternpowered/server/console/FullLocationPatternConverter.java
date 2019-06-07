@@ -32,7 +32,7 @@ import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
 
 import java.util.regex.Matcher;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Cannot be converted to Kotlin, the static 'newInstance' method is required.

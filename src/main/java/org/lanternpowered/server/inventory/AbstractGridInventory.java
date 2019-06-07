@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"unchecked", "ConstantConditions"})
 public abstract class AbstractGridInventory extends AbstractInventory2D implements GridInventory {

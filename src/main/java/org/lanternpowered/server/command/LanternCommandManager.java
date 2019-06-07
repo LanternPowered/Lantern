@@ -57,7 +57,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.TextMessageException;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -72,7 +71,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A simple implementation of {@link CommandManager}.

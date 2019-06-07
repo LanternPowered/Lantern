@@ -47,9 +47,9 @@
  */
 package org.lanternpowered.server.data.io;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.world.storage.WorldStorage;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.io.IOException;
 

@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 class SimpleElementProcessor<V extends Value<E>, E> extends AbstractProcessor<V, E>
         implements ElementProcessor<V, E>, Copyable<SimpleElementProcessor<V, E>>, ElementKeyRegistration<V, E> {

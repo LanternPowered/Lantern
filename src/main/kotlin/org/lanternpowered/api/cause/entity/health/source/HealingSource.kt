@@ -31,7 +31,6 @@ import org.spongepowered.api.event.cause.entity.health.HealingType
 import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource
 import org.spongepowered.api.event.cause.entity.health.source.HealingSource
 import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
 
 typealias BlockHealingSource = org.spongepowered.api.event.cause.entity.health.source.BlockHealingSource
 typealias BlockHealingSourceBuilder = org.spongepowered.api.event.cause.entity.health.source.BlockHealingSource.Builder

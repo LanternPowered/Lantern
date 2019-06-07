@@ -30,7 +30,7 @@ import org.spongepowered.api.Platform;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class InternalPluginsInfo {
 
@@ -67,7 +67,7 @@ public final class InternalPluginsInfo {
     public static final class Minecraft {
 
         public static final String IDENTIFIER = "minecraft";
-        public static final String VERSION = "1.14.1 Pre-Release 2";
+        public static final String VERSION = "1.14.3-pre1";
 
         private Minecraft() {
         }

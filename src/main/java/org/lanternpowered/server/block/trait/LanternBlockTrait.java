@@ -27,16 +27,16 @@ package org.lanternpowered.server.block.trait;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.Iterables;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.block.state.property.KeyStatePropertyValueTransformer;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 public abstract class LanternBlockTrait<T extends Comparable<T>, V> extends DefaultCatalogType implements BlockTrait<T> {

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play
 
-import com.flowpowered.math.vector.Vector3i
 import org.lanternpowered.server.network.message.Message
 
 data class MessagePlayInUpdateJigsawBlock(

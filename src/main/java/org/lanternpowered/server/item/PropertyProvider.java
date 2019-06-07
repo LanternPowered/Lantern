@@ -28,7 +28,7 @@ package org.lanternpowered.server.item;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("NullableProblems")
 @FunctionalInterface

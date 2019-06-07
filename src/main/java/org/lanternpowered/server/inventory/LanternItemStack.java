@@ -51,7 +51,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "SimplifiableConditionalExpression"})
 public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAdditionalDataHolder {

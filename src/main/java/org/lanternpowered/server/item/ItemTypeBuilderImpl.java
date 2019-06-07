@@ -41,7 +41,7 @@ import org.spongepowered.api.text.translation.Translation;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemTypeBuilderImpl implements ItemTypeBuilder {
 

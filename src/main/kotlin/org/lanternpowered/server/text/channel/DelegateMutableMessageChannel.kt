@@ -26,9 +26,9 @@
 package org.lanternpowered.server.text.channel
 
 import org.lanternpowered.api.text.Text
-import org.spongepowered.api.text.chat.ChatType
-import org.spongepowered.api.text.channel.MessageReceiver
 import org.spongepowered.api.text.channel.MessageChannel
+import org.spongepowered.api.text.channel.MessageReceiver
+import org.spongepowered.api.text.chat.ChatType
 import java.util.Optional
 
 

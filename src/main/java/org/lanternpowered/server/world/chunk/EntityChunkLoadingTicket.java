@@ -30,7 +30,7 @@ import org.spongepowered.api.world.chunk.ChunkTicketManager;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EntityChunkLoadingTicket extends ChunkLoadingTicket, ChunkTicketManager.EntityLoadingTicket {
 

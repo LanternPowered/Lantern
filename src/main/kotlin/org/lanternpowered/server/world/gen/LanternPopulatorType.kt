@@ -31,7 +31,6 @@ import org.lanternpowered.server.text.translation.Translated
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.text.translation.Translation
-import org.spongepowered.api.world.gen.PopulatorType
 
 class LanternPopulatorType(key: CatalogKey, translation: Translation) :
         DefaultCatalogType(key), PopulatorType, Translatable by Translated(translation) {

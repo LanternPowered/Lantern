@@ -36,7 +36,7 @@ import org.spongepowered.api.world.World;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A extension of {@link CraftingRecipe} that avoids making multiple

@@ -25,12 +25,12 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.worker.LanternBiomeVolumeWorker;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.BiomeVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeVolume;
 import org.spongepowered.api.world.extent.worker.BiomeVolumeWorker;
+import org.spongepowered.math.vector.Vector3i;
 
 public class UnmodifiableBiomeViewDownsize extends AbstractBiomeViewDownsize<BiomeVolume> implements UnmodifiableBiomeVolume {
 

@@ -40,7 +40,7 @@ import org.spongepowered.api.util.ban.BanTypes;
 import java.net.InetAddress;
 import java.time.Instant;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BanBuilder implements Ban.Builder {
 

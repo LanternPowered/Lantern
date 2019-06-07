@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.effect.entity;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.spongepowered.api.data.property.entity.EyeHeightProperty;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;

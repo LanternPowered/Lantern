@@ -32,7 +32,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractItemPropertyStore<V> implements PropertyStore<V> {
 

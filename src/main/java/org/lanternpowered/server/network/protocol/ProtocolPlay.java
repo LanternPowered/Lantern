@@ -145,8 +145,8 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTradeOffers;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUnloadChunk;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUnlockRecipes;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUpdateLight;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUpdateBlockEntity;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUpdateLight;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUpdateViewDistance;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUpdateViewPosition;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWindowItems;
@@ -252,6 +252,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBossBar;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
@@ -319,7 +320,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTheEnd;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTradeOffers;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;

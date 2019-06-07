@@ -27,7 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.inventory.Carrier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public class AbstractViewBuilder<R extends T, T extends AbstractInventory, B extends AbstractViewBuilder<R, T, B>>

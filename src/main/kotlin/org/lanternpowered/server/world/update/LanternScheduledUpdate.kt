@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.world.update
 
-import org.lanternpowered.api.world.BlockPosition
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.world.BlockPosition
 import org.lanternpowered.server.world.LanternLocation
 import org.spongepowered.api.scheduler.ScheduledUpdate
 import java.time.Duration

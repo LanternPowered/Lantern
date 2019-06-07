@@ -41,7 +41,7 @@ import org.spongepowered.api.text.translation.Translation;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public class LanternShapelessCraftingRecipeBuilder extends AbstractCatalogBuilder<ShapelessCraftingRecipe, ShapelessCraftingRecipe.Builder>

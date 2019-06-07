@@ -27,7 +27,6 @@ package org.lanternpowered.server.world.gen.debug;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
@@ -37,6 +36,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GenerationPopulator;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

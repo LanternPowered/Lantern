@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
@@ -36,6 +35,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.world.chunk.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.chunk.ChunkTicketManager.PlayerLoadingTicket;
+import org.spongepowered.math.vector.Vector2i;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -37,7 +37,6 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public final class ContextKeys {
 

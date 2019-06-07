@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.effect.sound.LanternSoundCategory;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
+import org.spongepowered.math.vector.Vector3d;
 
 public final class CodecPlayOutNamedSoundEffect implements Codec<MessagePlayOutNamedSoundEffect> {
 

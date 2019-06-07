@@ -32,7 +32,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ShapelessNetworkRecipe extends GroupedNetworkRecipe {
 

@@ -25,9 +25,6 @@
  */
 package org.lanternpowered.server.network.buffer;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3f;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.io.ByteStreams;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -41,7 +38,9 @@ import org.lanternpowered.server.network.item.NetworkItemHelper;
 import org.lanternpowered.server.network.item.RawItemStack;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.network.ChannelBuf;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3f;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +52,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class LanternByteBuffer implements ByteBuffer {

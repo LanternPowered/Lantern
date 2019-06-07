@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.effect.entity.sound.weather;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.effect.entity.AbstractEntityEffect;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Random;
 

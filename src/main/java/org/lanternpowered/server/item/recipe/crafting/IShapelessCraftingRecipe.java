@@ -32,7 +32,7 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
 import org.spongepowered.api.text.translation.Translation;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface IShapelessCraftingRecipe extends ShapelessCraftingRecipe, ICraftingRecipe {
 

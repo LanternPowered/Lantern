@@ -27,9 +27,9 @@ package org.lanternpowered.server.network.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 
 import java.util.function.Function;

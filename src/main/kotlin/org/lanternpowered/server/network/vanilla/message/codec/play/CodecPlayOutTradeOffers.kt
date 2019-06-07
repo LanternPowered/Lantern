@@ -44,6 +44,7 @@ class CodecPlayOutTradeOffers : Codec<MessagePlayOutTradeOffers> {
             writeVarInt(message.villagerLevel)
             writeVarInt(message.experience)
             writeBoolean(message.regularVillager)
+            writeBoolean(message.canRestock)
         }
     }
 }

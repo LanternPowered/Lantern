@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.util.gen.block;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.math.vector.Vector3i;
 
 public class IntArrayImmutableBlockBuffer extends AbstractImmutableBlockBuffer {
 

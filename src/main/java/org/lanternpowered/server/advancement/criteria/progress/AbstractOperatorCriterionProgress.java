@@ -35,7 +35,7 @@ import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import java.time.Instant;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("OptionalAssignedToNull")
 public abstract class AbstractOperatorCriterionProgress<T extends AbstractOperatorCriterion> extends AbstractCriterionProgress<T> {

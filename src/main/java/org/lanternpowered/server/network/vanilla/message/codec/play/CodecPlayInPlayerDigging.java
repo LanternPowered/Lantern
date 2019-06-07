@@ -27,7 +27,6 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.decodeDirection;
 
-import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
@@ -38,6 +37,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
+import org.spongepowered.math.vector.Vector3i;
 
 public final class CodecPlayInPlayerDigging implements Codec<Message> {
 

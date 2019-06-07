@@ -107,7 +107,6 @@ import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.factory.TimingsFactoryRegistryModule;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementCriterionModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeLayoutModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
@@ -116,10 +115,10 @@ import org.lanternpowered.server.game.registry.type.advancement.TriggerRegistryM
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockSoundGroupRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
-import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.ConstantDamageSourceRegistryModule;
@@ -134,6 +133,7 @@ import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryMo
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.CatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryModule;
@@ -144,7 +144,6 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.LlamaTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
@@ -226,10 +225,10 @@ import org.lanternpowered.server.item.recipe.fuel.LanternFuelRegistryModule;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeBuilder;
 import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegistry;
-import org.lanternpowered.server.network.entity.EntityProtocolType;
-import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.block.BlockEntityProtocolType;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypeRegistryModule;
+import org.lanternpowered.server.network.entity.EntityProtocolType;
+import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
@@ -458,7 +457,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
 public class LanternGameRegistry implements XGameRegistry {
@@ -669,7 +668,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(DyeColor.class, DyeColorRegistryModule.get())
                 .registerModule(PickupRule.class, PickupRuleRegistryModule.get())
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())
-                .registerModule(EnchantmentType.class, EnchantmentTypeRegistryModule.get())
+                .registerModule(EnchantmentType.class, EnchantmentTypeRegistryModule.INSTANCE)
                 .registerModule(PotionType.class, PotionTypeRegistryModule.INSTANCE)
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(DataRegistration.class, (CatalogRegistryModule) DataRegistrationRegistryModule.INSTANCE)

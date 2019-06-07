@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.command.element.ChoicesElement;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;

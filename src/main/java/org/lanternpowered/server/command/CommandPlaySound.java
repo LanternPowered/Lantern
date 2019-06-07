@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.command;
 
-import com.flowpowered.math.GenericMath;
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.command.CommandResult;
@@ -36,6 +34,8 @@ import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.math.GenericMath;
+import org.spongepowered.math.vector.Vector3d;
 
 public final class CommandPlaySound extends CommandProvider {
 

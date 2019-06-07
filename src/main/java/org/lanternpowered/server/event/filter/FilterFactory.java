@@ -36,7 +36,7 @@ import org.lanternpowered.server.util.DefineableClassLoader;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterFactory {
 

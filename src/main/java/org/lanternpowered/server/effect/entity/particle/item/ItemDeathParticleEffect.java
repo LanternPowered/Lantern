@@ -25,12 +25,12 @@
  */
 package org.lanternpowered.server.effect.entity.particle.item;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.effect.entity.EntityEffect;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.util.AABB;
+import org.spongepowered.math.vector.Vector3d;
 
 public class ItemDeathParticleEffect implements EntityEffect {
 

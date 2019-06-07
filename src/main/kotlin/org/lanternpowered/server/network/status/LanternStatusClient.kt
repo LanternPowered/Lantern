@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.status
 
-import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.MinecraftVersion
 import org.spongepowered.api.network.status.StatusClient

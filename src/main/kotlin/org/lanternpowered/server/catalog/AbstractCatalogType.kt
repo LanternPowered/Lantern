@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.server.util.ToString
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.server.util.ToString
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.NamedCatalogType
 

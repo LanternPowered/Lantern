@@ -44,8 +44,8 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.CompositeValueStore;
+import org.spongepowered.api.data.value.ValueContainer;
 
 import java.util.HashMap;
 import java.util.Map;

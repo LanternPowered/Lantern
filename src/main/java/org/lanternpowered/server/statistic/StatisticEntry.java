@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.statistic;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class StatisticEntry {
 

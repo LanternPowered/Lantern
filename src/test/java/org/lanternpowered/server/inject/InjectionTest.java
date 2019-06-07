@@ -27,7 +27,6 @@ package org.lanternpowered.server.inject;
 
 import static org.junit.Assert.assertEquals;
 
-import com.flowpowered.math.GenericMath;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -36,6 +35,7 @@ import joptsimple.OptionParser;
 import org.junit.Test;
 import org.lanternpowered.api.inject.option.Option;
 import org.lanternpowered.server.inject.option.OptionModule;
+import org.spongepowered.math.GenericMath;
 
 public class InjectionTest {
 

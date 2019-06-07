@@ -30,9 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
 
-import com.flowpowered.math.GenericMath;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.io.ChunkIOService;
@@ -49,10 +46,13 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.temporal.TemporalUnits;
-import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.GenericMath;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternChunkPreGenerateTask implements ChunkPreGenerate, Consumer<ScheduledTask> {
 

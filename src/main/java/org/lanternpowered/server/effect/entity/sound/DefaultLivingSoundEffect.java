@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.effect.entity.sound;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Random;
 

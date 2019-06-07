@@ -45,7 +45,6 @@ import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation
 import org.lanternpowered.server.text.LanternTexts
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.ThreadHelper
-import org.spongepowered.api.Console
 import org.spongepowered.api.command.exception.CommandException
 import org.spongepowered.api.command.manager.CommandManager
 import org.spongepowered.api.plugin.PluginContainer

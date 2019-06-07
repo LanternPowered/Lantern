@@ -39,7 +39,7 @@ import org.spongepowered.api.Sponge;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class CatalogTypeTypeAdapterFactory implements TypeAdapterFactory {
 

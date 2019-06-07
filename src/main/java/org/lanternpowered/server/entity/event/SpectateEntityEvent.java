@@ -29,7 +29,7 @@ import org.spongepowered.api.entity.Entity;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class SpectateEntityEvent implements EntityEvent {
 

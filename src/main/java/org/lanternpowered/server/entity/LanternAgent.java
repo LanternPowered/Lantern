@@ -33,7 +33,7 @@ import org.spongepowered.api.entity.living.Agent;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class LanternAgent extends LanternLiving implements Agent {
 

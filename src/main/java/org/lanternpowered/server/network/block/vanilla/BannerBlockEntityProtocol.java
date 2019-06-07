@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BannerBlockEntityProtocol<T extends LanternBlockEntity> extends BlockEntityProtocol<T> {
 

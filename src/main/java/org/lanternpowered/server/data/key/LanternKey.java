@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternKey<V extends Value<?>> implements Key<V>, CatalogType {
 

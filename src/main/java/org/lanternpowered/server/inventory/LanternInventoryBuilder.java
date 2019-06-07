@@ -50,7 +50,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public class LanternInventoryBuilder<T extends AbstractInventory> implements Inventory.Builder {

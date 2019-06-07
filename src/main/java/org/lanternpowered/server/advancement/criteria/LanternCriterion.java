@@ -29,7 +29,7 @@ import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternCriterion extends AbstractCriterion {
 

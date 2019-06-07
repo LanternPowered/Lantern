@@ -35,7 +35,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.HashSet;
 import java.util.List;

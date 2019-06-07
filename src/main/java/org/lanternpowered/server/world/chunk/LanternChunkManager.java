@@ -34,8 +34,6 @@ import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_S
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_VOLUME;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_BIOME_VOLUME;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -74,19 +72,21 @@ import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
+import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.BiomeTypes;
+import org.spongepowered.api.world.biome.VirtualBiomeType;
 import org.spongepowered.api.world.chunk.Chunk;
 import org.spongepowered.api.world.chunk.ChunkTicketManager;
 import org.spongepowered.api.world.chunk.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.chunk.ChunkTicketManager.LoadingTicket;
 import org.spongepowered.api.world.chunk.ChunkTicketManager.PlayerEntityLoadingTicket;
 import org.spongepowered.api.world.chunk.ChunkTicketManager.PlayerLoadingTicket;
-import org.spongepowered.api.world.biome.BiomeGenerationSettings;
-import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.biome.VirtualBiomeType;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.WorldGenerator;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -109,12 +109,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class LanternChunkManager {
 

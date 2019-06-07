@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.network.entity.parameter;
 
-import com.flowpowered.math.vector.Vector3f;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
@@ -37,6 +35,8 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.math.vector.Vector3f;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 import java.util.OptionalInt;

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world.weather.action;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.lanternpowered.api.script.ScriptContext;
@@ -42,6 +41,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.action.LightningEvent;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Chunk;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;

@@ -41,7 +41,7 @@ import org.spongepowered.api.text.format.TextColors;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternTeamBuilder implements Team.Builder {
 

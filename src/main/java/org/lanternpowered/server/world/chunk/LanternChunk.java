@@ -32,9 +32,6 @@ import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_BIO
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_MASK;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SIZE;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -42,17 +39,17 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.server.block.BlockEntityProvider;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
-import org.lanternpowered.server.block.BlockEntityProvider;
 import org.lanternpowered.server.block.action.BlockAction;
-import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
-import org.lanternpowered.server.block.provider.ConstantObjectProvider;
-import org.lanternpowered.server.block.provider.BlockObjectProvider;
-import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntityArchetype;
+import org.lanternpowered.server.block.provider.BlockObjectProvider;
+import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
+import org.lanternpowered.server.block.provider.ConstantObjectProvider;
+import org.lanternpowered.server.block.provider.SimpleObjectProvider;
 import org.lanternpowered.server.data.property.IStoreDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.IStorePropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -93,6 +90,9 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.chunk.Chunk;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -112,7 +112,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternChunk implements AbstractExtent, Chunk {
 

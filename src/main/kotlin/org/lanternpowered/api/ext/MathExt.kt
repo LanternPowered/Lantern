@@ -25,16 +25,6 @@
  */
 package org.lanternpowered.api.ext
 
-import com.flowpowered.math.imaginary.Quaterniond
-import com.flowpowered.math.imaginary.Quaternionf
-import com.flowpowered.math.vector.Vector2d
-import com.flowpowered.math.vector.Vector2f
-import com.flowpowered.math.vector.Vector2i
-import com.flowpowered.math.vector.Vector3d
-import com.flowpowered.math.vector.Vector3f
-import com.flowpowered.math.vector.Vector3i
-import org.lanternpowered.api.world.BlockVector
-
 operator fun Vector2d.component1(): Double = x
 operator fun Vector2d.component2(): Double = y
 operator fun Vector2d.times(value: Double): Vector2d = mul(value)

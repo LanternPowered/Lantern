@@ -44,7 +44,7 @@ import org.spongepowered.api.world.Location;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public class SlabItemInteractionBehavior implements InteractWithItemBehavior {

@@ -27,7 +27,6 @@ package org.lanternpowered.server.command;
 
 import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.command.element.RelativeDouble;
 import org.spongepowered.api.command.CommandException;
@@ -40,6 +39,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector3d;
 
 public final class CommandTeleport extends CommandProvider {
 

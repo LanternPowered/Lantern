@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import com.flowpowered.math.vector.Vector3f;
 import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.network.entity.parameter.ParameterType;
 import org.lanternpowered.server.network.entity.parameter.ParameterTypeCollection;
@@ -34,6 +33,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.math.vector.Vector3f;
 
 import java.util.Optional;
 import java.util.OptionalInt;

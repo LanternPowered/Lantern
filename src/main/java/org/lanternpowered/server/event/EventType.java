@@ -30,7 +30,7 @@ import org.spongepowered.api.event.Event;
 
 import java.util.Objects;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EventType<T extends Event> {
 

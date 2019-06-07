@@ -43,7 +43,7 @@ import org.spongepowered.api.world.World;
 import java.util.Iterator;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternCraftingInventory extends AbstractChildrenInventory implements CraftingInventory {
 

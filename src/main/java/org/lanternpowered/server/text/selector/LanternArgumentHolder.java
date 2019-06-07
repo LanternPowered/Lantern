@@ -25,10 +25,6 @@
  */
 package org.lanternpowered.server.text.selector;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3f;
-import com.flowpowered.math.vector.Vector3i;
-import com.flowpowered.math.vector.Vector3l;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
@@ -36,6 +32,10 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.lmbda.LambdaFactory;
 import org.spongepowered.api.text.selector.ArgumentHolder;
 import org.spongepowered.api.text.selector.ArgumentType;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3f;
+import org.spongepowered.math.vector.Vector3i;
+import org.spongepowered.math.vector.Vector3l;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;

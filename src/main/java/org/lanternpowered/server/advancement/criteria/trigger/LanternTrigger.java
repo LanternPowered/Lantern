@@ -31,11 +31,11 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonObject;
 import org.lanternpowered.api.catalog.CatalogKeys;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.advancement.criteria.progress.AbstractCriterionProgress;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
@@ -53,7 +53,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public class LanternTrigger<C extends FilteredTriggerConfiguration> extends DefaultCatalogType implements Trigger<C> {

@@ -25,12 +25,12 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeVolume;
 import org.spongepowered.api.world.extent.BlockVolume;
+import org.spongepowered.math.vector.Vector3i;
 
 public final class ExtentBufferHelper {
 

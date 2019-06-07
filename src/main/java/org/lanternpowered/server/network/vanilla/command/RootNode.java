@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.command;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class RootNode extends Node {
 

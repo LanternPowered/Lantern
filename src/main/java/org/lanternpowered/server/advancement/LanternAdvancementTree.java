@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.advancement;
 
-import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.api.util.ToStringHelper;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;

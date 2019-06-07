@@ -1110,5 +1110,33 @@
     {
         "version": 479,
         "name": "1.14.1 Pre-Release 2"
+    },
+    {
+        "version": 480,
+        "name": "1.14.1"
+    },
+    {
+        "version": 481,
+        "name": "1.14.2 Pre-Release 1"
+    },
+    {
+        "version": 482,
+        "name": "1.14.2 Pre-Release 2"
+    },
+    {
+        "version": 483,
+        "name": "1.14.2 Pre-Release 3"
+    },
+    {
+        "version": 484,
+        "name": "1.14.2 Pre-Release 4"
+    },
+    {
+        "version": 485,
+        "name": "1.14.2"
+    },
+    {
+        "version": 486,
+        "name": "1.14.3-pre1"
     }
 ]

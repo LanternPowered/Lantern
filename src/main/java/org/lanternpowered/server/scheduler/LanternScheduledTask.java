@@ -32,7 +32,7 @@ import org.spongepowered.api.scheduler.Task;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An internal representation of a {@link Task} created by a plugin.

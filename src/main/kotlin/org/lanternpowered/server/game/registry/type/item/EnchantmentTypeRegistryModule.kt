@@ -39,14 +39,13 @@ import org.spongepowered.api.item.enchantment.EnchantmentTypes
 
 object EnchantmentTypeRegistryModule : InternalPluginCatalogRegistryModule<EnchantmentType>(EnchantmentTypes::class) {
 
-    @JvmStatic
-    fun get(): EnchantmentTypeRegistryModule = this
-
     private inline fun register(id: String, name: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) {
         register(LanternEnchantmentTypeBuilder().id(id).name(tr(name)).apply(fn).build())
     }
 
     override fun registerDefaults() {
+
+
         // Register for minecraft plugin
         CauseStack.current().withPlugin(Lantern.getMinecraftPlugin()) {
             register("protection", "enchantment.protect.all")

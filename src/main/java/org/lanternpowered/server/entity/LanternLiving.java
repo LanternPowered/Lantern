@@ -27,15 +27,10 @@ package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2d;
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.ICompositeValueStore;
 import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.processor.ValueProcessor;
 import org.lanternpowered.server.data.processor.ValueProcessorBuilder;
 import org.lanternpowered.server.effect.entity.EntityEffect;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
@@ -54,12 +49,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
-import org.spongepowered.api.data.property.Properties;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.mutable.CompositeValueStore;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.manipulator.mutable.FoodData;
+import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
@@ -68,7 +59,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.Item;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.projectile.Projectile;
@@ -94,6 +84,8 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gamerule.GameRules;
+import org.spongepowered.math.vector.Vector2d;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +94,7 @@ import java.util.OptionalDouble;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public class LanternLiving extends LanternEntity implements Living {

@@ -26,7 +26,6 @@
 package org.lanternpowered.server.text.action
 
 import org.lanternpowered.api.ext.*
-import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
 import org.spongepowered.api.item.inventory.ItemStackSnapshot

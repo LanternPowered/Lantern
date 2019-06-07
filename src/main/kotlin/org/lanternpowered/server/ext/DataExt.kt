@@ -29,8 +29,8 @@ package org.lanternpowered.server.ext
 
 import org.lanternpowered.api.ext.*
 import org.spongepowered.api.data.DataTransactionResult
-import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.data.value.CompositeValueStore
+import org.spongepowered.api.data.value.ValueContainer
 import kotlin.reflect.KClass
 
 inline fun <H : ValueContainer<*>, V: H> CompositeValueStore<*, H>.get(containerClass: KClass<V>): H? =

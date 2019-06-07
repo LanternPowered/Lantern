@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.util;
 
-import com.flowpowered.math.imaginary.Quaterniond;
-import com.flowpowered.math.imaginary.Quaternionf;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3f;
+import org.spongepowered.math.imaginary.Quaterniond;
+import org.spongepowered.math.imaginary.Quaternionf;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3f;
 
 public final class Quaternions {
 

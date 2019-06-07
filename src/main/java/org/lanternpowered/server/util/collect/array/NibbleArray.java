@@ -31,7 +31,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @NonnullByDefault
 public class NibbleArray {

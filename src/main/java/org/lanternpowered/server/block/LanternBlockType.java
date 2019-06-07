@@ -46,7 +46,7 @@ import org.spongepowered.api.util.AABB;
 import java.util.Collection;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternBlockType extends DefaultCatalogType implements BlockType, IStorePropertyHolder {
 

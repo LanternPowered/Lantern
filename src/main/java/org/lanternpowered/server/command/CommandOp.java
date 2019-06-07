@@ -48,7 +48,7 @@ import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class CommandOp extends CommandProvider {
 

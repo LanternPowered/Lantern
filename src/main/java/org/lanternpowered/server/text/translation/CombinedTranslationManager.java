@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class CombinedTranslationManager implements TranslationManager, ReloadListener {
 

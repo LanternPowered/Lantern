@@ -32,7 +32,7 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 
 import java.util.Collection;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class NetworkAdvancement {
 

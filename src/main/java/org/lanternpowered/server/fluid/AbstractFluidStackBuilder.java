@@ -41,7 +41,7 @@ import org.spongepowered.api.fluid.FluidTypes;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 abstract class AbstractFluidStackBuilder<T extends DataSerializable, B extends DataBuilder<T>> extends AbstractDataBuilder<T> {

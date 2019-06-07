@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.vanilla.command.argument.ArgumentAndTyp
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ArgumentNode extends Node {
 

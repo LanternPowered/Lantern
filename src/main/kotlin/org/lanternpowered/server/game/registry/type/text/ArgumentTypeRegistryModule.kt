@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.text
 
-import com.flowpowered.math.vector.Vector3d
-import com.flowpowered.math.vector.Vector3i
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.text.selector.LanternArgumentHolder
 import org.spongepowered.api.entity.EntityType

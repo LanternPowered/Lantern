@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.command.argument;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class IntArgument extends Argument {
 

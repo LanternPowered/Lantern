@@ -28,7 +28,7 @@ package org.lanternpowered.server.item.recipe.crafting;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class SimpleCraftingMatrix implements ICraftingMatrix {
 

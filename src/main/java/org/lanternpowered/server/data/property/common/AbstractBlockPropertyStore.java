@@ -40,7 +40,7 @@ import org.spongepowered.api.world.Location;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractBlockPropertyStore<V> implements PropertyStore<V>, DirectionRelativePropertyStore<V> {

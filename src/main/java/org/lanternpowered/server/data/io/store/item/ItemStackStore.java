@@ -241,7 +241,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
             if (!views.isEmpty()) {
                 final List<Enchantment> enchantments = new ArrayList<>();
                 views.forEach(view -> {
-                    final Optional<EnchantmentType> enchantmentType = EnchantmentTypeRegistryModule.get()
+                    final Optional<EnchantmentType> enchantmentType = EnchantmentTypeRegistryModule.INSTANCE
                             .getByInternalId(view.getInt(ENCHANTMENT_ID).get());
                     if (enchantmentType.isPresent()) {
                         final int level = view.getInt(ENCHANTMENT_LEVEL).get();

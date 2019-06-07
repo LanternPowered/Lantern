@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class WeatherBuilder implements CopyableBuilder<LanternWeather, WeatherBuilder>, CatalogTypeConstructor<Weather> {
 

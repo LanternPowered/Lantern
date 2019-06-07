@@ -43,7 +43,7 @@ import org.spongepowered.api.text.translation.FixedTranslation;
 
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractDataManipulatorRegistration<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>>

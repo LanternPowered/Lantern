@@ -27,7 +27,6 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import static org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID;
 
-import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.EntityEvent;
@@ -57,11 +56,12 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.OptionalInt;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> {
 

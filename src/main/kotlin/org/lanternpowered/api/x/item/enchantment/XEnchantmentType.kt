@@ -40,8 +40,8 @@ interface XEnchantmentType : EnchantmentType, NamedCatalogType {
      */
     fun enchantabilityRangeForLevel(level: Int): IntRange
 
-    override fun getMinimumLevel(): Int = this.levelRange.start
-    override fun getMaximumLevel(): Int = this.levelRange.endInclusive
-    override fun getMinimumEnchantabilityForLevel(level: Int): Int = enchantabilityRangeForLevel(level).start
-    override fun getMaximumEnchantabilityForLevel(level: Int): Int = enchantabilityRangeForLevel(level).endInclusive
+    override fun getMinimumLevel() = this.levelRange.start
+    override fun getMaximumLevel() = this.levelRange.endInclusive
+    override fun getMinimumEnchantabilityForLevel(level: Int) = enchantabilityRangeForLevel(level).start
+    override fun getMaximumEnchantabilityForLevel(level: Int) = enchantabilityRangeForLevel(level).endInclusive
 }

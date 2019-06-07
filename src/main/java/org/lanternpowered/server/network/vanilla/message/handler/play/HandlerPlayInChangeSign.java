@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
@@ -41,6 +40,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -30,7 +30,7 @@ import org.lanternpowered.api.script.Script;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternScript<T> implements Script<T> {
 

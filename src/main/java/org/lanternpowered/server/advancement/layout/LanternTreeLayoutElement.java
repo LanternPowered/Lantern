@@ -27,10 +27,10 @@ package org.lanternpowered.server.advancement.layout;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2d;
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.TreeLayoutElement;
+import org.spongepowered.math.vector.Vector2d;
 
 public class LanternTreeLayoutElement implements TreeLayoutElement {
 

@@ -36,7 +36,6 @@ import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.InventoryViewerListener;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.List;

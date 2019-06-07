@@ -28,9 +28,9 @@ package org.lanternpowered.server.advancement;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.advancement.layout.LanternTreeLayoutElement;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
@@ -50,7 +50,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternAdvancement extends DefaultCatalogType.Named implements Advancement {
 

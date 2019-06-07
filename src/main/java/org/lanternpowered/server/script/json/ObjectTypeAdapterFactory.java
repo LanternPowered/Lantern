@@ -40,7 +40,7 @@ import org.spongepowered.api.CatalogKey;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public class ObjectTypeAdapterFactory<V, O extends ObjectType<V>> implements TypeAdapterFactory {

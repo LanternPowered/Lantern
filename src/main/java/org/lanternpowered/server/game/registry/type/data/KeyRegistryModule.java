@@ -26,9 +26,9 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeBoundedValueKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMapKeyWithKeyAndValue;
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeBoundedValueKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
@@ -36,8 +36,6 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeWeightedC
 import static org.lanternpowered.server.util.UncheckedThrowables.doUnchecked;
 import static org.spongepowered.api.data.DataQuery.of;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.key.LanternKey;
@@ -96,6 +94,8 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RespawnLocation;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.util.weighted.WeightedSerializableObject;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

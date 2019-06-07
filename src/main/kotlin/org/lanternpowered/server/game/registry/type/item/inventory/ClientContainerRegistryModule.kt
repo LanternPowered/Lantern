@@ -28,12 +28,24 @@ package org.lanternpowered.server.game.registry.type.item.inventory
 import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.lanternpowered.server.inventory.AbstractInventory
-import org.lanternpowered.server.inventory.client.*
+import org.lanternpowered.server.inventory.client.AnvilClientContainer
+import org.lanternpowered.server.inventory.client.BeaconClientContainer
+import org.lanternpowered.server.inventory.client.BrewingStandClientContainer
+import org.lanternpowered.server.inventory.client.ChestClientContainer
+import org.lanternpowered.server.inventory.client.ClientContainer
+import org.lanternpowered.server.inventory.client.ClientContainerType
+import org.lanternpowered.server.inventory.client.CraftingTableClientContainer
+import org.lanternpowered.server.inventory.client.DispenserClientContainer
+import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer
+import org.lanternpowered.server.inventory.client.EntityEquipmentClientContainer
+import org.lanternpowered.server.inventory.client.FurnaceClientContainer
+import org.lanternpowered.server.inventory.client.GrindstoneClientContainer
+import org.lanternpowered.server.inventory.client.HopperClientContainer
+import org.lanternpowered.server.inventory.client.ShulkerBoxClientContainer
+import org.lanternpowered.server.inventory.client.TradingClientContainer
 import org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.entity.Entity
-import org.spongepowered.api.item.inventory.gui.GuiId
-import org.spongepowered.api.item.inventory.gui.GuiIds
 import org.spongepowered.api.item.inventory.type.CarriedInventory
 
 object ClientContainerRegistryModule : DefaultCatalogRegistryModule<GuiId>(GuiIds::class) {

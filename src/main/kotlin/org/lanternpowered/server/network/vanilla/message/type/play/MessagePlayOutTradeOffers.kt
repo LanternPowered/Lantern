@@ -33,5 +33,6 @@ data class MessagePlayOutTradeOffers(
         val villagerLevel: Int,
         val experience: Int,
         val regularVillager: Boolean,
+        val canRestock: Boolean,
         val tradeOffers: List<NetworkTradeOffer>
 ) : Message

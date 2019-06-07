@@ -32,7 +32,7 @@ import org.lanternpowered.server.advancement.criteria.trigger.LanternTrigger;
 import java.time.Instant;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 abstract class LanternCriterionProgressBase<T extends AbstractCriterion> extends AbstractCriterionProgress<T> {
 

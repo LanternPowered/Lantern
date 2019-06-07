@@ -30,7 +30,6 @@ import static org.lanternpowered.server.config.world.WorldConfig.MAX_VIEW_DISTAN
 import static org.lanternpowered.server.config.world.WorldConfig.MIN_VIEW_DISTANCE;
 import static org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage.URL_ARGUMENT;
 
-import com.flowpowered.math.GenericMath;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -51,6 +50,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.math.GenericMath;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
 public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {

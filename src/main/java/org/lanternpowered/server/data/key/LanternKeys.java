@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data.key;
 
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeBoundedValueKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;

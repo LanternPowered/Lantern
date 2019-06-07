@@ -29,7 +29,6 @@ import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSourceBuilder
 import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
 
 class LanternBlockDamageSourceBuilder : AbstractDamageSourceBuilder<BlockDamageSource, BlockDamageSource.Builder>(), BlockDamageSource.Builder {
 

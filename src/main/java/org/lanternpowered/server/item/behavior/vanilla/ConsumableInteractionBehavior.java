@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public class ConsumableInteractionBehavior implements InteractWithItemBehavior, FinishUsingItemBehavior {

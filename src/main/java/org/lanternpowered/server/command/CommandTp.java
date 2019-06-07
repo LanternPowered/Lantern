@@ -27,7 +27,6 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.command.element.RelativeDouble;
 import org.lanternpowered.server.command.element.RelativeVector3d;
@@ -43,6 +42,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 

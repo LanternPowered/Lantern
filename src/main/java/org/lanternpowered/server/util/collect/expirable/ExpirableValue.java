@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.util.collect.expirable;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ExpirableValue<V> {
 

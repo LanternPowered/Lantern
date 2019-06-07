@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.util.RelativePositions;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Set;
 

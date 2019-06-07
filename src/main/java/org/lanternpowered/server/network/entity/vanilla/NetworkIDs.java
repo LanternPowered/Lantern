@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.game.registry.InternalRegistry;
 import org.lanternpowered.server.game.registry.InternalRegistries;
+import org.lanternpowered.server.game.registry.InternalRegistry;
 
 public final class NetworkIDs {
 

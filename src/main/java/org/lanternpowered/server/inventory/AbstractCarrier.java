@@ -31,7 +31,7 @@ import com.google.common.base.MoreObjects;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractCarrier<T extends CarriedInventory<?>> implements Carrier {

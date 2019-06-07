@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.block;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import org.lanternpowered.server.data.DataQueries;
@@ -39,6 +38,7 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Collection;
 import java.util.List;

@@ -25,9 +25,6 @@
  */
 package org.lanternpowered.server.util
 
-import com.flowpowered.math.imaginary.Quaterniond
-import com.flowpowered.math.matrix.Matrix4d
-import com.flowpowered.math.vector.Vector3d
 import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.util.Transform
 

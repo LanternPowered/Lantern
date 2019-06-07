@@ -41,7 +41,7 @@ import org.spongepowered.api.profile.property.ProfileProperty;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @ConfigSerializable
 public final class LanternProfileProperty implements ProfileProperty {

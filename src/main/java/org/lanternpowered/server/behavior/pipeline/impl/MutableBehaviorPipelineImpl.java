@@ -35,7 +35,7 @@ import org.lanternpowered.server.behavior.pipeline.SubBehaviorPipeline;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MutableBehaviorPipelineImpl<B extends Behavior> extends BehaviorPipelineImpl<B>
         implements MutableBehaviorPipeline<B> {

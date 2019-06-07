@@ -35,7 +35,7 @@ import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.event.cause.EventContextKey;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class LanternEventContextKeyBuilder<T> implements EventContextKey.Builder<T> {
 

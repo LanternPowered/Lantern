@@ -27,7 +27,6 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -42,12 +41,13 @@ import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 

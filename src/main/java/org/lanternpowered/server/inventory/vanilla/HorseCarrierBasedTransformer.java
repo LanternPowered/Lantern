@@ -38,7 +38,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class HorseCarrierBasedTransformer implements CarrierBasedTransformer<LanternChildrenInventory, LanternChildrenInventory.Builder<LanternChildrenInventory>> {
 

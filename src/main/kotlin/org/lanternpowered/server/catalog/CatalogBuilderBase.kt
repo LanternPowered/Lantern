@@ -32,8 +32,6 @@ import org.lanternpowered.api.ext.*
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.plugin.PluginContainer
-import org.spongepowered.api.text.translation.FixedTranslation
-import org.spongepowered.api.text.translation.Translation
 import org.spongepowered.api.util.CatalogBuilder
 import org.spongepowered.api.util.ResettableBuilder
 

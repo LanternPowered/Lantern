@@ -28,13 +28,13 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.spongepowered.api.util.temporal.TemporalUnits;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Duration;
 import java.util.Set;

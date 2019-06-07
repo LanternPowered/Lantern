@@ -33,7 +33,7 @@ import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.inventory.vanilla.LanternPrimaryPlayerInventory;
 import org.spongepowered.api.item.inventory.slot.InputSlot;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractShiftClickBehavior implements ShiftClickBehavior {
 

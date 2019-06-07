@@ -28,7 +28,7 @@ package org.lanternpowered.server.util.collect;
 import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Collections3 {
 

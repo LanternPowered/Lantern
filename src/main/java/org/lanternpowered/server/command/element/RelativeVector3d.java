@@ -27,7 +27,7 @@ package org.lanternpowered.server.command.element;
 
 import static java.util.Objects.requireNonNull;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 
 public final class RelativeVector3d {
 

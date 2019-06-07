@@ -27,7 +27,6 @@ package org.lanternpowered.api.inject.service
 
 import com.google.inject.ProvidedBy
 import org.lanternpowered.api.Lantern
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.plugin.PluginContainer
 import org.spongepowered.api.service.ProviderRegistration
 import java.util.Optional

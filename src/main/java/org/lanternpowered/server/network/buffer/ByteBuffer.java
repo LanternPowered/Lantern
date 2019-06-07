@@ -25,20 +25,20 @@
  */
 package org.lanternpowered.server.network.buffer;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3f;
-import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.ReferenceCounted;
 import org.lanternpowered.server.network.item.RawItemStack;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3f;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.io.IOException;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
 

@@ -26,8 +26,8 @@
 package org.lanternpowered.server.script;
 
 import org.lanternpowered.api.script.ObjectType;
-import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.api.util.ToStringHelper;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.spongepowered.api.CatalogKey;
 
 public abstract class AbstractObjectType<O> extends DefaultCatalogType implements ObjectType<O> {

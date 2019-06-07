@@ -27,7 +27,7 @@ package org.lanternpowered.testserver.plugin;
 
 import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
 
-import com.flowpowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;

@@ -32,7 +32,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.util.collect.array.VariableValueArray;
 import org.spongepowered.api.data.DataView;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MessagePlayOutChunkData implements Message {
 

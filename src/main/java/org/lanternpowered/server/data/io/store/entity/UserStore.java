@@ -27,7 +27,6 @@ package org.lanternpowered.server.data.io.store.entity;
 
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
@@ -61,6 +60,7 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.util.RespawnLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Instant;
 import java.util.ArrayList;

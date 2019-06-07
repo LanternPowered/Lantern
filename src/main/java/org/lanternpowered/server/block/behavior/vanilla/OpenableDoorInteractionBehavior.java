@@ -35,7 +35,6 @@ import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class OpenableDoorInteractionBehavior extends OpenableInteractionBehavior {
 

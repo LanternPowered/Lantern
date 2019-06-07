@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.effect.entity.sound.player;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.effect.entity.sound.AbstractLivingSoundEffect;
 import org.lanternpowered.server.entity.EntityBodyPosition;
@@ -34,6 +33,7 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Random;
 

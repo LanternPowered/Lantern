@@ -30,7 +30,7 @@ import co.aikar.timings.TimingsFactory;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.channel.MessageChannel;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DummyLanternTimingsFactory implements TimingsFactory {
 

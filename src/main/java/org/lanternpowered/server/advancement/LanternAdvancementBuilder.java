@@ -36,7 +36,7 @@ import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"NullableProblems", "ConstantConditions"})
 public class LanternAdvancementBuilder extends AbstractNamedCatalogBuilder<Advancement, Advancement.Builder> implements Advancement.Builder {

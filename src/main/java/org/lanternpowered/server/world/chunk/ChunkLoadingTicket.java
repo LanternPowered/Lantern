@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.world.chunk.ChunkTicketManager.LoadingTicket;
+import org.spongepowered.math.vector.Vector2i;
 
 public interface ChunkLoadingTicket extends LoadingTicket {
 

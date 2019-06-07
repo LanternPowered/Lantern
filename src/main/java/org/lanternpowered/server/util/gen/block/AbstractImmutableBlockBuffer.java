@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.util.gen.block;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
+import org.spongepowered.math.vector.Vector3i;
 
 public abstract class AbstractImmutableBlockBuffer extends AbstractBlockBuffer implements ImmutableBlockVolume {
 

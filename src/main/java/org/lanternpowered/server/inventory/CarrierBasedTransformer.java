@@ -29,7 +29,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @FunctionalInterface
 public interface CarrierBasedTransformer<R extends AbstractInventory, B extends AbstractArchetypeBuilder<R, ? super R, B>> {

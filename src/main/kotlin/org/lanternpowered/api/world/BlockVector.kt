@@ -28,9 +28,6 @@
 
 package org.lanternpowered.api.world
 
-import com.flowpowered.math.vector.Vector3d
-import com.flowpowered.math.vector.Vector3i
-
 /**
  * Shorter name alias for [BlockPosition].
  */

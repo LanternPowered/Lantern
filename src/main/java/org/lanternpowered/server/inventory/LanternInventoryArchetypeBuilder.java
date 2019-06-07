@@ -27,7 +27,6 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.lanternpowered.server.inventory.type.LanternGridInventory;
@@ -42,6 +41,7 @@ import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.inventory.type.InventoryColumn;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.math.vector.Vector2i;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"unchecked", "ConstantConditions"})
 public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<InventoryArchetype, InventoryArchetype.Builder>

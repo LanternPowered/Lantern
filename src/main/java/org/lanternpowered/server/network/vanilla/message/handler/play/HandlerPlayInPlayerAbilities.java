@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
@@ -37,6 +36,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.math.vector.Vector3d;
 
 public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayerAbilities> {
 

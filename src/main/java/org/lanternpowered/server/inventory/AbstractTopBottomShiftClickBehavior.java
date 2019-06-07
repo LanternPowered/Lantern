@@ -28,7 +28,7 @@ package org.lanternpowered.server.inventory;
 import org.lanternpowered.server.inventory.behavior.AbstractShiftClickBehavior;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link ShiftClickBehavior} that is only applicable to a {@link PlayerTopBottomContainer}.

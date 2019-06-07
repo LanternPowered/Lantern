@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.entity;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -57,12 +56,13 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternItem extends LanternEntity implements Item {
 

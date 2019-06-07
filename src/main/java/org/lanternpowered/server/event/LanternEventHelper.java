@@ -38,7 +38,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Optional;

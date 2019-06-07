@@ -87,10 +87,11 @@ import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class HandlerEncryptionResponse implements Handler<MessageLoginInEncryptionResponse> {
 

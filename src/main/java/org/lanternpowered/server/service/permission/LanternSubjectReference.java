@@ -31,7 +31,7 @@ import org.spongepowered.api.service.permission.SubjectReference;
 
 import java.util.concurrent.CompletableFuture;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class LanternSubjectReference implements SubjectReference {
 

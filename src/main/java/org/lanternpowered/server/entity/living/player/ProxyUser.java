@@ -27,7 +27,6 @@ package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Objects;
 import org.lanternpowered.server.data.io.UserIO;
 import org.lanternpowered.server.game.Lantern;
@@ -52,6 +51,7 @@ import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -62,7 +62,7 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProxyUser extends AbstractProxySubject implements IUser {
 

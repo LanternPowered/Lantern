@@ -29,13 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
 import org.lanternpowered.server.data.value.LanternImmutableValue;
 import org.lanternpowered.server.data.value.LanternMutableValue;
 import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.lanternpowered.api.util.ToStringHelper;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.OptionalValue;
 import org.spongepowered.api.data.value.Value;

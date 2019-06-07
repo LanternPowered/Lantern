@@ -44,8 +44,9 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.inject.Named;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 abstract class OptionObjectProvider<T> implements Provider<T> {

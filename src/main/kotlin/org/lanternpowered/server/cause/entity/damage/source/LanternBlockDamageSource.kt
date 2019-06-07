@@ -28,7 +28,6 @@ package org.lanternpowered.server.cause.entity.damage.source
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource
 import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
 
 internal class LanternBlockDamageSource(
         builder: LanternBlockDamageSourceBuilder,

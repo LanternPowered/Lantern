@@ -27,11 +27,11 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.flowpowered.math.GenericMath;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.math.GenericMath;
 
 public final class CodecUtils {
 

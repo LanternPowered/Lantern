@@ -50,7 +50,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 class LanternEmptyInventory extends AbstractInventory implements EmptyInventory, IQueryInventory {

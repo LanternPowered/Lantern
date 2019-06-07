@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.world;
 
-import com.flowpowered.math.vector.Vector3i;
-import com.google.gson.Gson;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.DataQueries;
@@ -61,6 +59,7 @@ import org.spongepowered.api.world.teleport.PortalAgentType;
 import org.spongepowered.api.world.teleport.PortalAgentTypes;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.io.DataInputStream;
 import java.io.FileNotFoundException;
@@ -76,7 +75,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 final class LanternWorldPropertiesIO {

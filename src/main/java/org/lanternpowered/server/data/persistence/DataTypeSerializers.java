@@ -28,7 +28,6 @@ package org.lanternpowered.server.data.persistence;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.util.roman.IllegalRomanNumberException;
@@ -42,7 +41,6 @@ import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Coerce;
 
 import java.lang.reflect.TypeVariable;

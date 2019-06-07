@@ -28,8 +28,6 @@ package org.lanternpowered.server.world.chunk;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -37,10 +35,12 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.LinkedList;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 class LanternLoadingTicket implements ChunkLoadingTicket {
 

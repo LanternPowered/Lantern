@@ -37,7 +37,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link JsonWriter} that serializes to a {@link DataContainer}

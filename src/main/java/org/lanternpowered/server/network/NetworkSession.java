@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import io.netty.channel.Channel;
@@ -94,7 +93,7 @@ import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -111,7 +110,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public final class NetworkSession extends SimpleChannelInboundHandler<Message> implements PlayerConnection {

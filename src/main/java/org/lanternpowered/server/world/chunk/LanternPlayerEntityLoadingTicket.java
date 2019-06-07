@@ -33,7 +33,7 @@ import org.spongepowered.api.world.chunk.ChunkTicketManager.PlayerEntityLoadingT
 
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implements PlayerEntityLoadingTicket {
 

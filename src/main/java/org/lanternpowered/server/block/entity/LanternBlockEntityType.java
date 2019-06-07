@@ -27,8 +27,8 @@ package org.lanternpowered.server.block.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.api.util.ToStringHelper;
+import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
@@ -36,7 +36,7 @@ import org.spongepowered.api.block.entity.BlockEntityType;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 public final class LanternBlockEntityType extends DefaultCatalogType implements BlockEntityType {

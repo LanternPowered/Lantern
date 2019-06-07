@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.ArmorType
 import org.spongepowered.api.item.recipe.crafting.Ingredient

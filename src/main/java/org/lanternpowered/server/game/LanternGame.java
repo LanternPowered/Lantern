@@ -52,7 +52,6 @@ import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.console.LanternConsole;
-import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.event.LanternEventManager;
@@ -101,7 +100,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
 public class LanternGame implements Game {

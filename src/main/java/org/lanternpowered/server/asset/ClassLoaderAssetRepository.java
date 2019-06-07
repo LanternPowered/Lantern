@@ -36,7 +36,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ClassLoaderAssetRepository extends AbstractMultiAssetRepository {
 

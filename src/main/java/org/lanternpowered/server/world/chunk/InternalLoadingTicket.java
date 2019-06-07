@@ -25,12 +25,12 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3i;
 
 final class InternalLoadingTicket implements ChunkLoadingTicket {
 

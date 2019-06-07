@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.item;
 
 import org.spongepowered.api.data.DataView;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class RawItemStack {
 

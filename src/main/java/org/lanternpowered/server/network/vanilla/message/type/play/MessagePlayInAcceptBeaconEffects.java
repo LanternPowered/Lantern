@@ -31,7 +31,7 @@ import org.spongepowered.api.effect.potion.PotionEffectType;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MessagePlayInAcceptBeaconEffects implements Message {
 

@@ -34,7 +34,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class PotionEffectSerializer {
 

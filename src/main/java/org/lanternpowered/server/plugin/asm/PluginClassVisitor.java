@@ -31,7 +31,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.spongepowered.plugin.meta.PluginMetadata;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class PluginClassVisitor extends ClassVisitor {
 

@@ -29,7 +29,7 @@ import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.world.World
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.data.DataContainer
+import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.world.biome.BiomeType
 import org.spongepowered.api.world.storage.WorldProperties
 

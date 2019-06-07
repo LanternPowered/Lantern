@@ -30,7 +30,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.vanilla.LanternUserInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 

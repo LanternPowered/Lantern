@@ -114,10 +114,10 @@ import org.spongepowered.api.advancement.AdvancementProgress;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.Sign;
-import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.persistence.DataView;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -127,7 +127,6 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -164,6 +163,7 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
@@ -213,7 +213,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     // The entity id that will be used for the client
     private int networkEntityId = -1;
 
-    private MessageChannel messageChannel = MessageChannel.TO_ALL;
+    private MessageChannel messageChannel = MessageChannel.toPlayersAndServer();
 
     // The (client) locale of the player
     private Locale locale = Locales.DEFAULT;
@@ -243,7 +243,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Nullable private Vector2i lastChunkPos = null;
 
     // The loading ticket that will force the chunks to be loaded
-    @Nullable private ChunkTicketManager.PlayerEntityLoadingTicket loadingTicket;
+    private ChunkTicketManager.@Nullable PlayerEntityLoadingTicket loadingTicket;
 
     private final ResourcePackSendQueue resourcePackSendQueue = new ResourcePackSendQueue(this);
 
@@ -409,6 +409,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         super.registerKeys();
 
         final ValueCollection c = getValueCollection();
+        c.register(Keys.IS_SLEEPING_IGNORED, false);
         ((ElementKeyRegistration<?, Optional<AdvancementTree>>) c.get(LanternKeys.OPEN_ADVANCEMENT_TREE).get())
                 .addListener((oldElement, newElement) -> {
                     if (getWorld() != null) {
@@ -481,7 +482,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (world != null) {
             final LanternGameMode gameMode = (LanternGameMode) get(Keys.GAME_MODE).get();
             final LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
-            final LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
             final boolean reducedDebug = world.getGameRule(GameRules.REDUCED_DEBUG_INFO);
             final boolean lowHorizon = world.getProperties().getConfig().isLowHorizon();
             // The player has joined the server
@@ -544,7 +544,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     // This is also needed to avoid weird client bugs
                     if (oldDimensionType == dimensionType) {
                         oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ?
-                                DimensionTypes.NETHER : DimensionTypes.OVERWORLD);
+                                DimensionTypes.THE_NETHER : DimensionTypes.OVERWORLD);
                         this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, lowHorizon));
                     }
                 }
@@ -670,11 +670,12 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     public void handleRespawn() {
         resetOpenedSignPosition();
+        final LanternWorld fromWorld = getWorld();
         Transform transform = getTransform();
-        final LanternWorld world = (LanternWorld) transform.getWorld();
+        World world = fromWorld;
         if (isDead()) {
             // TODO: Get the proper spawn location
-            final Transform toTransform = new LanternTransform(transform.getWorld(), new Vector3d(0, 100, 0));
+            final Transform toTransform = Transform.of(new Vector3d(0, 100, 0));
 
             // Make the player less dead...
             setDead(false);
@@ -693,14 +694,15 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 frame.addContext(EventContextKeys.PLAYER, this);
 
                 final RespawnPlayerEvent event = SpongeEventFactory.createRespawnPlayerEvent(causeStack.getCurrentCause(),
-                        this, this, transform, toTransform, false, true);
+                        this, this, transform, toTransform, world, world, false, true);
                 Sponge.getEventManager().post(event);
 
                 // Get the to transform, this can be overridden in the event
                 transform = event.getToTransform();
+                world = event.getToWorld();
             }
         }
-        setWorld(world, (LanternWorld) transform.getWorld());
+        setWorld(fromWorld, (LanternWorld) world);
         setPosition(transform.getPosition());
     }
 
@@ -1113,8 +1115,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (inventory instanceof IContainerProvidedInventory) {
             container = ((IContainerProvidedInventory) inventory).createContainer(this);
         } else {
-            inventory.getProperty(InventoryProperties.GUI_ID).orElseThrow(() ->
-                    new UnsupportedOperationException("Unsupported inventory type: " + inventory.getArchetype().getKey()));
             container = PlayerTopBottomContainer.construct(this.inventory, (AbstractChildrenInventory) inventory);
             container.setName(name);
         }
@@ -1225,16 +1225,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public Text getTeamRepresentation() {
         return Text.of(getName());
-    }
-
-    @Override
-    public boolean isSleepingIgnored() {
-        return this.sleepingIgnored;
-    }
-
-    @Override
-    public void setSleepingIgnored(boolean sleepingIgnored) {
-        this.sleepingIgnored = sleepingIgnored;
     }
 
     @Override

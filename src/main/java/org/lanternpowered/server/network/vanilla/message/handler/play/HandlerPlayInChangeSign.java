@@ -33,7 +33,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableSignData;
 import org.spongepowered.api.data.manipulator.mutable.SignData;
 import org.spongepowered.api.event.SpongeEventFactory;

@@ -35,7 +35,7 @@ import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;

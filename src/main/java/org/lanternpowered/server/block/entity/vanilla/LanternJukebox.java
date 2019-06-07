@@ -37,7 +37,7 @@ import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.Jukebox;
 import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;

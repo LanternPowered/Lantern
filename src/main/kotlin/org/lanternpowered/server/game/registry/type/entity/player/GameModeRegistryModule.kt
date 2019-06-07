@@ -29,7 +29,7 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule
 import org.spongepowered.api.data.DataHolder
-import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.Keys
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 

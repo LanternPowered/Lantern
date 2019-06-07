@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.io.store.entity;
 
-import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.persistence.DataQuery;
 
 public class ZombieVillagerStore {
 

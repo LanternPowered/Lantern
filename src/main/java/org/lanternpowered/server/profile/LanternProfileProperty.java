@@ -35,7 +35,7 @@ import com.google.gson.JsonObject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.data.DataQueries;
-import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.profile.property.ProfileProperty;
 
 import java.util.Objects;

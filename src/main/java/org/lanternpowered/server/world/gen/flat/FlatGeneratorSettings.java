@@ -28,7 +28,7 @@ package org.lanternpowered.server.world.gen.flat;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.world.biome.BiomeType;
 
 import java.util.List;

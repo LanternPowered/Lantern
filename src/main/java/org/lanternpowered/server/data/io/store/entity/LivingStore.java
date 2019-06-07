@@ -26,8 +26,8 @@
 package org.lanternpowered.server.data.io.store.entity;
 
 import org.lanternpowered.server.entity.LanternLiving;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataView;
 
 import java.util.List;
 import java.util.Optional;

@@ -36,7 +36,7 @@ import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 

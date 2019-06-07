@@ -34,7 +34,7 @@ import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegis
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
 import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.data.DataContainer
+import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.text.translation.Translation

@@ -33,7 +33,7 @@ import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipu
 import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;

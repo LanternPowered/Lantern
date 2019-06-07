@@ -29,7 +29,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternProfession;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.Professions;
 

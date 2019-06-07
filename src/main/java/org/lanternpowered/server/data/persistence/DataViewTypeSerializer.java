@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.persistence;
 
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataView;
 
 public interface DataViewTypeSerializer<T> extends DataTypeSerializer<T, DataView> {
 

@@ -27,7 +27,7 @@ package org.lanternpowered.server.state
 
 import com.google.common.collect.ImmutableMap
 import org.lanternpowered.api.catalog.CatalogKey
-import org.spongepowered.api.data.DataContainer
+import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateProperty
 

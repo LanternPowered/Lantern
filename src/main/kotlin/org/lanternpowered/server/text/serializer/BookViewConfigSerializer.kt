@@ -31,8 +31,8 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.lanternpowered.api.ext.*
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.data.DataQuery
-import org.spongepowered.api.data.DataView
+import org.spongepowered.api.data.persistence.DataQuery
+import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.Queries.TEXT_AUTHOR
 import org.spongepowered.api.data.Queries.TEXT_PAGE_LIST
 import org.spongepowered.api.data.Queries.TEXT_TITLE

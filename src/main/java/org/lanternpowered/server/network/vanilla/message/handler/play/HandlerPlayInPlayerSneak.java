@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 
 public final class HandlerPlayInPlayerSneak implements Handler<MessagePlayInPlayerSneak> {
 

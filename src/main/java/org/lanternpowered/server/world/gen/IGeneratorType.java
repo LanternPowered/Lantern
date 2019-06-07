@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.world.gen;
 
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.world.gen.GeneratorType;
 
 public interface IGeneratorType extends GeneratorType {

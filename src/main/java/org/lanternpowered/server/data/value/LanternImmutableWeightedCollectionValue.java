@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.value;
 
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.WeightedCollectionValue;
 import org.spongepowered.api.util.weighted.TableEntry;

@@ -29,9 +29,9 @@ import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 import static org.lanternpowered.server.data.io.store.item.ItemStackStore.DISPLAY;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataView;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Color;
 

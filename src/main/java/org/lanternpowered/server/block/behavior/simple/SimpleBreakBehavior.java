@@ -34,7 +34,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.BlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.event.cause.EventContextKeys;
 
 public class SimpleBreakBehavior implements BreakBlockBehavior {

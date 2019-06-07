@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.key;
 
 import org.lanternpowered.server.event.LanternEventListener;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 

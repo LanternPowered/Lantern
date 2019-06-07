@@ -29,8 +29,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.ArrayList;

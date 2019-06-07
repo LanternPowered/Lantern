@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.data;
 
-import static org.spongepowered.api.data.DataQuery.of;
+import static org.spongepowered.api.data.persistence.DataQuery.of;
 
-import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.persistence.DataQuery;
 
 public final class DataQueries {
 

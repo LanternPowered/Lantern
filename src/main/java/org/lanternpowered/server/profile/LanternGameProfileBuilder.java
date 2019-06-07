@@ -28,7 +28,7 @@ package org.lanternpowered.server.profile;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.data.DataQueries;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;

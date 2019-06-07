@@ -27,8 +27,8 @@ package org.lanternpowered.server.world.gen
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.data.DataContainer
-import org.spongepowered.api.data.DataView
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataView
 
 abstract class LanternGeneratorType protected constructor(key: CatalogKey) : DefaultCatalogType(key), IGeneratorType {
 

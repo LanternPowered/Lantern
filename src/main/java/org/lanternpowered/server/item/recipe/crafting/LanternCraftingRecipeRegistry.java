@@ -32,7 +32,7 @@ import org.lanternpowered.server.item.recipe.AbstractRecipeRegistry;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.util.UncheckedThrowables;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;

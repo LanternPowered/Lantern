@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.util.collect.array.VariableValueArray;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataView;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 

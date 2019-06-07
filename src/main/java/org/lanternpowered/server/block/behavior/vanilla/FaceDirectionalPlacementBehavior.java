@@ -31,7 +31,7 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 
 public class FaceDirectionalPlacementBehavior implements PlaceBlockBehavior {
 

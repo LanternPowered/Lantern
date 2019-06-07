@@ -41,7 +41,7 @@ import org.lanternpowered.server.inventory.transformation.InventoryTransforms;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;

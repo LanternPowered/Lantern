@@ -28,7 +28,7 @@ package org.lanternpowered.server.effect.entity.sound;
 import org.lanternpowered.server.effect.entity.AbstractEntityEffect;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 
 import java.util.Random;
 

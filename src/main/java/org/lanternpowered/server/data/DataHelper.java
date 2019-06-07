@@ -27,7 +27,7 @@ package org.lanternpowered.server.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.game.Lantern.getLogger;
-import static org.spongepowered.api.data.DataQuery.of;
+import static org.spongepowered.api.data.persistence.DataQuery.of;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
@@ -41,11 +41,11 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.DataRegistration;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.CompositeValueStore;

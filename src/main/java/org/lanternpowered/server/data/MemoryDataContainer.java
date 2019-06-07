@@ -27,10 +27,10 @@ package org.lanternpowered.server.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataView;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;
@@ -44,8 +44,8 @@ public final class MemoryDataContainer extends MemoryDataView implements DataCon
 
     /**
      * Creates a new {@link MemoryDataContainer} with a default
-     * {@link org.spongepowered.api.data.DataView.SafetyMode} of
-     * {@link org.spongepowered.api.data.DataView.SafetyMode#ALL_DATA_CLONED}.
+     * {@link org.spongepowered.api.data.persistence.DataView.SafetyMode} of
+     * {@link org.spongepowered.api.data.persistence.DataView.SafetyMode#ALL_DATA_CLONED}.
      *
      */
     public MemoryDataContainer() {
@@ -54,10 +54,10 @@ public final class MemoryDataContainer extends MemoryDataView implements DataCon
 
     /**
      * Creates a new {@link MemoryDataContainer} with the provided
-     * {@link org.spongepowered.api.data.DataView.SafetyMode}.
+     * {@link org.spongepowered.api.data.persistence.DataView.SafetyMode}.
      *
      * @param safety The safety mode to use
-     * @see org.spongepowered.api.data.DataView.SafetyMode
+     * @see org.spongepowered.api.data.persistence.DataView.SafetyMode
      */
     public MemoryDataContainer(DataView.SafetyMode safety) {
         super(safety);

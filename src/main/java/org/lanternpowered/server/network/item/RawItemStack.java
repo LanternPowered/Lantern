@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.item;
 
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataView;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 

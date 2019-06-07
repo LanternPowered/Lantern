@@ -27,8 +27,8 @@ package org.lanternpowered.server.data.key;
 
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;

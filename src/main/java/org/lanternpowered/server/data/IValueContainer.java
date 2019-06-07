@@ -36,7 +36,7 @@ import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
 import org.lanternpowered.server.data.value.LanternImmutableValue;
 import org.lanternpowered.server.data.value.LanternMutableValue;
 import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.OptionalValue;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.data.value.ValueContainer;

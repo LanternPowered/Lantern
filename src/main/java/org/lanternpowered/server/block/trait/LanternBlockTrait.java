@@ -31,7 +31,7 @@ import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.block.state.property.KeyStatePropertyValueTransformer;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.function.Predicate;

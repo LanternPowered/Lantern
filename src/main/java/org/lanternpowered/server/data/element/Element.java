@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.element;
 
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 public interface Element<E> {

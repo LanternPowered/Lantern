@@ -32,6 +32,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect
 import org.spongepowered.api.effect.sound.SoundCategory
 import org.spongepowered.api.effect.sound.SoundType
+import org.spongepowered.math.vector.Vector3d
 
 class LanternSoundType @JvmOverloads constructor(
         key: CatalogKey, private val eventId: Int? = null

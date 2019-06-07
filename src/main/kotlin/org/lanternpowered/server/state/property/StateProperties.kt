@@ -29,7 +29,7 @@ import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.state.StateKeyValueTransformer
 import org.lanternpowered.server.state.identityStateKeyValueTransformer
 import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.data.key.Key
+import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.BooleanStateProperty
 import org.spongepowered.api.state.EnumStateProperty

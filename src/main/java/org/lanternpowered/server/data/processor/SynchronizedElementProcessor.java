@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.processor;
 
 import org.lanternpowered.server.data.element.ElementListener;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.ArrayList;

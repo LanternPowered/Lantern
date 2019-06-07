@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data;
 
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;

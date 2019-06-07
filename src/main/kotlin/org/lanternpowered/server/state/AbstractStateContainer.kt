@@ -27,7 +27,7 @@ package org.lanternpowered.server.state
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
-import org.spongepowered.api.data.key.Key
+import org.spongepowered.api.data.Key
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 import org.spongepowered.api.state.StateProperty

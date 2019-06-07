@@ -50,7 +50,7 @@ import org.lanternpowered.server.util.TypeTokenHelper;
 import org.lanternpowered.server.util.function.ThrowableConsumer;
 import org.slf4j.Logger;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;

@@ -27,7 +27,7 @@ package org.lanternpowered.server.data;
 
 import org.lanternpowered.server.transformer.data.FastValueContainerClassTransformer;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.CompositeValueStore;
 import org.spongepowered.api.data.value.Value;

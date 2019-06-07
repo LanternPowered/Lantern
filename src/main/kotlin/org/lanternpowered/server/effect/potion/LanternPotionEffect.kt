@@ -29,7 +29,7 @@ import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.property.IStorePropertyHolder
-import org.spongepowered.api.data.DataContainer
+import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.Queries
 
 internal data class LanternPotionEffect(

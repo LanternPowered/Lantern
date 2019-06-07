@@ -32,8 +32,8 @@ import ninja.leaping.configurate.loader.HeaderMode
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.data.DataContainer
-import org.spongepowered.api.data.DataView
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.Queries
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.InvalidDataException

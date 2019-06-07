@@ -27,8 +27,8 @@ package org.lanternpowered.server.network.block;
 
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockEntity;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataView;
 
 import java.util.function.Supplier;
 

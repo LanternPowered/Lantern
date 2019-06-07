@@ -42,7 +42,7 @@ import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
 import org.spongepowered.api.block.entity.carrier.furnace.Furnace;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;

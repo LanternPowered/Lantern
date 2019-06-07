@@ -31,7 +31,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;

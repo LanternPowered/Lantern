@@ -46,7 +46,7 @@ import org.lanternpowered.server.text.serializer.BookViewConfigSerializer;
 import org.lanternpowered.server.text.serializer.TextConfigSerializer;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.property.PropertyRegistry;

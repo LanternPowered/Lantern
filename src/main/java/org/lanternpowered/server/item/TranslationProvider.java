@@ -26,7 +26,7 @@
 package org.lanternpowered.server.item;
 
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;

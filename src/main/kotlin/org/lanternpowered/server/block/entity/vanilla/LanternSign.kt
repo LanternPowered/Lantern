@@ -29,7 +29,7 @@ import org.lanternpowered.server.block.entity.LanternBlockEntity
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
 import org.lanternpowered.server.permission.ProxySubject
 import org.spongepowered.api.block.entity.Sign
-import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.service.permission.SubjectReference
 import org.spongepowered.api.text.Text

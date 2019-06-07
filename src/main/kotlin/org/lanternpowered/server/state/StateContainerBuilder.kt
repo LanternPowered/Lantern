@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.state
 
-import org.spongepowered.api.data.DataContainer
+import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 

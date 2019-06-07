@@ -29,7 +29,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnExperienceOrb;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 
 public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
 

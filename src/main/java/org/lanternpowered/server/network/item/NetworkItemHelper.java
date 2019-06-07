@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.item;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.item.ItemType;
 
 import org.checkerframework.checker.nullness.qual.Nullable;

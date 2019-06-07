@@ -28,8 +28,8 @@ package org.lanternpowered.server.data.io.store.item;
 import org.lanternpowered.server.data.io.store.InventorySnapshotSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.List;

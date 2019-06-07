@@ -29,7 +29,7 @@ import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes;
 import org.spongepowered.api.block.entity.Banner;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.DyeColors;
 
 import java.util.ArrayList;

@@ -85,8 +85,9 @@ public final class NetworkItemTypeRegistry {
         if (internalIdToItemType.containsValue(itemType1)) {
             return;
         }
-        final String id = itemType1.getAppearance().map(ItemAppearance::getItemTypeId).orElse(itemType.getId());
-        serverModdedToClientId.put(itemType.getId(), id);
+        final String serverId = itemType.getKey().toString();
+        final String id = itemType1.getAppearance().map(ItemAppearance::getItemTypeId).orElse(serverId);
+        serverModdedToClientId.put(serverId, id);
         final int networkId = normalToNetworkId.getInt(id);
         checkArgument(networkId != -1, "No network id was for the vanilla/modded item type id: " + id);
         final int internalId = internalIdCounter++;

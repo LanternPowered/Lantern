@@ -36,8 +36,8 @@ import org.lanternpowered.server.data.IImmutableValueHolder
 import org.lanternpowered.server.data.property.IStorePropertyHolder
 import org.lanternpowered.server.data.value.LanternMutableValue
 import org.lanternpowered.server.state.property.AbstractStateProperty
-import org.spongepowered.api.data.DataContainer
-import org.spongepowered.api.data.key.Key
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator
 import org.spongepowered.api.data.merge.MergeFunction
 import org.spongepowered.api.data.value.Value

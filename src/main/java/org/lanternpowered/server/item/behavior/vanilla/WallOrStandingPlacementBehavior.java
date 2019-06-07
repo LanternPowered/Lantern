@@ -37,7 +37,7 @@ import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBaseB
 import org.lanternpowered.server.util.rotation.RotationHelper;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;

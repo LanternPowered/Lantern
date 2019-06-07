@@ -32,7 +32,7 @@ import org.lanternpowered.server.event.RegisteredListener;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.CompositeValueStore;
 import org.spongepowered.api.data.value.Value;

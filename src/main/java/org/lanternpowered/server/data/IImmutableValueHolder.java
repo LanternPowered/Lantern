@@ -28,7 +28,7 @@ package org.lanternpowered.server.data;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.value.Value;

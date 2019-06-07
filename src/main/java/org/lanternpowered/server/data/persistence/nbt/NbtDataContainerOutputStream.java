@@ -28,9 +28,9 @@ package org.lanternpowered.server.data.persistence.nbt;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.persistence.DataContainerOutput;
-import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataView;
 
 import java.io.Closeable;
 import java.io.DataOutputStream;

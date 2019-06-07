@@ -27,7 +27,7 @@ package org.lanternpowered.server.item.behavior.vanilla.consumable
 
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.item.PropertyProvider
-import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.Keys
 import org.spongepowered.api.effect.potion.PotionEffect
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack

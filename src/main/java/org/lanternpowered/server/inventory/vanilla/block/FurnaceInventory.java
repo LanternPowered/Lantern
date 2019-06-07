@@ -33,7 +33,7 @@ import org.lanternpowered.server.inventory.type.slot.LanternFuelSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternInputSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternOutputSlot;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 

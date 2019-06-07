@@ -36,7 +36,7 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.BlockTrait;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 
 import java.util.ArrayList;
 import java.util.Collection;

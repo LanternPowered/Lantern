@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.persistence;
 
-import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataFormatException;
 
 import java.io.IOException;

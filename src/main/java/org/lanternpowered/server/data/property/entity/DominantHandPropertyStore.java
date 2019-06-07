@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.property.entity;
 
 import org.lanternpowered.server.data.property.common.AbstractEntityPropertyStore;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.entity.Entity;
 

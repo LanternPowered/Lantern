@@ -30,9 +30,9 @@ import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.lanternpowered.server.data.translator.ConfigurateTranslator
-import org.spongepowered.api.data.DataContainer
-import org.spongepowered.api.data.DataQuery.of
-import org.spongepowered.api.data.DataView
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataQuery.of
+import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.persistence.DataTranslator
 import org.spongepowered.api.data.persistence.InvalidDataException
 

@@ -32,7 +32,7 @@ import org.lanternpowered.server.data.element.ElementKeyRegistration;
 import org.lanternpowered.server.data.element.ElementListener;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.ArrayList;

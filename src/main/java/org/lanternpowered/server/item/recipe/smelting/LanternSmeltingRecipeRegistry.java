@@ -32,7 +32,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.item.recipe.AbstractRecipeRegistry;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;

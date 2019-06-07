@@ -39,8 +39,8 @@ import org.lanternpowered.server.state.property.booleanStatePropertyOf
 import org.lanternpowered.server.state.property.enumStatePropertyOf
 import org.lanternpowered.server.state.property.intStatePropertyOf
 import org.lanternpowered.server.state.stateKeyValueTransformer
-import org.spongepowered.api.data.key.Key
-import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.util.Direction
 

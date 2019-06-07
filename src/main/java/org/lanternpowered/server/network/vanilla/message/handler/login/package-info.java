@@ -36,5 +36,5 @@
  *
  * More info at: http://wiki.vg/Protocol#Login
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
+@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
 package org.lanternpowered.server.network.vanilla.message.handler.login;

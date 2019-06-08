@@ -29,11 +29,11 @@ import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.data.type.LanternBannerPatternShape;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.network.block.BlockEntityProtocol;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 

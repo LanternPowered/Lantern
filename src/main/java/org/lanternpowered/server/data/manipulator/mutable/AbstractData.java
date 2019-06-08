@@ -40,15 +40,15 @@ import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipu
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
 import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.Value;
 

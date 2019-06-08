@@ -36,8 +36,8 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
@@ -100,7 +100,6 @@ public class LanternKey<V extends Value<?>> implements Key<V>, CatalogType {
                 unwrappedBuilder.valueToken = createValueToken(elementToken);
             }
             unwrappedBuilder.key(CatalogKey.of(key.getNamespace(), key.getValue() + "_non_optional"));
-            unwrappedBuilder.name(name.get() + "NonOptional");
             final List<String> parts = new ArrayList<>(query.getParts());
             final int index = parts.size() - 1;
             parts.set(index, parts.get(index) + "NonOptional");
@@ -140,11 +139,6 @@ public class LanternKey<V extends Value<?>> implements Key<V>, CatalogType {
     }
 
     @Override
-    public DataQuery getQuery() {
-        return this.query;
-    }
-
-    @Override
     public <E extends DataHolder> void registerEvent(Class<E> holderFilter,
             EventListener<ChangeDataHolderEvent.ValueChange> listener) {
         checkNotNull(holderFilter, "holderFilter");
@@ -168,11 +162,6 @@ public class LanternKey<V extends Value<?>> implements Key<V>, CatalogType {
     @Override
     public CatalogKey getKey() {
         return this.key;
-    }
-
-    @Override
-    public String getName() {
-        return this.name.get();
     }
 
     @Override

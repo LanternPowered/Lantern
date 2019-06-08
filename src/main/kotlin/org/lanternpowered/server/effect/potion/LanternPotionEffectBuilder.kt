@@ -30,8 +30,8 @@ import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.data.DataQueries
-import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
+import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.persistence.InvalidDataException
 import java.util.Optional
 

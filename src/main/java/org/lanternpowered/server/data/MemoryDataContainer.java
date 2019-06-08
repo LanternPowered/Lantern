@@ -27,10 +27,10 @@ package org.lanternpowered.server.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.Value;
 
 import java.util.Optional;

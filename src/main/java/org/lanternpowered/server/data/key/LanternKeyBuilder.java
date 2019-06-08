@@ -32,8 +32,8 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.text.translation.Translation;
 

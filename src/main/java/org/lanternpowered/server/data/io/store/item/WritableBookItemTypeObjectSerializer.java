@@ -26,9 +26,9 @@
 package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 public class WritableBookItemTypeObjectSerializer extends ItemTypeObjectSerializer {

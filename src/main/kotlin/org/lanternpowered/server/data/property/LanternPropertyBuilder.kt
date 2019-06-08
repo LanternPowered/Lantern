@@ -26,16 +26,15 @@
 package org.lanternpowered.server.data.property
 
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.data.property.Property
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
-import org.spongepowered.api.text.translation.Translation
 import java.util.Comparator
 import java.util.function.BiPredicate
 
-@Suppress("UNCHECKED_CAST")
 class LanternPropertyBuilder<V> : AbstractCatalogBuilder<Property<V>, Property.Builder<V>>(), Property.Builder<V> {
 
     private var valueType: TypeToken<V>? = null
@@ -43,20 +42,20 @@ class LanternPropertyBuilder<V> : AbstractCatalogBuilder<Property<V>, Property.B
     private var includesTester: BiPredicate<V, V>? = null
 
     override fun <NV> valueType(typeToken: TypeToken<NV>) = apply {
-        this.valueType = typeToken as TypeToken<V>
+        this.valueType = typeToken.uncheckedCast()
         this.valueComparator = null
-    } as LanternPropertyBuilder<NV>
+    }.uncheckedCast<LanternPropertyBuilder<NV>>()
 
     override fun valueComparator(comparator: Comparator<V>) = apply { this.valueComparator = comparator }
     override fun valueIncludesTester(predicate: BiPredicate<V, V>) = apply { this.includesTester = predicate }
 
-    override fun build(key: CatalogKey, name: Translation): Property<V> {
+    override fun build(key: CatalogKey): Property<V> {
         val valueType = checkNotNull(this.valueType) { "The value type must be set" }
         val raw = valueType.rawType
 
         val valueComparator = this.valueComparator ?: run {
             when {
-                Comparable::class.java.isAssignableFrom(raw) -> Comparator(Comparable<*>::compareTo) as Comparator<V>
+                Comparable::class.java.isAssignableFrom(raw) -> Comparator(Comparable<*>::compareTo).uncheckedCast()
                 CatalogType::class.java.isAssignableFrom(raw) -> Comparator.comparing<V, CatalogKey> { o -> (o as CatalogType).key }
                 else -> Comparator.comparingInt { it.hashCode() }
             }
@@ -68,11 +67,12 @@ class LanternPropertyBuilder<V> : AbstractCatalogBuilder<Property<V>, Property.B
                 else -> BiPredicate<V, V> { _, _ -> false }
             }
         }
-        return LanternProperty(key, valueType, valueComparator!!, includesTester)
+        return LanternProperty(key, valueType, valueComparator, includesTester)
     }
 
     override fun reset() = apply {
         super.reset()
+
         this.valueType = null
         this.valueComparator = null
         this.includesTester = null

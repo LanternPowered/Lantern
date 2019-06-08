@@ -30,7 +30,7 @@ import org.lanternpowered.api.effect.firework.FireworkShape
 import org.lanternpowered.api.util.Color
 import org.lanternpowered.server.data.DataQueries
 import org.spongepowered.api.data.persistence.DataContainer
-import org.spongepowered.api.data.Queries
+import org.spongepowered.api.data.persistence.Queries
 
 internal data class LanternFireworkEffect(
         private val flicker: Boolean,

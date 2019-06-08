@@ -29,9 +29,9 @@ import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.Keys;
 
 import java.util.Optional;
 

@@ -29,11 +29,11 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.meta.PatternLayer;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.meta.PatternLayer;
-import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.type.BannerPatternShape;
 import org.spongepowered.api.data.type.DyeColor;

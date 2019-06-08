@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import org.lanternpowered.api.util.ToStringHelper;
-import org.lanternpowered.server.data.key.LanternKey;
+import org.lanternpowered.server.data.key.OptionalUnwrappedValueKey;
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
 import org.lanternpowered.server.data.value.LanternImmutableValue;
@@ -46,10 +46,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Set;
 
 @SuppressWarnings("unchecked")
-public interface IValueContainer<C extends ValueContainer<C>> extends ValueContainer<C>, IValueHolder {
+public interface IValueContainer extends ValueContainer, IValueHolder {
 
     /**
      * Converts the {@link Value}s of the {@link ValueContainer} into a nicely
@@ -58,7 +61,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
      * @param valueContainer The value container
      * @return The string
      */
-    static String valuesToString(ValueContainer<?> valueContainer) {
+    static String valuesToString(ValueContainer valueContainer) {
         return valuesToString(valueContainer.getValues());
     }
 
@@ -85,7 +88,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
      * @param valueContainerB The second value container
      * @return Whether the contents match
      */
-    static boolean matchContents(IValueContainer<?> valueContainerA, IValueContainer<?> valueContainerB) {
+    static boolean matchContents(IValueContainer valueContainerA, IValueContainer valueContainerB) {
         final boolean additional = valueContainerA instanceof IAdditionalCompositeValueStore;
         if (additional != valueContainerB instanceof IAdditionalCompositeValueStore) {
             return false;
@@ -114,16 +117,16 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
 
         // Match additional containers
         if (additional) {
-            final Map<Class<?>, ValueContainer<?>> mapA =
+            final Map<Class<?>, ValueContainer> mapA =
                     ((IAdditionalCompositeValueStore) valueContainerA).getAdditionalContainers().getMap();
-            final Map<Class<?>, ValueContainer<?>> mapB =
+            final Map<Class<?>, ValueContainer> mapB =
                     ((IAdditionalCompositeValueStore) valueContainerB).getAdditionalContainers().getMap();
             if (mapA.size() != mapB.size() || !mapA.keySet().containsAll(mapB.keySet())) {
                 return false;
             }
-            for (Map.Entry<Class<?>, ValueContainer<?>> entry : mapA.entrySet()) {
-                final ValueContainer<?> containerA = entry.getValue();
-                final ValueContainer<?> containerB = mapB.get(entry.getKey());
+            for (Map.Entry<Class<?>, ValueContainer> entry : mapA.entrySet()) {
+                final ValueContainer containerA = entry.getValue();
+                final ValueContainer containerB = mapB.get(entry.getKey());
                 if (!Objects.equals(containerA, containerB)) {
                     return false;
                 }
@@ -144,9 +147,8 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
         checkNotNull(key, "key");
 
         // Optional unwrapped key handling
-        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
-        if (optionalWrappedKey != null) {
-            return supports(optionalWrappedKey);
+        if (key instanceof OptionalUnwrappedValueKey) {
+            return supports(((OptionalUnwrappedValueKey<?, ?>) key).getWrappedKey());
         }
 
         // Check the local key registration
@@ -165,7 +167,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
         if (this instanceof AdditionalContainerHolder) {
             // Check for the custom value containers
             final AdditionalContainerCollection<?> containers = ((AdditionalContainerHolder<?>) this).getAdditionalContainers();
-            for (ValueContainer<?> valueContainer : containers.getAll()) {
+            for (ValueContainer valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
                     return true;
                 }
@@ -180,10 +182,8 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
     default <E> Optional<E> get(Key<? extends Value<E>> key) {
         checkNotNull(key, "key");
 
-        // Optional unwrapped key handling
-        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
-        if (optionalWrappedKey != null) {
-            return (Optional<E>) get(optionalWrappedKey).get();
+        if (key instanceof OptionalUnwrappedValueKey) {
+            return get(((OptionalUnwrappedValueKey<? extends Value<E>, E>) key).getWrappedKey()).orElse(Optional.empty());
         }
 
         // Check the local key registration
@@ -202,7 +202,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
         if (this instanceof AdditionalContainerHolder) {
             // Check for the custom value containers
             final AdditionalContainerCollection<?> containers = ((AdditionalContainerHolder<?>) this).getAdditionalContainers();
-            for (ValueContainer<?> valueContainer : containers.getAll()) {
+            for (ValueContainer valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
                     return valueContainer.get(key);
                 }
@@ -212,13 +212,28 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
         return Optional.empty();
     }
 
+    @Override
+    default OptionalInt getInt(Key<? extends Value<Integer>> key) {
+        return get(key).map(OptionalInt::of).orElseGet(OptionalInt::empty);
+    }
+
+    @Override
+    default OptionalDouble getDouble(Key<? extends Value<Double>> key) {
+        return get(key).map(OptionalDouble::of).orElseGet(OptionalDouble::empty);
+    }
+
+    @Override
+    default OptionalLong getLong(Key<? extends Value<Long>> key) {
+        return get(key).map(OptionalLong::of).orElseGet(OptionalLong::empty);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     default <E, V extends Value<E>> Optional<V> getRawMutableValueFor(Key<V> key) {
         // Optional unwrapped key handling
-        final LanternKey optionalWrappedKey = ((LanternKey) key).getOptionalWrappedKey();
-        if (optionalWrappedKey != null) {
-            final Optional<Value> optOptionalValue = getRawMutableValueFor(optionalWrappedKey);
+        if (key instanceof OptionalUnwrappedValueKey) {
+            final Optional<? extends OptionalValue<E>> optOptionalValue = getRawMutableValueFor(
+                    ((OptionalUnwrappedValueKey<V, E>) key).getWrappedKey());
             if (!optOptionalValue.isPresent()) {
                 return Optional.empty();
             }
@@ -251,7 +266,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
         if (this instanceof AdditionalContainerHolder) {
             // Check for the custom value containers
             final AdditionalContainerCollection<?> containers = ((AdditionalContainerHolder<?>) this).getAdditionalContainers();
-            for (ValueContainer<?> valueContainer : containers.getAll()) {
+            for (ValueContainer valueContainer : containers.getAll()) {
                 if (valueContainer.supports(key)) {
                     return valueContainer.getValue(key);
                 }

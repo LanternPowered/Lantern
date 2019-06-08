@@ -35,11 +35,11 @@ import org.lanternpowered.server.util.roman.RomanNumber;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataSerializable;
+import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
-import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.util.Coerce;
 

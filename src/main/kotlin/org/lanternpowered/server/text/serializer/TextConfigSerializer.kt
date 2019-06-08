@@ -32,15 +32,14 @@ import ninja.leaping.configurate.loader.HeaderMode
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
-import org.spongepowered.api.data.Queries
-import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.InvalidDataException
+import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.serializer.TextParseException
 import org.spongepowered.api.text.serializer.TextSerializers
-
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.IOException

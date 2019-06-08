@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.item.enchantment
 
-import org.spongepowered.api.data.persistence.DataView
-import org.spongepowered.api.data.Queries
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
+import org.spongepowered.api.data.persistence.DataView
+import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.item.enchantment.Enchantment
 import org.spongepowered.api.item.enchantment.EnchantmentType
 import java.util.Optional

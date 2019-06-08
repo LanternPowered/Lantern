@@ -38,7 +38,7 @@ import org.lanternpowered.api.text.serializer.TextSerializers
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.x.text.format.XTextStyle
 import org.spongepowered.api.data.persistence.DataContainer
-import org.spongepowered.api.data.Queries
+import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.HoverAction
 import org.spongepowered.api.text.action.ShiftClickAction

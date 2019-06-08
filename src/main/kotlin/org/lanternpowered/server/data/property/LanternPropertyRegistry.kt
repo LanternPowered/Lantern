@@ -30,6 +30,7 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.Named
 import org.lanternpowered.server.block.BlockProperties
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
@@ -51,7 +52,6 @@ import java.util.Comparator
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
-@Suppress("UNCHECKED_CAST")
 object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<*>>(), PropertyRegistry {
 
     private val propertyStoreMap = HashMultimap.create<Property<*>, PropertyStore<*>>()
@@ -87,7 +87,7 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
                     registerAdditionalCatalog(property)
                 }
                 if (inventoryProperties) {
-                    register(property as Property<Any>, InventoryPropertyStore(property))
+                    register(property.uncheckedCast(), InventoryPropertyStore(property))
                 }
                 try {
                     field.set(null, property)
@@ -107,13 +107,13 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
     fun completeRegistration() {
         finalizeContent()
         for ((key, value) in this.propertyStoreMap.asMap()) {
-            this.delegateMap[key] = constructDelegate(key as Property<Any>, value as Collection<PropertyStore<Any>>)
+            this.delegateMap[key] = constructDelegate(key.uncheckedCast<Property<Any>>(), value.uncheckedCast())
         }
         this.propertyStoreMap.clear()
     }
 
     private fun <V> constructDelegate(property: Property<V>): PropertyStoreDelegate<V> {
-        return constructDelegate(property, this.propertyStoreMap[property] as Collection<PropertyStore<V>>)
+        return constructDelegate(property, this.propertyStoreMap[property].uncheckedCast())
     }
 
     private fun <V> constructDelegate(property: Property<V>, propertyStores: Collection<PropertyStore<V>>): PropertyStoreDelegate<V> {
@@ -122,11 +122,9 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
         val immutableStores = ImmutableList.copyOf(stores)
         val valueType = property.valueType.rawType
         if (valueType == Int::class.java) {
-            immutableStores as ImmutableList<PropertyStore<Int>>
-            return IntPropertyStoreDelegate(immutableStores) as PropertyStoreDelegate<V>
+            return IntPropertyStoreDelegate(immutableStores.uncheckedCast()).uncheckedCast()
         } else if (valueType == Double::class.java) {
-            immutableStores as ImmutableList<PropertyStore<Double>>
-            return DoublePropertyStoreDelegate(immutableStores) as PropertyStoreDelegate<V>
+            return DoublePropertyStoreDelegate(immutableStores.uncheckedCast()).uncheckedCast()
         }
         return PropertyStoreDelegate(immutableStores)
     }
@@ -141,7 +139,7 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
         if (isContentFinalized) {
             return constructDelegate(property)
         }
-        return this.delegateMap.computeIfAbsent(property) { constructDelegate(property) } as PropertyStore<V>
+        return this.delegateMap.computeIfAbsent(property) { constructDelegate(property) }.uncheckedCast()
     }
 
     fun <V> getStoreForInventory(property: Property<V>): PropertyStore<V> {
@@ -149,13 +147,13 @@ object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<
         if (isContentFinalized) {
             return constructInventoryDelegate(property)
         }
-        return this.inventoryDelegateMap.computeIfAbsent(property) { constructInventoryDelegate(property) } as PropertyStore<V>
+        return this.inventoryDelegateMap.computeIfAbsent(property) { constructInventoryDelegate(property) }.uncheckedCast()
     }
 
     private fun <V> constructInventoryDelegate(property: Property<V>): PropertyStoreDelegate<V> {
         // Filter out inventory stores to avoid infinite loops
         // when a delegate store is called from a inventory
-        val propertyStores = (this.propertyStoreMap[property] as Collection<PropertyStore<V>>).stream()
+        val propertyStores = (this.propertyStoreMap[property].uncheckedCast<Collection<PropertyStore<V>>>()).stream()
                 .filter { it !is InventoryPropertyStore }
                 .collect(ImmutableList.toImmutableList())
         return constructDelegate(property, propertyStores)

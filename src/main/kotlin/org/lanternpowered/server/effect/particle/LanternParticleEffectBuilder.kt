@@ -27,14 +27,12 @@ package org.lanternpowered.server.effect.particle
 
 import com.google.common.collect.ImmutableList
 import org.lanternpowered.server.data.DataQueries
-import org.spongepowered.api.data.DataSerializable
-import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
+import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.persistence.InvalidDataException
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleOption
 import org.spongepowered.api.effect.particle.ParticleType
-
 import java.util.HashMap
 import java.util.Optional
 

@@ -28,6 +28,6 @@ package org.lanternpowered.server.data;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 
-public interface IAdditionalDataHolder extends IDataHolder, IAdditionalCompositeValueStore<DataHolder, DataManipulator> {
+public interface IAdditionalDataHolder extends IMutableDataHolder, IAdditionalCompositeValueStore<DataHolder, DataManipulator> {
 
 }

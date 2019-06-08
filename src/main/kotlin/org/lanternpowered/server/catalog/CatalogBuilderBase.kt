@@ -27,11 +27,8 @@
 
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.ext.*
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
-import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.util.CatalogBuilder
 import org.spongepowered.api.util.ResettableBuilder
 
@@ -44,13 +41,6 @@ abstract class CatalogBuilderBase<C : CatalogType, B : ResettableBuilder<C, B>> 
         check(key.value.isNotBlank()) { "The key value may not be blank." }
         this.key = key
     } as B
-
-    override fun id(id: String): B {
-        check(id.isNotBlank()) { "The id may not be blank." }
-        val pluginContainer = CauseStack.current().first<PluginContainer>()
-                ?: throw IllegalStateException("Unable to find PluginContainer in the cause stack.")
-        return key(CatalogKey.of(pluginContainer.id, id))
-    }
 
     override fun reset() = apply {
         this.key = null

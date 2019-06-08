@@ -40,12 +40,12 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.block.entity.BlockEntityArchetype;
 import org.spongepowered.api.block.entity.BlockEntityType;
-import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.manipulator.DataManipulator;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.persistence.Queries;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 

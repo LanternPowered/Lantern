@@ -37,18 +37,54 @@ import java.util.EnumMap
 import java.util.WeakHashMap
 import java.util.stream.Stream
 
+/**
+ * Converts this [Iterable] into a [ImmutableList].
+ */
 inline fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
+
+/**
+ * Converts this [Array] into a [ImmutableList].
+ */
 inline fun <T> Array<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
 
+/**
+ * Converts this [IntArray] into a [ImmutableList].
+ */
 fun IntArray.toImmutableList(): ImmutableList<Int> = ImmutableList.builder<Int>().apply { forEach { add(it) } }.build()
+
+/**
+ * Converts this [DoubleArray] into a [ImmutableList].
+ */
 fun DoubleArray.toImmutableList(): ImmutableList<Double> = ImmutableList.builder<Double>().apply { forEach { add(it) } }.build()
+
+/**
+ * Converts this [LongArray] into a [ImmutableList].
+ */
 fun LongArray.toImmutableList(): ImmutableList<Long> = ImmutableList.builder<Long>().apply { forEach { add(it) } }.build()
 
+/**
+ * Converts this [Iterable] into a [ImmutableSet].
+ */
 inline fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> = ImmutableSet.copyOf(this)
+
+/**
+ * Converts this [Array] into a [ImmutableSet].
+ */
 inline fun <T> Array<T>.toImmutableSet(): ImmutableSet<T> = ImmutableSet.copyOf(this)
 
+/**
+ * Converts this [IntArray] into a [ImmutableSet].
+ */
 fun IntArray.toImmutableSet(): ImmutableSet<Int> = ImmutableSet.builder<Int>().apply { forEach { add(it) } }.build()
+
+/**
+ * Converts this [DoubleArray] into a [ImmutableSet].
+ */
 fun DoubleArray.toImmutableSet(): ImmutableSet<Double> = ImmutableSet.builder<Double>().apply { forEach { add(it) } }.build()
+
+/**
+ * Converts this [LongArray] into a [ImmutableSet].
+ */
 fun LongArray.toImmutableSet(): ImmutableSet<Long> = ImmutableSet.builder<Long>().apply { forEach { add(it) } }.build()
 
 inline fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> = ImmutableMap.copyOf(this)
@@ -75,9 +111,70 @@ fun <E> immutableWeakSetOf(vararg args: E): Set<E> = Collections.unmodifiableSet
 /**
  * Returns a [ImmutableList] containing all elements produced by this stream.
  */
-fun <T> Stream<T>.toImmutableList(): ImmutableList<T> = collect(ImmutableList.toImmutableList())
+inline fun <T> Stream<T>.toImmutableList(): ImmutableList<T> = collect(ImmutableList.toImmutableList())
 
 /**
  * Returns a [ImmutableSet] containing all elements produced by this stream.
  */
-fun <T> Stream<T>.toImmutableSet(): ImmutableSet<T> = collect(ImmutableSet.toImmutableSet())
+inline fun <T> Stream<T>.toImmutableSet(): ImmutableSet<T> = collect(ImmutableSet.toImmutableSet())
+
+/**
+ * Returns this collection as a unmodifiable view.
+ */
+inline fun <E> Collection<E>.asUnmodifiableCollection(): Collection<E> = Collections.unmodifiableCollection(this)
+
+/**
+ * Returns this list as a unmodifiable view.
+ */
+inline fun <E> List<E>.asUnmodifiableList(): List<E> = Collections.unmodifiableList(this)
+
+/**
+ * Returns this set as a unmodifiable view.
+ */
+inline fun <E> Set<E>.asUnmodifiableSet(): Set<E> = Collections.unmodifiableSet(this)
+
+/**
+ * Gets whether all the elements of the [Iterable] are present in this [Collection].
+ */
+fun <E> Collection<E>.containsAll(iterable: Iterable<E>): Boolean {
+    if (iterable is Collection<*>) {
+        iterable as Collection<E>
+        return containsAll(iterable)
+    }
+    for (element in iterable) {
+        if (element !in this) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
+ * Removes all the keys of the [Iterable] from this [MutableMap].
+ *
+ * @param iterable The iterable with keys to remove
+ * @return Whether the map was modified
+ */
+fun <K> MutableMap<K, *>.removeAll(iterable: Iterable<K>): Boolean {
+    var modified = false
+    for (key in iterable) {
+        if (remove(key) != null) {
+            modified = true
+        }
+    }
+    return modified
+}
+
+/**
+ * Removes all the map entries from the [Map] from this [MutableMap].
+ *
+ * @param map The map with entries to remove
+ * @return Whether the map was modified
+ */
+fun <K, V> MutableMap<K, V>.removeAll(map: Map<K, V>): Boolean {
+    var modified = false
+    for ((key, value) in map.entries) {
+        modified = remove(key, value) or modified
+    }
+    return modified
+}

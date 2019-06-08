@@ -28,9 +28,9 @@ package org.lanternpowered.server.network.block.vanilla;
 import com.google.common.base.Objects;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.network.block.BlockEntityProtocol;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 

@@ -30,7 +30,7 @@ import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.property.IStorePropertyHolder
 import org.spongepowered.api.data.persistence.DataContainer
-import org.spongepowered.api.data.Queries
+import org.spongepowered.api.data.persistence.Queries
 
 internal data class LanternPotionEffect(
         private val effectType: PotionEffectType,

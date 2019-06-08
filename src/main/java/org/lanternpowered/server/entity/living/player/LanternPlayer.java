@@ -100,12 +100,10 @@ import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.text.translation.TextTranslation;
-import org.lanternpowered.server.util.LanternTransform;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
-import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
@@ -114,10 +112,10 @@ import org.spongepowered.api.advancement.AdvancementProgress;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.Sign;
-import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -139,7 +137,6 @@ import org.spongepowered.api.event.world.ChangeWorldBorderEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
@@ -229,9 +226,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     private boolean chatColorsEnabled;
 
     private LanternScoreboard scoreboard;
-
-    // Whether you should ignore this player when checking for sleeping players to reset the time
-    private boolean sleepingIgnored;
 
     // The chunks the client knows about
     private final Set<Vector2i> knownChunks = new HashSet<>();

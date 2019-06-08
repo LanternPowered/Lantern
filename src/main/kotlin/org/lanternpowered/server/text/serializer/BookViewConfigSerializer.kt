@@ -31,13 +31,13 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.lanternpowered.api.ext.*
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
-import org.spongepowered.api.data.Queries.TEXT_AUTHOR
-import org.spongepowered.api.data.Queries.TEXT_PAGE_LIST
-import org.spongepowered.api.data.Queries.TEXT_TITLE
-import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.InvalidDataException
+import org.spongepowered.api.data.persistence.Queries.TEXT_AUTHOR
+import org.spongepowered.api.data.persistence.Queries.TEXT_PAGE_LIST
+import org.spongepowered.api.data.persistence.Queries.TEXT_TITLE
 import org.spongepowered.api.text.BookView
 import org.spongepowered.api.text.Text
 import java.util.Optional

@@ -37,7 +37,6 @@ import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.OptionalValue;
 import org.spongepowered.api.data.value.SetValue;
 import org.spongepowered.api.data.value.Value;
-import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.data.value.WeightedCollectionValue;
 import org.spongepowered.api.util.weighted.WeightedTable;
 
@@ -54,7 +53,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
-public class LanternValueFactory implements ValueFactory {
+public class LanternValueFactory implements Value.Factory {
 
     private static LanternValueFactory instance = new LanternValueFactory();
 

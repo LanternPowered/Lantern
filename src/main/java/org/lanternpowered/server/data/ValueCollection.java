@@ -33,7 +33,7 @@ import org.lanternpowered.server.data.element.ElementKeyRegistration;
 import org.lanternpowered.server.data.processor.ElementProcessorBuilder;
 import org.lanternpowered.server.data.processor.Processor;
 import org.lanternpowered.server.data.processor.ValueProcessorKeyRegistration;
-import org.lanternpowered.server.data.value.LanternValueFactory;
+import org.lanternpowered.server.data.value.BoundedValueFactory;
 import org.lanternpowered.server.util.copy.Copyable;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.Key;
@@ -249,11 +249,10 @@ public final class ValueCollection implements Copyable<ValueCollection> {
 
     private <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerSupplied(
             Key<? extends V> key, E defaultValue,
-            Function<IValueContainer<?>, E> minimumSupplier,
-            Function<IValueContainer<?>, E> maximumSupplier) {
+            Function<IValueContainer, E> minimumSupplier,
+            Function<IValueContainer, E> maximumSupplier) {
         checkKey(key);
         final ElementProcessorBuilder<V, E> builder = ElementProcessorBuilder.create(key);
-        final boolean immutable = key.getValueToken().getRawType().isAssignableFrom(Value.Immutable.class);
         builder.fastOfferHandler((valueContainer, holder, element) -> {
             final E minimum = minimumSupplier.apply(valueContainer);
             final E maximum = maximumSupplier.apply(valueContainer);
@@ -266,12 +265,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
         builder.offerHandler((valueContainer, holder, element) -> {
             final E minimum = minimumSupplier.apply(valueContainer);
             final E maximum = maximumSupplier.apply(valueContainer);
-            final BoundedValue.Immutable<E> newValue = LanternValueFactory.boundedBuilder(key)
-                    .actualValue(element)
-                    .defaultValue(defaultValue)
-                    .maximum(maximum)
-                    .minimum(minimum)
-                    .build().asImmutable();
+            final BoundedValue.Immutable<E> newValue = BoundedValueFactory.INSTANCE.immutableOf(key, element, minimum, maximum).asImmutable();
             if (element.compareTo(maximum) > 0 || element.compareTo(minimum) < 0) {
                 return DataTransactionResult.errorResult(newValue);
             }
@@ -280,12 +274,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
                 return DataTransactionResult.successResult(newValue);
             }
             return DataTransactionResult.successReplaceResult(newValue,
-                    LanternValueFactory.boundedBuilder(key)
-                            .actualValue(oldElement)
-                            .defaultValue(defaultValue)
-                            .maximum(maximum)
-                            .minimum(minimum)
-                            .build().asImmutable());
+                    BoundedValueFactory.INSTANCE.immutableOf(key, oldElement, minimum, maximum).asImmutable());
         });
         builder.retrieveHandler((valueContainer, holder) -> {
             E element = holder.get();
@@ -320,13 +309,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
                     holder.set(maximum);
                     element = maximum;
                 }
-                final BoundedValue.Mutable<E> value = LanternValueFactory.boundedBuilder(key)
-                        .actualValue(element)
-                        .defaultValue(defaultValue)
-                        .maximum(maximum)
-                        .minimum(minimum)
-                        .build();
-                return Optional.of((V) (immutable ? value.asImmutable() : value));
+                return Optional.of(BoundedValueFactory.INSTANCE.immutableOf(key, element, minimum, maximum));
             }
         });
         builder.fastRemoveHandler((valueContainer, holder) -> false);
@@ -337,12 +320,7 @@ public final class ValueCollection implements Copyable<ValueCollection> {
             }
             final E minimum = minimumSupplier.apply(valueContainer);
             final E maximum = maximumSupplier.apply(valueContainer);
-            return DataTransactionResult.failResult(LanternValueFactory.boundedBuilder(key)
-                    .actualValue(element)
-                    .defaultValue(defaultValue)
-                    .maximum(maximum)
-                    .minimum(minimum)
-                    .build().asImmutable());
+            return DataTransactionResult.failResult(BoundedValueFactory.INSTANCE.immutableOf(key, element, minimum, maximum).asImmutable());
         });
         final ElementKeyRegistration<V, E> element = (ElementKeyRegistration<V, E>) builder.build();
         element.set(defaultValue);
@@ -351,17 +329,17 @@ public final class ValueCollection implements Copyable<ValueCollection> {
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerWithSuppliedBounds(Key<? extends V> key,
-            E defaultValue, Function<IValueContainer<?>, E> minimumSupplier, Function<IValueContainer<?>, E> maximumSupplier) {
+            E defaultValue, Function<IValueContainer, E> minimumSupplier, Function<IValueContainer, E> maximumSupplier) {
         return registerSupplied(key, defaultValue, minimumSupplier, maximumSupplier);
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerWithSuppliedMax(Key<? extends V> key,
-            E defaultValue, E minimum, Function<IValueContainer<?>, E> maximumSupplier) {
+            E defaultValue, E minimum, Function<IValueContainer, E> maximumSupplier) {
         return registerSupplied(key, defaultValue, container -> minimum, maximumSupplier);
     }
 
     public <V extends BoundedValue<E>, E extends Comparable<E>> ElementKeyRegistration<V, E> registerWithSuppliedMin(Key<? extends V> key,
-            E defaultValue, Function<IValueContainer<?>, E> minimumSupplier, E maximum) {
+            E defaultValue, Function<IValueContainer, E> minimumSupplier, E maximum) {
         return registerSupplied(key, defaultValue, minimumSupplier, container -> maximum);
     }
 

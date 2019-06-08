@@ -37,9 +37,9 @@ import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.text.LanternTexts;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.Keys;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.HashSet;

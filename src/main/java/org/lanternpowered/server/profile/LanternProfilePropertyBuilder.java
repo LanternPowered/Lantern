@@ -27,8 +27,8 @@ package org.lanternpowered.server.profile;
 
 import org.lanternpowered.server.data.DataQueries;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.profile.property.ProfileProperty;
 

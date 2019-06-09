@@ -38,7 +38,7 @@ import kotlin.reflect.KClass
  * @param entrySeparator The separator that is used to join multiple key-value pairs
  */
 class ToStringHelper @JvmOverloads constructor(
-        private val className: String,
+        private val className: String = "",
         private var brackets: Brackets = Brackets.ROUND,
         private var omitNullValues: Boolean = false,
         private var nameValueSeparator: String = "=",
@@ -65,11 +65,6 @@ class ToStringHelper @JvmOverloads constructor(
      * simple name of the given object.
      */
     constructor(self: Any): this(self::class)
-
-    /**
-     * Constructs a new [ToStringHelper] with no name.
-     */
-    constructor(): this("")
 
     /**
      * Applies changes to this [ToStringHelper].

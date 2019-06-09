@@ -32,8 +32,10 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Multimap
+import org.spongepowered.api.util.weighted.WeightedTable
 import java.util.Collections
 import java.util.EnumMap
+import java.util.LinkedList
 import java.util.WeakHashMap
 import java.util.stream.Stream
 
@@ -171,10 +173,22 @@ fun <K> MutableMap<K, *>.removeAll(iterable: Iterable<K>): Boolean {
  * @param map The map with entries to remove
  * @return Whether the map was modified
  */
-fun <K, V> MutableMap<K, V>.removeAll(map: Map<K, V>): Boolean {
+fun <K, V> MutableMap<K, V>.removeAll(map: Map<out K, V>): Boolean {
     var modified = false
     for ((key, value) in map.entries) {
         modified = remove(key, value) or modified
     }
     return modified
+}
+
+fun <C : MutableCollection<E>, E> mutableCollectionOf(collectionType: Class<C>): C {
+    return when {
+        LinkedHashSet::class.java.isAssignableFrom(collectionType) -> LinkedHashSet<Any>()
+        HashSet::class.java.isAssignableFrom(collectionType) -> HashSet<Any>()
+        Set::class.java.isAssignableFrom(collectionType) -> HashSet<Any>()
+        ArrayList::class.java.isAssignableFrom(collectionType) -> ArrayList<Any>()
+        LinkedList::class.java.isAssignableFrom(collectionType) -> LinkedList<Any>()
+        WeightedTable::class.java.isAssignableFrom(collectionType) -> WeightedTable<Any>()
+        else -> ArrayList<Any>()
+    }.uncheckedCast()
 }

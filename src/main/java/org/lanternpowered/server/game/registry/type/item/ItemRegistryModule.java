@@ -1101,7 +1101,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .maxStackQuantity(1)
                 .keysProvider(c -> c
-                        .register(Keys.PLAIN_BOOK_PAGES, null))
+                        .register(Keys.PLAIN_BOOK_PAGES))
                 .build("minecraft", "writable_book"));
         ////////////////////////
         ///   Written Book   ///
@@ -1109,9 +1109,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(builder()
                 .maxStackQuantity(1)
                 .keysProvider(c -> {
-                    c.register(Keys.BOOK_PAGES, null);
-                    c.register(Keys.BOOK_AUTHOR, null);
-                    c.register(Keys.GENERATION, null);
+                    c.register(Keys.BOOK_PAGES);
+                    c.register(Keys.BOOK_AUTHOR);
+                    c.register(Keys.GENERATION);
                 })
                 .behaviors(pipeline -> pipeline
                         .add(new OpenHeldBookBehavior()))
@@ -1279,7 +1279,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////////
         register(builder()
                 .keysProvider(c -> c
-                        .register(Keys.STORED_ENCHANTMENTS, null))
+                        .register(Keys.STORED_ENCHANTMENTS))
                 .maxStackQuantity(1)
                 .build("minecraft", "enchanted_book"));
         //////////////////////
@@ -1697,9 +1697,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                     return tr("item.potion.name");
                 })
                 .keysProvider(c -> {
-                    c.register(Keys.COLOR, null);
-                    c.register(Keys.POTION_EFFECTS, null);
-                    c.register(Keys.POTION_TYPE, null);
+                    c.register(Keys.COLOR);
+                    c.register(Keys.POTION_EFFECTS);
+                    c.register(Keys.POTION_TYPE);
                 });
     }
 
@@ -1749,7 +1749,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     private ItemTypeBuilder leatherArmorBuilder(int useLimit, EquipmentType equipmentType) {
         return armorBuilder(useLimit, ArmorTypes.LEATHER, equipmentType)
                 .keysProvider(c -> c
-                        .register(Keys.COLOR, null));
+                        .register(Keys.COLOR));
     }
 
     private ItemTypeBuilder armorBuilder(int useLimit, ArmorType armorType, EquipmentType equipmentType) {

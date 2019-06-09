@@ -28,14 +28,12 @@ package org.lanternpowered.server.data;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.meta.LanternPatternLayer;
 import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
 import org.lanternpowered.server.data.property.entity.DominantHandPropertyStore;
-import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
@@ -45,32 +43,22 @@ import org.lanternpowered.server.profile.LanternProfilePropertyBuilder;
 import org.lanternpowered.server.text.serializer.BookViewConfigSerializer;
 import org.lanternpowered.server.text.serializer.TextConfigSerializer;
 import org.lanternpowered.server.util.copy.Copyable;
-import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.property.PropertyRegistry;
-import org.spongepowered.api.data.type.BodyPart;
-import org.spongepowered.api.data.type.BodyParts;
-import org.spongepowered.api.data.type.WireAttachmentType;
-import org.spongepowered.api.data.type.WireAttachmentTypes;
-import org.spongepowered.api.data.value.CompositeValueStore;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RespawnLocation;
-import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public class DataRegistrar {
@@ -111,161 +99,6 @@ public class DataRegistrar {
         dataManager.registerBuilder(Enchantment.class, new LanternEnchantmentBuilder());
         dataManager.registerBuilder(ProfileProperty.class, new LanternProfilePropertyBuilder());
         dataManager.registerBuilder(GameProfile.class, new LanternGameProfileBuilder());
-
-        final LanternValueFactory valueFactory = LanternValueFactory.get();
-        valueFactory.registerKey(Keys.BIG_MUSHROOM_PORES).add(builder -> builder
-                .applicableTester(valueContainer ->
-                        valueContainer.supports(Keys.BIG_MUSHROOM_PORES_UP) || valueContainer.supports(Keys.BIG_MUSHROOM_PORES_WEST) ||
-                                valueContainer.supports(Keys.BIG_MUSHROOM_PORES_SOUTH) || valueContainer.supports(Keys.BIG_MUSHROOM_PORES_NORTH) ||
-                                valueContainer.supports(Keys.BIG_MUSHROOM_PORES_EAST) || valueContainer.supports(Keys.BIG_MUSHROOM_PORES_DOWN))
-                .retrieveHandler((valueContainer, key)  -> {
-                    final Set<Direction> directions = new HashSet<>();
-                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_WEST).orElse(false)) {
-                        directions.add(Direction.WEST);
-                    }
-                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_EAST).orElse(false)) {
-                        directions.add(Direction.EAST);
-                    }
-                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_SOUTH).orElse(false)) {
-                        directions.add(Direction.SOUTH);
-                    }
-                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_NORTH).orElse(false)) {
-                        directions.add(Direction.NORTH);
-                    }
-                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_UP).orElse(false)) {
-                        directions.add(Direction.UP);
-                    }
-                    if (valueContainer.get(Keys.BIG_MUSHROOM_PORES_DOWN).orElse(false)) {
-                        directions.add(Direction.DOWN);
-                    }
-                    return Optional.of(directions);
-                })
-                .offerHandler((valueContainer, key, directions) -> {
-                    if (valueContainer instanceof CompositeValueStore) {
-                        final CompositeValueStore store = (CompositeValueStore) valueContainer;
-                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
-                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_WEST, directions.contains(Direction.WEST)));
-                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_EAST, directions.contains(Direction.EAST)));
-                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_SOUTH, directions.contains(Direction.SOUTH)));
-                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_NORTH, directions.contains(Direction.NORTH)));
-                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_UP, directions.contains(Direction.UP)));
-                        resultBuilder.absorbResult(store.offer(Keys.BIG_MUSHROOM_PORES_DOWN, directions.contains(Direction.DOWN)));
-                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
-                    }
-                    return DataTransactionResult.successNoData();
-                })
-                .failAlwaysRemoveHandler());
-        valueFactory.registerKey(Keys.CONNECTED_DIRECTIONS).add(builder -> builder
-                .applicableTester(valueContainer ->
-                        valueContainer.supports(Keys.CONNECTED_WEST) || valueContainer.supports(Keys.CONNECTED_EAST) ||
-                        valueContainer.supports(Keys.CONNECTED_NORTH) || valueContainer.supports(Keys.CONNECTED_SOUTH))
-                .retrieveHandler((valueContainer, key)  -> {
-                    final Set<Direction> directions = new HashSet<>();
-                    if (valueContainer.get(Keys.CONNECTED_WEST).orElse(false)) {
-                        directions.add(Direction.WEST);
-                    }
-                    if (valueContainer.get(Keys.CONNECTED_EAST).orElse(false)) {
-                        directions.add(Direction.EAST);
-                    }
-                    if (valueContainer.get(Keys.CONNECTED_SOUTH).orElse(false)) {
-                        directions.add(Direction.SOUTH);
-                    }
-                    if (valueContainer.get(Keys.CONNECTED_NORTH).orElse(false)) {
-                        directions.add(Direction.NORTH);
-                    }
-                    return Optional.of(directions);
-                })
-                .offerHandler((valueContainer, key, directions) -> {
-                    if (valueContainer instanceof ICompositeValueStore) {
-                        final ICompositeValueStore store = (ICompositeValueStore) valueContainer;
-                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_WEST, directions.contains(Direction.WEST)));
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_EAST, directions.contains(Direction.EAST)));
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_SOUTH, directions.contains(Direction.SOUTH)));
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_NORTH, directions.contains(Direction.NORTH)));
-                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
-                    }
-                    return DataTransactionResult.successNoData();
-                })
-                .failAlwaysRemoveHandler());
-        valueFactory.registerKey(Keys.WIRE_ATTACHMENTS).add(builder -> builder
-                .applicableTester(valueContainer ->
-                        valueContainer.supports(Keys.WIRE_ATTACHMENT_WEST) || valueContainer.supports(Keys.WIRE_ATTACHMENT_EAST) ||
-                                valueContainer.supports(Keys.WIRE_ATTACHMENT_NORTH) || valueContainer.supports(Keys.WIRE_ATTACHMENT_SOUTH))
-                .retrieveHandler((valueContainer, key) -> {
-                    final Map<Direction, WireAttachmentType> attachments = new HashMap<>();
-                    valueContainer.get(Keys.WIRE_ATTACHMENT_WEST).ifPresent(type -> attachments.put(Direction.WEST, type));
-                    valueContainer.get(Keys.WIRE_ATTACHMENT_EAST).ifPresent(type -> attachments.put(Direction.EAST, type));
-                    valueContainer.get(Keys.WIRE_ATTACHMENT_SOUTH).ifPresent(type -> attachments.put(Direction.SOUTH, type));
-                    valueContainer.get(Keys.WIRE_ATTACHMENT_NORTH).ifPresent(type -> attachments.put(Direction.NORTH, type));
-                    return Optional.of(attachments);
-                })
-                .offerHandler((key, valueContainer, attachments) -> {
-                    if (valueContainer instanceof ICompositeValueStore) {
-                        final ICompositeValueStore store = (ICompositeValueStore) valueContainer;
-                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
-                        WireAttachmentType type = attachments.get(Direction.WEST);
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_WEST,
-                                type == null ? WireAttachmentTypes.NONE : type));
-                        type = attachments.get(Direction.EAST);
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_EAST,
-                                type == null ? WireAttachmentTypes.NONE : type));
-                        type = attachments.get(Direction.SOUTH);
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_SOUTH,
-                                type == null ? WireAttachmentTypes.NONE : type));
-                        type = attachments.get(Direction.NORTH);
-                        resultBuilder.absorbResult(store.offerNoEvents(Keys.CONNECTED_NORTH,
-                                type == null ? WireAttachmentTypes.NONE : type));
-                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
-                    }
-                    return DataTransactionResult.successNoData();
-                })
-                .failAlwaysRemoveHandler());
-        valueFactory.registerKey(Keys.BODY_ROTATIONS).add(builder -> builder
-                .applicableTester(valueContainer ->
-                        valueContainer.supports(Keys.RIGHT_ARM_ROTATION) || valueContainer.supports(Keys.LEFT_ARM_ROTATION) ||
-                                valueContainer.supports(Keys.RIGHT_LEG_ROTATION) || valueContainer.supports(Keys.LEFT_LEG_ROTATION) ||
-                                valueContainer.supports(Keys.HEAD_ROTATION) || valueContainer.supports(Keys.CHEST_ROTATION))
-                .retrieveHandler((valueContainer, key) -> {
-                    final Map<BodyPart, Vector3d> rotations = new HashMap<>();
-                    valueContainer.get(Keys.RIGHT_ARM_ROTATION).ifPresent(type -> rotations.put(BodyParts.RIGHT_ARM, type));
-                    valueContainer.get(Keys.RIGHT_LEG_ROTATION).ifPresent(type -> rotations.put(BodyParts.RIGHT_LEG, type));
-                    valueContainer.get(Keys.LEFT_ARM_ROTATION).ifPresent(type -> rotations.put(BodyParts.LEFT_ARM, type));
-                    valueContainer.get(Keys.LEFT_LEG_ROTATION).ifPresent(type -> rotations.put(BodyParts.LEFT_LEG, type));
-                    valueContainer.get(Keys.HEAD_ROTATION).ifPresent(type -> rotations.put(BodyParts.HEAD, type));
-                    valueContainer.get(Keys.CHEST_ROTATION).ifPresent(type -> rotations.put(BodyParts.CHEST, type));
-                    return Optional.of(rotations);
-                })
-                .offerHandler((key, valueContainer, rotations) -> {
-                    if (valueContainer instanceof CompositeValueStore) {
-                        final ICompositeValueStore store = (ICompositeValueStore) valueContainer;
-                        final DataTransactionResult.Builder resultBuilder = DataTransactionResult.builder();
-                        Vector3d rot;
-                        if ((rot = rotations.get(BodyParts.RIGHT_ARM)) != null) {
-                            resultBuilder.absorbResult(store.offerNoEvents(Keys.RIGHT_ARM_ROTATION, rot));
-                        }
-                        if ((rot = rotations.get(BodyParts.RIGHT_LEG)) != null) {
-                            resultBuilder.absorbResult(store.offerNoEvents(Keys.RIGHT_LEG_ROTATION, rot));
-                        }
-                        if ((rot = rotations.get(BodyParts.LEFT_ARM)) != null) {
-                            resultBuilder.absorbResult(store.offerNoEvents(Keys.LEFT_ARM_ROTATION, rot));
-                        }
-                        if ((rot = rotations.get(BodyParts.LEFT_LEG)) != null) {
-                            resultBuilder.absorbResult(store.offerNoEvents(Keys.LEFT_LEG_ROTATION, rot));
-                        }
-                        if ((rot = rotations.get(BodyParts.HEAD)) != null) {
-                            resultBuilder.absorbResult(store.offerNoEvents(Keys.HEAD_ROTATION, rot));
-                        }
-                        if ((rot = rotations.get(BodyParts.CHEST)) != null) {
-                            resultBuilder.absorbResult(store.offerNoEvents(Keys.CHEST_ROTATION, rot));
-                        }
-                        return resultBuilder.result(DataTransactionResult.Type.SUCCESS).build();
-                    }
-                    return DataTransactionResult.successNoData();
-                })
-                .failAlwaysRemoveHandler());
-
-        DataManipulatorRegistry.get();
     }
 
     public static void finalizeRegistrations(LanternGame game) {

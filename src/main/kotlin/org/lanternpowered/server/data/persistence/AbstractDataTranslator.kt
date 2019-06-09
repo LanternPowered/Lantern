@@ -27,13 +27,12 @@ package org.lanternpowered.server.data.persistence
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataTranslator
 
 abstract class AbstractDataTranslator<T>(key: CatalogKey, private val typeToken: TypeToken<T>) :
         DefaultCatalogType(key), DataTranslator<T> {
 
-    override fun getToken(): TypeToken<T> = this.typeToken
-    override fun toStringHelper(): ToStringHelper = super.toStringHelper().add("typeToken", this.typeToken)
+    override fun getToken() = this.typeToken
+    override fun toStringHelper() = super.toStringHelper().add("typeToken", this.typeToken)
 }

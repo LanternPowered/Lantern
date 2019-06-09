@@ -25,10 +25,13 @@
  */
 package org.lanternpowered.api.event;
 
+import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
@@ -69,9 +72,16 @@ public class LanternEventFactory {
 
     public static ConstructEntityEvent.@NonNull Pre createConstructEntityEventPre(
             @NonNull Cause cause,
-            @NonNull EntityType targetType,
+            @NonNull EntityType<?> targetType,
             @NonNull Transform transform,
             @NonNull World world) {
         return SpongeEventFactory.createConstructEntityEventPre(cause, targetType, transform, world);
+    }
+
+    public static ChangeDataHolderEvent.@NonNull ValueChange createChangeDataHolderEventValueChange(
+            @NonNull Cause cause,
+            @NonNull DataTransactionResult originalChanges,
+            DataHolder.@NonNull Mutable targetHolder) {
+        return SpongeEventFactory.createChangeDataHolderEventValueChange(cause, originalChanges, targetHolder);
     }
 }

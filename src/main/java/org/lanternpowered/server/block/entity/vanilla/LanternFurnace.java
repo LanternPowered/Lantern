@@ -28,8 +28,7 @@ package org.lanternpowered.server.block.entity.vanilla;
 import org.lanternpowered.server.block.entity.ICarrierBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.state.BlockStateProperties;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.element.ElementListener;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -39,6 +38,7 @@ import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.item.recipe.fuel.IFuel;
 import org.lanternpowered.server.item.recipe.smelting.ISmeltingRecipe;
+import org.lanternpowered.server.util.function.TriConsumer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
 import org.spongepowered.api.block.entity.carrier.furnace.Furnace;
@@ -72,14 +72,15 @@ public class LanternFurnace extends LanternBlockEntity implements Furnace, ICarr
     public void registerKeys() {
         super.registerKeys();
 
-        final ElementListener<Integer> clearProperty = (oldElement, newElement) -> this.inventory.resetCachedProgress();
+        final TriConsumer<LanternFurnace, Integer, Integer> clearProperty =
+                (furnace, oldElement, newElement) -> furnace.inventory.resetCachedProgress();
 
-        final ValueCollection c = getValueCollection();
-        c.register(Keys.DISPLAY_NAME, null);
-        c.register(Keys.MAX_BURN_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
-        c.register(Keys.PASSED_BURN_TIME, 0, 0, Keys.MAX_BURN_TIME).addListener(clearProperty);
-        c.register(Keys.MAX_COOK_TIME, 0, 0, Integer.MAX_VALUE).addListener(clearProperty);
-        c.register(Keys.PASSED_COOK_TIME, 0, 0, Keys.MAX_COOK_TIME).addListener(clearProperty);
+        final LocalKeyRegistry<LanternFurnace> c = getKeyRegistry().forHolder(LanternFurnace.class);
+        c.register(Keys.DISPLAY_NAME);
+        c.register(Keys.MAX_BURN_TIME, 0).minimum(0).maximum(Integer.MAX_VALUE).addChangeListener(clearProperty);
+        c.register(Keys.PASSED_BURN_TIME, 0).minimum(0).maximum(Keys.MAX_BURN_TIME).addChangeListener(clearProperty);
+        c.register(Keys.MAX_COOK_TIME, 0).minimum(0).maximum(Integer.MAX_VALUE).addChangeListener(clearProperty);
+        c.register(Keys.PASSED_COOK_TIME, 0).minimum(0).maximum(Keys.MAX_COOK_TIME).addChangeListener(clearProperty);
     }
 
     @Override

@@ -29,9 +29,12 @@ import com.google.common.reflect.TypeToken
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.value.BoundedValue
 
+/**
+ * Represents the [ValueKey] of a [BoundedValue].
+ */
 class BoundedValueKey<V : BoundedValue<E>, E : Any>(
-        key: CatalogKey, valueToken: TypeToken<V>, elementToken: TypeToken<E>,
+        key: CatalogKey, valueToken: TypeToken<V>, elementToken: TypeToken<E>, requiresExplicitRegistration: Boolean,
         val minimum: () -> E,
         val maximum: () -> E,
         val comparator: Comparator<in E>
-) : ValueKey<V, E>(key, valueToken, elementToken)
+) : ValueKey<V, E>(key, valueToken, elementToken, requiresExplicitRegistration)

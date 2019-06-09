@@ -28,15 +28,13 @@ package org.lanternpowered.server.block.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.block.LanternBlockSnapshot;
-import org.lanternpowered.server.data.AdditionalContainerCollection;
-import org.lanternpowered.server.data.IAdditionalDataHolder;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.LocalMutableDataHolder;
+import org.lanternpowered.server.data.LocalKeyRegistry;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.block.entity.BlockEntityArchetype;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -46,7 +44,7 @@ import org.spongepowered.math.vector.Vector3i;
 import java.util.Optional;
 import java.util.UUID;
 
-public class LanternBlockEntityArchetype implements BlockEntityArchetype, IStorePropertyHolder, IAdditionalDataHolder {
+public class LanternBlockEntityArchetype implements BlockEntityArchetype, StorePropertyHolder, LocalMutableDataHolder {
 
     final LanternBlockEntity blockEntity;
 
@@ -85,13 +83,8 @@ public class LanternBlockEntityArchetype implements BlockEntityArchetype, IStore
     }
 
     @Override
-    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
-        return this.blockEntity.getAdditionalContainers();
-    }
-
-    @Override
-    public ValueCollection getValueCollection() {
-        return this.blockEntity.getValueCollection();
+    public LocalKeyRegistry getKeyRegistry() {
+        return this.blockEntity.getKeyRegistry();
     }
 
     @Override

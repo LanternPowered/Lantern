@@ -29,7 +29,7 @@ import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.io.store.data.DataHolderStore;
+import org.lanternpowered.server.data.io.store.data.LocalMutableDataHolderStore;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistryModule;
@@ -63,7 +63,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
+public final class ItemStackStore extends LocalMutableDataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
 
     public static final ItemStackStore INSTANCE = new ItemStackStore();
 

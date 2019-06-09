@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.property
 
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.inventory.AbstractInventory
 import org.spongepowered.api.data.property.Property
 import org.spongepowered.api.data.property.PropertyHolder
@@ -33,7 +34,6 @@ import java.util.Optional
 
 class InventoryPropertyStore<V>(val property: Property<V>) : PropertyStore<V> {
 
-    override fun getFor(propertyHolder: PropertyHolder): Optional<V> {
-        return (propertyHolder as? AbstractInventory)?.getInventoryProperty(this.property) ?: Optional.empty()
-    }
+    override fun getFor(propertyHolder: PropertyHolder): Optional<V> =
+            (propertyHolder as? AbstractInventory)?.getInventoryProperty(this.property) ?: emptyOptional()
 }

@@ -31,13 +31,12 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
-import org.lanternpowered.server.data.IAdditionalDataHolder;
-import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.LocalMutableDataHolder;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -51,9 +50,7 @@ import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -111,7 +108,7 @@ import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePropertyHolder {
+public class LanternEntity implements Entity, LocalMutableDataHolder, StorePropertyHolder {
 
     // The unique id of this entity
     private final UUID uniqueId;
@@ -123,8 +120,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     private final Random random = new Random();
 
     // The raw value map
-    private final ValueCollection valueCollection = ValueCollection.create();
-    private final AdditionalContainerCollection<DataManipulator> additionalContainers = AdditionalContainerCollection.createConcurrent();
+    private final LocalKeyRegistry<? extends LanternEntity> localKeyRegistry = LocalKeyRegistry.of();
 
     // The world this entity is located in, may be null
     private LanternWorld world;
@@ -175,13 +171,8 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     private SoundCategory soundCategory = SoundCategories.NEUTRAL;
 
     @Override
-    public ValueCollection getValueCollection() {
-        return this.valueCollection;
-    }
-
-    @Override
-    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
-        return this.additionalContainers;
+    public LocalKeyRegistry<? extends LanternEntity> getKeyRegistry() {
+        return this.localKeyRegistry;
     }
 
     public enum RemoveState {
@@ -204,18 +195,18 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     }
 
     public void registerKeys() {
-        final ValueCollection c = getValueCollection();
+        final LocalKeyRegistry<?> c = getKeyRegistry();
         c.register(Keys.DISPLAY_NAME, Text.empty());
         c.register(Keys.CUSTOM_NAME_VISIBLE, true);
-        c.registerNonRemovable(Keys.TAGS, new HashSet<>());
-        c.registerNonRemovable(Keys.VELOCITY, Vector3d.ZERO);
-        c.registerNonRemovable(Keys.FIRE_TICKS, 0);
-        c.registerNonRemovable(Keys.FALL_DISTANCE, 0f);
-        c.registerNonRemovable(Keys.GLOWING, false);
-        c.registerNonRemovable(Keys.INVISIBLE, false);
-        c.registerNonRemovable(Keys.INVULNERABLE, false);
-        c.registerNonRemovable(Keys.HAS_GRAVITY, true);
-        c.registerNonRemovable(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
+        c.register(Keys.TAGS, new HashSet<>());
+        c.register(Keys.VELOCITY, Vector3d.ZERO);
+        c.register(Keys.FIRE_TICKS, 0);
+        c.register(Keys.FALL_DISTANCE, 0f);
+        c.register(Keys.GLOWING, false);
+        c.register(Keys.INVISIBLE, false);
+        c.register(Keys.INVULNERABLE, false);
+        c.register(Keys.HAS_GRAVITY, true);
+        c.register(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
     }
 
     /**
@@ -860,7 +851,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, IStorePrope
     }
 
     @Override
-    public DataHolder copy() {
+    public EntityArchetype copy() {
         return null;
     }
 

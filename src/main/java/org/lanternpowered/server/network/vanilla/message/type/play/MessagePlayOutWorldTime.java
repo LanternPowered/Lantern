@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.data.world.MoonPhase;
+import org.lanternpowered.server.data.type.MoonPhase;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutWorldTime implements Message {

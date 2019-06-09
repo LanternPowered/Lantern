@@ -74,7 +74,7 @@ import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
-import org.lanternpowered.server.data.key.LanternKeyBuilder;
+import org.lanternpowered.server.data.key.ValueKeyRegistryModule;
 import org.lanternpowered.server.data.property.LanternPropertyBuilder;
 import org.lanternpowered.server.data.property.LanternPropertyMatcherBuilder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
@@ -86,7 +86,6 @@ import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.lanternpowered.server.data.type.LanternSurface;
-import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectType;
 import org.lanternpowered.server.effect.entity.LanternEntityEffectCollectionBuilder;
@@ -105,7 +104,6 @@ import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
-import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.factory.TimingsFactoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeLayoutModule;
@@ -140,7 +138,6 @@ import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryM
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseStyleRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.LlamaTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
@@ -607,7 +604,7 @@ public class LanternGameRegistry implements XGameRegistry {
                         new EnumValueRegistryModule<Surface>(LanternSurface.class, Surfaces.class) {})
                 .registerModule(Hinge.class,
                         new EnumValueRegistryModule<Hinge>(LanternHinge.class, Hinges.class) {})
-                .registerModule(Key.class, KeyRegistryModule.get())
+                .registerModule(Key.class, ValueKeyRegistryModule.INSTANCE)
                 .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
                 .registerModule(SlabPortion.class, new EnumValueRegistryModule<SlabPortion>(LanternSlabPortion.class, SlabPortions.class) {})
                 .registerModule(NotePitch.class, NotePitchRegistryModule.INSTANCE)
@@ -1145,11 +1142,6 @@ public class LanternGameRegistry implements XGameRegistry {
     @Override
     public Optional<Translation> getTranslationById(String id) {
         return getTranslationManager().getIfPresent(id);
-    }
-
-    @Override
-    public ValueFactory getValueFactory() {
-        return LanternValueFactory.get();
     }
 
     @Override

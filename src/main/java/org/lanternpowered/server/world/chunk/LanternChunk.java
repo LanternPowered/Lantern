@@ -50,8 +50,8 @@ import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
-import org.lanternpowered.server.data.property.IStoreDirectionRelativePropertyHolder;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.property.StoreDirectionRelativePropertyHolder;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.game.Lantern;
@@ -1588,9 +1588,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final Location location = new Location<>(this.world, x, y, z);
         Optional<T> property;
         if (direction != null) {
-            property = IStoreDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
+            property = StoreDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
         } else {
-            property = IStorePropertyHolder.getPropertyFor(location, propertyClass);
+            property = StorePropertyHolder.getPropertyFor(location, propertyClass);
         }
         if (direction == null && !property.isPresent()) {
             final Optional<BlockEntity> blockEntity = getBlockEntity(x, y, z);
@@ -1628,7 +1628,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return Collections.emptyList();
         }
         return Arrays.stream(CARDINAL_FACES)
-                .filter(direction -> IStoreDirectionRelativePropertyHolder.getPropertyFor(location, direction, store.get()).isPresent())
+                .filter(direction -> StoreDirectionRelativePropertyHolder.getPropertyFor(location, direction, store.get()).isPresent())
                 .collect(ImmutableList.toImmutableList());
     }
 

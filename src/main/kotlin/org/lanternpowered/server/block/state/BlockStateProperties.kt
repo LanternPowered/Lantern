@@ -65,7 +65,7 @@ object BlockStateProperties {
 
     @JvmField val POWERED = booleanStatePropertyOf(minecraft("powered"), Keys.POWERED)
 
-    @JvmField val EXPLODE = booleanStatePropertyOf(minecraft("explode"), LanternKeys.EXPLODE)
+    @JvmField val UNSTABLE = booleanStatePropertyOf(minecraft("explode"), LanternKeys.UNSTABLE)
 
     @JvmField val HAS_MUSIC_DISC = booleanStatePropertyOf(minecraft("has_record"), LanternKeys.HAS_MUSIC_DISC)
 

@@ -36,7 +36,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.entity.living.player.OfflineUser
 import org.lanternpowered.server.entity.weather.LanternLightning
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
-import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule
 import org.lanternpowered.server.game.registry.type.effect.sound.entity.EntityEffectTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule

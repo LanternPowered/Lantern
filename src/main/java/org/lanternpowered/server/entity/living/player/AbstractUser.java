@@ -27,7 +27,7 @@ package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.io.store.entity.UserStore;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.AbstractArmorEquipable;
@@ -44,7 +44,6 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.statistic.StatisticMap;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
-import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.entity.living.player.User;
@@ -101,25 +100,25 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     @Override
     public void registerKeys() {
         super.registerKeys();
-        final ValueCollection c = getValueCollection();
+        final LocalKeyRegistry<AbstractUser> c = getKeyRegistry().forHolder(AbstractUser.class);
         c.register(LanternKeys.ACCESSORIES, new ArrayList<>());
-        c.register(LanternKeys.MAX_EXHAUSTION, 40.0, 0.0, Double.MAX_VALUE);
-        c.register(Keys.EXHAUSTION, DEFAULT_EXHAUSTION, 0.0, LanternKeys.MAX_EXHAUSTION);
-        c.register(LanternKeys.MAX_FOOD_LEVEL, 20, 0, Integer.MAX_VALUE);
-        c.register(Keys.FOOD_LEVEL, 20, 0, LanternKeys.MAX_FOOD_LEVEL);
-        c.registerWithSuppliedMax(Keys.SATURATION, DEFAULT_SATURATION, 0.0,
-                container -> container.get(Keys.FOOD_LEVEL).orElse(20).doubleValue());
-        c.register(Keys.LAST_DATE_PLAYED, null);
-        c.register(Keys.FIRST_DATE_PLAYED, null);
-        c.registerNonRemovable(Keys.WALKING_SPEED, 0.1);
-        c.registerNonRemovable(LanternKeys.FIELD_OF_VIEW_MODIFIER, 1.0);
-        c.registerNonRemovable(Keys.IS_FLYING, false);
-        c.registerNonRemovable(Keys.IS_SPRINTING, false);
-        c.registerNonRemovable(Keys.FLYING_SPEED, 0.1);
-        c.registerNonRemovable(Keys.CAN_FLY, false);
-        c.registerNonRemovable(Keys.RESPAWN_LOCATIONS, new HashMap<>());
-        c.registerNonRemovable(Keys.GAME_MODE, GameModes.NOT_SET).addListener(
-                (oldElement, newElement) -> {
+        c.register(LanternKeys.MAX_EXHAUSTION).minimum(0.0).maximum(Double.MAX_VALUE);
+        c.register(Keys.EXHAUSTION, DEFAULT_EXHAUSTION).minimum(0.0).maximum(LanternKeys.MAX_EXHAUSTION);
+        c.register(LanternKeys.MAX_FOOD_LEVEL, 20).minimum(0).maximum(Integer.MAX_VALUE);
+        c.register(Keys.FOOD_LEVEL, 20).minimum(0).maximum(LanternKeys.MAX_FOOD_LEVEL);
+        c.register(Keys.SATURATION, DEFAULT_SATURATION).minimum(0.0)
+                .maximum(user -> user.get(Keys.FOOD_LEVEL).orElse(20).doubleValue());
+        c.register(Keys.LAST_DATE_PLAYED);
+        c.register(Keys.FIRST_DATE_PLAYED);
+        c.register(Keys.WALKING_SPEED, 0.1);
+        c.register(LanternKeys.FIELD_OF_VIEW_MODIFIER, 1.0);
+        c.register(Keys.IS_FLYING, false);
+        c.register(Keys.IS_SPRINTING, false);
+        c.register(Keys.FLYING_SPEED, 0.1);
+        c.register(Keys.CAN_FLY, false);
+        c.register(Keys.RESPAWN_LOCATIONS, new HashMap<>());
+        c.register(Keys.GAME_MODE, GameModes.NOT_SET).addChangeListener(
+                (user, oldElement, newElement) -> {
                     ((LanternGameMode) newElement).getAbilityApplier().invoke(this);
                     // This MUST be updated, unless you want strange behavior on the client,
                     // the client has 3 different concepts of 'isCreative', and each combination
@@ -132,27 +131,27 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
                     // TODO: these kind of settings to avoid possible 'strange' behavior.
                     GlobalTabList.getInstance().get(getProfile()).ifPresent(e -> e.setGameMode(newElement));
                 });
-        c.registerNonRemovable(Keys.DOMINANT_HAND, HandPreferences.RIGHT);
-        c.registerNonRemovable(Keys.IS_ELYTRA_FLYING, false);
-        c.registerNonRemovable(LanternKeys.ELYTRA_GLIDE_SPEED, 0.1);
-        c.registerNonRemovable(LanternKeys.ELYTRA_SPEED_BOOST, false);
-        c.registerNonRemovable(LanternKeys.SUPER_STEVE, false);
-        c.registerNonRemovable(LanternKeys.CAN_WALL_JUMP, false);
-        c.registerNonRemovable(LanternKeys.CAN_DUAL_WIELD, false);
-        c.registerNonRemovable(LanternKeys.SCORE, 0);
-        c.registerNonRemovable(LanternKeys.ACTIVE_HAND, Optional.empty());
-        c.registerNonRemovable(LanternKeys.SMELTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
-        c.registerNonRemovable(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
-        c.registerProcessor(Keys.STATISTICS).add(builder -> builder
-                .offerHandler((key, valueContainer, map) -> {
-                    this.statisticMap.setStatisticValues(map);
-                    return DataTransactionResult.successNoData();
-                })
-                .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
-                .failAlwaysRemoveHandler());
-        c.registerNonRemovable(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty());
-        c.registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
-        c.registerNonRemovable(LanternKeys.POSE, Pose.STANDING);
+        c.register(Keys.DOMINANT_HAND, HandPreferences.RIGHT);
+        c.register(Keys.IS_ELYTRA_FLYING, false);
+        c.register(LanternKeys.ELYTRA_GLIDE_SPEED, 0.1);
+        c.register(LanternKeys.ELYTRA_SPEED_BOOST, false);
+        c.register(LanternKeys.SUPER_STEVE, false);
+        c.register(LanternKeys.CAN_WALL_JUMP, false);
+        c.register(LanternKeys.CAN_DUAL_WIELD, false);
+        c.register(LanternKeys.SCORE, 0);
+        c.register(LanternKeys.ACTIVE_HAND, Optional.empty());
+        c.register(LanternKeys.SMELTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
+        c.register(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
+        c.register(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty());
+        c.register(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
+        c.register(LanternKeys.POSE, Pose.STANDING);
+        c.registerProvider(Keys.STATISTICS, (builder, key) -> {
+            builder.offerFast((user, map) -> {
+                user.statisticMap.setStatisticValues(map);
+                return true;
+            });
+            builder.get(user -> this.statisticMap.getStatisticValues());
+        });
     }
 
     @Nullable

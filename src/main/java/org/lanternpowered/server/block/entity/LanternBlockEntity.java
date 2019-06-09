@@ -27,12 +27,11 @@ package org.lanternpowered.server.block.entity;
 
 import static java.util.Objects.requireNonNull;
 
-import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
-import org.lanternpowered.server.data.IAdditionalDataHolder;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.LocalMutableDataHolder;
+import org.lanternpowered.server.data.LocalKeyRegistry;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
 import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.network.block.AbstractBlockEntityProtocol;
 import org.lanternpowered.server.network.block.BlockEntityProtocolType;
@@ -40,8 +39,6 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.block.entity.BlockEntityArchetype;
 import org.spongepowered.api.block.entity.BlockEntityType;
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -54,11 +51,10 @@ import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public abstract class LanternBlockEntity implements BlockEntity, IAdditionalDataHolder, IStorePropertyHolder {
+public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDataHolder, StorePropertyHolder {
 
     private LanternBlockEntityType blockEntityType;
-    private final ValueCollection valueCollection = ValueCollection.create();
-    private final AdditionalContainerCollection<DataManipulator> additionalContainers = AdditionalContainerCollection.createConcurrent();
+    private final LocalKeyRegistry<? extends LanternBlockEntity> localKeyRegistry = LocalKeyRegistry.of();
 
     @Nullable private volatile Location location;
     @Nullable volatile BlockState blockState;
@@ -80,13 +76,8 @@ public abstract class LanternBlockEntity implements BlockEntity, IAdditionalData
     }
 
     @Override
-    public ValueCollection getValueCollection() {
-        return this.valueCollection;
-    }
-
-    @Override
-    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
-        return this.additionalContainers;
+    public LocalKeyRegistry<? extends LanternBlockEntity> getKeyRegistry() {
+        return this.localKeyRegistry;
     }
 
     @Override
@@ -159,8 +150,8 @@ public abstract class LanternBlockEntity implements BlockEntity, IAdditionalData
     }
 
     @Override
-    public DataHolder copy() {
-        return this;
+    public BlockEntityArchetype copy() {
+        return null;
     }
 
     @Override

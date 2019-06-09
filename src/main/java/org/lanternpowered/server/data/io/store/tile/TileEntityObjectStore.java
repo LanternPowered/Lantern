@@ -26,8 +26,8 @@
 package org.lanternpowered.server.data.io.store.tile;
 
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
-import org.lanternpowered.server.data.io.store.data.DataHolderStore;
+import org.lanternpowered.server.data.io.store.data.LocalMutableDataHolderStore;
 
-public class TileEntityObjectStore<T extends LanternBlockEntity> extends DataHolderStore<T> {
+public class TileEntityObjectStore<T extends LanternBlockEntity> extends LocalMutableDataHolderStore<T> {
 
 }

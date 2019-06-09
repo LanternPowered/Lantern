@@ -29,9 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.processor.ValueProcessorBuilder;
 import org.lanternpowered.server.effect.entity.EntityEffect;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
@@ -47,9 +46,7 @@ import org.lanternpowered.server.world.EntitySpawningEntry;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.manipulator.mutable.FoodData;
 import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -142,32 +139,31 @@ public class LanternLiving extends LanternEntity implements Living {
     @Override
     public void registerKeys() {
         super.registerKeys();
-        final ValueCollection c = getValueCollection();
-        c.register(Keys.MAX_AIR, 300, 0, Integer.MAX_VALUE);
-        c.register(Keys.REMAINING_AIR, 300, 0, Keys.MAX_AIR);
-        c.register(Keys.MAX_HEALTH, 20.0, 0.0, 1024.0);
-        c.register(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH)
-                .addListener((oldElement, newElement) -> {
+        final LocalKeyRegistry<LanternLiving> c = getKeyRegistry().forHolder(LanternLiving.class);
+        c.register(Keys.MAX_AIR, 300).minimum(0).maximum(Integer.MAX_VALUE);
+        c.register(Keys.REMAINING_AIR, 300).minimum(0).maximum(Keys.MAX_AIR);
+        c.register(Keys.MAX_HEALTH, 20.0).minimum(0.0).maximum(1024.0);
+        c.register(Keys.HEALTH, 20.0).minimum(0.0).maximum(Keys.MAX_HEALTH)
+                .addChangeListener((living, oldElement, newElement) -> {
                     if (newElement <= 0) {
-                        handleDeath();
+                        living.handleDeath();
                     }
                 });
-        c.register((Key<BoundedValue.Mutable<Double>>) (Key) Keys.ABSORPTION, 0.0, 0.0, 1024.0);
+        c.register(Keys.ABSORPTION, 0.0).minimum(0.0).maximum(1024.0);
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
-        c.registerProcessor(Keys.IS_SNEAKING).add(ValueProcessorBuilder.create(Keys.IS_SNEAKING)
-                .applicableTester((valueContainer, key) -> valueContainer.supports(LanternKeys.POSE))
-                .offerHandler((valueContainer, key, element) -> {
-                    final Pose pose = valueContainer.get(LanternKeys.POSE).get();
-                    if (pose == Pose.SNEAKING && !element) {
-                        offer(LanternKeys.POSE, Pose.STANDING);
-                    } else if (element) {
-                        offer(LanternKeys.POSE, Pose.SNEAKING);
-                    }
-                    return DataTransactionResult.successNoData();
-                })
-                .retrieveHandler((valueContainer, key) -> Optional.of(valueContainer.get(LanternKeys.POSE).orElse(null) == Pose.SNEAKING))
-                .failAlwaysRemoveHandler()
-                .build());
+        c.registerProvider(Keys.IS_SNEAKING, (builder, key) -> {
+            builder.supportedBy(entity -> entity.supports(LanternKeys.POSE));
+            builder.offer((entity, element) -> {
+                final Pose pose = entity.get(LanternKeys.POSE).get();
+                if (pose == Pose.SNEAKING && !element) {
+                    offer(LanternKeys.POSE, Pose.STANDING);
+                } else if (element) {
+                    offer(LanternKeys.POSE, Pose.SNEAKING);
+                }
+                return DataTransactionResult.successNoData();
+            });
+            builder.get((entity) -> entity.get(LanternKeys.POSE).orElse(null) == Pose.SNEAKING);
+        });
     }
 
     protected void setRawHeadRotation(Vector3d rotation) {

@@ -76,7 +76,6 @@ import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.InternalIDRegistries;
-import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.InventorySnapshot;
@@ -690,9 +689,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   TNT   ///
         ///////////////
         register(simpleBuilder()
-                .trait(BlockStateProperties.EXPLODE)
+                .trait(BlockStateProperties.UNSTABLE)
                 .defaultState(state -> state
-                        .withTrait(BlockStateProperties.EXPLODE, false).get())
+                        .withTrait(BlockStateProperties.UNSTABLE, false).get())
                 .itemType()
                 .properties(builder -> builder
                         .add(INSTANT_BROKEN))

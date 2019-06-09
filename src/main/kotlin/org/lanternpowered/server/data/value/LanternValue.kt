@@ -51,10 +51,8 @@ abstract class LanternValue<E : Any> protected constructor(
         return this.key == other.key && this.value == other.value
     }
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .add("key", this.key)
-                .add("value", this.value)
-                .toString()
-    }
+    override fun toString() = ToStringHelper(this)
+            .add("key", this.key)
+            .add("value", this.value)
+            .toString()
 }

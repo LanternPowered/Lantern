@@ -33,8 +33,7 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.element.ElementKeyRegistration;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
@@ -112,7 +111,6 @@ import org.spongepowered.api.advancement.AdvancementProgress;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.Sign;
-import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
@@ -402,28 +400,27 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     public void registerKeys() {
         super.registerKeys();
 
-        final ValueCollection c = getValueCollection();
+        final LocalKeyRegistry<LanternPlayer> c = getKeyRegistry().forHolder(LanternPlayer.class);
         c.register(Keys.IS_SLEEPING_IGNORED, false);
-        ((ElementKeyRegistration<?, Optional<AdvancementTree>>) c.get(LanternKeys.OPEN_ADVANCEMENT_TREE).get())
-                .addListener((oldElement, newElement) -> {
-                    if (getWorld() != null) {
-                        this.session.send(new MessagePlayOutSelectAdvancementTree(
-                                newElement.map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
-                    }
-                });
-        c.registerProcessor(Keys.ACTIVE_ITEM).add(builder -> builder
-                .valueOfferHandler((valueContainer, value) -> {
-                    final ItemStackSnapshot element = value.get();
-                    if (element.isEmpty()) {
-                        this.interactionHandler.cancelActiveItem();
-                        return DataTransactionResult.successResult(value.asImmutable());
-                    } else {
-                        // You cannot change the active item, only cancel it
-                        return DataTransactionResult.failResult(value.asImmutable());
-                    }
-                })
-                .retrieveHandler((valueContainer, key) -> Optional.of(this.interactionHandler.getActiveItem()))
-                .failAlwaysRemoveHandler());
+        c.registerProvider(Keys.ACTIVE_ITEM, (builder, key) -> {
+            builder.offerFast((player, item) -> {
+                if (item.isEmpty()) {
+                    this.interactionHandler.cancelActiveItem();
+                    return true;
+                } else {
+                    // You cannot change the active item, only cancel it
+                    return false;
+                }
+            });
+            builder.get((player) -> player.interactionHandler.getActiveItem());
+        });
+
+        c.getAsElement(LanternKeys.OPEN_ADVANCEMENT_TREE).addChangeListener((player, oldTree, newTree) -> {
+            if (player.getWorld() != null) {
+                player.session.send(new MessagePlayOutSelectAdvancementTree(
+                        newTree.map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
+            }
+        });
     }
 
     @Override

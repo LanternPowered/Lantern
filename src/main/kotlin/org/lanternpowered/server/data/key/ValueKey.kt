@@ -36,16 +36,30 @@ import org.spongepowered.api.CatalogType
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
 import org.spongepowered.api.plugin.PluginContainer
 import java.util.Objects
 
+/**
+ * Represents a [Key] that can be used to retrieve/offer data from [ValueContainer]s.
+ *
+ * Explicit registration is required by default for lantern created [Key]s. Keys built
+ * directly using the [Key.Builder] don't have to be registered explicitly, this is to
+ * be compatible with the specification of the API.
+ *
+ * @property key The key of the value key
+ * @property valueToken The type of the value
+ * @property elementToken The type of the element
+ * @property requiresExplicitRegistration Whether this key needs to be registered explicitly on a key collection or registry
+ */
 open class ValueKey<V : Value<E>, E : Any> internal constructor(
         private val key: CatalogKey,
         private val valueToken: TypeToken<V>,
-        private val elementToken: TypeToken<E>
+        private val elementToken: TypeToken<E>,
+        val requiresExplicitRegistration: Boolean
 ) : Key<V>, CatalogType {
 
     private val mutableListeners = mutableListOf<RegisteredListener<ChangeDataHolderEvent.ValueChange>>()
@@ -77,21 +91,19 @@ open class ValueKey<V : Value<E>, E : Any> internal constructor(
         if (other == null || javaClass != other.javaClass) {
             return false
         }
-        val key = other as ValueKey<*,*>
-        return this.valueToken == key.valueToken &&
-                this.key == key.key &&
-                this.elementToken == key.elementToken
+        other as ValueKey<*,*>
+        return this.valueToken == other.valueToken &&
+                this.key == other.key &&
+                this.elementToken == other.elementToken
     }
 
     override fun hashCode() = this.hashCode
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .add("id", this.key)
-                .add("valueToken", this.valueToken)
-                .add("elementToken", this.elementToken)
-                .toString()
-    }
+    override fun toString() = ToStringHelper(this)
+            .add("id", this.key)
+            .add("valueToken", this.valueToken)
+            .add("elementToken", this.elementToken)
+            .toString()
 
     companion object {
 

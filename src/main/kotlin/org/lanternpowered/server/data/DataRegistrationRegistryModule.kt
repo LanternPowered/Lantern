@@ -25,25 +25,27 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration
+import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.spongepowered.api.data.DataRegistration
+import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.value.Value
 
+@Suppress("UNCHECKED_CAST")
 object DataRegistrationRegistryModule : AdditionalPluginCatalogRegistryModule<DataRegistration>() {
 
-    override fun registerAdditionalCatalog(catalogType: DataRegistration) {
-        if (catalogType is DataManipulatorRegistration<*, *>) {
-            register(catalogType)
-        } else {
-            super.registerAdditionalCatalog(catalogType)
-        }
-    }
+    override fun <A : DataRegistration> register(registration: A): A {
+        return super.register(registration).apply {
+            for (key in registration.keys) {
+                key as Key<Value<Any>>
 
-    override fun <A : DataRegistration> register(catalogType: A): A {
-        if (catalogType is LanternDataRegistration<*, *>) {
-            catalogType.validate()
-            catalogType.register()
+                val provider = registration.getProviderFor(key).orNull()
+                if (provider != null) {
+                    GlobalKeyRegistry.register(key).addProvider(provider)
+                } else {
+                    // TODO: Register as non provider key
+                }
+            }
         }
-        return super.register(catalogType)
     }
 }

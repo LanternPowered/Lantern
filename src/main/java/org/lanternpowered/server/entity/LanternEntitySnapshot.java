@@ -25,35 +25,25 @@
  */
 package org.lanternpowered.server.entity;
 
-import org.lanternpowered.server.data.AdditionalContainerCollection;
-import org.lanternpowered.server.data.AdditionalContainerHolder;
-import org.lanternpowered.server.data.IImmutableDataHolder;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.LocalImmutableDataHolder;
+import org.lanternpowered.server.data.LocalKeyRegistry;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.value.MergeFunction;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 
 // TODO
-public class LanternEntitySnapshot implements EntitySnapshot, IImmutableDataHolder<EntitySnapshot>,
-        IStorePropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
-
-    @Override
-    public AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> getAdditionalContainers() {
-        return null;
-    }
+public class LanternEntitySnapshot implements EntitySnapshot, LocalImmutableDataHolder<EntitySnapshot>, StorePropertyHolder {
 
     @Override
     public UUID getWorldUniqueId() {
@@ -101,32 +91,7 @@ public class LanternEntitySnapshot implements EntitySnapshot, IImmutableDataHold
     }
 
     @Override
-    public <E> Optional<EntitySnapshot> transform(Key<? extends Value<E>> key, Function<E, E> function) {
-        return null;
-    }
-
-    @Override
     public <E> Optional<EntitySnapshot> with(Key<? extends Value<E>> key, E value) {
-        return null;
-    }
-
-    @Override
-    public Optional<EntitySnapshot> with(ImmutableDataManipulator<?, ?> valueContainer) {
-        return null;
-    }
-
-    @Override
-    public Optional<EntitySnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
-        return null;
-    }
-
-    @Override
-    public Optional<EntitySnapshot> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        return null;
-    }
-
-    @Override
-    public EntitySnapshot merge(EntitySnapshot that) {
         return null;
     }
 
@@ -136,7 +101,7 @@ public class LanternEntitySnapshot implements EntitySnapshot, IImmutableDataHold
     }
 
     @Override
-    public ValueCollection getValueCollection() {
+    public LocalKeyRegistry getKeyRegistry() {
         return null;
     }
 }

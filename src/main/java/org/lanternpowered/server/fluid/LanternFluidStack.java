@@ -29,13 +29,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.data.AdditionalContainerCollection;
 import org.lanternpowered.server.data.DataQueries;
-import org.lanternpowered.server.data.IAdditionalDataHolder;
-import org.lanternpowered.server.data.IValueContainer;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
-import org.spongepowered.api.data.manipulator.DataManipulator;
+import org.lanternpowered.server.data.LocalMutableDataHolder;
+import org.lanternpowered.server.data.LocalKeyRegistry;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.value.ValueFactory;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -43,33 +41,25 @@ import org.spongepowered.api.fluid.FluidStack;
 import org.spongepowered.api.fluid.FluidStackSnapshot;
 import org.spongepowered.api.fluid.FluidType;
 
-public class LanternFluidStack implements FluidStack, IStorePropertyHolder, IAdditionalDataHolder {
+public final class LanternFluidStack implements FluidStack, StorePropertyHolder, LocalMutableDataHolder {
 
-    private final ValueCollection valueCollection;
-    private final AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers;
+    private final LocalKeyRegistry<LanternFluidStack> localKeyRegistry;
     private final FluidType fluidType;
     private int volume;
 
     public LanternFluidStack(FluidType fluidType, int volume) {
-        this(fluidType, volume, ValueCollection.create(ValueCollection.Mode.NORMAL), AdditionalContainerCollection.create());
+        this(fluidType, volume, LocalKeyRegistry.of());
     }
 
-    private LanternFluidStack(FluidType fluidType, int volume,
-            ValueCollection valueCollection, AdditionalContainerCollection<DataManipulator<?, ?>> additionalContainers) {
-        this.valueCollection = valueCollection;
-        this.additionalContainers = additionalContainers;
+    private LanternFluidStack(FluidType fluidType, int volume, LocalKeyRegistry<LanternFluidStack> localKeyRegistry) {
+        this.localKeyRegistry = localKeyRegistry;
         this.fluidType = fluidType;
         this.volume = volume;
     }
 
     @Override
-    public ValueCollection getValueCollection() {
-        return this.valueCollection;
-    }
-
-    @Override
-    public AdditionalContainerCollection<DataManipulator<?, ?>> getAdditionalContainers() {
-        return this.additionalContainers;
+    public LocalKeyRegistry<LanternFluidStack> getKeyRegistry() {
+        return this.localKeyRegistry;
     }
 
     @Override
@@ -97,8 +87,7 @@ public class LanternFluidStack implements FluidStack, IStorePropertyHolder, IAdd
 
     @Override
     public LanternFluidStack copy() {
-        return new LanternFluidStack(getFluid(), getVolume(),
-                getValueCollection().copy(), getAdditionalContainers().copy());
+        return new LanternFluidStack(getFluid(), getVolume(), getKeyRegistry().copy());
     }
 
     @Override
@@ -111,12 +100,12 @@ public class LanternFluidStack implements FluidStack, IStorePropertyHolder, IAdd
         checkNotNull(dataView, "dataView");
         dataView.remove(DataQueries.FLUID_TYPE);
         this.volume = dataView.getInt(DataQueries.VOLUME).orElse(0);
-        IAdditionalDataHolder.super.setRawData(dataView);
+        LocalMutableDataHolder.super.setRawData(dataView);
     }
 
     @Override
     public DataContainer toContainer() {
-        return IAdditionalDataHolder.super.toContainer()
+        return LocalMutableDataHolder.super.toContainer()
                 .set(DataQueries.FLUID_TYPE, getFluid())
                 .set(DataQueries.VOLUME, getVolume());
     }
@@ -126,7 +115,7 @@ public class LanternFluidStack implements FluidStack, IStorePropertyHolder, IAdd
         return MoreObjects.toStringHelper(this)
                 .add("fluid", getFluid().getKey())
                 .add("volume", getVolume())
-                .add("data", IValueContainer.valuesToString(this))
+                .add("data", ValueFactory.INSTANCE.toString(this))
                 .toString();
     }
 }

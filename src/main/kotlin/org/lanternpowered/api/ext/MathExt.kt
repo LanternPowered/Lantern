@@ -25,6 +25,16 @@
  */
 package org.lanternpowered.api.ext
 
+import org.lanternpowered.api.world.BlockVector
+import org.spongepowered.math.imaginary.Quaterniond
+import org.spongepowered.math.imaginary.Quaternionf
+import org.spongepowered.math.vector.Vector2d
+import org.spongepowered.math.vector.Vector2f
+import org.spongepowered.math.vector.Vector2i
+import org.spongepowered.math.vector.Vector3d
+import org.spongepowered.math.vector.Vector3f
+import org.spongepowered.math.vector.Vector3i
+
 operator fun Vector2d.component1(): Double = x
 operator fun Vector2d.component2(): Double = y
 operator fun Vector2d.times(value: Double): Vector2d = mul(value)

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.value
 
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.key.OptionalWrappedValueKey
+import org.lanternpowered.server.data.key.OptionalValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
@@ -40,7 +40,7 @@ class LanternMutableOptionalValue<E : Any>(
     override fun getKey() = super.getKey().uncheckedCast<Key<out OptionalValue<E>>>()
 
     override fun orElse(defaultValue: E): Value.Mutable<E> {
-        val unwrappedKey = (this.key as OptionalWrappedValueKey<*,*>).unwrappedKey.uncheckedCast<Key<out Value<E>>>()
+        val unwrappedKey = (this.key as OptionalValueKey<*,*>).unwrappedKey.uncheckedCast<Key<out Value<E>>>()
         return LanternMutableValue(unwrappedKey, this.value.orElse(defaultValue))
     }
 

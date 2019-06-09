@@ -35,7 +35,7 @@ import org.lanternpowered.server.block.entity.LanternBlockEntityArchetype;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unchecked"})
-public class LanternBlockSnapshot implements BlockSnapshot, IStorePropertyHolder {
+public class LanternBlockSnapshot implements BlockSnapshot, StorePropertyHolder {
 
     @Nullable final Location location;
     private final BlockState state;

@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.query.LanternQueryOperation;
@@ -79,7 +79,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * The base implementation for all the {@link Inventory}s.
  */
 @SuppressWarnings({"unchecked", "ConstantConditions"})
-public abstract class AbstractInventory implements IInventory, IStorePropertyHolder {
+public abstract class AbstractInventory implements IInventory, StorePropertyHolder {
 
     /**
      * Represents a invalid slot index.

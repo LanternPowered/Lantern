@@ -59,13 +59,11 @@ abstract class LanternBoundedValue<E : Any> protected constructor(
                 && this.comparator == other.comparator
     }
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .add("key", this.key)
-                .add("value", this.value)
-                .add("min", this.min)
-                .add("max", this.max)
-                .add("comparator", this.comparator)
-                .toString()
-    }
+    override fun toString() = ToStringHelper(this)
+            .add("key", this.key)
+            .add("value", this.value)
+            .add("min", this.min)
+            .add("max", this.max)
+            .add("comparator", this.comparator)
+            .toString()
 }

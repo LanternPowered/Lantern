@@ -30,6 +30,9 @@ import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
 
+/**
+ * Represents the [ValueKey] of a unwrapped [OptionalValue], is always tied to a [OptionalValueKey].
+ */
 class OptionalUnwrappedValueKey<V : Value<E>, E : Any>(key: CatalogKey, valueToken: TypeToken<V>, elementToken: TypeToken<E>,
-        val wrappedKey: OptionalWrappedValueKey<out OptionalValue<E>, E>
-) : ValueKey<V, E>(key, valueToken, elementToken)
+        val wrappedKey: OptionalValueKey<out OptionalValue<E>, E>
+) : ValueKey<V, E>(key, valueToken, elementToken, true)

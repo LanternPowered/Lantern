@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.entity;
 
-import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
@@ -54,7 +54,7 @@ public class LanternHuman extends LanternAgent implements Human, AbstractArmorEq
     public void registerKeys() {
         super.registerKeys();
 
-        final ValueCollection c = getValueCollection();
+        final LocalKeyRegistry c = getKeyRegistry();
         c.registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
         c.registerNonRemovable(LanternKeys.POSE, Pose.STANDING);
         c.registerNonRemovable(Keys.SKIN, LanternProfileProperty.EMPTY_TEXTURES);

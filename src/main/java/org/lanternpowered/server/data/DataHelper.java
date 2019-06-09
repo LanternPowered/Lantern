@@ -39,7 +39,6 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
-import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
@@ -81,11 +80,11 @@ public final class DataHelper {
         return dataView.getView(query).orElseGet(() -> dataView.createView(query));
     }
 
-    public static DataContainer toContainer(IValueContainer valueContainer) {
+    public static DataContainer toContainer(ValueContainerBase valueContainer) {
         final DataContainer dataContainer = DataContainer.createNew();
-        final ValueCollection valueCollection = valueContainer.getValueCollection();
+        final LocalKeyRegistry localKeyRegistry = valueContainer.getValueCollection();
         final LanternDataManager dataManager = Lantern.getGame().getDataManager();
-        for (KeyRegistration<?,?> registration : valueCollection.getAll()) {
+        for (KeyRegistration<?,?> registration : localKeyRegistry.getAll()) {
             if (!(registration instanceof Element)) {
                 continue;
             }
@@ -103,27 +102,27 @@ public final class DataHelper {
         return dataContainer;
     }
 
-    public static <T extends IValueContainer> Optional<T> buildContent(DataView container, Supplier<T> manipulatorSupplier)
+    public static <T extends ValueContainerBase> Optional<T> buildContent(DataView container, Supplier<T> manipulatorSupplier)
             throws InvalidDataException {
         final T manipulator = manipulatorSupplier.get();
         deserializeRawData(container, manipulator);
         return Optional.of(manipulator);
     }
 
-    public static void serializeRawData(DataView dataView, IValueContainer valueContainer) {
+    public static void serializeRawData(DataView dataView, ValueContainerBase valueContainer) {
         serializeRawRegisteredKeyData(dataView, valueContainer);
         serializeRawContainerData(dataView, valueContainer);
     }
 
-    public static void serializeRawContainerData(DataView dataView, IValueContainer valueContainer) {
+    public static void serializeRawContainerData(DataView dataView, ValueContainerBase valueContainer) {
         serializeRawContainerData(dataView, valueContainer, DataQueries.DATA_MANIPULATORS);
     }
 
-    public static void serializeRawContainerData(DataView dataView, IValueContainer valueContainer, DataQuery query) {
+    public static void serializeRawContainerData(DataView dataView, ValueContainerBase valueContainer, DataQuery query) {
         if (!(valueContainer instanceof AdditionalContainerHolder)) {
             return;
         }
-        final ValueCollection valueCollection = valueContainer.getValueCollection();
+        final LocalKeyRegistry localKeyRegistry = valueContainer.getValueCollection();
         final AdditionalContainerCollection<ValueContainer<?>> containers =
                 ((AdditionalContainerHolder) valueContainer).getAdditionalContainers();
         final ImmutableList.Builder<DataView> builder = ImmutableList.builder();
@@ -147,23 +146,23 @@ public final class DataHelper {
                         .set(DataQueries.MANIPULATOR_DATA, ((DataManipulator) manipulator).toContainer()));
             }
         }
-        Element<List<DataView>> holder = valueCollection.getElement(LanternKeys.FAILED_DATA_MANIPULATORS).orElse(null);
+        Element<List<DataView>> holder = localKeyRegistry.getElement(LanternKeys.FAILED_DATA_MANIPULATORS).orElse(null);
         if (holder != null) {
             builder.addAll(holder.get());
         }
         dataView.set(query, builder.build());
     }
 
-    public static void serializeRawRegisteredKeyData(DataView dataView, IValueContainer valueContainer) {
+    public static void serializeRawRegisteredKeyData(DataView dataView, ValueContainerBase valueContainer) {
         serializeRawRegisteredKeyData(dataView, valueContainer, Collections.emptySet());
     }
 
-    public static void serializeRawRegisteredKeyData(DataView dataView, IValueContainer valueContainer,
+    public static void serializeRawRegisteredKeyData(DataView dataView, ValueContainerBase valueContainer,
             Set<Key> ignoredKeys) {
         DataView view = null;
-        final ValueCollection valueCollection = valueContainer.getValueCollection();
+        final LocalKeyRegistry localKeyRegistry = valueContainer.getValueCollection();
         final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
-        for (KeyRegistration<?,?> registration : valueCollection.getAll()) {
+        for (KeyRegistration<?,?> registration : localKeyRegistry.getAll()) {
             final Key<?> key = registration.getKey();
             if (!(registration instanceof Element)
                     || ignoredKeys.contains(key)
@@ -186,7 +185,7 @@ public final class DataHelper {
             }
             view.set(key.getQuery(), value);
         }
-        Element<DataView> holder = valueCollection.getElement(LanternKeys.FAILED_DATA_VALUES).orElse(null);
+        Element<DataView> holder = localKeyRegistry.getElement(LanternKeys.FAILED_DATA_VALUES).orElse(null);
         if (holder != null) {
             if (view == null) {
                 view = dataView.createView(DataQueries.DATA_VALUES);
@@ -199,18 +198,18 @@ public final class DataHelper {
         }
     }
 
-    public static void deserializeRawData(DataView dataView, IValueContainer valueContainer)
+    public static void deserializeRawData(DataView dataView, ValueContainerBase valueContainer)
             throws InvalidDataException {
         deserializeRawRegisteredKeyData(dataView, valueContainer);
         deserializeRawContainerData(dataView, valueContainer);
     }
 
-    public static void deserializeRawContainerData(DataView dataView, IValueContainer valueContainer)
+    public static void deserializeRawContainerData(DataView dataView, ValueContainerBase valueContainer)
             throws InvalidDataException {
         deserializeRawContainerData(dataView, valueContainer, DataQueries.DATA_MANIPULATORS);
     }
 
-    public static void deserializeRawContainerData(DataView dataView, IValueContainer valueContainer, DataQuery query)
+    public static void deserializeRawContainerData(DataView dataView, ValueContainerBase valueContainer, DataQuery query)
             throws InvalidDataException {
         final List<DataView> dataViews = dataView.getViewList(query).orElse(null);
         if (dataViews == null) {
@@ -220,7 +219,7 @@ public final class DataHelper {
             getLogger().warn("{} is not a AdditionalContainerHolder, but data manipulators were found.", valueContainer);
             return;
         }
-        final ValueCollection valueCollection = valueContainer.getValueCollection();
+        final LocalKeyRegistry localKeyRegistry = valueContainer.getValueCollection();
         final AdditionalContainerCollection<ValueContainer<?>> containers =
                 ((AdditionalContainerHolder) valueContainer).getAdditionalContainers();
         final List<DataView> failedData = new ArrayList<>();
@@ -260,23 +259,23 @@ public final class DataHelper {
         }
         if (!failedData.isEmpty()) {
             // Should be safe to cast, at least if nobody touches this key
-            Element<List<DataView>> holder = valueCollection.getElement(LanternKeys.FAILED_DATA_MANIPULATORS).orElse(null);
+            Element<List<DataView>> holder = localKeyRegistry.getElement(LanternKeys.FAILED_DATA_MANIPULATORS).orElse(null);
             if (holder == null) {
-                holder = valueCollection.register(LanternKeys.FAILED_DATA_MANIPULATORS, null);
+                holder = localKeyRegistry.register(LanternKeys.FAILED_DATA_MANIPULATORS, null);
             }
             holder.set(failedData);
         }
     }
 
-    public static void deserializeRawRegisteredKeyData(DataView dataView, IValueContainer valueContainer)
+    public static void deserializeRawRegisteredKeyData(DataView dataView, ValueContainerBase valueContainer)
             throws InvalidDataException {
         dataView = dataView.getView(DataQueries.DATA_VALUES).orElse(null);
         if (dataView == null) {
             return;
         }
-        final ValueCollection valueCollection = valueContainer.getValueCollection();
+        final LocalKeyRegistry localKeyRegistry = valueContainer.getValueCollection();
         final DataTypeSerializerContext context = DataSerializerRegistry.INSTANCE.getTypeSerializerContext();
-        for (KeyRegistration<?,?> registration : valueCollection.getAll()) {
+        for (KeyRegistration<?,?> registration : localKeyRegistry.getAll()) {
             final Key<?> key = registration.getKey();
             if (!(registration instanceof Element)
                     || key == LanternKeys.FAILED_DATA_MANIPULATORS
@@ -311,9 +310,9 @@ public final class DataHelper {
         }
         if (!dataView.isEmpty()) {
             // Should be safe to cast, at least if nobody touches this key
-            Element<DataView> holder = valueCollection.getElement(LanternKeys.FAILED_DATA_VALUES).orElse(null);
+            Element<DataView> holder = localKeyRegistry.getElement(LanternKeys.FAILED_DATA_VALUES).orElse(null);
             if (holder == null) {
-                holder = valueCollection.register(LanternKeys.FAILED_DATA_VALUES, null);
+                holder = localKeyRegistry.register(LanternKeys.FAILED_DATA_VALUES, null);
             }
             holder.set(dataView);
         }

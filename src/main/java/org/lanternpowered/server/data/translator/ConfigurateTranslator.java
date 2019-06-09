@@ -40,6 +40,8 @@ import org.spongepowered.api.data.persistence.InvalidDataException;
 import java.util.List;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class ConfigurateTranslator extends AbstractDataTranslator<ConfigurationNode> {
 
     private static final ConfigurateTranslator INSTANCE = new ConfigurateTranslator();
@@ -68,8 +70,8 @@ public class ConfigurateTranslator extends AbstractDataTranslator<ConfigurationN
     public DataContainer translate(ConfigurationNode node) throws InvalidDataException {
         checkNotNull(node, "node");
         final DataContainer container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-        final Object value = node.getValue();
-        final Object key = node.getKey();
+        @Nullable final Object value = node.getValue();
+        @Nullable final Object key = node.getKey();
         if (value != null) {
             if (key == null || value instanceof Map || value instanceof List) {
                 if (value instanceof Map) {

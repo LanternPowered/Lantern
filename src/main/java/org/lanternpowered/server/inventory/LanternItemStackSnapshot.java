@@ -28,21 +28,15 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Streams;
-import org.lanternpowered.server.data.AdditionalContainerCollection;
-import org.lanternpowered.server.data.AdditionalContainerHolder;
+import org.lanternpowered.server.data.LocalDataHolderHelper;
 import org.lanternpowered.server.data.DataQueries;
-import org.lanternpowered.server.data.IImmutableDataHolder;
-import org.lanternpowered.server.data.IValueContainer;
-import org.lanternpowered.server.data.MutableToImmutableManipulatorCollection;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.DataRegistration;
+import org.lanternpowered.server.data.LocalImmutableDataHolder;
+import org.lanternpowered.server.data.LocalKeyRegistry;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.value.ValueFactory;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.value.MergeFunction;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -51,12 +45,8 @@ import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmutableDataHolder<ItemStackSnapshot>,
-        IStorePropertyHolder, AdditionalContainerHolder<ImmutableDataManipulator<?,?>> {
+public final class LanternItemStackSnapshot implements ItemStackSnapshot, LocalImmutableDataHolder<ItemStackSnapshot>, StorePropertyHolder {
 
     /**
      * Gets the {@link ItemStackSnapshot.empty()} as a {@link LanternItemStackSnapshot}.
@@ -86,23 +76,14 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     }
 
     final LanternItemStack itemStack;
-    @Nullable private AdditionalContainerCollection<ImmutableDataManipulator<?, ?>> additionalContainers;
 
     LanternItemStackSnapshot(LanternItemStack itemStack) {
         this.itemStack = itemStack;
     }
 
     @Override
-    public ValueCollection getValueCollection() {
-        return this.itemStack.getValueCollection();
-    }
-
-    @Override
-    public AdditionalContainerCollection<ImmutableDataManipulator<?,?>> getAdditionalContainers() {
-        if (this.additionalContainers == null) {
-            this.additionalContainers = new MutableToImmutableManipulatorCollection(this.itemStack.getAdditionalContainers());
-        }
-        return this.additionalContainers;
+    public LocalKeyRegistry getKeyRegistry() {
+        return this.itemStack.getKeyRegistry();
     }
 
     @Override
@@ -132,7 +113,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
 
     @Override
     public DataContainer toContainer() {
-        return IImmutableDataHolder.super.toContainer()
+        return LocalImmutableDataHolder.super.toContainer()
                 .set(DataQueries.ITEM_TYPE, getType())
                 .set(DataQueries.QUANTITY, getQuantity());
     }
@@ -150,38 +131,6 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
     public <E> Optional<ItemStackSnapshot> with(Key<? extends Value<E>> key, E value) {
         final LanternItemStack copy = this.itemStack.copy();
         if (copy.offerFast(key, value)) {
-            return Optional.of(new LanternItemStackSnapshot(copy));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<ItemStackSnapshot> with(ImmutableDataManipulator<?, ?> valueContainer) {
-        final LanternItemStack copy = this.itemStack.copy();
-        if (copy.offerFast(valueContainer.asMutable())) {
-            return Optional.of(new LanternItemStackSnapshot(copy));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<ItemStackSnapshot> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
-        final LanternItemStack copy = this.itemStack.copy();
-        if (copy.offerFast(Streams.stream(valueContainers)
-                .map(ImmutableDataManipulator::asMutable)
-                .collect(Collectors.toList()))) {
-            return Optional.of(new LanternItemStackSnapshot(copy));
-        }
-        return Optional.empty();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Optional<ItemStackSnapshot> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        final LanternItemStack copy = this.itemStack.copy();
-        final DataRegistration registration = Lantern.getGame().getDataManager().get(containerClass)
-                .orElseThrow(() -> new IllegalStateException("The container class " + containerClass.getName() + " isn't registered."));
-        if (copy.removeFast(registration.getManipulatorClass())) {
             return Optional.of(new LanternItemStackSnapshot(copy));
         }
         return Optional.empty();
@@ -208,7 +157,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
         return MoreObjects.toStringHelper(this)
                 .add("type", getType().getKey())
                 .add("quantity", getQuantity())
-                .add("data", IValueContainer.valuesToString(this.itemStack))
+                .add("data", ValueFactory.INSTANCE.toString(this.itemStack))
                 .toString();
     }
 
@@ -236,7 +185,7 @@ public final class LanternItemStackSnapshot implements ItemStackSnapshot, IImmut
      */
     public boolean similarTo(ItemStack that) {
         checkNotNull(that, "that");
-        return getType() == that.getType() && IValueContainer.matchContents(this.itemStack, (IValueContainer) that);
+        return getType() == that.getType() && LocalDataHolderHelper.matchContents(this.itemStack, (LanternItemStack) that);
     }
 
     /**

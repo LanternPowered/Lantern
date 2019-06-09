@@ -40,7 +40,7 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.lmbda.MethodHandlesExtensions;
 import org.lanternpowered.server.cause.LanternCauseStackManager;
-import org.lanternpowered.server.data.key.KeyEventListener;
+import org.lanternpowered.server.data.key.ValueKeyEventListener;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.DefineableClassLoader;
@@ -287,7 +287,7 @@ public class LanternEventManager implements EventManager {
         synchronized (this.lock) {
             listeners = listeners.stream()
                     .filter(listener -> {
-                        if (!(listener.getHandler() instanceof KeyEventListener) &&
+                        if (!(listener.getHandler() instanceof ValueKeyEventListener) &&
                                 this.keyEventTypes.contains(listener.getEventType().getType())) {
                             // Check if somebody has been naughty, this will show a warning
                             // if there is a listener directly listening to a ChangeDataHolderEvent.ValueChange
@@ -492,9 +492,9 @@ public class LanternEventManager implements EventManager {
             final TempDataEventData temp = new TempDataEventData();
             temp.lastResult = event1.getEndResult();
             return post(event, listeners, listener -> {
-                if (listener.getHandler() instanceof KeyEventListener) {
-                    final KeyEventListener keyEventListener = (KeyEventListener) listener.getHandler();
-                    if (keyEventListener.getDataHolderPredicate().test(event1.getTargetHolder())) {
+                if (listener.getHandler() instanceof ValueKeyEventListener) {
+                    final ValueKeyEventListener keyEventListener = (ValueKeyEventListener) listener.getHandler();
+                    if (keyEventListener.getDataHolderFilter().invoke(event1.getTargetHolder())) {
                         final DataTransactionResult newResult = event1.getEndResult();
                         // We need the keys, only regenerate if changed
                         if (temp.keys == null || temp.lastResult != newResult) {

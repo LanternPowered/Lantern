@@ -30,12 +30,9 @@ import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
 import org.lanternpowered.server.permission.ProxySubject
 import org.spongepowered.api.block.entity.Sign
 import org.spongepowered.api.data.Keys
-import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.service.permission.SubjectReference
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.util.Tristate
-import java.util.ArrayList
-import java.util.Arrays
 
 class LanternSign : LanternBlockEntity(), ProxySubject, Sign {
 
@@ -52,11 +49,9 @@ class LanternSign : LanternBlockEntity(), ProxySubject, Sign {
 
     public override fun registerKeys() {
         super.registerKeys()
-        valueCollection.register<ListValue<Text>, List<Text>>(Keys.SIGN_LINES, ArrayList(emptyLines))
-    }
 
-    companion object {
-
-        private val emptyLines = Arrays.asList(Text.of(), Text.of(), Text.of(), Text.of())
+        keyRegistry {
+            register(Keys.SIGN_LINES, mutableListOf(Text.of(), Text.of(), Text.of(), Text.of()))
+        }
     }
 }

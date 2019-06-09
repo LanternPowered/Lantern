@@ -28,7 +28,7 @@ package org.lanternpowered.server.item;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.item.appearance.ItemAppearance;
 import org.spongepowered.api.CatalogKey;
@@ -48,7 +48,7 @@ public class LanternItemType extends DefaultCatalogType implements ItemType {
     private final PropertyProviderCollection propertyProviderCollection;
     private final MutableBehaviorPipeline<Behavior> behaviorPipeline;
     private final TranslationProvider translationProvider;
-    private final Consumer<ValueCollection> keysProvider;
+    private final Consumer<LocalKeyRegistry> keysProvider;
 
     @Nullable private final BlockType blockType;
     @Nullable private final ItemAppearance itemAppearance = null; // TODO: When custom item types get implemented
@@ -57,7 +57,7 @@ public class LanternItemType extends DefaultCatalogType implements ItemType {
 
     LanternItemType(CatalogKey key, PropertyProviderCollection propertyProviderCollection,
             MutableBehaviorPipeline<Behavior> behaviorPipeline,
-            TranslationProvider translationProvider, Consumer<ValueCollection> keysProvider,
+            TranslationProvider translationProvider, Consumer<LocalKeyRegistry> keysProvider,
             @Nullable BlockType blockType, int maxStackQuantity) {
         super(key);
         this.keysProvider = keysProvider;
@@ -91,7 +91,7 @@ public class LanternItemType extends DefaultCatalogType implements ItemType {
         return this.behaviorPipeline;
     }
 
-    public Consumer<ValueCollection> getKeysProvider() {
+    public Consumer<LocalKeyRegistry> getKeysProvider() {
         return this.keysProvider;
     }
 

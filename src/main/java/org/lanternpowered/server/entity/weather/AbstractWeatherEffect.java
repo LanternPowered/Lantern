@@ -25,18 +25,8 @@
  */
 package org.lanternpowered.server.entity.weather;
 
-import org.lanternpowered.server.data.key.LanternKeys;
 import org.spongepowered.api.entity.weather.WeatherEffect;
 
 public interface AbstractWeatherEffect extends WeatherEffect {
 
-    @Override
-    default boolean isEffect() {
-        return get(LanternKeys.IS_EFFECT).get();
-    }
-
-    @Override
-    default void setEffect(boolean effect) {
-        offer(LanternKeys.IS_EFFECT, effect);
-    }
 }

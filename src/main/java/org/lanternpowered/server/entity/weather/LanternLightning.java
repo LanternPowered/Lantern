@@ -26,7 +26,6 @@
 package org.lanternpowered.server.entity.weather;
 
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.sound.weather.LightningSoundEffect;
@@ -36,10 +35,11 @@ import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.weather.Lightning;
+import org.spongepowered.api.entity.weather.LightningBolt;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.action.LightningEvent;
 import org.spongepowered.api.event.cause.Cause;
@@ -58,7 +58,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
             .build();
 
     /**
-     * The region that the {@link Lightning} will damage {@link Entity}s.
+     * The region that the {@link LightningBolt} will damage {@link Entity}s.
      */
     private static final AABB ENTITY_STRIKE_REGION = new AABB(-3, -3, -3, 3, 9, 3);
 
@@ -78,7 +78,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
     @Override
     public void registerKeys() {
         super.registerKeys();
-        getValueCollection().registerNonRemovable(LanternKeys.IS_EFFECT, false);
+        getKeyRegistry().register(Keys.IS_WEATHER_EFFECT, false);
     }
 
     @Override

@@ -27,6 +27,9 @@ package org.lanternpowered.server.util
 
 import org.lanternpowered.api.util.ToStringHelper
 import org.spongepowered.api.util.Transform
+import org.spongepowered.math.imaginary.Quaterniond
+import org.spongepowered.math.matrix.Matrix4d
+import org.spongepowered.math.vector.Vector3d
 
 class LanternTransform @JvmOverloads constructor(
         private val position: Vector3d,

@@ -92,7 +92,7 @@ public class LanternChest extends ContainerBlockEntity<ChestInventory> implement
     @Override
     public void registerKeys() {
         super.registerKeys();
-        getValueCollection().register(Keys.DISPLAY_NAME, null);
+        getKeyRegistry().register(Keys.DISPLAY_NAME);
     }
 
     @Override

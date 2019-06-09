@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.IdentifiableObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.io.store.data.DataHolderStore;
+import org.lanternpowered.server.data.io.store.data.LocalMutableDataHolderStore;
 import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -49,7 +49,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> implements IdentifiableObjectStore<T> {
+public class EntityStore<T extends LanternEntity> extends LocalMutableDataHolderStore<T> implements IdentifiableObjectStore<T> {
 
     private static final DataQuery SPONGE_DATA = DataQueries.FORGE_DATA.then(DataQueries.SPONGE_DATA);
     private static final DataQuery POSITION = DataQuery.of("Pos");
@@ -202,7 +202,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     @Override
     public void deserializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
         dataView.getInt(FIRE_TICKS).ifPresent(v -> valueContainer.set(Keys.FIRE_TICKS, v));
-        dataView.getDouble(FALL_DISTANCE).ifPresent(v -> valueContainer.set(Keys.FALL_DISTANCE, v.floatValue()));
+        dataView.getDouble(FALL_DISTANCE).ifPresent(v -> valueContainer.set(Keys.FALL_DISTANCE, v));
         dataView.getInt(REMAINING_AIR).ifPresent(v -> valueContainer.set(Keys.REMAINING_AIR, v));
         // The health
         Optional<Double> health = dataView.getDouble(HEALTH);

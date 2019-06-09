@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
-import org.lanternpowered.server.data.MemoryDataContainer;
+import org.lanternpowered.server.data.persistence.MemoryDataContainer;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;

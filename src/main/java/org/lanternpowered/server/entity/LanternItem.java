@@ -26,7 +26,7 @@
 package org.lanternpowered.server.entity;
 
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
@@ -88,11 +88,11 @@ public class LanternItem extends LanternEntity implements Item {
     @Override
     public void registerKeys() {
         super.registerKeys();
-        final ValueCollection c = getValueCollection();
-        c.registerNonRemovable(Keys.REPRESENTED_ITEM, ItemStackSnapshot.empty());
-        c.registerNonRemovable(Keys.PICKUP_DELAY, 10);
-        c.registerNonRemovable(Keys.DESPAWN_DELAY, 6000);
-        c.registerNonRemovable(LanternKeys.GRAVITY_FACTOR, 0.002);
+        final LocalKeyRegistry<?> c = getKeyRegistry();
+        c.register(Keys.REPRESENTED_ITEM, ItemStackSnapshot.empty());
+        c.register(Keys.PICKUP_DELAY, 10);
+        c.register(Keys.DESPAWN_DELAY, 6000);
+        c.register(LanternKeys.GRAVITY_FACTOR, 0.002);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class LanternItem extends LanternEntity implements Item {
                 frame.pushCause(this);
 
                 // Throw the expire entity event
-                final ExpireEntityEvent.TargetItem event = SpongeEventFactory.createExpireEntityEventTargetItem(
+                final ExpireEntityEvent event = SpongeEventFactory.createExpireEntityEvent(
                         causeStack.getCurrentCause(), this);
                 Sponge.getEventManager().post(event);
 

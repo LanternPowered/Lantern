@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.entity.weather;
 
-import org.spongepowered.api.entity.weather.Lightning;
+import org.spongepowered.api.entity.weather.LightningBolt;
 
-public interface AbstractLightning extends AbstractWeatherEffect, Lightning {
+public interface AbstractLightning extends AbstractWeatherEffect, LightningBolt {
 
 }

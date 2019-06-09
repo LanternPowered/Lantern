@@ -37,7 +37,6 @@ import org.lanternpowered.server.block.entity.vanilla.LanternJukebox;
 import org.lanternpowered.server.block.entity.vanilla.LanternShulkerBox;
 import org.lanternpowered.server.block.entity.vanilla.LanternSign;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypeRegistryModule;
 import org.spongepowered.api.CatalogKey;

@@ -29,15 +29,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.data.AdditionalContainerCollection;
+import org.lanternpowered.server.data.LocalDataHolderHelper;
 import org.lanternpowered.server.data.DataQueries;
-import org.lanternpowered.server.data.IAdditionalDataHolder;
-import org.lanternpowered.server.data.IValueContainer;
-import org.lanternpowered.server.data.ValueCollection;
-import org.lanternpowered.server.data.property.IStorePropertyHolder;
+import org.lanternpowered.server.data.LocalMutableDataHolder;
+import org.lanternpowered.server.data.LocalKeyRegistry;
+import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.value.ValueFactory;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -54,7 +53,7 @@ import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "SimplifiableConditionalExpression"})
-public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAdditionalDataHolder {
+public class LanternItemStack implements ItemStack, StorePropertyHolder, LocalMutableDataHolder {
 
     private static final LanternItemStack empty = null;
 
@@ -82,8 +81,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
         return empty;
     }
 
-    private final ValueCollection valueCollection;
-    private final AdditionalContainerCollection<DataManipulator> additionalContainers;
+    private final LocalKeyRegistry localKeyRegistry;
     private final ItemType itemType;
 
     private int quantity;
@@ -105,23 +103,20 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
      */
     public LanternItemStack(ItemType itemType, int quantity) {
         // Use empty containers for the none item type
-        this(itemType, quantity, ValueCollection.create(),
-                itemType == ItemTypes.AIR ? AdditionalContainerCollection.empty() : AdditionalContainerCollection.createConcurrent());
+        this(itemType, quantity, LocalKeyRegistry.of());
         registerKeys();
     }
 
-    private LanternItemStack(ItemType itemType, int quantity, ValueCollection valueCollection,
-            AdditionalContainerCollection<DataManipulator> additionalContainers) {
+    private LanternItemStack(ItemType itemType, int quantity, LocalKeyRegistry localKeyRegistry) {
         checkArgument(quantity >= 0, "quantity may not be negative");
         checkNotNull(itemType, "itemType");
-        this.additionalContainers = additionalContainers;
-        this.valueCollection = valueCollection;
+        this.localKeyRegistry = localKeyRegistry;
         this.quantity = quantity;
         this.itemType = itemType;
     }
 
     private void registerKeys() {
-        final ValueCollection c = getValueCollection();
+        final LocalKeyRegistry c = getKeyRegistry();
         ((LanternItemType) this.itemType).getKeysProvider().accept(c);
         c.register(Keys.DISPLAY_NAME, null);
         c.register(Keys.ITEM_LORE, Collections.emptyList());
@@ -130,13 +125,8 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
     }
 
     @Override
-    public AdditionalContainerCollection<DataManipulator> getAdditionalContainers() {
-        return this.additionalContainers;
-    }
-
-    @Override
-    public ValueCollection getValueCollection() {
-        return this.valueCollection;
+    public LocalKeyRegistry getKeyRegistry() {
+        return this.localKeyRegistry;
     }
 
     @Override
@@ -149,12 +139,12 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
         checkNotNull(dataView, "dataView");
         dataView.remove(DataQueries.ITEM_TYPE);
         this.quantity = dataView.getInt(DataQueries.QUANTITY).orElse(1);
-        IAdditionalDataHolder.super.setRawData(dataView);
+        LocalMutableDataHolder.super.setRawData(dataView);
     }
 
     @Override
     public DataContainer toContainer() {
-        return IAdditionalDataHolder.super.toContainer()
+        return LocalMutableDataHolder.super.toContainer()
                 .set(DataQueries.ITEM_TYPE, getType())
                 .set(DataQueries.QUANTITY, getQuantity());
     }
@@ -238,7 +228,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
         if (isEmpty()) {
             return empty;
         }
-        return new LanternItemStack(this.itemType, this.quantity, getValueCollection().copy(), this.additionalContainers.copy());
+        return new LanternItemStack(this.itemType, this.quantity, getKeyRegistry().copy());
     }
 
     /**
@@ -290,7 +280,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
         if (emptyA != emptyB) {
             return emptyA && emptyB;
         }
-        return getType() == that.getType() && IValueContainer.matchContents(this, (IValueContainer) that);
+        return getType() == that.getType() && LocalDataHolderHelper.matchContents(this, (LanternItemStack) that);
     }
 
     public static boolean isEmpty(@Nullable ItemStack itemStack) {
@@ -322,7 +312,7 @@ public class LanternItemStack implements ItemStack, IStorePropertyHolder, IAddit
         return MoreObjects.toStringHelper(this)
                 .add("type", getType().getKey())
                 .add("quantity", getQuantity())
-                .add("data", IValueContainer.valuesToString(this))
+                .add("data", ValueFactory.INSTANCE.toString(this))
                 .toString();
     }
 

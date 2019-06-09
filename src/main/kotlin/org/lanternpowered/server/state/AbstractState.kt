@@ -31,13 +31,12 @@ import com.google.common.collect.ImmutableTable
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.AbstractCatalogType
-import org.lanternpowered.server.data.IImmutableDataHolderBase
-import org.lanternpowered.server.data.IImmutableValueHolder
-import org.lanternpowered.server.data.property.IStorePropertyHolder
-import org.lanternpowered.server.data.value.LanternMutableValue
+import org.lanternpowered.server.data.ImmutableDataHolder
+import org.lanternpowered.server.data.property.StorePropertyHolder
 import org.lanternpowered.server.state.property.AbstractStateProperty
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.data.value.Value.Immutable
 import org.spongepowered.api.state.State
@@ -49,8 +48,8 @@ import java.util.function.Function
 import java.util.function.Predicate
 
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateData<S>) : AbstractCatalogType(), IState<S>, IStorePropertyHolder,
-        IImmutableDataHolderBase<S> {
+abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateData<S>) : AbstractCatalogType(),
+        IState<S>, StorePropertyHolder, ImmutableDataHolder<S> {
 
     private val key: CatalogKey
 
@@ -72,9 +71,6 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     // A list with all the values of this state
     private val values: ImmutableSet<Immutable<*>>
 
-    // A cache to reuse constructed data manipulators
-    private val immutableContainerCache = IImmutableValueHolder.ImmutableContainerCache()
-
     // Serialized data container
     private val dataContainer: DataContainer
 
@@ -91,8 +87,6 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         propertyValueTable = ImmutableTable.of()
         values = ImmutableSet.of()
     }
-
-    override fun getContainerCache() = this.immutableContainerCache
 
     override fun <T : Comparable<T>> getStateProperty(stateProperty: StateProperty<T>): Optional<T> {
         return (this.stateValues[stateProperty] as? T).optional()
@@ -170,8 +164,8 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
     override fun getContentVersion() = 1
     override fun toContainer(): DataContainer = this.dataContainer.copy()
 
-    override fun <E> transform(key: Key<out Value<E>>, function: Function<E, E>): Optional<S> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
+    override fun <E : Any> transform(key: Key<out Value<E>>, function: Function<E, E>): Optional<S> {
+        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return super.transform(key, function)
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
         val currentStateValue = this.stateValues[property]
@@ -192,8 +186,8 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return (this.propertyValueTable.row(property)[newStateValue] as S).optional()
     }
 
-    override fun <E> with(key: Key<out Value<E>>, value: E): Optional<S> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
+    override fun <E : Any> with(key: Key<out Value<E>>, value: E): Optional<S> {
+        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return super.with(key, value)
 
         val stateValue = property.keyValueTransformer.toStateValue(value)
         val currentStateValue = this.stateValues[property]
@@ -209,63 +203,18 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
 
     override fun with(value: Value<*>) = with(value.key as Key<Value<Any>>, value.get())
 
-    override fun with(valueContainer: ImmutableDataManipulator): Optional<S> {
-        var state: Optional<S>? = null
-        for (value in valueContainer.values) {
-            state = with(value)
-            if (!state.isPresent) {
-                return state
-            }
-        }
-        return state ?: (this as S).optional()
-    }
-
-    override fun with(valueContainers: Iterable<ImmutableDataManipulator>): Optional<S> {
-        var state: Optional<S>? = null
-        for (valueContainer in valueContainers) {
-            state = with(valueContainer)
-            if (!state.isPresent) {
-                return state
-            }
-        }
-        return state ?: (this as S).optional()
-    }
-
-    override fun without(containerClass: Class<out ImmutableDataManipulator>) = Optional.empty<S>()
-
-    override fun merge(that: S): S {
-        return if (this.stateContainer != (that as IState<S>).stateContainer) {
-            this as S
-        } else {
-            var temp = this as S
-            for (manipulator in that.manipulators) {
-                val optional = temp.with(manipulator)
-                if (optional.isPresent) {
-                    temp = optional.get()
-                }
-            }
-            temp
-        }
-    }
+    override fun without(key: Key<*>) =
+            if (key in this.keysToProperty) emptyOptional() else super<ImmutableDataHolder>.without(key)
 
     override fun merge(that: S, function: MergeFunction): S {
-        return if (this.stateContainer != (that as IState<S>).stateContainer) {
-            this as S
-        } else {
-            var temp = this as S
-            for (manipulator in that.manipulators) {
-                val old = temp.get(manipulator.javaClass).orNull()
-                val optional = temp.with(checkNotNull(function.merge(old, manipulator)))
-                if (optional.isPresent) {
-                    temp = optional.get()
-                }
-            }
-            temp
+        if (this.stateContainer != (that as IState<S>).stateContainer) {
+            return this as S
         }
+        return super<ImmutableDataHolder>.merge(that, function)
     }
 
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
+        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return super.get(key)
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
         val currentStateValue = this.stateValues[property]
@@ -274,17 +223,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         return currentKeyValue.optional()
     }
 
-    override fun <E : Any, V : Value<E>> getRawMutableValueFor(key: Key<V>): Optional<V> {
-        val property = (this.keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return emptyOptional()
-        val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
-
-        val currentStateValue = this.stateValues[property]
-        val currentKeyValue = transformer.toKeyValue(currentStateValue as Comparable<Any>)
-
-        return (LanternMutableValue(key, currentKeyValue) as V).optional()
-    }
-
-    override fun supports(key: Key<*>) = key in this.keysToProperty
+    override fun supports(key: Key<*>) = key in this.keysToProperty || super<ImmutableDataHolder>.supports(key)
 
     override fun copy(): S = this as S
     override fun getKeys() = (this.stateContainer as AbstractStateContainer<*>).keys

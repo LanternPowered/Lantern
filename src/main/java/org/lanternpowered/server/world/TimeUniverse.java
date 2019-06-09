@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.world;
 
-import org.lanternpowered.server.data.world.MoonPhase;
+import org.lanternpowered.server.data.type.MoonPhase;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.spongepowered.api.world.gamerule.GameRules;
 

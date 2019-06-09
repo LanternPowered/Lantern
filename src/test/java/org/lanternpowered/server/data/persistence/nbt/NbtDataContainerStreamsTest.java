@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
-import org.lanternpowered.server.data.MemoryDataContainer;
+import org.lanternpowered.server.data.persistence.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;

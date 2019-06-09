@@ -29,30 +29,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.lanternpowered.server.catalog.AbstractCatalogType;
-import org.lanternpowered.server.data.IImmutableDataHolderBase;
-import org.lanternpowered.server.data.key.LanternKey;
-import org.lanternpowered.server.data.property.IStoreDirectionRelativePropertyHolder;
-import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.lanternpowered.server.data.value.mutable.LanternValue;
+import org.lanternpowered.server.data.ImmutableDataHolder;
+import org.lanternpowered.server.data.property.StoreDirectionRelativePropertyHolder;
+import org.lanternpowered.server.data.value.ValueFactory;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -61,7 +54,6 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.util.Cycleable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.schematic.BlockPalette;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.util.ArrayList;
@@ -76,7 +68,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings({"rawtypes", "unchecked", "SuspiciousMethodCalls"})
 public final class LanternBlockState extends AbstractCatalogType implements CatalogType, BlockState,
-        IStoreDirectionRelativePropertyHolder, IImmutableDataHolderBase<BlockState> {
+        StoreDirectionRelativePropertyHolder, ImmutableDataHolder<BlockState> {
 
     private static final DataQuery NAME = DataQuery.of("Name");
     private static final DataQuery PROPERTIES = DataQuery.of("Properties");
@@ -117,9 +109,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
         final ImmutableSet.Builder<Value.Immutable<?>> valuesBuilder = ImmutableSet.builder();
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
             final LanternBlockTrait trait = (LanternBlockTrait) entry.getKey();
-            final LanternKey key = (LanternKey) trait.getValueKey();
+            final Key key = (Key) trait.getValueKey();
             keyToBlockTraitBuilder.put(key, trait);
-            final Value value = (Value) LanternValueFactory.get().createValueForKey(key, entry.getValue());
+            final Value value = (Value) ValueFactory.INSTANCE.immutableOf(key, entry.getValue());
             valuesBuilder.add(value instanceof Value.Immutable ? (Value.Immutable) value : ((Value.Mutable) value).asImmutable());
         }
         this.keyToBlockTrait = keyToBlockTraitBuilder.build();

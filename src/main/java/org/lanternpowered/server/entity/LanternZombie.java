@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.entity;
 
-import org.lanternpowered.server.data.ValueCollection;
+import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.spongepowered.api.entity.living.monster.Zombie;
+import org.spongepowered.api.entity.living.monster.zombie.Zombie;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -50,8 +50,8 @@ public class LanternZombie extends LanternAgent implements Zombie, AbstractArmor
     public void registerKeys() {
         super.registerKeys();
 
-        final ValueCollection c = getValueCollection();
-        c.registerNonRemovable(LanternKeys.POSE, Pose.STANDING);
+        final LocalKeyRegistry<LanternZombie> c = getKeyRegistry().forHolder(LanternZombie.class);
+        c.register(LanternKeys.POSE, Pose.STANDING);
     }
 
     @Override

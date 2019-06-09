@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.value
 
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.key.OptionalWrappedValueKey
+import org.lanternpowered.server.data.key.OptionalValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
@@ -42,7 +42,7 @@ class LanternImmutableOptionalValue<E : Any>(
     override fun get(): Optional<E> = CopyHelper.copy(super.get())
 
     override fun orElse(defaultValue: E): Value.Immutable<E> {
-        val unwrappedKey = (this.key as OptionalWrappedValueKey<*,*>).unwrappedKey.uncheckedCast<Key<out Value<E>>>()
+        val unwrappedKey = (this.key as OptionalValueKey<*,*>).unwrappedKey.uncheckedCast<Key<out Value<E>>>()
         return LanternImmutableValue(unwrappedKey, this.value.orElseGet { CopyHelper.copy(defaultValue) })
     }
 

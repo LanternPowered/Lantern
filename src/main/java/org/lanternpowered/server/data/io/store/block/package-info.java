@@ -23,11 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.tile;
-
-import org.lanternpowered.server.block.entity.LanternBlockEntity;
-import org.lanternpowered.server.data.io.store.data.LocalMutableDataHolderStore;
-
-public class TileEntityObjectStore<T extends LanternBlockEntity> extends LocalMutableDataHolderStore<T> {
-
-}
+@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
+package org.lanternpowered.server.data.io.store.block;

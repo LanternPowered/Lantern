@@ -32,7 +32,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.data.io.store.entity.EntitySerializer;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
-import org.lanternpowered.server.data.io.store.tile.BlockEntitySerializer;
+import org.lanternpowered.server.data.io.store.block.BlockEntitySerializer;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.inventory.LanternItemStack;
 

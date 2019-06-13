@@ -37,9 +37,9 @@ import org.lanternpowered.server.data.io.store.entity.ItemStore;
 import org.lanternpowered.server.data.io.store.entity.LivingStore;
 import org.lanternpowered.server.data.io.store.entity.UserStore;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
-import org.lanternpowered.server.data.io.store.tile.ContainerBlockEntityStore;
-import org.lanternpowered.server.data.io.store.tile.JukeboxTileEntitySerializer;
-import org.lanternpowered.server.data.io.store.tile.TileEntityObjectStore;
+import org.lanternpowered.server.data.io.store.block.ContainerBlockEntityStore;
+import org.lanternpowered.server.data.io.store.block.JukeboxBlockEntitySerializer;
+import org.lanternpowered.server.data.io.store.block.BlockEntityObjectStore;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.entity.LanternLiving;
@@ -88,9 +88,9 @@ public final class ObjectStoreRegistry {
         register(LanternItemStack.class, ItemStackStore.INSTANCE);
 
         // Tile entities
-        register(LanternBlockEntity.class, new TileEntityObjectStore<>());
+        register(LanternBlockEntity.class, new BlockEntityObjectStore<>());
         register(ContainerBlockEntity.class, new ContainerBlockEntityStore<>());
-        register(LanternJukebox.class, new JukeboxTileEntitySerializer<>());
+        register(LanternJukebox.class, new JukeboxBlockEntitySerializer<>());
     }
 
     /**

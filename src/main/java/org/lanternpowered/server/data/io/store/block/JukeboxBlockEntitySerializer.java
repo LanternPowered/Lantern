@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.tile;
+package org.lanternpowered.server.data.io.store.block;
 
 import org.lanternpowered.server.block.entity.vanilla.LanternJukebox;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
@@ -34,7 +34,7 @@ import org.spongepowered.api.data.persistence.DataView;
 
 import java.util.Optional;
 
-public class JukeboxTileEntitySerializer<T extends LanternJukebox> extends TileEntityObjectStore<T> {
+public class JukeboxBlockEntitySerializer<T extends LanternJukebox> extends BlockEntityObjectStore<T> {
 
     private static final DataQuery RECORD = DataQuery.of("Record");
     private static final DataQuery RECORD_ITEM = DataQuery.of("RecordItem");

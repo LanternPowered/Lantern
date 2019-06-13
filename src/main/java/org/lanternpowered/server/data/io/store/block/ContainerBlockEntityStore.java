@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.tile;
+package org.lanternpowered.server.data.io.store.block;
 
 import static org.lanternpowered.server.data.io.store.InventorySnapshotSerializer.SLOT;
 
@@ -45,7 +45,7 @@ import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContainerBlockEntityStore<T extends ContainerBlockEntity> extends TileEntityObjectStore<T> {
+public class ContainerBlockEntityStore<T extends ContainerBlockEntity> extends BlockEntityObjectStore<T> {
 
     private static final DataQuery DISPLAY_NAME = DataQuery.of("CustomName");
     private static final DataQuery ITEMS = DataQuery.of("Items");

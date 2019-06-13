@@ -28,20 +28,11 @@ package org.lanternpowered.server.entity.living.player;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Objects;
+import org.lanternpowered.server.data.ForwardingMutableDataHolder;
 import org.lanternpowered.server.data.io.UserIO;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.permission.AbstractProxySubject;
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.persistence.DataContainer;
-import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -54,17 +45,12 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.Set;
 import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ProxyUser extends AbstractProxySubject implements IUser {
+public class ProxyUser extends AbstractProxySubject implements IUser, ForwardingMutableDataHolder {
 
     private final UUID uniqueId;
     private GameProfile gameProfile;
@@ -119,6 +105,11 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
         final OfflineUser offlineUser = new OfflineUser(this);
         setInternalUser(offlineUser);
         return offlineUser;
+    }
+
+    @Override
+    public Mutable getDelegateDataHolder() {
+        return resolveUser();
     }
 
     @Override
@@ -208,126 +199,6 @@ public class ProxyUser extends AbstractProxySubject implements IUser {
     @Override
     public Inventory getEnderChestInventory() {
         return resolveUser().getEnderChestInventory();
-    }
-
-    @Override
-    public <V> Optional<V> getProperty(Property<V> property) {
-        return resolveUser().getProperty(property);
-    }
-
-    @Override
-    public OptionalDouble getDoubleProperty(Property<Double> property) {
-        return resolveUser().getDoubleProperty(property);
-    }
-
-    @Override
-    public OptionalInt getIntProperty(Property<Integer> property) {
-        return resolveUser().getIntProperty(property);
-    }
-
-    @Override
-    public Map<Property<?>, ?> getProperties() {
-        return resolveUser().getProperties();
-    }
-
-    @Override
-    public int getContentVersion() {
-        return resolveUser().getContentVersion();
-    }
-
-    @Override
-    public DataContainer toContainer() {
-        return resolveUser().toContainer();
-    }
-
-    @Override
-    public boolean validateRawData(DataView container) {
-        return resolveUser().validateRawData(container);
-    }
-
-    @Override
-    public void setRawData(DataView container) throws InvalidDataException {
-        resolveUser().setRawData(container);
-    }
-
-    @Override
-    public <E> Optional<E> get(Key<? extends Value<E>> key) {
-        return resolveUser().get(key);
-    }
-
-    @Override
-    public <E, V extends Value<E>> Optional<V> getValue(Key<V> key) {
-        return resolveUser().getValue(key);
-    }
-
-    @Override
-    public boolean supports(Key<?> key) {
-        return resolveUser().supports(key);
-    }
-
-    @Override
-    public DataHolder copy() {
-        return resolveUser().copy();
-    }
-
-    @Override
-    public Set<Key<?>> getKeys() {
-        return resolveUser().getKeys();
-    }
-
-    @Override
-    public Set<Value.Immutable<?>> getValues() {
-        return resolveUser().getValues();
-    }
-
-    @Override
-    public <T extends DataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
-        return resolveUser().get(containerClass);
-    }
-
-    @Override
-    public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(Class<T> containerClass) {
-        return resolveUser().getOrCreate(containerClass);
-    }
-
-    @Override
-    public boolean supports(Class<? extends DataManipulator<?, ?>> holderClass) {
-        return resolveUser().supports(holderClass);
-    }
-
-    @Override
-    public <E> DataTransactionResult offer(Key<? extends Value<E>> key, E value) {
-        return resolveUser().offer(key, value);
-    }
-
-    @Override
-    public DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function) {
-        return resolveUser().offer(valueContainer, function);
-    }
-
-    @Override
-    public DataTransactionResult remove(Class<? extends DataManipulator<?, ?>> containerClass) {
-        return resolveUser().remove(containerClass);
-    }
-
-    @Override
-    public DataTransactionResult remove(Key<?> key) {
-        return resolveUser().remove(key);
-    }
-
-    @Override
-    public DataTransactionResult undo(DataTransactionResult result) {
-        return resolveUser().undo(result);
-    }
-
-    @Override
-    public DataTransactionResult copyFrom(DataHolder that, MergeFunction function) {
-        return resolveUser().copyFrom(that, function);
-    }
-
-    @Override
-    public Collection<DataManipulator<?, ?>> getContainers() {
-        return resolveUser().getContainers();
     }
 
     @Override

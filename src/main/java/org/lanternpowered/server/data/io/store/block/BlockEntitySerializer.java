@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.tile;
+package org.lanternpowered.server.data.io.store.block;
 
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntityType;
@@ -38,16 +38,13 @@ import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class BlockEntitySerializer implements ObjectSerializer<LanternBlockEntity> {
 
     private static final DataQuery ID = DataQuery.of("id");
 
     @Override
     public LanternBlockEntity deserialize(DataView dataView) throws InvalidDataException {
-        final String id = fixTileId(dataView, dataView.getString(ID).get());
+        final String id = dataView.getString(ID).get();
         dataView.remove(ID);
 
         final LanternBlockEntityType tileEntityType = (LanternBlockEntityType) Sponge.getRegistry()
@@ -69,42 +66,5 @@ public class BlockEntitySerializer implements ObjectSerializer<LanternBlockEntit
         final ObjectStore<LanternBlockEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();
         store.serialize(object, dataView);
         return dataView;
-    }
-
-    private static final Map<String, String> OLD_TO_NEW_ID_MAPPINGS = new HashMap<>();
-
-    private static void put(String newId, String oldId) {
-        OLD_TO_NEW_ID_MAPPINGS.put(oldId, newId);
-    }
-
-    static {
-        put("minecraft:banner", "Banner");
-        put("minecraft:beacon", "Beacon");
-        put("minecraft:brewing_stand", "Cauldron");
-        put("minecraft:chest", "Chest");
-        put("minecraft:command_block", "Control");
-        put("minecraft:comparator", "Comparator");
-        put("minecraft:daylight_detector", "DLDetector");
-        put("minecraft:dispenser", "Trap");
-        put("minecraft:dropper", "Dropper");
-        put("minecraft:enchanting_table", "EnchantTable");
-        put("minecraft:end_gateway", "EndGateway");
-        put("minecraft:end_portal", "Airportal");
-        put("minecraft:ender_chest", "EnderChest");
-        put("minecraft:flower_pot", "FlowerPot");
-        put("minecraft:furnace", "Furnace");
-        put("minecraft:hopper", "Hopper");
-        put("minecraft:jukebox", "RecordPlayer");
-        put("minecraft:mob_spawner", "MobSpawner");
-        put("minecraft:noteblock", "Music");
-        put("minecraft:piston", "Piston");
-        put("minecraft:sign", "Sign");
-        put("minecraft:skull", "Skull");
-        put("minecraft:structure_block", "Structure");
-    }
-
-    private static String fixTileId(DataView dataView, String id) {
-        final String id1 = OLD_TO_NEW_ID_MAPPINGS.get(id);
-        return id1 == null ? id : id1;
     }
 }

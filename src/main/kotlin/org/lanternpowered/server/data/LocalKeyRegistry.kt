@@ -56,21 +56,21 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * Gets this [LocalKeyRegistry] as a collection which targets the given [DataHolder] type.
      *
      * @param holderType The data holder type
-     * @return This value collection, for the given holder type
+     * @return This local key registry, for the given holder type
      */
     abstract fun <H : DataHolder> forHolder(holderType: Class<H>): LocalKeyRegistry<H>
 
     /**
      * Gets this [LocalKeyRegistry] as a collection which targets the given [DataHolder] type [H].
      *
-     * @return This value collection, for the given holder type
+     * @return This local key registry, for the given holder type
      */
     inline fun <H : DataHolder> forHolderUnchecked() = uncheckedCast<LocalKeyRegistry<H>>()
 
     /**
      * Gets this [LocalKeyRegistry] as a collection which targets the given [DataHolder] type [H].
      *
-     * @return This value collection, for the given holder type
+     * @return This local key registry, for the given holder type
      */
     inline fun <reified H : DataHolder> forHolder() = forHolder(H::class.java)
 
@@ -96,7 +96,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract fun <V : Value<E>, E : Any> getAsElement(key: Key<V>): ElementKeyRegistration<V, E, H>?
 
     /**
-     * Registers the given [Key] to this value collection.
+     * Registers the given [Key] to this local key registry.
      *
      * By default are registrations registered using this
      * method removable. This can be changed by explicitly
@@ -122,7 +122,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract fun <V : Value<E>, E : Any> register(key: Key<V>, initialElement: E): ElementKeyRegistration<V, E, H>
 
     /**
-     * Registers the given [Key] with bounded value to this value collection.
+     * Registers the given [Key] with bounded value to this local key registry.
      *
      * @param key The key to register
      * @return The bounded element key registration
@@ -130,7 +130,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract fun <V : BoundedValue<E>, E : Any> register(key: Key<V>): BoundedElementKeyRegistration<V, E, H>
 
     /**
-     * Registers the given [Key] with bounded value to this value collection.
+     * Registers the given [Key] with bounded value to this local key registry.
      *
      * @param key The key to register
      * @param initialElement The initial element
@@ -139,7 +139,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract fun <V : BoundedValue<E>, E : Any> register(key: Key<V>, initialElement: E): BoundedElementKeyRegistration<V, E, H>
 
     /**
-     * Registers the given [Key] with the data provider to this value collection.
+     * Registers the given [Key] with the data provider to this local key registry.
      *
      * @param key The key to register
      * @return The key registration
@@ -147,7 +147,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract fun <V : Value<E>, E : Any> registerProvider(key: Key<V>, provider: DataProvider<V, E>): LocalKeyRegistration<V, E, H>
 
     /**
-     * Registers the given [Key] with the local data provider to this value collection.
+     * Registers the given [Key] with the local data provider to this local key registry.
      *
      * @param key The key to register
      * @return The key registration
@@ -156,7 +156,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
             key: Key<V>, fn: LocalDataProviderBuilder<V, E, H>.(key: Key<V>) -> Unit): LocalKeyRegistration<V, E, H>
 
     /**
-     * Registers the given [Key] with the local data provider to this value collection.
+     * Registers the given [Key] with the local data provider to this local key registry.
      *
      * @param key The key to register
      * @return The key registration

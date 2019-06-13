@@ -66,7 +66,7 @@ open class LocalMutableDataHolderStore<H : LocalMutableDataHolder> : ObjectStore
                         if (simpleValueContainer[key].isPresent) {
                             Lantern.getLogger().warn("Duplicate usage of the key ${key.key} for value container ${holder.javaClass.name}")
                         } else {
-                            simpleValueContainer.set(key, serializer.deserialize(elementType, context, raw))
+                            simpleValueContainer[key] = serializer.deserialize(elementType, context, raw)
                         }
                     }
                 }
@@ -94,7 +94,7 @@ open class LocalMutableDataHolderStore<H : LocalMutableDataHolder> : ObjectStore
             val element = registration.get()
             if (element != null) {
                 val key = registration.key.uncheckedCast<Key<Value<Any>>>()
-                simpleValueContainer.set(key, element)
+                simpleValueContainer[key] = element
             }
         }
 

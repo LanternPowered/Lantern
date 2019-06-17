@@ -32,7 +32,7 @@ import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.LocalMutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.data.value.ValueFactory;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
@@ -41,7 +41,7 @@ import org.spongepowered.api.fluid.FluidStack;
 import org.spongepowered.api.fluid.FluidStackSnapshot;
 import org.spongepowered.api.fluid.FluidType;
 
-public final class LanternFluidStack implements FluidStack, StorePropertyHolder, LocalMutableDataHolder {
+public final class LanternFluidStack implements FluidStack, PropertyHolderBase, LocalMutableDataHolder {
 
     private final LocalKeyRegistry<LanternFluidStack> localKeyRegistry;
     private final FluidType fluidType;

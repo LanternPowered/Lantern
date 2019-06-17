@@ -33,7 +33,7 @@ import org.lanternpowered.server.data.LocalDataHolderHelper;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.LocalMutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.data.value.ValueFactory;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.data.Keys;
@@ -53,7 +53,7 @@ import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "SimplifiableConditionalExpression"})
-public class LanternItemStack implements ItemStack, StorePropertyHolder, LocalMutableDataHolder {
+public class LanternItemStack implements ItemStack, PropertyHolderBase, LocalMutableDataHolder {
 
     private static final LanternItemStack empty = null;
 

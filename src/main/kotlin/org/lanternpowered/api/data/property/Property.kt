@@ -23,5 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.data.property.entity;
+package org.lanternpowered.api.data.property
+
+import org.spongepowered.api.data.property.provider.DoublePropertyProvider
+import org.spongepowered.api.data.property.provider.IntPropertyProvider
+import org.spongepowered.api.data.property.provider.PropertyProvider
+
+typealias Property<V> = org.spongepowered.api.data.property.Property<V>
+typealias PropertyBuilder<V> = org.spongepowered.api.data.property.Property.Builder<V>
+typealias PropertyMatcher<V> = org.spongepowered.api.data.property.PropertyMatcher<V>
+typealias PropertyMatcherBuilder<V> = org.spongepowered.api.data.property.PropertyMatcher.Builder<V>
+typealias PropertyMatchOperator = org.spongepowered.api.data.property.PropertyMatcher.Operator
+typealias PropertyHolder = org.spongepowered.api.data.property.PropertyHolder
+typealias DoublePropertyProvider = DoublePropertyProvider
+typealias IntPropertyProvider = IntPropertyProvider
+typealias PropertyProvider<V> = PropertyProvider<V>
+typealias DirectionRelativePropertyHolder = org.spongepowered.api.data.property.DirectionRelativePropertyHolder

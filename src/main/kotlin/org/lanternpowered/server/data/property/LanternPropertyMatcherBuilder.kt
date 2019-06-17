@@ -25,13 +25,15 @@
  */
 package org.lanternpowered.server.data.property
 
-import org.spongepowered.api.data.property.Property
-import org.spongepowered.api.data.property.PropertyMatcher
+import org.lanternpowered.api.data.property.Property
+import org.lanternpowered.api.data.property.PropertyMatchOperator
+import org.lanternpowered.api.data.property.PropertyMatcher
+import org.lanternpowered.api.data.property.PropertyMatcherBuilder
 
 @Suppress("UNCHECKED_CAST")
-class LanternPropertyMatcherBuilder<V> : PropertyMatcher.Builder<V> {
+class LanternPropertyMatcherBuilder<V> : PropertyMatcherBuilder<V> {
 
-    private lateinit var operator: PropertyMatcher.Operator
+    private lateinit var operator: PropertyMatchOperator
     private var property: Property<V>? = null
     private var value: V? = null
 
@@ -43,7 +45,7 @@ class LanternPropertyMatcherBuilder<V> : PropertyMatcher.Builder<V> {
         this.property = property as Property<V>
     } as LanternPropertyMatcherBuilder<NV>
 
-    override fun operator(operator: PropertyMatcher.Operator) = apply { this.operator = operator }
+    override fun operator(operator: PropertyMatchOperator) = apply { this.operator = operator }
     override fun value(value: V?) = apply { this.value = value }
 
     override fun build(): PropertyMatcher<V> {
@@ -58,7 +60,7 @@ class LanternPropertyMatcherBuilder<V> : PropertyMatcher.Builder<V> {
     }
 
     override fun reset() = apply {
-        this.operator = PropertyMatcher.Operator.EQUAL
+        this.operator = PropertyMatchOperator.EQUAL
         this.property = null
         this.value = null
     }

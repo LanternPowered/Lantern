@@ -32,7 +32,7 @@ import org.lanternpowered.server.block.provider.BlockObjectProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollection;
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
@@ -48,7 +48,7 @@ import java.util.Optional;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class LanternBlockType extends DefaultCatalogType implements BlockType, StorePropertyHolder {
+public class LanternBlockType extends DefaultCatalogType implements BlockType, PropertyHolderBase {
 
     /**
      * The property provider collection.

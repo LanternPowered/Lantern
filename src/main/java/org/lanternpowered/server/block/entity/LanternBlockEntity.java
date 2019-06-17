@@ -31,7 +31,7 @@ import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.LocalMutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.network.block.AbstractBlockEntityProtocol;
 import org.lanternpowered.server.network.block.BlockEntityProtocolType;
@@ -51,7 +51,7 @@ import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDataHolder, StorePropertyHolder {
+public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDataHolder, PropertyHolderBase {
 
     private LanternBlockEntityType blockEntityType;
     private final LocalKeyRegistry<? extends LanternBlockEntity> localKeyRegistry = LocalKeyRegistry.of();

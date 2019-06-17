@@ -23,19 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.entity;
+package org.lanternpowered.server.data.property
 
-import org.lanternpowered.server.data.property.common.AbstractEntityPropertyStore;
-import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.type.HandPreference;
-import org.spongepowered.api.entity.Entity;
+import com.google.common.collect.ImmutableList
+import org.lanternpowered.api.data.property.DirectionRelativePropertyHolder
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.data.property.PropertyProvider
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.Direction
+import java.util.Optional
 
-import java.util.Optional;
+open class PropertyProviderDelegate<V : Any> internal constructor(
+        internal val providers: ImmutableList<PropertyProvider<V>>
+) : PropertyProvider<V> {
 
-public class DominantHandPropertyStore extends AbstractEntityPropertyStore<HandPreference> {
-
-    @Override
-    protected Optional<HandPreference> getFor(Entity entity) {
-        return entity.get(Keys.DOMINANT_HAND);
+    override fun getFor(propertyHolder: PropertyHolder): Optional<V> {
+        for (provider in this.providers) {
+            val optional = provider.getFor(propertyHolder)
+            if (optional.isPresent) {
+                return optional
+            }
+        }
+        return emptyOptional()
     }
+
+    override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction): Optional<V> {
+        for (provider in this.providers) {
+            val optional = provider.getFor(propertyHolder, direction)
+            if (optional.isPresent) {
+                return optional
+            }
+        }
+        return emptyOptional()
+    }
+
+    override fun getPriority() = Integer.MAX_VALUE
 }

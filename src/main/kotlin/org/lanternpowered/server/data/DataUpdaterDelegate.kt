@@ -36,7 +36,6 @@ internal class DataUpdaterDelegate(
 ) : DataContentUpdater {
 
     override fun getInputVersion() = this.from
-
     override fun getOutputVersion() = this.to
 
     override fun update(content: DataView): DataView {
@@ -46,9 +45,9 @@ internal class DataUpdaterDelegate(
             try {
                 updated = updater.update(updated)
             } catch (e: Exception) {
-                val exception = RuntimeException("There was error attempting to update some data for the content updater:"
-                        + updater.javaClass.name + "\nThe original data is being returned, possibly causing"
-                        + "issues later on, \nbut the original data should not be lost. Please notify the developer"
+                val exception = RuntimeException("There was error attempting to update some data for the content updater: "
+                        + "${updater.javaClass.name}\nThe original data is being returned, possibly causing "
+                        + "issues later on, \nbut the original data should not be lost. Please notify the developer "
                         + "of this exception with the stacktrace.", e)
                 exception.printStackTrace()
                 return copied

@@ -23,30 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.common;
+package org.lanternpowered.server.data.property
 
-import org.spongepowered.api.data.property.PropertyHolder;
-import org.spongepowered.api.data.property.store.PropertyStore;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.lanternpowered.api.data.property.DirectionRelativePropertyHolder
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.util.Direction
+import java.util.Optional
 
-import java.util.Optional;
+internal interface IGlobalPropertyProvider<V : Any> {
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+    fun getFor(propertyHolder: PropertyHolder, ignoreLocal: Boolean): Optional<V>
 
-public abstract class AbstractItemPropertyStore<V> implements PropertyStore<V> {
-
-    protected abstract Optional<V> getFor(ItemType itemType, @Nullable ItemStack itemStack);
-
-    @Override
-    public Optional<V> getFor(PropertyHolder propertyHolder) {
-        if (propertyHolder instanceof ItemStack) {
-            final ItemStack itemStack = (ItemStack) propertyHolder;
-            return getFor(itemStack.getType(), itemStack);
-        } else if (propertyHolder instanceof ItemType) {
-            return getFor((ItemType) propertyHolder, null);
-        }
-        return Optional.empty();
-    }
-
+    fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction, ignoreLocal: Boolean): Optional<V>
 }

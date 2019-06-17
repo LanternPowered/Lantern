@@ -25,34 +25,40 @@
  */
 package org.lanternpowered.server.data.property
 
-import com.google.common.collect.ImmutableList
-import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
-import org.spongepowered.api.data.property.PropertyHolder
-import org.spongepowered.api.data.property.store.PropertyStore
+import org.spongepowered.api.data.property.Property
 import org.spongepowered.api.util.Direction
 import java.util.Optional
+import java.util.OptionalDouble
+import java.util.OptionalInt
 
-open class PropertyStoreDelegate<V> internal constructor(internal val propertyStores: ImmutableList<PropertyStore<V>>) : PropertyStore<V> {
+interface LocalDirectionRelativePropertyHolder : LocalPropertyHolder, DirectionRelativePropertyHolderBase {
 
-    override fun getFor(propertyHolder: PropertyHolder): Optional<V> {
-        for (propertyStore in this.propertyStores) {
-            val optional = propertyStore.getFor(propertyHolder)
-            if (optional.isPresent) {
-                return optional
-            }
+    override val propertyRegistry: LocalPropertyRegistry<out LocalDirectionRelativePropertyHolder>
+
+    @JvmDefault
+    override fun <V : Any> getProperty(direction: Direction, property: Property<V>): Optional<V> {
+        val value = this.propertyRegistry.getProvider(property).getFor(this, direction)
+        if (value.isPresent) {
+            return value
         }
-        return Optional.empty()
+        return super<DirectionRelativePropertyHolderBase>.getProperty(direction, property)
     }
 
-    override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction): Optional<V> {
-        for (propertyStore in this.propertyStores) {
-            val optional = propertyStore.getFor(propertyHolder, direction)
-            if (optional.isPresent) {
-                return optional
-            }
+    @JvmDefault
+    override fun getIntProperty(direction: Direction, property: Property<Int>): OptionalInt {
+        val value = this.propertyRegistry.getIntProvider(property).getIntFor(this, direction)
+        if (value.isPresent) {
+            return value
         }
-        return Optional.empty()
+        return super<DirectionRelativePropertyHolderBase>.getIntProperty(direction, property)
     }
 
-    override fun getPriority() = Integer.MAX_VALUE
+    @JvmDefault
+    override fun getDoubleProperty(direction: Direction, property: Property<Double>): OptionalDouble {
+        val value = this.propertyRegistry.getDoubleProvider(property).getDoubleFor(this, direction)
+        if (value.isPresent) {
+            return value
+        }
+        return super<DirectionRelativePropertyHolderBase>.getDoubleProperty(direction, property)
+    }
 }

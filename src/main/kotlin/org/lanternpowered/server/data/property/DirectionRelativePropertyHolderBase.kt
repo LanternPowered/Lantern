@@ -23,24 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.common;
+package org.lanternpowered.server.data.property
 
-import org.spongepowered.api.data.property.PropertyHolder;
-import org.spongepowered.api.data.property.store.PropertyStore;
-import org.spongepowered.api.entity.Entity;
+import org.lanternpowered.api.data.property.DirectionRelativePropertyHolder
+import org.lanternpowered.api.data.property.Property
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.Direction
 
-import java.util.Optional;
+import java.util.Optional
+import java.util.OptionalDouble
+import java.util.OptionalInt
 
-public abstract class AbstractEntityPropertyStore<V> implements PropertyStore<V> {
+interface DirectionRelativePropertyHolderBase : DirectionRelativePropertyHolder {
 
-    protected abstract Optional<V> getFor(Entity entity);
+    @JvmDefault
+    override fun <V : Any> getProperty(direction: Direction, property: Property<V>): Optional<V> =
+            GlobalPropertyRegistry.getProvider(property).uncheckedCast<IGlobalPropertyProvider<V>>().getFor(this, direction, true)
 
-    @Override
-    public Optional<V> getFor(PropertyHolder propertyHolder) {
-        if (propertyHolder instanceof Entity) {
-            return getFor((Entity) propertyHolder);
-        }
-        return Optional.empty();
-    }
+    @JvmDefault
+    override fun getIntProperty(direction: Direction, property: Property<Int>): OptionalInt =
+            GlobalPropertyRegistry.getIntProvider(property).uncheckedCast<GlobalIntPropertyProviderDelegate>().getIntFor(this, direction, true)
 
+    @JvmDefault
+    override fun getDoubleProperty(direction: Direction, property: Property<Double>): OptionalDouble =
+            GlobalPropertyRegistry.getDoubleProvider(property).uncheckedCast<GlobalDoublePropertyProviderDelegate>().getDoubleFor(this, direction, true)
 }

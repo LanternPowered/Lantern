@@ -25,19 +25,91 @@
  */
 package org.lanternpowered.server.data
 
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.server.data.property.GlobalPropertyRegistry
+import org.lanternpowered.server.game.Lantern
+import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.Keys
+import org.spongepowered.api.data.property.Properties
+import org.spongepowered.api.data.property.Property
 import org.spongepowered.api.data.type.BodyParts
 import org.spongepowered.api.data.value.MapValue
 import org.spongepowered.api.data.value.SetValue
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.util.Direction
+import org.spongepowered.api.world.LightType
+import org.spongepowered.api.world.LightTypes
+import org.spongepowered.api.world.Location
 
 object DataRegistrar {
 
     fun init() {
+        registerPropertyStores()
         registerProviders()
+    }
+
+    private fun registerPropertyStores() {
+        registerLuminancePropertyStore(Properties.BLOCK_LUMINANCE, LightTypes.BLOCK)
+        registerLuminancePropertyStore(Properties.SKY_LUMINANCE, LightTypes.SKY)
+        registerDominantHandPropertyStore()
+        registerBlockTemperaturePropertyStore()
+        registerTemperaturePropertyStore()
+        registerFuelBurnTimePropertyStore()
+    }
+
+    private fun registerLuminancePropertyStore(property: Property<Double>, lightType: LightType) {
+        GlobalPropertyRegistry.registerProvider(property) {
+            forHolder<Location> {
+                get {
+                    val chunk = this.world.getChunk(this.chunkPosition)
+                    chunk.getLight(lightType, this.blockX, this.blockY, this.blockZ).toDouble() / 15.0
+                }
+            }
+        }
+    }
+
+    private fun registerBlockTemperaturePropertyStore() {
+        GlobalPropertyRegistry.registerProvider(Properties.BLOCK_TEMPERATURE) {
+            forHolder<Location> {
+                get {
+                    this.biome.temperature
+                }
+            }
+        }
+    }
+
+    private fun registerTemperaturePropertyStore() {
+        GlobalPropertyRegistry.registerProvider(Properties.TEMPERATURE) {
+            get {
+                getProperty(Properties.BLOCK_TEMPERATURE).orNull() ?:
+                    getProperty(Properties.FLUID_TEMPERATURE).orNull() ?:
+                    getProperty(Properties.BIOME_TEMPERATURE).orNull()
+            }
+        }
+    }
+
+    private fun registerDominantHandPropertyStore() {
+        GlobalPropertyRegistry.registerProvider(Properties.DOMINANT_HAND) {
+            forHolder<DataHolder> {
+                get {
+                    get(Keys.DOMINANT_HAND).orNull()
+                }
+            }
+        }
+    }
+
+    private fun registerFuelBurnTimePropertyStore() {
+        GlobalPropertyRegistry.registerProvider(Properties.FUEL_BURN_TIME) {
+            forHolder<ItemStack> {
+                get {
+                    val result = Lantern.getRegistry().fuelRegistry.getResult(createSnapshot())
+                    if (result.isPresent) result.asInt else null
+                }
+            }
+        }
     }
 
     private fun registerProviders() {

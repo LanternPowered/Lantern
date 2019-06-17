@@ -86,10 +86,13 @@ interface ElementKeyRegistration<V : Value<E>, E : Any, H : DataHolder> : LocalK
      */
     fun removable(): ElementKeyRegistration<V, E, H>
 
+    @JvmSynthetic
     override fun addChangeListener(listener: H.(newValue: E?, oldValue: E?) -> Unit): ElementKeyRegistration<V, E, H>
 
+    @JvmSynthetic
     override fun addChangeListener(listener: H.(newValue: E?) -> Unit): ElementKeyRegistration<V, E, H>
 
+    @JvmSynthetic
     override fun addChangeListener(listener: H.() -> Unit): ElementKeyRegistration<V, E, H>
 
     override fun addChangeListener(listener: TriConsumer<H, E?, E?>): ElementKeyRegistration<V, E, H>

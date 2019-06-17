@@ -34,14 +34,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.query.LanternQueryOperation;
 import org.lanternpowered.server.item.predicate.ItemPredicate;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.data.property.Property;
-import org.spongepowered.api.data.property.store.PropertyStore;
+import org.spongepowered.api.data.property.provider.PropertyProvider;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.item.ItemType;
@@ -79,7 +79,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * The base implementation for all the {@link Inventory}s.
  */
 @SuppressWarnings({"unchecked", "ConstantConditions"})
-public abstract class AbstractInventory implements IInventory, StorePropertyHolder {
+public abstract class AbstractInventory implements IInventory, PropertyHolderBase {
 
     /**
      * Represents a invalid slot index.
@@ -620,7 +620,7 @@ public abstract class AbstractInventory implements IInventory, StorePropertyHold
 
     /**
      * Gets the inventory {@link Property} of this inventory. This method
-     * will not be delegated through {@link PropertyStore}s.
+     * will not be delegated through {@link PropertyProvider}s.
      *
      * @param property The property
      * @param <V> The property value type

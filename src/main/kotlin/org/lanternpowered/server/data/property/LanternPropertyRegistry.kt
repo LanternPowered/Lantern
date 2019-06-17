@@ -25,148 +25,89 @@
  */
 package org.lanternpowered.server.data.property
 
-import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
-import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.data.property.DoublePropertyProvider
+import org.lanternpowered.api.data.property.IntPropertyProvider
+import org.lanternpowered.api.data.property.Property
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.data.property.PropertyProvider
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.util.Named
-import org.lanternpowered.server.block.BlockProperties
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
-import org.lanternpowered.server.inventory.LanternInventoryProperties
-import org.lanternpowered.server.item.ItemProperties
-import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.CatalogType
-import org.spongepowered.api.data.property.Properties
-import org.spongepowered.api.data.property.Property
-import org.spongepowered.api.data.property.PropertyHolder
-import org.spongepowered.api.data.property.PropertyRegistry
-import org.spongepowered.api.data.property.store.DoublePropertyStore
-import org.spongepowered.api.data.property.store.IntPropertyStore
-import org.spongepowered.api.data.property.store.PropertyStore
-import org.spongepowered.api.item.inventory.InventoryProperties
-import java.lang.reflect.Modifier
 import java.util.ArrayList
 import java.util.Comparator
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.reflect.KClass
 
-object LanternPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<*>>(), PropertyRegistry {
+open class LanternPropertyRegistry<H : PropertyHolder> : PropertyRegistry<H> {
 
-    private val propertyStoreMap = HashMultimap.create<Property<*>, PropertyStore<*>>()
-    private val delegateMap = ConcurrentHashMap<Property<*>, PropertyStoreDelegate<*>>()
+    private val propertyProviders = HashMultimap.create<Property<*>, PropertyProvider<*>>()
+    private val cachedDelegates = ConcurrentHashMap<Property<*>, PropertyProvider<*>>()
 
-    // A delegate map specialized to be used in inventories
-    private val inventoryDelegateMap = ConcurrentHashMap<Property<*>, PropertyStoreDelegate<*>>()
+    private var cachedProviders: Map<Property<*>, PropertyProvider<*>>? = null
 
-    override fun registerDefaults() {
-        val typeVariable = Property::class.java.typeParameters[0]
-
-        fun registerCatalog(catalog: KClass<*>, inventoryProperties: Boolean = false) {
-            for (field in catalog.java.declaredFields) {
-                if (!Modifier.isStatic(field.modifiers)) {
-                    continue
-                }
-
-                val name = field.getAnnotation(Named::class.java)?.value ?: field.name
-
-                val key = CatalogKey.sponge(name.toLowerCase())
-                val optProperty = get(key)
-
-                val property: Property<*>
-                if (optProperty.isPresent) {
-                    property = optProperty.get()
-                } else {
-                    val typeToken = TypeToken.of(field.genericType)
-                    val valueType = typeToken.resolveType(typeVariable)
-                    property = LanternPropertyBuilder<CatalogType>()
-                            .valueType(valueType)
-                            .key(key)
-                            .build()
-                    registerAdditionalCatalog(property)
-                }
-                if (inventoryProperties) {
-                    register(property.uncheckedCast(), InventoryPropertyStore(property))
-                }
-                try {
-                    field.set(null, property)
-                } catch (e: IllegalAccessException) {
-                    throw IllegalStateException(e)
-                }
+    override val providers: Map<Property<*>, PropertyProvider<*>>
+        get() {
+            var cachedProvidersMap = this.cachedProviders
+            if (cachedProvidersMap != null) {
+                return cachedProvidersMap
             }
+            val builder = ImmutableMap.builder<Property<*>, PropertyProvider<*>>()
+            for ((property, stores) in this.propertyProviders.entries()) {
+                val delegate = this.cachedDelegates.computeIfAbsent(property) {
+                    constructDelegate(property.uncheckedCast<Property<Any>>(), stores.uncheckedCast())
+                }
+                builder.put(property, delegate)
+            }
+            cachedProvidersMap = builder.build()
+            this.cachedProviders = cachedProvidersMap
+            return cachedProvidersMap
         }
 
-        registerCatalog(Properties::class)
-        registerCatalog(InventoryProperties::class, inventoryProperties = true)
-        registerCatalog(LanternInventoryProperties::class, inventoryProperties = true)
-        registerCatalog(ItemProperties::class)
-        registerCatalog(BlockProperties::class)
+    private fun <V : Any> constructDelegate(property: Property<V>): PropertyProvider<V> {
+        return constructDelegate(property, this.propertyProviders[property].uncheckedCast())
     }
 
-    fun completeRegistration() {
-        finalizeContent()
-        for ((key, value) in this.propertyStoreMap.asMap()) {
-            this.delegateMap[key] = constructDelegate(key.uncheckedCast<Property<Any>>(), value.uncheckedCast())
+    protected open fun <V : Any> constructDelegate(property: Property<V>, propertyProviders: Collection<PropertyProvider<V>>): PropertyProvider<V> {
+        if (propertyProviders.size == 1) {
+            return propertyProviders.iterator().next()
         }
-        this.propertyStoreMap.clear()
-    }
-
-    private fun <V> constructDelegate(property: Property<V>): PropertyStoreDelegate<V> {
-        return constructDelegate(property, this.propertyStoreMap[property].uncheckedCast())
-    }
-
-    private fun <V> constructDelegate(property: Property<V>, propertyStores: Collection<PropertyStore<V>>): PropertyStoreDelegate<V> {
-        val stores = ArrayList(propertyStores)
-        stores.sortWith(Comparator.comparing(PropertyStore<V>::getPriority))
-        val immutableStores = ImmutableList.copyOf(stores)
+        val providers = ArrayList(propertyProviders)
+        providers.sortWith(Comparator.comparing(PropertyProvider<V>::getPriority))
+        val immutableProviders = ImmutableList.copyOf(providers)
         val valueType = property.valueType.rawType
         if (valueType == Int::class.java) {
-            return IntPropertyStoreDelegate(immutableStores.uncheckedCast()).uncheckedCast()
+            return IntPropertyProviderDelegate(immutableProviders.uncheckedCast()).uncheckedCast()
         } else if (valueType == Double::class.java) {
-            return DoublePropertyStoreDelegate(immutableStores.uncheckedCast()).uncheckedCast()
+            return DoublePropertyProviderDelegate(immutableProviders.uncheckedCast()).uncheckedCast()
         }
-        return PropertyStoreDelegate(immutableStores)
+        return PropertyProviderDelegate(immutableProviders)
     }
 
-    override fun <V> register(property: Property<V>, store: PropertyStore<V>) {
-        checkFinalizedContent()
-        this.propertyStoreMap.put(property, store)
+    override fun <V : Any> registerProvider(property: Property<V>, propertyProvider: PropertyProvider<V>) {
+        this.propertyProviders.put(property, propertyProvider)
+        this.cachedProviders = null
+        this.cachedDelegates.remove(property)
     }
 
-    override fun <V> getStore(property: Property<V>): PropertyStore<V> {
-        checkNotNull(property, "property")
-        if (isContentFinalized) {
-            return constructDelegate(property)
+    override fun <V : Any> registerProvider(property: Property<V>, fn: PropertyProviderBuilder<V, H>.(property: Property<V>) -> Unit) {
+        val builder = LanternPropertyProviderBaseBuilder<V, H>()
+        builder.fn(property)
+        registerProvider(property, builder.build())
+    }
+
+    override fun <V : Any> register(property: Property<V>, constant: V) {
+        val store = when (property.valueType.rawType) {
+            Int::class.java -> ConstantIntPropertyProvider(constant.uncheckedCast()).uncheckedCast()
+            Double::class.java -> ConstantDoublePropertyProvider(constant.uncheckedCast()).uncheckedCast()
+            else -> ConstantPropertyProvider(constant)
         }
-        return this.delegateMap.computeIfAbsent(property) { constructDelegate(property) }.uncheckedCast()
+        registerProvider(property, store)
     }
 
-    fun <V> getStoreForInventory(property: Property<V>): PropertyStore<V> {
-        checkNotNull(property, "property")
-        if (isContentFinalized) {
-            return constructInventoryDelegate(property)
-        }
-        return this.inventoryDelegateMap.computeIfAbsent(property) { constructInventoryDelegate(property) }.uncheckedCast()
+    override fun <V : Any> getProvider(property: Property<V>): PropertyProvider<V> {
+        return this.cachedDelegates.computeIfAbsent(property) { constructDelegate(property) }.uncheckedCast()
     }
 
-    private fun <V> constructInventoryDelegate(property: Property<V>): PropertyStoreDelegate<V> {
-        // Filter out inventory stores to avoid infinite loops
-        // when a delegate store is called from a inventory
-        val propertyStores = (this.propertyStoreMap[property].uncheckedCast<Collection<PropertyStore<V>>>()).stream()
-                .filter { it !is InventoryPropertyStore }
-                .collect(ImmutableList.toImmutableList())
-        return constructDelegate(property, propertyStores)
-    }
-
-    override fun getIntStore(property: Property<Int>) = getStore(property) as IntPropertyStore
-    override fun getDoubleStore(property: Property<Double>) = getStore(property) as DoublePropertyStore
-
-    fun getPropertiesFor(holder: PropertyHolder): Map<Property<*>, *> {
-        val builder = ImmutableMap.builder<Property<*>, Any>()
-        for ((key, store) in this.delegateMap) {
-            store.getFor(holder).ifPresent { value -> builder.put(key, value!!) }
-        }
-        return builder.build()
-    }
+    override fun getIntProvider(property: Property<Int>) = getProvider(property) as IntPropertyProvider
+    override fun getDoubleProvider(property: Property<Double>) = getProvider(property) as DoublePropertyProvider
 }

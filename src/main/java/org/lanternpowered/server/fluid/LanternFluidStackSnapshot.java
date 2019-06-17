@@ -28,7 +28,7 @@ package org.lanternpowered.server.fluid;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.LocalImmutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.data.value.ValueFactory;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.MergeFunction;
@@ -40,7 +40,7 @@ import org.spongepowered.api.fluid.FluidType;
 import java.util.Optional;
 import java.util.function.Function;
 
-public final class LanternFluidStackSnapshot implements FluidStackSnapshot, LocalImmutableDataHolder<FluidStackSnapshot>, StorePropertyHolder {
+public final class LanternFluidStackSnapshot implements FluidStackSnapshot, LocalImmutableDataHolder<FluidStackSnapshot>, PropertyHolderBase {
 
     private final LanternFluidStack fluidStack;
 

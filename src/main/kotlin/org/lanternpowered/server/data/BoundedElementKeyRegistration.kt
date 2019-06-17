@@ -105,10 +105,13 @@ interface BoundedElementKeyRegistration<V : BoundedValue<E>, E : Any, H : DataHo
 
     override fun removable(): BoundedElementKeyRegistration<V, E, H>
 
+    @JvmSynthetic
     override fun addChangeListener(listener: H.(newValue: E?, oldValue: E?) -> Unit): BoundedElementKeyRegistration<V, E, H>
 
+    @JvmSynthetic
     override fun addChangeListener(listener: H.(newValue: E?) -> Unit): BoundedElementKeyRegistration<V, E, H>
 
+    @JvmSynthetic
     override fun addChangeListener(listener: H.() -> Unit): BoundedElementKeyRegistration<V, E, H>
 
     override fun addChangeListener(listener: TriConsumer<H, E?, E?>): BoundedElementKeyRegistration<V, E, H>

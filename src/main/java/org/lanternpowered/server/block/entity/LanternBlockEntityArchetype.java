@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.data.LocalMutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
@@ -44,7 +44,7 @@ import org.spongepowered.math.vector.Vector3i;
 import java.util.Optional;
 import java.util.UUID;
 
-public class LanternBlockEntityArchetype implements BlockEntityArchetype, StorePropertyHolder, LocalMutableDataHolder {
+public class LanternBlockEntityArchetype implements BlockEntityArchetype, PropertyHolderBase, LocalMutableDataHolder {
 
     final LanternBlockEntity blockEntity;
 

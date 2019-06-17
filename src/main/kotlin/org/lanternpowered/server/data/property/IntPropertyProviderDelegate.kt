@@ -26,51 +26,38 @@
 package org.lanternpowered.server.data.property
 
 import com.google.common.collect.ImmutableList
-import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
-import org.spongepowered.api.data.property.PropertyHolder
-import org.spongepowered.api.data.property.store.IntPropertyStore
-import org.spongepowered.api.data.property.store.PropertyStore
-import org.spongepowered.api.util.Direction
+import org.lanternpowered.api.data.property.DirectionRelativePropertyHolder
+import org.lanternpowered.api.data.property.IntPropertyProvider
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.data.property.PropertyProvider
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.Direction
 import java.util.OptionalInt
 
-class IntPropertyStoreDelegate internal constructor(propertyStores: ImmutableList<PropertyStore<Int>>) :
-        PropertyStoreDelegate<Int>(propertyStores), IntPropertyStore {
+internal open class IntPropertyProviderDelegate internal constructor(providers: ImmutableList<PropertyProvider<Int>>) :
+        PropertyProviderDelegate<Int>(providers), IntPropertyProvider {
 
     override fun getFor(propertyHolder: PropertyHolder) =
-            super<PropertyStoreDelegate>.getFor(propertyHolder)
+            super<PropertyProviderDelegate>.getFor(propertyHolder)
 
     override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction) =
-            super<PropertyStoreDelegate>.getFor(propertyHolder, direction)
+            super<PropertyProviderDelegate>.getFor(propertyHolder, direction)
 
     override fun getIntFor(propertyHolder: PropertyHolder): OptionalInt {
-        for (propertyStore in this.propertyStores) {
-            if (propertyStore is IntPropertyStore) {
-                val optional = propertyStore.getIntFor(propertyHolder)
-                if (optional.isPresent) {
-                    return optional
-                }
-            } else {
-                val optional = propertyStore.getFor(propertyHolder)
-                if (optional.isPresent) {
-                    return OptionalInt.of(optional.get())
-                }
+        for (propertyStore in this.providers) {
+            val optional = propertyStore.getIntFor(propertyHolder)
+            if (optional.isPresent) {
+                return optional
             }
         }
         return OptionalInt.empty()
     }
 
     override fun getIntFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction): OptionalInt {
-        for (propertyStore in this.propertyStores) {
-            if (propertyStore is IntPropertyStore) {
-                val optional = propertyStore.getIntFor(propertyHolder, direction)
-                if (optional.isPresent) {
-                    return optional
-                }
-            } else {
-                val optional = propertyStore.getFor(propertyHolder, direction)
-                if (optional.isPresent) {
-                    return OptionalInt.of(optional.get())
-                }
+        for (propertyStore in this.providers) {
+            val optional = propertyStore.getIntFor(propertyHolder, direction)
+            if (optional.isPresent) {
+                return optional
             }
         }
         return OptionalInt.empty()

@@ -152,6 +152,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @param key The key to register
      * @return The key registration
      */
+    @JvmSynthetic
     abstract fun <V : Value<E>, E : Any> registerProvider(
             key: Key<V>, fn: LocalDataProviderBuilder<V, E, H>.(key: Key<V>) -> Unit): LocalKeyRegistration<V, E, H>
 

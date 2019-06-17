@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.block
 
-import org.lanternpowered.server.data.property.StoreDirectionRelativePropertyHolder
+import org.lanternpowered.server.data.property.DirectionRelativePropertyHolderBase
 import org.lanternpowered.server.state.AbstractState
 import org.lanternpowered.server.state.StateData
 import org.spongepowered.api.block.BlockSnapshot
@@ -34,7 +34,7 @@ import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.fluid.FluidState
 import org.spongepowered.api.world.Location
 
-class LanternBlockState(data: StateData<BlockState>) : AbstractState<BlockState, BlockType>(data), BlockState, StoreDirectionRelativePropertyHolder {
+class LanternBlockState(data: StateData<BlockState>) : AbstractState<BlockState, BlockType>(data), BlockState, DirectionRelativePropertyHolderBase {
 
     override fun snapshotFor(location: Location): BlockSnapshot {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

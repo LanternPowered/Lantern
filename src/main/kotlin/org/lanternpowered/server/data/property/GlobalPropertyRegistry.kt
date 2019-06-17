@@ -23,27 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.block;
+package org.lanternpowered.server.data.property
 
-import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.LightTypes;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.chunk.Chunk;
+import org.spongepowered.api.data.property.PropertyHolder
 
-import java.util.Optional;
+interface GlobalPropertyRegistry : PropertyRegistry<PropertyHolder> {
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-public final class SkyLuminancePropertyStore extends AbstractBlockPropertyStore<Double> {
-
-    @Override
-    protected Optional<Double> getFor(BlockState blockState, @Nullable Location location, @Nullable Direction direction) {
-        if (location == null) {
-            return Optional.empty();
-        }
-        final Chunk chunk = location.getWorld().getChunk(location.getChunkPosition());
-        return Optional.of((double) chunk.getLight(LightTypes.SKY, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-    }
+    /**
+     * The instance of the global registry.
+     */
+    companion object : GlobalPropertyRegistry by LanternGlobalPropertyRegistry
 }

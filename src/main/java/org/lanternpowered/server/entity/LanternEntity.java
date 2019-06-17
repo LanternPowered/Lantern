@@ -36,7 +36,7 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.LocalMutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -108,7 +108,7 @@ import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class LanternEntity implements Entity, LocalMutableDataHolder, StorePropertyHolder {
+public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHolderBase {
 
     // The unique id of this entity
     private final UUID uniqueId;

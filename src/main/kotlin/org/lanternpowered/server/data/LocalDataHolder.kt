@@ -27,17 +27,17 @@ package org.lanternpowered.server.data
 
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.property.StorePropertyHolder
+import org.lanternpowered.server.data.property.PropertyHolderBase
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import java.util.Optional
 
-interface LocalDataHolder : ValueContainerBase, DataHolderBase, StorePropertyHolder {
+interface LocalDataHolder : ValueContainerBase, DataHolderBase, PropertyHolderBase {
 
     /**
      * Gets the [LocalKeyRegistry].
      *
-     * @return The value collection
+     * @return The key registry
      */
     val keyRegistry: LocalKeyRegistry<out LocalDataHolder>
 

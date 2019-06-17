@@ -28,7 +28,7 @@ package org.lanternpowered.server.effect.potion
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.server.data.DataQueries
-import org.lanternpowered.server.data.property.StorePropertyHolder
+import org.lanternpowered.server.data.property.PropertyHolderBase
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.Queries
 
@@ -38,7 +38,7 @@ internal data class LanternPotionEffect(
         private val amplifier: Int,
         private val ambient: Boolean,
         private val showParticles: Boolean
-) : PotionEffect, StorePropertyHolder {
+) : PotionEffect, PropertyHolderBase {
 
     override fun getType(): PotionEffectType = this.effectType
     override fun getDuration(): Int = this.duration

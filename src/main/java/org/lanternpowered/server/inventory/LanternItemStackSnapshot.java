@@ -32,7 +32,7 @@ import org.lanternpowered.server.data.LocalDataHolderHelper;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.LocalImmutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.data.value.ValueFactory;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -46,7 +46,7 @@ import org.spongepowered.api.text.translation.Translation;
 import java.util.Optional;
 import java.util.function.Function;
 
-public final class LanternItemStackSnapshot implements ItemStackSnapshot, LocalImmutableDataHolder<ItemStackSnapshot>, StorePropertyHolder {
+public final class LanternItemStackSnapshot implements ItemStackSnapshot, LocalImmutableDataHolder<ItemStackSnapshot>, PropertyHolderBase {
 
     /**
      * Gets the {@link ItemStackSnapshot.empty()} as a {@link LanternItemStackSnapshot}.

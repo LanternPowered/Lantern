@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.data.property
 
-import org.spongepowered.api.data.property.Property
-import org.spongepowered.api.data.property.PropertyMatcher
-
+import org.lanternpowered.api.data.property.Property
+import org.lanternpowered.api.data.property.PropertyMatchOperator
+import org.lanternpowered.api.data.property.PropertyMatcher
 import java.util.Optional
 
 data class LanternPropertyMatcher<V>(
         private val property: Property<V>,
-        private val operator: PropertyMatcher.Operator,
+        private val operator: PropertyMatchOperator,
         private val value: V?
 ) : PropertyMatcher<V> {
 
@@ -42,14 +42,14 @@ data class LanternPropertyMatcher<V>(
 
     override fun matches(value: V?): Boolean {
         return when (this.operator) {
-            PropertyMatcher.Operator.EQUAL -> compare(value) == 0
-            PropertyMatcher.Operator.NOT_EQUAL -> compare(value) != 0
-            PropertyMatcher.Operator.GREATER -> compare(value) > 0
-            PropertyMatcher.Operator.GREATER_OR_EQUAL -> compare(value) >= 0
-            PropertyMatcher.Operator.LESS -> compare(value) < 0
-            PropertyMatcher.Operator.LESS_OR_EQUAL -> compare(value) <= 0
-            PropertyMatcher.Operator.INCLUDES -> includes(value)
-            PropertyMatcher.Operator.EXCLUDES -> !includes(value)
+            PropertyMatchOperator.EQUAL -> compare(value) == 0
+            PropertyMatchOperator.NOT_EQUAL -> compare(value) != 0
+            PropertyMatchOperator.GREATER -> compare(value) > 0
+            PropertyMatchOperator.GREATER_OR_EQUAL -> compare(value) >= 0
+            PropertyMatchOperator.LESS -> compare(value) < 0
+            PropertyMatchOperator.LESS_OR_EQUAL -> compare(value) <= 0
+            PropertyMatchOperator.INCLUDES -> includes(value)
+            PropertyMatchOperator.EXCLUDES -> !includes(value)
             else -> throw IllegalStateException("Unknown operator: $operator")
         }
     }

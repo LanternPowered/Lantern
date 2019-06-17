@@ -26,16 +26,17 @@
 package org.lanternpowered.server.data.property
 
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.data.property.Property
+import org.lanternpowered.api.data.property.PropertyBuilder
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
-import org.spongepowered.api.data.property.Property
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import java.util.Comparator
 import java.util.function.BiPredicate
 
-class LanternPropertyBuilder<V> : AbstractCatalogBuilder<Property<V>, Property.Builder<V>>(), Property.Builder<V> {
+class LanternPropertyBuilder<V> : AbstractCatalogBuilder<Property<V>, PropertyBuilder<V>>(), PropertyBuilder<V> {
 
     private var valueType: TypeToken<V>? = null
     private var valueComparator: Comparator<V>? = null

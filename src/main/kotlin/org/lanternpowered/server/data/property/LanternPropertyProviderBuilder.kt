@@ -23,32 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.block;
+package org.lanternpowered.server.data.property
 
-import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.provider.property.PropertyProvider;
-import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.Direction
+import org.lanternpowered.api.util.TypeToken
+import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
+import org.spongepowered.api.data.property.PropertyHolder
+import java.util.Optional
 
-import java.util.Optional;
+class LanternPropertyProviderBuilder<V : Any, H : PropertyHolder>(
+        private val holderType: TypeToken<H>,
+        private val base: LanternPropertyProviderBaseBuilder<V, in H>
+) : PropertyProviderBuilder<V, H>() {
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+    override fun <N : H> forHolder(holderType: TypeToken<N>): PropertyProviderBuilder<V, N> =
+            LanternPropertyProviderBuilder(holderType, this.base)
 
-public final class BlockPropertyStore<V> extends AbstractBlockPropertyStore<V> {
-
-    private final Class<V> propertyType;
-
-    public BlockPropertyStore(Class<V> propertyType) {
-        this.propertyType = propertyType;
+    override fun priority(priority: Int) = apply {
+        this.base.priority(priority)
     }
 
-    @Override
-    protected Optional<V> getFor(BlockState blockState, @Nullable Location location,
-             @Nullable Direction direction) {
-        final Optional<PropertyProvider<V>> provider = ((LanternBlockType) blockState.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.of(provider.get().get(blockState, location, direction)) : Optional.empty();
+    override fun getOptional(fn: H.() -> Optional<V>) = apply {
+        this.base.getOptional(this.holderType, fn)
+    }
+
+    override fun <H> PropertyProviderBuilder<V, H>.getOptional(fn: H.(direction: Direction) -> Optional<V>):
+            PropertyProviderBuilder<V, H> where H : PropertyHolder, H : DirectionRelativePropertyHolder {
+        this@LanternPropertyProviderBuilder.base.getDirectionRelativeOptional(
+                this@LanternPropertyProviderBuilder.holderType.uncheckedCast(), fn)
+        return this
     }
 }

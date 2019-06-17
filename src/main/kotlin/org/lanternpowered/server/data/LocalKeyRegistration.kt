@@ -40,6 +40,7 @@ interface LocalKeyRegistration<V : Value<E>, E : Any, H : DataHolder> : KeyRegis
      * @param listener The listener to add
      * @return This registration, for chaining
      */
+    @JvmSynthetic
     fun addChangeListener(listener: H.(newValue: E?, oldValue: E?) -> Unit): LocalKeyRegistration<V, E, H>
 
     /**
@@ -48,6 +49,7 @@ interface LocalKeyRegistration<V : Value<E>, E : Any, H : DataHolder> : KeyRegis
      * @param listener The listener to add
      * @return This registration, for chaining
      */
+    @JvmSynthetic
     fun addChangeListener(listener: H.(newValue: E?) -> Unit): LocalKeyRegistration<V, E, H>
 
     /**
@@ -56,6 +58,7 @@ interface LocalKeyRegistration<V : Value<E>, E : Any, H : DataHolder> : KeyRegis
      * @param listener The listener to add
      * @return This registration, for chaining
      */
+    @JvmSynthetic
     fun addChangeListener(listener: H.() -> Unit): LocalKeyRegistration<V, E, H>
 
     /**

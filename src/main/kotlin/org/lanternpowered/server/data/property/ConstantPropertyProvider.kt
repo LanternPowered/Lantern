@@ -23,5 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.data.property.common;
+package org.lanternpowered.server.data.property
+
+import org.lanternpowered.api.data.property.DirectionRelativePropertyHolder
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.data.property.PropertyProvider
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.Direction
+
+class ConstantPropertyProvider<V : Any>(value: V) : PropertyProvider<V> {
+
+    private val optionalValue = value.optional()
+
+    override fun getFor(propertyHolder: PropertyHolder) = this.optionalValue
+    override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction) = this.optionalValue
+}

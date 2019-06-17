@@ -36,40 +36,42 @@ import java.util.Optional
 
 interface IDataProvider<V : Value<E>, E : Any> : DataProvider<V, E> {
 
-    override fun offer(container: DataHolder.Mutable, element: E): DataTransactionResult
+    override fun getKey(): Key<V>
 
-    fun offerFast(container: DataHolder.Mutable, element: E) = offer(container, element).isSuccessful
+    override fun isSupported(container: DataHolder): Boolean
 
+    @JvmDefault
     fun allowsAsynchronousAccess(container: DataHolder): Boolean {
         return allowsAsynchronousAccess(container.javaClass.typeToken)
     }
 
     override fun allowsAsynchronousAccess(token: TypeToken<out DataHolder>): Boolean
 
-    override fun get(container: DataHolder): Optional<E>
-
-    override fun getKey(): Key<V>
-
-    override fun isSupported(container: DataHolder): Boolean
-
-    @JvmDefault
-    fun removeFast(container: DataHolder.Mutable) = remove(container).isSuccessful
-
-    override fun remove(container: DataHolder.Mutable): DataTransactionResult
-
-    override fun <I : DataHolder.Immutable<I>> with(immutable: I, element: E): Optional<I>
-
-    override fun <I : DataHolder.Immutable<I>> without(immutable: I): Optional<I>
-
     @JvmDefault
     override fun getValue(container: DataHolder): Optional<V> = super.getValue(container)
 
+    override fun get(container: DataHolder): Optional<E>
+
+    override fun offer(container: DataHolder.Mutable, element: E): DataTransactionResult
+
     @JvmDefault
-    fun offerValueFast(container: DataHolder.Mutable, value: V) = offerValue(container, value).isSuccessful
+    fun offerFast(container: DataHolder.Mutable, element: E) = offer(container, element).isSuccessful
 
     @JvmDefault
     override fun offerValue(container: DataHolder.Mutable, value: V): DataTransactionResult = super.offerValue(container, value)
 
     @JvmDefault
+    fun offerValueFast(container: DataHolder.Mutable, value: V) = offerValue(container, value).isSuccessful
+
+    override fun remove(container: DataHolder.Mutable): DataTransactionResult
+
+    @JvmDefault
+    fun removeFast(container: DataHolder.Mutable) = remove(container).isSuccessful
+
+    override fun <I : DataHolder.Immutable<I>> with(immutable: I, element: E): Optional<I>
+
+    @JvmDefault
     override fun <I : DataHolder.Immutable<I>> withValue(immutable: I, value: V): Optional<I> = super.withValue(immutable, value)
+
+    override fun <I : DataHolder.Immutable<I>> without(immutable: I): Optional<I>
 }

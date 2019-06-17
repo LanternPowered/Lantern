@@ -23,29 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.item;
+package org.lanternpowered.server.data.property
 
-import org.lanternpowered.server.data.property.common.AbstractItemPropertyStore;
-import org.lanternpowered.server.item.LanternItemType;
-import org.spongepowered.api.data.property.Property;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.lanternpowered.api.data.property.DirectionRelativePropertyHolder
+import org.lanternpowered.api.data.property.IntPropertyProvider
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.Direction
 
-import java.util.Optional;
+class ConstantIntPropertyProvider(value: Int) : IntPropertyProvider {
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+    private val optionalValue = value.optional()
+    private val optionalIntValue = value.optionalInt()
 
-public final class ItemPropertyStore<V> extends AbstractItemPropertyStore<V> {
-
-    private final Property<V> property;
-
-    public ItemPropertyStore(Property<V> property) {
-        this.property = property;
-    }
-
-    @Override
-    protected Optional<V> getFor(ItemType itemType, @Nullable ItemStack itemStack) {
-        return ((LanternItemType) itemType).getPropertyProviderCollection().get(this.property)
-                .flatMap(provider -> Optional.ofNullable(provider.get(itemType, itemStack)));
-    }
+    override fun getFor(propertyHolder: PropertyHolder) = this.optionalValue
+    override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction) = this.optionalValue
+    override fun getIntFor(propertyHolder: PropertyHolder) = this.optionalIntValue
+    override fun getIntFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction) = this.optionalIntValue
 }

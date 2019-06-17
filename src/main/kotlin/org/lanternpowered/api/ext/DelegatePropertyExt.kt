@@ -23,23 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.item;
+package org.lanternpowered.api.ext
 
-import org.lanternpowered.server.data.property.common.AbstractItemPropertyStore;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.property.item.BurningFuelProperty;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.lanternpowered.api.util.property.InitOnceProperty
+import org.lanternpowered.api.util.property.ServiceProperty
+import kotlin.properties.ReadOnlyProperty
+import kotlin.properties.ReadWriteProperty
 
-import java.util.Optional;
-import java.util.OptionalInt;
+/**
+ * A property that can only be written once.
+ */
+inline fun <reified T> initOnce(): ReadWriteProperty<Any, T> = InitOnceProperty()
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public final class BurningFuelPropertyStore extends AbstractItemPropertyStore<BurningFuelProperty> {
-
-    @Override
-    protected Optional<BurningFuelProperty> getFor(ItemStack itemStack) {
-        final OptionalInt fuelTime = Lantern.getRegistry().getFuelRegistry()
-                .getResult(itemStack.createSnapshot());
-        return fuelTime.isPresent() ? Optional.of(new BurningFuelProperty(fuelTime.getAsInt())) : Optional.empty();
-    }
-}
+/**
+ * A property that provides a service from the service manager.
+ */
+inline fun <reified T> service(): ReadOnlyProperty<Any, T> = ServiceProperty(T::class.java)

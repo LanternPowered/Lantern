@@ -23,27 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("UNCHECKED_CAST")
+
 package org.lanternpowered.server.data.property
 
-import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
+import com.google.common.collect.ImmutableMap
+import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.LocalDataDsl
 import org.spongepowered.api.data.property.Property
-import org.spongepowered.api.util.Direction
-
+import org.spongepowered.api.data.property.PropertyHolder
 import java.util.Optional
 import java.util.OptionalDouble
 import java.util.OptionalInt
 
-interface StoreDirectionRelativePropertyHolder : DirectionRelativePropertyHolder {
+@LocalDataDsl
+interface PropertyHolderBase : PropertyHolder {
 
     @JvmDefault
-    override fun <V> getProperty(direction: Direction, property: Property<V>): Optional<V> =
-            LanternPropertyRegistry.getStore(property).getFor(this, direction)
+    override fun getProperties(): Map<Property<*>, *> {
+        val properties = ImmutableMap.builder<Property<*>, Any>()
+        for ((property, store) in GlobalPropertyRegistry.providers) {
+            val value = store.uncheckedCast<IGlobalPropertyProvider<Any>>().getFor(this, true).orNull()
+            if (value != null) {
+                properties.put(property, value)
+            }
+        }
+        return properties.build()
+    }
 
     @JvmDefault
-    override fun getIntProperty(direction: Direction, property: Property<Int>): OptionalInt =
-            LanternPropertyRegistry.getIntStore(property).getIntFor(this, direction)
+    override fun getDoubleProperty(property: Property<Double>): OptionalDouble =
+            GlobalPropertyRegistry.getDoubleProvider(property).uncheckedCast<GlobalDoublePropertyProviderDelegate>().getDoubleFor(this, true)
 
     @JvmDefault
-    override fun getDoubleProperty(direction: Direction, property: Property<Double>): OptionalDouble =
-            LanternPropertyRegistry.getDoubleStore(property).getDoubleFor(this, direction)
+    override fun getIntProperty(property: Property<Int>): OptionalInt =
+            GlobalPropertyRegistry.getIntProvider(property).uncheckedCast<GlobalIntPropertyProviderDelegate>().getIntFor(this, true)
+
+    @JvmDefault
+    override fun <V : Any> getProperty(property: Property<V>): Optional<V> =
+            GlobalPropertyRegistry.getProvider(property).uncheckedCast<IGlobalPropertyProvider<V>>().getFor(this, true)
 }

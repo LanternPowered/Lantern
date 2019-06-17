@@ -136,6 +136,11 @@ inline fun <E> List<E>.asUnmodifiableList(): List<E> = Collections.unmodifiableL
 inline fun <E> Set<E>.asUnmodifiableSet(): Set<E> = Collections.unmodifiableSet(this)
 
 /**
+ * Returns this set as a unmodifiable view.
+ */
+inline fun <K, V> Map<K, V>.asUnmodifiableMap(): Map<K, V> = Collections.unmodifiableMap(this)
+
+/**
  * Gets whether all the elements of the [Iterable] are present in this [Collection].
  */
 fun <E> Collection<E>.containsAll(iterable: Iterable<E>): Boolean {

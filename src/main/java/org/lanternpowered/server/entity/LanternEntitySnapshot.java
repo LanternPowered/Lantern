@@ -27,7 +27,7 @@ package org.lanternpowered.server.entity;
 
 import org.lanternpowered.server.data.LocalImmutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
-import org.lanternpowered.server.data.property.StorePropertyHolder;
+import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.value.MergeFunction;
 import org.spongepowered.api.data.value.Value;
@@ -43,7 +43,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 // TODO
-public class LanternEntitySnapshot implements EntitySnapshot, LocalImmutableDataHolder<EntitySnapshot>, StorePropertyHolder {
+public class LanternEntitySnapshot implements EntitySnapshot, LocalImmutableDataHolder<EntitySnapshot>, PropertyHolderBase {
 
     @Override
     public UUID getWorldUniqueId() {

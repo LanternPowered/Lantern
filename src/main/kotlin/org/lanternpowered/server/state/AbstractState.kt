@@ -32,7 +32,7 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.catalog.AbstractCatalogType
 import org.lanternpowered.server.data.ImmutableDataHolder
-import org.lanternpowered.server.data.property.StorePropertyHolder
+import org.lanternpowered.server.data.property.PropertyHolderBase
 import org.lanternpowered.server.state.property.AbstractStateProperty
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
@@ -49,7 +49,7 @@ import java.util.function.Predicate
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateData<S>) : AbstractCatalogType(),
-        IState<S>, StorePropertyHolder, ImmutableDataHolder<S> {
+        IState<S>, PropertyHolderBase, ImmutableDataHolder<S> {
 
     private val key: CatalogKey
 

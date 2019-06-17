@@ -38,6 +38,16 @@ import java.util.OptionalInt
 inline fun <T> emptyOptional(): Optional<T> = Optional.empty()
 
 /**
+ * Gets a empty [OptionalInt].
+ */
+inline fun emptyOptionalInt(): OptionalInt = OptionalInt.empty()
+
+/**
+ * Gets a empty [OptionalDouble].
+ */
+inline fun emptyOptionalDouble(): OptionalDouble = OptionalDouble.empty()
+
+/**
  * Unwraps the [Optional] value.
  */
 inline fun <T> Optional<T>.orNull(): T? = orElse(null)
@@ -70,6 +80,30 @@ inline fun <T : Any> T.optional(): Optional<T> = Optional.of(this)
  */
 @JvmName("optionalOfNullable")
 inline fun <T : Any> T?.optional(): Optional<T> = Optional.ofNullable(this)
+
+/**
+ * Wraps the int into an [OptionalInt].
+ */
+@JvmName("optionalOf")
+inline fun Int.optionalInt(): OptionalInt = OptionalInt.of(this)
+
+/**
+ * Wraps the int into an [OptionalInt].
+ */
+@JvmName("optionalOfNullable")
+inline fun Int?.optionalInt(): OptionalInt = if (this == null) OptionalInt.empty() else OptionalInt.of(this)
+
+/**
+ * Wraps the double into an [OptionalDouble].
+ */
+@JvmName("optionalOf")
+inline fun Double.optionalDouble(): OptionalDouble = OptionalDouble.of(this)
+
+/**
+ * Wraps the double into an [OptionalDouble].
+ */
+@JvmName("optionalOfNullable")
+inline fun Double?.optionalDouble(): OptionalDouble = if (this == null) OptionalDouble.empty() else OptionalDouble.of(this)
 
 /**
  * Transforms this [Optional] into a [OptionalInt].

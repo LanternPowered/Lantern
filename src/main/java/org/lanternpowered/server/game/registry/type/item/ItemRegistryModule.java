@@ -121,8 +121,6 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     public <A extends ItemType> A register(A catalogType) {
         super.register(catalogType);
         NetworkItemTypeRegistry.register(catalogType);
-        Lantern.getGame().getPropertyRegistry().registerItemPropertyStores(
-                ((LanternItemType) catalogType).getPropertyProviderCollection());
         return catalogType;
     }
 

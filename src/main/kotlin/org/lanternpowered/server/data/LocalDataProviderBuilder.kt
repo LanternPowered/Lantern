@@ -143,7 +143,7 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
             handler: H.() -> H?): LocalDataProviderBuilder<V, E, H>
 
     /**
-     * Sets the retrieve handler of this value processor, it will be called when someone attempts
+     * Sets the get handler of this value processor, it will be called when someone attempts
      * to get a element from the [DataHolder].
      *
      * @param handler The retrieve handler
@@ -152,7 +152,7 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
     fun get(handler: H.() -> E?): LocalDataProviderBuilder<V, E, H>
 
     /**
-     * Sets the retrieve retrieve handler of this value processor, it will be called when someone attempts
+     * Sets the get handler of this value processor, it will be called when someone attempts
      * to get a [Value] from the [DataHolder].
      *
      * @param handler The retrieve handler

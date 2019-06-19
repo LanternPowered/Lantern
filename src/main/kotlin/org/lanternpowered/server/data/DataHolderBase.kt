@@ -33,6 +33,7 @@ import org.lanternpowered.server.data.value.LanternMutableValue
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
 import java.util.Optional
@@ -76,6 +77,7 @@ interface DataHolderBase : DataHolder, ValueContainerBase {
     @JvmDefault
     override fun toContainer(): DataContainer {
         val dataContainer = DataContainer.createNew()
+                .set(Queries.CONTENT_VERSION, this.contentVersion)
         DataHelper.serializeRawData(dataContainer, this)
         return dataContainer
     }

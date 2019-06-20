@@ -25,56 +25,24 @@
  */
 package org.lanternpowered.server.fluid
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.ToStringHelper
-import org.lanternpowered.server.data.LocalImmutableDataHolder
+import org.lanternpowered.server.data.MutableBackedLocalImmutableDataHolder
 import org.lanternpowered.server.data.value.ValueFactory
-import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.MergeFunction
-import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.fluid.FluidStackSnapshot
-import java.util.Optional
 
-class LanternFluidStackSnapshot internal constructor(private val fluidStack: LanternFluidStack) : FluidStackSnapshot,
-        LocalImmutableDataHolder<FluidStackSnapshot> {
+class LanternFluidStackSnapshot internal constructor(fluidStack: LanternFluidStack) : FluidStackSnapshot,
+        MutableBackedLocalImmutableDataHolder<FluidStackSnapshot, LanternFluidStack>(fluidStack) {
 
-    override val keyRegistry get() = this.fluidStack.keyRegistry.forHolder<LanternFluidStackSnapshot>()
+    override fun getFluid() = this.backingDataHolder.fluid
+    override fun getVolume() = this.backingDataHolder.volume
 
-    override fun getFluid() = this.fluidStack.fluid
-    override fun getVolume() = this.fluidStack.volume
+    override fun createStack() = this.backingDataHolder.copy()
 
-    override fun createStack() = this.fluidStack.copy()
-
-    override fun with(value: Value<*>): Optional<FluidStackSnapshot> {
-        val copy = this.fluidStack.copy()
-        return if (copy.offerFast(value)) {
-            LanternFluidStackSnapshot(copy).optional()
-        } else super.with(value)
-    }
-
-    override fun <E : Any> with(key: Key<out Value<E>>, value: E): Optional<FluidStackSnapshot> {
-        val copy = this.fluidStack.copy()
-        return if (copy.offerFast(key, value)) {
-            LanternFluidStackSnapshot(copy).optional()
-        } else super.with(key, value)
-    }
-
-    override fun without(key: Key<*>): Optional<FluidStackSnapshot> {
-        val copy = this.fluidStack.copy()
-        return if (copy.removeFast(key)) {
-            LanternFluidStackSnapshot(copy).optional()
-        } else super<LocalImmutableDataHolder>.without(key)
-    }
-
-    override fun merge(that: FluidStackSnapshot, function: MergeFunction): FluidStackSnapshot {
-        val copy = this.fluidStack.copy()
-        copy.copyFromNoEvents((that as LanternFluidStackSnapshot).fluidStack, function)
-        return LanternFluidStackSnapshot(copy)
-    }
+    override fun withBacking(backingDataHolder: LanternFluidStack) = LanternFluidStackSnapshot(backingDataHolder)
 
     override fun toString() = ToStringHelper(this)
             .add("fluid", this.fluid.key)
             .add("volume", this.volume)
-            .add("data", ValueFactory.toString(this.fluidStack))
+            .add("data", ValueFactory.toString(this.backingDataHolder))
             .toString()
 }

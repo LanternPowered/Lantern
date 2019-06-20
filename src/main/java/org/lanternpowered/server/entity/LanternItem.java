@@ -232,7 +232,7 @@ public class LanternItem extends LanternEntity implements Item {
                 triggerEvent(new CollectEntityEvent((Living) entity, added));
             }
             if (isRemoved()) {
-                stack.clear();
+                stack.setQuantity(0);
             }
             if (stack.isEmpty()) {
                 break;

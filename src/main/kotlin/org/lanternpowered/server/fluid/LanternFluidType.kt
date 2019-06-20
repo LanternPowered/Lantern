@@ -34,9 +34,10 @@ import org.spongepowered.api.fluid.FluidState
 import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.state.StateProperty
 
-class LanternFluidType @JvmOverloads constructor(
+class LanternFluidType(
         key: CatalogKey, override val internalId: Int
 ) : DefaultCatalogType(key), FluidType, PropertyHolderBase, InternalCatalogType {
+
     override fun getDefaultState(): FluidState {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

@@ -23,18 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.fluid;
+package org.lanternpowered.server.fluid
 
-import org.spongepowered.api.fluid.FluidStack;
+import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.fluid.FluidStackSnapshot
 
-public final class LanternFluidStackBuilder extends AbstractFluidStackBuilder<FluidStack, FluidStack.Builder> implements FluidStack.Builder {
+class LanternFluidStackSnapshotBuilder : AbstractFluidStackBuilder<FluidStackSnapshot, FluidStackSnapshot.Builder>(FluidStackSnapshot::class.java),
+        FluidStackSnapshot.Builder {
 
-    public LanternFluidStackBuilder() {
-        super(FluidStack.class);
+    override fun <V : Any> add(key: Key<out Value<V>>, value: V) = apply {
+        fluidStack(null).offerFastNoEvents(key, value)
     }
 
-    @Override
-    public LanternFluidStack build() {
-        return buildStack();
-    }
+    override fun build() = LanternFluidStackSnapshot(buildStack())
 }

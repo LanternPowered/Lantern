@@ -23,41 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.fluid;
+package org.lanternpowered.server.fluid
 
-import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.Value;
-import org.spongepowered.api.fluid.FluidStackSnapshot;
+import org.spongepowered.api.fluid.FluidStack
 
-public final class LanternFluidStackSnapshotBuilder extends AbstractFluidStackBuilder<FluidStackSnapshot, FluidStackSnapshot.Builder>
-        implements FluidStackSnapshot.Builder {
+class LanternFluidStackBuilder : AbstractFluidStackBuilder<FluidStack, FluidStack.Builder>(FluidStack::class.java), FluidStack.Builder {
 
-    public LanternFluidStackSnapshotBuilder() {
-        super(FluidStackSnapshot.class);
-    }
-
-    @Override
-    public FluidStackSnapshot.Builder add(DataManipulator<?, ?> manipulator) {
-        fluidStack(null).offerFastNoEvents(manipulator, MergeFunction.IGNORE_ALL);
-        return this;
-    }
-
-    @Override
-    public FluidStackSnapshot.Builder add(ImmutableDataManipulator<?, ?> manipulator) {
-        return add(manipulator.asMutable());
-    }
-
-    @Override
-    public <V> FluidStackSnapshot.Builder add(Key<? extends Value<V>> key, V value) {
-        fluidStack(null).offerFastNoEvents(key, value);
-        return this;
-    }
-
-    @Override
-    public FluidStackSnapshot build() {
-        return new LanternFluidStackSnapshot(buildStack());
-    }
+    override fun build() = buildStack()
 }

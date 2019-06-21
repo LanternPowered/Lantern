@@ -45,13 +45,10 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.gui.GuiIds;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
@@ -575,7 +572,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
     }
 
     @Override
-    public Optional<ISlot> getSlot(int index) {
+    public Optional<Slot> getSlot(int index) {
         final List<AbstractSlot> slots = getSlots();
         return index < 0 || index >= slots.size() ? Optional.empty() : Optional.ofNullable(slots.get(index));
     }
@@ -589,7 +586,7 @@ public abstract class AbstractChildrenInventory extends AbstractMutableInventory
     protected <V> Optional<V> tryGetProperty(Inventory child, Property<V> property) {
         if (property == InventoryProperties.SLOT_INDEX && child instanceof Slot) {
             final int index = getSlotIndex((Slot) child);
-            return index == INVALID_SLOT_INDEX ? Optional.empty() : Optional.of((V) SlotIndex.of(index));
+            return index == INVALID_SLOT_INDEX ? Optional.empty() : Optional.of((V) (Integer) index);
         }
         return super.tryGetProperty(child, property);
     }

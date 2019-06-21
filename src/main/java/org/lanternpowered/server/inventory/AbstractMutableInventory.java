@@ -36,8 +36,6 @@ import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.ArrayList;
@@ -59,7 +57,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
 
     @Nullable private PluginContainer plugin;
     @Nullable private LanternEmptyInventory emptyInventory;
-    @Nullable private InventoryArchetype archetype;
 
     private ShiftClickBehavior shiftClickBehavior = SimpleShiftClickBehavior.INSTANCE;
 
@@ -84,15 +81,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
      */
     void setPlugin(PluginContainer plugin) {
         this.plugin = plugin;
-    }
-
-    /**
-     * Sets the {@link InventoryArchetype} of this inventory.
-     *
-     * @param archetype The archetype
-     */
-    void setArchetype(InventoryArchetype archetype) {
-        this.archetype = archetype;
     }
 
     /**
@@ -247,11 +235,6 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     }
 
     @Override
-    public InventoryArchetype getArchetype() {
-        return this.archetype == null ? InventoryArchetypes.UNKNOWN : this.archetype;
-    }
-
-    @Override
     public PluginContainer getPlugin() {
         return this.plugin == null ? super.getPlugin() : this.plugin;
     }
@@ -259,7 +242,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Override
     public EmptyInventory empty() {
         // Lazily construct the empty inventory
-        LanternEmptyInventory emptyInventory = this.emptyInventory;
+        @Nullable LanternEmptyInventory emptyInventory = this.emptyInventory;
         if (emptyInventory == null) {
             emptyInventory = this.emptyInventory = new LanternEmptyInventory();
             emptyInventory.setParent(this);

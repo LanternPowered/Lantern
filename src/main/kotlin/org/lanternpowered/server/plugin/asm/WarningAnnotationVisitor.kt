@@ -23,46 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin.asm;
+package org.lanternpowered.server.plugin.asm
 
-import static org.objectweb.asm.Opcodes.ASM5;
+import org.lanternpowered.server.game.Lantern
+import org.objectweb.asm.AnnotationVisitor
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassVisitor;
-import org.spongepowered.plugin.meta.PluginMetadata;
+internal abstract class WarningAnnotationVisitor(api: Int, val className: String) : AnnotationVisitor(api) {
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+    internal abstract val annotation: String
 
-public final class PluginClassVisitor extends ClassVisitor {
-
-    private static final String PLUGIN_DESCRIPTOR = "Lorg/spongepowered/api/plugin/Plugin;";
-
-    private String className;
-    @Nullable private PluginAnnotationVisitor annotationVisitor;
-
-    public PluginClassVisitor() {
-        super(ASM5);
+    override fun visit(name: String?, value: Any) {
+        logger.warn("Found unknown $annotation annotation element in $className: $name = $value")
     }
 
-    public String getClassName() {
-        return this.className;
+    override fun visitEnum(name: String?, desc: String, value: String) {
+        logger.warn("Found unknown $annotation annotation element in $className: $name ($desc) = $value")
     }
 
-    public PluginMetadata getMetadata() {
-        return this.annotationVisitor != null ? this.annotationVisitor.getMetadata() : null;
+    override fun visitAnnotation(name: String?, desc: String): AnnotationVisitor? {
+        logger.warn("Found unknown $annotation annotation element in $className: $name ($desc)")
+        return null
     }
 
-    @Override
-    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        this.className = name;
+    override fun visitArray(name: String?): AnnotationVisitor? {
+        logger.warn("Found unknown $annotation annotation element in $className: $name")
+        return null
     }
 
-    @Override @Nullable
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (visible && desc.equals(PLUGIN_DESCRIPTOR)) {
-            return this.annotationVisitor = new PluginAnnotationVisitor(className);
-        }
-        return null;
-    }
+    companion object {
 
+        private val logger = Lantern.getLogger()
+    }
 }

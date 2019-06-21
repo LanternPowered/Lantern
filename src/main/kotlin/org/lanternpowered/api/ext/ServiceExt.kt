@@ -23,42 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.permission;
+package org.lanternpowered.api.ext
 
-public final class Permissions {
+import org.lanternpowered.api.Lantern
+import kotlin.reflect.typeOf
 
-    public static final String SELECTOR_PERMISSION = "minecraft.selector";
-
-    public static final int SELECTOR_LEVEL = 1;
-
-    public static final String COMMAND_BLOCK_PERMISSION = "minecraft.commandblock";
-
-    public static final int COMMAND_BLOCK_LEVEL = 2;
-
-    public static final class Login {
-
-        public static final String BYPASS_WHITELIST_PERMISSION = "minecraft.login.bypass-whitelist";
-
-        public static final int BYPASS_WHITELIST_LEVEL = 1;
-
-        public static final String BYPASS_PLAYER_LIMIT_PERMISSION = "minecraft.login.bypass-player-limit";
-
-        public static final int BYPASS_PLAYER_LIMIT_LEVEL = 1;
-
-        private Login() {
-        }
+inline fun <reified S> serviceOf(): S {
+    val type = typeOf<S>()
+    if (type.isMarkedNullable) {
+        return Lantern.serviceManager.provide(S::class.java).orNull() as S
     }
-
-    public static final class Chat {
-
-        public static final String FORMAT_URLS = "lantern.chat.format-urls";
-
-        public static final int FORMAT_URLS_LEVEL = 0;
-
-        private Chat() {
-        }
-    }
-
-    private Permissions() {
-    }
+    return Lantern.serviceManager.provideUnchecked(S::class.java)
 }

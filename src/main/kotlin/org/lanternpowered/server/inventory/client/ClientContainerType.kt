@@ -28,9 +28,10 @@ package org.lanternpowered.server.inventory.client
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.inventory.AbstractInventory
+import org.spongepowered.api.item.inventory.ContainerType
 
 class ClientContainerType(key: CatalogKey, private val containerProvider: (AbstractInventory) -> ClientContainer) :
-        DefaultCatalogType(key), GuiId {
+        DefaultCatalogType(key), ContainerType {
 
     /**
      * Creates a new [ClientContainer].

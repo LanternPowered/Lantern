@@ -15,7 +15,7 @@ plugins {
     id 'net.minecrell.licenser' version '0.4'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id 'org.spongepowered.plugin' version '0.8.1'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.31'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.40'
 }
 
 apply from: rootProject.file('gradle/lantern.gradle')
@@ -113,7 +113,8 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.15'
 
     // Asm
-    compile 'org.ow2.asm:asm-all:5.2'
+    compile 'org.ow2.asm:asm:7.1'
+    compile 'org.ow2.asm:asm-tree:7.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
@@ -126,6 +127,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
     freeCompilerArgs = [
             '-Xuse-experimental=kotlin.ExperimentalUnsignedTypes',
             '-Xuse-experimental=kotlin.contracts.ExperimentalContracts',
+            '-Xuse-experimental=kotlin.ExperimentalStdlibApi',
             '-XXLanguage:+InlineClasses',
             '-Xjvm-default=enable'
     ]
@@ -154,8 +156,7 @@ processResources {
 def ignoredDependencyArtifacts = new HashSet<>()
 // Don't include the api again
 ignoredDependencyArtifacts.add "$api.group:$api.name"
-// We already include 'asm-all'
-ignoredDependencyArtifacts.add 'org.ow2.asm:asm'
+// Don't include testing related libraries
 ignoredDependencyArtifacts.add 'junit:junit'
 ignoredDependencyArtifacts.add 'org.hamcrest:hamcrest-core'
 ignoredDependencyArtifacts.add 'org.hamcrest:hamcrest-library'

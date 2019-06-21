@@ -34,7 +34,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
@@ -193,11 +192,6 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    public int getStackSize() {
-        return getDelegateSlot().getStackSize();
-    }
-
-    @Override
     public boolean canFit(ItemStack stack) {
         return getDelegateSlot().canFit(stack);
     }
@@ -213,43 +207,38 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
     }
 
     @Override
-    public Optional<ItemStack> poll(SlotIndex index) {
-        return getDelegateSlot().poll(index);
+    public Optional<ItemStack> pollFrom(int index) {
+        return getDelegateSlot().pollFrom(index);
     }
 
     @Override
-    public Optional<ItemStack> poll(SlotIndex index, int limit) {
-        return getDelegateSlot().poll(index, limit);
+    public Optional<ItemStack> pollFrom(int index, int limit) {
+        return getDelegateSlot().pollFrom(index, limit);
     }
 
     @Override
-    public Optional<ItemStack> peek(SlotIndex index) {
-        return getDelegateSlot().peek(index);
+    public Optional<ItemStack> peekAt(int index) {
+        return getDelegateSlot().peekAt(index);
     }
 
     @Override
-    public Optional<ItemStack> peek(SlotIndex index, int limit) {
-        return getDelegateSlot().peek(index, limit);
+    public Optional<ItemStack> peekAt(int index, int limit) {
+        return getDelegateSlot().peekAt(index, limit);
     }
 
     @Override
-    public InventoryTransactionResult set(SlotIndex index, ItemStack stack) {
+    public InventoryTransactionResult set(int index, ItemStack stack) {
         return getDelegateSlot().set(index, stack);
     }
 
     @Override
-    public Optional<Slot> getSlot(SlotIndex index) {
+    public Optional<Slot> getSlot(int index) {
         return getDelegateSlot().getSlot(index);
     }
 
     @Override
     public InventoryTransactionResult setForced(ItemStack stack) {
         return getDelegateSlot().setForced(stack);
-    }
-
-    @Override
-    public Optional<ISlot> getSlot(int index) {
-        return getDelegateSlot().getSlot(index);
     }
 
     @Override

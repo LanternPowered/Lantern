@@ -46,9 +46,12 @@ import org.lanternpowered.server.inventory.client.TradingClientContainer
 import org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.item.inventory.ContainerType
+import org.spongepowered.api.item.inventory.ContainerTypes
 import org.spongepowered.api.item.inventory.type.CarriedInventory
+import kotlin.math.ceil
 
-object ClientContainerRegistryModule : DefaultCatalogRegistryModule<GuiId>(GuiIds::class) {
+object ClientContainerRegistryModule : DefaultCatalogRegistryModule<ContainerType>(ContainerTypes::class) {
 
     override fun registerDefaults() {
         fun register(id: String, supplier: (AbstractInventory) -> ClientContainer) {
@@ -56,7 +59,7 @@ object ClientContainerRegistryModule : DefaultCatalogRegistryModule<GuiId>(GuiId
         }
 
         register("chest") { inventory ->
-            val rows = Math.ceil(inventory.capacity().toDouble() / 9.0).toInt()
+            val rows = ceil(inventory.capacity().toDouble() / 9.0).toInt()
             ChestClientContainer(rows)
         }
         register("furnace") { FurnaceClientContainer() }
@@ -71,7 +74,7 @@ object ClientContainerRegistryModule : DefaultCatalogRegistryModule<GuiId>(GuiId
         register("horse") { inventory ->
             var capacity = inventory.capacity()
             capacity -= 2
-            capacity = Math.ceil(capacity.toDouble() / 3).toInt()
+            capacity = ceil(capacity.toDouble() / 3).toInt()
             var entityId = -1
             if (inventory is CarriedInventory<*>) {
                 val carrier = inventory.carrier.orElse(null)

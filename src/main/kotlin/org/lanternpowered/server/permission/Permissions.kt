@@ -23,45 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin.asm;
+package org.lanternpowered.server.permission
 
-import org.lanternpowered.server.game.Lantern;
-import org.objectweb.asm.AnnotationVisitor;
-import org.slf4j.Logger;
+object Permissions {
 
-abstract class WarningAnnotationVisitor extends AnnotationVisitor {
+    const val SELECTOR_PERMISSION = "minecraft.selector"
 
-    private static final Logger logger = Lantern.getLogger();
+    const val SELECTOR_LEVEL = 1
 
-    final String className;
+    const val COMMAND_BLOCK_PERMISSION = "minecraft.commandblock"
 
-    WarningAnnotationVisitor(int api, String className) {
-        super(api);
-        this.className = className;
+    const val COMMAND_BLOCK_LEVEL = 2
+
+    object Login {
+
+        const val BYPASS_WHITELIST_PERMISSION = "minecraft.login.bypass-whitelist"
+
+        const val BYPASS_WHITELIST_LEVEL = 1
+
+        const val BYPASS_PLAYER_LIMIT_PERMISSION = "minecraft.login.bypass-player-limit"
+
+        const val BYPASS_PLAYER_LIMIT_LEVEL = 1
     }
 
-    abstract String getAnnotation();
+    object Chat {
 
-    @Override
-    public void visit(String name, Object value) {
-        logger.warn("Found unknown {} annotation element in {}: {} = {}", getAnnotation(), this.className, name, value);
+        const val FORMAT_URLS = "lantern.chat.format-urls"
+
+        const val FORMAT_URLS_LEVEL = 0
     }
-
-    @Override
-    public void visitEnum(String name, String desc, String value) {
-        logger.warn("Found unknown {} annotation element in {}: {} ({}) = {}", getAnnotation(), this.className, name, desc, value);
-    }
-
-    @Override
-    public AnnotationVisitor visitAnnotation(String name, String desc) {
-        logger.warn("Found unknown {} annotation element in {}: {} ({})", getAnnotation(), this.className, name, desc);
-        return null;
-    }
-
-    @Override
-    public AnnotationVisitor visitArray(String name) {
-        logger.warn("Found unknown {} annotation element in {}: {}", getAnnotation(), this.className, name);
-        return null;
-    }
-
 }

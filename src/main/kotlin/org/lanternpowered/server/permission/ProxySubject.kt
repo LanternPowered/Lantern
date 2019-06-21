@@ -26,7 +26,6 @@
 package org.lanternpowered.server.permission
 
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.service.LanternServiceListeners
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.service.permission.PermissionService
@@ -72,14 +71,14 @@ interface ProxySubject : Subject {
 
     @JvmDefault
     fun resolveNullableSubject(): Subject? {
-        var reference = internalSubject
+        var reference = this.internalSubject
         if (reference == null) {
-            val optService = Lantern.getGame().serviceManager.provide(PermissionService::class.java)
-            if (optService.isPresent) {
+            val service = serviceOf<PermissionService?>()
+            if (service != null) {
                 // Try to update the internal subject
-                SubjectSettingCallback.apply(this, optService.get())
+                SubjectSettingCallback.apply(this, service)
                 // Get the new subject reference, can be null if failed
-                reference = internalSubject
+                reference = this.internalSubject
             }
         }
         return reference?.resolve()?.join()

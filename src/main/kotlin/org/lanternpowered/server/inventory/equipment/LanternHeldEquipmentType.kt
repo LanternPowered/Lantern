@@ -29,5 +29,5 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import org.spongepowered.api.item.inventory.equipment.HeldEquipmentType
 
-class LanternHeldEquipmentType @JvmOverloads constructor(key: CatalogKey, childChecker: (EquipmentType) -> Boolean = { _ -> false }) :
+class LanternHeldEquipmentType @JvmOverloads constructor(key: CatalogKey, childChecker: (EquipmentType) -> Boolean = { false }) :
         LanternEquipmentType(key, childChecker), HeldEquipmentType

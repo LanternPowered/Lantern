@@ -53,7 +53,6 @@ import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -549,39 +548,33 @@ public abstract class AbstractInventory implements IInventory, PropertyHolderBas
     }
 
     @Override
-    public Optional<ItemStack> poll(SlotIndex index) {
+    public Optional<ItemStack> pollFrom(int index) {
         return getSlot(index).map(Inventory::poll);
     }
 
     @Override
-    public Optional<ItemStack> poll(SlotIndex index, int limit) {
+    public Optional<ItemStack> pollFrom(int index, int limit) {
         return getSlot(index).map(slot -> slot.poll(limit));
     }
 
     @Override
-    public Optional<ItemStack> peek(SlotIndex index) {
+    public Optional<ItemStack> peekAt(int index) {
         return getSlot(index).map(Inventory::peek);
     }
 
     @Override
-    public Optional<ItemStack> peek(SlotIndex index, int limit) {
+    public Optional<ItemStack> peekAt(int index, int limit) {
         return getSlot(index).map(slot -> slot.peek(limit));
     }
 
     @Override
-    public InventoryTransactionResult offer(SlotIndex index, ItemStack stack) {
+    public InventoryTransactionResult offer(int index, ItemStack stack) {
         return getSlot(index).map(slot -> slot.offer(stack)).orElse(CachedInventoryTransactionResults.FAIL_NO_TRANSACTIONS);
     }
 
     @Override
-    public InventoryTransactionResult set(SlotIndex index, ItemStack stack) {
+    public InventoryTransactionResult set(int index, ItemStack stack) {
         return getSlot(index).map(slot -> slot.set(stack)).orElse(CachedInventoryTransactionResults.FAIL_NO_TRANSACTIONS);
-    }
-
-    @Override
-    public Optional<Slot> getSlot(SlotIndex slotIndex) {
-        checkNotNull(slotIndex, "slotIndex");
-        return (Optional) getSlot(slotIndex.getIndex());
     }
 
     // Properties

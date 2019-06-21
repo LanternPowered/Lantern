@@ -23,5 +23,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.permission;
+package org.lanternpowered.server.plugin.asm
+
+import jdk.internal.org.objectweb.asm.Type
+import org.objectweb.asm.AnnotationVisitor
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.Opcodes.ASM7
+import org.spongepowered.api.plugin.Plugin
+import org.spongepowered.plugin.meta.PluginMetadata
+
+class PluginClassVisitor : ClassVisitor(ASM7) {
+
+    lateinit var className: String
+        private set
+
+    private var annotationVisitor: PluginAnnotationVisitor? = null
+
+    val metadata: PluginMetadata?
+        get() = this.annotationVisitor?.metadata
+
+    override fun visit(version: Int, access: Int, name: String, signature: String, superName: String, interfaces: Array<String>) {
+        this.className = name
+    }
+
+    override fun visitAnnotation(desc: String, visible: Boolean): AnnotationVisitor? {
+        return if (visible && desc == pluginDescriptor) {
+            PluginAnnotationVisitor(this.className).also { this.annotationVisitor = it }
+        } else null
+    }
+
+    companion object {
+
+        private val pluginDescriptor = Type.getDescriptor(Plugin::class.java)
+    }
+}

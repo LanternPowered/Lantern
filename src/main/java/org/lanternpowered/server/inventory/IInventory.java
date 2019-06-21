@@ -227,14 +227,6 @@ public interface IInventory extends Inventory {
     }
 
     /**
-     * Gets the {@link Slot} for the specified index.
-     *
-     * @param index The slot index
-     * @return The slot if found
-     */
-    Optional<ISlot> getSlot(int index);
-
-    /**
      * Gets the index of the {@link Slot} in this ordered inventory,
      * may return {@code -1} if the slot was not found.
      *

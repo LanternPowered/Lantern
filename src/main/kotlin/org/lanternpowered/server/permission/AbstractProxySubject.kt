@@ -23,5 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.console;
+package org.lanternpowered.server.permission
+
+import org.spongepowered.api.service.permission.SubjectReference
+
+abstract class AbstractProxySubject : ProxySubject {
+
+    override var internalSubject: SubjectReference? = null
+}

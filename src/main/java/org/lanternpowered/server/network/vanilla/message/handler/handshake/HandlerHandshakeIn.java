@@ -83,7 +83,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                 String[] split = hostname.split("\0\\|", 2);
 
                 // Check for a fml marker
-                session.getChannel().attr(NetworkSession.FML_MARKER).set(split.length == 2 == split[1].contains(FML_MARKER));
+                session.getChannel().attr(NetworkSession.FML_MARKER).set(split.length == 2 && split[1].contains(FML_MARKER));
 
                 split = split[0].split("\00");
                 if (split.length == 3 || split.length == 4) {

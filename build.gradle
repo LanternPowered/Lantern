@@ -1,27 +1,11 @@
-// Gradle plugins
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url = 'https://dl.bintray.com/lanternpowered/maven/'
-        }
-    }
-    dependencies {
-        classpath 'org.lanternpowered:lanterngradle:1.0.2'
-    }
-}
-
 plugins {
-    id 'net.minecrell.licenser' version '0.4'
-    id 'com.github.johnrengelman.shadow' version '2.0.1'
-    id 'org.spongepowered.plugin' version '0.8.1'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.40'
+    id 'net.minecrell.licenser' // version '0.4'
+    id 'com.github.johnrengelman.shadow' // version '2.0.1'
+    id 'org.lanternpowered.gradle'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
 }
 
 apply from: rootProject.file('gradle/lantern.gradle')
-
-// Apply plugins
-apply plugin: 'org.lanternpowered.gradle'
 
 // Basic project information
 archivesBaseName = 'lanternserver'
@@ -45,11 +29,12 @@ idea.module.sourceDirs += file('src/java6/java')
 // Disable some tasks to make the building go faster and
 // disable the wrapper task to avoid that we turn the
 // dependency dirty when we call this on our project.
-[api.tasks.javadoc,
- api.tasks.javadocJar,
+[/*api.tasks.javadoc,*/
+ /*api.tasks.javadocJar,*/
  api.tasks.checkstyleMain,
  api.tasks.checkstyleTest,
- api.tasks.wrapper]*.enabled = false
+ /*api.tasks.wrapper*/
+]*.enabled = false
 
 configurations {
     // A configuration that will be excluded
@@ -342,7 +327,7 @@ if (project.hasProperty('lanternRepo')) {
 
 // Gradle version used for generating the Gradle wrapper
 wrapper {
-    gradleVersion = '4.10.2'
+    gradleVersion = '5.6.3'
 }
 
 // A custom update wrapper task, using a custom task prevents

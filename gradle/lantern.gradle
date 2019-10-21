@@ -1,11 +1,14 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
-apply plugin: 'org.spongepowered.plugin'
 apply plugin: 'net.minecrell.licenser'
 
 // Basic information
 group = 'org.lanternpowered'
+
+// Set java version
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 // Setup the default tasks
 defaultTasks 'licenseFormat', 'build'

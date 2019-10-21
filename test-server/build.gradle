@@ -49,6 +49,7 @@ sourceJar {
 }
 
 // Add a nice 'mcmod.info' file to the final jar
+/*
 sponge {
     plugin {
         id = archivesBaseName.replace('-', '_')
@@ -62,6 +63,7 @@ sponge {
         }
     }
 }
+*/
 
 // Project dependencies
 dependencies {
